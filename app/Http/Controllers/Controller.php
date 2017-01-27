@@ -10,4 +10,17 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class Controller extends BaseController
 {
 	use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+
+	public function __construct()
+	{
+		if(!request()->wantsJson())
+		{
+			$this->middleware('auth');
+		}
+	}
+
+	public function layout($view, $data = array(), $layout = 'layouts.layout')
+	{
+		return view($layout, $data)->nest('content', $view, $data);
+	}
 }

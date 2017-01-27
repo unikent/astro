@@ -1,0 +1,11 @@
+{
+	"presets": [
+		["latest", { "modules": false }]
+	],
+	"plugins": [
+		"transform-class-properties",
+		"transform-object-rest-spread",
+		"transform-object-assign",
+		"array-includes"
+	]
+}

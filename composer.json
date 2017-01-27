@@ -1,13 +1,25 @@
 {
-	"name": "laravel/laravel",
-	"description": "The Laravel Framework.",
-	"keywords": ["framework", "laravel"],
-	"license": "MIT",
+	"name": "unikent/prototype",
+	"description": "Prototype CMS",
 	"type": "project",
+	"repositories": [
+		{
+			"url": "git@gitlab.kent.ac.uk:webdev/kentauth.git",
+			"type": "git"
+		},
+		{
+			"type": "git",
+			"url": "https://github.com/maddhatter/html.git"
+		}
+	],
 	"require": {
 		"php": ">=5.6.4",
 		"laravel/framework": "5.4.*",
-		"laravel/tinker": "~1.0"
+		"laravelcollective/html": "5.4.x-dev",
+		"laravel/tinker": "~1.0",
+		"unikent/kentauth": "dev-master",
+		"baum/baum": "~1.0",
+		"barryvdh/laravel-debugbar": "^2.3"
 	},
 	"require-dev": {
 		"fzaninotto/faker": "~1.4",

@@ -1,0 +1,65 @@
+.modal-backdrop {
+	background-color: rgba(5, 52, 92, 0.59);
+}
+
+.row-offcanvas {
+	position: relative;
+	transition: all .25s ease-out;
+}
+
+.row-offcanvas-right {
+	right: 0;
+}
+
+.row-offcanvas-left {
+	left: 0;
+}
+
+.row-offcanvas-right
+.sidebar-offcanvas {
+	right: -100%; /* 12 columns */
+}
+
+.row-offcanvas-right.active
+.sidebar-offcanvas {
+	right: -33.33333%; /* 6 columns */
+}
+
+.row-offcanvas-left
+.sidebar-offcanvas {
+	left: -100%; /* 12 columns */
+}
+
+.row-offcanvas-left.active
+.sidebar-offcanvas {
+	left: -33.33333%; /* 6 columns */
+}
+
+.row-offcanvas-right.active {
+	right: 33.33333%; /* 6 columns */
+}
+
+.row-offcanvas-left.active {
+	left: 33.33333%; /* 6 columns */
+}
+
+.sidebar-offcanvas {
+	position: absolute;
+	top: 0;
+	width: 33.33333%; /* 6 columns */
+}
+
+.redactor-toolbar {
+	background: #05345c;
+	box-shadow: none;
+}
+.redactor-toolbar li a {
+	color: #fff;
+}
+.redactor-toolbar li a:hover,
+.redactor-toolbar li a:active,
+.redactor-toolbar li a.redactor-act {
+	background-color: #1f527f;
+	text-shadow: 0px 0px 2px #05345c;
+	color: #fff;
+}
