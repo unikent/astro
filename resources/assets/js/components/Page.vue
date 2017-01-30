@@ -32,9 +32,10 @@
 </template>
 
 <script>
-	import Vue from 'vue'
-	import Block from './Block.vue'
-	import draggable from 'vuedraggable'
+	import Vue from 'vue';
+	import Block from './Block.vue';
+	import draggable from 'vuedraggable';
+	import axios from 'axios';
 
 	export default {
 		components : {
@@ -52,22 +53,28 @@
 
 		methods: {
 			getPage() {
-				this.$root.$http.get('/api/page/'+this.pageid).then((response) => {
-					this.page = response.body
-				});
+				axios
+					.get('/api/page/'+this.pageid)
+					.then((response) => {
+						this.page = response.data;
+					});
 			},
 
 			getConfig() {
-				this.$root.$http.get('/api/config').then((response) => {
-					this.globalConfig = response.body
-				});
+				axios
+					.get('/api/config')
+					.then((response) => {
+						this.globalConfig = response.data;
+					});
 			},
 
 			postPage() {
-				this.$root.$http.put('/api/page/'+this.pageid, this.page).then((response) => {
-					console.log(response);
-					$('#myModal').modal('toggle')
-				});
+				axios
+					.put('/api/page/'+this.pageid, this.page)
+					.then((response) => {
+						console.log(response);
+						$('#myModal').modal('toggle')
+					});
 			},
 
 			addNew() {
@@ -88,7 +95,7 @@
 
 						"blockorderid": 2
 					}
-				)
+				);
 			}
 		},
 
