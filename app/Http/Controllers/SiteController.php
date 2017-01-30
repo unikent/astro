@@ -49,4 +49,17 @@ class SiteController extends Controller
 		return view('sites.edit')
 			->with(['route'=>$route, 'site'=> $site, 'page'=> $page, 'pages'=> $pagesInSite, 'blocks'=>null]);
 	}
+
+	public function structure($id) {
+		if($page = Page::find($id))
+		{
+			$pages = $page->descendantsAndSelf();
+		}
+		else
+		{
+			$pages = [];
+		}
+
+		return $pages;
+	}
 }

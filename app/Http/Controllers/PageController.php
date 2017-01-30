@@ -11,6 +11,15 @@ use Illuminate\Http\Request;
 class PageController extends Controller
 {
 
+	public function index() {
+		if(!isset($_GET['path']))
+		{
+			return ['error' => 'no path supplied'];
+		}
+
+		return Page::findByPath($_GET['path']);
+	}
+
 	/**
 	 * Show the form for creating a new resource.
 	 *
@@ -83,12 +92,12 @@ class PageController extends Controller
 	/**
 	 * Display the specified resource.
 	 *
-	 * @param  int  $id
+	 * @param  int  $page_id
 	 * @return \Illuminate\Http\Response
 	 */
-	public function show(Page $site, Page $page)
+	public function show($page_id)
 	{
-		return $this->edit($site, $page);
+		return Page::find($page_id)->getBlockStructure();
 	}
 
 

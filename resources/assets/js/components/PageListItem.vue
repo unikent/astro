@@ -2,7 +2,7 @@
 	<li v-if="this.page" :class="{'parent-page': hasChildren, 'is-site': this.page.type && this.page.type.indexOf('site') !== -1}">
 		<div :style="leftPadding">
 
-			<svg v-if="this.getLevel !== 0" class="move" viewBox="0 0 128 128">
+			<svg v-if="this.getDepth !== 0" class="move" viewBox="0 0 128 128">
 				<g fill="#bbbbbf">
 					<rect height="24" width="24" y="7" x="49"/>
 					<rect height="24" width="24" y="52" x="49"/>
@@ -10,12 +10,12 @@
 				</g>
 			</svg>
 
-			<svg style="width: 12px" v-if="this.getLevel !== 0 && this.page.type && this.page.type.indexOf('site') !== -1" viewBox="0 0 128 128">
+			<svg style="width: 12px" v-if="this.getDepth !== 0 && this.page.type && this.page.type.indexOf('site') !== -1" viewBox="0 0 128 128">
 				<path v-if="this.page.type && this.page.type.indexOf('locked') !== -1" d="m100 112h-72c-3.6 0-6-2.4-6-6v-48c0-3.6 2.4-6 6-6 0-19.8 16.2-36 36-36s36 16.2 36 36c3.6 0 6 2.4 6 6v48c0 3.6-2.4 6-6 6zm-36-84c-13.2 0-24 10.8-24 24h48c0-13.2-10.8-24-24-24zm30 36h-60v36h60v-36zm-30 6c3.6 0 6 2.4 6 6v12c0 3.6-2.4 6-6 6s-6-2.4-6-6v-12c0-3.6 2.4-6 6-6z" fill="#999" />
 				<path v-else d="m100 52c3.6 0 6 2.4 6 6v48c0 3.6-2.4 6-6 6h-72c-3.6 0-6-2.4-6-6v-48c0-3.6 2.11-5.67 6.5-5.74-2.6-20 2.6-35.5 20.8-43.4 18-7.76 39.1 0.49 47.1 18.4l-11 4.8c-5.4-11.9-19.4-17.3-31.4-12.2-12.1 5.3-16.4 21.2-13.8 31.6zm-6 12h-60v36h60zm-30 6c3.6 0 6 2.4 6 6v12c0 3.6-2.4 6-6 6s-6-2.4-6-6v-12c0-3.6 2.4-6 6-6z" fill="#41b883"/>
 			</svg>
 
-			<svg v-if="this.getLevel !== 0 && hasChildren" class="chevron" :class="{'open': open}" @click="toggle" viewBox="0 0 100 100">
+			<svg v-if="this.getDepth !== 0 && hasChildren" class="chevron" :class="{'open': open}" @click="toggle" viewBox="0 0 100 100">
 				<path d="M 10,50 L 60,100 L 70,90 L 30,50  L 70,10 L 60,0 Z" fill="#444" class="arrow" transform="translate(100, 100) rotate(180)"></path>
 			</svg>
 
@@ -35,21 +35,21 @@
 				</button>
 				<div class="dropdown-menu">
 					<a class="dropdown-item" href="#" @click="edit">Edit</a>
-					<a v-show="isParent && this.getLevel <= 2" class="dropdown-item" href="#" @click="addChild">Add page</a>
-					<a v-show="this.getLevel !== 0" class="dropdown-item" href="#" @click="rename">Rename</a>
-					<div v-show="this.getLevel !== 0" class="dropdown-divider"></div>
-					<a v-show="this.getLevel !== 0" class="dropdown-item" href="#" @click="remove(page)" data-toggle="modal" data-target="#exampleModal">Delete</a>
+					<a v-show="isParent && this.getDepth <= 2" class="dropdown-item" href="#" @click="addChild">Add page</a>
+					<a v-show="this.getDepth !== 0" class="dropdown-item" href="#" @click="rename">Rename</a>
+					<div v-show="this.getDepth !== 0" class="dropdown-divider"></div>
+					<a v-show="this.getDepth !== 0" class="dropdown-item" href="#" @click="remove(page)" data-toggle="modal" data-target="#exampleModal">Delete</a>
 				</div>
 			</div>
 		</div>
 		<ul class="children" :class="{'collapsed': !open && page.depth !== 0}" v-if="isParent">
-			<subpages
+			<sub-page
 				class="item"
 				:key="`page-${page.id}`"
 				v-for="page in page.children"
 				:page="page"
 				:site="site">
-			</subpages>
+			</sub-page>
 		</ul>
 	</li>
 	<div v-else>Loading..</div>
@@ -68,7 +68,7 @@
 	var timer = null
 
 	export default {
-		name: 'subpages',
+		name: 'SubPage',
 
 		props: ['page', 'site'],
 
@@ -87,20 +87,13 @@
 				return this.page.children && this.page.children.length
 			},
 
-			getLevel() {
-				var level = -2, parent = this;
-
-				while(parent) {
-					level++;
-					parent = parent.$parent
-				}
-
-				return level;
+			getDepth() {
+				return this.page.depth;
 			},
 
 			leftPadding() {
 				return {
-					paddingLeft: (this.getLevel * 20) + (this.isParent ? 10 : 0) + 'px'
+					paddingLeft: (this.getDepth * 20) + (this.isParent ? 10 : 0) + 'px'
 				}
 			}
 		},
@@ -158,7 +151,8 @@
 					newLength = this.page.children.push({
 						title: id.substring(0, 8),
 						id: id,
-						children: []
+						children: [],
+						depth: this.page.depth + 1
 					});
 
 				this.open = true;
