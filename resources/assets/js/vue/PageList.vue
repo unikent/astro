@@ -63,20 +63,19 @@
 		computed: {
 			orderedHierarchy() {
 				return order[this.order](this.hierarchy)
-			},
+			}
 		},
 
 		methods: {
-			getStructure() {
+			fetchData() {
 				this.$root.$http.get(`/api/site/structure/${this.site}`).then((response) => {
 					this.hierarchy = response.body;
-					console.log(this.hierarchy);
 				});
 			}
 		},
 
 		created() {
-			this.getStructure();
+			this.fetchData();
 		}
 	}
 </script>

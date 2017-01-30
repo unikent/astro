@@ -1,16 +1,7 @@
-import jquery from 'jquery';
 import './redactor';
-import vue from 'vue';
-import axios from 'axios';
+import 'bootstrap';
 
-window.$ = window.jQuery = jquery;
-window.Tether = require('tether');
-require('bootstrap');
-
-window.Vue = vue;
-window.axios = axios;
 window.KENT = window.KENT || {};
-
 window.axios.defaults.headers.common = {
 	'X-Requested-With': 'XMLHttpRequest'
 };
@@ -18,10 +9,10 @@ window.axios.defaults.headers.common = {
 window.KENT.kentbar = {
 	config: {
 		components: [
-			"staff"
+			'staff'
 		],
 		styles:{
-			kentfont: "https://static.kent.ac.uk/pantheon/static/webfonts/kentfont/css/kentfont.css",
+			kentfont: 'https://static.kent.ac.uk/pantheon/static/webfonts/kentfont/css/kentfont.css',
 			fonts: false,
 			base: false
 		}

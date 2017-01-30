@@ -1,16 +1,27 @@
-const { mix } = require('laravel-mix');
-
-/*
- |--------------------------------------------------------------------------
- | Mix Asset Management
- |--------------------------------------------------------------------------
- |
- | Mix provides a clean, fluent API for defining some Webpack build steps
- | for your Laravel application. By default, we are compiling the Sass
- | file for the application as well as bundling up all the JS files.
- |
- */
+const
+	{ mix } = require('laravel-mix'),
+	webpack = require('webpack');
 
 mix
+	.webpackConfig({
+		plugins: [
+			new webpack.ProvidePlugin({
+				$: 'jquery',
+				jQuery: 'jquery',
+				'window.jQuery': 'jquery',
+				'Tether': 'tether',
+				'window.axios': 'axios'
+			})
+		]
+	})
+	.copy(
+		'node_modules/kent-bar/build/deploy/assets/app.js',
+		'public/js/kent-bar.js'
+	)
+	.copy(
+		'node_modules/kent-bar/build/deploy/assets/main.css',
+		'public/css/kent-bar.css'
+	)
 	.js('resources/assets/js/app.js', 'public/js')
-	.sass('resources/assets/sass/app.scss', 'public/css');
+	.sass('resources/assets/sass/app.scss', 'public/css')
+	.extract(['vue', 'jquery', 'axios', 'tether', 'bootstrap']);
