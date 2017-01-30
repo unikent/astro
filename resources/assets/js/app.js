@@ -1,8 +1,8 @@
 import './bootstrap';
 
 import Vue from 'vue'
-import App from './vue/App.vue'
-import PageList from './vue/PageList.vue'
+import App from './components/App.vue'
+import PageList from './components/PageList.vue'
 
 var VueResource = require('vue-resource');
 
