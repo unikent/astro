@@ -92,10 +92,21 @@ class PageController extends Controller
 	/**
 	 * Display the specified resource.
 	 *
+	 * @param  int  $id
+	 * @return \Illuminate\Http\Response
+	 */
+	public function show(Page $site, Page $page)
+	{
+		return $this->edit($site, $page);
+	}
+
+	/**
+	 * Display the specified resource.
+	 *
 	 * @param  int  $page_id
 	 * @return \Illuminate\Http\Response
 	 */
-	public function show($page_id)
+	public function showApi($page_id)
 	{
 		return Page::find($page_id)->getBlockStructure();
 	}

@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 class ConfigController extends Controller
 {
-    public function show($guid)
+    public function show($guid = null)
 	{
 		$json = json_decode('{
 			"97a2e1b5-4804-46dc-9857-4235bf76a058": {
@@ -55,7 +55,11 @@ class ConfigController extends Controller
 				}],
 				"view": "path/to/view"
 			}
-		}');
+		}', true);
+
+		if(is_null($guid)) {
+			return $json;
+		}
 
 		if(!array_key_exists($guid, $json)) {
 			return response([
