@@ -84,7 +84,7 @@
 						"parent_block": 0,
 						"order": 0,
 						"section": 0,
-						"type_guid": "97a2e1b5-4804-46dc-9857-4235bf76a058",
+						"type": "97a2e1b5-4804-46dc-9857-4235bf76a058",
 						"fields": {
 							"image": null,
 							"block_heading": "Title block",
