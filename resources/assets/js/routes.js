@@ -12,8 +12,9 @@ const routes = [
 	{ path: '/preview', component: Preview },
 	{ path: '*', component: NotFound }
 ];
-
+console.log(window.Laravel.base);
 export const router = new VueRouter({
 	mode: 'history',
-	routes
+	routes,
+	base: (typeof window.Laravel.base !== 'undefined') ? `${window.Laravel.base}/` : '/'
 });

@@ -2,7 +2,7 @@
 <div class="editor">
 	<header></header>
 	<div class="editor-body">
-		<iframe class="editor-content" src="/preview" frameborder="0"></iframe>
+		<iframe class="editor-content" :src="getUrl" frameborder="0"></iframe>
 		<nav class="editor-nav editor-sidebar">
 			<page-list></page-list>
 		</nav>
@@ -27,6 +27,9 @@
 		components: {
 			PageList,
 			BlockList
+		},
+		computed: {
+			getUrl() { return `${window.Laravel.base}/preview`;}
 		}
 	}
 

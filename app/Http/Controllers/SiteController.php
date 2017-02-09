@@ -51,15 +51,15 @@ class SiteController extends Controller
 	}
 
 	public function structure($id) {
+
 		if($page = Page::find($id))
-		{
+		{	
 			$pages = $page->descendantsAndSelf();
 		}
 		else
 		{
 			$pages = [];
 		}
-
 		return $pages;
 	}
 }

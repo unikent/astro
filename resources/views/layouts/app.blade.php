@@ -17,8 +17,11 @@
 	<script>
 		window.Laravel = <?php echo json_encode([
 			'csrfToken' => csrf_token(),
-			'apiBase' => url("/") 
-		]); ?>
+			'base' => url("/") 
+		]);
+
+
+	 ?>
 	</script>
 </head>
 

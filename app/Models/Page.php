@@ -114,8 +114,6 @@ class Page extends Model
 				->toHierarchy()
 				->toArray();
 
-		$this->createPageHierarchy($hierarchy);
-
 		return array_values($hierarchy);
 	}
 
@@ -129,8 +127,6 @@ class Page extends Model
 				->get()
 				->toHierarchy()
 				->toArray();
-
-		$this->createPageHierarchy($hierarchy);
 
 		return array_values($hierarchy)[0];
 	}
@@ -196,26 +192,6 @@ class Page extends Model
 	public function scopePageHierarchy($query)
 	{
 		// return $query->toHierarchy()->;
-	}
-
-	protected function createPageHierarchy(array &$page_structure)
-	{
-		$merged = [];
-
-		foreach($page_structure as &$page)
-		{
-			if(isset($page['children']))
-			{
-				$this->createPageHierarchy($page['children']);
-			}
-
-			if(isset($page['page']))
-			{
-				$page = array_merge($page, $page['page']);
-			}
-
-			unset($page['page']);
-		}
 	}
 
 	protected function flattenBlockStructure($block_array, $parent = 0)

@@ -11,9 +11,16 @@ class Route extends Model
 	public $root = null;
 	public $parent = null;
 
+	protected $appends = ['title'];
+	protected $hidden = ['page','lft','rgt'];
+
+	public function getTitleAttribute(){
+		return $this->page->title;
+	}
+
 	public function page()
 	{
-		return $this->hasOne('App\Models\Page');
+		return $this->hasOne('App\Models\Page', 'id');
 	}
 
 	public function save(array $options = [])
