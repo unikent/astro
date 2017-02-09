@@ -1,24 +1,29 @@
 import './bootstrap';
 
-import Vue from 'vue'
-import App from './components/App.vue'
-import PageList from './components/PageList.vue'
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import ElementUI from 'element-ui';
+import App from './components/App.vue';
+import { router } from './routes';
 
-var VueResource = require('vue-resource');
+Vue.use(VueRouter);
+Vue.use(ElementUI);
 
-Vue.use(VueResource);
+const vueIfExists = (selector, options) => {
+	if(document.querySelector(selector)) {
+		return new Vue({
+			el: selector,
+			...options
+		});
+	}
+	return null;
+};
 
-new Vue({
-	el: '#app',
+vueIfExists('#app', {
 	render: h => h(App)
 });
 
-new Vue({
-	el: '#js-page-list',
-	...PageList
-});
-
-$('[data-toggle="offcanvas"]').click(function() {
-	$('.row-offcanvas').toggleClass('active');
-	$('.row-oncanvas').toggleClass('col-sm-12').toggleClass('col-sm-8');
+const inlineEditor = vueIfExists('#editor', {
+	template: '<router-view></router-view>',
+	router
 });

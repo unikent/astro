@@ -1,5 +1,7 @@
 @import 'variables';
 @import '~bootstrap/scss/bootstrap';
-@import 'kent-bar';
+// @import 'kent-bar';
 @import 'redactor';
+@import 'editor';
+@import '~element-ui/lib/theme-default/index';
 @import 'overrides';

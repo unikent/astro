@@ -5,21 +5,13 @@
 </template>
 
 <script>
-	import Page from './Page.vue'
+	import Page from './Page.vue';
 
 	export default {
 		name: 'app',
 
 		components: {
-			Page,
-		},
-
-		data() {
-			return {};
+			Page
 		}
 	}
 </script>
-
-<style>
-
-</style>
