@@ -50,7 +50,7 @@ class Pages extends Migration
 			$table->integer('order')->default(0);;
 			$table->integer('section')->default(0);
 
-			$table->string('type_guid');
+			$table->string('type');
 			$table->text('fields');
 
 			// Keep track

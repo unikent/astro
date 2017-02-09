@@ -35,7 +35,7 @@
 	import Vue from 'vue';
 	import Block from './Block.vue';
 	import draggable from 'vuedraggable';
-	import axios from 'axios';
+	import api from '../libs/api';
 
 	export default {
 		components : {
@@ -53,7 +53,7 @@
 
 		methods: {
 			getPage() {
-				axios
+				api
 					.get('/api/page/'+this.pageid)
 					.then((response) => {
 						this.page = response.data;
@@ -61,7 +61,7 @@
 			},
 
 			getConfig() {
-				axios
+				api
 					.get('/api/config')
 					.then((response) => {
 						this.globalConfig = response.data;
@@ -69,7 +69,7 @@
 			},
 
 			postPage() {
-				axios
+				api
 					.put('/api/page/'+this.pageid, this.page)
 					.then((response) => {
 						console.log(response);

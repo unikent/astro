@@ -8,7 +8,7 @@ class Block extends Model
 {
 	use Tracked;
 
-	public $fillable = ['fields', 'parent_block', 'section', 'order', 'type_guid'];
+	public $fillable = ['fields', 'parent_block', 'section', 'order', 'type'];
 
 	public function getFieldsAttribute()
 	{

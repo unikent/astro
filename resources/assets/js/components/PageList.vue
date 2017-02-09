@@ -29,7 +29,7 @@
 
 <script>
 	import PageListItem from './PageListItem.vue';
-	import axios from 'axios';
+	import api from '../libs/api';
 
 	const order = {
 
@@ -69,7 +69,7 @@
 
 		methods: {
 			fetchData() {
-				axios
+				api
 					.get(`/api/site/structure/${this.site}`)
 					.then((response) => {
 						this.hierarchy = response.data;

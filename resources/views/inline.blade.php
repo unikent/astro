@@ -10,13 +10,15 @@
 
 	<title>Kent CMS</title>
 
-	<link rel="stylesheet" href="{{ mix('/css/app.css') }}"></link>
-	<link rel="stylesheet" href="/css/main.min.css" />
+	<link rel="stylesheet" href="{{ url("/") }}{{ mix('css/app.css') }}"></link>
+	<link rel="stylesheet" href="{{ url("/") }}/css/main.min.css" />
 
 	<script>
 	window.Laravel = <?php echo json_encode([
 		'csrfToken' => csrf_token(),
-	]); ?>
+		'apiBase' => url("/") 
+	]); 
+	?>
 	</script>
 </head>
 <body>
@@ -24,8 +26,8 @@
 
 	</div>
 
-	<script src="{{ mix('/js/manifest.js') }}"></script>
-	<script src="{{ mix('/js/vendor.js') }}"></script>
-	<script src="{{ mix('/js/app.js') }}"></script>
+	<script src="{{ url("/") }}{{ mix('js/manifest.js') }}"></script>
+	<script src="{{ url("/") }}{{ mix('js/vendor.js') }}"></script>
+	<script src="{{ url("/") }}{{ mix('js/app.js') }}"></script>
 </body>
 </html>

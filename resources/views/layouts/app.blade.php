@@ -6,17 +6,18 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 
-	<link rel="icon" href="../../favicon.ico">
+	<link rel="icon" href="{{ url("/") }}/favicon.ico">
 
 	<title>Kent CMS</title>
 
-	<link rel="stylesheet" href="{{ mix('/css/app.css') }}"></link>
+	<link rel="stylesheet" href="{{ url('/') }}{{ mix('css/app.css') }}"></link>
 	<!-- TODO: move kent bar CSS into bundled dependencies -->
 	<link rel="stylesheet" href="{{ url('/') }}/css/kent-bar.css"></link>
 
 	<script>
 		window.Laravel = <?php echo json_encode([
 			'csrfToken' => csrf_token(),
+			'apiBase' => url("/") 
 		]); ?>
 	</script>
 </head>
@@ -26,9 +27,9 @@
 	@include('components.menu')
 	@yield('content')
 
-	<script src="{{ mix('/js/manifest.js') }}"></script>
-	<script src="{{ mix('/js/vendor.js') }}"></script>
-	<script src="{{ mix('/js/app.js') }}"></script>
+	<script src="{{ url('/') }}{{ mix('js/manifest.js') }}"></script>
+	<script src="{{ url('/') }}{{ mix('js/vendor.js') }}"></script>
+	<script src="{{ url('/') }}{{ mix('js/app.js') }}"></script>
 	<!-- TODO: move kent bar JS into bundled dependencies -->
 	<script src="{{ url('/') }}/js/kent-bar.js"></script>
 </body>

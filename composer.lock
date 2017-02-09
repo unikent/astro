@@ -2043,11 +2043,11 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:unikent/cms-prototype-blocks.git",
-                "reference": "6e6828cdddc352cad8a1f4a22f020e4452bdb604"
+                "reference": "3853bc18370e4eab252e59a408bdfa76ec2876d1"
             },
             "type": "library",
             "description": "Our block views",
-            "time": "2017-02-08 16:49:44"
+            "time": "2017-02-09 09:56:35"
         },
         {
             "name": "unikent/kentauth",

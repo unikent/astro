@@ -5,7 +5,7 @@
 </template>
 
 <script>
-	import axios from 'axios';
+	import api from '../libs/api';
 
 	export default {
 
@@ -17,7 +17,7 @@
 
 		methods: {
 			fetchData() {
-				axios
+				api
 					.get('/api/definition')
 					.then((response) => {
 						this.blocks = response.data;

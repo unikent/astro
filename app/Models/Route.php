@@ -13,7 +13,7 @@ class Route extends Model
 
 	public function page()
 	{
-		return $this->hasOne('App\Models\Page', 'id', 'page_id');
+		return $this->hasOne('App\Models\Page');
 	}
 
 	public function save(array $options = [])

@@ -10,9 +10,9 @@ class Page extends Model
 {
 	use Tracked;
 
-	protected $fillable = ['parent_block', 'order', 'section', 'type_guid', 'fields'];
+	protected $fillable = ['parent_block', 'order', 'section', 'type', 'fields', 'title', 'slug'];
 	protected $visible = ['title', 'options','slug', 'path', 'structure', 'id', 'order', 'parent_block', 'section', 'created_by', 'created_at', 'title'];
-	protected $appends = ['slug', 'path', 'structure'];
+	protected $appends = ['slug', 'path', 'structure', 'parent'];
 
 	public function route()
 	{
@@ -22,6 +22,18 @@ class Page extends Model
 	public function blocks()
 	{
 		return $this->hasMany('App\Models\Block', 'page_id')->orderBy('parent_block')->orderBy('order');
+	}
+
+	public function save(array $options = [])
+	{
+		parent::save();
+
+		if($this->route)
+		{
+			$this->route->page_id = $this->id;
+			$this->route->save();
+		}
+
 	}
 
 	public function getOptionsAttribute()
@@ -52,7 +64,38 @@ class Page extends Model
 
 	public function setSlugAttribute($slug)
 	{
+		if(!$this->route)
+		{
+			$this->setRelation('route',new Route);
+		}
+
 		return ($this->route->slug = $slug);
+
+	}
+
+	public function setRootAttribute($root)
+	{
+		if(!$this->route)
+		{
+			$this->setRelation('route',new Route);
+		}
+
+		return ($this->route->root = $root);
+	}
+
+	public function setParentAttribute($parent)
+	{
+		if(!$this->route)
+		{
+			$this->setRelation('route',new Route);
+		}
+
+		return ($this->route->parent = Route::where('page_id', $parent)->first());
+	}
+
+	public function getParentAttribute()
+	{
+		return $this->route->parent;
 	}
 
 	public function ancestors()
