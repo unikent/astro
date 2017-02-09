@@ -19,6 +19,23 @@ class Controller extends BaseController
 		}
 	}
 
+	public function returnError($code, $message)
+	{
+		return response()->json([
+			'success'   => 'false',
+			'message'   => $message,
+			'data'      => []
+		], $code);
+	}
+	public function returnSuccess($data = [])
+	{
+		return response()->json([
+			'success'   => 'true',
+			'message'   => '',
+			'data'      => $data
+		], '200');
+	}
+
 	public function layout($view, $data = array(), $layout = 'layouts.layout')
 	{
 		return view($layout, $data)->nest('content', $view, $data);

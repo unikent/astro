@@ -14,7 +14,7 @@
 Route::group(['middleware' => ['web']], function() {
 	Route::resource('/', 'SiteController');
 	Route::resource('site', 'SiteController');
-	Route::resource('site.page', 'PageController');
+	//Route::resource('site.page', 'PageController');
 });
 
 // Overwrite routes from plugin

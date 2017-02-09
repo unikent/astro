@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
 			if($i == 0)
 			{
 				factory('App\Models\Block')
-					->create([ 'page_id' => $p->id, 'order' => $i, 'type_guid' => "97a2e1b5-4804-46dc-9857-4235bf76a058", 'fields' => ['image' => 'http://lorempixel.com/1200/700/cats/', 'block_heading'=> "Title block", 'block_description' => 'Sub title', 'block_link' => '', 'image_alignment'=>'top']]);
+					->create([ 'page_id' => $p->id, 'order' => $i, 'type' => "97a2e1b5-4804-46dc-9857-4235bf76a058", 'fields' => ['image' => 'http://lorempixel.com/1200/700/cats/', 'block_heading'=> "Title block", 'block_description' => 'Sub title', 'block_link' => '', 'image_alignment'=>'top']]);
 			}
 			else
 			{
@@ -43,7 +43,7 @@ class DatabaseSeeder extends Seeder
 				if($x == 0)
 				{
 					factory('App\Models\Block')
-						->create([ 'page_id' => $p2->id, 'order' => $x, 'type_guid' => "97a2e1b5-4804-46dc-9857-4235bf76a058", 'fields' => ['image' => 'http://lorempixel.com/1200/700/cats/', 'block_heading'=> "Title block", 'block_description' => 'Sub title', 'block_link' => '', 'image_alignment'=>'top']]);
+						->create([ 'page_id' => $p2->id, 'order' => $x, 'type' => "97a2e1b5-4804-46dc-9857-4235bf76a058", 'fields' => ['image' => 'http://lorempixel.com/1200/700/cats/', 'block_heading'=> "Title block", 'block_description' => 'Sub title', 'block_link' => '', 'image_alignment'=>'top']]);
 				}
 				else
 				{
