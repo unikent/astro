@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack --progress --colors --hide-modules --display-error-details --config=node_modules/laravel-mix/setup/webpack.config.js",
     "watch": "cross-env NODE_ENV=development webpack --watch --progress --colors --hide-modules --display-error-details --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "hot": "cross-env NODE_ENV=development webpack-dev-server --inline --hot --colors --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "hot": "cross-env NODE_ENV=development webpack-dev-server --hot --colors --content-base=public/ --config=node_modules/laravel-mix/setup/webpack.config.js",
     "production": "cross-env NODE_ENV=production webpack --progress --colors --hide-modules --display-error-details --config=node_modules/laravel-mix/setup/webpack.config.js",
     "refresh": "php artisan migrate:refresh && php artisan db:seed"
   },
@@ -17,16 +17,20 @@
     "babel-plugin-transform-object-rest-spread": "^6.22.0",
     "babel-preset-latest": "^6.22.0",
     "bootstrap": "v4.0.0-alpha.6",
+    "cms-prototype-blocks": "git+ssh://git@github.com/unikent/cms-prototype-blocks.git#master",
     "cross-env": "^3.0.0",
+    "element-ui": "^1.1.6",
     "eslint": "^3.14.1",
     "eslint-loader": "^1.6.1",
     "jquery": "^3.1.0",
     "kent-bar": "git+ssh://git@gitlab.kent.ac.uk/webdev/kent-bar.git#1.1.5",
     "laravel-mix": "^0.5.16",
+    "velocity-animate": "^1.4.2",
     "vue": "^2.1.0",
     "vue-router": "^2.2.0",
     "vuedraggable": "^2.8.1-rc0",
     "vuex": "^2.1.1",
-    "webpack": "^2.2.0"
+    "webpack": "^2.2.0",
+    "webpack-dev-server": "^2.3.0"
   }
 }
