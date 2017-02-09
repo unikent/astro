@@ -12,7 +12,10 @@ mix
 				'Tether': 'tether',
 				'window.axios': 'axios'
 			})
-		]
+		],
+		resolve: {
+			symlinks: false
+		}
 	})
 	.copy(
 		'node_modules/kent-bar/build/deploy/assets/app.js',
@@ -24,4 +27,4 @@ mix
 	)
 	.js('resources/assets/js/app.js', 'public/js')
 	.sass('resources/assets/sass/app.scss', 'public/css')
-	.extract(['vue', 'jquery', 'axios', 'tether', 'bootstrap']);
+	.extract(['vue', 'jquery', 'axios', 'tether', 'bootstrap', 'element-ui']);
