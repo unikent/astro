@@ -10,6 +10,10 @@
 		{
 			"type": "git",
 			"url": "https://github.com/maddhatter/html.git"
+		},
+		{
+			"type": "git",
+			"url": "git@github.com:unikent/cms-prototype-blocks.git"
 		}
 	],
 	"require": {
@@ -17,6 +21,7 @@
 		"laravel/framework": "5.4.*",
 		"laravelcollective/html": "5.4.x-dev",
 		"laravel/tinker": "~1.0",
+		"unikent/cms-prototype-blocks": "dev-master",
 		"unikent/kentauth": "dev-master",
 		"baum/baum": "~1.0",
 		"barryvdh/laravel-debugbar": "^2.3"

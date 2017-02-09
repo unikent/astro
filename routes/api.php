@@ -6,4 +6,4 @@ Route::get('/page', 'PageController@index');
 Route::get('/page/{page_id}', 'PageController@showApi');
 Route::put('/page/{page_id}', 'PageController@update');
 
-Route::get('/config/{guid?}', 'ConfigController@show');
+Route::get('/definition/{guid?}', 'DefinitionController@show');
