@@ -1,13 +1,13 @@
 <template>
 <div class="editor">
-	<header></header>
+	<header>Sup</header>
 	<div class="editor-body">
 		<iframe class="editor-content" :src="getUrl" frameborder="0"></iframe>
 		<nav class="editor-nav editor-sidebar">
 			<page-list></page-list>
 		</nav>
 		<aside class="editor-component-list editor-sidebar">
-			<block-list></block-list>
+			<block-sidebar></block-sidebar>
 		</aside>
 	</div>
 	<footer class="b-bar">
@@ -19,14 +19,14 @@
 
 <script>
 	import PageList from './PageList.vue';
-	import BlockList from './BlockList.vue';
+	import BlockSidebar from './BlockSidebar.vue';
 
 	export default {
 		name: 'editor',
 
 		components: {
 			PageList,
-			BlockList
+			BlockSidebar
 		},
 		computed: {
 			getUrl() { return `${window.Laravel.base}/preview`;}

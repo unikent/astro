@@ -10,7 +10,7 @@
 
 	<title>Kent CMS</title>
 
-	<link rel="stylesheet" href="{{ url('/') }}{{ mix('css/app.css') }}"></link>
+	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/css/app.css') }}"></link>
 	<!-- TODO: move kent bar CSS into bundled dependencies -->
 	<link rel="stylesheet" href="{{ url('/') }}/css/kent-bar.css"></link>
 
@@ -26,6 +26,7 @@
 </head>
 
 <body>
+
 	@include('components.kentbar')
 	@include('components.menu')
 	@yield('content')
@@ -34,6 +35,7 @@
 	<script src="{{ url('/') }}{{ mix('js/vendor.js') }}"></script>
 	<script src="{{ url('/') }}{{ mix('js/app.js') }}"></script>
 	<!-- TODO: move kent bar JS into bundled dependencies -->
-	<script src="{{ url('/') }}/js/kent-bar.js"></script>
+
+		
 </body>
 </html>
