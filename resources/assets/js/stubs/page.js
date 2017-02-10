@@ -1,6 +1,12 @@
 import fullWidth from './full-width-text-v1';
 import blockQuote from './block-quote-v1';
 
+let blocks = [];
+
+for(let i = 3; i <= 20; i++) {
+	blocks.push({id: i});
+}
+
 export default {
 	title: 'Test page 1',
 	slug: 'test-page-1',
@@ -16,26 +22,7 @@ export default {
 			id: 2,
 			...blockQuote
 		},
-		{
-			id: 3,
-			// ...featurePanel
-		},
-		{
-			id: 4,
-			// ...featurePanel
-		},
-		{
-			id: 5,
-			// ...featurePanel
-		},
-		{
-			id: 6,
-			// ...featurePanel
-		},
-		{
-			id: 7,
-			// ...featurePanel
-		}
+		...blocks
 	],
 	published: true,
 	date_published: '03/02/17'
