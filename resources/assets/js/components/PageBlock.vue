@@ -17,6 +17,7 @@
 <script>
 	import fieldMarkup from '../stubs/block-markup';
 	import fields from 'cms-prototype-blocks';
+	import eventBus from '../libs/event-bus.js';
 
 	var fieldKeys = Object.keys(fieldMarkup);
 
@@ -37,12 +38,10 @@
 				z: 0,
 				scale: 1,
 				pointer: 'auto',
-				shadow: 10,
+				shadow: 0,
 				transition: 'none',
 				scroll: 0
 			};
-
-			console.log(this.blockData.type, fields)
 
 			return {
 				zoomed: true,
@@ -85,19 +84,16 @@
 					this.size = this.$el.getBoundingClientRect();
 
 					this.addTransition(true);
-					this.start.y = this.size.top;
+					this.start.y = this.$el.offsetTop;
 
 					this.dragging = true;
-					this.current.y = this.getY(e);
+					this.current.y = 0;
 
 					this.current.z = 20;
 					this.current.scale = 1.05;
 					this.current.pointer = 'none';
 					this.current.shadow = 10;
 
-					this.start.scroll = window.scrollY * 0.4;
-
-					window.addEventListener('scroll', this.addScroll);
 
 					window.addEventListener('mousemove', this.onDrag);
 					window.addEventListener('mouseup', this.stopDrag);
@@ -122,38 +118,25 @@
 				this.$el.addEventListener('transitionend', onEnd);
 			},
 
-			addScroll(e) {
-				this.current.scroll = window.scrollY - this.start.scroll;
-			},
-
 			getY(e) {
-				var scale = (1 / 0.4);
-				return ((e.clientY - this.start.y - this.size.height / 2) * scale) + this.current.scroll;
+				const scale = (1 / 0.4);
+				this.current.fullY = (e.pageY * scale) - (this.size.height / 2);
+				return (e.pageY * scale) - this.start.y - (this.size.height / 2);
 			},
 
 			onDrag(e) {
+
 				if(this.dragging) {
 					this.current.y = this.getY(e);
 				}
 
-				this.onDragOver(e);
+				// const next = (e.clientY - rect.top) / (rect.bottom - rect.top) > .5;
 
-				if(e.target === this.prevOver) {
-					return;
-				}
-
-				if(e.target.classList.contains('block')) {
-					this.prevOver = e.target;
-				}
+				// this.onDragOver(e);
 			},
 
-			onDragOver(e) {
-				if(this.prevOver) {
-					var rect = this.prevOver.parentNode.__vue__.size;
-					console.dir(next ? 'move' : 'nope');
-					var next = (e.clientY - rect.top) / (rect.bottom - rect.top) > .5;
-				}
-			},
+			// onDragOver(e) {
+			// },
 
 			stopDrag() {
 				if(this.dragging) {
@@ -169,7 +152,7 @@
 					this.prevOver = null;
 
 					window.removeEventListener('mousemove', this.onDrag);
-					window.removeEventListener('scroll', this.addScroll);
+					window.removeEventListener('mouseup', this.stopDrag);
 				}
 			}
 		},
@@ -177,7 +160,12 @@
 		mounted() {
 			this.size = this.$el.getBoundingClientRect();
 
-			window.emitter.$on('drag', info => {
+			eventBus.$emit('block-size', {
+				idx: this.index,
+				height: this.size.height
+			});
+
+			eventBus.$on('drag', info => {
 				if(info.el === this.$el) {
 					this.startDrag(info.event, info.el);
 				}

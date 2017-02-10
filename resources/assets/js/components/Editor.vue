@@ -2,7 +2,9 @@
 <div class="editor">
 	<header>Sup</header>
 	<div class="editor-body">
-		<iframe class="editor-content" :src="getUrl" frameborder="0"></iframe>
+		<div class="editor-wrapper">
+			<iframe class="editor-content" :src="getUrl" frameborder="0"></iframe>
+		</div>
 		<nav class="editor-nav editor-sidebar">
 			<page-list></page-list>
 		</nav>
@@ -28,8 +30,11 @@
 			PageList,
 			BlockSidebar
 		},
+
 		computed: {
-			getUrl() { return `${window.Laravel.base}/preview`;}
+			getUrl() {
+				return `${window.Laravel.base}/preview`;
+			}
 		}
 	}
 

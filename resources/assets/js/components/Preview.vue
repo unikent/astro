@@ -6,6 +6,7 @@
 			:key="`block-${blockData.id}`"
 			:blockData="blockData"
 			:scale="scale"
+			:sizes="sizes"
 			:index="index">
 		</page-block>
 	</div>
@@ -16,9 +17,8 @@
 	import Vue from 'vue';
 	import PageBlock from './PageBlock.vue';
 	import page from '../stubs/page';
+	import eventBus from '../libs/event-bus.js';
 	import Editor from './Editor';
-
-	window.emitter = new Vue();
 
 	export default {
 		name: 'wrapper',
@@ -30,8 +30,21 @@
 		data() {
 			return {
 				page,
-				scale: 1
+				scale: 1,
+				sizes: [],
+				all: []
 			};
+		},
+
+		created() {
+			eventBus.$on('block-size', block => {
+				this.sizes[block.idx] = block.height;
+
+				// all blocks have loaded
+				if(this.sizes.length === page.blocks.length) {
+					console.log('done');
+				}
+			});
 		},
 
 		mounted() {

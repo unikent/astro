@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Velocity from 'velocity-animate';
+import eventBus from '../libs/event-bus.js';
 
 // TODO: port to vue.js (should be easy enough)
 
@@ -27,6 +28,19 @@ export default class Editor {
 		this.editableBlock = document.createElement('div');
 		this.editableBlock.setAttribute('class', 'b-block');
 
+		this.options = document.createElement('div');
+		this.options.setAttribute('class', 'b-block-options');
+
+		this.options.innerHTML = '⚙';
+
+		this.moveEl = document.createElement('div');
+		this.moveEl.setAttribute('class', 'b-block-move');
+
+		this.moveEl.innerHTML = '⇅';
+
+		this.editableBlock.appendChild(this.options);
+		this.editableBlock.appendChild(this.moveEl);
+
 		this.handle = document.createElement('div');
 		this.handle.setAttribute('class', 'b-handle');
 
@@ -47,9 +61,7 @@ export default class Editor {
 	}
 
 	initEvents() {
-
 		document.querySelectorAll('.b-block-container').forEach((block) => {
-			// block.style.border = '1px solid #888'
 			block.setAttribute('data-block', true);
 			block.addEventListener('mouseover', () => {
 				this.positionOverlay(block, this.editableBlock, true)
@@ -65,42 +77,63 @@ export default class Editor {
 			});
 		});
 
-		var links = document.querySelectorAll('#main_content a, #main_content h3, #main_content h2, #main_content li, #main_content p');
+		var links = document.querySelectorAll(`
+			#main_content a,
+			#main_content h3,
+			#main_content h2,
+			#main_content li,
+			#main_content p
+		`);
 
 		links.forEach((el) => {
 			el.setAttribute('contenteditable', true);
 			el.addEventListener('mouseover', () => this.positionOverlay(el, this.editable));
 			el.addEventListener('mouseout', (e) => {
-				if(!e.relatedTarget || !e.relatedTarget.hasAttribute('class') || e.relatedTarget.getAttribute('class').indexOf('b-editable') === -1) {
+				if(!e.relatedTarget || !e.relatedTarget.hasAttribute('class') ||
+					e.relatedTarget.getAttribute('class').indexOf('b-editable') === -1) {
 					this.editable.style.opacity = 0;
 				}
 			});
 			el.addEventListener('focus', (e) => {
-				if(!e.relatedTarget || !e.relatedTarget.hasAttribute('class') || e.relatedTarget.getAttribute('class').indexOf('b-editable') === -1) {
+				if(!e.relatedTarget || !e.relatedTarget.hasAttribute('class') ||
+					e.relatedTarget.getAttribute('class').indexOf('b-editable') === -1) {
 					this.editable.style.opacity = 0;
 				}
 			});
 		});
 
-		document.addEventListener('mousedown', (e) => {
-			if(e.target === this.editableBlock) {
-				this.wrapper.style.userSelect =  'none';
+		const moveFunc = this.move.bind(this);
 
-				if(e.button === 0) {
-					this.handle.style.opacity = 1;
-					this.drag(false, e.clientY);
-					window.emitter.$emit('drag', {
-						event: e,
-						el: this.current
-					})
+		document.addEventListener('mousedown', e => {
+			switch(e.target) {
+				case this.moveEl:
+					this.wrapper.style.userSelect =  'none';
+					this.overlay.style.pointerEvents =  'auto';
 
-					this.editableBlock.classList.add('hide-drag');
-					document.addEventListener('mousemove', this.move.bind(this));
-				}
+					if(e.button === 0) {
+						this.handle.style.opacity = 1;
+						this.drag(false, e.clientY);
+
+						eventBus.$emit('drag', {
+							event: e,
+							el: this.current
+						});
+
+						this.editableBlock.classList.add('hide-drag');
+						document.addEventListener('mousemove', moveFunc);
+					}
+					break;
+				case this.options:
+					if(e.button === 0) {
+						eventBus.$emit('block:edit', {});
+					}
+					break;
+
+				default:
 			}
 		});
 
-		document.addEventListener('mouseup', (e) => {
+		document.addEventListener('mouseup', e => {
 			this.wrapper.style.userSelect =  'auto';
 
 			if(this.scaled) {
@@ -108,14 +141,14 @@ export default class Editor {
 				this.drag(true, e.clientY);
 
 				this.editableBlock.classList.remove('hide-drag');
-				document.removeEventListener('mousemove', this.move.bind(this));
+				document.removeEventListener('mousemove', moveFunc);
 			}
 		});
 	}
 
 	positionOverlay(el, box, setCurrent) {
 		var
-			pos = this.getDimensions(el),
+			pos = el.getBoundingClientRect(),
 			heightDiff = Math.round(pos.height - 30),
 			widthDiff = Math.round(pos.width - 30),
 			minusTop = 0,
@@ -145,35 +178,10 @@ export default class Editor {
 		}
 	}
 
-	getDimensions(el) {
-		var
-			bbox = el.getBoundingClientRect(),
-			pos = {
-				top: bbox.top,
-				left: bbox.left,
-				height: bbox.height,
-				width: bbox.width
-			},
-			computed = getComputedStyle(el),
-			margins = {
-				top   : parseInt(computed.getPropertyValue('margin-top'), 10),
-				bottom: parseInt(computed.getPropertyValue('margin-bottom'), 10),
-				left  : parseInt(computed.getPropertyValue('margin-left'), 10),
-				right : parseInt(computed.getPropertyValue('margin-right'), 10)
-			};
-
-		pos.top -= margins.top;
-		pos.left -= margins.left;
-		pos.height += Math.max(0, margins.top + margins.bottom);
-		pos.width += Math.max(0, margins.left + margins.right);
-
-		return pos;
-	}
-
 	drag(revert, mouseY) {
 		var scroll = window.scrollY;
 
-		if(this.scaled && revert) {
+		if(revert) {
 			this.scaled = false;
 
 			var
@@ -197,7 +205,10 @@ export default class Editor {
 				queue: false
 			}, {
 				duration: 300,
-				easing: 'swing'
+				easing: 'swing',
+				complete: () => {
+					this.overlay.style.pointerEvents =  'none';
+				}
 			});
 
 		} else {
@@ -207,14 +218,7 @@ export default class Editor {
 				scaledOffset = scroll * 0.4,
 				offsetMinusScaled = mouseY - (mouseY * 0.4);
 
-			Velocity(this.handle, {
-				translateY: ((mouseY + window.scrollY) * 0.4) - 22,
-				queue: false
-			}, {
-				duration: 300,
-				easing: 'swing'
-			});
-
+			this.handle.style.transform = 'translateY(' + (((mouseY + window.scrollY) * 0.4) - 22) + 'px)';
 
 			Velocity(
 				document.body,

@@ -9,9 +9,21 @@
 	flex: 1;
 }
 
-.editor-content {
+.editor-wrapper {
 	flex: 1;
-	min-width: 300px;
+	width: 70%;
+	min-width: 320px; // HVGA upwards
+}
+
+.editor-content {
+	display: block;
+	height: calc(100vh - 50px);
+	width: 100%;
+	margin: 0 auto;
+
+	transition:
+		width .3s cubic-bezier(.53,.41,.25,1.41),
+		height .3s cubic-bezier(.53,.41,.25,1.41);
 }
 
 .editor-nav {
@@ -26,16 +38,6 @@
 
 #main_content {
 	background-color: #ccc;
-}
-
-iframe {
-	display: block;
-	width: 70%;
-	height: calc(100vh - 50px);
-
-	// transition:
-	// 	width .3s cubic-bezier(.53,.41,.25,1.41),
-	// 	height .3s cubic-bezier(.53,.41,.25,1.41);
 }
 
 .b-bar {
@@ -62,7 +64,8 @@ iframe {
 }
 
 #b-overlay {
-	position: absolute;
+	position: fixed;
+	transform: translateZ(0);
 	top: 0;
 	left: 0;
 	bottom: 0;
@@ -70,7 +73,7 @@ iframe {
 	background-color: rgba(255, 255, 255, 0);
 	z-index: 1;
 	pointer-events: none;
-	cursor: ns-resize;
+	cursor: move;
 }
 
 .b-editable,
@@ -86,9 +89,35 @@ iframe {
 	border-width: 4px;
 }
 
-.b-block:after {
+.b-block-options,
+.b-block-move {
 	transition: background-color .3s ease-out;
-	content: '⇅';
+	position: absolute;
+	background-color: #2196f3;
+	color: #fff;
+	line-height: 44px;
+	height: 44px;
+	width: 44px;
+	font-size: 20px;
+	pointer-events: auto;
+	text-align: center;
+}
+
+.b-block-move {
+	top: 50%;
+	transform: translateY(-50%);
+	left: -4px;
+	cursor: move;
+}
+
+.b-block-options {
+	top: -4px;
+	right: -4px;
+	cursor: pointer;
+}
+
+.b-block-move {
+	transition: background-color .3s ease-out;
 	position: absolute;
 	top: 50%;
 	transform: translateY(-50%);
@@ -104,26 +133,27 @@ iframe {
 	text-align: center;
 }
 
-.b-block.hide-drag:after {
+.hide-drag .b-block-options,
+.hide-drag .b-block-move {
 	opacity: 0;
 }
 
-.b-editable:after {
-	transition: background-color .3s ease-out;
-	content: '⚙';
-	position: absolute;
-	top: -1px;
-	right: -1px;
-	background-color: #2196f3;
-	color: #fff;
-	line-height: 22px;
-	height: 22px;
-	width: 22px;
-	pointer-events: auto;
-	cursor: pointer;
-	text-align: center;
-	z-index: 1;
-}
+// .b-editable:after {
+// 	transition: background-color .3s ease-out;
+// 	content: '⚙';
+// 	position: absolute;
+// 	top: -1px;
+// 	right: -1px;
+// 	background-color: #2196f3;
+// 	color: #fff;
+// 	line-height: 22px;
+// 	height: 22px;
+// 	width: 22px;
+// 	pointer-events: auto;
+// 	cursor: pointer;
+// 	text-align: center;
+// 	z-index: 1;
+// }
 
 .b-editable:hover {
 	border-color: #1b73b9;
