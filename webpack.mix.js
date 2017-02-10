@@ -27,4 +27,5 @@ mix
 	)
 	.js('resources/assets/js/app.js', 'public/js')
 	.sass('resources/assets/sass/app.scss', 'public/css')
-	.extract(['vue', 'jquery', 'axios', 'tether', 'bootstrap', 'element-ui']);
+	.extract(['vue', 'jquery', 'axios', 'tether', 'bootstrap', 'element-ui'])
+	.sourceMaps();
