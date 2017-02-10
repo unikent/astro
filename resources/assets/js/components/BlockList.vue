@@ -32,5 +32,12 @@
 </script>
 
 <style lang="scss">
+.block-list {
+	list-style: none;
+	padding: 0;
 
+	li {
+		padding: 10px 20px;
+	}
+}
 </style>
