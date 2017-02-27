@@ -25,22 +25,27 @@
 				<input class="edit-input" ref="input" type="text" @blur="saveEdit" @keyup.13="saveEdit" :value="page.title">
 			</span>
 
-			<div class="btn-group options">
-				<button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+
+			<el-dropdown trigger="click" size="small" class="options">
+
+				<el-button style="padding: 6px;">
 					<div class="cog">
 						<svg viewBox="0 0 128 128">
 							<path d="m55.5 0l-2.8 19.7c-4.2 1.1-8.2 2.8-12 5l-15.9-12-12.1 12.1 12 15.9c-2.2 3.8-3.9 7.8-4.9 12l-19.8 2.8v17l19.7 2.8c1.1 4.2 2.8 8.2 5 12l-12 15.7 12.1 12 15.9-12c3.8 2 7.8 4 12 5l2.8 20h17l2.8-20c4.2-1 8.2-3 12-5l15.7 12 12-12-12-15.7c2-3.8 4-7.8 5-12l20-2.8v-17l-20-2.8c-1-4.2-3-8.2-5-12l12-15.9-12-12.1-15.7 12c-3.8-2.2-7.8-3.9-12-4.9l-2.8-19.8h-17zm8.5 41a23 23 0 0 1 23 23 23 23 0 0 1 -23 23 23 23 0 0 1 -23 -23 23 23 0 0 1 23 -23z" fill="#8e8e8e"/>
 						</svg>
 					</div>
-				</button>
-				<div class="dropdown-menu">
-					<a class="dropdown-item" href="#" @click="edit">Edit</a>
-					<a v-show="isParent && this.getDepth <= 2" class="dropdown-item" href="#" @click="addChild">Add page</a>
-					<a v-show="this.getDepth !== 0" class="dropdown-item" href="#" @click="rename">Rename</a>
-					<div v-show="this.getDepth !== 0" class="dropdown-divider"></div>
-					<a v-show="this.getDepth !== 0" class="dropdown-item" href="#" @click="remove(page)" data-toggle="modal" data-target="#exampleModal">Delete</a>
-				</div>
-			</div>
+					<i class="el-icon-caret-bottom el-icon--right" style="font-size: 10px; margin-left: 0;"></i>
+				</el-button>
+
+				<el-dropdown-menu slot="dropdown">
+					<el-dropdown-item command="edit" @click="edit">Edit</el-dropdown-item>
+					<el-dropdown-item>Move</el-dropdown-item>
+					<el-dropdown-item v-show="isParent && this.getDepth <= 2" command="add-child" @click="addChild">Add page</el-dropdown-item>
+					<el-dropdown-item v-show="this.getDepth !== 0" command="rename" @click="rename">Rename</el-dropdown-item>
+					<el-dropdown-item v-show="this.getDepth !== 0" command="remove" @click="remove(page)" data-toggle="modal" data-target="#exampleModal" divided>Delete</el-dropdown-item>
+				</el-dropdown-menu>
+
+			</el-dropdown>
 		</div>
 		<ul class="children" :class="{'collapsed': !open && page.depth !== 0}" v-if="isParent">
 			<sub-page

@@ -70,7 +70,7 @@
 		methods: {
 			fetchData() {
 				api
-					.get(`/api/site/structure/${this.site}`)
+					.get(`site/structure/${this.site}`)
 					.then((response) => {
 						this.hierarchy = response.data;
 					});
@@ -90,6 +90,7 @@
 		user-select: none;
 		font-size: 14px;
 		width: 100%;
+		margin: 0;
 
 		button {
 			padding: 4px 8px;
@@ -121,7 +122,7 @@
 
 		li:not(.parent-page):hover,
 		.parent-page > div:hover {
-			background: #f6f6f6;
+			background: #dee3ed;
 		}
 
 		li.add:hover {
@@ -133,6 +134,7 @@
 			width: 12px;
 			margin-right: 2px;
 			transition: transform .2s ease-out;
+			vertical-align: middle;
 		}
 
 		.chevron.open {
@@ -189,6 +191,7 @@
 			cursor: move;
 			width: 10px;
 			opacity: 0;
+			vertical-align: middle;
 		}
 
 		.page-list .btn-group {

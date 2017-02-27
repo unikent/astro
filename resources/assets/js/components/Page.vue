@@ -22,7 +22,7 @@
 		</div>
 
 		<draggable :list="page"  @start="drag=true" @end="drag=false" v-if="page && globalConfig" :options="{handle:'.card-header'}">
-			<block v-if="page.length" v-for="block in page" :key="block.blockorderid" :definition="globalConfig" :data="block"></block>
+			<block-edit v-if="page.length" v-for="block in page" :key="block.blockorderid" :definition="globalConfig" :data="block"></block-edit>
 		</draggable>
 
 		<button @click="addNew">Add New</button>
@@ -33,13 +33,13 @@
 
 <script>
 	import Vue from 'vue';
-	import Block from './Block.vue';
+	import BlockEdit from './BlockEdit.vue';
 	import draggable from 'vuedraggable';
 	import api from '../libs/api';
 
 	export default {
 		components : {
-			Block,
+			BlockEdit,
 			draggable,
 		},
 
@@ -54,7 +54,7 @@
 		methods: {
 			getPage() {
 				api
-					.get('/api/page/'+this.pageid)
+					.get('page/'+this.pageid)
 					.then((response) => {
 						this.page = response.data;
 					});
@@ -62,7 +62,7 @@
 
 			getConfig() {
 				api
-					.get('/api/config')
+					.get('config')
 					.then((response) => {
 						this.globalConfig = response.data;
 					});
@@ -70,7 +70,7 @@
 
 			postPage() {
 				api
-					.put('/api/page/'+this.pageid, this.page)
+					.put('page/'+this.pageid, this.page)
 					.then((response) => {
 						console.log(response);
 						$('#myModal').modal('toggle')

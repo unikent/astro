@@ -237,4 +237,6 @@ return [
 
 	],
 
+	'blocks_path' => env('BLOCKS_PATH', 'vendor/unikent/cms-prototype-blocks/blocks'),
+
 ];
