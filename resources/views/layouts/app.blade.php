@@ -17,16 +17,12 @@
 	<script>
 		window.Laravel = <?php echo json_encode([
 			'csrfToken' => csrf_token(),
-			'base' => url("/") 
-		]);
-
-
-	 ?>
+			'base' => url("/")
+		]); ?>
 	</script>
 </head>
 
 <body>
-
 	@include('components.kentbar')
 	@include('components.menu')
 	@yield('content')
@@ -36,6 +32,5 @@
 	<script src="{{ url('/') }}{{ mix('js/app.js') }}"></script>
 	<!-- TODO: move kent bar JS into bundled dependencies -->
 
-		
 </body>
 </html>

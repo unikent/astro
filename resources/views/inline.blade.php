@@ -11,17 +11,19 @@
 	<title>Kent CMS</title>
 
 	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/css/app.css') }}"></link>
-	<link rel="stylesheet" href="{{ url("/") }}/css/main.min.css" />
+	@if ($route === 'preview')
+		<!-- <link rel="stylesheet" href="{{ url("/") }}/css/main.min.css" /> -->
+	@endif
 
 	<script>
 	window.Laravel = <?php echo json_encode([
 		'csrfToken' => csrf_token(),
 		'base' => Request::getBaseUrl()
-	]); 
+	]);
 	?>
 	</script>
 </head>
-<body>
+<body class="custom-scrollbar">
 	<div id="editor">
 
 	</div>

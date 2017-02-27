@@ -25,6 +25,6 @@ Route::group(['prefix' => 'auth'], function() {
 	Route::get('loggedout', ['as' => 'auth.loggedout', 'uses' => '\App\Http\Controllers\AuthController@getLoggedout']);
 });
 
-Route::get('/{catchall?}', function() {
-	return response()->view('inline');
+Route::get('/{catchall?}', function($route) {
+	return response()->view('inline', ['route' => $route]);
 })->where('catchall', '(.*)');
