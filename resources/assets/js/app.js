@@ -4,6 +4,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import ElementUI from 'element-ui';
 import locale from './libs/locale';
+import store from './store';
 import App from './components/App.vue';
 import { router } from './routes';
 
@@ -14,6 +15,7 @@ const vueIfExists = (selector, options) => {
 	if(document.querySelector(selector)) {
 		return new Vue({
 			el: selector,
+			store,
 			...options
 		});
 	}

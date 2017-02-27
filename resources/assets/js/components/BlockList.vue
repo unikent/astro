@@ -1,31 +1,39 @@
 <template>
+<div>
+	<h2 class="block-list-header">Available blocks</h2>
 	<ul class="block-list">
-		<li v-for="(block, name) in blocks">{{ name }}</li>
+		<!-- <draggable @start="drag=true" @end="drag=false"> -->
+		<li v-for="block in blocks" v-if="block">
+			<div class="block-move">{{ block.name }}</div>
+		</li>
+		<!-- </draggable> -->
 	</ul>
+</div>
 </template>
 
 <script>
 	import api from '../libs/api';
+	import draggable from 'vuedraggable';
 
 	export default {
 
-		data() {
-			return {
-				blocks: {}
+		components : {
+			draggable
+		},
+
+		computed: {
+			blocks() {
+				return this.$store.state.blockList;
 			}
 		},
 
 		methods: {
 			fetchData() {
-				api
-					.get('/api/definition')
-					.then((response) => {
-						this.blocks = response.data;
-					});
+				this.$store.dispatch('fetchBlockList');
 			}
 		},
 
-		created() {
+		mounted() {
 			this.fetchData();
 		}
 	}
@@ -35,9 +43,31 @@
 .block-list {
 	list-style: none;
 	padding: 0;
+	margin: 0;
 
 	li {
 		padding: 10px 20px;
 	}
+
+	.block-move {
+		padding: 10px;
+		background-color: #fff;
+		border: 1px solid #d9dee7;
+		border-radius: 3px;
+		transition: background-color .2s ease-out;
+		cursor: move;
+		user-select: none;
+	}
+
+	.block-move:hover {
+		background-color: #f5f5f5;
+	}
+}
+
+.block-list-header {
+	text-align: center;
+	margin: 10px 20px;
+	font-weight: normal;
+	text-transform: capitalize;
 }
 </style>
