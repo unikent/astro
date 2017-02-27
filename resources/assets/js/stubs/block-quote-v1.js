@@ -4,15 +4,15 @@ export default {
 		"cite_text": "Cite text?",
 		"quote": "This is a quote, <strong>good stuff</strong>!",
 		"image": {
-			image: "http://www.emoticonswallpapers.com/avatar/gamesicons/SAW - TheGame_3.png",
-			alt: "Scary person"
+			image: "http://fancy-blocks.site/face.png",
+			alt: "Some person we're quoting"
 		},
-		"cite": "Billy the puppet",
-		"cite_subtext": "I want to play a game.",
+		"cite": "Frank Wang",
+		"cite_subtext": "I'll have you know it's pronounced wong.",
 		"cite_link": {
-			"text": "Proceed",
+			"text": "Check out this link",
 			"url": "https://en.wikipedia.org/wiki/Saw_(franchise)",
 		},
-		"text_color": "primary",
+		"text_color": "primary"
 	}
 }

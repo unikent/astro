@@ -1,11 +1,12 @@
 import fullWidth from './full-width-text-v1';
 import blockQuote from './block-quote-v1';
+import featurePanel from './feature-panel-v1';
 
-let blocks = [];
+// let blocks = [];
 
-for(let i = 3; i <= 20; i++) {
-	blocks.push({id: i});
-}
+// for(let i = 4; i <= 20; i++) {
+// 	blocks.push({id: i});
+// }
 
 export default {
 	title: 'Test page 1',
@@ -15,15 +16,17 @@ export default {
 	meta_description: 'Meta description here.',
 	blocks: [
 		{
-			id: 1,
-			...fullWidth
-		},
-		{
 			id: 2,
 			...blockQuote
 		},
-		...blocks
-	],
-	published: true,
-	date_published: '03/02/17'
+		{
+			id: 1,
+			...fullWidth
+		},
+		// {
+		// 	id: 3,
+		// 	...featurePanel
+		// }//,
+		// ...blocks
+	]
 }

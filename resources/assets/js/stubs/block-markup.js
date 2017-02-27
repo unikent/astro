@@ -8,7 +8,7 @@ export default {
 				<p class="card-text">Block description text</p>
 			</div>
 			<div class="card-media-wrap " data-mode="fullscreen">
-				<img class="card-img" src="https://beta.kent.ac.uk/examples/images/hummingbird.jpg" alt="a hummingbird" title="">
+				<img class="card-img" src="/bg.jpg" alt="a hummingbird" title="">
 			</div>
 
 			<div class=" card-img-overlay-bottom-shaded  card-overlay-inline-sm">
@@ -41,7 +41,7 @@ export default {
 			<p>Where you live  is a big decision. See our range of accommodation  and prices to make sure you get it right.</p>
 		</div>
 		<div class="card-media-wrap">
-			<img class="card-img-top" alt="Violinist" src="https://beta.kent.ac.uk/examples/images/unsplash-violinist-3x2.jpg">
+			<img class="card-img-top" alt="Violinist" src="/bg.jpg">
 		</div>
 	</div>
 	<div class="card-footer">
