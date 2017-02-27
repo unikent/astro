@@ -1,4 +1,23 @@
+html {
+	box-sizing: border-box;
+	line-height: 1.15;
+	-ms-text-size-adjust: 100%;
+	-webkit-text-size-adjust: 100%;
+	-ms-overflow-style: scrollbar;
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: inherit;
+}
+
 .editor {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	letter-spacing: .06em;
+	line-height: 1.8em;
+
 	display: flex;
 	min-height: 100vh;
 	flex-direction: column;
@@ -9,42 +28,53 @@
 	flex: 1;
 }
 
+.editor-sidebar {
+	width: 250px;
+	background-color: #eef1f6;
+	z-index: 0;
+	min-width: 210px;
+	font-size: 14px;
+}
+
 .editor-wrapper {
 	flex: 1;
-	width: 70%;
+	width: 100%;
 	min-width: 320px; // HVGA upwards
+	position: relative;
+	background-color: #ccc;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .editor-content {
-	display: block;
-	height: calc(100vh - 50px);
-	width: 100%;
-	margin: 0 auto;
-
-	transition:
-		width .3s cubic-bezier(.53,.41,.25,1.41),
-		height .3s cubic-bezier(.53,.41,.25,1.41);
+	transition: width .3s ease-out, height .3s ease-out;
+	max-height: calc(100vh - 56px);
+	margin-bottom: 56px;
 }
 
 .editor-nav {
 	order: -1;
+	box-shadow: 2px 0px 3px rgba(0, 0, 0, 0.05);
+	border-right: 1px solid #bcc8dc;
 }
 
-.editor-sidebar {
-	width: 250px;
-	background-color: #fff;
-	border: 1px solid #e5e5e5;
+.editor-component-list {
+	box-shadow: -2px 0px 3px rgba(0, 0, 0, 0.05);
+	border-left: 1px solid #bcc8dc;
+	position: relative;
+	overflow: hidden;
+	width: 380px;
 }
-
 #main_content {
 	background-color: #ccc;
 }
 
 .b-bar {
-	position: fixed;
+	position: absolute;
+	width: 100%;
 	left: 0;
 	bottom: 0;
-	width: 100%;
 	background-color: #fff;
 	border-top: 1px solid #eee;
 	padding: 10px;
@@ -114,6 +144,7 @@
 	top: -4px;
 	right: -4px;
 	cursor: pointer;
+	font-size: 25px;
 }
 
 .b-block-move {
@@ -192,4 +223,17 @@
 	user-select: none;
 	text-align: center;
 	opacity: 0;
+}
+
+.b-back-button {
+	padding: 0 16px;
+	height: 42px;
+	line-height: 42px;
+	border-bottom: 1px solid #d1dbe5;
+	background-color: #fff;
+	cursor: pointer;
+
+	i {
+		margin-right: 10px;
+	}
 }
