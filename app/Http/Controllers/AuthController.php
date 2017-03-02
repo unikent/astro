@@ -1,9 +1,0 @@
-<?php namespace App\Http\Controllers;
-
-use KentAuth\Http\Controllers\AuthController as KentAuthController;
-
-class AuthController extends KentAuthController {
-
-	protected $redirectPath = '/';
-
-}
