@@ -3,5 +3,5 @@
 return [
 	'createOnAuth' => false,
 	'defaultRole' => 'user',
-	'authcontroller' => '\App\Http\Controllers\AuthController'
+	'authcontroller' => '\App\Http\Controllers\Auth\AuthController'
 ];

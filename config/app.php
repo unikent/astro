@@ -167,11 +167,11 @@ return [
 		 * Package Service Providers...
 		 */
 		Laravel\Tinker\TinkerServiceProvider::class,
-		Collective\Html\HtmlServiceProvider::class,
 
 		KentAuth\AuthServiceProvider::class,
 		Baum\Providers\BaumServiceProvider::class,
-		Barryvdh\Debugbar\ServiceProvider::class,
+		Conner\Tagging\Providers\TaggingServiceProvider::class,
+		// Barryvdh\Debugbar\ServiceProvider::class,
 
 		/*
 		 * Application Service Providers...
@@ -231,10 +231,8 @@ return [
 		'URL' => Illuminate\Support\Facades\URL::class,
 		'Validator' => Illuminate\Support\Facades\Validator::class,
 		'View' => Illuminate\Support\Facades\View::class,
-		'SSO' => KentAuth\Facades\SSO::class,
-		'Form' => Collective\Html\FormFacade::class,
-		'Html' => Collective\Html\HtmlFacade::class,
 
+		'SSO' => KentAuth\Facades\SSO::class
 	],
 
 	'blocks_path' => env('BLOCKS_PATH', 'vendor/unikent/cms-prototype-blocks/blocks'),
