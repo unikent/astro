@@ -23,7 +23,7 @@ class PageController extends ApiController
 	 */
 	public function create(Page $site)
 	{
-		if(!$site->is_site) die("no access");
+		if(!$site->is_site) die("no access"); // TODO: Move to Middleware?
 
 		// Get site details
 		$route = $site->route;
@@ -38,7 +38,7 @@ class PageController extends ApiController
 	 * @param  \Illuminate\Http\Request  $request
 	 * @return \Illuminate\Http\Response
 	 */
-	public function store(Request $request)
+	public function store(Request $request) // TODO: There is no validation on this?
 	{
 
 		$page = new Page;

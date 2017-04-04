@@ -72,7 +72,7 @@ class MediaController extends ApiController
 	 */
 	public function store(Request $request)
 	{
-		$this->validateUpload($request);
+		$this->validateUpload($request); // TODO: Move to FormRequest
 
 		$file = $request->file('upload');
 
@@ -139,7 +139,7 @@ class MediaController extends ApiController
 	 * @param  array  One or more rules to be added.
 	 * @return  string  A new rule containing all passed in.
 	 */
-	protected function mergeValidationRules($rules)
+	protected function mergeValidationRules($rules) // TODO: Move to a helper/utility class? Some sort of Provider?
 	{
 		return implode(
 			'|',
