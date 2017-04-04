@@ -17,20 +17,30 @@ html {
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 	letter-spacing: .06em;
 	line-height: 1.8em;
-
-	display: flex;
 	min-height: 100vh;
-	flex-direction: column;
+
+	button,
+	input,
+	optgroup,
+	select,
+	textarea {
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+		letter-spacing: .06em;
+	}
+
+	padding-top: 50px;
 }
 
 .editor-body {
 	display: flex;
 	flex: 1;
+	height: calc(100vh - 50px);
+	overflow: hidden;
 }
 
 .editor-sidebar {
 	width: 250px;
-	background-color: #eef1f6;
+	background-color: #f5f7fa;
 	z-index: 0;
 	min-width: 210px;
 	font-size: 14px;
@@ -41,7 +51,7 @@ html {
 	width: 100%;
 	min-width: 320px; // HVGA upwards
 	position: relative;
-	background-color: #ccc;
+	background-color: #f7f7f7;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -49,8 +59,14 @@ html {
 
 .editor-content {
 	transition: width .3s ease-out, height .3s ease-out;
-	max-height: calc(100vh - 56px);
+	max-height: calc(100vh - 106px);
 	margin-bottom: 56px;
+}
+
+.editor-nav,
+.editor-component-list {
+	position: relative;
+	transition: margin .2s ease-out;
 }
 
 .editor-nav {
@@ -63,11 +79,10 @@ html {
 	box-shadow: -2px 0px 3px rgba(0, 0, 0, 0.05);
 	border-left: 1px solid #bcc8dc;
 	position: relative;
-	overflow: hidden;
 	width: 380px;
 }
 #main_content {
-	background-color: #ccc;
+	background-color: #f7f7f7;
 }
 
 .b-bar {
@@ -78,8 +93,8 @@ html {
 	background-color: #fff;
 	border-top: 1px solid #eee;
 	padding: 10px;
-	z-index: 10;
 	box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.05);
+	user-select: none;
 }
 
 .b-button {
@@ -91,6 +106,7 @@ html {
 	background-color: #fff;
 	transform-origin: top center;
 	backface-visibility: hidden;
+	outline: 2px solid #ddd;
 }
 
 #b-overlay {
@@ -116,6 +132,8 @@ html {
 }
 
 .b-block {
+	top: 0;
+	opacity: 0;
 	border-width: 4px;
 }
 
@@ -236,4 +254,36 @@ html {
 	i {
 		margin-right: 10px;
 	}
+}
+
+
+.fade-enter-active, .fade-leave-active {
+	transition: opacity .3s ease;
+}
+.fade-enter, .fade-leave-active {
+	opacity: 0;
+}
+
+.main-header {
+	text-transform: uppercase;
+	color: #888;
+}
+
+
+.manage-table__header {
+	display: flex;
+	align-items: center;
+}
+
+@each $breakpoint in map-keys($grid-breakpoints) {
+	@include media-breakpoint-up($breakpoint) {
+		$infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+		.d#{$infix}-none  { display: none; }
+		.d#{$infix}-block { display: block; }
+	}
+}
+
+.u-mla {
+	margin-left: auto;
 }
