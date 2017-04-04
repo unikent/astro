@@ -158,8 +158,8 @@ h3 {
 					<lazy-img
 						class="img-grid"
 						:bg="true"
-						:src="filteredImages[getThumbIndex(rowIndex, colIndex)].path"
-						:smallSrc="`storage/${filteredImages[getThumbIndex(rowIndex, colIndex)].path}`"
+						:src="filteredImages[getThumbIndex(rowIndex, colIndex)].urlSmall"
+						:smallSrc="filteredImages[getThumbIndex(rowIndex, colIndex)].url"
 					/>
 					<div class="image-grid__item-overlay" />
 					<div class="item-grid__edit">
@@ -254,29 +254,7 @@ export default {
 			this.images.push({
 				url: '/bg.jpg',
 				urlSmall: '/small.jpg',
-				title: `img ${i + 1}`,
-
-				"id": 1,
-				"type": "image",
-				"path": "public/uploads/3/47/944/1939/benny-jackson-133285.jpg",
-				"file_name": "benny-jackson-133285.jpg",
-				"file_mime": "image/jpeg",
-				"file_size": 113096,
-				"meta": {
-				"dataformat": "jpg",
-				"lossless": false,
-				"bits_per_sample": 24,
-				"pixel_aspect_ratio": 1,
-				"resolution_x": 800,
-				"resolution_y": 534,
-				"compression_ratio": 0.088245942571785
-				},
-				"sha1": "7965589972b17f761785e844f6e4f1374574f8be",
-				"created_by": "Admin",
-				"updated_by": 1,
-				"created_at": "2017-04-03 11:26:25",
-				"updated_at": "2017-04-03 11:26:25",
-				"deleted_at": null
+				title: `img ${i + 1}`
 			});
 		}
 	},
