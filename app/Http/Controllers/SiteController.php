@@ -32,7 +32,7 @@ class SiteController extends Controller
 
 	public function edit(Page $site)
 	{
-		if(!$site->is_site) die("no access");
+		if(!$site->is_site) die("no access"); // TODO: Move to Middleware?
 
 		// Get site details
 		$route = $site->route;
