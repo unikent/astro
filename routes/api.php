@@ -1,7 +1,13 @@
 <?php
 
-Route::get('/site/structure/{id}', 'SiteController@structure');
+Route::get('/sites', 'SiteController@index');
 
-Route::resource('/page', 'PageController');
+Route::get('/sites/structure/{id}', 'SiteController@structure');
 
-Route::get('/definition', 'DefinitionController@show');
+Route::resource('/pages', 'PageController');
+
+Route::get('/definitions', 'DefinitionController@show');
+
+Route::post('/upload', 'UploadController@store');
+
+Route::resource('/media', 'MediaController');

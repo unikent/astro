@@ -24,7 +24,7 @@ class TrackedObserver
 		}
 		else
 		{
-		   $model->created_by = -1;
+			$model->created_by = 0;
 		}
 	}
 	public function saving($model)
@@ -38,7 +38,7 @@ class TrackedObserver
 		}
 		else
 		{
-		   $model->updated_by = -1;
+			$model->updated_by = 0;
 		}
 	}
 }

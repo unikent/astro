@@ -32,7 +32,7 @@ class Pages extends Migration
 			$table->string('title');
 			$table->text('options');
 
-			$table->boolean('key_page')->default(0);
+			$table->boolean('is_site')->default(0);
 			$table->boolean('published')->default(0);
 
 			// Keep track

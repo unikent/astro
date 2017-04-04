@@ -171,6 +171,7 @@ return [
 		KentAuth\AuthServiceProvider::class,
 		Baum\Providers\BaumServiceProvider::class,
 		Conner\Tagging\Providers\TaggingServiceProvider::class,
+		Intervention\Image\ImageServiceProvider::class,
 		// Barryvdh\Debugbar\ServiceProvider::class,
 
 		/*
@@ -232,7 +233,8 @@ return [
 		'Validator' => Illuminate\Support\Facades\Validator::class,
 		'View' => Illuminate\Support\Facades\View::class,
 
-		'SSO' => KentAuth\Facades\SSO::class
+		'SSO' => KentAuth\Facades\SSO::class,
+		'Image' => Intervention\Image\Facades\Image::class
 	],
 
 	'blocks_path' => env('BLOCKS_PATH', 'vendor/unikent/cms-prototype-blocks/blocks'),
