@@ -1,18 +1,63 @@
 import VueRouter from 'vue-router';
 
-import Preview from './components/Preview.vue';
+import Admin from './app/Admin.vue';
+
+import Dashboard from './app/Dashboard.vue';
+import SiteList from './app/SiteList.vue';
+import Media from './app/media/Media.vue';
+import Settings from './app/Settings.vue'
+import Preview from './app/Preview.vue';
+
 import Editor from './components/Editor.vue';
-import NotFound from './components/NotFound.vue';
+import Test from './app/Test.vue';
+import NotFound from './app/NotFound.vue';
 
 const routes = [
-	// { path: '/site', component: SiteList },
-	// { path: '/site/:site_id', component: Site },
-	// { path: '/site/:site_id/page/:page_id', component: Page },
-	{ path: '/inline', component: Editor },
-	{ path: '/preview', component: Preview },
-	{ path: '*', component: NotFound }
+	{
+		path: '/',
+		component: Admin,
+		redirect: '/home',
+		children: [
+			{
+				path: 'home',
+				component: Dashboard
+			},
+			{
+				path: 'sites',
+				component: SiteList
+			},
+			{
+				path: 'media',
+				component: Media
+			},
+			{
+				path: 'settings',
+				component: Settings
+			}
+		]
+	},
+	{
+		path: '/site/:site_id',
+		component: Editor
+	},
+	{
+		path: '/site/:site_id/page/:page_id',
+		component: Editor
+	},
+	{
+		path: '/preview',
+		component: Preview
+	},
+	{
+		path: '/test',
+		component: Test
+	},
+	{
+		path: '*',
+		component: NotFound
+	}
 ];
-console.log(window.Laravel.base);
+
 export const router = new VueRouter({
 	mode: 'history',
 	routes,

@@ -7,6 +7,8 @@
 
 	export default {
 
+		name: 'TextField',
+
 		props: ['name'],
 
 		computed: {

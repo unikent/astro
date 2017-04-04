@@ -1,44 +1,3 @@
-<template>
-<div>
-	<h2 class="block-list-header">Available blocks</h2>
-	<ul class="block-list">
-		<!-- <draggable @start="drag=true" @end="drag=false"> -->
-		<li v-for="block in blocks" v-if="block">
-			<div class="block-move">{{ block.name }}</div>
-		</li>
-		<!-- </draggable> -->
-	</ul>
-</div>
-</template>
-
-<script>
-	import api from '../libs/api';
-	import draggable from 'vuedraggable';
-
-	export default {
-
-		components : {
-			draggable
-		},
-
-		computed: {
-			blocks() {
-				return this.$store.state.blockList;
-			}
-		},
-
-		methods: {
-			fetchData() {
-				this.$store.dispatch('fetchBlockList');
-			}
-		},
-
-		mounted() {
-			this.fetchData();
-		}
-	}
-</script>
-
 <style lang="scss">
 .block-list {
 	list-style: none;
@@ -54,13 +13,14 @@
 		background-color: #fff;
 		border: 1px solid #d9dee7;
 		border-radius: 3px;
-		transition: background-color .2s ease-out;
+		transition: background-color .2s ease-out, border .2s ease-out;
 		cursor: move;
 		user-select: none;
 	}
 
 	.block-move:hover {
-		background-color: #f5f5f5;
+		background-color: #eef1f6;
+		border: 1px solid #bac3d4;
 	}
 }
 
@@ -71,3 +31,45 @@
 	text-transform: capitalize;
 }
 </style>
+
+<template>
+<div>
+	<h2 class="block-list-header">Available blocks</h2>
+	<ul class="block-list">
+		<li v-for="block in blocks" v-if="block">
+			<draggable-block :block="block" />
+		</li>
+	</ul>
+</div>
+</template>
+
+<script>
+	import DraggableBlock from './DraggableBlock.vue';
+	import { mapState } from 'vuex';
+
+	export default {
+
+		components : {
+			DraggableBlock
+		},
+
+		computed: {
+			...mapState([
+				'over'
+			]),
+			blocks() {
+				return this.$store.state.blockList;
+			}
+		},
+
+		methods: {
+			fetchData() {
+				this.$store.dispatch('fetchBlockList');
+			}
+		},
+
+		created() {
+			this.fetchData();
+		}
+	}
+</script>

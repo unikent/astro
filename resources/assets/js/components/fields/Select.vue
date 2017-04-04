@@ -14,6 +14,8 @@
 
 	export default {
 
+		name: 'SelectField',
+
 		props: ['field'],
 
 		data() {
@@ -35,10 +37,6 @@
 			...mapActions([
 				'updateValue'
 			])
-		},
-
-		mounted() {
-			console.log(this.field);
 		}
 
 	}

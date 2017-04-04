@@ -9,8 +9,13 @@ export default {
 		"header": false,
 		"block_heading": "Superb student experience",
 		"block_description": "Our campuses provide stunning locations for your studies and offer first class academic and social facilities.",
-		"block_link": "//beta.kent.ac.uk/courses/undergraduate/academic-life/",
+		"block_link": {
+			"text": "",
+			"url": "//beta.kent.ac.uk/courses/undergraduate/academic-life/"
+		},
 		"block_position": "left",
+
+		"overlay": "<p>test</p>",
 
 		"overlay_position": "",
 		"overlay_inline_breakpoint": "",

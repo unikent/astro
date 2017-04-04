@@ -7,30 +7,25 @@
 				:key="`block-${blockData.id}`"
 				:type="blockData.type"
 				:index="index"
-
 				:blockData="blockData"
-
-				:scale="meta.scale"
-				:sizes="meta.sizes"
-				:offsets="meta.offsets"
+				:scale="scale"
 			>
 			</block>
-			<div class="b-editable"></div>
-			<div class="b-block" style="top: 0; opacity: 0">
+			<!-- <div class="b-editable"></div> -->
+			<div class="b-block">
 				<div class="b-block-options" @click="editBlock">⚙</div>
 				<div class="b-block-move">⇅</div>
 			</div>
 		</div>
 	</div>
-	<div class="b-handle" :style="meta.handleStyle">⇅</div>
+	<div class="b-handle" :style="blockInfo.handleStyle">⇅</div>
 	<div id="b-overlay"></div>
 </div>
 </template>
 
 <script>
 	import Vue from 'vue';
-	import Block from './Block.vue';
-	import page from '../stubs/page';
+	import Block from '../components/Block.vue';
 	import eventBus from '../libs/event-bus.js';
 	import Velocity from 'velocity-animate';
 
@@ -49,31 +44,20 @@
 
 		data() {
 			return {
-				meta : {
-					scale: 1,
-					sizes: [],
-					offsets: [],
-					handleStyle: ''
-				}
+				scale: 1,
+				handleStyle: {}
 			};
 		},
 
 		computed: {
 			...mapState([
-				'page'
+				'page',
+				'over',
+				'blockInfo'
 			])
 		},
 
 		created() {
-			eventBus.$on('block:set_info', block => {
-				this.meta.sizes[block.idx] = block.height;
-
-				// all blocks have loaded
-				if(this.meta.sizes.length === page.blocks.length) {
-					console.log('done');
-				}
-			});
-
 			eventBus.$on('block:move', index => {
 				this.moved = index;
 			});
@@ -87,12 +71,17 @@
 			this.editableBlock = document.querySelector('.b-block');
 			this.options = document.querySelector('.b-block-options');
 			this.moveEl = document.querySelector('.b-block-move');
-			this.handle = document.querySelector('.b-handle');
 
 			this.scaled = false;
 			this.current = null;
 
 			this.initEvents();
+		},
+
+		beforeDestroy() {
+			document.removeEventListener('mousedown', this.mouseDown);
+			document.removeEventListener('mouseup', this.mouseUp);
+			document.removeEventListener('mousemove', this.move);
 		},
 
 		methods: {
@@ -101,60 +90,83 @@
 			},
 
 			move(e) {
-				this.handleStyle = `transform: translateY(${e.pageY - 22}px)`;
+				this.handleStyle.transform = `translateY(${e.pageY - 22}px)`;
 			},
 
 			showOverlay(block) {
-				this.positionOverlay(block, this.editableBlock, true);
+				if(block !== this.current) {
+					this.positionOverlay(block, this.editableBlock, true);
+				}
 			},
 
-			hideOverlay() {
-				this.editableBlock.style.opacity = 0;
+			hideOverlay(block) {
+				if(block !== this.current) {
+					this.editableBlock.style.opacity = 0;
+				}
 			},
 
 			initEvents() {
 				eventBus.$on('block:showOverlay', this.showOverlay);
 				eventBus.$on('block:hideOverlay', this.hideOverlay);
 
-				document.addEventListener('mousedown', e => {
-					switch(e.target) {
-						case this.moveEl:
-							this.wrapper.style.userSelect =  'none';
-							this.overlay.style.pointerEvents =  'auto';
+				eventBus.$on('block:move', this.repositionOverlay);
 
-							if(e.button === 0) {
-								this.handle.style.opacity = 1;
-								this.drag(false, e.clientY);
+				document.addEventListener('mousedown', this.mouseDown);
+				document.addEventListener('mouseup', this.mouseUp);
+			},
 
-								eventBus.$emit('block:dragstart', {
-									event: e,
-									el: this.current
-								});
+			mouseDown(e) {
+				switch(e.target) {
+					case this.moveEl:
+						this.wrapper.style.userSelect =  'none';
+						this.overlay.style.pointerEvents =  'auto';
 
-								this.editableBlock.classList.add('hide-drag');
-								document.addEventListener('mousemove', this.move);
-							}
-							break;
-						// case this.options:
-						// 	if(e.button === 0) {
-						// 		eventBus.$emit('block:edit', {});
-						// 	}
-						// 	break;
+						if(e.button === 0) {
+							this.handleStyle.opacity = 1;
+							this.drag(false, e.clientY);
 
-						default:
+							eventBus.$emit('block:dragstart', {
+								event: e,
+								el: this.current.$el
+							});
+
+							this.editableBlock.classList.add('hide-drag');
+							document.addEventListener('mousemove', this.move);
+						}
+						break;
+
+					default:
+				}
+			},
+
+			mouseUp(e) {
+				if(this.scaled) {
+					this.wrapper.style.userSelect =  'auto';
+					this.handleStyle.opacity = 0;
+					this.drag(true, e.clientY);
+
+					this.editableBlock.classList.remove('hide-drag');
+					document.removeEventListener('mousemove', this.move);
+				}
+			},
+
+			repositionOverlay(data) {
+				let size = 0;
+
+				if(data.to > data.from) {
+					for(let i = 0; i <= data.to; i++) {
+						size += this.blockInfo.sizes[i];
 					}
-				});
-
-				document.addEventListener('mouseup', e => {
-					if(this.scaled) {
-						this.wrapper.style.userSelect =  'auto';
-						this.handle.style.opacity = 0;
-						this.drag(true, e.clientY);
-
-						this.editableBlock.classList.remove('hide-drag');
-						document.removeEventListener('mousemove', this.move);
+					size -= this.blockInfo.sizes[data.from];
+				} else {
+					for(let i = 0; i < data.to; i++) {
+						size += this.blockInfo.sizes[i];
 					}
-				});
+				}
+
+				console.log(size, this.overlay);
+
+				this.editableBlock.style.transform = `translateY(${(size)}px)`;
 			},
 
 			positionOverlay(block, box, setCurrent) {
@@ -192,17 +204,25 @@
 			resetAfterDrag() {
 				this.overlay.style.pointerEvents =  'none';
 
-				const element = page.blocks[this.moved.from];
-				page.blocks.splice(this.moved.from, 1);
-				page.blocks.splice(this.moved.to, 0, element);
+				this.$store.dispatch('reorderBlocks', {
+					from:  this.moved.from,
+					to:    this.moved.to,
+					value: this.page.blocks[this.moved.from]
+				});
 
-				const size = this.meta.sizes[this.moved.from];
-				this.meta.sizes.splice(this.moved.from, 1);
-				this.meta.sizes.splice(this.moved.to, 0, size);
+				this.$store.dispatch('updateBlockDataOrder', {
+					type: 'sizes',
+					from:  this.moved.from,
+					to:    this.moved.to,
+					value: this.blockInfo.sizes[this.moved.from]
+				});
 
-				const offset = this.meta.offsets[this.moved.from];
-				this.meta.offsets.splice(this.moved.from, 1);
-				this.meta.offsets.splice(this.moved.to, 0, offset);
+				this.$store.dispatch('updateBlockDataOrder', {
+					type: 'offsets',
+					from:  this.moved.from,
+					to:    this.moved.to,
+					value: this.blockInfo.offsets[this.moved.from]
+				});
 
 				eventBus.$emit('block:dragstop');
 			},
@@ -248,7 +268,7 @@
 						scaledOffset = scroll * SCALE_DOWN,
 						offsetMinusScaled = mouseY - (mouseY * SCALE_DOWN);
 
-					this.handle.style.transform = 'translateY(' + (((mouseY + window.scrollY) * SCALE_DOWN) - 22) + 'px)';
+					this.handleStyle.transform = 'translateY(' + (((mouseY + window.scrollY) * SCALE_DOWN) - 22) + 'px)';
 
 					Velocity(
 						document.body,

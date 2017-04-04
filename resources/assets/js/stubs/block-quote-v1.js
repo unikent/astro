@@ -2,16 +2,17 @@ export default {
 	"type": "block-quote-v1",
 	"fields": {
 		"cite_text": "Cite text?",
-		"quote": "This is a quote, <strong>good stuff</strong>!",
+		"quote": "This is a quote, <strong>with formatting</strong>",
 		"image": {
-			image: "http://fancy-blocks.site/face.png",
-			alt: "Some person we're quoting"
+			"name": "face.png",
+			"url": "http://blocks.site/face.png",
+			"alt": "Some person we're quoting"
 		},
-		"cite": "Frank Wang",
-		"cite_subtext": "I'll have you know it's pronounced wong.",
+		"cite": "Robert Dingle",
+		"cite_subtext": "Professor of Advanced Stuff",
 		"cite_link": {
-			"text": "Check out this link",
-			"url": "https://en.wikipedia.org/wiki/Saw_(franchise)",
+			"text": "Visit profile",
+			"url": "https://en.wikipedia.org/wiki/Institute_for_Advanced_Study",
 		},
 		"text_color": "primary"
 	}

@@ -2,11 +2,33 @@ import fullWidth from './full-width-text-v1';
 import blockQuote from './block-quote-v1';
 import featurePanel from './feature-panel-v1';
 
-// let blocks = [];
+const blockMarkup = [
+	'TextBlock',
+	'PanelBlock',
+	'QuoteBlock',
+	'TextBlock2',
+	'TextBlock3',
+	'PanelBlock2',
+	'TextBlock',
+	'PanelBlock',
+	'QuoteBlock',
+	'TextBlock2',
+	'TextBlock3',
+	'PanelBlock2',
+	'TextBlock',
+	'PanelBlock',
+	'QuoteBlock'
+];
 
-// for(let i = 4; i <= 20; i++) {
-// 	blocks.push({id: i});
-// }
+let blocks = [], bm = 0;
+
+for(let i = 4; i <= 19; i++) {
+	blocks.push({
+		id: i,
+		markup: blockMarkup[bm]
+	});
+	bm++;
+}
 
 export default {
 	title: 'Test page 1',
@@ -26,7 +48,7 @@ export default {
 		// {
 		// 	id: 3,
 		// 	...featurePanel
-		// }//,
-		// ...blocks
+		// },
+		...blocks
 	]
-}
+};

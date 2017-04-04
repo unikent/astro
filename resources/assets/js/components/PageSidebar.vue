@@ -1,13 +1,21 @@
+<style>
+.side-container {
+	padding: 30px;
+	text-align: center;
+}
+</style>
+
 <template>
 	<el-tabs v-model="activeName" @tab-click="handleClick">
 		<el-tab-pane label="Site" name="first">
 			<page-list></page-list>
 		</el-tab-pane>
 		<el-tab-pane label="Page" name="second">
-			Page options here
+			<div class="side-container">Page options here</div>
 		</el-tab-pane>
 	</el-tabs>
 </template>
+
 <script>
 	import PageList from './PageList.vue';
 

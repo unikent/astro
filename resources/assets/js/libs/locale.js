@@ -58,8 +58,8 @@ export default {
 		},
 		pagination: {
 			goto: 'Go to',
-			pagesize: '/page',
-			total: 'Total {total}',
+			pagesize: '',
+			total: '{total} Results found',
 			pageClassifier: ''
 		},
 		messagebox: {

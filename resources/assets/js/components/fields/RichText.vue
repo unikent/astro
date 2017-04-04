@@ -9,6 +9,8 @@
 
 	export default {
 
+		name: 'RichTextField',
+
 		props: ['name'],
 
 		data() {

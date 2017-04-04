@@ -12,6 +12,8 @@
 
 	export default {
 
+		name: 'LinkField',
+
 		props: ['name'],
 
 		computed: {

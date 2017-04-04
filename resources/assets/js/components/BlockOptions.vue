@@ -6,7 +6,7 @@ h3 {
 }
 
 .block-options-list {
-	height: calc(100vh - 42px);
+	height: calc(100vh - 92px);
 	padding: 0 20px 80px;
 	overflow: auto;
 	margin-bottom: 80px;
@@ -18,14 +18,13 @@ h3 {
 	<div class="b-back-button" @click="editBlock">
 		<i class="el-icon-arrow-left"></i>Back
 	</div>
-	<div class="block-options-list">
+	<div class="block-options-list custom-scrollbar">
 		<h2 v-if="currentDefinition">Edit {{ currentDefinition.name }} Block</h2>
 
 		<div v-if="currentDefinition">
 			<div v-for="field in currentDefinition.fields">
 				<h3>{{ field.label }}</h3>
-				<component :is="getField(field.type)" :name="field.name" :field="field">
-				<pre>{{ currentDefinition }}</pre>
+				<component :is="getField(field.type)" :name="field.name" :field="field" />
 			</div>
 		</div>
 	</div>
