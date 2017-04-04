@@ -8,19 +8,29 @@
 
 	<link rel="icon" href="../../favicon.ico">
 
-	<title>Kent CMS</title>
+	<title>Astro</title>
 
-	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/css/app.css') }}"></link>
+	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/css/app.css') }}" />
 	@if ($route === 'preview')
-		<!-- <link rel="stylesheet" href="{{ url("/") }}/css/main.min.css" /> -->
+		<link rel="stylesheet" href="{{ url("/") }}/css/main.min.css" />
+		<link rel="stylesheet" href="https://static.kent.ac.uk/pantheon/kent-theme-assets/assets/css/kentfont.css" />
+		<style>
+		html {
+			background-color: #f7f7f7;
+		}
+		.b-block {
+			max-width: calc(100vw - 17px);
+		}
+		</style>
 	@endif
 
 	<script>
 	window.Laravel = <?php echo json_encode([
 		'csrfToken' => csrf_token(),
-		'base' => Request::getBaseUrl()
-	]);
-	?>
+		'base' => Request::getBaseUrl(),
+		'username' => $user
+	]); ?>;
+	window.isEditor = <?php echo json_encode($route !== 'preview'); ?>;
 	</script>
 </head>
 <body class="custom-scrollbar">

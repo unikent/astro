@@ -23,8 +23,7 @@
 </head>
 
 <body>
-	@include('components.kentbar')
-	@include('components.menu')
+	<!-- @include('components.menu') -->
 	@yield('content')
 
 	<script src="{{ url('/') }}{{ mix('js/manifest.js') }}"></script>
