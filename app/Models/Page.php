@@ -148,7 +148,7 @@ class Page extends Model
 
 	public function scopeSites($query)
 	{
-		return $query->where('key_page', 1)->with('route');
+		return $query->where('is_site', 1)->with('route');
 	}
 
 	// To me: clean up crazy code

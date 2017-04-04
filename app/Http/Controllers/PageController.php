@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Api\ApiController;
 
 use App\Models\Page;
 use App\Models\Block;
 use App\Models\Route;
 use Illuminate\Http\Request;
 
-class PageController extends Controller
+class PageController extends ApiController
 {
 
 	public function index() {
@@ -22,7 +23,7 @@ class PageController extends Controller
 	 */
 	public function create(Page $site)
 	{
-		if(!$site->key_page) die("no access");
+		if(!$site->is_site) die("no access");
 
 		// Get site details
 		$route = $site->route;
@@ -64,7 +65,7 @@ class PageController extends Controller
 			return $this->returnError(500, 'Could not save page');
 		}
 
-		return $this->returnSuccess($page);
+		return $this->success($page);
 	}
 
 	/**
@@ -75,7 +76,7 @@ class PageController extends Controller
 	 */
 	public function show($page_id)
 	{
-		return $this->returnSuccess(Page::find($page_id));
+		return $this->success(Page::find($page_id));
 	}
 
 

@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Api\ApiController;
+
 use Illuminate\Http\Request;
 
-class DefinitionController extends Controller
+class DefinitionController extends ApiController
 {
     public function show($type = null)
 	{
@@ -28,7 +30,7 @@ class DefinitionController extends Controller
 
 		if(is_null($type))
 		{
-			return $json;
+			return $this->success($json);
 		}
 
 		if(!array_key_exists($type, $json))

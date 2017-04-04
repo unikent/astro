@@ -16,11 +16,7 @@ class SiteController extends Controller
 	public function index()
 	{
 		// get all the sites
-		$pages = Page::sites()->get();
-
-		// load the view
-		return view('sites.index')
-			->with('pages', $pages);
+		return Page::sites()->get();
 	}
 
 	public function show(Page $site)
@@ -36,7 +32,7 @@ class SiteController extends Controller
 
 	public function edit(Page $site)
 	{
-		if(!$site->key_page) die("no access");
+		if(!$site->is_site) die("no access");
 
 		// Get site details
 		$route = $site->route;
@@ -53,7 +49,7 @@ class SiteController extends Controller
 	public function structure($id) {
 
 		if($page = Page::find($id))
-		{	
+		{
 			$pages = $page->descendantsAndSelf();
 		}
 		else
