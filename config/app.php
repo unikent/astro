@@ -173,6 +173,7 @@ return [
 		Conner\Tagging\Providers\TaggingServiceProvider::class,
 		Intervention\Image\ImageServiceProvider::class,
 		// Barryvdh\Debugbar\ServiceProvider::class,
+		Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
 
 		/*
 		 * Application Service Providers...
