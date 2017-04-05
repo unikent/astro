@@ -4,7 +4,7 @@ namespace App\Astro\Serializers;
 
 use League\Fractal\Serializer\ArraySerializer;
 
-class AstroApiSerializer extends ArraySerializer
+class ApiSerializer extends ArraySerializer
 {
 	/**
 	 * Serialize a collection.
