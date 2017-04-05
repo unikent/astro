@@ -1,0 +1,12 @@
+{
+	"foo": "Fizz",
+	"bar": "Buzz",
+	"fields": [
+		{
+			"name": "content",
+			"label": "Content",
+			"type": "content",
+			"rules": ["required"]
+		}
+	]
+}
