@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\Facades\Gate;
+use App\Models\Definitions\Block as BlockDefinition;
+use App\Policies\Definitions\BlockPolicy as BlockDefinitionPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -13,7 +15,7 @@ class AuthServiceProvider extends ServiceProvider
 	 * @var array
 	 */
 	protected $policies = [
-		'App\Model' => 'App\Policies\ModelPolicy',
+		BlockDefinition::class => BlockDefinitionPolicy::class,
 	];
 
 	/**
