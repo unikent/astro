@@ -8,6 +8,7 @@ use App\Exceptions\JsonDecodeException;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 use App\Exceptions\MethodNotSupportedException;
+use App\Exceptions\DefinitionNotFoundException;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\Concerns\HasAttributes;
 use Illuminate\Database\Eloquent\MassAssignmentException;
@@ -336,6 +337,22 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
 
         $path .= '/definition.json';
         return file_exists($path) ? $path : null;
+    }
+
+
+    /**
+     * Locates a Definition file on disk; throws an exception if no Definition is found.
+     *
+     * @param  string $name
+     * @param  int $version
+     * @throws App\Exceptions\DefinitionNotFoundException
+     * @return string
+     */
+    public static function locateDefinitionOrFail($name, $version = null){
+        $path = static::locateDefinition($name, $version);
+        if(is_null($path)) throw new DefinitionNotFoundException;
+
+        return $path;
     }
 
 

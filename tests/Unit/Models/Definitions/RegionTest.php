@@ -6,6 +6,7 @@ use Mockery;
 use Tests\TestCase;
 use Illuminate\Support\Collection;
 use App\Models\Definitions\Region;
+use App\Exceptions\DefinitionNotFoundException;
 
 class RegionTest extends TestCase
 {
@@ -28,6 +29,22 @@ class RegionTest extends TestCase
 	 */
 	public function locateDefinition_WhenDefinitionIsNotFound_ReturnsNull(){
 		$this->assertNull(Region::locateDefinition('foobar'));
+	}
+
+	/**
+	 * @test
+	 */
+	public function locateDefinitionOrFail_WhenDefinitionIsFound_ReturnsPath(){
+		$path = Region::locateDefinitionOrFail('test-region');
+		$this->assertEquals(base_path('tests/Support/Fixtures/definitions/regions/test-region/v1/definition.json'), $path);
+	}
+
+	/**
+	 * @test
+	 */
+	public function locateDefinitionOrFail_WhenDefinitionIsNotFound_ThrowsException(){
+		$this->expectException(DefinitionNotFoundException::class);
+		Region::locateDefinitionOrFail('foobar');
 	}
 
 

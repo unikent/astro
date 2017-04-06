@@ -8,13 +8,6 @@ class Region extends BaseDefinition
 
     protected static $defDir = 'regions';
 
-	protected $attributes = [
-		'name',
-		'label',
-		'version',
-		'blocks',
-	];
-
 	protected $casts = [
         'blocks' => 'array',
 	];

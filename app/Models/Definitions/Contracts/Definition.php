@@ -54,4 +54,14 @@ interface Definition {
      */
     public static function locateDefinition($name, $version = null);
 
+    /**
+     * Locates a Definition file on disk; throws an exception if no Definition is found.
+     *
+     * @param  string $name
+     * @param  int $version
+     * @throws App\Exceptions\DefinitionNotFoundException
+     * @return string
+     */
+    public static function locateDefinitionOrFail($name, $version = null);
+
 }

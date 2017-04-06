@@ -6,6 +6,7 @@ use Mockery;
 use Tests\TestCase;
 use Illuminate\Support\Collection;
 use App\Models\Definitions\Layout;
+use App\Exceptions\DefinitionNotFoundException;
 
 class LayoutTest extends TestCase
 {
@@ -28,6 +29,22 @@ class LayoutTest extends TestCase
 	 */
 	public function locateDefinition_WhenDefinitionIsNotFound_ReturnsNull(){
 		$this->assertNull(Layout::locateDefinition('foobar'));
+	}
+
+	/**
+	 * @test
+	 */
+	public function locateDefinitionOrFail_WhenDefinitionIsFound_ReturnsPath(){
+		$path = Layout::locateDefinitionOrFail('test-layout');
+		$this->assertEquals(base_path('tests/Support/Fixtures/definitions/layouts/test-layout/v1/definition.json'), $path);
+	}
+
+	/**
+	 * @test
+	 */
+	public function locateDefinitionOrFail_WhenDefinitionIsNotFound_ThrowsException(){
+		$this->expectException(DefinitionNotFoundException::class);
+		Layout::locateDefinitionOrFail('foobar');
 	}
 
 

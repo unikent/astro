@@ -10,13 +10,6 @@ class Layout extends BaseDefinition
 
     protected $regionDefinitions;
 
-	protected $attributes = [
-		'name',
-		'label',
-		'version',
-		'regions',
-	];
-
 	protected $casts = [
         'regions' => 'array',
 	];
