@@ -99,7 +99,7 @@
 <script>
 	import { mapActions, mapState } from 'vuex';
 	import Icon from '../components/Icon.vue';
-	import sites from '../stubs/sites';
+	import sites from '../tests/stubs/sites';
 	import editIcon from '!IconPath/pencil.svg';
 	import deleteIcon from '!IconPath/trash.svg';
 

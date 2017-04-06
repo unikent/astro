@@ -41,11 +41,11 @@ var getDaysArray = function(year, month) {
 	return result;
 };
 
-const generateData = (length, to) => {
+const generateData = (length, maxValue) => {
 	const result = [], result2 = [];
 
 	for(let i = 0; i < length; i++) {
-		result.push(Math.round(Math.random() * to));
+		result.push(Math.round(Math.random() * maxValue));
 	}
 
 	for(let i = 0; i < length; i++) {
@@ -112,14 +112,11 @@ export default {
 					date.setHours(-24 * (day - 1));
 				}
 
-				console.log(date.getDay())
-
 				var count = 0;
 
 				while(count < 7) {
 					result.push(names[date.getDay()] + ' ' + date.getDate());
 					date.setDate(date.getDate() + 1);
-					console.log(date.getDay());
 					count++;
 				}
 

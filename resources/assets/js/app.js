@@ -9,7 +9,7 @@ import eventBusPlugin from './plugins/eventbus';
 import snackBarPlugin from './plugins/snackbar';
 import locale from './libs/locale';
 import store from './store';
-import App from './app/App.vue';
+import App from './components/views/App.vue';
 import { router } from './routes';
 
 Vue.use(VueRouter);
