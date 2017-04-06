@@ -12,7 +12,6 @@
 */
 
 use Illuminate\Support\Facades\Auth;
-use Intervention\Image\Facades\Image;
 
 // Overwrite routes from plugin
 Route::group(['prefix' => 'auth'], function() {
@@ -22,31 +21,12 @@ Route::group(['prefix' => 'auth'], function() {
 	Route::get('loggedout', ['as' => 'auth.loggedout', 'uses' => '\App\Http\Controllers\Auth\AuthController@getLoggedout']);
 });
 
-Route::get('/image', function() {
-	$img = Image::make(public_path() . '/bg.jpg');
-
-	$type = 'blur';
-
-	switch($type) {
-		case 'blur':
-
-			$img->resize(50, 50, function($constraint) {
-				$constraint->aspectRatio();
-			});
-
-			$img->{$type}(3);
-			break;
-	}
-
-	echo '<img src="' . $img->encode('data-url') . '" style="height: 100vh" />';
-});
-
 Route::get('/{catchall?}', function($route) {
-	return response()->view('inline', ['route' => $route, 'user' => Auth::user()->name]);
+	// TODO: grab user info from endpoint, rather than inline js
+	return response()->view('inline', [
+		'route' => $route,
+		'user'  => Auth::user()->name
+	]);
 })
 ->where('catchall', '(.*)')
 ->middleware('auth');
-
-
-// rotate, crop, resize, resizeCanvas, orientate, fit
-// http://image.intervention.io/use/filters, height, width

@@ -3,5 +3,5 @@
   "/css/app.css": "/css/app.css",
   "/js/vendor.js": "/js/vendor.js",
   "/js/manifest.js": "/js/manifest.js",
-  "img/sprite.svg": "img/sprite.svg"
+  "/img/sprite.svg": "/img/sprite.svg"
 }

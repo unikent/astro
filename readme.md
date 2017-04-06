@@ -12,6 +12,7 @@
 
 ## Commands to run
 yarn and npm should be interchangeable for these commands
+
 ```bash
 cd /path/to/astro
 
@@ -26,14 +27,12 @@ ln -s /path/to/astro/storage/app/public /path/to/astro/public/storage
 mklink /d /j C:\path\to\astro\public\storage C:\path\to\astro\storage\app\public
 ```
 
-### Developing block/theme
+### Developing blocks/themes
 
 ```bash
-
 cd /path/to/theme-blocks && yarn link
-cd /path/to/main-repo && yarn link theme-blocks
+cd /path/to/astro && yarn link theme-blocks-repo-name
 
-yarn link
 ```
 
-vendor/bin/studio
+> TODO: finish documenting
