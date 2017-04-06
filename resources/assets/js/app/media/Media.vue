@@ -90,6 +90,14 @@ h3 {
 .el-pagination .show-text {
 	margin: 0 10px 0 20px;
 }
+
+.u-flex {
+	display: flex;
+}
+
+.upload-button {
+	margin-right: 14px;
+}
 </style>
 
 <template>
@@ -97,9 +105,9 @@ h3 {
 	<div slot="header" class="manage-table__header">
 		<span class="main-header">Media Manager</span>
 
-		<div class="u-mla" style="display: flex;">
+		<div class="u-mla u-flex">
 
-			<el-button style="margin-right: 14px;" @click="showUploadForm = true">
+			<el-button class="upload-button" @click="showUploadForm = true">
 				Upload
 			</el-button>
 
@@ -116,7 +124,7 @@ h3 {
 
 	<el-row>
 
-		<el-col :span="21">
+		<el-col :span="18">
 			<el-select style="max-width: 120px" placeholder="Filter by">
 				<el-option label="All media" value="media" />
 				<el-option label="Image" value="image" />
@@ -138,12 +146,29 @@ h3 {
 
 		</el-col>
 
-		<el-col :span="3">
-			<el-slider
-				v-model="test"
-				:step="25"
-				style="margin: 0 5px;"
-			/>
+		<el-col :span="6">
+			<el-row>
+				<el-col :span="12">
+					<el-slider
+					v-model="imageSize"
+					:step="25"
+					style="margin: 0 5px;"
+				/>
+				</el-col>
+				<el-col :span="12">
+					<el-pagination
+						@size-change="changeSize"
+						:page-sizes="[20, 50, 100, 200]"
+						:page-size="size"
+						layout="slot, sizes"
+						style="margin: 0"
+					>
+						<slot>
+							<span class="show-text">Show</span>
+						</slot>
+					</el-pagination>
+				</el-col>
+			</el-row>
 		</el-col>
 
 	</el-row>
@@ -154,16 +179,16 @@ h3 {
 				<div
 					v-if="filteredImages[getThumbIndex(rowIndex, colIndex)]"
 					class="image-grid__item"
-					:title="filteredImages[getThumbIndex(rowIndex, colIndex)].title">
+					:title="filteredImages[getThumbIndex(rowIndex, colIndex)].name">
 					<lazy-img
 						class="img-grid"
 						:bg="true"
-						:src="filteredImages[getThumbIndex(rowIndex, colIndex)].urlSmall"
-						:smallSrc="filteredImages[getThumbIndex(rowIndex, colIndex)].url"
+						:src="`/storage/uploads/${getImage(rowIndex, colIndex).id}/${getImage(rowIndex, colIndex).name}`"
+						:smallSrc="`/storage/uploads/${getImage(rowIndex, colIndex).id}/${filteredImages[getThumbIndex(rowIndex, colIndex)].name}`"
 					/>
 					<div class="image-grid__item-overlay" />
 					<div class="item-grid__edit">
-						<i class="el-icon-edit it-butt" @click="showMediaDetails = true"></i>
+						<i class="el-icon-edit it-butt" @click="showMediaDetails = true; media = getThumbIndex(rowIndex, colIndex)"></i>
 						<el-dropdown trigger="click" menu-align="start">
 							<i class="el-icon-more"></i>
 							<el-dropdown-menu slot="dropdown">
@@ -175,6 +200,9 @@ h3 {
 				</div>
 			</div>
 		</div>
+	</el-row>
+
+	<el-row>
 		<el-pagination
 			@size-change="changeSize"
 			@current-change="changeCurrent"
@@ -205,19 +233,14 @@ h3 {
 	</el-dialog>
 
 	<el-dialog title="Details" v-model="showMediaDetails" size="large">
-		<div class="columns">
+		<div v-if="filteredImages[media]" class="columns">
 			<div class="column">
-
+				<img :src="`/storage/uploads/${filteredImages[media].id}/${filteredImages[media].name}`" />
 			</div>
 			<div class="column is-one-third">
-				File name: IMG_3466.jpg
-				File type: image/jpeg
-				Uploaded on: July 6, 2016
-				File size: 128 kB
-				Dimensions: 640 × 480
-				URL: /uploads/IMG_3466.jpg
+				<pre>{{ filteredImages[media].meta }}</pre>
 			</div>
-	</div>
+		</div>
 	</el-dialog>
 </el-card>
 </template>
@@ -240,38 +263,25 @@ export default {
 			showMediaDetails: false,
 			accept: '*/*',
 			uploadType: 'media',
-			test: 25,
+			imageSize: 25,
 
 			current: 1,
 			size: 20,
 
-			images: []
+			images: [],
+
+			media: 0
 		};
 	},
 
 	mounted() {
-		for(var i = 0; i < 800; i++) {
-			this.images.push({
-				url: '/bg.jpg',
-				urlSmall: '/small.jpg',
-				title: `img ${i + 1}`
-			});
-		}
+		this.fetchData();
 	},
 
 	computed: {
-		heights() {
-			let heights = [];
-
-			for(let i = 0; i < 4 * 4; i++) {
-				heights[i] = Math.round(Math.random() * 300);
-			}
-
-			return heights;
-		},
 
 		colCount() {
-			switch(this.test) {
+			switch(this.imageSize) {
 				case 0:
 					return 8;
 				case 25:
@@ -325,6 +335,10 @@ export default {
 			this.colCount = num;
 		},
 
+		getImage(row, col) {
+			return this.filteredImages[this.getThumbIndex(row, col)];
+		},
+
 		getThumbIndex(rowIndex, colIndex) {
 			return (rowIndex - 1) * this.colCount + colIndex - 1;
 		},
@@ -335,6 +349,14 @@ export default {
 
 		changeCurrent(newCurrent) {
 			this.current = newCurrent;
+		},
+
+		fetchData() {
+			this.$api
+				.get('media')
+				.then((response) => {
+					this.images = response.data;
+				});
 		}
 
 	}
