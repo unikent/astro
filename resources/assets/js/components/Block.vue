@@ -21,7 +21,7 @@
 </template>
 
 <script>
-	import fieldMarkup from '../stubs/block-markup';
+	import fieldMarkup from '../tests/stubs/block-markup';
 	import fields from 'cms-prototype-blocks';
 	import eventBus from '../libs/event-bus.js';
 	import { mapState } from 'vuex';

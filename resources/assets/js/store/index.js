@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import page from '../stubs/page';
+import page from '../tests/stubs/page';
 import undoRedo from './undo-redo';
 import { Message } from 'element-ui';
 import api from '../plugins/http/api';
@@ -38,7 +38,8 @@ const store = (
 			},
 			meta: {
 				blocks: []
-			}
+			},
+			baseUrl: window.Laravel.base
 		},
 
 		getters: {
