@@ -4,14 +4,14 @@ namespace App\Policies\Definitions;
 
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
-use App\Models\Definitions\Block as BlockDefinition;
+use App\Models\Definitions\Layout as LayoutDefinition;
 
-class BlockPolicy
+class LayoutPolicy
 {
     use HandlesAuthorization;
 
     /**
-     * Determine whether the user can index definition.
+     * Determine whether the user can index definitions.
      *
      * @param  User  $user
      * @return boolean
@@ -25,10 +25,10 @@ class BlockPolicy
      * Determine whether the user can view the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Definitions\Block  $definition
+     * @param  \App\Models\Definitions\Layout  $definition
      * @return boolean
      */
-    public function read(User $user, BlockDefinition $definition)
+    public function read(User $user, LayoutDefinition $definition)
     {
         return true;
     }
@@ -48,10 +48,10 @@ class BlockPolicy
      * Determine whether the user can update the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Definitions\Block  $definition
+     * @param  \App\Models\Definitions\Layout  $definition
      * @return boolean
      */
-    public function update(User $user, BlockDefinition $definition)
+    public function update(User $user, LayoutDefinition $definition)
     {
         return false;
     }
@@ -60,10 +60,10 @@ class BlockPolicy
      * Determine whether the user can delete the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Definitions\Block  $definition
+     * @param  \App\Models\Definitions\Layout  $definition
      * @return boolean
      */
-    public function delete(User $user, BlockDefinition $definition)
+    public function delete(User $user, LayoutDefinition $definition)
     {
         return false;
     }
