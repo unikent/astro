@@ -1,6 +1,7 @@
 {
 	"foo": "Fizz",
 	"bar": "Buzz",
+	
 	"fields": [
 		{
 			"name": "content",

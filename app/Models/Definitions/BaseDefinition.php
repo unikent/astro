@@ -1,6 +1,7 @@
 <?php
 namespace App\Models\Definitions;
 
+use Config;
 use Exception;
 use JsonSerializable;
 use App\Exceptions\JsonDecodeException;
@@ -20,6 +21,9 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
 {
 
 	use HasAttributes, HidesAttributes, GuardsAttributes;
+
+
+    protected static $defDir = '';
 
 
     /**
@@ -311,6 +315,28 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
 
 		return static::fromDefinition(file_get_contents($path));
 	}
+
+
+    /**
+     * Locates a Definition file on disk; when no version is specified
+     * it will return the latest.
+     *
+     * @param  string $name
+     * @param  int $version
+     * @return string|null
+     */
+    public static function locateDefinition($name, $version = null){
+        if(is_null($version)){
+            $path = sprintf('%s/%s/%s/*', Config::get('app.definitions_path'), static::$defDir, $name);
+            $glob = glob($path, GLOB_ONLYDIR);
+            $path = array_pop($glob);
+        } else {
+            $path = sprintf('%s/%s/%s/v%d', Config::get('app.definitions_path'), static::$defDir, $name, $version);
+        }
+
+        $path .= '/definition.json';
+        return file_exists($path) ? $path : null;
+    }
 
 
     /**

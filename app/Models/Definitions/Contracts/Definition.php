@@ -44,4 +44,14 @@ interface Definition {
 	 */
 	public static function fromDefinitionFile($path);
 
+    /**
+     * Locates a Definition file on disk; when no version is specified
+     * it will return the latest.
+     *
+     * @param  string $name
+     * @param  int $version
+     * @return string|null
+     */
+    public static function locateDefinition($name, $version = null);
+
 }

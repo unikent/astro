@@ -13,7 +13,7 @@ class BaseDefinitionTest extends TestCase
 
 	public function setUp(){
 		parent::setUp();
-		$this->definition = base_path('tests/Support/Fixtures/double-definition.json');
+		$this->definition = base_path('tests/Support/Fixtures/definitions/double-definition.json');
 	}
 
 	public function tearDown(){

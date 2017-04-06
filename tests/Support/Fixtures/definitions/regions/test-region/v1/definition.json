@@ -1,0 +1,10 @@
+{
+	"label": "Test Region",
+	"name": "test-region",
+	
+	"version": 1,
+	
+	"blocks": [
+		"test-block"
+	]
+}

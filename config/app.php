@@ -12,7 +12,7 @@ return [
 	| any other location as required by the application or its packages.
 	*/
 
-	'name' => 'Prototype CMS',
+	'name' => 'Astro',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -123,6 +123,19 @@ return [
 	'log' => env('APP_LOG', 'single'),
 
 	'log_level' => env('APP_LOG_LEVEL', 'debug'),
+
+
+	/*
+	|--------------------------------------------------------------------------
+	| Astro: Definitions Path
+	|--------------------------------------------------------------------------
+	|
+	| Where to locate the layout/region/block definitions. Should not
+	| include trailing slash.
+	|
+	*/
+	'definitions_path' => env('BLOCKS_PATH', base_path('vendor/unikent/cms-prototype-blocks')),
+
 
 	/*
 	|--------------------------------------------------------------------------
@@ -237,7 +250,5 @@ return [
 		'SSO' => KentAuth\Facades\SSO::class,
 		'Image' => Intervention\Image\Facades\Image::class
 	],
-
-	'blocks_path' => env('BLOCKS_PATH', 'vendor/unikent/cms-prototype-blocks/blocks'),
 
 ];

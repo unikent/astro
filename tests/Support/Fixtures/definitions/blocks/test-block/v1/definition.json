@@ -1,0 +1,15 @@
+{
+	"name": "Test Block",
+	"type": "test-block",
+	
+	"version": 1,
+
+	"fields": [
+		{
+			"name": "content",
+			"label": "Content",
+			"type": "richtext",
+			"rules": ["required"]
+		}
+	]
+}
