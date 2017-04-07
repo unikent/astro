@@ -97,78 +97,73 @@
 </template>
 
 <script>
-	import { mapActions, mapState } from 'vuex';
-	import Icon from '../components/Icon.vue';
-	import sites from '../tests/stubs/sites';
-	import editIcon from '!IconPath/pencil.svg';
-	import deleteIcon from '!IconPath/trash.svg';
+import { mapActions, mapState } from 'vuex';
+import Icon from '../Icon.vue';
+import sites from '../../tests/stubs/sites';
+import editIcon from '!IconPath/pencil.svg';
+import deleteIcon from '!IconPath/trash.svg';
 
-	export default {
+export default {
 
-		components: {
-			Icon
+	components: {
+		Icon
+	},
+
+	data() {
+		return {
+			sites,
+			editIcon,
+			deleteIcon,
+
+			dialogFormVisible: false,
+			formLabelWidth: '120px',
+
+			form: {
+				title: '',
+				url: '',
+				parent: 0,
+				layout: '',
+				options: {
+					description: '',
+				}
+			}
+		};
+	},
+
+	methods: {
+
+		askRemove(index) {
+			this.$confirm(`Site ${index} will be permanently removed.\nAre you sure?`, 'Warning', {
+				confirmButtonText: 'OK',
+				cancelButtonText: 'Cancel',
+				type: 'warning'
+			}).then(() => {
+				this.$message({
+					type: 'success',
+					message: 'Delete completed'
+				});
+			}).catch(() => {});
 		},
 
-		data() {
-			return {
-				sites,
-				editIcon,
-				deleteIcon,
+		addSite() {
+			this.sites.push({
+				title: this.form.title,
+				url: this.form.url,
+				id: this.sites.length
+			});
+			this.dialogFormVisible = false;
 
-				dialogFormVisible: false,
-				formLabelWidth: '120px',
-
-				form: {
-					title: '',
-					url: '',
-					parent: 0,
-					layout: '',
-					options: {
-						description: '',
-					}
+			this.form = {
+				title: '',
+				url: '',
+				parent: 0,
+				layout: '',
+				options: {
+					description: '',
 				}
 			};
-		},
-
-		mounted() {
-			// this.fetch();
-			console.log('hello');
-		},
-
-		methods: {
-
-			askRemove(index) {
-				this.$confirm(`Site ${index} will be permanently removed.\nAre you sure?`, 'Warning', {
-					confirmButtonText: 'OK',
-					cancelButtonText: 'Cancel',
-					type: 'warning'
-				}).then(() => {
-					this.$message({
-						type: 'success',
-						message: 'Delete completed'
-					});
-				}).catch(() => {});
-			},
-
-			addSite() {
-				this.sites.push({
-					title: this.form.title,
-					url: this.form.url,
-					id: this.sites.length
-				});
-				this.dialogFormVisible = false;
-
-				this.form = {
-					title: '',
-					url: '',
-					parent: 0,
-					layout: '',
-					options: {
-						description: '',
-					}
-				};
-			}
-
 		}
+
 	}
+};
 </script>

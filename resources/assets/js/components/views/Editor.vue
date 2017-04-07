@@ -154,90 +154,90 @@
 </template>
 
 <script>
-	import { Loading } from 'element-ui';
-	import { mapState } from 'vuex';
+import { Loading } from 'element-ui';
+import { mapState } from 'vuex';
 
-	import PageSidebar from './PageSidebar.vue';
-	import BlockSidebar from './BlockSidebar.vue';
+import PageSidebar from '../PageSidebar.vue';
+import BlockSidebar from '../BlockSidebar.vue';
 
-	import Icon from '../components/Icon.vue';
-	import UndoIcon from '!IconPath/undo.svg';
-	import RedoIcon from '!IconPath/redo.svg';
-	import DesktopIcon from '!IconPath/desktop.svg';
-	import TabletIcon from '!IconPath/tablet.svg';
-	import MobileIcon from '!IconPath/mobile.svg';
+import Icon from '../Icon.vue';
+import UndoIcon from '!IconPath/undo.svg';
+import RedoIcon from '!IconPath/redo.svg';
+import DesktopIcon from '!IconPath/desktop.svg';
+import TabletIcon from '!IconPath/tablet.svg';
+import MobileIcon from '!IconPath/mobile.svg';
 
-	export default {
-		name: 'editor',
+export default {
+	name: 'editor',
 
-		components: {
-			PageSidebar,
-			BlockSidebar,
-			Icon
+	components: {
+		PageSidebar,
+		BlockSidebar,
+		Icon
+	},
+
+	data() {
+		return {
+			views: {
+				'desktop': {
+					icon: DesktopIcon,
+					label: 'Desktop',
+					width: '100%',
+					height: '100vh'
+				},
+				'tablet': {
+					icon: TabletIcon,
+					label: 'Tablet',
+					width: '768px',
+					height: '1024px'
+				},
+				'mobile': {
+					icon: MobileIcon,
+					label: 'Mobile',
+					width: '320px',
+					height: '568px'
+				}
+			},
+			currentView: 'desktop',
+			UndoIcon,
+			RedoIcon,
+			showPageData: false,
+			sideBarOpen: true,
+			blockListOpen: true
+		};
+	},
+
+	computed: {
+		getUrl() {
+			return `${window.Laravel.base}/preview`;
 		},
 
-		data() {
+		dimensions() {
 			return {
-				views: {
-					'desktop': {
-						icon: DesktopIcon,
-						label: 'Desktop',
-						width: '100%',
-						height: '100vh'
-					},
-					'tablet': {
-						icon: TabletIcon,
-						label: 'Tablet',
-						width: '768px',
-						height: '1024px'
-					},
-					'mobile': {
-						icon: MobileIcon,
-						label: 'Mobile',
-						width: '320px',
-						height: '568px'
-					}
-				},
-				currentView: 'desktop',
-				UndoIcon,
-				RedoIcon,
-				showPageData: false,
-				sideBarOpen: true,
-				blockListOpen: true
+				width: this.views[this.currentView].width,
+				height: this.views[this.currentView].height
 			};
 		},
 
-		computed: {
-			getUrl() {
-				return `${window.Laravel.base}/preview`;
-			},
+		...mapState([
+			'page',
+			'preview'
+		])
+	},
 
-			dimensions() {
-				return {
-					width: this.views[this.currentView].width,
-					height: this.views[this.currentView].height
-				};
-			},
+	mounted() {
+		const
+			loader = Loading.service({
+				target: this.$refs.editor,
+				text: 'Loading preview...',
+				customClass: 'loading-overlay'
+			}),
+			removeLoader = () => {
+				loader.close()
+				this.$refs.iframe.removeEventListener('load', removeLoader);
+			};
 
-			...mapState([
-				'page',
-				'preview'
-			])
-		},
-
-		mounted() {
-			const
-				loader = Loading.service({
-					target: this.$refs.editor,
-					text: 'Loading preview...',
-					customClass: 'loading-overlay'
-				}),
-				removeLoader = () => {
-					loader.close()
-					this.$refs.iframe.removeEventListener('load', removeLoader);
-				};
-
-			this.$refs.iframe.addEventListener('load', removeLoader);
-		}
+		this.$refs.iframe.addEventListener('load', removeLoader);
 	}
+};
 </script>

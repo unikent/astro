@@ -12,6 +12,7 @@ h3 {
 	border: 1px solid #d1dbe5;
 	border-radius: 2px;
 	transition: transform .2s ease-out, border .2s ease-out, box-shadow .2s ease-out;
+	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0), 0 4px 8px 0 rgba(0, 0, 0, 0);
 	overflow: hidden;
 }
 .image-grid__item .img-grid {
@@ -36,9 +37,8 @@ h3 {
 
 .item-grid__edit {
 
-	transform: translateY(40%);
+	transform: translateY(40px);
 	position: absolute;
-	top: 0;
 	left: 0;
 	right: 0;
 	bottom: 0;
@@ -66,8 +66,6 @@ h3 {
 }
 
 .image-grid__item:hover  {
-	// transform: scale(1.02);
-	transform-origin: 50%;
 	border: 1px solid #3b6586;
 	box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1), 0 4px 8px 0 rgba(0,0,0,0.2);
 
@@ -107,9 +105,7 @@ h3 {
 
 		<div class="u-mla u-flex">
 
-			<el-button class="upload-button" @click="showUploadForm = true">
-				Upload
-			</el-button>
+			<el-button class="upload-button" @click="showUploadForm = true">Upload</el-button>
 
 			<el-input
 				placeholder="Search for media"
@@ -246,8 +242,8 @@ h3 {
 </template>
 
 <script>
-import UploadForm from '../../components/UploadForm';
-import LazyImg from '../../components/LazyImage';
+import UploadForm from '../UploadForm';
+import LazyImg from '../LazyImage';
 
 export default {
 

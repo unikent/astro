@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import LineChart from '../components/LineChart';
+import LineChart from '../LineChart';
 
 var getDaysArray = function(year, month) {
 	var names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];

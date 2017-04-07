@@ -226,7 +226,7 @@
 </template>
 
 <script>
-import Icon from '../components/Icon.vue';
+import Icon from '../Icon.vue';
 import homeIcon from '!IconPath/home.svg';
 import settingsIcon from '!IconPath/settings.svg';
 import sitesIcon from '!IconPath/files.svg';
