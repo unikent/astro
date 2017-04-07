@@ -21,7 +21,7 @@ use App\Models\Definitions\Contracts\Definition as DefinitionContract;
 abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable, JsonSerializable
 {
 
-	use HasAttributes, HidesAttributes, GuardsAttributes;
+    use HasAttributes, HidesAttributes, GuardsAttributes;
 
 
     protected static $defDir = '';
@@ -274,48 +274,48 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
      *
      * @return string
      */
-	public function toDefinition()
-	{
-		$this->toJson();
-	}
+    public function toDefinition()
+    {
+    	$this->toJson();
+    }
 
 
-	/**
-	 * Decodes a JSON-blob of definition-data and returns
-	 * a populated model instance.
-	 *
-	 * @param  string $json
-	 * @return DefinitionContract
-	 */
-	public static function fromDefinition($json)
-	{
-		$definition = json_decode($json, TRUE);
+    /**
+     * Decodes a JSON-blob of definition-data and returns
+     * a populated model instance.
+     *
+     * @param  string $json
+     * @return DefinitionContract
+     */
+    public static function fromDefinition($json)
+    {
+    	$definition = json_decode($json, TRUE);
 
         if(JSON_ERROR_NONE !== json_last_error()){
             throw new JsonDecodeException(json_last_error_msg());
         }
 
-		$instance = new static();
-		$instance->forceFill($definition);
+    	$instance = new static();
+    	$instance->forceFill($definition);
 
-		return $instance;
-	}
+    	return $instance;
+    }
 
 
-	/**
-	 * Returns a new model instance based on a definition file.
-	 *
-	 * @param  string $path
-	 * @return DefinitionContract
-	 */
-	public static function fromDefinitionFile($path)
-	{
-		if(!file_exists($path)){
-			throw new FileNotFoundException;
-		}
+    /**
+     * Returns a new model instance based on a definition file.
+     *
+     * @param  string $path
+     * @return DefinitionContract
+     */
+    public static function fromDefinitionFile($path)
+    {
+    	if(!file_exists($path)){
+    		throw new FileNotFoundException;
+    	}
 
-		return static::fromDefinition(file_get_contents($path));
-	}
+    	return static::fromDefinition(file_get_contents($path));
+    }
 
 
     /**
@@ -382,7 +382,7 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
     public function toJson($options = 0)
     {
         $json = json_encode($this->jsonSerialize(), $options);
-        if (JSON_ERROR_NONE !== json_last_error()) {
+            if (JSON_ERROR_NONE !== json_last_error()) {
             throw JsonEncodingException::forModel($this, json_last_error_msg());
         }
         return $json;
