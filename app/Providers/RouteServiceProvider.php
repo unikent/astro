@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Models\Definitions\Layout as LayoutDefinition;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
 class RouteServiceProvider extends ServiceProvider
@@ -23,9 +25,12 @@ class RouteServiceProvider extends ServiceProvider
 	 */
 	public function boot()
 	{
-		//
-
 		parent::boot();
+
+	    Route::bind('layout_definition', function($value){
+	        $path = LayoutDefinition::locateDefinitionOrFail($value, request()->get('version', null));
+	        return LayoutDefinition::fromDefinitionFile($path);
+	    });
 	}
 
 	/**
@@ -66,8 +71,8 @@ class RouteServiceProvider extends ServiceProvider
 	protected function mapApiRoutes()
 	{
 		Route::prefix('api')
+			 ->namespace('App\Http\Controllers\Api')
 			 ->middleware('api')
-			 ->namespace($this->namespace)
 			 ->group(base_path('routes/api.php'));
 	}
 }

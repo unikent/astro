@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Response;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Validation\ValidationException;
+// use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+// use Illuminate\Foundation\Bus\DispatchesJobs;
+// use Illuminate\Foundation\Validation\ValidatesRequests;
+// use Illuminate\Contracts\Validation\Validator;
+// use Illuminate\Validation\ValidationException;
 
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
@@ -19,7 +19,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ApiController extends Controller
 {
-	use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
 	protected
 		/**
