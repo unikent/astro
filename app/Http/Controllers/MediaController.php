@@ -10,6 +10,7 @@ use App\Models\Media;
 class MediaController extends ApiController
 {
 
+	// TODO: move these to definition files
 	const UPLOAD_RULES = [
 		'shared' => 'required|file',
 		'image'  => 'image|dimensions:min_width=400,min_height=400',
@@ -24,8 +25,14 @@ class MediaController extends ApiController
 			'm4v,mov,wmv,avi,mpg,ogv,3gp,3g2'
 	];
 
+	/**
+	 * Display a listing of the resource.
+	 *
+	 * @return \Illuminate\Http\Response
+	 */
 	public function index()
 	{
+		// TODO: use fractal transformer
 		return Media::all();
 	}
 
@@ -37,6 +44,7 @@ class MediaController extends ApiController
 	 */
 	public function show($id)
 	{
+		// TODO: use fractal transformer
 		return Media::find($id);
 	}
 
@@ -49,7 +57,7 @@ class MediaController extends ApiController
 	 */
 	public function update($media_id, Request $request)
 	{
-		//
+		// TODO: implement updating media
 	}
 
 	/**
@@ -61,7 +69,18 @@ class MediaController extends ApiController
 	public function destroy($id)
 	{
 		$media = Media::find($id);
-		$media->delete();
+
+		if(!isset($media))
+		{
+			return $this->errorNotFound();
+		}
+
+		if(!$media->delete())
+		{
+			return $this->errorInternal('Unable to delete media');
+		}
+
+		return $this->success();
 	}
 
 	/**
@@ -127,7 +146,6 @@ class MediaController extends ApiController
 					$this->mergeValidationRules([self::UPLOAD_RULES['upload']]);
 			}
 		}
-		// max:5120
 
 		$this->validate($request, $rules);
 	}

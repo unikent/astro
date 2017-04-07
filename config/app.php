@@ -124,6 +124,8 @@ return [
 
 	'log_level' => env('APP_LOG_LEVEL', 'debug'),
 
+	'media_path' => env('MEDIA_PATH', 'uploads/media'),
+
 	/*
 	|--------------------------------------------------------------------------
 	| Autoloaded Service Providers

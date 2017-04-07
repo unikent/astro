@@ -8,7 +8,11 @@ class DatabaseSeeder extends Seeder
 	 * @var array
 	 */
 	private $tables = [
-
+		'users',
+		'pages',
+		'routes',
+		'blocks',
+		'media'
 	];
 
 	/**
@@ -25,8 +29,7 @@ class DatabaseSeeder extends Seeder
 
 		$this->cleanDatabase();
 
-		// $this->call('MerchantTableSeeder');
-		// $this->call('PlaceTableSeeder');
+		// TODO: separate out seeders and clean up code left from prototype
 
 		$a = factory('App\Models\User')->create([ 'username' => 'admin', 'name'=> 'Admin']);
 		$p = factory('App\Models\Page')->create([ 'title' => 'Test Site', 'is_site'=> 1]);
@@ -94,6 +97,8 @@ class DatabaseSeeder extends Seeder
 		$r = factory('App\Models\Route')->make([ 'page_id' => $p3->id, 'slug' => 'nested-page']);
 		$r->parent = $r2;
 		$r->save();
+
+		$this->call(MediaSeeder::class);
 	}
 
 	/**
@@ -108,7 +113,8 @@ class DatabaseSeeder extends Seeder
 
 		DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
-		foreach ($this->tables as $table) {
+		foreach($this->tables as $table)
+		{
 			DB::table($table)->truncate();
 		}
 
