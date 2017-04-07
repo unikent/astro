@@ -25,7 +25,7 @@ interface Definition {
      * Returns a JSON representation of the Definition
      * @return string
      */
-	public function toDefinition();
+    public function toDefinition();
 
     /**
      * Decodes a JSON-blob of definition-data and returns
@@ -34,15 +34,15 @@ interface Definition {
      * @param  string $json
      * @return DefinitionContract
      */
-	public static function fromDefinition($json);
+    public static function fromDefinition($json);
 
-	/**
-	 * Returns a new model instance based on a definition file.
-	 *
-	 * @param  string $path
-	 * @return DefinitionContract
-	 */
-	public static function fromDefinitionFile($path);
+    /**
+     * Returns a new model instance based on a definition file.
+     *
+     * @param  string $path
+     * @return DefinitionContract
+     */
+    public static function fromDefinitionFile($path);
 
     /**
      * Locates a Definition file on disk; when no version is specified
