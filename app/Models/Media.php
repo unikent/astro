@@ -25,6 +25,9 @@ class Media extends Model
 			'aspect_ratio',
 			'duration'
 		],
+		$appends = [
+			'src'
+		],
 		$sortable = [
 			'id',
 			'title',
@@ -46,6 +49,7 @@ class Media extends Model
 		DB::beginTransaction();
 
 		$filePath = $this->file->getPathname();
+		$fileName = str_slug($this->file->getClientOriginalName(), '.');
 
 		$id3 = new \getID3();
 		$fileInfo = $id3->analyze($filePath);
@@ -54,7 +58,7 @@ class Media extends Model
 
 		$this->fill(array_merge(
 			[
-				'name' => $this->file->getClientOriginalName(),
+				'name' => $fileName,
 				'sha1' => $this->hash
 			],
 			$metaData
@@ -67,7 +71,7 @@ class Media extends Model
 			return false;
 		}
 
-		if(!$this->saveFile($this->id))
+		if(!$this->saveFile($this->id, $fileName))
 		{
 			DB::rollBack();
 			return false;
@@ -93,10 +97,23 @@ class Media extends Model
 		return self::where('sha1', $this->hash)->first();
 	}
 
-	public function saveFile($dir)
+	protected function saveFile($dir, $filename)
 	{
 		return $this->file->storeAs(
-			'public/uploads/' . $dir, $this->file->getClientOriginalName()
+			'public/' . config('app.media_path') . '/' . $dir,
+			$filename
+		);
+	}
+
+	public function getSrcAttribute()
+	{
+		$attr = $this->attributes;
+
+		return (
+			'storage/' .
+			config('app.media_path') . '/' .
+			$attr['id'] . '/' .
+			$attr['name']
 		);
 	}
 

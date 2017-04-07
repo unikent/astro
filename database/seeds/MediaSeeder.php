@@ -18,7 +18,7 @@ class MediaSeeder extends Seeder
 	{
 		$this->fileSystem = new Filesystem();
 
-		$uploadDir = storage_path('app/public/uploads');
+		$uploadDir = storage_path('app/public/' . config('app.media_path'));
 
 		$this->cleanFiles($uploadDir);
 
