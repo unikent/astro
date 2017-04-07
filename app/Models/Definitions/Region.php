@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 class Region extends BaseDefinition
 {
 
-    protected static $defDir = 'regions';
+	public static $defDir = 'regions';
 
 	protected $casts = [
         'blocks' => 'array',

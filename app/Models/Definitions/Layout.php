@@ -6,9 +6,9 @@ use Illuminate\Support\Collection;
 class Layout extends BaseDefinition
 {
 
-    protected static $defDir = 'layouts';
+	public static $defDir = 'layouts';
 
-    protected $regionDefinitions;
+	protected $regionDefinitions;
 
 	protected $casts = [
         'regions' => 'array',
