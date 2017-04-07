@@ -136,6 +136,16 @@ return [
 	*/
 	'definitions_path' => env('BLOCKS_PATH', base_path('vendor/unikent/cms-prototype-blocks')),
 
+	/*
+	|--------------------------------------------------------------------------
+	| Astro: Media Path
+	|--------------------------------------------------------------------------
+	|
+	| Where to locate uploaded media.
+	|
+	*/
+	'media_path' => env('MEDIA_PATH', 'uploads/media'),
+
 
 	/*
 	|--------------------------------------------------------------------------

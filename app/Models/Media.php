@@ -4,22 +4,29 @@ namespace App\Models;
 
 use App\Models\Traits\Tracked;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class Media extends Model
 {
-	use Tracked;
+	use Tracked, SoftDeletes;
 
 	protected
 		$fillable = [
 			'type',
-			'title',
-			'path',
-			'file_name',
-			'file_mime',
-			'file_size',
+			'name',
+			'size',
 			'sha1',
-			'meta'
+			'format',
+			'mime_type',
+			'width',
+			'height',
+			'aspect_ratio',
+			'duration'
+		],
+		$appends = [
+			'src'
 		],
 		$sortable = [
 			'id',
@@ -39,27 +46,40 @@ class Media extends Model
 
 	public function save(array $options = [])
 	{
-		$path = $this->saveFile();
+		DB::beginTransaction();
 
-		if(!$path) {
+		$filePath = $this->file->getPathname();
+		$fileName = str_slug($this->file->getClientOriginalName(), '.');
+
+		$id3 = new \getID3();
+		$fileInfo = $id3->analyze($filePath);
+
+		$metaData = $this->transformMetaData($fileInfo);
+
+		$this->fill(array_merge(
+			[
+				'name' => $fileName,
+				'sha1' => $this->hash
+			],
+			$metaData
+		));
+
+		$saved = parent::save();
+
+		if(!$saved)
+		{
 			return false;
 		}
 
-		$fullPath = storage_path('app/' . $path);
+		if(!$this->saveFile($this->id, $fileName))
+		{
+			DB::rollBack();
+			return false;
+		}
 
-		$getID3 = new \getID3();
-		$fileInfo = $getID3->analyze($fullPath);
+		DB::commit();
 
-		$this->fill([
-			'path'      => $path,
-			'file_name' => $this->file->getClientOriginalName(),
-			'file_mime' => $this->file->getMimeType(),
-			'file_size' => filesize($fullPath),
-			'sha1'      => $this->hash,
-			'meta'      => isset($fileInfo['video']) ? $fileInfo['video'] : null
-		]);
-
-		return parent::save();
+		return $saved;
 	}
 
 	public function exists()
@@ -77,56 +97,60 @@ class Media extends Model
 		return self::where('sha1', $this->hash)->first();
 	}
 
-	public function saveFile()
+	protected function saveFile($dir, $filename)
 	{
-		$filePath = $this->file->getPathname();
-
-		$path = $this->getFolderPath($filePath, $this->hash);
-
 		return $this->file->storeAs(
-			'public/uploads/' . $path, $this->file->getClientOriginalName()
+			'public/' . config('app.media_path') . '/' . $dir,
+			$filename
 		);
 	}
 
-	/**
-	 * Creates a string for deep folder structures of type "1/23/456/7891/".
-	 * Hopefully this is better long term than storing it all in one folder.
-	 *
-	 * @param  string  $filePath  The temporary file path.
-	 * @param  string  $hash  The sha1 or other hash of file.
-	 *
-	 * @return  string  The freshly figured out path.
-	 */
-	protected function getFolderPath($filePath, $hash)
+	public function getSrcAttribute()
 	{
-		// path starts life as a 10 char hash
-		$path = sprintf('%u', crc32($hash));
+		$attr = $this->attributes;
 
-		// loop and add slashes
-		for($pos = 1, $i = 0; $i < 3; $i++) {
-			$path = substr_replace($path, '/', $pos, 0);
-			$pos += $i + 3;
-		}
-
-		return $path;
-	}
-
-	public function getMetaAttribute()
-	{
-		return !empty($this->attributes['meta']) ? json_decode($this->attributes['meta'], true) : null;
-	}
-
-	public function setMetaAttribute($json)
-	{
-		$this->attributes['meta'] = json_encode($json);
+		return (
+			'storage/' .
+			config('app.media_path') . '/' .
+			$attr['id'] . '/' .
+			$attr['name']
+		);
 	}
 
 	public function getCreatedByAttribute()
 	{
-		$user = !empty($this->attributes['created_by']) ?
-			User::findOrFail($this->attributes['created_by']) : null;
+		return $this->resolveUserById($this->attributes['created_by']);
+	}
 
-		return isset($user) ? $user->name : null;
+	public function getUpdatedByAttribute()
+	{
+		return $this->resolveUserById($this->attributes['updated_by']);
+	}
+
+	protected function resolveUserById($id)
+	{
+		return ($user = User::find($id)) ? $user->name : null;
+	}
+
+	public static function transformMetaData($meta)
+	{
+		$get = function($key, $default = null) use ($meta) {
+			return array_get($meta, $key, $default);
+		};
+
+		$x = $get('video.resolution_x');
+		$y = $get('video.resolution_y');
+		$aspect_ratio = isset($x, $y) && $y > 0 ? $x / $y : null; // scared of zeros
+
+		return [
+			'size'         => $get('filesize'),
+			'format'       => $get('fileformat'),
+			'mime_type'    => $get('mime_type'),
+			'width'        => $x,
+			'height'       => $y,
+			'aspect_ratio' => $aspect_ratio,
+			'duration'     => $get('playtime_seconds')
+		];
 	}
 
 }

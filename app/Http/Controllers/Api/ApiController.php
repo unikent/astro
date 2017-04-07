@@ -112,6 +112,10 @@ class ApiController extends Controller
 
 	protected function success($data = [], $message = '')
 	{
+		if(empty($data)) {
+			return;
+		}
+
 		return $this->respondWithArray([
 			'data' => $data
 		]);

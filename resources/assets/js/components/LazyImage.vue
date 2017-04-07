@@ -28,21 +28,30 @@ export default {
 		}
 	},
 
+	watch: {
+		src() {
+			this.loadImage();
+		}
+	},
+
 	mounted() {
-		console.log(this.bg ? true : false);
-		let img = new Image();
+		this.loadImage();
+	},
 
-		img.addEventListener('load', (e) => {
-			this.imageSrc = this.src;
-		});
+	methods: {
+		loadImage() {
+			let img = new Image();
 
-		img.addEventListener('error', (e) => {
-			console.warn(`Oops! We couldnt load the "${img.src}" image.`);
-			img.src = '/unavailable.png';
-			img.onload();
-		});
+			img.addEventListener('load', (e) => {
+				this.imageSrc = this.src;
+			});
 
-		img.src = this.src;
+			img.addEventListener('error', (e) => {
+				console.warn(`Oops! We couldnt load the "${img.src}" image.`);
+			});
+
+			img.src = this.src;
+		}
 	}
 
 };
