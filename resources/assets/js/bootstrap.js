@@ -1,5 +1,4 @@
 import './redactor';
-import 'bootstrap';
 import Vue from 'vue';
 
 window.eventBus = (window.self === window.top ? new Vue() : window.top.eventBus);

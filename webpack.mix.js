@@ -1,5 +1,5 @@
 const { mix } = require('laravel-mix');
-	
+
 const webpack = require('webpack'),
 	  path = require('path');
 
@@ -50,7 +50,19 @@ mix.webpackConfig({
  */
 mix.js('resources/assets/js/app.js', 'public/js')
 	.sass('resources/assets/sass/app.scss', 'public/css')
-	.extract(['vue', 'jquery', 'axios', 'tether', 'bootstrap', 'element-ui'])
+	.extract([
+		'axios',
+		'chart.js',
+		'element-ui',
+		'jquery',
+		'lodash',
+		'velocity-animate',
+		'vue',
+		'vue-chartjs',
+		'vue-router',
+		'vuedraggable',
+		'vuex'
+	])
 	.sourceMaps();
 
 	// .copy(

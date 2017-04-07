@@ -34,17 +34,13 @@ h3 {
 <script>
 import { mapState, mapActions } from 'vuex';
 import fields from './fields';
-import f from 'cms-prototype-blocks';
+import views from 'cms-prototype-blocks';
 
 export default {
 
 	computed: {
 		currentDefinition() {
 			return this.$store.state.blockDef;
-		},
-
-		currentView() {
-			return f['block-quote-v1'];
 		}
 	},
 

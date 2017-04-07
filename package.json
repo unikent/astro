@@ -11,17 +11,13 @@
   },
   "dependencies": {
     "axios": "^0.15.3",
-    "bootstrap": "^3.3.7",
     "bulma": "^0.4.0",
     "chart.js": "^2.5.0",
     "cms-prototype-blocks": "git+ssh://git@github.com/unikent/cms-prototype-blocks.git#master",
-    "element-ui": "^1.1.6",
-    "external-svg-sprite-loader": "^2.1.1",
+    "element-ui": "^1.2.8",
     "jquery": "^3.1.0",
     "lodash": "^4.17.4",
     "normalize.css": "^5.0.0",
-    "svg-sprite-loader": "^0.3.0",
-    "tether": "^1.4.0",
     "velocity-animate": "^1.4.2",
     "vue": "^2.1.0",
     "vue-chartjs": "^2.3.9",
@@ -38,7 +34,9 @@
     "cross-env": "^3.0.0",
     "eslint": "^3.14.1",
     "eslint-loader": "^1.6.1",
+    "external-svg-sprite-loader": "^2.1.1",
     "laravel-mix": "^0.8.8",
+    "svg-sprite-loader": "^0.3.0",
     "webpack": "2.2.1",
     "webpack-dev-server": "^2.3.0"
   }
