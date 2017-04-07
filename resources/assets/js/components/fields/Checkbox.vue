@@ -1,8 +1,19 @@
 <template>
-	<el-checkbox-group v-model="model">
-		<el-checkbox label="Label 1" name="type"></el-checkbox>
-		<el-checkbox label="Label 2" name="type"></el-checkbox>
-		<el-checkbox label="Label 3" name="type"></el-checkbox>
-		<el-checkbox label="Label 4" name="type"></el-checkbox>
+	<el-checkbox-group v-model="value">
+		<el-checkbox
+				v-for="option in options"
+				:label="option.value"
+			>
+			{{ option.label }}
+		</el-checkbox>
 	</el-checkbox-group>
 </template>
+
+<script>
+import BaseFieldMixin from './BaseFieldMixin';
+
+export default {
+	name: 'CheckboxField',
+	mixins: [BaseFieldMixin]
+};
+</script>

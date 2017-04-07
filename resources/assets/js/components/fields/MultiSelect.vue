@@ -1,6 +1,19 @@
 <template>
-	<el-select multiple placeholder="Activity zone">
-		<el-option label="Zone one" value="shanghai"></el-option>
-		<el-option label="Zone two" value="beijing"></el-option>
+	<el-select multiple v-model="value" :placeholder="options.placeholder">
+		<el-option
+			v-for="option in options"
+			:label="option.label"
+			:value="option.value"
+		>
+		</el-option>
 	</el-select>
 </template>
+
+<script>
+import BaseFieldMixin from './BaseFieldMixin';
+
+export default {
+	name: 'multiSelectField',
+	mixins: [BaseFieldMixin]
+};
+</script>

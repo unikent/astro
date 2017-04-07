@@ -10,34 +10,10 @@
 </template>
 
 <script>
-	import { mapActions } from 'vuex';
+import BaseFieldMixin from './BaseFieldMixin';
 
-	export default {
-
-		name: 'SelectField',
-
-		props: ['field'],
-
-		data() {
-			return this.field;
-		},
-
-		computed: {
-			value: {
-				get() {
-					return this.$store.getters.getCurrentFieldValue(this.name);
-				},
-				set(value) {
-					this.updateValue({ name: this.name, value });
-				}
-			}
-		},
-
-		methods: {
-			...mapActions([
-				'updateValue'
-			])
-		}
-
-	}
+export default {
+	name: 'SelectField',
+	mixins: [BaseFieldMixin]
+};
 </script>
