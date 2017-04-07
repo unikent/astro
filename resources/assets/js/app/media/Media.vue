@@ -177,14 +177,14 @@ h3 {
 		<div v-for="rowIndex in Math.ceil(filteredImages.length / colCount)" class="columns">
 			<div v-for="colIndex in colCount" class="column">
 				<div
-					v-if="filteredImages[getThumbIndex(rowIndex, colIndex)]"
+					v-if="getImage(rowIndex, colIndex)"
 					class="image-grid__item"
-					:title="filteredImages[getThumbIndex(rowIndex, colIndex)].name">
+					:title="getImage(rowIndex, colIndex).title">
 					<lazy-img
 						class="img-grid"
 						:bg="true"
-						:src="`/storage/uploads/${getImage(rowIndex, colIndex).id}/${getImage(rowIndex, colIndex).name}`"
-						:smallSrc="`/storage/uploads/${getImage(rowIndex, colIndex).id}/${filteredImages[getThumbIndex(rowIndex, colIndex)].name}`"
+						:src="getImage(rowIndex, colIndex).src"
+						:smallSrc="getImage(rowIndex, colIndex).src"
 					/>
 					<div class="image-grid__item-overlay" />
 					<div class="item-grid__edit">
@@ -235,10 +235,10 @@ h3 {
 	<el-dialog title="Details" v-model="showMediaDetails" size="large">
 		<div v-if="filteredImages[media]" class="columns">
 			<div class="column">
-				<img :src="`/storage/uploads/${filteredImages[media].id}/${filteredImages[media].name}`" />
+				<img :src="filteredImages[media].src" />
 			</div>
 			<div class="column is-one-third">
-				<pre>{{ filteredImages[media].meta }}</pre>
+
 			</div>
 		</div>
 	</el-dialog>
