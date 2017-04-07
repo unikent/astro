@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<el-radio-group size="small">
+		<el-radio-group v-model="value" size="small">
 			<el-radio
 				v-for="option in options"
 				:label="option.value"
