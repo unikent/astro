@@ -59,7 +59,15 @@ class Handler extends ExceptionHandler
 				switch(get_class($exception)){
 					case 'App\Exceptions\DefinitionNotFoundException':
 					case 'Illuminate\Database\Eloquent\ModelNotFoundException':
-						return response()->json([ 'errors' => [[ 'message' => 'Not found', 'reason' => $classname ]] ], 404);
+						return response()->json([ 'errors' => [[ 'message' => 'Not Found', 'reason' => $classname ]] ], 404);
+						break;
+
+					case 'Illuminate\Auth\AuthenticationException':
+						return response()->json([ 'errors' => [[ 'message' => 'Not Authenticated', 'reason' => $classname ]] ], 401);
+						break;
+
+					case 'Illuminate\Auth\Access\AuthorizationException':
+						return response()->json([ 'errors' => [[ 'message' => 'Not Authenticated', 'reason' => $classname ]] ], 403);
 						break;
 
 					default:

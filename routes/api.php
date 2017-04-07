@@ -15,11 +15,11 @@
 //
 
 Route::group([ 'prefix' => 'v1', 'namespace' => 'v1' ], function(){
-	Route::get('layout/definitions', 'LayoutsController@definitions');
-	Route::get('layout/{layout_definition}/definition', 'LayoutsController@definition');
-	Route::get('layout/{layout_definition}/regions', 'LayoutsController@regions');
+	Route::get('layout/definitions', 'LayoutController@definitions');
+	Route::get('layout/{layout_definition}/definition', 'LayoutController@definition');
+	Route::get('layout/{layout_definition}/regions', 'LayoutController@regions');
 
-	Route::resource('layout', 'LayoutsController');
+	Route::resource('layout', 'LayoutController');
 
 	// Route::resource('region', '');
 	// Route::resource('block', '');

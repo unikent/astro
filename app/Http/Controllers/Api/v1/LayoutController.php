@@ -4,11 +4,10 @@ namespace App\Http\Controllers\Api\v1;
 use Auth;
 use Config;
 use Illuminate\Http\Request;
-use Illuminate\Contracts\Auth\Access\Gate;
 use App\Models\Definitions\Layout as Definition;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
-class LayoutsController extends ApiController
+class LayoutController extends ApiController
 {
 	use AuthorizesRequests;
 
