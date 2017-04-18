@@ -10,7 +10,7 @@ class Page extends Model
 {
 	use Tracked;
 
-	protected $fillable = ['parent_block', 'order', 'section', 'type', 'fields', 'title', 'slug'];
+	protected $fillable = ['parent_block', 'order', 'section', 'type', 'fields', 'title', 'slug', 'layout_name', 'layout_version'];
 	protected $visible = ['title', 'options','slug', 'path', 'structure', 'id', 'order', 'parent_block', 'section', 'created_by', 'created_at', 'title'];
 	protected $appends = ['slug', 'path', 'structure', 'parent'];
 
