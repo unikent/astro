@@ -184,7 +184,7 @@ class RegionControllerTest extends ApiControllerTestCase {
         $json = $response->json();
         $this->assertArrayHasKey('data', $json);
         $this->assertCount(1, $json['data']);
-        $this->assertEquals('test-block', $json['data'][0]['type']);
+        $this->assertEquals('test-block', $json['data'][0]['name']);
     }
 
 }

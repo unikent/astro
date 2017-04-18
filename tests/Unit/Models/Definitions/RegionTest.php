@@ -70,7 +70,7 @@ class RegionTest extends TestCase
 		$collection = $region->getBlockDefinitions();
 
 		$this->assertCount(1, $collection);
-		$this->assertEquals('test-block', $collection[0]->type);
+		$this->assertEquals('test-block', $collection[0]->name);
 	}
 
 	/**

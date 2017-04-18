@@ -1,6 +1,6 @@
 {
-	"name": "Test Block",
-	"type": "test-block",
+	"label": "Test Block",
+	"name": "test-block",
 	
 	"version": 1,
 

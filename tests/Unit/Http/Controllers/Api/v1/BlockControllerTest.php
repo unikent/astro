@@ -117,7 +117,7 @@ class BlockControllerTest extends ApiControllerTestCase {
 
         $json = $response->json();
         $this->assertArrayHasKey('data', $json);
-        $this->assertEquals('test-block', $json['data']['type']);
+        $this->assertEquals('test-block', $json['data']['name']);
     }
 
 }
