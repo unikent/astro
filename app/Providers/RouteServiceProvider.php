@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\Definitions\Layout as LayoutDefinition;
+use App\Models\Definitions\Region as RegionDefinition;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
 class RouteServiceProvider extends ServiceProvider
@@ -30,6 +31,11 @@ class RouteServiceProvider extends ServiceProvider
 	    Route::bind('layout_definition', function($value){
 	        $path = LayoutDefinition::locateDefinitionOrFail($value, request()->get('version', null));
 	        return LayoutDefinition::fromDefinitionFile($path);
+	    });
+
+	    Route::bind('region_definition', function($value){
+	        $path = RegionDefinition::locateDefinitionOrFail($value, request()->get('version', null));
+	        return RegionDefinition::fromDefinitionFile($path);
 	    });
 	}
 
