@@ -15,6 +15,10 @@
 //
 
 Route::group([ 'prefix' => 'v1', 'namespace' => 'v1' ], function(){
+	Route::get('block/definitions', 'BlockController@definitions');
+	Route::get('block/{block_definition}/definition', 'BlockController@definition');
+	Route::get('block/{block_definition}/blocks', 'BlockController@blocks');
+
 	Route::get('layout/definitions', 'LayoutController@definitions');
 	Route::get('layout/{layout_definition}/definition', 'LayoutController@definition');
 	Route::get('layout/{layout_definition}/regions', 'LayoutController@regions');
