@@ -15,7 +15,7 @@ class UpdateRoutesPostPrototype extends Migration
     {
         Schema::table('routes', function (Blueprint $table) {
             $table->integer('page_id')->unsigned()->change();
-            $table->foreign('page_id', 'page_id_fk')->references('id')->on('pages');
+            $table->foreign('page_id', 'page_id_fk')->references('id')->on('pages')->onDelete('cascade');
 
             $table->string('slug')->nullable(true)->change();
 

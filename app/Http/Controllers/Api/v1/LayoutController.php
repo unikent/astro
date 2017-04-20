@@ -5,11 +5,9 @@ use Auth;
 use Config;
 use Illuminate\Http\Request;
 use App\Models\Definitions\Layout as Definition;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class LayoutController extends ApiController
 {
-	use AuthorizesRequests;
 
 	/**
 	 * GET /api/v1/layout/definitions

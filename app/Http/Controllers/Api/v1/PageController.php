@@ -21,6 +21,8 @@ class PageController extends ApiController
 	 * @return Response
 	 */
 	public function store(StoreRequest $request){
+		$this->authorize('create', Page::class);
+
 		$page = new Page;
 		$this->process($request, $page);
 		return response()->json([ 'data' => $page ], 201);
@@ -35,6 +37,8 @@ class PageController extends ApiController
 	 * @return Response
 	 */
 	public function update(UpdateRequest $request, Page $page){
+		$this->authorize('update', $page);
+
 		$this->process($request, $page);
 		return response()->json([ 'data' => $page ], 200);
 	}
@@ -47,6 +51,8 @@ class PageController extends ApiController
 	 * @return Response
 	 */
 	public function destroy(Request $request, Page $page){
+		$this->authorize('delete', $page);
+
 		$page->delete();
     	return (new SymfonyResponse())->setStatusCode(200);
 	}
@@ -69,8 +75,8 @@ class PageController extends ApiController
 			// TODO: Validation needs to ensure that the route is within the appropriate hierarchy.
 			// TODO: Validation needs to ensure that the route is not Canonical for another page.
 			$route = Route::firstOrNew([
-				'slug' => $request->get('route.slug'),
-				'parent_id' => $request->get('route.parent_id', null),
+				'slug' => $request->input('route.slug'),
+				'parent_id' => $request->input('route.parent_id', null),
 			]);
 
 			// Set the Page attributes and save it, so we have an ID
@@ -88,7 +94,7 @@ class PageController extends ApiController
 
 			// Populate the regions with Blocks
 			if($request->has('regions')){
-				foreach($request->get('regions') as $region => $blocks){
+				foreach($request->input('regions') as $region => $blocks){
 					// Remove any existing Blocks in the region (to avoid re-ordering existing)
 					$page->clearRegion($region);
 
@@ -112,6 +118,7 @@ class PageController extends ApiController
 			DB::commit();
 		} catch(Exception $e){
 			DB::rollBack();
+			throw $e;
 		}
 	}
 

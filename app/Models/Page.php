@@ -38,11 +38,6 @@ class Page extends Model
 		return $this->hasMany(Block::class, 'page_id');
 	}
 
-	public function blocksByRegion()
-	{
-		return $this->blocks->groupBy('region_name');
-	}
-
 
 	/**
 	 * Scopes query to return Pages where 'is_site' is true

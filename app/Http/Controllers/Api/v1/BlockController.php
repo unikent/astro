@@ -5,11 +5,9 @@ use Auth;
 use Config;
 use Illuminate\Http\Request;
 use App\Models\Definitions\Block as Definition;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class BlockController extends ApiController
 {
-	use AuthorizesRequests;
 
 	/**
 	 * GET /api/v1/region/definitions

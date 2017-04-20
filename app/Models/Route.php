@@ -9,7 +9,7 @@ class Route extends BaumNode
 {
 	public $timestamps = false;
 
-	protected $fillable = [ 'slug' ];
+	protected $fillable = [ 'slug', 'parent_id' ];
 
 	protected $hidden = [ 'lft', 'rgt'];
 
