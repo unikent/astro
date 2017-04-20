@@ -32,3 +32,13 @@ $compiledPath = __DIR__.'/cache/compiled.php';
 if (file_exists($compiledPath)) {
 	require $compiledPath;
 }
+
+/*
+|--------------------------------------------------------------------------
+| Include Custom Utilities
+|--------------------------------------------------------------------------
+|
+| Include custom utility methods
+|
+*/
+require __DIR__ . '/../utilities.php';

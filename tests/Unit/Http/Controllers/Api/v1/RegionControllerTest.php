@@ -2,16 +2,10 @@
 namespace Tests\Unit\Http\Controllers\Api\v1;
 
 use Gate;
-use Config;
 use App\Models\Definitions\Region as Definition;
 use App\Http\Controllers\Api\v1\RegionController;
 
 class RegionControllerTest extends ApiControllerTestCase {
-
-    public function setUp(){
-        parent::setUp();
-        Config::set('app.definitions_path', base_path('tests/Support/Fixtures/definitions'));
-    }
 
     /**
      * @test

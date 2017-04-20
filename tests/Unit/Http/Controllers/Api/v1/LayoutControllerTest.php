@@ -8,11 +8,6 @@ use App\Http\Controllers\Api\v1\LayoutController;
 
 class LayoutControllerTest extends ApiControllerTestCase {
 
-    public function setUp(){
-        parent::setUp();
-        Config::set('app.definitions_path', base_path('tests/Support/Fixtures/definitions'));
-    }
-
     /**
      * @test
      * @group authentication

@@ -2,16 +2,10 @@
 namespace Tests\Unit\Http\Controllers\Api\v1;
 
 use Gate;
-use Config;
 use App\Models\Definitions\Block as Definition;
 use App\Http\Controllers\Api\v1\BlockController;
 
 class BlockControllerTest extends ApiControllerTestCase {
-
-    public function setUp(){
-        parent::setUp();
-        Config::set('app.definitions_path', base_path('tests/Support/Fixtures/definitions'));
-    }
 
     /**
      * @test

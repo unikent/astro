@@ -23,6 +23,8 @@ Route::group([ 'prefix' => 'v1', 'namespace' => 'v1' ], function(){
 	Route::get('layout/{layout_definition}/definition', 'LayoutController@definition');
 	Route::get('layout/{layout_definition}/regions', 'LayoutController@regions');
 
+	Route::resource('page', 'PageController', [ 'except' => [ 'index', 'create', 'edit' ]]);
+
 	Route::get('region/definitions', 'RegionController@definitions');
 	Route::get('region/{region_definition}/definition', 'RegionController@definition');
 	Route::get('region/{region_definition}/blocks', 'RegionController@blocks');

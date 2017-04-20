@@ -35,7 +35,12 @@ class Page extends Model
 
 	public function blocks()
 	{
-		return $this->hasMany(Block::class, 'page_id')->orderBy('order');
+		return $this->hasMany(Block::class, 'page_id');
+	}
+
+	public function blocksByRegion()
+	{
+		return $this->blocks->groupBy('region_name');
 	}
 
 
