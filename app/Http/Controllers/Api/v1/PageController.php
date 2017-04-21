@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Api\v1;
 
 use DB;
+use Exception;
 use App\Models\Page;
 use App\Models\Block;
 use App\Models\Route;
@@ -21,10 +22,8 @@ class PageController extends ApiController
 	 * @return Response
 	 */
 	public function store(StoreRequest $request){
-		$this->authorize('create', Page::class);
-
 		$page = new Page;
-		$this->process($request, $page);
+		$this->process($request, $page); // Handles authorization and persistance
 		return response()->json([ 'data' => $page ], 201);
 	}
 
@@ -37,9 +36,7 @@ class PageController extends ApiController
 	 * @return Response
 	 */
 	public function update(UpdateRequest $request, Page $page){
-		$this->authorize('update', $page);
-
-		$this->process($request, $page);
+		$this->process($request, $page); // Handles authorization and persistance
 		return response()->json([ 'data' => $page ], 200);
 	}
 
@@ -48,7 +45,7 @@ class PageController extends ApiController
 	 *
 	 * @param  Request    $request
 	 * @param  Definition $definition
-	 * @return Response
+	 * @return SymfonyResponse
 	 */
 	public function destroy(Request $request, Page $page){
 		$this->authorize('delete', $page);
@@ -71,7 +68,6 @@ class PageController extends ApiController
 
 		try {
 			// Create/Update the Route
-			// TODO: Authorization needs to check that the User can edit the Route
 			// TODO: Validation needs to ensure that the route is within the appropriate hierarchy.
 			// TODO: Validation needs to ensure that the route is not Canonical for another page.
 			$route = Route::firstOrNew([
@@ -79,17 +75,22 @@ class PageController extends ApiController
 				'parent_id' => $request->input('route.parent_id', null),
 			]);
 
-			// Set the Page attributes and save it, so we have an ID
+			// Set the Page attributes and save the Page (we need an ID for the Route)
 			$page->fill($request->all());
 			$page->save();
 
-			// Ensure that the Route directs to the Page
+			// Associate the Route with the Page
 			$route->page_id = $page->getKey();
 
-			// Save the Route
+			// Now that we have a populated Route object, lets save the Route
 			$route->save();
 
-			// Ensure that the Route is canonical
+			// Now we have a Page in a state that we can authorize, so lets do that
+			// Note: as we are within a Transaction, ALL changes will be rolled-back should authz fail
+			$this->authorize($page->wasRecentlyCreated ? 'create' : 'update', $page);
+
+			// Now we can make the Route canonical
+			// Note: we don't do this pre-authz as permissions check requires knowledge of existing canonical Route
 			$route->makeCanonical();
 
 			// Populate the regions with Blocks

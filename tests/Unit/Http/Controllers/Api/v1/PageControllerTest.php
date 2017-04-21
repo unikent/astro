@@ -44,7 +44,7 @@ class PageControllerTest extends ApiControllerTestCase {
      * @group authorization
      */
     public function store_WhenAuthenticated_ChecksAuthorization(){
-        Gate::shouldReceive('authorize')->with('create', Page::class)->once();
+        Gate::shouldReceive('authorize')->with('create', Mockery::type(Page::class))->once();
 
         $this->authenticated();
         $response = $this->action('POST', PageController::class . '@store', [], $this->getAttrs());
