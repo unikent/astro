@@ -14,6 +14,8 @@ import Test from './components/views/Test.vue';
 
 import NotFound from './components/views/NotFound.vue';
 
+/* global window */
+
 const routes = [
 	{
 		path: '/',

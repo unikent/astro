@@ -66,6 +66,8 @@
 import { mapState } from 'vuex';
 import SnackBar from '../SnackBar.vue';
 
+/* global window */
+
 export default {
 	name: 'App',
 

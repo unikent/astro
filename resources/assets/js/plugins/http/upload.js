@@ -1,5 +1,7 @@
 import api from './api';
 
+/* global FormData */
+
 export default (options) => {
 
 	const config = {
@@ -13,7 +15,7 @@ export default (options) => {
 
 		headers: options.headers || {},
 
-    	withCredentials: !!options.withCredentials
+		withCredentials: !!options.withCredentials
 	};
 
 	const formData = new FormData();

@@ -1,3 +1,9 @@
+<style>
+.icon {
+	vertical-align: middle;
+}
+</style>
+
 <template>
 <svg :class="className" :width="width" :height="height" :viewBox="glyph.viewBox">
 	<use :xlink:href="glyph.symbol" />
@@ -5,15 +11,22 @@
 </template>
 
 <script>
+import astro from '!IconPath/unknown.svg';
+
 export default {
 	props: {
-		glyph: {},
+		glyph: {
+			default: () => astro
+		},
+
 		width: {
 			default: 17
 		},
+
 		height: {
 			default: 17
 		},
+
 		className: {
 			default: 'icon'
 		}

@@ -17,24 +17,24 @@
 </template>
 
 <script>
-	import PageList from './PageList.vue';
+import PageList from './PageList.vue';
 
-	export default {
+export default {
 
-		components: {
-			PageList
-		},
+	components: {
+		PageList
+	},
 
-		data() {
-			return {
-				activeName: 'first'
-			};
-		},
+	data() {
+		return {
+			activeName: 'first'
+		};
+	},
 
-		methods: {
-			handleClick(tab, event) {
-				console.log(tab, event);
-			}
+	methods: {
+		handleClick(tab, event) {
+			console.log(tab, event);
 		}
-	};
+	}
+};
 </script>

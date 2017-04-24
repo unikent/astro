@@ -1,136 +1,136 @@
 <style lang="scss">
-	.page-list {
-		list-style: none;
+.page-list {
+	list-style: none;
+	padding: 0;
+	user-select: none;
+	font-size: 14px;
+	width: 100%;
+	margin: 0;
+
+	.option-button {
+		padding: 6px;
+	}
+
+	.parent-page {
 		padding: 0;
-		user-select: none;
+	}
+
+	.parent-page > div {
+		color: #03a9f4;
+	}
+
+	.is-site > div  {
+		color: #41b883;
+	}
+
+	.parent-page > div,
+	li {
+		padding: 10px;
+		transition: background 300ms ease;
+		cursor: default;
+	}
+
+	ul {
+		list-style: none;
+		padding-left: 0;
+	}
+
+	li:not(.parent-page):hover,
+	.parent-page > div:hover {
+		background-color: #e5e9f1;
+	}
+
+	li.add:hover {
+		background: none;
+	}
+
+	.chevron {
+		cursor: pointer;
+		width: 12px;
+		margin-right: 2px;
+		transition: transform .2s ease-out;
+		vertical-align: middle;
+	}
+
+	.chevron.open {
+		transform: rotate(90deg);
+	}
+
+	.children {
+		transition: max-height .2s ease-out;
+	}
+
+	.collapsed {
+		display: none;
+	}
+
+	.name {
+		display: inline-block;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		vertical-align: middle;
+	}
+
+	input {
 		font-size: 14px;
-		width: 100%;
-		margin: 0;
-
-		.option-button {
-			padding: 6px;
-		}
-
-		.parent-page {
-			padding: 0;
-		}
-
-		.parent-page > div {
-			color: #03a9f4;
-		}
-
-		.is-site > div  {
-			color: #41b883;
-		}
-
-		.parent-page > div,
-		li {
-			padding: 10px;
-			transition: background 300ms ease;
-			cursor: default;
-		}
-
-		ul {
-			list-style: none;
-			padding-left: 0;
-		}
-
-		li:not(.parent-page):hover,
-		.parent-page > div:hover {
-			background-color: #e5e9f1;
-		}
-
-		li.add:hover {
-			background: none;
-		}
-
-		.chevron {
-			cursor: pointer;
-			width: 12px;
-			margin-right: 2px;
-			transition: transform .2s ease-out;
-			vertical-align: middle;
-		}
-
-		.chevron.open {
-			transform: rotate(90deg);
-		}
-
-		.children {
-			transition: max-height .2s ease-out;
-		}
-
-		.collapsed {
-			display: none;
-		}
-
-		.name {
-			display: inline-block;
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			vertical-align: middle;
-		}
-
-		input {
-			font-size: 14px;
-		}
-
-		.name,
-		.edit-input {
-			max-width: calc(100% - 85px);
-		}
-
-		.item span:first-child {
-			padding: 2px;
-		}
-
-		.options {
-			opacity: 0;
-			display: inline-block;
-			vertical-align: middle;
-			margin-left: 4px;
-		}
-
-		.cog {
-			width: 12px;
-			display: inline-block;
-			vertical-align: middle;
-		}
-
-		.options:hover path {
-			fill: #555;
-		}
-
-		.move {
-			cursor: move;
-			width: 10px;
-			opacity: 0;
-			vertical-align: middle;
-		}
-
-		.page-list .btn-group {
-			cursor: move;
-			opacity: 0;
-		}
-
-		.item:hover > div .move,
-		.item:hover > div .options {
-			opacity: 1;
-		}
-
-		.dropdown-menu {
-			font-size: .9rem;
-		}
 	}
 
-	.kkjdhgs {
-		background-color: rgba(238, 241, 246, .85);
+	.name,
+	.edit-input {
+		max-width: calc(100% - 85px);
 	}
 
-	.js-app {
-		min-height: 200px;
+	.item span:first-child {
+		padding: 2px;
 	}
+
+	.options {
+		opacity: 0;
+		display: inline-block;
+		vertical-align: middle;
+		margin-left: 4px;
+	}
+
+	.cog {
+		width: 12px;
+		display: inline-block;
+		vertical-align: middle;
+	}
+
+	.options:hover path {
+		fill: #555;
+	}
+
+	.move {
+		cursor: move;
+		width: 10px;
+		opacity: 0;
+		vertical-align: middle;
+	}
+
+	.page-list .btn-group {
+		cursor: move;
+		opacity: 0;
+	}
+
+	.item:hover > div .move,
+	.item:hover > div .options {
+		opacity: 1;
+	}
+
+	.dropdown-menu {
+		font-size: .9rem;
+	}
+}
+
+.kkjdhgs {
+	background-color: rgba(238, 241, 246, .85);
+}
+
+.js-app {
+	min-height: 200px;
+}
 </style>
 
 <template>
@@ -163,73 +163,82 @@
 </template>
 
 <script>
-	import PageListItem from './PageListItem.vue';
-	import { Loading } from 'element-ui';
+import PageListItem from './PageListItem.vue';
+import { Loading } from 'element-ui';
 
-	const order = {
+import pageStructure from '../tests/stubs/page-structure.json';
 
-		title(hierarchy) {
-			return hierarchy;
-		},
+const order = {
 
-		modified(hierarchy) {
-			return null;
-		},
+	title(hierarchy) {
+		return hierarchy;
+	},
 
-		created(hierarchy) {
-			return null;
-		}
+	modified(hierarchy) {
+		return null;
+	},
+
+	created(hierarchy) {
+		return null;
 	}
+}
 
-	export default {
+export default {
 
-		data() {
-			return {
-				site: 1,
-				hierarchy: null,
-				edit: null,
-				order: 'title',
-				loading: true
-			};
-		},
+	data() {
+		return {
+			site: 1,
+			hierarchy: null,
+			edit: null,
+			order: 'title',
+			loading: true
+		};
+	},
 
-		components: {
-			PageListItem
-		},
+	components: {
+		PageListItem
+	},
 
-		computed: {
-			orderedHierarchy() {
-				return order[this.order](this.hierarchy)
-			}
-		},
+	computed: {
+		orderedHierarchy() {
+			return order[this.order](this.hierarchy)
+		}
+	},
 
-		methods: {
-			fetchData() {
-				this.$api
-					.get(`sites/structure/${this.site}`)
-					.then((response) => {
-						this.hierarchy = response.data;
-						this.loading = false;
-						if(this.loadingInstance) {
-							this.loadingInstance.close();
-						}
-					});
-			}
-		},
+	methods: {
+		fetchData() {
+			// this.$api
+			// 	.get(`sites/structure/${this.site}`)
+			// 	.then((response) => {
+			// 		this.hierarchy = response.data;
+			// 		this.loading = false;
+			// 		if(this.loadingInstance) {
+			// 			this.loadingInstance.close();
+			// 		}
+			// 	});
 
-		created() {
-			this.fetchData();
-			this.$bus.$on('rename-page', (id) => this.edit = id);
-		},
+			this.hierarchy = pageStructure;
 
-		mounted() {
-			if(this.loading) {
-				this.loadingInstance = Loading.service({
-					target: this.$el,
-					text: 'Loading...',
-					customClass: 'kkjdhgs'
-				});
+			this.loading = false;
+			if(this.loadingInstance) {
+				this.loadingInstance.close();
 			}
 		}
+	},
+
+	created() {
+		this.fetchData();
+		this.$bus.$on('rename-page', (id) => this.edit = id);
+	},
+
+	mounted() {
+		if(this.loading) {
+			this.loadingInstance = Loading.service({
+				target: this.$el,
+				text: 'Loading...',
+				customClass: 'kkjdhgs'
+			});
+		}
 	}
+};
 </script>

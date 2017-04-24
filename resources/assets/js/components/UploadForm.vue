@@ -52,7 +52,7 @@
 import upload from '../plugins/http/upload';
 import UploadFailList from './UploadFailList';
 
-// TODO: while uploading stop visiting to different page?.
+// TODO: while uploading show global upload progress.
 
 export default {
 	props: [

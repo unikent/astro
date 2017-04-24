@@ -12,6 +12,8 @@ import store from './store';
 import App from './components/views/App.vue';
 import { router } from './routes';
 
+/* global document */
+
 Vue.use(VueRouter);
 Vue.use(ElementUI, { locale });
 
@@ -30,7 +32,7 @@ const vueIfExists = (selector, options) => {
 	return null;
 };
 
-const inlineEditor = vueIfExists('#editor', {
+vueIfExists('#editor', {
 	render: h => h(App),
 	router
 });

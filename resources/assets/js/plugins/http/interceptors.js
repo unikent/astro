@@ -2,6 +2,8 @@ import Vue from 'vue';
 
 const vue = new Vue();
 
+/* global window, Promise */
+
 export default (http, store, router) => {
 	// http.interceptors.request.use(
 	// 	config => {
@@ -17,9 +19,9 @@ export default (http, store, router) => {
 		error => {
 			const { response } = error
 
-			if([401, 400].indexOf(response.status) > -1) {
-				window.location = '/auth/login';
-			}
+			// if([401, 400].indexOf(response.status) > -1) {
+			// 	window.location = '/auth/login';
+			// }
 
 			// TODO: hook up to snackbar
 			if(Array.isArray(response.data.errors)) {

@@ -105,7 +105,10 @@ h3 {
 
 		<div class="u-mla u-flex">
 
-			<el-button class="upload-button" @click="showUploadForm = true">Upload</el-button>
+			<el-button
+				class="upload-button"
+				@click="showUploadForm = true"
+			>Upload</el-button>
 
 			<el-input
 				placeholder="Search for media"
@@ -146,10 +149,10 @@ h3 {
 			<el-row>
 				<el-col :span="12">
 					<el-slider
-					v-model="imageSize"
-					:step="25"
-					style="margin: 0 5px;"
-				/>
+						v-model="imageSize"
+						:step="25"
+						style="margin: 0 5px;"
+					/>
 				</el-col>
 				<el-col :span="12">
 					<el-pagination
@@ -175,7 +178,8 @@ h3 {
 				<div
 					v-if="getImage(rowIndex, colIndex)"
 					class="image-grid__item"
-					:title="getImage(rowIndex, colIndex).title">
+					:title="getImage(rowIndex, colIndex).title"
+				>
 					<lazy-img
 						class="img-grid"
 						:bg="true"
@@ -302,7 +306,7 @@ export default {
 	},
 
 	methods: {
-		search(e) {
+		search() {
 			console.log('Search for files', this.searchTerm);
 		},
 

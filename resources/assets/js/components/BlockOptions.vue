@@ -32,9 +32,8 @@ h3 {
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapActions } from 'vuex';
 import fields from './fields';
-import views from 'cms-prototype-blocks';
 
 export default {
 
@@ -60,5 +59,5 @@ export default {
 		}
 	}
 
-}
+};
 </script>

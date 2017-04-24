@@ -1,9 +1,12 @@
 <template>
 <div>
-	<div id="main_content">
-		<div id="b-wrapper" ref="container">
+	<div
+		v-for="(region, name) in page.regions"
+		:id="name"
+	>
+		<div id="b-wrapper">
 			<block
-				v-for="(blockData, index) in page.blocks"
+				v-for="(blockData, index) in region"
 				:key="`block-${blockData.id}`"
 				:type="blockData.type"
 				:index="index"
@@ -11,7 +14,6 @@
 				:scale="scale"
 			>
 			</block>
-			<!-- <div class="b-editable"></div> -->
 			<div class="b-block">
 				<div class="b-block-options" @click="editBlock">⚙</div>
 				<div class="b-block-move">⇅</div>
@@ -24,12 +26,12 @@
 </template>
 
 <script>
-import Vue from 'vue';
 import Block from '../Block.vue';
-import eventBus from '../../libs/event-bus.js';
 import Velocity from 'velocity-animate';
 
 import { mapState } from 'vuex';
+
+/* global document, window */
 
 const
 	SCALE_DOWN = 0.4,
@@ -58,7 +60,7 @@ export default {
 	},
 
 	created() {
-		eventBus.$on('block:move', index => {
+		this.$bus.$on('block:move', index => {
 			this.moved = index;
 		});
 	},
@@ -85,7 +87,7 @@ export default {
 	},
 
 	methods: {
-		editBlock(e) {
+		editBlock() {
 			this.$store.dispatch('editBlock', this.current);
 		},
 
@@ -106,10 +108,10 @@ export default {
 		},
 
 		initEvents() {
-			eventBus.$on('block:showOverlay', this.showOverlay);
-			eventBus.$on('block:hideOverlay', this.hideOverlay);
+			this.$bus.$on('block:showOverlay', this.showOverlay);
+			this.$bus.$on('block:hideOverlay', this.hideOverlay);
 
-			eventBus.$on('block:move', this.repositionOverlay);
+			this.$bus.$on('block:move', this.repositionOverlay);
 
 			document.addEventListener('mousedown', this.mouseDown);
 			document.addEventListener('mouseup', this.mouseUp);
@@ -125,7 +127,7 @@ export default {
 						this.handleStyle.opacity = 1;
 						this.drag(false, e.clientY);
 
-						eventBus.$emit('block:dragstart', {
+						this.$bus.$emit('block:dragstart', {
 							event: e,
 							el: this.current.$el
 						});
@@ -158,13 +160,14 @@ export default {
 					size += this.blockInfo.sizes[i];
 				}
 				size -= this.blockInfo.sizes[data.from];
-			} else {
+			}
+			else {
 				for(let i = 0; i < data.to; i++) {
 					size += this.blockInfo.sizes[i];
 				}
 			}
 
-			console.log(size, this.overlay);
+			// console.log(size, this.overlay);
 
 			this.editableBlock.style.transform = `translateY(${(size)}px)`;
 		},
@@ -190,7 +193,7 @@ export default {
 			}
 
 			box.style.transform = `translateY(${(pos.top + window.scrollY - minusTop)}px)`;
-			// box.style.left = (pos.left + window.scrollX - minusLeft) + 'px';
+			box.style.left = (pos.left + window.scrollX - minusLeft) + 'px';
 			box.style.width = (pos.width + addWidth) + 'px';
 			box.style.height = (pos.height + addHeight) + 'px';
 
@@ -207,41 +210,43 @@ export default {
 			this.$store.dispatch('reorderBlocks', {
 				from:  this.moved.from,
 				to:    this.moved.to,
-				value: this.page.blocks[this.moved.from]
+				value: this.page.regions['main_content'][this.moved.from]
 			});
 
 			this.$store.dispatch('updateBlockDataOrder', {
-				type: 'sizes',
+				type:  'sizes',
 				from:  this.moved.from,
 				to:    this.moved.to,
 				value: this.blockInfo.sizes[this.moved.from]
 			});
 
 			this.$store.dispatch('updateBlockDataOrder', {
-				type: 'offsets',
+				type:  'offsets',
 				from:  this.moved.from,
 				to:    this.moved.to,
 				value: this.blockInfo.offsets[this.moved.from]
 			});
 
-			eventBus.$emit('block:dragstop');
+			this.$bus.$emit('block:dragstop');
 		},
 
 		drag(revert, mouseY) {
 			var scroll = window.scrollY;
 
+			// TODO: don't actually scroll, just use transforms to scroll page?
+
 			if(revert) {
 				this.scaled = false;
 
 				var
-					scaledOffset = scroll * SCALE_UP,
+					scrollScaleUp = scroll * SCALE_UP,
 					offsetPlusScaled = (mouseY * SCALE_UP) - mouseY;
 
 				Velocity(
 					document.body,
 					'scroll',
 					{
-						offset: scaledOffset + offsetPlusScaled,
+						offset: scrollScaleUp + offsetPlusScaled,
 						queue: false,
 						duration: 300,
 						easing: 'swing'
@@ -261,11 +266,12 @@ export default {
 					}
 				);
 
-			} else {
+			}
+			else {
 				this.scaled = true;
 
 				var
-					scaledOffset = scroll * SCALE_DOWN,
+					scrollScaleDown = scroll * SCALE_DOWN,
 					offsetMinusScaled = mouseY - (mouseY * SCALE_DOWN);
 
 				this.handleStyle.transform = 'translateY(' + (((mouseY + window.scrollY) * SCALE_DOWN) - 22) + 'px)';
@@ -274,7 +280,7 @@ export default {
 					document.body,
 					'scroll',
 					{
-						offset: scaledOffset - offsetMinusScaled,
+						offset: scrollScaleDown - offsetMinusScaled,
 						queue: false,
 						duration: 300,
 						easing: 'swing'

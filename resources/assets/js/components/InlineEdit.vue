@@ -3,13 +3,10 @@
 </template>
 
 <script>
-import Vue from 'vue';
+/* global $ */
 
 export default {
-
 	mounted() {
-		console.log(this.$el);
-
 		$(this.$el).redactor({
 			air: true,
 			callbacks: {
@@ -19,5 +16,5 @@ export default {
 			}
 		});
 	}
-}
+};
 </script>

@@ -1,16 +1,16 @@
 <style scoped>
-	.pagination {
-		float: right;
-		margin-top: 20px;
-	}
+.pagination {
+	float: right;
+	margin-top: 20px;
+}
 
-	.manage-table__add-button {
-		margin-left: auto;
-	}
+.manage-table__add-button {
+	margin-left: auto;
+}
 
-	.w100 {
-		width: 100%;
-	}
+.w100 {
+	width: 100%;
+}
 </style>
 
 <template>
@@ -97,7 +97,6 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex';
 import Icon from '../Icon.vue';
 import sites from '../../tests/stubs/sites';
 import editIcon from '!IconPath/pencil.svg';

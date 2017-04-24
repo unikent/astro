@@ -1,12 +1,12 @@
 <style>
-	.site-item {
-		width: 12px;
-	}
+.site-item {
+	width: 12px;
+}
 
-	.side-caret {
-		font-size: 10px;
-		margin-left: 0;
-	}
+.side-caret {
+	font-size: 10px;
+	margin-left: 0;
+}
 </style>
 
 <template>
@@ -72,129 +72,129 @@
 </template>
 
 <script>
-	import Vue from 'vue';
+import Vue from 'vue';
 
-	// https://gist.github.com/jed/982883
-	function uuid(a) {
-		return a ?
-			(a^Math.random() * 16 >> a / 4).toString(16) :
-			([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, uuid);
-	}
+/* global clearTimeout, setTimeout */
 
-	var timer = null
+// https://gist.github.com/jed/982883
+function uuid(a) {
+	return a ?
+		(a^Math.random() * 16 >> a / 4).toString(16) :
+		([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, uuid);
+}
 
-	export default {
-		name: 'SubPage',
+var timer = null
 
-		props: ['page', 'site', 'editing'],
+export default {
+	name: 'SubPage',
 
-		data() {
+	props: ['page', 'site', 'editing'],
+
+	data() {
+		return {
+			open: false
+		}
+	},
+
+	computed: {
+		isParent() {
+			return this.page.children
+		},
+
+		hasChildren() {
+			return this.page.children && this.page.children.length
+		},
+
+		getDepth() {
+			return this.page.depth;
+		},
+
+		leftPadding() {
 			return {
-				open: false
-			}
-		},
-
-		computed: {
-			isParent() {
-				return this.page.children
-			},
-
-			hasChildren() {
-				return this.page.children && this.page.children.length
-			},
-
-			getDepth() {
-				return this.page.depth;
-			},
-
-			leftPadding() {
-				return {
-					paddingLeft: (this.getDepth * 20) + (this.isParent ? 10 : 0) + 'px'
-				}
-			}
-		},
-
-		methods: {
-			toggle() {
-				if(this.isParent) {
-					this.open = !this.open;
-				}
-			},
-
-			waitAndEdit() {
-				clearTimeout(timer);
-				timer = setTimeout(this.edit, 400);
-			},
-
-			edit() {
-				clearTimeout(timer);
-				this.$router.push(`/site/${this.site}/page/${this.page.id}`);
-				this.$store.dispatch('changePage', this.page.title);
-			},
-
-			rename() {
-				clearTimeout(timer);
-
-				console.log(this.$root);
-
-				this.$bus.$emit('rename-page', this.page.id);
-
-				var nameWidth = Math.max(50, this.$refs.name.offsetWidth);
-
-				Vue.nextTick(() => {
-					var input = this.$refs.input;
-					input.style.width = (nameWidth + 4) + 'px';
-					input.focus()
-				});
-			},
-
-			saveEdit() {
-				if(this.page.title !== this.$refs.input.value) {
-					this.page.title = this.$refs.input.value;
-
-					// update page title in DB
-					console.log(this.page.id, this.page.title);
-				}
-
-				this.$bus.$emit('rename-page', null);
-			},
-
-			remove() {
-				this.$confirm(`Are you sure you want to delete "${this.page.title}"?`, 'Warning', {
-					confirmButtonText: 'OK',
-					cancelButtonText: 'Cancel',
-					type: 'warning'
-				}).then(() => {
-					var children = this.$parent.page.children;
-					children.splice(children.indexOf(this.page), 1);
-				});
-			},
-
-			addChild() {
-				var
-					id = uuid(),
-					newLength = this.page.children.push({
-						title: id.substring(0, 8),
-						id: id,
-						children: [],
-						depth: this.page.depth + 1
-					});
-
-				console.log(this.page.children);
-
-				this.open = true;
-
-				Vue.nextTick(() => {
-					this.$children[newLength - 1].rename();
-				});
-			},
-
-			handleCommand(command) {
-				if(this[command]) {
-					this[command]();
-				}
-				// this.$message('click on item ' + command);
+				paddingLeft: (this.getDepth * 20) + (this.isParent ? 10 : 0) + 'px'
 			}
 		}
+	},
+
+	methods: {
+		toggle() {
+			if(this.isParent) {
+				this.open = !this.open;
+			}
+		},
+
+		waitAndEdit() {
+			clearTimeout(timer);
+			timer = setTimeout(this.edit, 400);
+		},
+
+		edit() {
+			clearTimeout(timer);
+			this.$router.push(`/site/${this.site}/page/${this.page.id}`);
+			this.$store.dispatch('changePage', this.page.title);
+		},
+
+		rename() {
+			clearTimeout(timer);
+
+			this.$bus.$emit('rename-page', this.page.id);
+
+			var nameWidth = Math.max(50, this.$refs.name.offsetWidth);
+
+			Vue.nextTick(() => {
+				var input = this.$refs.input;
+				input.style.width = (nameWidth + 4) + 'px';
+				input.focus()
+			});
+		},
+
+		saveEdit() {
+			if(this.page.title !== this.$refs.input.value) {
+				this.page.title = this.$refs.input.value;
+
+				// update page title in DB
+				console.log(this.page.id, this.page.title);
+			}
+
+			this.$bus.$emit('rename-page', null);
+		},
+
+		remove() {
+			this.$confirm(`Are you sure you want to delete "${this.page.title}"?`, 'Warning', {
+				confirmButtonText: 'OK',
+				cancelButtonText: 'Cancel',
+				type: 'warning'
+			}).then(() => {
+				var children = this.$parent.page.children;
+				children.splice(children.indexOf(this.page), 1);
+			});
+		},
+
+		addChild() {
+			var
+				id = uuid(),
+				newLength = this.page.children.push({
+					title: id.substring(0, 8),
+					id: id,
+					children: [],
+					depth: this.page.depth + 1
+				});
+
+			console.log(this.page.children);
+
+			this.open = true;
+
+			Vue.nextTick(() => {
+				this.$children[newLength - 1].rename();
+			});
+		},
+
+		handleCommand(command) {
+			if(this[command]) {
+				this[command]();
+			}
+			// this.$message('click on item ' + command);
+		}
 	}
+};
 </script>

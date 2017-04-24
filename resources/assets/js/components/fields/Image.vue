@@ -22,69 +22,71 @@
 </template>
 
 <script>
-	import { mapActions, mapState } from 'vuex';
-	import _ from 'lodash';
+import { mapActions, mapState } from 'vuex';
+import _ from 'lodash';
 
-	export default {
+/* global URL */
 
-		name: 'ImageField',
+export default {
 
-		props: ['name'],
+	name: 'image-field',
 
-		data() {
-			return {
-				showPreview: false
-			};
-		},
+	props: ['name'],
 
-		computed: {
-			fileList: {
-				get() {
-					const val = this.$store.getters.getCurrentFieldValue(this.name)
-					return val ? [ val ] : [];
-				},
-				set(value) {
-					this.updateValue({
-						name: this.name,
-						value: value ? _.pick(value, 'name', 'url') : value
-					});
-				}
+	data() {
+		return {
+			showPreview: false
+		};
+	},
+
+	computed: {
+		fileList: {
+			get() {
+				const val = this.$store.getters.getCurrentFieldValue(this.name);
+				return val ? [val] : [];
 			},
-
-			...mapState([
-				'page',
-				'preview'
-			])
-		},
-
-		methods: {
-
-			...mapActions([
-				'updateValue'
-			]),
-
-			handleRemove(file, fileList) {
-				this.fileList = null;
-			},
-
-			handlePreview(file) {
-				this.$store.dispatch('changePreview', {
-					visible: true,
-					url: this.fileList[0].url
+			set(value) {
+				this.updateValue({
+					name: this.name,
+					value: value ? _.pick(value, 'name', 'url') : value
 				});
-			},
-
-			handleSuccess(file) {
-				console.log(file);
-			},
-
-			handleError(res, file) {
-				this.fileList = {
-					name: file.name,
-					url: URL.createObjectURL(file.raw)
-				};
 			}
+		},
 
+		...mapState([
+			'page',
+			'preview'
+		])
+	},
+
+	methods: {
+
+		...mapActions([
+			'updateValue'
+		]),
+
+		handleRemove(file, fileList) {
+			this.fileList = null;
+		},
+
+		handlePreview(file) {
+			this.$store.dispatch('changePreview', {
+				visible: true,
+				url: this.fileList[0].url
+			});
+		},
+
+		handleSuccess(file) {
+			console.log(file);
+		},
+
+		handleError(res, file) {
+			this.fileList = {
+				name: file.name,
+				url: URL.createObjectURL(file.raw)
+			};
 		}
+
 	}
+};
 </script>

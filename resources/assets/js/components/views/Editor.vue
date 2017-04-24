@@ -137,10 +137,10 @@
 	</nav>
 
 	<aside :style="{marginRight: blockListOpen ? 0 : '-380px'}" class="editor-component-list editor-sidebar">
-		<block-sidebar></block-sidebar>
 		<div class="right-collapse" @click="blockListOpen = !blockListOpen">
 			<i :class="{'el-icon-arrow-right' : blockListOpen, 'el-icon-arrow-left' : !blockListOpen}" :style="{ marginLeft: blockListOpen ? '5px' : '3px'}"></i>
 		</div>
+		<block-sidebar></block-sidebar>
 	</aside>
 
 	<el-dialog title="Current page data" v-model="showPageData">
@@ -166,6 +166,8 @@ import RedoIcon from '!IconPath/redo.svg';
 import DesktopIcon from '!IconPath/desktop.svg';
 import TabletIcon from '!IconPath/tablet.svg';
 import MobileIcon from '!IconPath/mobile.svg';
+
+/* global window */
 
 export default {
 	name: 'editor',

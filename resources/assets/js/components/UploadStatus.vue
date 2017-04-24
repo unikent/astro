@@ -1,7 +1,8 @@
 <style lang="scss">
 .upload-progress-wrapper {
 	font-size: 13px;
-	position: absolute;
+	position: fixed;
+	transform: translateZ(0);
 	bottom: 0;
 	right: 0;
 	overflow: hidden;
@@ -44,15 +45,15 @@
 <template>
 	<div class="upload-progress-wrapper">
 		<div @click="handleClick">
-		<el-tooltip content="View status list" placement="top" :open-delay="500">
-		<el-card class="upload-progress">
-			<span>Upload progress</span>
-			<el-progress :percentage="50"></el-progress>
-			<div class="small" v-if="failed">
-				<span class="dot" /> 1 Failed
-			</div>
-		</el-card>
-		</el-tooltip>
+			<el-tooltip content="View status list" placement="top" :open-delay="500">
+				<el-card class="upload-progress">
+					<span>Upload progress</span>
+					<el-progress :percentage="50"></el-progress>
+					<div class="small" v-if="failed">
+						<span class="dot" /> 1 Failed
+					</div>
+				</el-card>
+			</el-tooltip>
 		</div>
 	</div>
 </template>

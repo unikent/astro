@@ -1,9 +1,10 @@
-const { mix } = require('laravel-mix');
+/* global require, __dirname, process */
 
-const webpack = require('webpack'),
-	  path = require('path');
-
-const SvgStorePlugin = require('external-svg-sprite-loader/lib/SvgStorePlugin');
+const
+	{ mix } = require('laravel-mix'),
+	webpack = require('webpack'),
+	path = require('path'),
+	SvgStorePlugin = require('external-svg-sprite-loader/lib/SvgStorePlugin');
 
 mix.webpackConfig({
 	module: {

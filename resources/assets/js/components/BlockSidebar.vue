@@ -22,35 +22,35 @@
 </template>
 
 <script>
-	import BlockOptions from './BlockOptions.vue';
-	import BlockList from './BlockList.vue';
-	import { mapState } from 'vuex';
+import BlockOptions from './BlockOptions.vue';
+import BlockList from './BlockList.vue';
+import { mapState } from 'vuex';
 
-	export default {
-		name: 'BlockSidebar',
+export default {
+	name: 'BlockSidebar',
 
-		components: {
-			BlockOptions,
-			BlockList
+	components: {
+		BlockOptions,
+		BlockList
+	},
+
+	computed: {
+		mode() {
+			return this.blockDef ? 'edit' : 'list';
+		},
+		...mapState([
+			'blockDef'
+		])
+	},
+
+	methods: {
+		editBlock() {
+			this.mode = 'edit';
 		},
 
-		computed: {
-			mode() {
-				return this.blockDef ? 'edit' : 'list';
-			},
-			...mapState([
-				'blockDef'
-			])
-		},
-
-		methods: {
-			editBlock: function(blockId) {
-				this.mode = 'edit';
-			},
-
-			exitEditBlock: function() {
-				this.mode = 'list';
-			}
+		exitEditBlock() {
+			this.mode = 'list';
 		}
 	}
+};
 </script>

@@ -1,5 +1,7 @@
 import SnackBar from '../components/SnackBar.vue';
 
+/* global document */
+
 export default (Vue, el = false) => {
 	const snackbar = new (Vue.extend(SnackBar));
 	snackbar.vm = snackbar.$mount();
