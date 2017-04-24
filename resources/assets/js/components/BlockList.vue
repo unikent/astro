@@ -37,39 +37,39 @@
 	<h2 class="block-list-header">Available blocks</h2>
 	<ul class="block-list">
 		<li v-for="block in blocks" v-if="block">
-			<draggable-block :block="block" />
+			<block-list-item :block="block" />
 		</li>
 	</ul>
 </div>
 </template>
 
 <script>
-	import DraggableBlock from './DraggableBlock.vue';
-	import { mapState } from 'vuex';
+import BlockListItem from './BlockListItem.vue';
+import { mapState } from 'vuex';
 
-	export default {
+export default {
 
-		components : {
-			DraggableBlock
-		},
+	components: {
+		BlockListItem
+	},
 
-		computed: {
-			...mapState([
-				'over'
-			]),
-			blocks() {
-				return this.$store.state.blockList;
-			}
-		},
-
-		methods: {
-			fetchData() {
-				this.$store.dispatch('fetchBlockList');
-			}
-		},
-
-		created() {
-			this.fetchData();
+	computed: {
+		...mapState([
+			'over'
+		]),
+		blocks() {
+			return this.$store.state.blockList;
 		}
+	},
+
+	methods: {
+		fetchData() {
+			this.$store.dispatch('fetchBlockList');
+		}
+	},
+
+	created() {
+		this.fetchData();
 	}
+};
 </script>
