@@ -134,7 +134,7 @@ return [
 	| include trailing slash.
 	|
 	*/
-	'definitions_path' => env('BLOCKS_PATH', base_path('vendor/unikent/cms-prototype-blocks')),
+	'definitions_path' => env('DEFINITIONS_PATH', base_path('vendor/unikent/cms-prototype-blocks')),
 
 	/*
 	|--------------------------------------------------------------------------
