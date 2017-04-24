@@ -33,9 +33,7 @@ class DatabaseSeeder extends Seeder
 
 		$a = factory('App\Models\User')->create([ 'username' => 'admin', 'name'=> 'Admin']);
 		$p = factory('App\Models\Page')->create([ 'title' => 'Test Site', 'is_site'=> 1]);
-		$r = factory('App\Models\Route')->make([ 'page_id' => $p->id, 'slug' => '']);
-		$r->root = true;
-		$r->save();
+		$r = factory('App\Models\Route')->states('isRoot')->create([ 'page_id' => $p->id ]);
 
 		for($i = 0; $i < 5; $i++)
 		{
@@ -45,7 +43,6 @@ class DatabaseSeeder extends Seeder
 					->create([
 						'page_id' => $p->id,
 						'order'   => $i,
-						'type'    => '97a2e1b5-4804-46dc-9857-4235bf76a058',
 						'fields'  => [
 							'image' => 'http://lorempixel.com/1200/700/cats/',
 							'block_heading'=> 'Title block',
@@ -64,9 +61,10 @@ class DatabaseSeeder extends Seeder
 		for($i = 0; $i < 5; $i++)
 		{
 			$p2 = factory('App\Models\Page')->create([ 'title' => 'Test Page '. $i]);
-			$r2 = factory('App\Models\Route')->make([ 'page_id' => $p2->id ]);
-			$r2->parent = $r;
-			$r2->save();
+			$r2 = factory('App\Models\Route')->create([
+				'parent_id' => $r->id,
+				'page_id' => $p2->id
+			]);
 
 			for($x = 0; $x < 5; $x++)
 			{
@@ -76,7 +74,6 @@ class DatabaseSeeder extends Seeder
 						->create([
 							'page_id' => $p2->id,
 							'order'   => $x,
-							'type'    => '97a2e1b5-4804-46dc-9857-4235bf76a058',
 							'fields'  => [
 								'image'             => 'http://lorempixel.com/1200/700/cats/',
 								'block_heading'     => 'Title block',
@@ -94,9 +91,11 @@ class DatabaseSeeder extends Seeder
 		}
 
 		$p3 = factory('App\Models\Page')->create([ 'title' => 'Nested Page']);
-		$r = factory('App\Models\Route')->make([ 'page_id' => $p3->id, 'slug' => 'nested-page']);
-		$r->parent = $r2;
-		$r->save();
+		$r = factory('App\Models\Route')->create([
+			'page_id' => $p3->id,
+			'parent_id' => $r2->id,
+			'slug' => 'nested-page'
+		]);
 
 		$this->call(MediaSeeder::class);
 	}

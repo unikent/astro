@@ -20,8 +20,8 @@ class KentauthUsersTable extends Migration {
 			$table->string('name');
 			$table->string('email');
 			$table->string('role');
-			$table->integer('created_by')->index();
-			$table->integer('updated_by')->index();
+			$table->integer('created_by')->index()->nullable();
+			$table->integer('updated_by')->index()->nullable();
 			$table->timestamps();
 		});
 	}

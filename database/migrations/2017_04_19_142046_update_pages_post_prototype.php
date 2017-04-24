@@ -25,7 +25,7 @@ class UpdatePagesPostPrototype extends Migration
      */
     public function down()
     {
-        Schema::table('routes', function (Blueprint $table) {
+        Schema::table('pages', function (Blueprint $table) {
             $table->renameColumn('is_published', 'published');
         });
     }
