@@ -1,4 +1,4 @@
-import { inlineFieldMixin } from '../libs/helpers';
+import inlineFieldMixin from '../mixins/inlineFieldMixin';
 import inlineEdit from '../directives/inline-edit';
 
 export default {

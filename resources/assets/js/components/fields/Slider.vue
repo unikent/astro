@@ -3,10 +3,10 @@
 </template>
 
 <script>
-import BaseFieldMixin from './BaseFieldMixin';
+import baseFieldMixin from '../../mixins/baseFieldMixin';
 
 export default {
 	name: 'slider-field',
-	mixins: [BaseFieldMixin]
+	mixins: [baseFieldMixin]
 };
 </script>

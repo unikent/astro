@@ -1,6 +1,6 @@
 import { mapActions } from 'vuex';
 
-export const inlineFieldMixin = {
+export default {
 
 	methods: {
 		...mapActions([

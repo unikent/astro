@@ -7,7 +7,7 @@ import ElementUI from 'element-ui';
 import httpPlugin from './plugins/http'
 import eventBusPlugin from './plugins/eventbus';
 import snackBarPlugin from './plugins/snackbar';
-import locale from './libs/locale';
+import locale from './locale';
 import store from './store';
 import App from './components/views/App.vue';
 import { router } from './routes';
