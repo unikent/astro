@@ -13,7 +13,7 @@
 import BaseFieldMixin from './BaseFieldMixin';
 
 export default {
-	name: 'CheckboxField',
+	name: 'checkbox-field',
 	mixins: [BaseFieldMixin]
 };
 </script>

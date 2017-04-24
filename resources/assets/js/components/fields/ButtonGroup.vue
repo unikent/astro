@@ -13,7 +13,7 @@
 import BaseFieldMixin from './BaseFieldMixin';
 
 export default {
-	name: 'ButtonGroupField',
+	name: 'button-group-field',
 	mixins: [BaseFieldMixin]
 };
 </script>

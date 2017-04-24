@@ -13,7 +13,7 @@
 import BaseFieldMixin from './BaseFieldMixin';
 
 export default {
-	name: 'multiSelectField',
+	name: 'multi-select-field',
 	mixins: [BaseFieldMixin]
 };
 </script>

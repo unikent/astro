@@ -6,7 +6,7 @@
 import BaseFieldMixin from './BaseFieldMixin';
 
 export default {
-	name: 'SliderField',
+	name: 'slider-field',
 	mixins: [BaseFieldMixin]
 };
 </script>

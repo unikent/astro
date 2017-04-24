@@ -15,7 +15,7 @@
 import BaseFieldMixin from './BaseFieldMixin';
 
 export default {
-	name: 'RadioField',
+	name: 'radio-field',
 	mixins: [BaseFieldMixin]
 };
 </script>

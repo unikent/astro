@@ -6,7 +6,7 @@
 import BaseFieldMixin from './BaseFieldMixin';
 
 export default {
-	name: 'TimeField',
+	name: 'time-field',
 	mixins: [BaseFieldMixin]
 };
 </script>

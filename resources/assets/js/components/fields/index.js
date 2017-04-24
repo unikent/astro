@@ -10,7 +10,6 @@ import Radio         from './Radio.vue';
 import ButtonGroup   from './ButtonGroup.vue';
 import Link          from './Link.vue';
 import Image         from './Image.vue';
-import Video         from './Video.vue';
 import File          from './File.vue';
 import Slider        from './Slider.vue';
 import Date          from './Date.vue';
@@ -30,7 +29,6 @@ export default {
 	buttongroup: ButtonGroup,
 	link:        Link,
 	image:       Image,
-	video:       Video,
 	file:        File,
 	number:      Number,
 	slider:      Slider,

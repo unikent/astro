@@ -6,7 +6,7 @@
 import BaseFieldMixin from './BaseFieldMixin';
 
 export default {
-	name: 'NestedOptionsField',
+	name: 'nested-options-field',
 	mixins: [BaseFieldMixin]
 };
 </script>

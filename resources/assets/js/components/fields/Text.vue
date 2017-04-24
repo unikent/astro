@@ -6,7 +6,7 @@
 import BaseFieldMixin from './BaseFieldMixin';
 
 export default {
-	name: 'TextField',
+	name: 'text-field',
 	mixins: [BaseFieldMixin]
 };
 </script>

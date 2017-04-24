@@ -12,7 +12,7 @@
 
 	export default {
 
-		name: 'LinkField',
+		name: 'link-field',
 
 		props: ['name'],
 

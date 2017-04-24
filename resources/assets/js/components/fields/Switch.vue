@@ -6,7 +6,7 @@
 import BaseFieldMixin from './BaseFieldMixin';
 
 export default {
-	name: 'SwitchField',
+	name: 'switch-field',
 	mixins: [BaseFieldMixin]
 };
 </script>
