@@ -7,8 +7,7 @@ use App\Models\Page;
 use App\Models\Block;
 use App\Models\Route;
 use Illuminate\Http\Request;
-use App\Http\Requests\Api\v1\Page\StoreRequest;
-use App\Http\Requests\Api\v1\Page\UpdateRequest;
+use App\Http\Requests\Api\v1\Page\PersistRequest;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class PageController extends ApiController
@@ -21,7 +20,7 @@ class PageController extends ApiController
 	 * @param  Page $page
 	 * @return Response
 	 */
-	public function store(StoreRequest $request){
+	public function store(PersistRequest $request){
 		$page = new Page;
 		$this->process($request, $page); // Handles authorization and persistance
 		return response()->json([ 'data' => $page ], 201);
@@ -35,7 +34,7 @@ class PageController extends ApiController
 	 * @param Page $page
 	 * @return Response
 	 */
-	public function update(UpdateRequest $request, Page $page){
+	public function update(PersistRequest $request, Page $page){
 		$this->process($request, $page); // Handles authorization and persistance
 		return response()->json([ 'data' => $page ], 200);
 	}
@@ -68,8 +67,6 @@ class PageController extends ApiController
 
 		try {
 			// Create/Update the Route
-			// TODO: Validation needs to ensure that the route is within the appropriate hierarchy.
-			// TODO: Validation needs to ensure that the route is not Canonical for another page.
 			$route = Route::firstOrNew([
 				'slug' => $request->input('route.slug'),
 				'parent_id' => $request->input('route.parent_id', null),
