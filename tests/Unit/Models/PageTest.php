@@ -1,9 +1,11 @@
 <?php
 namespace Tests\Unit\Models;
 
+use Mockery;
 use Tests\TestCase;
 use App\Models\Page;
 use App\Models\Block;
+use App\Models\Definitions\Layout as LayoutDefinition;
 
 class PageTest extends TestCase
 {
@@ -50,6 +52,99 @@ class PageTest extends TestCase
 
 		$page->clearRegion('foobar');
 		$this->assertEquals(3, $page->blocks()->count());
+	}
+
+
+
+	/**
+	 * @test
+	 */
+	public function getPageDefinition_ReturnLayoutDefinition(){
+		$page = factory(Page::class)->make();
+		$this->assertInstanceOf(LayoutDefinition::class, $page->getLayoutDefinition());
+	}
+
+	/**
+	 * @test
+	 */
+	public function getLayoutDefinition_WhenPageDefinitionIsNotLoaded_LoadsSupportedLayoutDefinition(){
+		$page = factory(Page::class)->make();
+		$definition = $page->getLayoutDefinition();
+
+		$this->assertNotEmpty($definition);
+		$this->assertEquals('test-layout', $definition->name);
+	}
+
+	/**
+	 * @test
+	 */
+	public function getLayoutDefinition_WhenLayoutDefinitionIsLoaded_DoesNotReloadLayoutDefinition(){
+		$page = factory(Page::class)->make();
+		$page->getLayoutDefinition(); 					// This should populate $pageDefinition
+
+		$page = Mockery::mock($page)->makePartial()->shouldAllowMockingProtectedMethods();
+		$page->shouldNotReceive('loadLayoutDefinition');
+
+		$definition = $page->getLayoutDefinition(); 	// This should not re-populate $pageDefinition
+		$this->assertNotEmpty($definition);				// Is populated, but not empty.
+	}
+
+	/**
+	 * @test
+	 */
+	public function getLayoutDefinition_WithRegionDefinitionsWhenLayoutDefinitionIsLoadedWithoutRegions_HasRegionDefinitions()
+	{
+		$page = factory(Page::class)->make();
+		$page->loadLayoutDefinition();
+
+		$definition = $page->getLayoutDefinition(true);
+
+		// Ensure that our assertion does not trigger loading of Region definitions
+		$definition = Mockery::mock($definition)->makePartial()->shouldAllowMockingProtectedMethods();
+		$definition->shouldNotReceive('loadRegionDefinitions');
+
+		$this->assertCount(1, $definition->getRegionDefinitions());
+	}
+
+	/**
+	 * @test
+	 */
+	public function getLayoutDefinition_WithRegionDefinitionsWhenLayoutDefinitionIsLoadedWithRegions_HasRegionDefinitions()
+	{
+		$page = factory(Page::class)->make();
+		$definition = $page->getLayoutDefinition(true);
+
+		// Ensure that our assertion does not trigger loading of Region definitions
+		$definition = Mockery::mock($definition)->makePartial()->shouldAllowMockingProtectedMethods();
+		$definition->shouldNotReceive('loadRegionDefinitions');
+
+		$this->assertCount(1, $definition->getRegionDefinitions());
+	}
+
+
+
+	/**
+	 * @test
+	 */
+	public function toArray_WhenLayoutDefinitionIsNotLoaded_DoesNotIncludeLayoutDefinition()
+	{
+		$page = factory(Page::class)->make();
+
+		$output = $page->toArray();
+		$this->assertArrayNotHasKey('layoutDefinition', $output);
+	}
+
+	/**
+	 * @test
+	 */
+	public function toArray_WhenLayoutDefinitionIsLoaded_IncludesLayoutDefinition()
+	{
+		$page = factory(Page::class)->make();
+		$page->loadLayoutDefinition();
+
+		$output = $page->toArray();
+		$this->assertArrayHasKey('layoutDefinition', $output);
+		$this->assertNotEmpty($output['layoutDefinition']);
 	}
 
 }

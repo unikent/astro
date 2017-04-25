@@ -90,4 +90,30 @@ class RegionTest extends TestCase
 		$this->assertNotEmpty($collection);				// Is populated, but not empty.
 	}
 
+	/**
+	 * @test
+	 */
+	public function toArray_WhenBlockDefinitionsAreNotLoaded_DoesNotIncludeBlockDefinitions()
+	{
+		$path = Region::locateDefinition('test-region');
+		$region = Region::fromDefinitionFile($path);
+
+		$output = $region->toArray();
+		$this->assertArrayNotHasKey('blockDefinitions', $output);
+	}
+
+	/**
+	 * @test
+	 */
+	public function toArray_WhenBlockDefinitionsAreLoaded_IncludesBlockDefinitions()
+	{
+		$path = Region::locateDefinition('test-region');
+		$region = Region::fromDefinitionFile($path);
+		$region->loadBlockDefinitions();
+
+		$output = $region->toArray();
+		$this->assertArrayHasKey('blockDefinitions', $output);
+		$this->assertCount(1, $output['blockDefinitions']);
+	}
+
 }

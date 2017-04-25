@@ -12,6 +12,8 @@ class Region extends BaseDefinition
         'blocks' => 'array',
 	];
 
+	protected $blockDefinitions;
+
 	public function __construct(){
 		$this->blockDefinitions = new Collection;
 	}
@@ -21,7 +23,7 @@ class Region extends BaseDefinition
 	 *
 	 * @return void
 	 */
-	protected function loadBlockDefinitions(){
+	public function loadBlockDefinitions(){
 		foreach($this->blocks as $name){
 			$path = Block::locateDefinition($name);
 
@@ -44,5 +46,23 @@ class Region extends BaseDefinition
 
 		return $this->blockDefinitions;
 	}
+
+    /**
+     * Convert the model instance to an array.
+     *
+     * This is the same implementation as Illuminate\Database\Eloquent\Model.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        $attributes = parent::toArray();
+
+        if(!$this->blockDefinitions->isEmpty()){
+	        $attributes['blockDefinitions'] = $this->blockDefinitions->toArray();
+        }
+
+        return $attributes;
+    }
 
 }

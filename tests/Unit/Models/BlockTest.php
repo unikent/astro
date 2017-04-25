@@ -1,9 +1,11 @@
 <?php
 namespace Tests\Unit\Models;
 
+use Mockery;
 use Tests\TestCase;
 use App\Models\Page;
 use App\Models\Block;
+use App\Models\Definitions\Block as BlockDefinition;
 
 class BlockTest extends TestCase
 {
@@ -45,5 +47,67 @@ class BlockTest extends TestCase
 		Block::deleteForPageRegion($page, 'foobar');
 		$this->assertEquals(3, Block::count());
 	}
+
+
+
+	/**
+	 * @test
+	 */
+	public function getBlockDefinition_ReturnBlockDefinition(){
+		$block = factory(Block::class)->make();
+		$this->assertInstanceOf(BlockDefinition::class, $block->getBlockDefinition());
+	}
+
+	/**
+	 * @test
+	 */
+	public function getBlockDefinition_WhenBlockDefinitionIsNotLoaded_LoadsSupportedBlockDefinition(){
+		$block = factory(Block::class)->make();
+		$definition = $block->getBlockDefinition();
+
+		$this->assertNotEmpty($definition);
+		$this->assertEquals('test-block', $definition->name);
+	}
+
+	/**
+	 * @test
+	 */
+	public function getBlockDefinition_WhenBlockDefinitionIsLoaded_DoesNotReloadBlockDefinition(){
+		$block = factory(Block::class)->make();
+		$block->getBlockDefinition(); 					// This should populate $blockDefinition
+
+		$block = Mockery::mock($block)->makePartial()->shouldAllowMockingProtectedMethods();
+		$block->shouldNotReceive('loadBlockDefinition');
+
+		$definition = $block->getBlockDefinition(); 	// This should not re-populate $blockDefinition
+		$this->assertNotEmpty($definition);				// Is populated, but not empty.
+	}
+
+
+
+	/**
+	 * @test
+	 */
+	public function toArray_WhenBlockDefinitionIsNotLoaded_DoesNotIncludeBlockDefinition()
+	{
+		$block = factory(Block::class)->make();
+
+		$output = $block->toArray();
+		$this->assertArrayNotHasKey('blockDefinition', $output);
+	}
+
+	/**
+	 * @test
+	 */
+	public function toArray_WhenBlockDefinitionIsLoaded_IncludesBlockDefinition()
+	{
+		$block = factory(Block::class)->make();
+		$block->loadBlockDefinition();
+
+		$output = $block->toArray();
+		$this->assertArrayHasKey('blockDefinition', $output);
+		$this->assertNotEmpty($output['blockDefinition']);
+	}
+
 
 }

@@ -3,6 +3,7 @@ namespace App\Models;
 
 use App\Models\Traits\Tracked;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Definitions\Block as BlockDefinition;
 
 class Block extends Model
 {
@@ -20,6 +21,8 @@ class Block extends Model
         'fields' => 'json',
 	];
 
+	protected $blockDefinition = null;
+
 
     /**
      * Create a new Eloquent model instance.
@@ -29,9 +32,34 @@ class Block extends Model
      */
     public function __construct($attributes = []){
         parent::__construct($attributes);
-
         $this->fields = $this->fields ?: [];
     }
+
+
+	/**
+	 * Loads the Block definition
+	 * @return void
+	 */
+	public function loadBlockDefinition()
+	{
+		$file = BlockDefinition::locateDefinition($this->definition_name, $this->definition_version);
+		$definition = BlockDefinition::fromDefinitionFile($file);
+
+		$this->blockDefinition = $definition;
+	}
+
+	/**
+	 * Returns the blockDefinition, loading from disk if necessary.
+	 * @return BlockDefinition
+	 */
+	public function getBlockDefinition(){
+		if(!$this->blockDefinition){
+			$this->loadBlockDefinition();
+		}
+
+		return $this->blockDefinition;
+	}
+
 
 	/**
 	 * Deletes all blocks for a given Page and Region.
@@ -45,5 +73,24 @@ class Block extends Model
 		$page_id = is_numeric($page_or_id) ? $page_or_id : $page_or_id->getKey();
 		static::where('page_id', '=', $page_id)->where('region_name', '=', $region)->delete();
 	}
+
+
+
+    /**
+     * Convert the model instance to an array.
+     * If loaded, includes the $blockDefinition.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+    	$attributes = $this->attributesToArray();
+
+    	if($this->blockDefinition){
+    		$attributes['blockDefinition'] = $this->blockDefinition;
+    	}
+
+        return $attributes;
+    }
 
 }

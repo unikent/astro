@@ -23,7 +23,7 @@ class Layout extends BaseDefinition
 	 *
 	 * @return void
 	 */
-	protected function loadRegionDefinitions(){
+	public function loadRegionDefinitions(){
 		foreach($this->regions as $name){
 			$path = Region::locateDefinition($name);
 
@@ -47,4 +47,21 @@ class Layout extends BaseDefinition
 		return $this->regionDefinitions;
 	}
 
+    /**
+     * Convert the model instance to an array.
+     *
+     * This is the same implementation as Illuminate\Database\Eloquent\Model.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        $attributes = parent::toArray();
+
+        if(!$this->regionDefinitions->isEmpty()){
+	        $attributes['regionDefinitions'] = $this->regionDefinitions->toArray();
+        }
+
+        return $attributes;
+    }
 }

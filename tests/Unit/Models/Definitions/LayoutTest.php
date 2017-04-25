@@ -53,9 +53,9 @@ class LayoutTest extends TestCase
 	 */
 	public function getRegionDefinitions_ReturnsCollection(){
 		$path = Layout::locateDefinition('test-layout');
-		$region = Layout::fromDefinitionFile($path);
+		$layout = Layout::fromDefinitionFile($path);
 
-		$this->assertInstanceOf(Collection::class, $region->getRegionDefinitions());
+		$this->assertInstanceOf(Collection::class, $layout->getRegionDefinitions());
 	}
 
 	/**
@@ -65,9 +65,9 @@ class LayoutTest extends TestCase
 	 */
 	public function getRegionDefinitions_WhenRegionDefinitionsAreNotLoaded_LoadsSupportedRegionDefinitionsIntoCollection(){
 		$path = Layout::locateDefinition('test-layout');
-		$region = Layout::fromDefinitionFile($path);
+		$layout = Layout::fromDefinitionFile($path);
 
-		$collection = $region->getRegionDefinitions();
+		$collection = $layout->getRegionDefinitions();
 
 		$this->assertCount(1, $collection);
 		$this->assertEquals('test-region', $collection[0]->name);
@@ -80,14 +80,42 @@ class LayoutTest extends TestCase
 	public function getRegionDefinitions_WhenRegionDefinitionsAreLoaded_DoesNotReloadRegionDefinitions(){
 		$path = Layout::locateDefinition('test-layout');
 
-		$region = Layout::fromDefinitionFile($path);
-		$region->getRegionDefinitions(); 				// This should populate the Collection
+		$layout = Layout::fromDefinitionFile($path);
+		$layout->getRegionDefinitions(); 				// This should populate the Collection
 
-		$region = Mockery::mock($region)->makePartial()->shouldAllowMockingProtectedMethods();
-		$region->shouldNotReceive('loadRegionDefinitions');
+		$layout = Mockery::mock($layout)->makePartial()->shouldAllowMockingProtectedMethods();
+		$layout->shouldNotReceive('loadRegionDefinitions');
 
-		$collection = $region->getRegionDefinitions(); 	// This should not populate the Collection
+		$collection = $layout->getRegionDefinitions(); 	// This should not populate the Collection
 		$this->assertNotEmpty($collection);				// Is populated, but not empty.
+	}
+
+	/**
+	 * @test
+	 */
+	public function toArray_WhenRegionDefinitionsAreNotLoaded_DoesNotIncludeRegionDefinitions()
+	{
+		$path = Layout::locateDefinition('test-layout');
+
+		$layout = Layout::fromDefinitionFile($path);
+		$output = $layout->toArray();
+
+		$this->assertArrayNotHasKey('regionDefinitions', $output);
+	}
+
+	/**
+	 * @test
+	 */
+	public function toArray_WhenRegionDefinitionsAreLoaded_IncludesRegionDefinitions()
+	{
+		$path = Layout::locateDefinition('test-layout');
+
+		$layout = Layout::fromDefinitionFile($path);
+		$layout->loadRegionDefinitions();
+
+		$output = $layout->toArray();
+		$this->assertArrayHasKey('regionDefinitions', $output);
+		$this->assertCount(1, $output['regionDefinitions']);
 	}
 
 }
