@@ -20,13 +20,13 @@ class BlockController extends ApiController
 		$this->authorize('index', Definition::class);
 
 		$path = sprintf('%s/%s/', Config::get('app.definitions_path'), Definition::$defDir);
-		$regions = glob($path . '*', GLOB_ONLYDIR);
+		$blocks = glob($path . '*', GLOB_ONLYDIR);
 
-		foreach($regions as &$region){
-			$region = str_replace($path, '', $region);
+		foreach($blocks as &$block){
+			$block = str_replace($path, '', $block);
 		}
 
-		return response()->json([ 'data' => $regions ]);
+		return response()->json([ 'data' => $blocks ]);
 	}
 
 	/**
