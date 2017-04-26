@@ -52,7 +52,7 @@ export default {
 	</div>
 </div>`,
 
-	QUoteBlock:
+	QuoteBlock:
 `<blockquote class="social-quote social-quote-twitter ">
 	<a href="https://beta.kent.ac.uk/examples/undergraduate/test">
 		<button></button>

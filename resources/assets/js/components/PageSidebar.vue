@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import PageList from './PageList.vue';
+import PageList from './PageList';
 
 export default {
 

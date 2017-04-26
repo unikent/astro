@@ -120,7 +120,7 @@ export default {
 		edit() {
 			clearTimeout(timer);
 			this.$router.push(`/site/${this.site}/page/${this.page.id}`);
-			this.$store.dispatch('changePage', this.page.title);
+			this.$store.commit('changePage', this.page.title);
 		},
 
 		rename() {
@@ -130,10 +130,11 @@ export default {
 
 			var nameWidth = Math.max(50, this.$refs.name.offsetWidth);
 
+			/* TODO: Move into component to avoid refs? */
 			Vue.nextTick(() => {
 				var input = this.$refs.input;
 				input.style.width = (nameWidth + 4) + 'px';
-				input.focus()
+				input.focus();
 			});
 		},
 
@@ -169,8 +170,6 @@ export default {
 					depth: this.page.depth + 1
 				});
 
-			console.log(this.page.children);
-
 			this.open = true;
 
 			Vue.nextTick(() => {
@@ -182,7 +181,6 @@ export default {
 			if(this[command]) {
 				this[command]();
 			}
-			// this.$message('click on item ' + command);
 		}
 	}
 };

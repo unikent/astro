@@ -3,164 +3,12 @@
 	<aside class="left-side sidebar-offcanvas">
 		<section class="sidebar">
 			<ul class="app-sidebar" role="navigation">
-				<li>
-					<SideMenuItem
-						link="/home"
-						:icon="homeIcon"
-						title="Home"
-					/>
-				</li>
-				<li>
-					<SideMenuItem
-						link="/sites"
-						:icon="sitesIcon"
-						title="Sites"
-					/>
-				</li>
-				<li>
-					<SideMenuItem
-						link="/media"
-						:icon="mediaIcon"
-						title="Media Manager"
-					/>
-				</li>
-				<li>
-					<SideMenuItem
-						link="/settings"
-						:icon="settingsIcon"
-						title="General Settings"
-					/>
-				</li>
-				<!-- <li class="menu-dropdown">
-					<a href="#">
-						<i class="menu-icon ti-menu"></i>
-						<span>
-								Menu levels
-							</span>
-						<span class="fa arrow"></span>
-					</a>
-					<ul class="sub-menu collapse">
-						<li>
-							<a href="#">
-								<i class="fa fa-fw ti-control-skip-forward"></i> Level 1
-								<span class="fa arrow"></span>
-							</a>
-							<ul class="sub-menu sub-submenu collapse">
-								<li>
-									<a href="#">
-										<i class="fa fa-fw ti-control-skip-forward"></i> Level 2
-									</a>
-								</li>
-								<li>
-									<a href="#">
-										<i class="fa fa-fw ti-control-skip-forward"></i> Level 2
-									</a>
-								</li>
-								<li>
-									<a href="#">
-										<i class="fa fa-fw ti-control-skip-forward"></i> Level 2
-										<span class="fa arrow"></span>
-									</a>
-									<ul class="sub-menu sub-submenu collapse">
-										<li>
-											<a href="#">
-												<i class="fa fa-fw ti-control-skip-forward"></i> Level 3
-											</a>
-										</li>
-										<li>
-											<a href="#">
-												<i class="fa fa-fw ti-control-skip-forward"></i> Level 3
-											</a>
-										</li>
-										<li>
-											<a href="#">
-												<i class="fa fa-fw ti-control-skip-forward"></i> Level 3
-												<span class="fa arrow"></span>
-											</a>
-											<ul class="sub-menu sub-submenu collapse">
-												<li>
-													<a href="#">
-														<i class="fa fa-fw ti-control-skip-forward"></i> Level 4
-													</a>
-												</li>
-												<li>
-													<a href="#">
-														<i class="fa fa-fw ti-control-skip-forward"></i> Level 4
-													</a>
-												</li>
-												<li>
-													<a href="#">
-														<i class="fa fa-fw ti-control-skip-forward"></i> Level 4
-														<span class="fa arrow"></span>
-													</a>
-													<ul class="sub-menu sub-submenu collapse">
-														<li>
-															<a href="#">
-																<i class="fa fa-fw ti-control-skip-forward"></i> Level 5
-															</a>
-														</li>
-														<li>
-															<a href="#">
-																<i class="fa fa-fw ti-control-skip-forward"></i> Level 5
-															</a>
-														</li>
-														<li>
-															<a href="#">
-																<i class="fa fa-fw ti-control-skip-forward"></i> Level 5
-															</a>
-														</li>
-													</ul>
-												</li>
-											</ul>
-										</li>
-										<li>
-											<a href="#">
-												<i class="fa fa-fw ti-control-skip-forward"></i> Level 4
-											</a>
-										</li>
-									</ul>
-								</li>
-								<li>
-									<a href="#">
-										<i class="fa fa-fw ti-control-skip-forward"></i> Level 2
-										<span class="fa arrow"></span>
-									</a>
-								</li>
-							</ul>
-						</li>
-						<li>
-							<a href="#">
-								<i class="fa fa-fw ti-control-skip-forward"></i> Level 1
-							</a>
-						</li>
-						<li>
-							<a href="#">
-								<i class="fa fa-fw ti-control-skip-forward"></i> Level 1
-								<span class="fa arrow"></span>
-							</a>
-							<ul class="sub-menu sub-submenu collapse">
-								<li>
-									<a href="#">
-										<i class="fa fa-fw ti-control-skip-forward"></i> Level 2
-										<span class="fa arrow"></span>
-									</a>
-								</li>
-								<li>
-									<a href="#">
-										<i class="fa fa-fw ti-control-skip-forward"></i> Level 2
-										<span class="fa arrow"></span>
-									</a>
-								</li>
-								<li>
-									<a href="#">
-										<i class="fa fa-fw ti-control-skip-forward"></i> Level 2
-										<span class="fa arrow"></span>
-									</a>
-								</li>
-							</ul>
-						</li>
-					</ul>
-				</li> -->
+				<side-menu-item
+					v-for="item in menu"
+					:link="item.link"
+					:icon="item.icon"
+					:title="item.title"
+				/>
 			</ul>
 		</section>
 	</aside>
@@ -171,7 +19,7 @@
 </template>
 
 <script>
-import Icon from '../Icon.vue';
+import Icon from '../Icon';
 import homeIcon from '!IconPath/home.svg';
 import settingsIcon from '!IconPath/settings.svg';
 import sitesIcon from '!IconPath/files.svg';
@@ -189,20 +37,40 @@ export default {
 			},
 
 			template: `
-				<router-link :to="link">
-					<Icon :glyph="icon" className="menu-icon" />
-					<span>{{ title }}</span>
-				</router-link>
+				<li>
+					<router-link :to="link">
+						<Icon :glyph="icon" className="menu-icon" />
+						<span>{{ title }}</span>
+					</router-link>
+				</li>
 			`
 		}
 	},
 
 	data() {
 		return {
-			homeIcon,
-			settingsIcon,
-			sitesIcon,
-			mediaIcon
+			menu: [
+				{
+					link: '/home',
+					icon: homeIcon,
+					title: 'Home'
+				},
+				{
+					link: '/sites',
+					icon: sitesIcon,
+					title: 'Sites'
+				},
+				{
+					link: '/media',
+					icon: mediaIcon,
+					title: 'Media Manager'
+				},
+				{
+					link: '/settings',
+					icon: settingsIcon,
+					title: 'General Settings'
+				}
+			]
 		};
 	}
 };

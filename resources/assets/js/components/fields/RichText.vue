@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { mapMutations } from 'vuex';
 
 /* global document, $ */
 
@@ -28,7 +28,7 @@ export default {
 	},
 
 	methods: {
-		...mapActions([
+		...mapMutations([
 			'updateValue'
 		]),
 

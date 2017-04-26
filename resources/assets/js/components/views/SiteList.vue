@@ -9,7 +9,7 @@
 	<div>
 		<!--
 
-		<div class="pagination">
+		<div class="site-list-pagination">
 			<el-pagination
 				@current-change="navigate"
 				:current-page="pagination.current_page"
@@ -23,9 +23,9 @@
 
 		<el-row type="flex" justify="center">
 			<el-col :span="24">
-				 <el-table :data="sites" stripe border class="w100">
-					<el-table-column prop="title" label="Title" width="160"></el-table-column>
-					<el-table-column prop="url" label="URL"></el-table-column>
+				 <el-table :data="sites" stripe border class="w100" v-loading.body="loading">
+					<el-table-column prop="name" label="Name" width="300"></el-table-column>
+					<el-table-column prop="canonical.path" label="Path"></el-table-column>
 					<el-table-column inline-template label="Actions" width="110">
 						<div>
 							<router-link :to="`/site/${sites[$index].id}`">
@@ -82,8 +82,7 @@
 </template>
 
 <script>
-import Icon from '../Icon.vue';
-import sites from '../../tests/stubs/sites';
+import Icon from '../Icon';
 import editIcon from '!IconPath/pencil.svg';
 import deleteIcon from '!IconPath/trash.svg';
 
@@ -95,12 +94,14 @@ export default {
 
 	data() {
 		return {
-			sites,
+			sites: [],
 			editIcon,
 			deleteIcon,
 
 			dialogFormVisible: false,
 			formLabelWidth: '120px',
+
+			loading: true,
 
 			form: {
 				title: '',
@@ -114,14 +115,22 @@ export default {
 		};
 	},
 
+	created() {
+		this.fetchData();
+	},
+
 	methods: {
 
 		askRemove(index) {
-			this.$confirm(`Site ${index} will be permanently removed.\nAre you sure?`, 'Warning', {
-				confirmButtonText: 'OK',
-				cancelButtonText: 'Cancel',
-				type: 'warning'
-			}).then(() => {
+			this.$confirm(
+				`Site ${index} will be permanently removed.\nAre you sure?`,
+				'Warning',
+				{
+					confirmButtonText: 'OK',
+					cancelButtonText: 'Cancel',
+					type: 'warning'
+				}
+			).then(() => {
 				this.$message({
 					type: 'success',
 					message: 'Delete completed'
@@ -135,6 +144,7 @@ export default {
 				url: this.form.url,
 				id: this.sites.length
 			});
+
 			this.dialogFormVisible = false;
 
 			this.form = {
@@ -146,6 +156,15 @@ export default {
 					description: '',
 				}
 			};
+		},
+
+		fetchData() {
+			this.$api
+				.get('site')
+				.then((response) => {
+					this.sites = response.data.data;
+					this.loading = false;
+				});
 		}
 
 	}

@@ -23,15 +23,5 @@ export default [
 		url: '/site/5',
 		title: 'Site 5',
 		id: 5
-	},
-	{
-		url: '/site/6',
-		title: 'Site 6',
-		id: 6
-	},
-	{
-		url: '/site/7',
-		title: 'Site 7',
-		id: 7
 	}
 ];

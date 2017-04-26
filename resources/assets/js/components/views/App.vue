@@ -1,5 +1,5 @@
 <template>
-	<div :class="{ editor: isEditor }">
+	<div :class="{ editor: isEditor }" :style="wrapperStyles">
 		<router-view></router-view>
 		<div v-if="isEditor" class="top-bar">
 			<div v-show="showBack" @click="backToSites" class="top-bar-backbutton">
@@ -21,7 +21,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import SnackBar from '../SnackBar.vue';
+import SnackBar from '../SnackBar';
 
 /* global window */
 
@@ -33,22 +33,23 @@ export default {
 	},
 
 	computed: {
+		...mapState([
+			'pageName',
+			'wrapperStyles'
+		]),
+
 		isEditor() {
 			return window.isEditor;
 		},
 
 		username() {
-			return window.Laravel.username;
+			return window.astro.username;
 		},
 
 		// TODO: clean up hack
 		showBack() {
 			return !!this.$route.path.match(/\/site\/[^\/]+(\/page\/[^\/]+)?/)
-		},
-
-		...mapState([
-			'pageName'
-		])
+		}
 	},
 
 	methods: {
@@ -59,7 +60,7 @@ export default {
 		},
 
 		backToSites() {
-			this.$store.dispatch('changePage', '');
+			this.$store.commit('changePage', '');
 			this.$router.push('/sites')
 		}
 	}

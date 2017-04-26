@@ -1,0 +1,79 @@
+{
+	"id": 1,
+	"path": "/",
+	"slug": null,
+	"page_id": 1,
+	"parent_id": null,
+	"depth": 0,
+	"is_canonical": 0,
+	"title": "Test Site",
+	"children": [
+		{
+			"id": 2,
+			"path": "/dolores",
+			"slug": "dolores",
+			"page_id": 2,
+			"parent_id": 1,
+			"depth": 1,
+			"is_canonical": 0,
+			"title": "Test Page 0",
+			"children": []
+		},
+		{
+			"id": 3,
+			"path": "/nostrum",
+			"slug": "nostrum",
+			"page_id": 3,
+			"parent_id": 1,
+			"depth": 1,
+			"is_canonical": 0,
+			"title": "Test Page 1",
+			"children": []
+		},
+		{
+			"id": 4,
+			"path": "/impedit",
+			"slug": "impedit",
+			"page_id": 4,
+			"parent_id": 1,
+			"depth": 1,
+			"is_canonical": 0,
+			"title": "Test Page 2",
+			"children": []
+		},
+		{
+			"id": 5,
+			"path": "/tempora",
+			"slug": "tempora",
+			"page_id": 5,
+			"parent_id": 1,
+			"depth": 1,
+			"is_canonical": 0,
+			"title": "Test Page 3",
+			"children": []
+		},
+		{
+			"id": 6,
+			"path": "/et",
+			"slug": "et",
+			"page_id": 6,
+			"parent_id": 1,
+			"depth": 1,
+			"is_canonical": 0,
+			"title": "Test Page 4",
+			"children": [
+				{
+					"id": 7,
+					"path": "/et/nested-page",
+					"slug": "nested-page",
+					"page_id": 7,
+					"parent_id": 6,
+					"depth": 2,
+					"is_canonical": 0,
+					"title": "Nested Page",
+					"children": []
+				}
+			]
+		}
+	]
+}

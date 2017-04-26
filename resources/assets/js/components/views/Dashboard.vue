@@ -122,11 +122,11 @@ export default {
 			datasets[0].data = data[0];
 			datasets[1].data = data[1];
 
-			this.datacollection = Object.assign(
-				{},
-				this.datacollection,
-				{ labels, datasets }
-			);
+			this.datacollection = {
+				...this.datacollection,
+				labels,
+				datasets
+			};
 		},
 
 		getMonth() {
@@ -140,11 +140,11 @@ export default {
 			datasets[0].data = data[0];
 			datasets[1].data = data[1];
 
-			this.datacollection = Object.assign(
-				{},
-				this.datacollection,
-				{ labels, datasets }
-			);
+			this.datacollection = {
+				...this.datacollection,
+				labels,
+				datasets
+			};
 		},
 
 		getYear() {
@@ -160,11 +160,11 @@ export default {
 			datasets[0].data = [20, 16, 6, 22, 36, 50, 13, 12, 15, 33, 55, 39];
 			datasets[1].data = [40, 39, 10, 40, 39, 80, 40, 34, 23, 46, 87, 89];
 
-			this.datacollection = Object.assign(
-				{},
-				this.datacollection,
-				{ labels, datasets }
-			);
+			this.datacollection = {
+				...this.datacollection,
+				labels,
+				datasets
+			};
 		}
 	}
 

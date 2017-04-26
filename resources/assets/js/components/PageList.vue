@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import PageListItem from './PageListItem.vue';
+import PageListItem from './PageListItem';
 import { Loading } from 'element-ui';
 
 import pageStructure from '../tests/stubs/page-structure.json';

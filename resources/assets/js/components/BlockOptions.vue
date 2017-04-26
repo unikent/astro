@@ -1,6 +1,6 @@
 <template>
 <div>
-	<div class="b-back-button" @click="editBlock">
+	<div class="b-back-button" @click="setBlock">
 		<i class="el-icon-arrow-left"></i>Back
 	</div>
 	<div class="block-options-list custom-scrollbar">
@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { mapMutations } from 'vuex';
 import fields from './fields';
 
 export default {
@@ -29,8 +29,8 @@ export default {
 	},
 
 	methods: {
-		...mapActions([
-			'editBlock'
+		...mapMutations([
+			'setBlock'
 		]),
 
 		getField(type) {

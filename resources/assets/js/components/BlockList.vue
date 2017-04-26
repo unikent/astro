@@ -10,8 +10,8 @@
 </template>
 
 <script>
-import BlockListItem from './BlockListItem.vue';
-import { mapState } from 'vuex';
+import BlockListItem from './BlockListItem';
+import { mapState, mapActions } from 'vuex';
 
 export default {
 
@@ -29,13 +29,13 @@ export default {
 	},
 
 	methods: {
-		fetchData() {
-			this.$store.dispatch('fetchBlockList');
-		}
+		...mapActions([
+			'fetchBlockList'
+		])
 	},
 
 	created() {
-		this.fetchData();
+		this.fetchBlockList();
 	}
 };
 </script>

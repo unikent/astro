@@ -1,12 +1,15 @@
 <template>
 <div>
-	<div
+	<!-- <div
 		v-for="(region, name) in page.regions"
 		:id="name"
+	> -->
+	<div
+		id="main_content"
 	>
 		<div id="b-wrapper">
 			<block
-				v-for="(blockData, index) in region"
+				v-for="(blockData, index) in page.regions.main_content"
 				:key="`block-${blockData.id}`"
 				:type="blockData.type"
 				:index="index"
@@ -14,28 +17,24 @@
 				:scale="scale"
 			>
 			</block>
-			<div class="b-block">
+			<div class="b-block" :style="blockOverlayStyles">
 				<div class="b-block-options" @click="editBlock">⚙</div>
 				<div class="b-block-move">⇅</div>
 			</div>
 		</div>
 	</div>
-	<div class="b-handle" :style="blockInfo.handleStyle">⇅</div>
+	<div class="b-handle" :style="handleStyles">⇅</div>
 	<div id="b-overlay"></div>
 </div>
 </template>
 
 <script>
-import Block from '../Block.vue';
+import Block from '../Block';
 import Velocity from 'velocity-animate';
 
-import { mapState } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 
 /* global document, window */
-
-const
-	SCALE_DOWN = 0.4,
-	SCALE_UP = 1 / SCALE_DOWN;
 
 export default {
 	name: 'wrapper',
@@ -47,7 +46,8 @@ export default {
 	data() {
 		return {
 			scale: 1,
-			handleStyle: {}
+			handleStyles: {},
+			blockOverlayStyles: {}
 		};
 	},
 
@@ -55,7 +55,8 @@ export default {
 		...mapState([
 			'page',
 			'over',
-			'blockInfo'
+			'blockInfo',
+			'pageScale'
 		])
 	},
 
@@ -63,15 +64,16 @@ export default {
 		this.$bus.$on('block:move', index => {
 			this.moved = index;
 		});
+
+		this.SCALE_DOWN = this.pageScale;
+		this.SCALE_UP = 1 / this.SCALE_DOWN;
 	},
 
 	mounted() {
 		this.wrapper = document.querySelector('#b-wrapper');
 		this.overlay = document.querySelector('#b-overlay');
 
-		this.editable = document.querySelector('.b-editable');
-		this.editableBlock = document.querySelector('.b-block');
-		this.options = document.querySelector('.b-block-options');
+		this.blockOverlay = document.querySelector('.b-block');
 		this.moveEl = document.querySelector('.b-block-move');
 
 		this.scaled = false;
@@ -87,23 +89,32 @@ export default {
 	},
 
 	methods: {
+		...mapMutations([
+			'setBlock',
+			'reorderBlocks',
+			'updateBlockPositionsOrder'
+		]),
+
 		editBlock() {
-			this.$store.dispatch('editBlock', this.current);
+			this.setBlock(this.current);
 		},
 
 		move(e) {
-			this.handleStyle.transform = `translateY(${e.pageY - 22}px)`;
+			this.updateHandleStyle(
+				'transform',
+				`translateY(${e.pageY - 22}px)`
+			);
 		},
 
 		showOverlay(block) {
 			if(block !== this.current) {
-				this.positionOverlay(block, this.editableBlock, true);
+				this.positionOverlay(block, true);
 			}
 		},
 
 		hideOverlay(block) {
 			if(block !== this.current) {
-				this.editableBlock.style.opacity = 0;
+				this.blockOverlay.style.opacity = 0;
 			}
 		},
 
@@ -124,7 +135,7 @@ export default {
 					this.overlay.style.pointerEvents =  'auto';
 
 					if(e.button === 0) {
-						this.handleStyle.opacity = 1;
+						this.updateHandleStyle('opacity', 1);
 						this.drag(false, e.clientY);
 
 						this.$bus.$emit('block:dragstart', {
@@ -132,7 +143,7 @@ export default {
 							el: this.current.$el
 						});
 
-						this.editableBlock.classList.add('hide-drag');
+						this.blockOverlay.classList.add('hide-drag');
 						document.addEventListener('mousemove', this.move);
 					}
 					break;
@@ -144,10 +155,10 @@ export default {
 		mouseUp(e) {
 			if(this.scaled) {
 				this.wrapper.style.userSelect =  'auto';
-				this.handleStyle.opacity = 0;
+				this.updateHandleStyle('opacity', 0);
 				this.drag(true, e.clientY);
 
-				this.editableBlock.classList.remove('hide-drag');
+				this.blockOverlay.classList.remove('hide-drag');
 				document.removeEventListener('mousemove', this.move);
 			}
 		},
@@ -169,10 +180,10 @@ export default {
 
 			// console.log(size, this.overlay);
 
-			this.editableBlock.style.transform = `translateY(${(size)}px)`;
+			this.blockOverlay.style.transform = `translateY(${(size)}px)`;
 		},
 
-		positionOverlay(block, box, setCurrent) {
+		positionOverlay(block, setCurrent) {
 			var
 				pos = block.$el.getBoundingClientRect(),
 				heightDiff = Math.round(pos.height - 30),
@@ -192,12 +203,12 @@ export default {
 				minusLeft = addWidth / 2;
 			}
 
-			box.style.transform = `translateY(${(pos.top + window.scrollY - minusTop)}px)`;
-			box.style.left = (pos.left + window.scrollX - minusLeft) + 'px';
-			box.style.width = (pos.width + addWidth) + 'px';
-			box.style.height = (pos.height + addHeight) + 'px';
+			this.blockOverlay.style.transform = `translateY(${(pos.top + window.scrollY - minusTop)}px)`;
+			this.blockOverlay.style.left = (pos.left + window.scrollX - minusLeft) + 'px';
+			this.blockOverlay.style.width = (pos.width + addWidth) + 'px';
+			this.blockOverlay.style.height = (pos.height + addHeight) + 'px';
 
-			box.style.opacity = 1;
+			this.blockOverlay.style.opacity = 1;
 
 			if(setCurrent) {
 				this.current = block;
@@ -207,20 +218,20 @@ export default {
 		resetAfterDrag() {
 			this.overlay.style.pointerEvents =  'none';
 
-			this.$store.dispatch('reorderBlocks', {
+			this.reorderBlocks({
 				from:  this.moved.from,
 				to:    this.moved.to,
 				value: this.page.regions['main_content'][this.moved.from]
 			});
 
-			this.$store.dispatch('updateBlockDataOrder', {
+			this.updateBlockPositionsOrder({
 				type:  'sizes',
 				from:  this.moved.from,
 				to:    this.moved.to,
 				value: this.blockInfo.sizes[this.moved.from]
 			});
 
-			this.$store.dispatch('updateBlockDataOrder', {
+			this.updateBlockPositionsOrder({
 				type:  'offsets',
 				from:  this.moved.from,
 				to:    this.moved.to,
@@ -239,8 +250,8 @@ export default {
 				this.scaled = false;
 
 				var
-					scrollScaleUp = scroll * SCALE_UP,
-					offsetPlusScaled = (mouseY * SCALE_UP) - mouseY;
+					scrollScaleUp = scroll * this.SCALE_UP,
+					offsetPlusScaled = (mouseY * this.SCALE_UP) - mouseY;
 
 				Velocity(
 					document.body,
@@ -271,10 +282,13 @@ export default {
 				this.scaled = true;
 
 				var
-					scrollScaleDown = scroll * SCALE_DOWN,
-					offsetMinusScaled = mouseY - (mouseY * SCALE_DOWN);
+					scrollScaleDown = scroll * this.SCALE_DOWN,
+					offsetMinusScaled = mouseY - (mouseY * this.SCALE_DOWN);
 
-				this.handleStyle.transform = 'translateY(' + (((mouseY + window.scrollY) * SCALE_DOWN) - 22) + 'px)';
+				this.updateHandleStyle(
+					'transform',
+					'translateY(' + (((mouseY + window.scrollY) * this.SCALE_DOWN) - 22) + 'px)'
+				);
 
 				Velocity(
 					document.body,
@@ -290,7 +304,7 @@ export default {
 				Velocity(
 					this.wrapper,
 					{
-						scale: SCALE_DOWN,
+						scale: this.SCALE_DOWN,
 						queue: false
 					},
 					{
@@ -299,6 +313,10 @@ export default {
 					}
 				);
 			}
+		},
+
+		updateHandleStyle(prop, value) {
+			this.handleStyles = { ...this.handleStyles, [prop]: value };
 		}
 	}
 };

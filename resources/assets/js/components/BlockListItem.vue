@@ -7,6 +7,8 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex';
+
 /* global document */
 
 export default {
@@ -56,7 +58,7 @@ export default {
 	},
 
 	beforeDestroy() {
-		this.cleanUp();
+		this.destroy();
 	},
 
 	mounted() {
@@ -64,6 +66,11 @@ export default {
 	},
 
 	methods: {
+		...mapMutations([
+			'showIframeOverlay',
+			'updateWrapperStyle'
+		]),
+
 		handleMousedown(e) {
 			this.dragging = true;
 
@@ -86,14 +93,14 @@ export default {
 
 			this.iframePos = this.iframe.getBoundingClientRect();
 
-			// also fire before mouse moves
+			// fire before mouse moves
 			this.handleMouseMove(e);
 
 			document.addEventListener('mousemove', this.handleMouseMove);
 			document.addEventListener('mouseup', this.handleMouseUp);
 
-			document.querySelector('.iframe-overlay').style.position = 'absolute';
-			document.body.style.userSelect = 'none';
+			this.showIframeOverlay(true);
+			this.updateWrapperStyle({ prop: 'userSelect', value: 'none' });
 		},
 
 		handleMouseMove(e) {
@@ -108,14 +115,14 @@ export default {
 			];
 
 			if(x !== 0 && y !== 0 && x !== this.iframePos.width && y !== this.iframePos.height) {
-				this.$store.dispatch('updateOver', {x, y});
+				this.$store.commit('updateOver', {x, y});
 			}
 		},
 
 		handleMouseUp() {
-			this.cleanUp();
+			this.destroy();
 
-			document.querySelector('.iframe-overlay').style.position = 'static';
+			this.showIframeOverlay(false);
 
 			this.transition = 'transform 0.3s ease-out';
 
@@ -129,10 +136,11 @@ export default {
 			this.dragging = false;
 		},
 
-		cleanUp() {
+		destroy() {
 			document.removeEventListener('mouseup', this.handleMouseUp);
 			document.removeEventListener('mousemove', this.handleMouseMove);
-			document.body.style.userSelect = 'auto';
+
+			this.updateWrapperStyle({ prop: 'userSelect', value: 'auto' });
 		}
 
 	}

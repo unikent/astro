@@ -6,8 +6,8 @@
 </template>
 
 <script>
-import BlockOptions from './BlockOptions.vue';
-import BlockList from './BlockList.vue';
+import BlockOptions from './BlockOptions';
+import BlockList from './BlockList';
 import { mapState } from 'vuex';
 
 export default {

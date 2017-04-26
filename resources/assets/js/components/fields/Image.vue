@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex';
+import { mapMutations, mapState } from 'vuex';
 import _ from 'lodash';
 
 /* global URL */
@@ -61,7 +61,7 @@ export default {
 
 	methods: {
 
-		...mapActions([
+		...mapMutations([
 			'updateValue'
 		]),
 
@@ -70,7 +70,7 @@ export default {
 		},
 
 		handlePreview(file) {
-			this.$store.dispatch('changePreview', {
+			this.$store.commit('changePreview', {
 				visible: true,
 				url: this.fileList[0].url
 			});

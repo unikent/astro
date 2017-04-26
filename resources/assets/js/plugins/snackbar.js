@@ -1,4 +1,4 @@
-import SnackBar from '../components/SnackBar.vue';
+import SnackBar from '../components/SnackBar';
 
 /* global document */
 

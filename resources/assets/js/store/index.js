@@ -1,11 +1,11 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import page from '../tests/stubs/page';
-import undoRedo from './undo-redo';
-import { Message } from 'element-ui';
+import definitions from '../tests/stubs/definitions.json';
+import undoRedo from '../plugins/undo-redo';
 import api from '../plugins/http/api';
 
-const debug = process.env.NODE_ENV !== 'production';
+/* global window, console */
 
 Vue.use(Vuex);
 
@@ -16,7 +16,8 @@ const store = (
 			blockIndex: null,
 			blockDef: null,
 			blockList: null,
-			page,
+			region: 'main_content',
+			page: {},
 			over: {
 				x: 0,
 				y: 0
@@ -36,15 +37,14 @@ const store = (
 				offsets: [],
 				moved: null
 			},
-			meta: {
-				blocks: []
-			},
-			baseUrl: window.Laravel.base
+			wrapperStyles: {},
+			showIframeOverlay: false,
+			pageScale: .4
 		},
 
 		getters: {
-			getFieldValue: (state, getters) => (index, name) => {
-				return state.page.blocks[index].fields[name];
+			getFieldValue: (state) => (index, name) => {
+				return state.page.regions[state.region][index].fields[name];
 			},
 
 			getCurrentFieldValue: (state, getters) => (name) => {
@@ -53,97 +53,101 @@ const store = (
 		},
 
 		mutations: {
-			SET_BLOCKLIST(state, list) {
-				state.blockList = list;
-			},
 
-			EDIT_BLOCK(state, { index, type } = { index: null, type: null }) {
-				state.blockIndex = state.blockIndex ? null : index;
-				state.blockDef = state.blockDef ? null : state.blockList[type];
-			},
-
-			UPDATE_VALUE(state, { name, value, index }) {
+			updateValue(state, { name, value, index }) {
 				let idx = typeof index !== 'undefined' ? index : state.blockIndex;
 				console.log(name, value, idx, state.blockIndex, typeof index);
-				const block = state.page.blocks[idx];
+				const block = state.page.regions[state.region][idx];
 				block.fields[name] = value;
-				state.page.blocks.splice(idx, 1, block);
+				state.page.regions[state.region].splice(idx, 1, block);
 			},
 
-			UPDATE_OVER(state, position) {
+			updateOver(state, position) {
 				state.over = position;
 			},
 
-			CHANGE_PAGE(state, name) {
+			changePage(state, name) {
 				state.pageName = name;
 			},
 
-			CHANGE_PREVIEW(state, val) {
-				state.preview = val;
+			changePreview(state, value) {
+				state.preview = value;
 			},
 
-			REORDER_BLOCKS(state, { type, from, to, value }) {
-				state.page.blocks.splice(from, 1);
-				state.page.blocks.splice(to, 0, value);
+			updateWrapperStyle(state, { prop, value }) {
+				state.wrapperStyles = { ...state.wrapperStyles, [prop]: value };
 			},
 
-			UPDATE_BLOCK_DATA_ORDER(state, { type, from, to, value }) {
+			showIframeOverlay(state, yes) {
+				state.showIframeOverlay = yes;
+			},
+
+			setPage(state, page) {
+				state.page = page;
+			},
+
+			// block mutations
+
+			setBlocklist(state, list) {
+				state.blockList = list;
+			},
+
+			setBlock(state, { index, type } = { index: null, type: null }) {
+				state.blockIndex = index;
+				state.blockDef = state.blockList[type] || null;
+			},
+
+			reorderBlocks(state, { from, to, value }) {
+				state.page.regions[state.region].splice(from, 1);
+				state.page.regions[state.region].splice(to, 0, value);
+			},
+
+			updateBlockPositionsOrder(state, { type, from, to, value }) {
 				state.blockInfo[type].splice(from, 1);
 				state.blockInfo[type].splice(to, 0, value);
 			},
 
-			UPDATE_BLOCK_DATA(state, { type, index, value }) {
+			updateBlockPositions(state, { type, index, value }) {
 				state.blockInfo[type].splice(index, 1, value);
-			}
+			},
+
+			// addBlock(state, { index, row }) {},
+			// deleteBlock(state, { index, row }) {}
 		},
 
 		actions: {
-			fetchBlockList({ commit }) {
+			fetchPage({ commit }, id) {
 				api
-					.get('definitions')
+					.get(`page/${id}?include=blocks`)
 					.then((response) => {
-						commit('SET_BLOCKLIST', response.data.data);
+						commit('setPage', response.data.data);
 					});
 			},
 
-			editBlock({ commit }, data) {
-				commit('EDIT_BLOCK', data);
-			},
+			fetchBlockList({ commit }) {
+				api
+					.get('block/definitions')
+					.then((response) => {
+						// commit('setBlocklist', response.data.data);
+					});
 
-			updateValue({ commit }, data) {
-				commit('UPDATE_VALUE', data);
-			},
+				let defs = {};
 
-			updateOver({ commit }, data) {
-				commit('UPDATE_OVER', data);
-			},
+				Object.keys(definitions).forEach(
+					name => {
+						const def = definitions[name];
 
-			changePage({ commit }, data) {
-				commit('CHANGE_PAGE', data);
-			},
+						if(def) {
+							defs[`${def.name}-v${def.version}`] = def;
+						}
+					}
+				);
 
-			changePreview({ commit }, data) {
-				commit('CHANGE_PREVIEW', data);
-			},
-
-			updateBlockData({ commit }, data) {
-				commit('UPDATE_BLOCK_DATA', data);
-			},
-
-			updateBlockDataOrder({ commit }, data) {
-				commit('UPDATE_BLOCK_DATA_ORDER', data);
-			},
-
-			reorderBlocks({ commit }, data) {
-				commit('REORDER_BLOCKS', data);
+				commit('setBlocklist', defs);
 			}
-
-			// TODO: add these actions?
-			// addRow(row, index) // uuid.v1?
-			// updateRows(index, row)
-			// deleteRow(row, index)
-			// sortRows(to, from)
 		},
+
+		modules: {},
 
 		plugins: [undoRedo]
 
