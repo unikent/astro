@@ -104,7 +104,7 @@ class RegionControllerTest extends ApiControllerTestCase {
     /**
      * @test
      */
-    public function definition_WhenAuthorized_ReturnsJson(){
+    public function definition_WhenAuthorizedAndFound_ReturnsJson(){
         $this->authenticatedAndAuthorized();
 
         $response = $this->action('GET', RegionController::class . '@definition', 'test-region');
@@ -112,6 +112,24 @@ class RegionControllerTest extends ApiControllerTestCase {
         $json = $response->json();
         $this->assertArrayHasKey('data', $json);
         $this->assertEquals('test-region', $json['data']['name']);
+    }
+
+    /**
+     * @test
+     */
+    public function definition_WhenAuthorizedAndFoundAndRequestIncludesBlockDefinitions_IncludesBlockDefinitionsInJson(){
+        $this->authenticatedAndAuthorized();
+
+        $response = $this->action('GET', RegionController::class . '@definition', [
+            'layout_definition' => 'test-region',
+            'include' => 'block_definitions',
+        ]);
+
+        $json = $response->json();
+
+        $this->assertArrayHasKey('data', $json);
+        $this->assertArrayHasKey('block_definitions', $json['data']);
+        $this->assertCount(1, $json['data']['block_definitions']);
     }
 
 

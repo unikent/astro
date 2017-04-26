@@ -28,8 +28,8 @@ class Region extends BaseDefinition
 			$path = Block::locateDefinition($name);
 
 			if(!is_null($path)){
-				$region = Block::fromDefinitionFile($path);
-				$this->blockDefinitions->push($region);
+				$block = Block::fromDefinitionFile($path);
+				$this->blockDefinitions->push($block);
 			}
 		}
 	}

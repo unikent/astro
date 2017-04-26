@@ -105,7 +105,7 @@ class LayoutControllerTest extends ApiControllerTestCase {
     /**
      * @test
      */
-    public function definition_WhenAuthorized_ReturnsJson(){
+    public function definition_WhenAuthorizedAndFound_ReturnsJson(){
         $this->authenticatedAndAuthorized();
 
         $response = $this->action('GET', LayoutController::class . '@definition', 'test-layout');
@@ -113,6 +113,24 @@ class LayoutControllerTest extends ApiControllerTestCase {
         $json = $response->json();
         $this->assertArrayHasKey('data', $json);
         $this->assertEquals('test-layout', $json['data']['name']);
+    }
+
+    /**
+     * @test
+     */
+    public function definition_WhenAuthorizedAndFoundAndRequestIncludesRegionDefinitions_IncludesRegionDefinitionsInJson(){
+        $this->authenticatedAndAuthorized();
+
+        $response = $this->action('GET', LayoutController::class . '@definition', [
+            'layout_definition' => 'test-layout',
+            'include' => 'region_definitions',
+        ]);
+
+        $json = $response->json();
+
+        $this->assertArrayHasKey('data', $json);
+        $this->assertArrayHasKey('region_definitions', $json['data']);
+        $this->assertCount(1, $json['data']['region_definitions']);
     }
 
 
