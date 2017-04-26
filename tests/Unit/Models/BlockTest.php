@@ -53,17 +53,17 @@ class BlockTest extends TestCase
 	/**
 	 * @test
 	 */
-	public function getBlockDefinition_ReturnBlockDefinition(){
+	public function getDefinition_ReturnBlockDefinition(){
 		$block = factory(Block::class)->make();
-		$this->assertInstanceOf(BlockDefinition::class, $block->getBlockDefinition());
+		$this->assertInstanceOf(BlockDefinition::class, $block->getDefinition());
 	}
 
 	/**
 	 * @test
 	 */
-	public function getBlockDefinition_WhenBlockDefinitionIsNotLoaded_LoadsSupportedBlockDefinition(){
+	public function getDefinition_WhenBlockDefinitionIsNotLoaded_LoadsSupportedBlockDefinition(){
 		$block = factory(Block::class)->make();
-		$definition = $block->getBlockDefinition();
+		$definition = $block->getDefinition();
 
 		$this->assertNotEmpty($definition);
 		$this->assertEquals('test-block', $definition->name);
@@ -72,42 +72,15 @@ class BlockTest extends TestCase
 	/**
 	 * @test
 	 */
-	public function getBlockDefinition_WhenBlockDefinitionIsLoaded_DoesNotReloadBlockDefinition(){
+	public function getDefinition_WhenBlockDefinitionIsLoaded_DoesNotReloadBlockDefinition(){
 		$block = factory(Block::class)->make();
-		$block->getBlockDefinition(); 					// This should populate $blockDefinition
+		$block->getDefinition(); 					// This should populate $blockDefinition
 
 		$block = Mockery::mock($block)->makePartial()->shouldAllowMockingProtectedMethods();
 		$block->shouldNotReceive('loadBlockDefinition');
 
-		$definition = $block->getBlockDefinition(); 	// This should not re-populate $blockDefinition
+		$definition = $block->getDefinition(); 	// This should not re-populate $blockDefinition
 		$this->assertNotEmpty($definition);				// Is populated, but not empty.
 	}
-
-
-
-	/**
-	 * @test
-	 */
-	public function toArray_WhenBlockDefinitionIsNotLoaded_DoesNotIncludeBlockDefinition()
-	{
-		$block = factory(Block::class)->make();
-
-		$output = $block->toArray();
-		$this->assertArrayNotHasKey('blockDefinition', $output);
-	}
-
-	/**
-	 * @test
-	 */
-	public function toArray_WhenBlockDefinitionIsLoaded_IncludesBlockDefinition()
-	{
-		$block = factory(Block::class)->make();
-		$block->loadBlockDefinition();
-
-		$output = $block->toArray();
-		$this->assertArrayHasKey('blockDefinition', $output);
-		$this->assertNotEmpty($output['blockDefinition']);
-	}
-
 
 }

@@ -34,6 +34,205 @@ class PageControllerTest extends ApiControllerTestCase {
      * @test
      * @group authentication
      */
+    public function show_WhenUnauthenticated_Returns401(){
+        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
+        $page = $route->page;
+
+        $response = $this->action('GET', PageController::class . '@show', [ $page->getKey() ]);
+        $response->assertStatus(401);
+    }
+
+    /**
+     * @test
+     * @group authorization
+     */
+    public function show_WhenAuthenticated_ChecksAuthorization(){
+        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
+        $page = $route->page;
+
+        Gate::shouldReceive('authorize')->with('read', Mockery::type(Page::class))->once();
+
+        $this->authenticated();
+        $response = $this->action('GET', PageController::class . '@show', [ $page->getKey() ]);
+    }
+
+    /**
+     * @test
+     * @group authorization
+     */
+    public function show_WhenAuthenticatedAndUnauthorized_Returns403(){
+        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
+        $page = $route->page;
+
+        $this->authenticatedAndUnauthorized();
+
+        $response = $this->action('GET', PageController::class . '@show', [ $page->getKey() ]);
+        $response->assertStatus(403);
+    }
+
+    /**
+     * @test
+     */
+    public function show_WhenAuthorizedAndPageNotFound_Returns404(){
+        $this->authenticatedAndAuthorized();
+
+        $response = $this->action('GET', PageController::class . '@show', [ 123 ]);
+        $response->assertStatus(404);
+    }
+
+    /**
+     * @test
+     */
+    public function show_WhenAuthorizedAndFound_Returns200(){
+        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
+        $page = $route->page;
+
+        $this->authenticatedAndAuthorized();
+
+        $response = $this->action('GET', PageController::class . '@show', [ $page->getKey() ]);
+        $response->assertStatus(200);
+    }
+
+    /**
+     * @test
+     */
+    public function show_WhenAuthorizedAndFound_ReturnsJson(){
+        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
+        $page = $route->page;
+
+        $this->authenticatedAndAuthorized();
+
+        $response = $this->action('GET', PageController::class . '@show', [ $page->getKey() ]);
+        $json = $response->json();
+
+        $this->assertArrayHasKey('data', $json);
+        $this->assertEquals($page->title, $json['data']['title']);
+    }
+
+    /**
+     * @test
+     */
+    public function show_WhenAuthorizedAndFound_ReturnsCanonicalRouteInJson(){
+        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
+        $route->makeCanonical();
+
+        $page = $route->page;
+
+        $this->authenticatedAndAuthorized();
+
+        $response = $this->action('GET', PageController::class . '@show', [ $page->getKey() ]);
+        $json = $response->json();
+
+        $this->assertArrayHasKey('data', $json);
+        $this->assertArrayHasKey('canonical', $json['data']);
+        $this->assertEquals($route->slug, $json['data']['canonical']['slug']);
+    }
+
+    /**
+     * @test
+     */
+    public function show_WhenAuthorizedAndFoundRequestIncludesLayoutDefinition_IncludesLayoutDefinitionInJson(){
+        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
+        $route->makeCanonical();
+
+        $page = $route->page;
+
+        $this->authenticatedAndAuthorized();
+
+        $response = $this->action('GET', PageController::class . '@show', [
+            'page' => $page->getKey(),
+            'include' => 'layout_definition',
+        ]);
+
+        $json = $response->json();
+
+        $this->assertArrayHasKey('data', $json);
+        $this->assertArrayHasKey('layout_definition', $json['data']);
+        $this->assertEquals($page->layout_name, $json['data']['layout_definition']['name']);
+    }
+
+    /**
+     * @test
+     */
+    public function show_WhenAuthorizedAndFoundRequestIncludesRoutes_IncludesRoutesInJson(){
+        $r1 = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
+        $r2 = factory(Route::class)->create([ 'page_id' => $r1->page_id, 'parent_id' => $r1->parent_id ]);
+
+        $r1->makeCanonical();
+
+        $page = $r1->page;
+
+        $this->authenticatedAndAuthorized();
+
+        $response = $this->action('GET', PageController::class . '@show', [
+            'page' => $page->getKey(),
+            'include' => 'routes',
+        ]);
+
+        $json = $response->json();
+
+        $this->assertArrayHasKey('data', $json);
+        $this->assertArrayHasKey('routes', $json['data']);
+        $this->assertCount(2, $json['data']['routes']);
+    }
+
+    /**
+     * @test
+     */
+    public function show_WhenAuthorizedAndFoundRequestIncludesBlocks_IncludesBlocksInJson(){
+        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
+        $route->makeCanonical();
+
+        $page = $route->page;
+        $block = factory(Block::class)->create([ 'page_id' => $page->getKey() ]);
+
+        $this->authenticatedAndAuthorized();
+
+        $response = $this->action('GET', PageController::class . '@show', [
+            'page' => $page->getKey(),
+            'include' => 'blocks',
+        ]);
+
+        $json = $response->json();
+
+        $this->assertArrayHasKey('data', $json);
+        $this->assertArrayHasKey('blocks', $json['data']);
+        $this->assertCount(1, $json['data']['blocks']);
+    }
+
+    /**
+     * @test
+     */
+    public function show_WhenAuthorizedAndFoundRequestIncludesBlocksDefinition_IncludesBlocksAndDefinitionsInJson(){
+        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
+        $route->makeCanonical();
+
+        $page = $route->page;
+        $block = factory(Block::class)->create([ 'page_id' => $page->getKey() ]);
+
+        $this->authenticatedAndAuthorized();
+
+        $response = $this->action('GET', PageController::class . '@show', [
+            'page' => $page->getKey(),
+            'include' => 'blocks.definition',
+        ]);
+
+        $json = $response->json();
+
+        $this->assertArrayHasKey('data', $json);
+        $this->assertArrayHasKey('blocks', $json['data']);
+        $this->assertCount(1, $json['data']['blocks']);
+
+        $this->assertArrayHasKey('definition', $json['data']['blocks'][0]);
+        $this->assertEquals($block->definition_name, $json['data']['blocks'][0]['definition']['name']);
+    }
+
+
+
+    /**
+     * @test
+     * @group authentication
+     */
     public function store_WhenUnauthenticated_Returns401(){
         $response = $this->action('POST', PageController::class . '@store', [], $this->getAttrs());
         $response->assertStatus(401);

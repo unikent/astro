@@ -47,22 +47,4 @@ class Region extends BaseDefinition
 		return $this->blockDefinitions;
 	}
 
-    /**
-     * Convert the model instance to an array.
-     *
-     * This is the same implementation as Illuminate\Database\Eloquent\Model.
-     *
-     * @return array
-     */
-    public function toArray()
-    {
-        $attributes = parent::toArray();
-
-        if(!$this->blockDefinitions->isEmpty()){
-	        $attributes['blockDefinitions'] = $this->blockDefinitions->toArray();
-        }
-
-        return $attributes;
-    }
-
 }

@@ -193,10 +193,11 @@ return [
 
 		KentAuth\AuthServiceProvider::class,
 		Baum\Providers\BaumServiceProvider::class,
-		Conner\Tagging\Providers\TaggingServiceProvider::class,
+		Spatie\Fractal\FractalServiceProvider::class,
 		Intervention\Image\ImageServiceProvider::class,
 		// Barryvdh\Debugbar\ServiceProvider::class,
 		Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
+		Conner\Tagging\Providers\TaggingServiceProvider::class,
 
 		/*
 		 * Application Service Providers...
@@ -257,8 +258,9 @@ return [
 		'Validator' => Illuminate\Support\Facades\Validator::class,
 		'View' => Illuminate\Support\Facades\View::class,
 
+		'Fractal' => Spatie\Fractal\FractalFacade::class,
+		'Image' => Intervention\Image\Facades\Image::class,
 		'SSO' => KentAuth\Facades\SSO::class,
-		'Image' => Intervention\Image\Facades\Image::class
 	],
 
 ];

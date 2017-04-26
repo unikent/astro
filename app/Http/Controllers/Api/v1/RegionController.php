@@ -5,6 +5,8 @@ use Auth;
 use Config;
 use Illuminate\Http\Request;
 use App\Models\Definitions\Region as Definition;
+use App\Http\Transformers\Api\v1\Definitions\BlockTransformer;
+use App\Http\Transformers\Api\v1\Definitions\RegionTransformer;
 
 class RegionController extends ApiController
 {
@@ -31,6 +33,7 @@ class RegionController extends ApiController
 
 	/**
 	 * GET /api/v1/region/{region_definition}/definition
+	 * This endpoint supports 'include'.
 	 *
 	 * @param  Request    $request
 	 * @param  Definition $definition
@@ -38,7 +41,7 @@ class RegionController extends ApiController
 	 */
 	public function definition(Request $request, Definition $definition){
 		$this->authorize('read', $definition);
-		return response()->json([ 'data' => $definition ]);
+		return fractal($definition, new RegionTransformer)->parseIncludes($request->get('include'))->respond();
 	}
 
 	/**
@@ -50,7 +53,7 @@ class RegionController extends ApiController
 	 */
 	public function blocks(Request $request, Definition $definition){
 		$this->authorize('read', $definition);
-		return response()->json([ 'data' => $definition->getBlockDefinitions() ]);
+		return fractal($definition->getBlockDefinitions(), new BlockTransformer)->respond();
 	}
 
 }

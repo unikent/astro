@@ -8,10 +8,26 @@ use App\Models\Block;
 use App\Models\Route;
 use Illuminate\Http\Request;
 use App\Http\Requests\Api\v1\Page\PersistRequest;
+use App\Http\Transformers\Api\v1\PageTransformer;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+
 
 class PageController extends ApiController
 {
+
+	/**
+	 * POST /api/v1/page/{page}
+	 *
+	 * @param  Request $request
+	 * @param  Page $page
+	 * @return Response
+	 */
+	public function show(Request $request, Page $page){
+		$this->authorize('read', $page);
+
+		return fractal($page, new PageTransformer)->parseIncludes($request->get('include'))->respond();
+	}
+
 
 	/**
 	 * POST /api/v1/page
@@ -23,7 +39,8 @@ class PageController extends ApiController
 	public function store(PersistRequest $request){
 		$page = new Page;
 		$this->process($request, $page); // Handles authorization and persistance
-		return response()->json([ 'data' => $page ], 201);
+
+		return fractal($page, new PageTransformer)->respond(201);
 	}
 
 	/**
@@ -36,7 +53,7 @@ class PageController extends ApiController
 	 */
 	public function update(PersistRequest $request, Page $page){
 		$this->process($request, $page); // Handles authorization and persistance
-		return response()->json([ 'data' => $page ], 200);
+		return fractal($page, new PageTransformer)->respond();
 	}
 
 	/**

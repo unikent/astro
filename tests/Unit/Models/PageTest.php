@@ -121,30 +121,4 @@ class PageTest extends TestCase
 		$this->assertCount(1, $definition->getRegionDefinitions());
 	}
 
-
-
-	/**
-	 * @test
-	 */
-	public function toArray_WhenLayoutDefinitionIsNotLoaded_DoesNotIncludeLayoutDefinition()
-	{
-		$page = factory(Page::class)->make();
-
-		$output = $page->toArray();
-		$this->assertArrayNotHasKey('layoutDefinition', $output);
-	}
-
-	/**
-	 * @test
-	 */
-	public function toArray_WhenLayoutDefinitionIsLoaded_IncludesLayoutDefinition()
-	{
-		$page = factory(Page::class)->make();
-		$page->loadLayoutDefinition();
-
-		$output = $page->toArray();
-		$this->assertArrayHasKey('layoutDefinition', $output);
-		$this->assertNotEmpty($output['layoutDefinition']);
-	}
-
 }

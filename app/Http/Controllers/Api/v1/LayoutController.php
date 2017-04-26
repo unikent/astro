@@ -5,6 +5,7 @@ use Auth;
 use Config;
 use Illuminate\Http\Request;
 use App\Models\Definitions\Layout as Definition;
+use App\Http\Transformers\Api\v1\Definitions\LayoutTransformer;
 
 class LayoutController extends ApiController
 {
@@ -31,6 +32,7 @@ class LayoutController extends ApiController
 
 	/**
 	 * GET /api/v1/layout/{layout_definition}/definition
+	 * This endpoint supports 'include'.
 	 *
 	 * @param  Request    $request
 	 * @param  Definition $definition
@@ -38,7 +40,7 @@ class LayoutController extends ApiController
 	 */
 	public function definition(Request $request, Definition $definition){
 		$this->authorize('read', $definition);
-		return response()->json([ 'data' => $definition ]);
+		return fractal($definition, new LayoutTransformer)->parseIncludes($request->get('include'))->respond();
 	}
 
 	/**

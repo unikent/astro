@@ -21,7 +21,7 @@ class Block extends Model
         'fields' => 'json',
 	];
 
-	protected $blockDefinition = null;
+	protected $definition = null;
 
 
     /**
@@ -40,24 +40,24 @@ class Block extends Model
 	 * Loads the Block definition
 	 * @return void
 	 */
-	public function loadBlockDefinition()
+	public function loadDefinition()
 	{
 		$file = BlockDefinition::locateDefinition($this->definition_name, $this->definition_version);
 		$definition = BlockDefinition::fromDefinitionFile($file);
 
-		$this->blockDefinition = $definition;
+		$this->definition = $definition;
 	}
 
 	/**
-	 * Returns the blockDefinition, loading from disk if necessary.
+	 * Returns the definition, loading from disk if necessary.
 	 * @return BlockDefinition
 	 */
-	public function getBlockDefinition(){
-		if(!$this->blockDefinition){
-			$this->loadBlockDefinition();
+	public function getDefinition(){
+		if(!$this->definition){
+			$this->loadDefinition();
 		}
 
-		return $this->blockDefinition;
+		return $this->definition;
 	}
 
 
@@ -73,24 +73,5 @@ class Block extends Model
 		$page_id = is_numeric($page_or_id) ? $page_or_id : $page_or_id->getKey();
 		static::where('page_id', '=', $page_id)->where('region_name', '=', $region)->delete();
 	}
-
-
-
-    /**
-     * Convert the model instance to an array.
-     * If loaded, includes the $blockDefinition.
-     *
-     * @return array
-     */
-    public function toArray()
-    {
-    	$attributes = $this->attributesToArray();
-
-    	if($this->blockDefinition){
-    		$attributes['blockDefinition'] = $this->blockDefinition;
-    	}
-
-        return $attributes;
-    }
 
 }

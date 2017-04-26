@@ -90,32 +90,4 @@ class LayoutTest extends TestCase
 		$this->assertNotEmpty($collection);				// Is populated, but not empty.
 	}
 
-	/**
-	 * @test
-	 */
-	public function toArray_WhenRegionDefinitionsAreNotLoaded_DoesNotIncludeRegionDefinitions()
-	{
-		$path = Layout::locateDefinition('test-layout');
-
-		$layout = Layout::fromDefinitionFile($path);
-		$output = $layout->toArray();
-
-		$this->assertArrayNotHasKey('regionDefinitions', $output);
-	}
-
-	/**
-	 * @test
-	 */
-	public function toArray_WhenRegionDefinitionsAreLoaded_IncludesRegionDefinitions()
-	{
-		$path = Layout::locateDefinition('test-layout');
-
-		$layout = Layout::fromDefinitionFile($path);
-		$layout->loadRegionDefinitions();
-
-		$output = $layout->toArray();
-		$this->assertArrayHasKey('regionDefinitions', $output);
-		$this->assertCount(1, $output['regionDefinitions']);
-	}
-
 }
