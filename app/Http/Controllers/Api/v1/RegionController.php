@@ -44,16 +44,4 @@ class RegionController extends ApiController
 		return fractal($definition, new RegionTransformer)->parseIncludes($request->get('include'))->respond();
 	}
 
-	/**
-	 * GET /api/v1/region/{region_definition}/blocks
-	 *
-	 * @param  Request    $request
-	 * @param  Definition $definition
-	 * @return Response
-	 */
-	public function blocks(Request $request, Definition $definition){
-		$this->authorize('read', $definition);
-		return fractal($definition->getBlockDefinitions(), new BlockTransformer)->respond();
-	}
-
 }

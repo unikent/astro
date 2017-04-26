@@ -43,16 +43,4 @@ class LayoutController extends ApiController
 		return fractal($definition, new LayoutTransformer)->parseIncludes($request->get('include'))->respond();
 	}
 
-	/**
-	 * GET /api/v1/layout/{layout_definition}/regions
-	 *
-	 * @param  Request    $request
-	 * @param  Definition $definition
-	 * @return Response
-	 */
-	public function regions(Request $request, Definition $definition){
-		$this->authorize('read', $definition);
-		return response()->json([ 'data' => $definition->getRegionDefinitions() ]);
-	}
-
 }
