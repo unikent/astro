@@ -22,10 +22,12 @@ Route::group(['prefix' => 'auth'], function() {
 });
 
 Route::get('/{catchall?}', function($route) {
+	$user = Auth::user();
 	// TODO: grab user info from endpoint, rather than inline js
 	return response()->view('inline', [
 		'route' => $route,
-		'user'  => Auth::user()->name
+		'user'  => $user->name,
+		'api_token' => $user->api_token
 	]);
 })
 ->where('catchall', '(.*)')

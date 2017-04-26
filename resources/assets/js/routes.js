@@ -1,20 +1,17 @@
 import VueRouter from 'vue-router';
 
-import Admin from './components/views/Admin.vue';
+import Admin from './components/views/Admin';
 
-import Dashboard from './components/views/Dashboard.vue';
-import SiteList from './components/views/SiteList.vue';
-import Media from './components/views/Media.vue';
-import Settings from './components/views/Settings.vue'
+import Dashboard from './components/views/Dashboard';
+import SiteList from './components/views/SiteList';
+import Media from './components/views/Media';
+import Settings from './components/views/Settings'
 
-import Editor from './components/views/Editor.vue';
-import Preview from './components/views/Preview.vue';
-
-import Test from './components/views/Test.vue';
-
-import NotFound from './components/views/NotFound.vue';
-
-/* global window */
+import Editor from './components/views/Editor';
+import Preview from './components/views/Preview';
+import Test from './components/views/Test';
+import NotFound from './components/views/NotFound';
+import Config from './classes/Config';
 
 const routes = [
 	{
@@ -65,5 +62,5 @@ const routes = [
 export const router = new VueRouter({
 	mode: 'history',
 	routes,
-	base: (typeof window.Laravel.base !== 'undefined') ? `${window.Laravel.base}/` : '/'
+	base: `${Config.get('base_url', '')}/`
 });

@@ -2,7 +2,10 @@
 <div class="editor-body">
 	<div class="editor-wrapper" ref="editor">
 		<iframe ref="iframe" class="editor-content" :style="dimensions" :src="getUrl" frameborder="0"></iframe>
-		<div class="iframe-overlay"></div>
+		<div
+			class="iframe-overlay"
+			:style="{ 'position' : showIframeOverlay ? 'absolute' : null }"
+		/>
 		<footer class="b-bar">
 
 			<el-tooltip class="item" effect="dark" content="Switch preview mode" placement="top">
@@ -17,11 +20,11 @@
 			</el-tooltip>
 
 			<el-button-group class="undo-redo">
-				<el-button disabled><Icon :glyph="UndoIcon" aria-hidden="true" width="14" height="14" class="ico" /></i></el-button>
-				<el-button disabled><Icon :glyph="RedoIcon" aria-hidden="true" width="14" height="14" class="ico" /></el-button>
+				<el-button disabled><Icon :glyph="undoIcon" aria-hidden="true" width="14" height="14" class="ico" /></i></el-button>
+				<el-button disabled><Icon :glyph="redoIcon" aria-hidden="true" width="14" height="14" class="ico" /></el-button>
 			</el-button-group>
 
-			<el-button class="save-button" @click="showPageData = true">Save</el-button>
+			<el-button class="save-button" @click="savePage">Save</el-button>
 		</footer>
 	</div>
 
@@ -51,19 +54,18 @@
 
 <script>
 import { Loading } from 'element-ui';
-import { mapState } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 
-import PageSidebar from '../PageSidebar.vue';
-import BlockSidebar from '../BlockSidebar.vue';
+import Config from '../../classes/Config';
+import PageSidebar from '../PageSidebar';
+import BlockSidebar from '../BlockSidebar';
 
-import Icon from '../Icon.vue';
-import UndoIcon from '!IconPath/undo.svg';
-import RedoIcon from '!IconPath/redo.svg';
-import DesktopIcon from '!IconPath/desktop.svg';
-import TabletIcon from '!IconPath/tablet.svg';
-import MobileIcon from '!IconPath/mobile.svg';
-
-/* global window */
+import Icon from '../Icon';
+import undoIcon from '!IconPath/undo.svg';
+import redoIcon from '!IconPath/redo.svg';
+import desktopIcon from '!IconPath/desktop.svg';
+import tabletIcon from '!IconPath/tablet.svg';
+import mobileIcon from '!IconPath/mobile.svg';
 
 export default {
 	name: 'editor',
@@ -74,31 +76,36 @@ export default {
 		Icon
 	},
 
+	created() {
+		this.undoIcon = undoIcon;
+		this.redoIcon = redoIcon;
+		this.views = {
+			desktop: {
+				icon: desktopIcon,
+				label: 'Desktop',
+				width: '100%',
+				height: '100vh'
+			},
+			tablet: {
+				icon: tabletIcon,
+				label: 'Tablet',
+				width: '768px',
+				height: '1024px'
+			},
+			mobile: {
+				icon: mobileIcon,
+				label: 'Mobile',
+				width: '320px',
+				height: '568px'
+			}
+		};
+
+		this.fetchPage(this.$route.params.site_id);
+	},
+
 	data() {
 		return {
-			views: {
-				'desktop': {
-					icon: DesktopIcon,
-					label: 'Desktop',
-					width: '100%',
-					height: '100vh'
-				},
-				'tablet': {
-					icon: TabletIcon,
-					label: 'Tablet',
-					width: '768px',
-					height: '1024px'
-				},
-				'mobile': {
-					icon: MobileIcon,
-					label: 'Mobile',
-					width: '320px',
-					height: '568px'
-				}
-			},
 			currentView: 'desktop',
-			UndoIcon,
-			RedoIcon,
 			showPageData: false,
 			sideBarOpen: true,
 			blockListOpen: true
@@ -106,8 +113,14 @@ export default {
 	},
 
 	computed: {
+		...mapState([
+			'page',
+			'preview',
+			'showIframeOverlay'
+		]),
+
 		getUrl() {
-			return `${window.Laravel.base}/preview`;
+			return `${Config.get('base_url', '')}/preview`;
 		},
 
 		dimensions() {
@@ -115,12 +128,7 @@ export default {
 				width: this.views[this.currentView].width,
 				height: this.views[this.currentView].height
 			};
-		},
-
-		...mapState([
-			'page',
-			'preview'
-		])
+		}
 	},
 
 	mounted() {
@@ -136,6 +144,26 @@ export default {
 			};
 
 		this.$refs.iframe.addEventListener('load', removeLoader);
+	},
+
+	methods: {
+		...mapActions([
+			'fetchPage'
+		]),
+
+		savePage() {
+			// this.showPageData = true;
+
+			this.$api
+				.put('page/1', this.page)
+				.then((response) => {
+					console.log(response.data);
+				});
+
+			console.log(
+				JSON.stringify(this.page, null, 4)
+			);
+		}
 	}
 };
 </script>

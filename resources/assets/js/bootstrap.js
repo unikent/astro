@@ -1,6 +1,9 @@
-import './redactor';
+import Config from './classes/Config';
 
-window.axios.defaults.headers.common = {
-	'X-Requested-With': 'XMLHttpRequest',
-	'Accept': 'application/json'
-};
+/* global window */
+
+Config.init(window.astro);
+Config.set(
+	'api_base_url',
+	Config.get('base_url', '') + Config.get('api_url', '/api/')
+);

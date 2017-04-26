@@ -25,10 +25,12 @@
 	@endif
 
 	<script>
-	window.Laravel = <?php echo json_encode([
-		'csrfToken' => csrf_token(),
-		'base' => Request::getBaseUrl(),
-		'username' => $user
+	window.astro = <?php echo json_encode([
+		'csrf_token' => csrf_token(),
+		'base_url' => Request::getBaseUrl(),
+		'api_url' => '/api/v1/',
+		'username' => $user,
+		'api_token' => $api_token
 	]); ?>;
 	window.isEditor = <?php echo json_encode($route !== 'preview'); ?>;
 	</script>
@@ -38,8 +40,8 @@
 
 	</div>
 
-	<script src="{{ url("/") }}{{ mix('js/manifest.js') }}"></script>
-	<script src="{{ url("/") }}{{ mix('js/vendor.js') }}"></script>
-	<script src="{{ url("/") }}{{ mix('js/app.js') }}"></script>
+	<script src="{{ url('/') }}{{ mix('js/manifest.js') }}"></script>
+	<script src="{{ url('/') }}{{ mix('js/vendor.js') }}"></script>
+	<script src="{{ url('/') }}{{ mix('js/app.js') }}"></script>
 </body>
 </html>

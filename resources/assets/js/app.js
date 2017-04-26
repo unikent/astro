@@ -1,16 +1,17 @@
-import './bootstrap';
-
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import ElementUI from 'element-ui';
 
-import httpPlugin from './plugins/http'
-import eventBusPlugin from './plugins/eventbus';
-import snackBarPlugin from './plugins/snackbar';
+import './bootstrap';
 import locale from './locale';
 import store from './store';
-import App from './components/views/App.vue';
 import { router } from './routes';
+import httpPlugin from './plugins/http';
+import eventBusPlugin from './plugins/eventbus';
+import snackBarPlugin from './plugins/snackbar';
+import App from './components/views/App';
+
+import './redactor';
 
 /* global document */
 
