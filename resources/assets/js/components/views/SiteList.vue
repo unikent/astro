@@ -1,18 +1,3 @@
-<style scoped>
-.pagination {
-	float: right;
-	margin-top: 20px;
-}
-
-.manage-table__add-button {
-	margin-left: auto;
-}
-
-.w100 {
-	width: 100%;
-}
-</style>
-
 <template>
 <el-card>
 	<div slot="header" class="manage-table__header">

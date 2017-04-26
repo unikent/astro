@@ -1,10 +1,3 @@
-<style>
-.side-container {
-	padding: 30px;
-	text-align: center;
-}
-</style>
-
 <template>
 	<el-tabs v-model="activeName" @tab-click="handleClick">
 		<el-tab-pane label="Site" name="first">

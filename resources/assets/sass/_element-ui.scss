@@ -1,0 +1,59 @@
+.el-tabs__header {
+	margin: 0;
+}
+
+.el-dropdown-menu {
+	font-size: 14px;
+}
+
+.editor-nav {
+	.el-tabs__nav {
+		float: none;
+	}
+	.el-tabs__nav-wrap {
+		margin-bottom: 0;
+	}
+	.el-tabs__item {
+		width: 50%;
+		text-align: center;
+		background-color: #fff;
+	}
+}
+
+.el-upload-dragger {
+	width: 100%;
+}
+
+.el-dialog,
+.el-message-box {
+	border: 1px solid #dce3ea;
+	box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 10px;
+}
+
+.el-table td,
+.el-table th {
+	line-height: 50px;
+	height: auto;
+}
+
+.el-table th > .cell,
+.el-table .cell {
+	line-height: inherit;
+}
+
+.el-table th {
+	background-color: #f0f6f9;
+}
+
+.el-table__fixed-header-wrapper thead div,
+.el-table__header-wrapper thead div {
+	background-color: #f0f6f9;
+}
+
+.el-table--striped .el-table__body tr:nth-child(2n) td {
+	background-color: #f7fafc;
+}
+
+.el-dialog {
+	border-radius: 4px;
+}

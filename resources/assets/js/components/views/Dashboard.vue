@@ -1,13 +1,3 @@
-<style>
-.dash-type-switch {
-	float: right;
-}
-.dash-chart {
-	width: calc(100% - 40px);
-	margin: 20px;
-}
-</style>
-
 <template>
 <el-card>
 	<div slot="header" class="manage-table__header">

@@ -1,0 +1,97 @@
+.manage-table__search {
+	max-width: 250px;
+}
+h3 {
+	margin-top: 0;
+}
+.image-grid__item {
+	background-color: #d9dee2;
+	position: relative;
+	padding-top: 100%;
+	border: 1px solid #d1dbe5;
+	border-radius: 2px;
+	transition: transform .2s ease-out, border .2s ease-out, box-shadow .2s ease-out;
+	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0), 0 4px 8px 0 rgba(0, 0, 0, 0);
+	overflow: hidden;
+}
+.image-grid__item .img-grid {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+.image-grid__item-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	opacity: 0;
+	background-color: #204869;
+	background: radial-gradient(farthest-corner at 50% 50%, rgba(50, 50, 50, .5) 50%, #323232 100%);
+	transition: opacity .3s ease-out;
+}
+
+.item-grid__edit {
+
+	transform: translateY(40px);
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+
+	opacity: 0;
+	transition: transform .2s ease-out, opacity .2s ease-out;
+
+	.it-butt {
+		position: absolute;
+		left: 10px;
+		bottom: 10px;
+		font-size: 1.2rem;
+		color: #fff;
+		cursor: pointer;
+	}
+
+	.el-dropdown {
+		position: absolute;
+		right: 10px;
+		bottom: 5px;
+		color: #fff;
+		font-size: 1.2rem;
+		cursor: pointer;
+	}
+}
+
+.image-grid__item:hover  {
+	border: 1px solid #3b6586;
+	box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1), 0 4px 8px 0 rgba(0,0,0,0.2);
+
+	.image-grid__item-overlay {
+		opacity: .6;
+	}
+
+	.item-grid__edit {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.el-pagination {
+	margin-top: 2em;
+}
+.el-pagination .el-select .el-input {
+	width: 68px;
+}
+.el-pagination .show-text {
+	margin: 0 10px 0 20px;
+}
+
+.u-flex {
+	display: flex;
+}
+
+.upload-button {
+	margin-right: 14px;
+}

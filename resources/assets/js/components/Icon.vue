@@ -1,9 +1,3 @@
-<style>
-.icon {
-	vertical-align: middle;
-}
-</style>
-
 <template>
 <svg :class="className" :width="width" :height="height" :viewBox="glyph.viewBox">
 	<use :xlink:href="glyph.symbol" />

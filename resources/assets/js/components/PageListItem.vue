@@ -1,14 +1,3 @@
-<style>
-.site-item {
-	width: 12px;
-}
-
-.side-caret {
-	font-size: 10px;
-	margin-left: 0;
-}
-</style>
-
 <template>
 	<li v-if="this.page" :class="{'parent-page': hasChildren, 'is-site': this.page.type && this.page.type.indexOf('site') !== -1}">
 		<div :style="leftPadding">

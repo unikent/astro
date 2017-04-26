@@ -1,19 +1,3 @@
-<style lang="scss" scoped>
-.block-options {
-	transition: transform .2s ease-in-out;
-	transform: translateX(100%);
-	position: absolute;
-	top: 0;
-	background-color: #eef1f6;
-	height: calc(100vh - 50px);
-	width: 100%;
-	border-left: 1px solid #bcc8dc;
-}
-.options-visible {
-	transform: translateX(-1px);
-}
-</style>
-
 <template>
 	<div>
 		<block-list></block-list>

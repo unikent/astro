@@ -1,18 +1,3 @@
-<style scoped>
-h3 {
-	margin-top: 30px;
-	padding-top: 20px;
-	border-top: 1px solid rgba(191, 203, 217, 0.3);
-}
-
-.block-options-list {
-	height: calc(100vh - 92px);
-	padding: 0 20px 80px;
-	overflow: auto;
-	margin-bottom: 80px;
-}
-</style>
-
 <template>
 <div>
 	<div class="b-back-button" @click="editBlock">
@@ -23,7 +8,7 @@ h3 {
 
 		<div v-if="currentDefinition">
 			<div v-for="field in currentDefinition.fields">
-				<h3>{{ field.label }}</h3>
+				<h3 class="field-label">{{ field.label }}</h3>
 				<component :is="getField(field.type)" :name="field.name" :field="field" />
 			</div>
 		</div>

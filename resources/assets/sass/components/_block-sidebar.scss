@@ -1,0 +1,26 @@
+.block-options {
+	transition: transform .2s ease-in-out;
+	transform: translateX(100%);
+	position: absolute;
+	top: 0;
+	left: 1px;
+	background-color: #f5f7fa;
+	height: calc(100vh - 50px);
+	width: calc(100% - 1px);
+}
+.options-visible {
+	transform: translateX(-1px);
+}
+
+.field-label {
+	margin-top: 30px;
+	padding-top: 20px;
+	border-top: 1px solid rgba(191, 203, 217, 0.3);
+}
+
+.block-options-list {
+	height: calc(100vh - 92px);
+	padding: 0 20px 80px;
+	overflow: auto;
+	margin-bottom: 80px;
+}

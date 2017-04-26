@@ -1,14 +1,7 @@
-<style>
-.block-move-container {
-	transition: transform 0.2s ease-out;
-	z-index: 100;
-}
-</style>
-
 <template>
 	<div class="block-move-container" :style="offsetStyles">
 		<div class="block-move" @mousedown="handleMousedown" :style="styles">
-			{{ block.name }}
+			{{ block.label }}
 		</div>
 	</div>
 </template>
