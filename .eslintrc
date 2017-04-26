@@ -1,14 +1,7 @@
 {
 	"extends": "eslint:recommended",
 
-	"parserOptions": {
-		"ecmaVersion": 2017,
-		"sourceType": "module",
-		"ecmaFeatures": {
-			"globalReturn": true,
-			"experimentalObjectRestSpread": true
-		}
-	},
+	"parser": "babel-eslint",
 
 	"plugins": ["html"],
 
