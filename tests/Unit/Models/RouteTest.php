@@ -4,6 +4,7 @@ namespace Tests\Unit\Models;
 use Exception;
 use Tests\TestCase;
 use App\Models\Page;
+use App\Models\Site;
 use App\Models\Route;
 
 class RouteTest extends TestCase
@@ -42,6 +43,113 @@ class RouteTest extends TestCase
 		$this->assertFalse($routes[0]->is_canonical);
 		$this->assertTrue($routes[1]->is_canonical);
 		$this->assertFalse($routes[2]->is_canonical);
+	}
+
+
+
+	/**
+	 * @test
+	 */
+	public function isCanonical_WhenIsCanonicalIsTrue_ReturnsTrue()
+	{
+		$route = factory(Route::class)->make([ 'is_canonical' => true ]);
+		$this->assertTrue($route->isCanonical());
+	}
+
+	/**
+	 * @test
+	 */
+	public function isCanonical_WhenIsCanonicalIsFase_ReturnsFalse()
+	{
+		$route = factory(Route::class)->make([ 'is_canonical' => false ]);
+		$this->assertFalse($route->isCanonical());
+	}
+
+
+
+
+	/**
+	 * @test
+	 */
+	function makeSite_WithSiteInstance_SetsSiteIdOnCurrentRoute()
+	{
+		$route = factory(Route::class)->states('withPage', 'withParent')->create();
+
+		$site = factory(Site::class)->states('withPublishingGroup')->create();
+		$route->makeSite($site);
+
+		$route = $route->fresh();
+		$this->assertEquals($route->site_id, $site->getKey());
+	}
+
+	/**
+	 * @test
+	 */
+	function makeSite_WithSiteInstance_SetsSiteIdOnAllOtherRoutesToPage()
+	{
+		$r1 = factory(Route::class)->states('withPage', 'withParent')->create();
+		$r2 = factory(Route::class)->create([ 'page_id' => $r1->page_id, 'parent_id' => $r1->parent_id ]);
+
+		$site = factory(Site::class)->states('withPublishingGroup')->create();
+		$r2->makeSite($site);
+
+		$r1 = $r1->fresh();
+		$this->assertEquals($r1->site_id, $site->getKey());
+
+		$r2 = $r2->fresh();
+		$this->assertEquals($r2->site_id, $site->getKey());
+	}
+
+	/**
+	 * @test
+	 */
+	function makeSite_WithSiteId_SetsSiteIdOnCurrentRoute()
+	{
+		$route = factory(Route::class)->states('withPage', 'withParent')->create();
+
+		$site = factory(Site::class)->states('withPublishingGroup')->create();
+		$route->makeSite($site->getKey());
+
+		$route = $route->fresh();
+		$this->assertEquals($route->site_id, $site->getKey());
+	}
+
+	/**
+	 * @test
+	 */
+	function makeSite_WithSiteId_SetsSiteIdOnAllOtherRoutesToPage()
+	{
+		$r1 = factory(Route::class)->states('withPage', 'withParent')->create();
+		$r2 = factory(Route::class)->create([ 'page_id' => $r1->page_id, 'parent_id' => $r1->parent_id ]);
+
+		$site = factory(Site::class)->states('withPublishingGroup')->create();
+		$r2->makeSite($site->getKey());
+
+		$r1 = $r1->fresh();
+		$this->assertEquals($r1->site_id, $site->getKey());
+
+		$r2 = $r2->fresh();
+		$this->assertEquals($r2->site_id, $site->getKey());
+	}
+
+
+
+	/**
+	 * @test
+	 */
+	public function isSite_WhenSiteIdIsSet_ReturnsTrue()
+	{
+		$route = factory(Route::class)->states('withPage', 'withParent', 'withSite')->create();
+		$this->assertTrue($route->isSite());
+	}
+
+	/**
+	 * @test
+	 */
+	public function isSite_WhenSiteIdNotSet_ReturnsFalse()
+	{
+		$route = factory(Route::class)->states('withPage', 'withParent')->create();
+		$this->assertFalse($route->isSite());
 	}
 
 

@@ -5,7 +5,6 @@ $factory->define(App\Models\Page::class, function (Faker\Generator $faker) {
 		'title' => $faker->name,
 		'options' => [ 'description'=> $faker->sentence() ],
 
-		'is_site' => 0,
 		'is_published' => 0,
 
 		'layout_name' => 'test-layout',

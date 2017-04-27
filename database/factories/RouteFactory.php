@@ -28,3 +28,11 @@ $factory->state(App\Models\Route::class, 'withParent', function ($faker) {
         'parent_id' => $parent->getKey(),
     ];
 });
+
+$factory->state(App\Models\Route::class, 'withSite', function ($faker) {
+    $site = factory(App\Models\Site::class)->states('withPublishingGroup')->create();
+
+    return [
+        'site_id' => $site->getKey(),
+    ];
+});

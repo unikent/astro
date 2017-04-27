@@ -9,10 +9,15 @@ class Route extends BaumNode
 {
 	public $timestamps = false;
 
-	protected $fillable = [ 'slug', 'parent_id' ];
+	protected $fillable = [
+		'slug',
+		'parent_id',
+	];
 
-	protected $hidden = [ 'lft', 'rgt'];
-
+	protected $hidden = [
+		'lft',
+		'rgt'
+	];
 
 	protected $casts = [
         'is_canonical' => 'boolean',
@@ -46,11 +51,24 @@ class Route extends BaumNode
 		});
 	}
 
+
+	public function site()
+	{
+		return $this->belongsTo(Site::class, 'site_id');
+	}
+
 	public function page()
 	{
 		return $this->belongsTo(Page::class, 'page_id');
 	}
 
+
+	/**
+	 * Sets is_canonical to true on this route, and sets is_canonical to
+	 * false on all routes sharing the same Page destination.
+	 *
+	 * @return void
+	 */
 	public function makeCanonical()
 	{
 		DB::beginTransaction();
@@ -70,6 +88,56 @@ class Route extends BaumNode
 		}
 	}
 
+	/**
+	 * Returns true if is_canonical is true, else false
+	 * @return boolean
+	 */
+	public function isCanonical()
+	{
+		return $this->is_canonical;
+	}
+
+
+	/**
+	 * Ensures that this Route, and all Routes sharing the same page_id,
+	 * are marked as sites.
+	 *
+	 * @return void
+	 */
+	public function makeSite($site_or_id)
+	{
+		$site_id = is_a($site_or_id, Site::class) ? $site_or_id->getKey() : $site_or_id;
+
+		DB::beginTransaction();
+
+		try {
+			static::where('page_id', '=', $this->page_id)
+				->update([ 'site_id' => $site_id ]);
+
+			$this->site_id = $site_id;
+			$this->save();
+
+			DB::commit();
+		} catch(Exception $e){
+			DB::rollback();
+			throw $e;
+		}
+	}
+
+	/**
+	 * Returns true if site_id is set, else false
+	 * @return boolean
+	 */
+	public function isSite()
+	{
+		return !empty($this->site_id);
+	}
+
+
+	/**
+	 * Assembles a path using the ancestor slugs within the Route tree
+	 * @return string
+	 */
 	public function generatePath()
 	{
 		if(!$this->parent_id && $this->slug){

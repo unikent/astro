@@ -19,11 +19,11 @@ class Page extends Model
 
 	protected $casts = [
         'options' => 'json',
-        'is_site' => 'boolean',
         'is_published' => 'boolean',
 	];
 
 	protected $layoutDefinition = null;
+
 
 	public function canonical()
 	{
@@ -81,18 +81,6 @@ class Page extends Model
 
 
 	/**
-	 * Scopes query to return Pages where 'is_site' is true
-	 *
-	 * @param  $query
-	 * @return Collection
-	 */
-	public function scopeSites($query)
-	{
-		return $query->where('is_site', 1);
-	}
-
-
-	/**
 	 * Deletes all blocks in the given Region
 	 *
 	 * @param  string $region
@@ -101,6 +89,5 @@ class Page extends Model
 	public function clearRegion($region){
 		Block::deleteForPageRegion($this, $region);
 	}
-
 
 }

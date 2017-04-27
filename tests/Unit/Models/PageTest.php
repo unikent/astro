@@ -10,23 +10,6 @@ use App\Models\Definitions\Layout as LayoutDefinition;
 class PageTest extends TestCase
 {
 
-	/**
-	 * @test
-	 */
-	public function scopeSites_ReturnsPagesWithIsSiteSetToTrue()
-	{
-		$pages = factory(Page::class, 3)->create();
-		$sites = factory(Page::class, 2)->create([ 'is_site' => true ]);
-
-		$results = Page::sites()->get();
-		$this->assertCount(2, $results);
-
-		$ids = $results->pluck('id');
-		$this->assertContains($sites[0]->getKey(), $ids);
-		$this->assertContains($sites[1]->getKey(), $ids);
-	}
-
-
 
 	/**
 	 * @test
