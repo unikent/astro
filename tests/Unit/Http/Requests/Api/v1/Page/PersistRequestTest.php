@@ -4,10 +4,11 @@ namespace Tests\Unit\Http\Requests\Api\v1\Page;
 use Faker;
 use Mockery;
 use Validator;
-use Carbon\Carbon;
 use App\Models\Page;
+use App\Models\Site;
 use App\Models\Block;
 use App\Models\Route;
+use App\Models\PublishingGroup;
 use Tests\Unit\Http\Requests\RequestTestCase;
 use App\Http\Requests\Api\v1\Page\PersistRequest;
 
@@ -17,15 +18,19 @@ class PersistRequestTest extends RequestTestCase
     protected static $modelClass = Page::class;
     protected static $requestClass = PersistRequest::class;
 
-    protected function getAttrs(Page $page = null, Route $route = null, Block $block = null)
+    protected function getAttrs(Page $page = null, Route $route = null, Block $block = null, Site $site = null)
     {
         $page = $page ?: factory(Page::class)->make();
         $route = $route ?: factory(Route::class)->states('withParent')->make([ 'page_id' => $page->getKey() ]);
+
+        $site = $site ?: factory(Site::class)->states('withPublishingGroup')->make();
 
         $block = $block ?: factory(Block::class)->make();
 
         return attrs_for($page) + [
             'route' => attrs_for($route),
+
+            'site' => attrs_for($site),
 
             'regions' => [
                 'test-region' => [
@@ -34,6 +39,7 @@ class PersistRequestTest extends RequestTestCase
             ],
         ];
     }
+
 
     /**
      * @test
@@ -201,69 +207,6 @@ class PersistRequestTest extends RequestTestCase
         $this->assertCount(1, $validator->errors()->get('layout_name'));
     }
 
-
-    /**
-     * @test
-     * @group validation
-     */
-    public function validation_WithoutIsSite_IsValid(){
-        $attrs = $this->getAttrs();
-        unset($attrs['is_site']);
-
-        $request = $this->mockRequest('POST', $attrs);
-        $validator = $request->getValidatorInstance();
-
-        $validator->passes();
-        $this->assertEmpty($validator->errors()->get('is_site'));
-    }
-
-    /**
-     * @test
-     * @group validation
-     */
-    public function validation_WithEmptyIsSite_IsInvalid(){
-        $attrs = $this->getAttrs();
-        $attrs['is_site'] = '';
-
-        $request = $this->mockRequest('POST', $attrs);
-        $validator = $request->getValidatorInstance();
-
-        $validator->passes();
-        $this->assertCount(1, $validator->errors()->get('is_site'));
-    }
-
-    /**
-     * @test
-     * @group validation
-     */
-    public function validation_IsSiteMustBeBoolean(){
-        // Valid as true
-        $attrs = $this->getAttrs();
-        $attrs['is_site'] = true;
-
-        $request = $this->mockRequest('POST', $attrs);
-        $validator = $request->getValidatorInstance();
-        $validator->passes();
-        $this->assertEmpty($validator->errors()->get('is_site'));
-
-        // Valid as falsey
-        $attrs['is_site'] = 0;
-
-        $request = $this->mockRequest('POST', $attrs);
-        $validator = $request->getValidatorInstance();
-
-        $validator->passes();
-        $this->assertEmpty($validator->errors()->get('is_site'));
-
-        // Invalid (not boolean)
-        $attrs['is_site'] = 'foobar';
-
-        $request = $this->mockRequest('POST', $attrs);
-        $validator = $request->getValidatorInstance();
-
-        $validator->passes();
-        $this->assertCount(1, $validator->errors()->get('is_site'));
-    }
 
 
     /**
@@ -606,5 +549,242 @@ class PersistRequestTest extends RequestTestCase
 
         $validator->passes();
         $this->assertCount(1, $validator->errors()->get('route.parent_id'));
+    }
+
+
+
+    /**
+     * @test
+     * @group validation
+     */
+    public function validation_WhenSiteIdIsAbsent_IsValid(){
+        $attrs = $this->getAttrs();
+        unset($attrs['site_id']);
+
+        $request = $this->mockRequest('POST', $attrs);
+        $validator = $request->getValidatorInstance();
+
+        $validator->passes();
+        $this->assertEmpty($validator->errors()->get('site_id'));
+    }
+
+    /**
+     * @test
+     * @group validation
+     */
+    public function validation_WhenSiteIdIsPresentAndIsEmpty_IsValid(){
+        $attrs = $this->getAttrs();
+        $attrs['site_id'] = '';
+
+        $request = $this->mockRequest('POST', $attrs);
+        $validator = $request->getValidatorInstance();
+
+        $validator->passes();
+        $this->assertEmpty($validator->errors()->get('site_id'));
+    }
+
+    /**
+     * @test
+     * @group validation
+     */
+    public function validation_WhenSiteIdIsPresentAndExists_IsValid(){
+        $site = factory(Site::class)->states('withPublishingGroup')->create();
+
+        $attrs = $this->getAttrs();
+        $attrs['site_id'] = $site->getKey();
+
+        $request = $this->mockRequest('POST', $attrs);
+        $validator = $request->getValidatorInstance();
+
+        $validator->passes();
+        $this->assertEmpty($validator->errors()->get('site_id'));
+    }
+
+    /**
+     * @test
+     * @group validation
+     */
+    public function validation_WhenSiteIdIsPresentAndDoesNotExist_IsInvalid(){
+        $attrs = $this->getAttrs();
+        $attrs['site_id'] = 456;
+
+        $request = $this->mockRequest('POST', $attrs);
+        $validator = $request->getValidatorInstance();
+
+        $validator->passes();
+        $this->assertCount(1, $validator->errors()->get('site_id'));
+    }
+
+
+
+    /**
+     * @test
+     * @group validation
+     */
+    public function validation_WhenSitePublishingGroupIdIsPresentAndSiteNameIsAbsent_IsInvalid(){
+        $attrs = $this->getAttrs();
+        unset($attrs['site']['name']);
+
+        $request = $this->mockRequest('POST', $attrs);
+        $validator = $request->getValidatorInstance();
+
+        $validator->passes();
+        $this->assertCount(1, $validator->errors()->get('site.name'));
+    }
+
+    /**
+     * @test
+     * @group validation
+     */
+    public function validationWhenSitePublishingGroupIdIsPresentAndSiteNameIsEmpty_IsInvalid(){
+        $attrs = $this->getAttrs();
+        $attrs['site']['name'] = '';
+
+        $request = $this->mockRequest('POST', $attrs);
+        $validator = $request->getValidatorInstance();
+
+        $validator->passes();
+        $this->assertCount(1, $validator->errors()->get('site.name'));
+    }
+
+    /**
+     * @test
+     * @group validation
+     */
+    public function validation_WhenSitePublishingGroupIdIsAbsentAndSiteNameIsAbsent_IsValid(){
+        $attrs = $this->getAttrs();
+        unset($attrs['site']['name']);
+        unset($attrs['site']['publishing_group_id']);
+
+        $request = $this->mockRequest('POST', $attrs);
+        $validator = $request->getValidatorInstance();
+
+        $validator->passes();
+        $this->assertEmpty($validator->errors()->get('site.name'));
+    }
+
+    /**
+     * @test
+     * @group validation
+     */
+    public function validation_WhenSitePublishingGroupIdIsEmptyAndSiteNameIsEmpty_IsValid(){
+        $attrs = $this->getAttrs();
+        $attrs['site']['name'] = '';
+        $attrs['site']['publishing_group_id'] = '';
+
+        $request = $this->mockRequest('POST', $attrs);
+        $validator = $request->getValidatorInstance();
+
+        $validator->passes();
+        $this->assertEmpty($validator->errors()->get('site.name'));
+    }
+
+    /**
+     * @test
+     * @group validation
+     */
+    public function validation_WhenSiteNameIs255Chars_IsValid(){
+        $attrs = $this->getAttrs();
+        $attrs['site']['name'] = str_repeat('a', 255);
+
+        $request = $this->mockRequest('POST', $attrs);
+        $validator = $request->getValidatorInstance();
+
+        $validator->passes();
+        $this->assertEmpty($validator->errors()->get('site.name'));
+    }
+
+    /**
+     * @test
+     * @group validation
+     */
+    public function validation_WhenSiteNameIs256Chars_IsInvalid(){
+        $attrs = $this->getAttrs();
+        $attrs['site']['name'] = str_repeat('a', 256);
+
+        $request = $this->mockRequest('POST', $attrs);
+        $validator = $request->getValidatorInstance();
+
+        $validator->passes();
+        $this->assertCount(1, $validator->errors()->get('site.name'));
+    }
+
+
+
+    /**
+     * @test
+     * @group validation
+     */
+    public function validation_WhenSiteNameIsPresentAndSitePublishingGroupIdIsAbsent_IsInvalid(){
+        $attrs = $this->getAttrs();
+        unset($attrs['site']['publishing_group_id']);
+
+        $request = $this->mockRequest('POST', $attrs);
+        $validator = $request->getValidatorInstance();
+
+        $validator->passes();
+        $this->assertCount(1, $validator->errors()->get('site.publishing_group_id'));
+    }
+
+    /**
+     * @test
+     * @group validation
+     */
+    public function validationWhenSiteNameIsPresentAndSitePublishingGroupIdIsEmpty_IsInvalid(){
+        $attrs = $this->getAttrs();
+        $attrs['site']['publishing_group_id'] = '';
+
+        $request = $this->mockRequest('POST', $attrs);
+        $validator = $request->getValidatorInstance();
+
+        $validator->passes();
+        $this->assertCount(1, $validator->errors()->get('site.publishing_group_id'));
+    }
+
+    /**
+     * @test
+     * @group validation
+     */
+    public function validation_WhenRouteIdIsAbsentAndSiteNameIsAbsent_IsValid(){
+        $attrs = $this->getAttrs();
+        unset($attrs['site']['publishing_group_id']);
+        unset($attrs['site']['name']);
+
+        $request = $this->mockRequest('POST', $attrs);
+        $validator = $request->getValidatorInstance();
+
+        $validator->passes();
+        $this->assertEmpty($validator->errors()->get('site.publishing_group_id'));
+    }
+
+    /**
+     * @test
+     * @group validation
+     */
+    public function validation_WhenSiteNameIsEmptyAndSitePublishingGroupIdIsEmpty_IsValid(){
+        $attrs = $this->getAttrs();
+        $attrs['site']['publishing_group_id'] = '';
+        $attrs['site']['name'] = '';
+
+        $request = $this->mockRequest('POST', $attrs);
+        $validator = $request->getValidatorInstance();
+
+        $validator->passes();
+        $this->assertEmpty($validator->errors()->get('site.publishing_group_id'));
+    }
+
+    /**
+     * @test
+     * @group validation
+     */
+    public function validation_WhenSitePublishingGroupIdDoesNotExist_IsInvalid(){
+        $attrs = $this->getAttrs();
+        $attrs['site']['publishing_group_id'] = 456;
+
+        $request = $this->mockRequest('POST', $attrs);
+        $validator = $request->getValidatorInstance();
+
+        $validator->passes();
+        $this->assertCount(1, $validator->errors()->get('site.publishing_group_id'));
     }
 }

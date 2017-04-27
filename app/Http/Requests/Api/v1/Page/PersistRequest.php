@@ -33,7 +33,10 @@ class PersistRequest extends FormRequest
             'route.slug' => [ 'required_with:route.parent_id', 'max:255' ],
             'route.parent_id' => [ 'required_with:route.slug' ],
 
-            'is_site' => 'filled|boolean',
+            'site_id' => [],
+            'site.name' => [ 'required_with:site.publishing_group_id', 'max:255' ],
+            'site.publishing_group_id' => [ 'required_with:site.name' ],
+
             'is_published' => 'filled|boolean',
 
             'options' => 'array',
@@ -55,6 +58,10 @@ class PersistRequest extends FormRequest
         });
 
         $rules['route.parent_id'][] = Rule::exists('routes', 'id');
+
+        $rules['site_id'][] = Rule::exists('sites', 'id');
+
+        $rules['site.publishing_group_id'][] = Rule::exists('publishing_groups', 'id');
 
         return $rules;
     }
