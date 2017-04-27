@@ -16,7 +16,7 @@ class PageController extends ApiController
 {
 
 	/**
-	 * POST /api/v1/page/{page}
+	 * GET /api/v1/page/{page}
 	 *
 	 * @param  Request $request
 	 * @param  Page $page
@@ -24,7 +24,6 @@ class PageController extends ApiController
 	 */
 	public function show(Request $request, Page $page){
 		$this->authorize('read', $page);
-
 		return fractal($page, new PageTransformer)->parseIncludes($request->get('include'))->respond();
 	}
 

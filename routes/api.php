@@ -27,6 +27,8 @@ Route::group([ 'prefix' => 'v1', 'namespace' => 'v1' ], function(){
 	Route::get('region/definitions', 'RegionController@definitions');
 	Route::get('region/{region_definition}/definition', 'RegionController@definition');
 
+	Route::resource('site', 'SiteController', [ 'only' => [ 'index' ]]);
+
 	// Route::resource('region', '');
 	// Route::resource('block', '');
 });
