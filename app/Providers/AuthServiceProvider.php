@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 use App\Models\Page;
+use App\Models\Site;
 use App\Models\Route;
 use App\Policies\PagePolicy;
+use App\Policies\SitePolicy;
 use App\Policies\RoutePolicy;
 use Illuminate\Support\Facades\Gate;
 use App\Models\Definitions\Block as BlockDefinition;
@@ -25,6 +27,7 @@ class AuthServiceProvider extends ServiceProvider
 	protected $policies = [
 		Page::class => PagePolicy::class,
 		Route::class => RoutePolicy::class,
+		Site::class => SitePolicy::class,
 		BlockDefinition::class => BlockDefinitionPolicy::class,
 		LayoutDefinition::class => LayoutDefinitionPolicy::class,
 		RegionDefinition::class => RegionDefinitionPolicy::class,

@@ -4,9 +4,11 @@ namespace Tests\Unit\Http\Controllers\Api\v1;
 use Gate;
 use Mockery;
 use App\Models\Page;
+use App\Models\Site;
 use App\Models\Block;
 use App\Models\Route;
 use App\Http\Controllers\Api\v1\PageController;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class PageControllerTest extends ApiControllerTestCase {
 
@@ -321,6 +323,73 @@ class PageControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+     * @group wip
+     * @group authorization
+     */
+    public function store_WhenAuthorizedAndValidPageIsASite_WhenSiteFieldArePresent_AuthorizesSiteOperation(){
+        $this->authenticated();
+
+        Gate::shouldReceive('authorize')->with('create', Mockery::type(Site::class))->once();
+
+        Gate::shouldReceive('authorize');
+
+        $site = factory(Site::class)->states('withPublishingGroup')->make();
+
+        $attrs = $this->getAttrs();
+        array_set($attrs, 'site', [
+            'name' => $site->name,
+            'publishing_group_id' => $site->publishing_group_id,
+        ]);
+
+        $this->action('POST', PageController::class . '@store', [], $attrs);
+    }
+
+    /**
+     * @test
+     * @group wip
+     * @group authorization
+     */
+    public function store_WhenAuthorizedAndValidPageIsASite_WhenSiteFieldArePresentButUnauthorizedOnSite_Returns403(){
+        $this->authenticated();
+
+        Gate::shouldReceive('authorize')->with('create', Mockery::type(Site::class))->andThrow(AuthorizationException::class);
+        Gate::shouldReceive('authorize');
+
+        $site = factory(Site::class)->states('withPublishingGroup')->make();
+
+        $attrs = $this->getAttrs();
+        array_set($attrs, 'site', [
+            'name' => $site->name,
+            'publishing_group_id' => $site->publishing_group_id,
+        ]);
+
+        $response = $this->action('POST', PageController::class . '@store', [], $attrs);
+        $response->assertStatus(403);
+    }
+
+    /**
+     * @test
+     * @group wip
+     */
+    public function store_WhenAuthorizedAndValidAndSiteFieldsArePresent_CreatesSiteAndAssociatesWithRoute(){
+        $this->authenticatedAndAuthorized();
+
+        $site = factory(Site::class)->states('withPublishingGroup')->make();
+
+        $attrs = $this->getAttrs();
+        array_set($attrs, 'site', [
+            'name' => $site->name,
+            'publishing_group_id' => $site->publishing_group_id,
+        ]);
+
+        $response = $this->action('POST', PageController::class . '@store', [], $attrs);
+
+        $page = Page::all()->last();
+        $this->assertEquals($attrs['site']['name'], $page->canonical->site->name);
+    }
+
+    /**
+     * @test
      */
     public function store_WhenAuthorizedAndValid_Returns201(){
         $this->authenticatedAndAuthorized();
@@ -494,6 +563,147 @@ class PageControllerTest extends ApiControllerTestCase {
 
         $this->assertCount(1, $regions);
         $this->assertEquals($regions['test-region'][0]->fields['fizz'], 'buzz');
+    }
+
+    /**
+     * @test
+     * @group wip
+     */
+    public function update_WhenAuthorizedAndValidPageIsASite_WhenSiteIdIsAbsent_DoesNotBreakSiteAssociation(){
+        $this->authenticatedAndAuthorized();
+
+        $route = factory(Route::class)->states('withPage', 'withParent', 'withSite')->create();
+
+        $page = $route->page;
+        $site = $route->site;
+
+        $attrs = $this->getAttrs($page);
+        $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
+
+        $route = $route->fresh();
+        $this->assertEquals($site->getKey(), $route->site->getKey());
+    }
+
+    /**
+     * @test
+     * @group wip
+     */
+    public function update_WhenAuthorizedAndValidPageIsASite_WhenSiteIdIsPresent_DoesNotBreakSiteAssociation(){
+        $this->authenticatedAndAuthorized();
+
+        $route = factory(Route::class)->states('withPage', 'withParent', 'withSite')->create();
+
+        $page = $route->page;
+        $site = $route->site;
+
+        $attrs = $this->getAttrs($page);
+        array_set($attrs, 'site_id', $site->getKey());
+
+        $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
+
+        $route = $route->fresh();
+        $this->assertEquals($site->getKey(), $route->site->getKey());
+        $this->assertEquals($site->name, $route->site->name);
+    }
+
+    /**
+     * @test
+     * @group wip
+     */
+    public function update_WhenAuthorizedAndValidPageIsASite_WhenSiteIdIsPresent_DoesNotEditSite(){
+        $this->authenticatedAndAuthorized();
+
+        $route = factory(Route::class)->states('withPage', 'withParent', 'withSite')->create();
+
+        $page = $route->page;
+        $site = $route->site;
+
+        $attrs = $this->getAttrs($page);
+        $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
+
+        $route = $route->fresh();
+        $this->assertEquals($site->name, $route->site->name);
+    }
+
+    /**
+     * @test
+     * @group wip
+     * @group authorization
+     */
+    public function update_WhenAuthorizedAndValidPageIsASite_WhenSiteFieldArePresent_AuthorizesSiteOperation(){
+        $this->authenticated();
+
+        $route = factory(Route::class)->states('withPage', 'withParent', 'withSite')->create();
+
+        $page = $route->page;
+        $site = $route->site;
+
+        Gate::shouldReceive('authorize')->with('update', Mockery::on(function($model) use ($site){
+            return (is_a($model, Site::class) && ($model->getKey() == $site->getKey()));
+        }))->once();
+
+        Gate::shouldReceive('authorize');
+
+        $attrs = $this->getAttrs();
+        array_set($attrs, 'site_id', $site->getKey());
+        array_set($attrs, 'site', [
+            'name' => $site->name,
+            'publishing_group_id' => $site->publishing_group_id,
+        ]);
+
+        $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
+    }
+
+    /**
+     * @test
+     * @group wip
+     * @group authorization
+     */
+    public function update_WhenAuthorizedAndValidPageIsASite_WhenSiteFieldArePresentButUnauthorizedOnSite_Returns403(){
+        $this->authenticated();
+
+        $route = factory(Route::class)->states('withPage', 'withParent', 'withSite')->create();
+
+        $page = $route->page;
+        $site = $route->site;
+
+        Gate::shouldReceive('authorize')->with('update', Mockery::type(Site::class))->andThrow(AuthorizationException::class);
+        Gate::shouldReceive('authorize');
+
+        $attrs = $this->getAttrs();
+        array_set($attrs, 'site_id', $site->getKey());
+        array_set($attrs, 'site', [
+            'name' => $site->name,
+            'publishing_group_id' => $site->publishing_group_id,
+        ]);
+
+        $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
+        $response->assertStatus(403);
+    }
+
+    /**
+     * @test
+     * @group wip
+     */
+    public function update_WhenAuthorizedAndValidPageIsASite_WhenSiteIdIsPresentAndSiteFieldsArePresent_UpdatesSite(){
+        $this->authenticatedAndAuthorized();
+
+        $route = factory(Route::class)->states('withPage', 'withParent', 'withSite')->create();
+
+        $page = $route->page;
+        $site = $route->site;
+
+        $attrs = $this->getAttrs($page);
+        array_set($attrs, 'site_id', $site->getKey());
+        array_set($attrs, 'site', [
+            'name' => 'Foobar!',
+            'publishing_group_id' => $site->publishing_group_id,
+        ]);
+
+        $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
+
+        $route = $route->fresh();
+        $this->assertEquals('Foobar!', $route->site->name);
     }
 
     /**

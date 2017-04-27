@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\v1;
 use DB;
 use Exception;
 use App\Models\Page;
+use App\Models\Site;
 use App\Models\Block;
 use App\Models\Route;
 use Illuminate\Http\Request;
@@ -71,8 +72,8 @@ class PageController extends ApiController
 
 
 	/**
-	 * Creates/Updates and persists the page and its associated blocks,
-	 * using a transaction to ensure consistency.
+	 * Persists Page, Route and Site objects, also persists Block object
+	 * associations for the given Page.
 	 *
 	 * @param  Request $request
 	 * @param  Page    $page
@@ -97,6 +98,21 @@ class PageController extends ApiController
 
 			// Now that we have a populated Route object, lets save the Route
 			$route->save();
+
+			// Create/Update the Site, if appropriate
+			if($request->has('site_id')){
+				$site = Site::findOrFail($request->get('site_id'));
+			}
+
+			if($request->has('site')){
+				$site = isset($site) ? $site : new Site;
+				$site->fill($request->get('site'));
+				$site->save();
+
+				$this->authorize($site->wasRecentlyCreated ? 'create' : 'update', $site);
+
+				$route->makeSite($site);
+			}
 
 			// Now we have a Page in a state that we can authorize, so lets do that
 			// Note: as we are within a Transaction, ALL changes will be rolled-back should authz fail
