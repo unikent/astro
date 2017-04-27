@@ -10,13 +10,19 @@ class Site extends Model
 
 	public $fillable = [
 		'name',
+		'publishing_group_id',
 	];
 
 	protected $definition = null;
 
-	public function route()
+	public function canonical()
 	{
-		return $this->belongsTo(Route::class, 'site_id');
+		return $this->hasOne(Route::class, 'site_id')->where('is_canonical', '=', true);
+	}
+
+	public function routes()
+	{
+		return $this->hasMany(Route::class, 'site_id');
 	}
 
 	public function publishingGroup()

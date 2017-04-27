@@ -1,26 +1,54 @@
 <?php
 namespace App\Http\Controllers\Api\v1;
 
-use Auth;
-use App\Models\Page;
+use App\Models\Site;
 use Illuminate\Http\Request;
-use App\Http\Transformers\Api\v1\Definitions\PageTransformer;
+use App\Http\Transformers\Api\v1\SiteTransformer;
+use App\Http\Transformers\Api\v1\RouteTransformer;
 
-class RegionController extends ApiController
+class SiteController extends ApiController
 {
 
 	/**
 	 * GET /api/v1/site
 	 *
 	 * @param  Request    $request
-	 * @param  Definition $definition
 	 * @return Response
 	 */
 	public function index(Request $request){
-		$this->authorize('index', Page::class);
+		$this->authorize('index', Site::class);
 
-		$sites = Page::sites()->get();
-		return fractal($sites, new PageTransformer)->respond();
+		$sites = Site::with('canonical')->get();
+		return fractal($sites, new SiteTransformer)->respond();
+	}
+
+	/**
+	 * GET /api/v1/site/{site}
+	 * This endpoint supports 'include'.
+	 *
+	 * @param  Request    $request
+	 * @param  Site $site
+	 * @return Response
+	 */
+	public function show(Request $request, Site $site){
+		$this->authorize('read', $site);
+		return fractal($site, new SiteTransformer)->parseIncludes($request->get('include'))->respond();
+	}
+
+	/**
+	 * GET /api/v1/site/{site}/tree
+	 *
+	 * @param  Request    $request
+	 * @param  Site $site
+	 * @return Response
+	 */
+	public function tree(Request $request, Site $site){
+		$this->authorize('read', $site);
+
+		$qb = $site->canonical->descendantsAndSelf();
+		$routes = $qb->get()->toHierarchy();
+
+		return fractal($routes, new RouteTransformer)->respond();
 	}
 
 }
