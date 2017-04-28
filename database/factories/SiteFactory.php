@@ -2,7 +2,7 @@
 
 $factory->define(App\Models\Site::class, function (Faker\Generator $faker) {
 	return [
-		'name' => $faker->name,
+		'name' => $faker->sentence(2),
 	];
 });
 

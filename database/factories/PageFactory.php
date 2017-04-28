@@ -2,7 +2,7 @@
 
 $factory->define(App\Models\Page::class, function (Faker\Generator $faker) {
 	return [
-		'title' => $faker->name,
+		'title' => $faker->sentence(3),
 		'options' => [ 'description'=> $faker->sentence() ],
 
 		'is_published' => 0,

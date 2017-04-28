@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Block;
+use App\Models\Route;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -29,75 +31,28 @@ class DatabaseSeeder extends Seeder
 
 		$this->cleanDatabase();
 
-		// TODO: separate out seeders and clean up code left from prototype
+		$routes = [];
 
-		$a = factory('App\Models\User')->create([ 'username' => 'admin', 'name'=> 'Admin']);
-		$p = factory('App\Models\Page')->create([ 'title' => 'Test Site', 'is_site'=> 1]);
-		$r = factory('App\Models\Route')->states('isRoot')->create([ 'page_id' => $p->id ]);
+		$routes[] = factory(Route::class)->states('withPage', 'withSite')->create([ 'slug' => null ]);
+		$routes[] = factory(Route::class)->states('withPage')->create([ 'parent_id' => $routes[0]->getKey() ]);
+		$routes[] = factory(Route::class)->states('withPage')->create([ 'parent_id' => $routes[1]->getKey() ]);
 
-		for($i = 0; $i < 5; $i++)
-		{
-			if($i == 0)
-			{
-				factory('App\Models\Block')
-					->create([
-						'page_id' => $p->id,
-						'order'   => $i,
-						'fields'  => [
-							'image' => 'http://lorempixel.com/1200/700/cats/',
-							'block_heading'=> 'Title block',
-							'block_description' => 'Sub title',
-							'block_link' => '',
-							'image_alignment'=>'top'
-						]
-					]);
-			}
-			else
-			{
-				factory('App\Models\Block')->create([ 'page_id' => $p->id, 'order' => $i]);
-			}
+		foreach($routes as $route){
+			$route->page->layout_name = 'astro17';
+			$route->page->save();
+
+			$route->makeCanonical();
 		}
 
-		for($i = 0; $i < 5; $i++)
-		{
-			$p2 = factory('App\Models\Page')->create([ 'title' => 'Test Page '. $i]);
-			$r2 = factory('App\Models\Route')->create([
-				'parent_id' => $r->id,
-				'page_id' => $p2->id
-			]);
-
-			for($x = 0; $x < 5; $x++)
-			{
-				if($x == 0)
-				{
-					factory('App\Models\Block')
-						->create([
-							'page_id' => $p2->id,
-							'order'   => $x,
-							'fields'  => [
-								'image'             => 'http://lorempixel.com/1200/700/cats/',
-								'block_heading'     => 'Title block',
-								'block_description' => 'Sub title',
-								'block_link'        => '',
-								'image_alignment'   =>'top'
-							]
-						]);
-				}
-				else
-				{
-					factory('App\Models\Block')->create([ 'page_id' => $p2->id, 'order' => $x]);
-				}
-			}
-		}
-
-		$p3 = factory('App\Models\Page')->create([ 'title' => 'Nested Page']);
-		$r = factory('App\Models\Route')->create([
-			'page_id' => $p3->id,
-			'parent_id' => $r2->id,
-			'slug' => 'nested-page'
+		factory(Block::class)->create([
+			'page_id' => $routes[1]->page->getKey(),
+			'definition_name' => 'block-quote',
+			'definition_version' => 1,
+			'fields' => [
+				'quote' => 'This is a quote, <strong>with formatting</strong>.',
+				'cite_text' => 'Winston Churchill',
+			],
 		]);
-
-		$this->call(MediaSeeder::class);
 	}
 
 	/**
