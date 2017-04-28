@@ -19,7 +19,8 @@ abstract class RequestTestCase extends HttpTestCase
         );
 
         // Convert to a Laravel Request
-        $request = static::$requestClass::createFromBase($symfonyRequest);
+        $class = static::$requestClass;
+        $request = $class::createFromBase($symfonyRequest);
 
         // Ensure that the container is set appropriately
         $request->setContainer($this->app);
