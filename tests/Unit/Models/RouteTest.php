@@ -13,6 +13,33 @@ class RouteTest extends TestCase
 	/**
 	 * @test
 	 */
+	function scopeCanonical_ReturnsCanonicalRoutesOnly()
+	{
+		$routes = factory(Route::class, 2)->states('withPage', 'withParent')->create([ 'is_canonical' => true ]);
+		factory(Route::class, 2)->states('withPage', 'withParent')->create([ 'is_canonical' => false ]);
+
+		$results = Route::canonical()->get()->pluck('id');
+		$this->assertContains($routes[0]->getKey(), $results);
+		$this->assertContains($routes[1]->getKey(), $results);
+	}
+
+	/**
+	 * @test
+	 */
+	function scopeCanonical_WithFalseArgument_ReturnsNonCanonicalRoutesOnly()
+	{
+		factory(Route::class, 2)->states('withPage', 'withParent')->create([ 'is_canonical' => true ]);
+		$routes = factory(Route::class, 2)->states('withPage', 'withParent')->create([ 'is_canonical' => false ]);
+
+		$results = Route::canonical(false)->get()->pluck('id');
+		$this->assertContains($routes[0]->getKey(), $results);
+		$this->assertContains($routes[1]->getKey(), $results);
+	}
+
+
+	/**
+	 * @test
+	 */
 	function makeCanonical_SetsIsCanonicalToTrue()
 	{
 		$route = factory(Route::class)->states('withParent', 'withPage')->create();

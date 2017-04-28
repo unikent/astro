@@ -4,6 +4,7 @@ namespace App\Models;
 use DB;
 use Exception;
 use Baum\Node as BaumNode;
+use Illuminate\Database\Eloquent\Builder;
 
 class Route extends BaumNode
 {
@@ -62,6 +63,18 @@ class Route extends BaumNode
 		return $this->belongsTo(Page::class, 'page_id');
 	}
 
+
+    /**
+     * Scope a query to only include canonical routes.
+     *
+     * @param Builder $query
+     * @param boolean $value
+     * @return Builder
+     */
+	public function scopeCanonical(Builder $query, $value = true)
+	{
+		return $query->where('is_canonical', '=', $value);
+	}
 
 	/**
 	 * Sets is_canonical to true on this route, and sets is_canonical to
