@@ -13,7 +13,7 @@ export default {
 	update(el, { value, oldValue }, { context: block }) {
 
 		if(value !== oldValue && !block.internalChange) {
-			// $(el).redactor('code.set', value);
+			$(el).redactor('code.set', value);
 			console.log(value);
 		}
 

@@ -1,7 +1,6 @@
 <template>
 	<div
 		class="b-block-container"
-		style="/* user-select: none; */"
 		:style="stylesOuter"
 		@mouseover="showOverlay"
 		@mouseout="hideOverlay"
@@ -15,7 +14,7 @@
 				:index="index"
 				:fields="blockData.fields"
 				:other="this.getData()"
-			></component>
+			/>
 		</div>
 	</div>
 </template>
@@ -23,8 +22,7 @@
 <script>
 import fieldMarkup from '../tests/stubs/block-markup';
 import fields from 'cms-prototype-blocks';
-import { eventBus } from '../plugins/eventbus';
-import { mapState } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 
 /* global document */
 
@@ -48,8 +46,8 @@ export default {
 
 		return {
 			dragging: false,
-			start: Object.assign({}, startValues),
-			current: Object.assign({}, startValues),
+			start: { ...startValues },
+			current: { ...startValues },
 			size: null,
 			prevOver: null,
 			currentView: fields[this.type] ? fields[this.type] : {
@@ -71,6 +69,7 @@ export default {
 		},
 
 		stylesInner() {
+			// TODO: animate opacity, not box-shadow, for buttery smooth animation
 			return {
 				transform: `scale(${this.current.scale})`,
 				boxShadow: `rgba(0, 0, 0, 0.2) 0px ${this.current.shadow * (1 / this.scale)}px ${this.current.shadow * (2 / this.scale)}px 0px`,
@@ -82,13 +81,60 @@ export default {
 	},
 
 	methods: {
+		...mapMutations([
+			'updateBlockPositions'
+		]),
+
+		listen() {
+			this.$bus.$on('block:dragstart', info => {
+				if(info.el === this.$el) {
+					this.startDrag(info.event, info.el);
+				}
+			});
+
+			this.$bus.$on('block:dragstart', () => {
+				this.dragging = true;
+			});
+
+			this.$bus.$on('block:move', index => {
+				const after = index.from <= index.to;
+
+				console.log(after ? 'after' : 'not after');
+
+				if(after && this.index > index.from && this.index <= index.to) {
+					this.offset = -this.blockInfo.sizes[index.from];
+				}
+				else if(!after && this.index >= index.to && this.index < index.from) {
+					this.offset = this.blockInfo.sizes[index.from];
+				}
+				else {
+					this.offset = 0;
+				}
+
+				this.updateBlockPositions({
+					type: 'offsets',
+					index: this.index,
+					value: this.offset
+				});
+			});
+
+			this.$bus.$on('block:dragstop', () => {
+				this.dragging = false;
+				this.updateBlockPositions({
+					type: 'offsets',
+					index: this.index,
+					value: 0
+				});
+			});
+		},
+
 		getData() {
 			const {_type, _fields, ...other} = this.blockData;
 			return other;
 		},
 
 		showOverlay() {
-			eventBus.$emit('block:showOverlay', this);
+			this.$bus.$emit('block:showOverlay', this);
 		},
 
 		hideOverlay(e) {
@@ -97,7 +143,7 @@ export default {
 				!e.relatedTarget.hasAttribute('class') ||
 				e.relatedTarget.getAttribute('class').indexOf('b-block') === -1
 			) {
-				eventBus.$emit('block:hideOverlay', this);
+				this.$bus.$emit('block:hideOverlay', this);
 			}
 		},
 
@@ -136,36 +182,35 @@ export default {
 				this.start.y = this.$el.offsetTop;
 
 				this.dragging = true;
-				this.current.y = 0;
 
-				this.current.z = 20;
-				this.current.scale = 1.05;
-				this.current.pointer = 'none';
-				this.current.shadow = 10;
+				this.current = {
+					...this.current,
+					y: 0,
+					z: 20,
+					scale: 1.05,
+					pointer: 'none',
+					shadow: 10
+				};
 
 				let top = 0;
-				this.sizeCache = [];
-				this.sizeCache2 = {};
-				this.lastHover = null;
-
-				this.sizeCache3 = {};
+				// this.sizeCacheAll = [];
+				this.centerPoints = {};
+				this.lastHover = this.index;
 
 				for(var i = 0; i < this.blockInfo.sizes.length; i++) {
-					this.sizeCache[i] = {
-						top,
-						height: this.blockInfo.sizes[i],
-						mid: top + (this.blockInfo.sizes[i] / 2),
-						bottom: top + this.blockInfo.sizes[i]
-					};
+					// this.sizeCacheAll[i] = {
+					// 	top,
+					// 	height: this.blockInfo.sizes[i],
+					// 	mid: top + (this.blockInfo.sizes[i] / 2),
+					// 	bottom: top + this.blockInfo.sizes[i]
+					// };
 
-					this.sizeCache2[(top + this.blockInfo.sizes[i] / 2).toFixed(3)] = i;
-
-					this.sizeCache3[i] = this.blockInfo.sizes[i].toFixed(3);
+					this.centerPoints[
+						(top + this.blockInfo.sizes[i] / 2).toFixed(3)
+					] = i;
 
 					top += this.blockInfo.sizes[i];
 				}
-
-				// console.log(this.sizeCache3, this.sizeCache2);
 
 				document.addEventListener('mousemove', this.onDrag);
 				document.addEventListener('mouseup', this.stopDrag)
@@ -178,11 +223,22 @@ export default {
 			let
 				currentIndex = 0,
 				offset = this.lastHover && this.blockInfo.offsets[this.lastHover] ?
+					this.blockInfo.offsets[this.lastHover] + this.blockInfo.sizes[this.index] : 0;
+
+			for(let size in this.centerPoints) {
+				if(this.mouseY - offset > size) {
+					currentIndex = this.centerPoints[size];
+				}
+			}
+
+			if(currentIndex < this.lastHover) {
+				offset = this.lastHover && this.blockInfo.offsets[this.lastHover] ?
 					this.blockInfo.offsets[this.lastHover] : 0;
 
-			for(let size in this.sizeCache2) {
-				if(this.mouseY - offset > size) {
-					currentIndex = this.sizeCache2[size];
+				for(let size in this.centerPoints) {
+					if(this.mouseY - offset > size) {
+						currentIndex = this.centerPoints[size];
+					}
 				}
 			}
 
@@ -194,7 +250,12 @@ export default {
 		},
 
 		onDragOver(mouseY, idx) {
-			eventBus.$emit('block:move', {
+			// console.log('drag over', {
+			// 	from: this.index,
+			// 	to: idx
+			// });
+
+			this.$bus.$emit('block:move', {
 				from: this.index,
 				to: idx
 			});
@@ -219,50 +280,13 @@ export default {
 	mounted() {
 		this.size = this.$el.getBoundingClientRect();
 
-		this.$store.dispatch('updateBlockData', {
+		this.updateBlockPositions({
 			type: 'sizes',
 			index: this.index,
-			value: this.size.height,
+			value: this.size.height
 		});
 
-		eventBus.$on('block:dragstart', info => {
-			if(info.el === this.$el) {
-				this.startDrag(info.event, info.el);
-			}
-		});
-
-		eventBus.$on('block:dragstart', () => {
-			this.dragging = true;
-		});
-
-		eventBus.$on('block:move', index => {
-			const after = index.from <= index.to;
-
-			if(after && this.index > index.from && this.index <= index.to) {
-				this.offset = -this.blockInfo.sizes[index.from];
-			}
-			else if(!after && this.index >= index.to && this.index < index.from) {
-				this.offset = this.blockInfo.sizes[index.from];
-			}
-			else {
-				this.offset = 0;
-			}
-
-			this.$store.dispatch('updateBlockData', {
-				type: 'offsets',
-				index: this.index,
-				value: this.offset,
-			});
-		});
-
-		eventBus.$on('block:dragstop', () => {
-			this.dragging = false;
-			this.$store.dispatch('updateBlockData', {
-				type: 'offsets',
-				index: this.index,
-				value: 0,
-			});
-		});
+		this.listen();
 	},
 
 	beforeDestroy() {

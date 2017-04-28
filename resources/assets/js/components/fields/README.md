@@ -70,10 +70,10 @@ All fields share some attributes:
 {
 	"type":        "text|textarea",
 	"name":        "name",
-	"label":       "Text",
+	"label":       "Text Field",
 	"default":     "value",
-	"info":        "Text",
-	"placeholder": "Text"
+	"info":        "Info here",
+	"placeholder": "Placeholder Value"
 }
 ```
 > Screenshots here
@@ -83,9 +83,9 @@ All fields share some attributes:
 {
 	"type":        "richtext",
 	"name":        "name",
-	"label":       "Text",
+	"label":       "Richtext Field",
 	"default":     "<p>value</p>",
-	"info":        "Text",
+	"info":        "Info here",
 	"placeholder": "Text"
 }
 ```
@@ -96,9 +96,9 @@ All fields share some attributes:
 {
 	"type":    "switch|checkbox",
 	"name":    "name",
-	"label":   "Text",
+	"label":   "Switch/Checkbox Field",
 	"default": false,
-	"info":    "Text"
+	"info":    "Info here"
 }
 ```
 > Screenshots here
@@ -108,7 +108,7 @@ All fields share some attributes:
 {
 	"type":    "select|multiselect",
 	"name":    "name",
-	"label":   "Text",
+	"label":   "Select Field",
 	"options": [
 		{
 			"group": "Group 1",
@@ -122,7 +122,7 @@ All fields share some attributes:
 		}
 	],
 	"default": "value",
-	"info":    "Text"
+	"info":    "Info here"
 }
 
 ```
@@ -133,7 +133,7 @@ All fields share some attributes:
 {
 	"type":    "radio|buttongroup",
 	"name":    "name",
-	"label":   "Text",
+	"label":   "Radio Field",
 	"options": [
 		{
 			"value": "value",
@@ -145,7 +145,7 @@ All fields share some attributes:
 		}
 	],
 	"default": "value",
-	"info":    "Text"
+	"info":    "Info here"
 }
 ```
 > Screenshots here
@@ -155,8 +155,8 @@ All fields share some attributes:
 {
 	"type":  "link",
 	"name":  "name",
-	"label": "Text",
-	"info":  "Text"
+	"label": "Link Field",
+	"info":  "Info here"
 }
 ```
 > Screenshot here
@@ -166,11 +166,11 @@ All fields share some attributes:
 {
 	"type":     "image",
 	"name":     "name",
-	"label":    "Text",
+	"label":    "Image Field",
 	"settings": [
 
 	],
-	"info":     "Text"
+	"info":     "Info here"
 }
 ```
 > Screenshot here
@@ -180,11 +180,11 @@ All fields share some attributes:
 {
 	"type":     "video",
 	"name":     "name",
-	"label":    "Text",
+	"label":    "Video Field",
 	"settings": [
 
 	],
-	"info":     "Text"
+	"info":     "Info here"
 }
 ```
 > Screenshot here
@@ -194,35 +194,35 @@ All fields share some attributes:
 {
 	"type":     "file",
 	"name":     "name",
-	"label":    "Text",
+	"label":    "File Field",
 	"settings": [
 
 	],
-	"info":     "Text"
+	"info":     "Info here"
 }
 ```
 > Screenshot here
 
-#### Layout fields
+#### Display fields
 
-Layout fields give us the ability to visually separate fields without actually modifying the structure of the data underneath (these fields have no user inputs).
+Display fields give us the ability to visually separate fields without actually modifying the structure of the data underneath (these fields have no user inputs).
 
 All fields share some attributes:
 
 | Attribute | Required? | Description |
 | --- | --- | --- |
-| `type` | yes | The field type (header|paragraph). |
+| `type` | yes | The field type (header or paragraph). |
 | `content` | yes | Textual content. |
 | `info` | no | Additional information about the field, displayed as a tooltip. |
 
-#### Layout field definitions
+#### Display field definitions
 
 ##### Header / Paragraph
 ```
 {
 	"type":    "header|paragraph",
 	"content": "content",
-	"info":    "Text"
+	"info":    "Info here"
 }
 ```
 > Screenshots here
@@ -230,7 +230,7 @@ All fields share some attributes:
 
 #### Multiples of the same field
 
-Eventually we'll need a collection of a certain field type. As an example we may want several images for a slider. We could repeat the same field several times using a different name eg. slide1, slide2, slide3. This isn't the best solution though, as we might want to allow between 0 and 5 images, so some of those fields will appear and be left empty.
+Sometimes we need a collection of a certain field type. As an example we may want several images for a slider. We could repeat the same field several times using a different name eg. slide1, slide2, slide3. This isn't the best solution though, as we might want to allow between 0 and 5 images, so some of those fields will appear and be left empty.
 
 Instead we have an attribute that controls this for us and displays a simple UI to add/remove fields.
 

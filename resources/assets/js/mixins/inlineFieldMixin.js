@@ -1,9 +1,11 @@
-import { mapActions } from 'vuex';
+import { mapMutations } from 'vuex';
+
+/* global $, window */
 
 export default {
 
 	methods: {
-		...mapActions([
+		...mapMutations([
 			'updateValue'
 		]),
 
@@ -22,21 +24,21 @@ export default {
 		const self = this;
 
 		Object.keys(this.inlineFields).forEach(fieldName => {
-			// $(this.inlineFields[fieldName]).redactor({
-			// 	focus: true,
-			// 	toolbarExternal: window.parent.document.querySelector('#toolbar'),
-			// 	callbacks: {
-			// 		change() {
-			// 			console.log(this);
-			// 			self.updateValue({
-			// 				index: self.index,
-			// 				name: fieldName,
-			// 				value: this.code.get()
-			// 			});
-			// 			self.internalChange = true;
-			// 		}
-			// 	}
-			// });
+			$(this.inlineFields[fieldName]).redactor({
+				focus: true,
+				toolbarExternal: window.parent.document.querySelector('#toolbar'),
+				callbacks: {
+					change() {
+						console.log(this);
+						self.updateValue({
+							index: self.index,
+							name: fieldName,
+							value: this.code.get()
+						});
+						self.internalChange = true;
+					}
+				}
+			});
 		});
 	}
 
