@@ -14,8 +14,7 @@ class DatabaseSeeder extends Seeder
 		'users',
 		'pages',
 		'routes',
-		'blocks',
-		'media'
+		'blocks'
 	];
 
 	/**
