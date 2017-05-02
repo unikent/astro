@@ -19,7 +19,6 @@
 		"barryvdh/laravel-ide-helper": "^2.3",
 		"baum/baum": "~1.0",
 		"doctrine/dbal": "^2.5",
-		"franzl/studio": "^0.11.2",
 		"intervention/image": "^2.3",
 		"intervention/imagecache": "^2.3",
 		"james-heinrich/getid3": "^1.9",
@@ -33,7 +32,6 @@
 		"unikent/kentauth": "dev-laravel/5.2"
 	},
 	"require-dev": {
-		"franzl/studio": "^0.11.2",
 		"fzaninotto/faker": "~1.4",
 		"laravel/dusk": "^1.0",
 		"mockery/mockery": "0.9.*",
