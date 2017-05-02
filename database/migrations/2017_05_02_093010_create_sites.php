@@ -20,6 +20,8 @@ class CreateSites extends Migration
 
             $table->timestamps();
             $table->softDeletes();
+
+            $table->foreign('publishing_group_id', 'sites_publishing_group_id_fk')->references('id')->on('publishing_groups');
         });
     }
 
@@ -30,6 +32,10 @@ class CreateSites extends Migration
      */
     public function down()
     {
+        Schema::table('sites', function(Blueprint $table) {
+            $table->dropForeign('sites_publishing_group_id_fk');
+        });
+
         Schema::dropIfExists('sites');
     }
 }
