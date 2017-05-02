@@ -120,7 +120,7 @@ const store = (
 				api
 					.get(`page/${id}?include=blocks`)
 					.then((response) => {
-						commit('setPage', response.data.data);
+						commit('setPage', page);
 					});
 			},
 

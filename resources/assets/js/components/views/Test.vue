@@ -6,13 +6,7 @@
 </template>
 
 <script>
-import UploadStatus from '../components/UploadStatus';
-
 export default {
-	name: 'Test',
-
-	components: {
-		UploadStatus
-	}
+	name: 'Test'
 };
 </script>
