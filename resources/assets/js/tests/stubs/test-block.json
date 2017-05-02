@@ -23,7 +23,7 @@
 			"label": "Text Field",
 			"type": "textarea",
 			"info": "Info here"
-		}
+		},
 		{
 			"name": "richtext_field",
 			"label": "Richtext Field",
