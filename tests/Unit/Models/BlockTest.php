@@ -18,8 +18,10 @@ class BlockTest extends TestCase
 		$page = factory(Page::class)->create();
 		factory(Block::class, 3)->create([ 'page_id' => $page->getKey() ]);
 
+		$count = Block::count();
+
 		Block::deleteForPageRegion($page, 'test-region');
-		$this->assertEquals(0, Block::count());
+		$this->assertEquals($count - 3, Block::count());
 	}
 
 	/**
@@ -30,8 +32,10 @@ class BlockTest extends TestCase
 		$page = factory(Page::class)->create();
 		factory(Block::class, 3)->create([ 'page_id' => $page->getKey() ]);
 
+		$count = Block::count();
+
 		Block::deleteForPageRegion($page->getKey(), 'test-region');
-		$this->assertEquals(0, Block::count());
+		$this->assertEquals($count - 3, Block::count());
 	}
 
 	/**
@@ -44,8 +48,10 @@ class BlockTest extends TestCase
 		factory(Block::class, 3)->create([ 'page_id' => $page->getKey() ]);
 		factory(Block::class, 2)->create([ 'page_id' => $page->getKey(), 'region_name' => 'foobar' ]);
 
+		$count = Block::count();
+
 		Block::deleteForPageRegion($page, 'foobar');
-		$this->assertEquals(3, Block::count());
+		$this->assertEquals($count - 2, Block::count());
 	}
 
 

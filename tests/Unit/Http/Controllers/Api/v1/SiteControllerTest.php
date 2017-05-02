@@ -65,11 +65,13 @@ class SiteControllerTest extends ApiControllerTestCase {
 
         $this->authenticatedAndAuthorized();
 
+        $count = Site::count();
+
         $response = $this->action('GET', SiteController::class . '@index');
         $json = $response->json();
 
         $this->assertArrayHasKey('data', $json);
-        $this->assertCount(3, $json['data']);
+        $this->assertCount($count, $json['data']);
     }
 
     /**
@@ -283,7 +285,6 @@ class SiteControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
-     * @group focus
      */
     public function tree_WhenAuthorizedAndFound_ReturnsJsonOfSiteRoutesAsHierarchy(){
         $route = factory(Route::class)->states([ 'withPage', 'withParent', 'withSite' ])->create([ 'is_canonical' => true ]);
