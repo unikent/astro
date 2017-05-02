@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use App\Models\Block;
 use App\Models\Route;
 use Illuminate\Database\Seeder;
@@ -30,6 +31,11 @@ class DatabaseSeeder extends Seeder
 		}
 
 		$this->cleanDatabase();
+
+		factory(User::class)->create([
+			'username' => 'admin',
+			'name'=> 'Admin'
+		]);
 
 		$routes = [];
 
