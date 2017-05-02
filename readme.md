@@ -46,6 +46,16 @@ yarn install
 
 ## Developer Notes
 ### Approach
+#### API Requests, Authentication & Authorization
+Anyone wishing to access the API will need a registered user with an API Token. An API Token is automatically generated when a User is added to the system.
+
+API requests will need to request a JSON response with an `Accepts: application/json` header, and pass the access token with an `Authorization: Bearer TOKEN` header. Data can be passed to the API as form data or as a JSON object (with a `Content-Type: application/json` header).
+
+Fractal is used to serialize the API output in a consistent way. When an endpoint supports includes, additional data can be requested using an `?include=` get parameter.
+
+The API is intended to be RESTful, uses Laravel naming conventions and should make semantic use of HTTP status codes.
+
+
 #### Routes, Pages, Sites & Permissions
 Routes give hierarchy to pages within Astro and are implemented as a nested-set using Baum.
 
