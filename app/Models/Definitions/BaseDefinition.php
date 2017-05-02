@@ -14,9 +14,8 @@ use Illuminate\Database\Eloquent\Concerns\HasAttributes;
 use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Database\Eloquent\Concerns\HidesAttributes;
 use Illuminate\Database\Eloquent\Concerns\GuardsAttributes;
-use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use App\Models\Definitions\Contracts\Definition as DefinitionContract;
-
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 
 abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable, JsonSerializable
 {
@@ -311,7 +310,7 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
     public static function fromDefinitionFile($path)
     {
     	if(!file_exists($path)){
-    		throw new FileNotFoundException;
+    		throw new FileNotFoundException($path);
     	}
 
     	return static::fromDefinition(file_get_contents($path));
