@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\PublishingGroup;
 use Illuminate\Support\Collection;
 use App\Http\Requests\Api\v1\Media\DeleteRequest;
-use App\Http\Requests\Api\v1\Media\PersistRequest;
+use App\Http\Requests\Api\v1\Media\StoreRequest;
 use App\Http\Transformers\Api\v1\MediaTransformer;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
@@ -24,11 +24,11 @@ class MediaController extends ApiController
 	 * we associate the existing Media with the specified Site/PublishingGroup. From the users'
 	 * perspective, the upload completed.
 	 *
-	 * @param  PersistRequest $request
+	 * @param  StoreRequest $request
 	 * @param  Media $media
 	 * @return Response
 	 */
-	public function store(PersistRequest $request){
+	public function store(StoreRequest $request){
 		$file = $request->file('upload');
 		$hash = Media::hash($file);
 
@@ -86,7 +86,13 @@ class MediaController extends ApiController
 
 
 	/**
-	 * Ensures that the user can write to the provided Site / PublishingGroup IDs
+	 * Ensures that the user can has the required permissions for performing Media operations
+	 * given a set of Site / PublishingGroup IDs.
+	 *
+	 * @param Request $request
+	 * @param string $action
+	 * @param Media $media
+	 *
 	 * @return void
 	 */
 	protected function authorizeAll(Request $request, $action, Media $media)

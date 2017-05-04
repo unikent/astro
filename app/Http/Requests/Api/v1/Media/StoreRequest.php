@@ -6,7 +6,7 @@ use App\Models\Media;
 use Illuminate\Validation\Rule;
 use App\Http\Requests\FormRequest;
 
-class PersistRequest extends FormRequest
+class StoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,6 +26,10 @@ class PersistRequest extends FormRequest
     public function rules()
     {
         return [
+            'upload' => 'required|file',
+
+            'site_ids' => 'required_without:publishing_group_ids|array',
+            'publishing_group_ids' => 'required_without:site_ids|array',
         ];
     }
 

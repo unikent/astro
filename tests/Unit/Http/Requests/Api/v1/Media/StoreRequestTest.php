@@ -5,16 +5,21 @@ use Faker;
 use Mockery;
 use Validator;
 use App\Models\Site;
+use Tests\FileUploadTrait;
+use Tests\FileCleanupTrait;
 use App\Models\PublishingGroup;
 use Illuminate\Support\Collection;
 use Tests\Unit\Http\Requests\RequestTestCase;
-use App\Http\Requests\Api\v1\Media\DeleteRequest;
+use App\Http\Requests\Api\v1\Media\StoreRequest;
 
-class DeleteRequestTest extends RequestTestCase
+class StoreRequestTest extends RequestTestCase
 {
 
+    use FileUploadTrait, FileCleanupTrait;
+
+
     protected static $modelClass = Media::class;
-    protected static $requestClass = DeleteRequest::class;
+    protected static $requestClass = StoreRequest::class;
 
 
     protected function getAttrs()
@@ -27,10 +32,13 @@ class DeleteRequestTest extends RequestTestCase
         ]);
 
         return [
+            'upload' => $this->setupFileUpload('media', 'image.jpg'),
+
             'site_ids' => $sites->pluck('id')->toArray(),
             'publishing_group_ids' => $pgs->pluck('id')->toArray(),
         ];
     }
+
 
 
     /**
@@ -49,12 +57,12 @@ class DeleteRequestTest extends RequestTestCase
     /**
      * @test
      */
-    public function validation_WhenSiteIdsArePresentButPublishingGroupIdsAreNot_IsValid()
+    public function validation_WhenPublishingGroupIdsArePresentButSiteIdsAreNot_IsValid()
     {
         $attrs = $this->getAttrs();
-        unset($attrs['publishing_group_ids']);
+        unset($attrs['publishing_group']);
 
-        $request = $this->mockRequest('DELETE', $attrs);
+        $request = $this->mockRequest('POST', $attrs);
         $validator = $request->getValidatorInstance();
 
         $this->assertTrue($validator->passes());
@@ -63,12 +71,12 @@ class DeleteRequestTest extends RequestTestCase
     /**
      * @test
      */
-    public function validation_WhenPublishingGroupIdsArePresentButSiteIdsAreNot_IsValid()
+    public function validation_WhenSiteIdsArePresentButPublishingGroupIdsAreNot_IsValid()
     {
         $attrs = $this->getAttrs();
-        unset($attrs['site_ids']);
+        unset($attrs['publishing_group_ids']);
 
-        $request = $this->mockRequest('DELETE', $attrs);
+        $request = $this->mockRequest('POST', $attrs);
         $validator = $request->getValidatorInstance();
 
         $this->assertTrue($validator->passes());
@@ -79,7 +87,7 @@ class DeleteRequestTest extends RequestTestCase
      */
     public function validation_WhenPublishingGroupIdsAndSiteIdsAreMissing_IsInvalid()
     {
-        $request = $this->mockRequest('DELETE', []);
+        $request = $this->mockRequest('POST', []);
         $validator = $request->getValidatorInstance();
 
         $this->assertFalse($validator->passes());
@@ -95,13 +103,12 @@ class DeleteRequestTest extends RequestTestCase
         $attrs = $this->getAttrs();
         $attrs['site_ids'] = '1,2';
 
-        $request = $this->mockRequest('DELETE', $attrs);
+        $request = $this->mockRequest('POST', $attrs);
         $validator = $request->getValidatorInstance();
 
         $validator->passes();
         $this->assertCount(1, $validator->errors('site_ids'));
     }
-
 
 
     /**
@@ -112,11 +119,45 @@ class DeleteRequestTest extends RequestTestCase
         $attrs = $this->getAttrs();
         $attrs['publishing_group_ids'] = '1,2';
 
-        $request = $this->mockRequest('DELETE', $attrs);
+        $request = $this->mockRequest('POST', $attrs);
         $validator = $request->getValidatorInstance();
 
         $validator->passes();
         $this->assertCount(1, $validator->errors('publishing_group_ids'));
+    }
+
+
+
+    /**
+     * @test
+     */
+    public function validation_WhenUploadIsNotPresent_IsInvalid()
+    {
+        $attrs = $this->getAttrs();
+        unset($attrs['upload']);
+
+        $request = $this->mockRequest('POST', $attrs);
+
+        $validator = $request->getValidatorInstance();
+        $validator->passes();
+
+        $this->assertCount(1, $validator->errors('upload'));
+    }
+
+    /**
+     * @test
+     */
+    public function validation_WhenUploadIsNotAFile_IsInvalid()
+    {
+        $attrs = $this->getAttrs();
+        $attrs['upload'] = 'foobar';
+
+        $request = $this->mockRequest('POST', $attrs);
+
+        $validator = $request->getValidatorInstance();
+        $validator->passes();
+
+        $this->assertCount(1, $validator->errors('upload'));
     }
 
 }
