@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\Site;
 use App\Models\User;
+use App\Models\Site;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class SitePolicy
@@ -42,7 +42,8 @@ class SitePolicy
      */
     public function create(User $user, Site $site)
     {
-        return true;
+        $pgs = $user->publishing_groups->keyBy($site->publishing_group->getKeyName());
+        return $pgs->has($site->publishing_group->getKey());
     }
 
     /**
@@ -54,7 +55,8 @@ class SitePolicy
      */
     public function update(User $user, Site $site)
     {
-        return true;
+        $pgs = $user->publishing_groups->keyBy($site->publishing_group->getKeyName());
+        return $pgs->has($site->publishing_group->getKey());
     }
 
     /**
@@ -66,6 +68,6 @@ class SitePolicy
      */
     public function delete(User $user, Site $site)
     {
-        return true;
+        return false;
     }
 }

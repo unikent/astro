@@ -25,9 +25,9 @@ class Site extends Model
 		return $this->hasMany(Route::class, 'site_id');
 	}
 
-	public function publishingGroup()
+	public function publishing_group()
 	{
-		return $this->hasMany(PublishingGroup::class, 'publishing_group_id');
+		return $this->belongsTo(PublishingGroup::class, 'publishing_group_id');
 	}
 
 }

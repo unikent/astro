@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\Route;
 use App\Models\User;
+use App\Models\Route;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class RoutePolicy
