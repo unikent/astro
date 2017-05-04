@@ -243,7 +243,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
         $this->authenticated();
 
-        $attrs = [ 'site_ids' => $sites->pluck('id') ];
+        $attrs = [ 'site_ids' => $sites->pluck('id')->toArray() ];
         $this->action('DELETE', MediaController::class . '@destroy', [ $media->getKey() ], $attrs);
     }
 
@@ -266,7 +266,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
         $this->authenticated();
 
-        $attrs = [ 'publishing_group_ids' => $pgs->pluck('id') ];
+        $attrs = [ 'publishing_group_ids' => $pgs->pluck('id')->toArray() ];
         $response = $this->action('DELETE', MediaController::class . '@destroy', [ $media->getKey() ], $attrs);
     }
 

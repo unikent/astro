@@ -8,6 +8,7 @@ use App\Models\Media;
 use Illuminate\Http\Request;
 use App\Models\PublishingGroup;
 use Illuminate\Support\Collection;
+use App\Http\Requests\Api\v1\Media\DeleteRequest;
 use App\Http\Requests\Api\v1\Media\PersistRequest;
 use App\Http\Transformers\Api\v1\MediaTransformer;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -67,7 +68,7 @@ class MediaController extends ApiController
 	 * @param  Definition $definition
 	 * @return SymfonyResponse
 	 */
-	public function destroy(Request $request, Media $media){
+	public function destroy(DeleteRequest $request, Media $media){
 		$this->authorizeAll($request, 'delete', $media); // Ensures that the user can sync with Sites / Practice Groups
 
 		if($request->has('site_ids')){
