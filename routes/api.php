@@ -22,6 +22,9 @@ Route::group([ 'prefix' => 'v1', 'namespace' => 'v1' ], function(){
 	Route::get('layout/definitions', 'LayoutController@definitions');
 	Route::get('layout/{layout_definition}/definition', 'LayoutController@definition');
 
+	Route::post('media', 'MediaController@store');
+	Route::delete('media/{media}', 'MediaController@destroy');
+
 	Route::resource('page', 'PageController', [ 'except' => [ 'index', 'create', 'edit' ]]);
 
 	Route::get('region/definitions', 'RegionController@definitions');

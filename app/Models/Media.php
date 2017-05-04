@@ -18,6 +18,8 @@ class Media extends Model
 	use Tracked, SoftDeletes;
 
 	protected $fillable = [
+		'file',
+
 		'type',
 		'filename',
 		'hash',
@@ -54,6 +56,19 @@ class Media extends Model
 		$this->fileUrl = Config::get('app.media_url');
 		$this->filePath = Config::get('app.media_path');
     }
+
+
+
+	public function publishing_groups()
+	{
+		return $this->belongsToMany(PublishingGroup::class, 'media_publishing_groups');
+	}
+
+	public function sites()
+	{
+		return $this->belongsToMany(Site::class, 'media_sites');
+	}
+
 
 	/**
 	 * Sanitizes the filename to a safe set of characters
