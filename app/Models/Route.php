@@ -168,4 +168,27 @@ class Route extends BaumNode
 
 		return $path . $this->slug;
 	}
+
+	/**
+	 * Attempts to retrieve a Route by path
+	 *
+	 * @param  string $hash
+	 * @return Route
+	 */
+	public static function findByPath($path)
+	{
+		return static::where('path', '=', $path)->first();
+	}
+
+	/**
+	 * Attempts to retrieve a Route by path, throws Exception when not found
+	 *
+	 * @param  string $path
+	 * @return Route
+	 * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+	 */
+	public static function findByPathOrFail($path)
+	{
+		return static::where('path', '=', $path)->firstOrFail();
+	}
 }
