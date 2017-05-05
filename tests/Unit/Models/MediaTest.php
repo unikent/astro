@@ -8,6 +8,7 @@ use Tests\TestCase;
 use App\Models\Media;
 use Tests\FileUploadTrait;
 use Tests\FileCleanupTrait;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 
 class MediaTest extends TestCase
@@ -236,6 +237,36 @@ class MediaTest extends TestCase
 
 		$this->assertNull(Media::findByHash($hash));
 	}
+
+
+
+	/**
+	 * @test
+	 */
+	public function findByHashOrFail_WhenHashExists_ReturnsItem()
+	{
+		$file = static::setupFileUpload('media', 'image.jpg');
+		$hash = Media::hash($file);
+
+		$media = factory(Media::class)->create([ 'file' => $file ]);
+
+		$result = Media::findByHashOrFail($hash);
+		$this->assertEquals($media->getKey(), $result->getKey());
+	}
+
+	/**
+	 * @test
+	 */
+	public function findByHashOrFail_WhenHashDoesNotExist_ReturnsNull()
+	{
+		$file = static::setupFile('media', 'image.jpg');
+		$hash = Media::hash($file);
+
+        $this->expectException(ModelNotFoundException::class);
+
+		Media::findByHashOrFail($hash);
+	}
+
 
 
 	/**

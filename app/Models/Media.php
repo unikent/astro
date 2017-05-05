@@ -249,6 +249,18 @@ class Media extends Model
 	}
 
 	/**
+	 * Attempts to retrieve a Media item using its file hash
+	 *
+	 * @param  string $hash
+	 * @return Media|null
+	 * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+	 */
+	public static function findByHashOrFail($hash)
+	{
+		return static::where('hash', '=', $hash)->firstOrFail();
+	}
+
+	/**
 	 * Hashes a file for use with the Media model
 	 *
 	 * @param  File   $file
