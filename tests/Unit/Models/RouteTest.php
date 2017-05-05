@@ -6,6 +6,7 @@ use Tests\TestCase;
 use App\Models\Page;
 use App\Models\Site;
 use App\Models\Route;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class RouteTest extends TestCase
 {
@@ -233,6 +234,48 @@ class RouteTest extends TestCase
 
 		$r3->save();
 		$this->assertEquals('/' . $r2->slug . '/' . $r3->slug, $r3->path); // $r1 is a root node, so has no slug
+	}
+
+
+
+	/**
+	 * @test
+	 */
+	public function findByPath_WhenPathExists_ReturnsItem()
+	{
+		$route = factory(Route::class)->states('withParent', 'withPage')->create();
+		$result = Route::findByPath($route->path);
+		$this->assertEquals($route->getKey(), $result->getKey());
+	}
+
+	/**
+	 * @test
+	 */
+	public function findByPath_WhenPathDoesNotExist_ReturnsNull()
+	{
+		$this->assertNull(Route::findByPath('/foobar'));
+	}
+
+
+
+	/**
+	 * @test
+	 */
+	public function findByPathOrFail_WhenPathExists_ReturnsItem()
+	{
+		$route = factory(Route::class)->states('withParent', 'withPage')->create();
+
+		$result = Route::findByPathOrFail($route->path);
+		$this->assertEquals($route->getKey(), $result->getKey());
+	}
+
+	/**
+	 * @test
+	 */
+	public function findByPathOrFail_WhenPathDoesNotExist_ReturnsNull()
+	{
+        $this->expectException(ModelNotFoundException::class);
+		Route::findByPathOrFail('/foobar');
 	}
 
 }

@@ -31,6 +31,8 @@ Route::group([ 'prefix' => 'v1', 'namespace' => 'v1' ], function(){
 	Route::get('region/definitions', 'RegionController@definitions');
 	Route::get('region/{region_definition}/definition', 'RegionController@definition');
 
+	Route::get('route/resolve', 'RouteController@resolve');
+
 	Route::resource('site', 'SiteController', [ 'only' => [ 'index', 'show' ]]);
 	Route::get('site/{site}/tree', 'SiteController@tree');
 
