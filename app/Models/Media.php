@@ -2,138 +2,222 @@
 
 namespace App\Models;
 
+use DB;
+use Config;
+use getID3;
+use Exception;
+use File as FS;
 use App\Models\Traits\Tracked;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class Media extends Model
 {
 	use Tracked, SoftDeletes;
 
-	protected
-		$fillable = [
-			'type',
-			'name',
-			'size',
-			'sha1',
-			'format',
-			'mime_type',
-			'width',
-			'height',
-			'aspect_ratio',
-			'duration'
-		],
-		$appends = [
-			'src'
-		],
-		$sortable = [
-			'id',
-			'title',
-			'file_name',
-			'file_size',
-			'created_at',
-			'updated_at'
-		],
-		$file,
-		$hash;
+	protected $fillable = [
+		'file',
 
-	public function setFile(UploadedFile $file)
+		'type',
+		'filename',
+		'hash',
+
+		'filesize',
+		'format',
+		'mime_type',
+
+		'width',
+		'height',
+		'aspect_ratio',
+		'duration'
+	];
+
+	protected $appends = [
+		'src',
+		'file',
+	];
+
+	protected $file;
+
+	protected $fileUrl;
+	protected $filePath;
+
+    /**
+     * Create a new Eloquent model instance.
+     *
+     * @param  array  $attributes
+     * @return void
+     */
+    public function __construct($attributes = []){
+        parent::__construct($attributes);
+
+		$this->fileUrl = Config::get('app.media_url');
+		$this->filePath = Config::get('app.media_path');
+    }
+
+
+
+	public function publishing_groups()
+	{
+		return $this->belongsToMany(PublishingGroup::class, 'media_publishing_groups');
+	}
+
+	public function sites()
+	{
+		return $this->belongsToMany(Site::class, 'media_sites');
+	}
+
+
+	/**
+	 * Sanitizes the filename to a safe set of characters
+	 *
+	 * @param string $value
+	 * @return void
+	 */
+	public function setFilenameAttribute($value)
+	{
+		$value = preg_replace('/[^\w\-\.]+/', '', $value);
+		$value = preg_replace('/[\.]{2,}/', '.', $value);
+
+		$this->attributes['filename'] = $value;
+	}
+
+	/**
+	 * Sets $file.
+	 *
+	 * @param File $file
+	 * @return void
+	 */
+	public function setFileAttribute(File $file)
 	{
 		$this->file = $file;
 	}
 
-	public function save(array $options = [])
+	/**
+	 * Attempts to load a File object, and returns the value of $file.
+	 *
+	 * @param File $file
+	 * @return void
+	 */
+	public function getFileAttribute()
 	{
-		DB::beginTransaction();
-
-		$filePath = $this->file->getPathname();
-		$fileName = str_slug($this->file->getClientOriginalName(), '.');
-
-		$id3 = new \getID3();
-		$fileInfo = $id3->analyze($filePath);
-
-		$metaData = $this->transformMetaData($fileInfo);
-
-		$this->fill(array_merge(
-			[
-				'name' => $fileName,
-				'sha1' => $this->hash
-			],
-			$metaData
-		));
-
-		$saved = parent::save();
-
-		if(!$saved)
-		{
-			return false;
+		if(!is_a($this->file, File::class)){
+			$this->loadFile();
 		}
 
-		if(!$this->saveFile($this->id, $fileName))
-		{
-			DB::rollBack();
-			return false;
+		return $this->file;
+	}
+
+	/**
+	 * When persisted, initializes a File object and sets $file.
+	 * @return void
+	 */
+	protected function loadFile()
+	{
+		if($this->exists){
+			$this->setFileAttribute(new File($this->filePath . '/' . $this->id . '/' . $this->filename));
 		}
-
-		DB::commit();
-
-		return $saved;
 	}
 
-	public function exists()
-	{
-		$filePath = $this->file->getPathname();
-		$this->hash = sha1_file($filePath);
 
-		// TODO: if hashing fails return an error
-		// if(!$this->hash)
-		// {
-		// 	return error
-		// }
-
-		// check if file already exists
-		return self::where('sha1', $this->hash)->first();
-	}
-
-	protected function saveFile($dir, $filename)
-	{
-		return $this->file->storeAs(
-			'public/' . config('app.media_path') . '/' . $dir,
-			$filename
-		);
-	}
-
+	/**
+	 * Returns an HTML-friendly src attribute
+	 * @return string
+	 */
 	public function getSrcAttribute()
 	{
-		$attr = $this->attributes;
-
-		return (
-			'storage/' .
-			config('app.media_path') . '/' .
-			$attr['id'] . '/' .
-			$attr['name']
-		);
+		return ($this->id && !empty($this->filename)) ? sprintf('%s/%d/%s', $this->fileUrl, $this->id, $this->filename) : '';
 	}
 
-	public function getCreatedByAttribute()
-	{
-		return $this->resolveUserById($this->attributes['created_by']);
-	}
+    /**
+     * Save the model to the database.
+     *
+     * We wrap the save operation in a transaction, to ensure that we have an ID assigned
+     * before writing the file to disk. Any failure should bail out safely.
+     *
+     * @param  array  $options
+     * @return bool
+     */
+    public function save(array $options = [])
+    {
+    	DB::beginTransaction();
 
-	public function getUpdatedByAttribute()
-	{
-		return $this->resolveUserById($this->attributes['updated_by']);
-	}
+    	try {
+			if(is_a($this->file, File::class)){
+				$this->hash = static::hash($this->file);
+				$this->filename = $this->file->getFilename();
 
-	protected function resolveUserById($id)
-	{
-		return ($user = User::find($id)) ? $user->name : null;
-	}
+				$this->fill(static::extractMeta($this->file));
+			}
 
-	public static function transformMetaData($meta)
+			$saved = parent::save();
+
+			if(is_a($this->file, File::class)){
+				$path = sprintf('%s/%d', $this->filePath, $this->id);
+
+				if(is_a($this->file, UploadedFile::class)){
+					$this->filename = $this->file->getClientOriginalName();
+					$this->file->move($path, $this->filename);
+
+				// Ensure that we don't move the File if it is already in the right place
+				} elseif(!preg_match('#^' . $this->filePath . '#', $this->file->getPath())) {
+					$this->filename = $this->file->getFilename();
+
+					if(!FS::isDirectory($path)){
+						FS::makeDirectory($path, 493, true);
+					}
+
+					FS::copy($this->file->getPath() . '/' . $this->file->getFilename(), $path . '/' . $this->filename);
+				}
+
+				$saved = parent::save();
+				$this->loadFile(); // Reload the File as location on disk has changed.
+			}
+
+			DB::commit();
+			return $saved;
+		} catch(Exception $e){
+			DB::rollBack();
+			throw $e;
+		}
+    }
+
+
+    /**
+     * Force a hard delete on a soft deleted model.
+     *
+     * This method protects developers from running forceDelete when trait is missing.
+     *
+     * @return bool|null
+     */
+    public function forceDelete()
+    {
+      	DB::beginTransaction();
+
+    	try {
+    		FS::deleteDirectory($this->filePath);
+			parent::forceDelete();
+
+			DB::commit();
+		} catch(Exception $e){
+			DB::rollBack();
+			throw $e;
+		}
+    }
+
+
+    /**
+     * Transforms the getID3 metadata into something a little friendlier...
+     *
+     * @param  array $meta
+     * @return array
+     */
+	public static function extractMeta(File $file)
 	{
+		$meta = (new getID3)->analyze($file->getRealPath());
+
 		$get = function($key, $default = null) use ($meta) {
 			return array_get($meta, $key, $default);
 		};
@@ -143,7 +227,7 @@ class Media extends Model
 		$aspect_ratio = isset($x, $y) && $y > 0 ? $x / $y : null; // scared of zeros
 
 		return [
-			'size'         => $get('filesize'),
+			'filesize'     => $get('filesize'),
 			'format'       => $get('fileformat'),
 			'mime_type'    => $get('mime_type'),
 			'width'        => $x,
@@ -151,6 +235,28 @@ class Media extends Model
 			'aspect_ratio' => $aspect_ratio,
 			'duration'     => $get('playtime_seconds')
 		];
+	}
+
+	/**
+	 * Attempts to retrieve a Media item using its file hash
+	 *
+	 * @param  string $hash
+	 * @return Media|null
+	 */
+	public static function findByHash($hash)
+	{
+		return static::where('hash', '=', $hash)->first();
+	}
+
+	/**
+	 * Hashes a file for use with the Media model
+	 *
+	 * @param  File   $file
+	 * @return string
+	 */
+	public static function hash(File $file)
+	{
+		return sha1_file($file->getRealPath());
 	}
 
 }

@@ -26,7 +26,7 @@ class User extends KentUser
    		$this->api_token = $this->api_token ?: str_random(255);
 	}
 
-    public function publishingGroups()
+    public function publishing_groups()
     {
         return $this->belongsToMany(PublishingGroup::class, 'publishing_groups_users');
     }
