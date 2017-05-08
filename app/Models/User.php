@@ -31,4 +31,14 @@ class User extends KentUser
         return $this->belongsToMany(PublishingGroup::class, 'publishing_groups_users');
     }
 
+    /**
+     * Returns true if users' role is set to 'admin'
+     *
+     * @return boolean
+     */
+    public function isAdmin()
+    {
+        return ($this->role == 'admin');
+    }
+
 }

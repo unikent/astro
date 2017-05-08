@@ -9,6 +9,7 @@ use Exception;
 use File as FS;
 use App\Models\Traits\Tracked;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -56,6 +57,59 @@ class Media extends Model
 		$this->fileUrl = Config::get('app.media_url');
 		$this->filePath = Config::get('app.media_path');
     }
+
+
+    /**
+     * Scope a query to include Media items associated with the given Sites.
+     *
+     * @param Builder $query
+     * @param Array $site_ids
+     * @return Builder
+     */
+	public function scopeSites(Builder $query, Array $site_ids)
+	{
+		$query->whereHas('sites', function($q) use ($site_ids) {
+		    $q->whereIn('sites.id', $site_ids);
+		});
+	}
+
+    /**
+     * Scope a query to include Media items associated with the given PracticeGroups.
+     *
+     * @param Builder $query
+     * @param Array $publishing_groups
+     * @return Builder
+     */
+	public function scopePublishingGroups(Builder $query, Array $publishing_groups)
+	{
+		$query->whereHas('publishing_groups', function($q) use ($publishing_groups) {
+		    $q->whereIn('publishing_groups.id', $publishing_groups);
+		});
+	}
+
+    /**
+     * Scope a query to include Media items of the given types.
+     *
+     * @param Builder $query
+     * @param Array $types
+     * @return Builder
+     */
+	public function scopeTypes(Builder $query, Array $types)
+	{
+		$query->whereIn('type', $types);
+	}
+
+    /**
+     * Scope a query to include Media items of the given types.
+     *
+     * @param Builder $query
+     * @param Array $mime_types
+     * @return Builder
+     */
+	public function scopeMimeTypes(Builder $query, Array $mime_types)
+	{
+		$query->whereIn('mime_type', $mime_types);
+	}
 
 
 

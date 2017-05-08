@@ -5,9 +5,11 @@ use Config;
 use Mockery;
 use File as FS;
 use Tests\TestCase;
+use App\Models\Site;
 use App\Models\Media;
 use Tests\FileUploadTrait;
 use Tests\FileCleanupTrait;
+use App\Models\PublishingGroup;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 
@@ -22,6 +24,102 @@ class MediaTest extends TestCase
 
 		Config::set('app.media_url', 'public/tests/media');
 		Config::set('app.media_path', storage_path('tests/media'));
+	}
+
+
+
+	/**
+	 * @test
+	 */
+	public function scopePublishingGroups_ReturnsOnlyItemsAssociatedWithTheGivenPublishingGroups()
+	{
+		$pgs = factory(PublishingGroup::class, 3)->create();
+
+		$file = static::setupFile('media', 'image.jpg');
+		$m1 = factory(Media::class)->create([ 'format' => 'image', 'file' => $file ]);
+		$m1->publishing_groups()->attach($pgs[0]);
+
+		$file = static::setupFile('media', 'document.pdf');
+		$m2 = factory(Media::class)->create([ 'format' => 'document', 'file' => $file ]);
+		$m2->publishing_groups()->attach($pgs[1]);
+
+		$file = static::setupFile('media', 'audio.mp3');
+		$m3 = factory(Media::class)->create([ 'format' => 'audio', 'file' => $file ]);
+		$m3->publishing_groups()->attach($pgs[2]);
+
+		$ids = Media::query()->publishingGroups([ $pgs[0]->getKey(), $pgs[2]->getKey() ])->get()->pluck('id');
+
+		$this->assertCount(2, $ids);
+		$this->assertContains($m1->getKey(), $ids);
+		$this->assertContains($m3->getKey(), $ids);
+	}
+
+	/**
+	 * @test
+	 */
+	public function scopeSites_ReturnsOnlyItemsAssociatedWithTheGivenSites()
+	{
+		$sites = factory(Site::class, 3)->states('withPublishingGroup')->create();
+
+		$file = static::setupFile('media', 'image.jpg');
+		$m1 = factory(Media::class)->create([ 'format' => 'image', 'file' => $file ]);
+		$m1->sites()->attach($sites[0]);
+
+		$file = static::setupFile('media', 'document.pdf');
+		$m2 = factory(Media::class)->create([ 'format' => 'document', 'file' => $file ]);
+		$m2->sites()->attach($sites[1]);
+
+		$file = static::setupFile('media', 'audio.mp3');
+		$m3 = factory(Media::class)->create([ 'format' => 'audio', 'file' => $file ]);
+		$m3->sites()->attach($sites[2]);
+
+		$ids = Media::query()->sites([ $sites[1]->getKey(), $sites[2]->getKey() ])->get()->pluck('id');
+
+		$this->assertCount(2, $ids);
+		$this->assertContains($m2->getKey(), $ids);
+		$this->assertContains($m3->getKey(), $ids);
+	}
+
+	/**
+	 * @test
+	 */
+	public function scopeTypes_ReturnsOnlyItemsMatchingGivenTypes()
+	{
+		$file = static::setupFile('media', 'image.jpg');
+		$m1 = factory(Media::class)->create([ 'type' => 'image', 'file' => $file ]);
+
+		$file = static::setupFile('media', 'document.pdf');
+		$m2 = factory(Media::class)->create([ 'type' => 'document', 'file' => $file ]);
+
+		$file = static::setupFile('media', 'audio.mp3');
+		$m3 = factory(Media::class)->create([ 'type' => 'audio', 'file' => $file ]);
+
+		$ids = Media::query()->types([ 'image', 'document' ])->get()->pluck('id');
+
+		$this->assertCount(2, $ids);
+		$this->assertContains($m1->getKey(), $ids);
+		$this->assertContains($m2->getKey(), $ids);
+	}
+
+	/**
+	 * @test
+	 */
+	public function scopeMimeTypes_ReturnsOnlyItemsMatchingGivenMimeTypes()
+	{
+		$file = static::setupFile('media', 'image.jpg');
+		$m1 = factory(Media::class)->create([ 'format' => 'image', 'file' => $file ]);
+
+		$file = static::setupFile('media', 'document.pdf');
+		$m2 = factory(Media::class)->create([ 'format' => 'document', 'file' => $file ]);
+
+		$file = static::setupFile('media', 'audio.mp3');
+		$m3 = factory(Media::class)->create([ 'format' => 'audio', 'file' => $file ]);
+
+		$ids = Media::query()->mimeTypes([ 'image/jpeg', 'audio/mpeg' ])->get()->pluck('id');
+
+		$this->assertCount(2, $ids);
+		$this->assertContains($m1->getKey(), $ids);
+		$this->assertContains($m3->getKey(), $ids);
 	}
 
 

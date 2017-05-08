@@ -23,6 +23,7 @@ Route::group([ 'prefix' => 'v1', 'namespace' => 'v1' ], function(){
 	Route::get('layout/{layout_definition}/definition', 'LayoutController@definition');
 
 	// Media does not use resource routing as {media} gets pluralized to {medium}, resulting in dragons.
+	Route::get('media', 'MediaController@index');
 	Route::post('media', 'MediaController@store');
 	Route::delete('media/{media}', 'MediaController@destroy');
 

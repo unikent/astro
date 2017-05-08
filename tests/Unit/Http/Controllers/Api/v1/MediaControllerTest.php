@@ -8,6 +8,7 @@ use App\Models\Media;
 use Tests\FileUploadTrait;
 use Tests\FileCleanupTrait;
 use App\Models\PublishingGroup;
+use Illuminate\Support\Collection;
 use App\Http\Controllers\Api\v1\MediaController;
 use Illuminate\Auth\Access\AuthorizationException;
 
@@ -28,6 +29,305 @@ class MediaControllerTest extends ApiControllerTestCase {
             'publishing_group_ids' => [ $pg->getKey() ],
         ];
     }
+
+
+
+    /**
+     * @test
+     * @group authentication
+     */
+    public function index_WhenUnauthenticated_Returns401(){
+        $response = $this->action('GET', MediaController::class . '@index');
+        $response->assertStatus(401);
+    }
+
+    /**
+     * @test
+     * @group authentication
+     */
+    public function index_WhenAuthenticatedAndRequestIsWithoutSiteIdsAndPublishingGroupIds_ChecksAuthorization(){
+        Gate::shouldReceive('authorize')->with('index', Media::class)->once();
+
+        $this->authenticated();
+        $response = $this->action('GET', MediaController::class . '@index');
+    }
+
+    /**
+     * @test
+     * @group authentication
+     */
+    public function index_WhenAuthenticatedAndRequestHasSiteIds_ChecksAuthorization(){
+        $sites = factory(Site::class, 3)->states('withPublishingGroup')->create();
+
+        $media = new Collection([
+            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
+            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
+            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
+        ]);
+
+        $media[0]->sites()->attach($sites[0]);
+        $media[1]->sites()->attach($sites[1]);
+        $media[2]->sites()->attach($sites[2]);
+
+        Gate::shouldReceive('authorize')->with('index', Media::class)->times(0);
+
+        Gate::shouldReceive('authorize')->with('index', Mockery::on(function($args){
+            return (is_array($args) && ($args[0] == Media::class) && is_a($args[1], Site::class));
+        }))->times(2);
+
+        $this->authenticated();
+
+        $response = $this->action('GET', MediaController::class . '@index', [
+            'site_ids' => [ $sites[0]->getKey(), $sites[1]->getKey() ]
+        ]);
+    }
+
+    /**
+     * @test
+     * @group authentication
+     */
+    public function index_WhenAuthenticatedAndRequestHasPublishingGroupIds_ChecksAuthorization(){
+        $pgs = factory(PublishingGroup::class, 3)->create();
+
+        $media = new Collection([
+            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
+            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
+            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
+        ]);
+
+        $media[0]->publishing_groups()->attach($pgs[0]);
+        $media[1]->publishing_groups()->attach($pgs[1]);
+        $media[2]->publishing_groups()->attach($pgs[2]);
+
+        Gate::shouldReceive('authorize')->with('index', Media::class)->times(0);
+
+        Gate::shouldReceive('authorize')->with('index', Mockery::on(function($args){
+            return (is_array($args) && ($args[0] == Media::class) && is_a($args[1], PublishingGroup::class));
+        }))->times(2);
+
+        $this->authenticated();
+
+        $response = $this->action('GET', MediaController::class . '@index', [
+            'publishing_group_ids' => [ $pgs[0]->getKey(), $pgs[1]->getKey() ]
+        ]);
+    }
+
+    /**
+     * @test
+     * @group authentication
+     */
+    public function index_WhenAuthenticatedAndRequestIsWithoutSiteIdsAndPublishingGroupIdsAndUnauthorized_Returns403(){
+        $this->authenticated();
+
+        Gate::shouldReceive('authorize')->with('index', Media::class)->andThrow(AuthorizationException::class);
+
+        $response = $this->action('GET', MediaController::class . '@index');
+        $response->assertStatus(403);
+    }
+
+    /**
+     * @test
+     * @group authentication
+     */
+    public function index_WhenAuthenticatedAndRequestHasSiteIdsAndUnauthorized_Returns403(){
+        $sites = factory(Site::class, 3)->states('withPublishingGroup')->create();
+
+        $media = new Collection([
+            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
+            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
+            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
+        ]);
+
+        $media[0]->sites()->attach($sites[0]);
+        $media[1]->sites()->attach($sites[1]);
+        $media[2]->sites()->attach($sites[2]);
+
+        $this->authenticated();
+
+        Gate::shouldReceive('authorize')->with('index', Mockery::on(function($args){
+            return (is_array($args) && ($args[0] == Media::class) && is_a($args[1], Site::class));
+        }))->andThrow(AuthorizationException::class);
+
+        $response = $this->action('GET', MediaController::class . '@index', [
+            'site_ids' => [ $sites[0]->getKey(), $sites[1]->getKey() ]
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    /**
+     * @test
+     * @group authentication
+     */
+    public function index_WhenAuthenticatedAndRequestHasPublishingGroupIdsAndUnauthorized_Returns403(){
+        $pgs = factory(PublishingGroup::class, 3)->create();
+
+        $media = new Collection([
+            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
+            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
+            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
+        ]);
+
+        $media[0]->publishing_groups()->attach($pgs[0]);
+        $media[1]->publishing_groups()->attach($pgs[1]);
+        $media[2]->publishing_groups()->attach($pgs[2]);
+
+        $this->authenticated();
+
+        Gate::shouldReceive('authorize')->with('index', Mockery::on(function($args){
+            return (is_array($args) && ($args[0] == Media::class) && is_a($args[1], PublishingGroup::class));
+        }))->andThrow(AuthorizationException::class);
+
+        $response = $this->action('GET', MediaController::class . '@index', [
+            'publishing_group_ids' => [ $pgs[0]->getKey(), $pgs[1]->getKey() ]
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    /**
+     * @test
+     */
+    public function index_WhenAuthorizedAndRequestHasSiteIds_ReturnsJsonOfMediaAssociatedWithSiteIds(){
+        $sites = factory(Site::class, 3)->states('withPublishingGroup')->create();
+
+        $media = new Collection([
+            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
+            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
+            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
+        ]);
+
+        $media[0]->sites()->attach($sites[0]);
+        $media[1]->sites()->attach($sites[1]);
+        $media[2]->sites()->attach($sites[2]);
+
+        $this->authenticatedAndAuthorized();
+
+        $response = $this->action('GET', MediaController::class . '@index', [
+            'site_ids' => [ $sites[0]->getKey(), $sites[1]->getKey() ]
+        ]);
+
+        $json = $response->json();
+        $this->assertArrayHasKey('data', $json);
+
+        $this->assertCount(2, $json['data']);
+        $this->assertEquals($media[0]->getKey(), $json['data'][0]['id']);
+        $this->assertEquals($media[1]->getKey(), $json['data'][1]['id']);
+    }
+
+    /**
+     * @test
+     */
+    public function index_WhenAuthorizedRequestHasPublishingGroupIds_ReturnsJsonOfMediaAssociatedWithPublishingGroups(){
+        $pgs = factory(PublishingGroup::class, 3)->create();
+
+        $media = new Collection([
+            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
+            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
+            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
+        ]);
+
+        $media[0]->publishing_groups()->attach($pgs[0]);
+        $media[1]->publishing_groups()->attach($pgs[1]);
+        $media[2]->publishing_groups()->attach($pgs[2]);
+
+        $this->authenticatedAndAuthorized();
+
+        $response = $this->action('GET', MediaController::class . '@index', [
+            'publishing_group_ids' => [ $pgs[0]->getKey(), $pgs[1]->getKey() ]
+        ]);
+
+        $json = $response->json();
+        $this->assertArrayHasKey('data', $json);
+
+        $this->assertCount(2, $json['data']);
+        $this->assertEquals($media[0]->getKey(), $json['data'][0]['id']);
+        $this->assertEquals($media[1]->getKey(), $json['data'][1]['id']);
+    }
+
+    /**
+     * @test
+     */
+    public function index_WhenAuthorizedAndRequestHasTypes_ReturnsJsonOfMedia(){
+        $media = new Collection([
+            factory(Media::class)->create([ 'type' => 'image', 'file' => $this->setupFile('media', 'image.jpg') ]),
+            factory(Media::class)->create([ 'type' => 'document', 'file' => $this->setupFile('media', 'document.pdf') ]),
+            factory(Media::class)->create([ 'type' => 'audio', 'file' => $this->setupFile('media', 'audio.mp3') ]),
+        ]);
+
+        $this->authenticatedAndAuthorized();
+
+        $response = $this->action('GET', MediaController::class . '@index');
+
+        $json = $response->json();
+        $this->assertArrayHasKey('data', $json);
+        $this->assertCount(3, $json['data']);
+    }
+
+    /**
+     * @test
+     */
+    public function index_WhenAuthorizedAndRequestHasTypes_ReturnsJsonOfMediaFilteredByTypes(){
+        $media = new Collection([
+            factory(Media::class)->create([ 'type' => 'image', 'file' => $this->setupFile('media', 'image.jpg') ]),
+            factory(Media::class)->create([ 'type' => 'document', 'file' => $this->setupFile('media', 'document.pdf') ]),
+            factory(Media::class)->create([ 'type' => 'audio', 'file' => $this->setupFile('media', 'audio.mp3') ]),
+        ]);
+
+        $this->authenticatedAndAuthorized();
+
+        $response = $this->action('GET', MediaController::class . '@index', [
+            'types' => [ 'image', 'audio' ]
+        ]);
+
+        $json = $response->json();
+        $this->assertArrayHasKey('data', $json);
+
+        $this->assertCount(2, $json['data']);
+        $this->assertEquals($media[0]->getKey(), $json['data'][0]['id']);
+        $this->assertEquals($media[2]->getKey(), $json['data'][1]['id']);
+    }
+
+    /**
+     * @test
+     */
+    public function index_WhenAuthorizedAndRequestHasMimeTypes_ReturnsJsonOfMediaFilteredByMimeTypes(){
+        $media = new Collection([
+            factory(Media::class)->create([ 'type' => 'image', 'file' => $this->setupFile('media', 'image.jpg') ]),
+            factory(Media::class)->create([ 'type' => 'document', 'file' => $this->setupFile('media', 'document.pdf') ]),
+            factory(Media::class)->create([ 'type' => 'audio', 'file' => $this->setupFile('media', 'audio.mp3') ]),
+        ]);
+
+        $this->authenticatedAndAuthorized();
+
+        $response = $this->action('GET', MediaController::class . '@index', [
+            'mime_types' => [ 'image/jpeg', 'audio/mpeg' ]
+        ]);
+
+        $json = $response->json();
+        $this->assertArrayHasKey('data', $json);
+
+        $this->assertCount(2, $json['data']);
+        $this->assertEquals($media[0]->getKey(), $json['data'][0]['id']);
+        $this->assertEquals($media[2]->getKey(), $json['data'][1]['id']);
+    }
+
+    /**
+     * @test
+     */
+    public function index_WhenAuthorized_Returns200(){
+        $media = new Collection([
+            factory(Media::class)->create([ 'type' => 'image', 'file' => $this->setupFile('media', 'image.jpg') ]),
+            factory(Media::class)->create([ 'type' => 'document', 'file' => $this->setupFile('media', 'document.pdf') ]),
+            factory(Media::class)->create([ 'type' => 'audio', 'file' => $this->setupFile('media', 'audio.mp3') ]),
+        ]);
+
+        $this->authenticatedAndAuthorized();
+
+        $response = $this->action('GET', MediaController::class . '@index');
+        $response->assertStatus(200);
+    }
+
 
 
     /**
