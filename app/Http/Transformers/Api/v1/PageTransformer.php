@@ -2,6 +2,7 @@
 namespace App\Http\Transformers\Api\v1;
 
 use App\Models\Page;
+use Illuminate\Database\Eloquent\Collection;
 use League\Fractal\Resource\Item as FractalItem;
 use League\Fractal\Resource\Collection as FractalCollection;
 use League\Fractal\TransformerAbstract as FractalTransformer;
@@ -33,7 +34,7 @@ class PageTransformer extends FractalTransformer
     /**
      * Include all associated Routes
      *
-     * @return League\Fractal\ItemResource
+     * @return League\Fractal\CollectionResource
      */
     public function includeRoutes(Page $page)
     {
@@ -45,12 +46,30 @@ class PageTransformer extends FractalTransformer
     /**
      * Include associated Blocks
      *
-     * @return League\Fractal\ItemResource
+     * It was decided that API clients would rather consume ordered blocks sorted
+     * into regions, rather than duplicating ordering and grouping logic in every client.
+     *
+     * Some nastiness resides here in order to achieve this, commented below...
+     *
+     * @return League\Fractal\CollectionResource
      */
     public function includeBlocks(Page $page)
     {
     	if(!$page->blocks->isEmpty()){
-	    	return new FractalCollection($page->blocks, new BlockTransformer, false);
+            // Using sortBy instead of orderBy as the collection might have been eager-loaded
+            // Use of groupBy results in a Collection with nested Collections, keyed by 'region_name'.
+            $blocksByRegion = $page->blocks->sortBy('order')->groupBy('region_name');
+
+            // Unfortunately Fractal cannot serialize a Collection with nested Collections. We use an
+            // inline Transformer to create a FractalCollection, serializing as we go. We use the current
+            // scope to access the manager and also pass it to createData ensure includes function.
+            $scope = $this->getCurrentScope();
+
+            return new FractalCollection($blocksByRegion, function(Collection $blocks) use ($scope){
+                $key = $blocks[0]->region_name;
+                $collection = new FractalCollection($blocks, new BlockTransformer, $key);
+                return $scope->getManager()->createData($collection, 'blocks', $scope)->toArray();
+            }, false);
     	}
     }
 
