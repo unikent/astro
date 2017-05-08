@@ -65,10 +65,13 @@ class PageTransformer extends FractalTransformer
             // scope to access the manager and also pass it to createData ensure includes function.
             $scope = $this->getCurrentScope();
 
-            return new FractalCollection($blocksByRegion, function(Collection $blocks) use ($scope){
-                $key = $blocks[0]->region_name;
-                $collection = new FractalCollection($blocks, new BlockTransformer, $key);
-                return $scope->getManager()->createData($collection, 'blocks', $scope)->toArray();
+            return new FractalItem($blocksByRegion, function(Collection $blocksByRegion) use ($scope){
+                foreach($blocksByRegion as $region => $blocks){
+                    $collection = new FractalCollection($blocks, new BlockTransformer, false);
+                    $blocksByRegion[$region] = $scope->getManager()->createData($collection, 'blocks', $scope)->toArray();
+                }
+
+                return $blocksByRegion->toArray();
             }, false);
     	}
     }
