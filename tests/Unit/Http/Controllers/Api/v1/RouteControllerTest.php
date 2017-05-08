@@ -198,7 +198,7 @@ class RouteControllerTest extends ApiControllerTestCase {
     /**
      * @test
      */
-    public function resolve_WhenAuthorizedAndFoundRequestIncludesPageBlocks_IncludesPageBlocksInJson(){
+    public function resolve_WhenAuthorizedAndFoundRequestIncludesPageBlocks_IncludesPageBlocksByRegionInJson(){
         $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
 
         $page = $route->page;
@@ -216,6 +216,7 @@ class RouteControllerTest extends ApiControllerTestCase {
         $this->assertArrayHasKey('data', $json);
         $this->assertArrayHasKey('page', $json['data']);
         $this->assertArrayHasKey('blocks', $json['data']['page']);
+        $this->assertArrayHasKey('test-region', $json['data']['page']['blocks']);
         $this->assertCount(1, $json['data']['page']['blocks']);
     }
 
@@ -240,10 +241,11 @@ class RouteControllerTest extends ApiControllerTestCase {
         $this->assertArrayHasKey('data', $json);
         $this->assertArrayHasKey('page', $json['data']);
         $this->assertArrayHasKey('blocks', $json['data']['page']);
-        $this->assertCount(1, $json['data']['page']['blocks']);
+        $this->assertArrayHasKey('test-region', $json['data']['page']['blocks']);
+        $this->assertCount(1, $json['data']['page']['blocks']['test-region']);
 
-        $this->assertArrayHasKey('definition', $json['data']['page']['blocks'][0]);
-        $this->assertEquals($block->definition_name, $json['data']['page']['blocks'][0]['definition']['name']);
+        $this->assertArrayHasKey('definition', $json['data']['page']['blocks']['test-region'][0]);
+        $this->assertEquals($block->definition_name, $json['data']['page']['blocks']['test-region'][0]['definition']['name']);
     }
 
 }
