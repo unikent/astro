@@ -18,6 +18,54 @@ class MediaController extends ApiController
 {
 
 	/**
+	 * GET /api/v1/media
+	 *
+	 * Returns an index of Media objects.
+	 * Supports querying with site_ids, pubishing_group_ids, types and mime_types.
+	 *
+	 * @param  Request $request
+	 * @return Response
+	 */
+	public function index(Request $request){
+		$query = Media::query();
+
+		if(!$request->has('site_ids') && !$request->has('publishing_group_ids')){
+			$this->authorize('index', Media::class);
+		}
+
+		if($request->has('site_ids')){
+			$sites = Site::with('publishing_group')->whereIn('id', $request->get('site_ids'))->get();
+
+			foreach($sites as $site){
+				$this->authorize('index', [ Media::class, $site ]);
+			}
+
+			$query->sites($sites->pluck('id')->toArray());
+		}
+
+		if($request->has('publishing_group_ids')){
+			$pgs = PublishingGroup::whereIn('id', $request->get('publishing_group_ids'))->get();
+
+			foreach($pgs as $pg){
+				$this->authorize('index', [ Media::class, $pg ]);
+			}
+
+			$query->publishingGroups($pgs->pluck('id')->toArray());
+		}
+
+		if($request->has('types')){
+			$query->types($request->get('types'));
+		}
+
+		if($request->has('mime_types')){
+			$query->mimeTypes($request->get('mime_types'));
+		}
+
+		return fractal($query->get(), new MediaTransformer)->respond(200);
+	}
+
+
+	/**
 	 * POST /api/v1/media
 	 *
 	 * Handles the creation of new Media objects. If the file has previously been uploaded,
