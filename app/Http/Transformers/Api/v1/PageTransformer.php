@@ -61,8 +61,9 @@ class PageTransformer extends FractalTransformer
             $blocksByRegion = $page->blocks->sortBy('order')->groupBy('region_name');
 
             // Unfortunately Fractal cannot serialize a Collection with nested Collections. We use an
-            // inline Transformer to create a FractalCollection, serializing as we go. We use the current
-            // scope to access the manager and also pass it to createData ensure includes function.
+            // inline Transformer to create a FractalItem, serializing nested FractalCollections as we go.
+            // We use the current scope to access the manager and also pass it to createData to ensure
+            // includes continue to function.
             $scope = $this->getCurrentScope();
 
             return new FractalItem($blocksByRegion, function(Collection $blocksByRegion) use ($scope){
