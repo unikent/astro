@@ -26,7 +26,11 @@ abstract class DefinitionValidator {
 	 */
 	public function getRules()
 	{
-		$this->transformRules([]);
+		$rules = [];
+
+		// Load Rules here...
+
+		return $this->transformRules($rules);
 	}
 
 

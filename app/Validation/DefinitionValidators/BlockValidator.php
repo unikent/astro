@@ -11,7 +11,7 @@ class BlockValidator extends DefinitionValidator {
 	 *
 	 * @return Array
 	 */
-	public function getRules(RegionDefinition $regionDefinition = null)
+	public function getRules()
 	{
 		$rules = [];
 
@@ -22,13 +22,22 @@ class BlockValidator extends DefinitionValidator {
 			}
 		}
 
-		$rules = $this->transformRules($rules);
+		return $this->transformRules($rules);
+	}
 
-		if(isset($regionDefinition)){
-			$rules['definition_name'] = sprintf('in:%s', array_merge(',', $regionDefinition->blocks));
-		}
-
-		return $rules;
+	/**
+	 * Creates a validation rule based on Region block-constraints
+	 *
+	 * @param \App\Models\Definition\Region $region
+	 * @return Array
+	 */
+	public function getRegionConstraintRules(RegionDefinition $region = null)
+	{
+		return [
+			'definition_name' => [
+				'in:' . implode(',', $region->blocks),
+			]
+		];
 	}
 
 }

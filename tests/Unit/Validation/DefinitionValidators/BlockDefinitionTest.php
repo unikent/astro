@@ -5,6 +5,7 @@ use Config;
 use Tests\TestCase;
 use Illuminate\Validation\ValidationException;
 use App\Models\Definitions\Block as BlockDefinition;
+use App\Models\Definitions\Region as RegionDefinition;
 use App\Validation\DefinitionValidators\BlockValidator;
 use Illuminate\Validation\Validator as LaravelValidator;
 
@@ -112,6 +113,23 @@ class BlockDefinitionTest extends TestCase
 		$this->assertArrayHasKey('number_of_widgets', $rules);
 		$this->assertContains('integer', $rules['number_of_widgets']);
 		$this->assertContains('max:100', $rules['number_of_widgets']);
+	}
+
+
+
+	/**
+	 * @test
+	 */
+	public function getRegionConstraintRules_CreatesRuleValidatingDefinitionNameAgainstRegionContraints()
+	{
+        $file = RegionDefinition::locateDefinition('test-region');
+        $region = RegionDefinition::fromDefinitionFile($file);
+
+		$bv = new BlockValidator($this->block);
+		$rules = $bv->getRegionConstraintRules($region);
+
+		$this->assertArrayHasKey('definition_name', $rules);
+		$this->assertEquals('in:test-block', $rules['definition_name'][0]);
 	}
 
 
