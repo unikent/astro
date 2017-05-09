@@ -21,13 +21,14 @@ Route::group(['prefix' => 'auth'], function() {
 	Route::get('loggedout', ['as' => 'auth.loggedout', 'uses' => '\App\Http\Controllers\Auth\AuthController@getLoggedout']);
 });
 
-Route::get('/{catchall?}', function($route) {
+Route::get('/{catchall?}', function($route = '') {
 	$user = Auth::user();
 	// TODO: grab user info from endpoint, rather than inline js
 	return response()->view('inline', [
-		'route' => $route,
-		'user'  => $user->name,
-		'api_token' => $user->api_token
+		'route'      => $route,
+		'is_preview' => starts_with($route, 'preview/'),
+		'user'       => $user->name,
+		'api_token'  => $user->api_token
 	]);
 })
 ->where('catchall', '(.*)')

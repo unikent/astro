@@ -11,7 +11,7 @@
 	<title>Astro</title>
 
 	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/css/app.css') }}" />
-	@if ($route === 'preview')
+	@if ($is_preview)
 		<link rel="stylesheet" href="{{ url("/") }}/css/main.min.css" />
 		<link rel="stylesheet" href="https://static.kent.ac.uk/pantheon/kent-theme-assets/assets/css/kentfont.css" />
 		<style>
@@ -32,7 +32,7 @@
 		'username' => $user,
 		'api_token' => $api_token
 	]); ?>;
-	window.isEditor = <?php echo json_encode($route !== 'preview'); ?>;
+	window.isEditor = <?php echo json_encode(!$is_preview); ?>;
 	</script>
 </head>
 <body class="custom-scrollbar">
