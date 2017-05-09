@@ -77,7 +77,9 @@ export default {
 			}
 		},
 
-		...mapState(['blockInfo'])
+		...mapState({
+			blockMeta: state => state.page.blockMeta
+		})
 	},
 
 	methods: {
@@ -102,10 +104,10 @@ export default {
 				console.log(after ? 'after' : 'not after');
 
 				if(after && this.index > index.from && this.index <= index.to) {
-					this.offset = -this.blockInfo.sizes[index.from];
+					this.offset = -this.blockMeta.sizes[index.from];
 				}
 				else if(!after && this.index >= index.to && this.index < index.from) {
-					this.offset = this.blockInfo.sizes[index.from];
+					this.offset = this.blockMeta.sizes[index.from];
 				}
 				else {
 					this.offset = 0;
@@ -160,7 +162,7 @@ export default {
 				if(!dragstart) {
 					this.current.z = this.start.z;
 				}
-			}
+			};
 
 			this.$el.addEventListener('transitionend', onEnd);
 		},
@@ -197,19 +199,19 @@ export default {
 				this.centerPoints = {};
 				this.lastHover = this.index;
 
-				for(var i = 0; i < this.blockInfo.sizes.length; i++) {
+				for(var i = 0; i < this.blockMeta.sizes.length; i++) {
 					// this.sizeCacheAll[i] = {
 					// 	top,
-					// 	height: this.blockInfo.sizes[i],
-					// 	mid: top + (this.blockInfo.sizes[i] / 2),
-					// 	bottom: top + this.blockInfo.sizes[i]
+					// 	height: this.blockMeta.sizes[i],
+					// 	mid: top + (this.blockMeta.sizes[i] / 2),
+					// 	bottom: top + this.blockMeta.sizes[i]
 					// };
 
 					this.centerPoints[
-						(top + this.blockInfo.sizes[i] / 2).toFixed(3)
+						(top + this.blockMeta.sizes[i] / 2).toFixed(3)
 					] = i;
 
-					top += this.blockInfo.sizes[i];
+					top += this.blockMeta.sizes[i];
 				}
 
 				document.addEventListener('mousemove', this.onDrag);
@@ -222,8 +224,8 @@ export default {
 
 			let
 				currentIndex = 0,
-				offset = this.lastHover && this.blockInfo.offsets[this.lastHover] ?
-					this.blockInfo.offsets[this.lastHover] + this.blockInfo.sizes[this.index] : 0;
+				offset = this.lastHover && this.blockMeta.offsets[this.lastHover] ?
+					this.blockMeta.offsets[this.lastHover] + this.blockMeta.sizes[this.index] : 0;
 
 			for(let size in this.centerPoints) {
 				if(this.mouseY - offset > size) {
@@ -232,8 +234,8 @@ export default {
 			}
 
 			if(currentIndex < this.lastHover) {
-				offset = this.lastHover && this.blockInfo.offsets[this.lastHover] ?
-					this.blockInfo.offsets[this.lastHover] : 0;
+				offset = this.lastHover && this.blockMeta.offsets[this.lastHover] ?
+					this.blockMeta.offsets[this.lastHover] : 0;
 
 				for(let size in this.centerPoints) {
 					if(this.mouseY - offset > size) {

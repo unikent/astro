@@ -4,7 +4,8 @@ const
 	{ mix } = require('laravel-mix'),
 	webpack = require('webpack'),
 	path = require('path'),
-	SvgStorePlugin = require('external-svg-sprite-loader/lib/SvgStorePlugin');
+	SvgStorePlugin = require('external-svg-sprite-loader/lib/SvgStorePlugin'),
+	resolve = (dir) => path.resolve(__dirname, `resources/assets/js/${dir}`);
 
 mix.webpackConfig({
 	module: {
@@ -32,8 +33,14 @@ mix.webpackConfig({
 	resolve: {
 		symlinks: false,
 		alias: {
-			CMS_ALIAS: path.resolve(__dirname, 'resources/assets/js'),
-			IconPath: path.resolve(__dirname, 'resources/assets/icons')
+			classes:    resolve('classes'),
+			components: resolve('components'),
+			directives: resolve('directives'),
+			mixins:     resolve('mixins'),
+			plugins:    resolve('plugins'),
+			store:      resolve('store'),
+			views:      resolve('components/views'),
+			IconPath:   path.resolve(__dirname, 'resources/assets/icons')
 		}
 	}
 });

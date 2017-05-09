@@ -46,7 +46,7 @@ export default {
 				return val ? [val] : [];
 			},
 			set(value) {
-				this.updateValue({
+				this.updateFieldValue({
 					name: this.name,
 					value: value ? _.pick(value, 'name', 'url') : value
 				});
@@ -54,7 +54,6 @@ export default {
 		},
 
 		...mapState([
-			'page',
 			'preview'
 		])
 	},
@@ -62,7 +61,7 @@ export default {
 	methods: {
 
 		...mapMutations([
-			'updateValue'
+			'updateFieldValue'
 		]),
 
 		handleRemove(file, fileList) {

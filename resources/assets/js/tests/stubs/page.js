@@ -61,7 +61,7 @@ export default {
 	meta_keywords: 'keyword1, keyword2, keyword3',
 	meta_description: 'Meta description here.',
 	regions: {
-		main_content: [
+		main: [
 			{
 				id: 2,
 				...blockQuote

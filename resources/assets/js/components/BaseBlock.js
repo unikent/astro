@@ -1,5 +1,5 @@
-import inlineFieldMixin from '../mixins/inlineFieldMixin';
-import inlineEdit from '../directives/inline-edit';
+// import inlineFieldMixin from '../mixins/inlineFieldMixin';
+// import inlineEdit from '../directives/inline-edit';
 
 export default {
 
@@ -7,9 +7,9 @@ export default {
 
 	props: ['name', 'index', 'fields', 'other'],
 
-	directives: {
-		inlineEdit
-	},
+	// directives: {
+	// 	inlineEdit
+	// },
 
 	data() {
 		return { ...this.fields };

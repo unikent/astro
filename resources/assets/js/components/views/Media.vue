@@ -24,6 +24,7 @@
 	<el-row>
 
 		<el-col :span="18">
+
 			<el-select style="max-width: 120px" placeholder="Filter by">
 				<el-option label="All media" value="media" />
 				<el-option label="Image" value="image" />
@@ -33,14 +34,13 @@
 			</el-select>
 
 			<el-select style="max-width: 140px" placeholder="Order by">
-				<el-option label="Date added" value="media">
+				<el-option label="Date added" value="creation">
 					<span style="float: left">Date Added</span>
 					<span style="float: right; color: #8492a6; font-size: 13px">asc</span>
 				</el-option>
-				<el-option label="Name" value="image" />
-				<el-option label="Rating" value="document" />
-				<el-option label="Resolution" value="video" />
-				<el-option label="Duration" value="audio" />
+				<el-option label="Name" value="name" />
+				<el-option label="Resolution" value="resolution" />
+				<el-option label="Duration" value="duration" />
 			</el-select>
 
 		</el-col>
@@ -56,9 +56,9 @@
 				</el-col>
 				<el-col :span="12">
 					<el-pagination
-						@size-change="changeSize"
+						@size-change="handleMediaCountChange"
 						:page-sizes="[20, 50, 100, 200]"
-						:page-size="size"
+						:page-size="mediaCount"
 						layout="slot, sizes"
 						style="margin: 0"
 					>
@@ -76,19 +76,19 @@
 		<div v-for="rowIndex in Math.ceil(filteredImages.length / colCount)" class="columns">
 			<div v-for="colIndex in colCount" class="column">
 				<div
-					v-if="getImage(rowIndex, colIndex)"
+					v-if="getThumbnail(rowIndex, colIndex)"
 					class="image-grid__item"
-					:title="getImage(rowIndex, colIndex).title"
+					:title="getThumbnail(rowIndex, colIndex).title"
 				>
 					<lazy-img
 						class="img-grid"
 						:bg="true"
-						:src="getImage(rowIndex, colIndex).src"
-						:smallSrc="getImage(rowIndex, colIndex).src"
+						:src="getThumbnail(rowIndex, colIndex).src"
+						:smallSrc="getThumbnail(rowIndex, colIndex).src"
 					/>
 					<div class="image-grid__item-overlay" />
 					<div class="item-grid__edit">
-						<i class="el-icon-edit it-butt" @click="showMediaDetails = true; media = getThumbIndex(rowIndex, colIndex)"></i>
+						<i class="el-icon-edit it-butt" @click="showMediaDetails = true; media = getThumbnailIndex(rowIndex, colIndex)"></i>
 						<el-dropdown trigger="click" menu-align="start">
 							<i class="el-icon-more"></i>
 							<el-dropdown-menu slot="dropdown">
@@ -104,11 +104,11 @@
 
 	<el-row>
 		<el-pagination
-			@size-change="changeSize"
-			@current-change="changeCurrent"
-			:current-page="current"
+			@size-change="handleMediaCountChange"
+			@current-change="handlePagination"
+			:current-page="currentPage"
 			:page-sizes="[20, 50, 100, 200]"
-			:page-size="size"
+			:page-size="mediaCount"
 			layout="total, slot, sizes, ->, prev, pager, next"
 			:total="total"
 		>
@@ -165,8 +165,8 @@ export default {
 			uploadType: 'media',
 			imageSize: 25,
 
-			current: 1,
-			size: 20,
+			currentPage: 1,
+			mediaCount: 20,
 
 			images: [],
 
@@ -175,7 +175,7 @@ export default {
 	},
 
 	mounted() {
-		this.fetchData();
+		this.fetchMedia();
 	},
 
 	computed: {
@@ -196,8 +196,8 @@ export default {
 		},
 
 		filteredImages() {
-			const start = (this.current - 1) * this.size;
-			return this.images.slice(start, start + this.size);
+			const start = (this.currentPage - 1) * this.mediaCount;
+			return this.images.slice(start, start + this.mediaCount);
 		},
 
 		total() {
@@ -207,7 +207,7 @@ export default {
 
 	methods: {
 		search() {
-			console.log('Search for files', this.searchTerm);
+			// TODO: filter media by "this.searchTerm"
 		},
 
 		handleChange(val) {
@@ -227,31 +227,25 @@ export default {
 				default:
 					this.accept = '*/*';
 			}
-
-			console.log(this.accept);
 		},
 
-		updateColumnCount(num) {
-			this.colCount = num;
+		getThumbnail(row, col) {
+			return this.filteredImages[this.getThumbnailIndex(row, col)];
 		},
 
-		getImage(row, col) {
-			return this.filteredImages[this.getThumbIndex(row, col)];
-		},
-
-		getThumbIndex(rowIndex, colIndex) {
+		getThumbnailIndex(rowIndex, colIndex) {
 			return (rowIndex - 1) * this.colCount + colIndex - 1;
 		},
 
-		changeSize(newSize) {
-			this.size = newSize;
+		handleMediaCountChange(newSize) {
+			this.mediaCount = newSize;
 		},
 
-		changeCurrent(newCurrent) {
-			this.current = newCurrent;
+		handlePagination(pageNumber) {
+			this.currentPage = pageNumber;
 		},
 
-		fetchData() {
+		fetchMedia() {
 			this.$api
 				.get('media')
 				.then((response) => {
