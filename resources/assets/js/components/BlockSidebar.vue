@@ -19,12 +19,13 @@ export default {
 	},
 
 	computed: {
+		...mapState({
+			currentBlockDefinition: state => state.definition.currentBlockDefinition
+		}),
+
 		mode() {
-			return this.blockDef ? 'edit' : 'list';
-		},
-		...mapState([
-			'blockDef'
-		])
+			return this.currentBlockDefinition ? 'edit' : 'list';
+		}
 	},
 
 	methods: {

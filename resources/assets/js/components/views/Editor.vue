@@ -1,7 +1,7 @@
 <template>
 <div class="editor-body">
 	<div class="editor-wrapper" ref="editor">
-		<iframe ref="iframe" class="editor-content" :style="dimensions" :src="getUrl" frameborder="0"></iframe>
+		<iframe ref="iframe" class="editor-content" :style="dimensions" :src="getPreviewUrl" frameborder="0"></iframe>
 		<div
 			class="iframe-overlay"
 			:style="{ 'position' : showIframeOverlay ? 'absolute' : null }"
@@ -54,7 +54,7 @@
 
 <script>
 import { Loading } from 'element-ui';
-import { mapState, mapActions } from 'vuex';
+import { mapState } from 'vuex';
 
 import Config from '../../classes/Config';
 import PageSidebar from '../PageSidebar';
@@ -99,8 +99,6 @@ export default {
 				height: '568px'
 			}
 		};
-
-		this.fetchPage(this.$route.params.site_id);
 	},
 
 	data() {
@@ -114,13 +112,16 @@ export default {
 
 	computed: {
 		...mapState([
-			'page',
 			'preview',
 			'showIframeOverlay'
 		]),
 
-		getUrl() {
-			return `${Config.get('base_url', '')}/preview`;
+		...mapState({
+			page: state => state.page.pageData
+		}),
+
+		getPreviewUrl() {
+			return `${Config.get('base_url', '')}/preview/${this.$route.params.site_id}`;
 		},
 
 		dimensions() {
@@ -147,10 +148,6 @@ export default {
 	},
 
 	methods: {
-		...mapActions([
-			'fetchPage'
-		]),
-
 		savePage() {
 			// this.showPageData = true;
 

@@ -46,7 +46,7 @@ const routes = [
 		component: Editor
 	},
 	{
-		path: '/preview',
+		path: '/preview/:site_id',
 		component: Preview
 	},
 	{

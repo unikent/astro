@@ -6,7 +6,7 @@ export default {
 
 	methods: {
 		...mapMutations([
-			'updateValue'
+			'updateFieldValue'
 		]),
 
 		markAsInline(name) {
@@ -30,7 +30,7 @@ export default {
 				callbacks: {
 					change() {
 						console.log(this);
-						self.updateValue({
+						self.updateFieldValue({
 							index: self.index,
 							name: fieldName,
 							value: this.code.get()
