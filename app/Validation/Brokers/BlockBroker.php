@@ -1,10 +1,10 @@
 <?php
-namespace App\Validation\DefinitionValidators;
+namespace App\Validation\Brokers;
 
 use App\Models\Definitions\Block as BlockDefinition;
 use App\Models\Definitions\Region as RegionDefinition;
 
-class BlockValidator extends DefinitionValidator {
+class BlockBroker extends DefinitionBroker {
 
 	/**
 	 * Loads the rules from the field definitions, runs them through the Transformer.

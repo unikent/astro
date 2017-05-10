@@ -1,15 +1,15 @@
 <?php
-namespace Tests\Unit\Validation\DefinitionValidators;
+namespace Tests\Unit\Validation\Brokers;
 
 use Config;
 use Tests\TestCase;
+use App\Validation\Brokers\BlockBroker;
 use Illuminate\Validation\ValidationException;
 use App\Models\Definitions\Block as BlockDefinition;
 use App\Models\Definitions\Region as RegionDefinition;
-use App\Validation\DefinitionValidators\BlockValidator;
 use Illuminate\Validation\Validator as LaravelValidator;
 
-class BlockDefinitionTest extends TestCase
+class BlockBrokerTest extends TestCase
 {
 
 	protected $block;
@@ -37,7 +37,7 @@ class BlockDefinitionTest extends TestCase
 	 */
 	public function getRules_ReturnsValidationRulesFromDefinition()
 	{
-		$bv = new BlockValidator($this->block);
+		$bv = new BlockBroker($this->block);
 		$rules = $bv->getRules();
 
 		$this->assertArrayHasKey('content', $rules);
@@ -55,7 +55,7 @@ class BlockDefinitionTest extends TestCase
 	 */
 	public function getRules_WhenDefinitionHasRequiredRule_TransformsRequiredRule()
 	{
-		$bv = new BlockValidator($this->block);
+		$bv = new BlockBroker($this->block);
 		$rules = $bv->getRules();
 
 		$this->assertArrayHasKey('content', $rules);
@@ -68,7 +68,7 @@ class BlockDefinitionTest extends TestCase
 	 */
 	public function getRules_WhenDefinitionHasMinLengthRule_TransformsMinLengthRule()
 	{
-		$bv = new BlockValidator($this->block);
+		$bv = new BlockBroker($this->block);
 		$rules = $bv->getRules();
 
 		$this->assertArrayHasKey('title_of_widget', $rules);
@@ -81,7 +81,7 @@ class BlockDefinitionTest extends TestCase
 	 */
 	public function getRules_WhenDefinitionHasMaxLengthRule_TransformsMaxLengthRule()
 	{
-		$bv = new BlockValidator($this->block);
+		$bv = new BlockBroker($this->block);
 		$rules = $bv->getRules();
 
 		$this->assertArrayHasKey('title_of_widget', $rules);
@@ -94,7 +94,7 @@ class BlockDefinitionTest extends TestCase
 	 */
 	public function getRules_WhenDefinitionHasMinValueRule_TransformsMinValueRule()
 	{
-		$bv = new BlockValidator($this->block);
+		$bv = new BlockBroker($this->block);
 		$rules = $bv->getRules();
 
 		$this->assertArrayHasKey('number_of_widgets', $rules);
@@ -107,7 +107,7 @@ class BlockDefinitionTest extends TestCase
 	 */
 	public function getRules_WhenDefinitionHasMaxValueRule_TransformsMaxValueRule()
 	{
-		$bv = new BlockValidator($this->block);
+		$bv = new BlockBroker($this->block);
 		$rules = $bv->getRules();
 
 		$this->assertArrayHasKey('number_of_widgets', $rules);
@@ -125,7 +125,7 @@ class BlockDefinitionTest extends TestCase
         $file = RegionDefinition::locateDefinition('test-region');
         $region = RegionDefinition::fromDefinitionFile($file);
 
-		$bv = new BlockValidator($this->block);
+		$bv = new BlockBroker($this->block);
 		$rules = $bv->getRegionConstraintRules($region);
 
 		$this->assertArrayHasKey('definition_name', $rules);
@@ -139,7 +139,7 @@ class BlockDefinitionTest extends TestCase
 	 */
 	public function getValidator_ReturnsValidatorInstance()
 	{
-		$bv = new BlockValidator($this->block);
+		$bv = new BlockBroker($this->block);
 		$this->assertInstanceOf(LaravelValidator::class, $bv->getValidator());
 	}
 
@@ -148,7 +148,7 @@ class BlockDefinitionTest extends TestCase
 	 */
 	public function getValidator_SetsRulesOnValidator()
 	{
-		$bv = new BlockValidator($this->block);
+		$bv = new BlockBroker($this->block);
 
 		$rules = $bv->getRules();
 		$validator = $bv->getValidator();
@@ -161,7 +161,7 @@ class BlockDefinitionTest extends TestCase
 	 */
 	public function getValidator_WhenDataIsProvided_SetsDataOnValidator()
 	{
-		$bv = new BlockValidator($this->block);
+		$bv = new BlockBroker($this->block);
 
 		$data = [ 'number_of_widgets' => 23 ];
 		$validator = $bv->getValidator($data);
@@ -174,7 +174,7 @@ class BlockDefinitionTest extends TestCase
 	 */
 	public function getValidator_WhenMessagesAreProvided_SetsMessagesOnValidator()
 	{
-		$bv = new BlockValidator($this->block);
+		$bv = new BlockBroker($this->block);
 
 		$messages = [ 'number_of_widgets' => 'Foobar!' ];
 		$validator = $bv->getValidator([], $messages);
@@ -189,7 +189,7 @@ class BlockDefinitionTest extends TestCase
 	 */
 	public function validate_WhenInvalid_ThrowsException()
 	{
-		$bv = new BlockValidator($this->block);
+		$bv = new BlockBroker($this->block);
 
 		$data = [ 'number_of_widgets' => 101 ];
 

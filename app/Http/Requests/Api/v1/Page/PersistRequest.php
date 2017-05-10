@@ -5,9 +5,9 @@ use Gate;
 use App\Models\Page;
 use Illuminate\Validation\Rule;
 use App\Http\Requests\FormRequest;
+use App\Validation\Brokers\BlockBroker;
 use App\Models\Definitions\Block as BlockDefinition;
 use App\Models\Definitions\Region as RegionDefinition;
-use App\Validation\DefinitionValidators\BlockValidator;
 
 class PersistRequest extends FormRequest
 {
@@ -80,16 +80,16 @@ class PersistRequest extends FormRequest
                     $blockDefinition = BlockDefinition::fromDefinitionFile($file);
 
                     // ...load the validation rules from the definition...
-                    $bv = new BlockValidator($blockDefinition);
+                    $bb = new BlockBroker($blockDefinition);
 
                     // ...merge any region constraint validation rules...
-                    foreach($bv->getRegionConstraintRules($regionDefinition) as $field => $ruleset){
+                    foreach($bb->getRegionConstraintRules($regionDefinition) as $field => $ruleset){
                         $key = sprintf('blocks.%s.%d.%s', $region, $delta, $field);
                         $rules[$key] = $ruleset;
                     }
 
                     // ...and then merge the block field validation rules.
-                    foreach($bv->getRules() as $field => $ruleset){
+                    foreach($bb->getRules() as $field => $ruleset){
                         $key = sprintf('blocks.%s.%d.fields.%s', $region, $delta, $field);
                         $rules[$key] = $ruleset;
                     }

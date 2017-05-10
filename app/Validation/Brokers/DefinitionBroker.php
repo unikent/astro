@@ -1,5 +1,5 @@
 <?php
-namespace App\Validation\DefinitionValidators;
+namespace App\Validation\Brokers;
 
 use Illuminate\Validation\ValidationException;
 use App\Models\Definitions\Block as BlockDefinition;
@@ -7,7 +7,7 @@ use App\Models\Definition\BaseDefinition as Definition;
 use Illuminate\Validation\Validator as LaravelValidator;
 use Illuminate\Support\Facades\Validator as ValidatorFacade;
 
-abstract class DefinitionValidator {
+abstract class DefinitionBroker {
 
 
 	protected $definition;
