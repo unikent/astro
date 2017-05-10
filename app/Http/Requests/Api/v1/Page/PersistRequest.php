@@ -5,6 +5,9 @@ use Gate;
 use App\Models\Page;
 use Illuminate\Validation\Rule;
 use App\Http\Requests\FormRequest;
+use App\Models\Definitions\Block as BlockDefinition;
+use App\Models\Definitions\Region as RegionDefinition;
+use App\Validation\DefinitionValidators\BlockValidator;
 
 class PersistRequest extends FormRequest
 {
@@ -62,6 +65,38 @@ class PersistRequest extends FormRequest
         $rules['site_id'][] = Rule::exists('sites', 'id');
 
         $rules['site.publishing_group_id'][] = Rule::exists('publishing_groups', 'id');
+
+        // For each block instance...
+        if($this->has('blocks')){
+            foreach($this->get('blocks') as $region => $blocks){
+                foreach($blocks as $delta => $block){
+                    // ...load the Region definition...
+                    $file = RegionDefinition::locateDefinition($region);
+                    $regionDefinition = RegionDefinition::fromDefinitionFile($file);
+
+                    // ...load the Block definition...
+                    $version = isset($block['definition_version']) ? $block['definition_version'] : null;
+                    $file = BlockDefinition::locateDefinition($block['definition_name'], $version);
+                    $blockDefinition = BlockDefinition::fromDefinitionFile($file);
+
+                    // ...load the validation rules from the definition...
+                    $bv = new BlockValidator($blockDefinition);
+
+                    // ...merge any region constraint validation rules...
+                    foreach($bv->getRegionConstraintRules($regionDefinition) as $field => $ruleset){
+                        $key = sprintf('blocks.%s.%d.%s', $region, $delta, $field);
+                        $rules[$key] = $ruleset;
+                    }
+
+                    // ...and then merge the block field validation rules.
+                    foreach($bv->getRules() as $field => $ruleset){
+                        $key = sprintf('blocks.%s.%d.fields.%s', $region, $delta, $field);
+                        $rules[$key] = $ruleset;
+                    }
+
+                }
+            }
+        }
 
         return $rules;
     }

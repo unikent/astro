@@ -31,7 +31,7 @@ class BlockValidator extends DefinitionValidator {
 	 * @param \App\Models\Definition\Region $region
 	 * @return Array
 	 */
-	public function getRegionConstraintRules(RegionDefinition $region = null)
+	public function getRegionConstraintRules(RegionDefinition $region)
 	{
 		return [
 			'definition_name' => [
