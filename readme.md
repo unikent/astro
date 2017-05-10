@@ -56,6 +56,12 @@ Fractal is used to serialize the API output in a consistent way. When an endpoin
 The API is intended to be RESTful, uses Laravel naming conventions and should make semantic use of HTTP status codes.
 
 
+#### Definitions
+At present, definition files are read from disk into the application; at a later date this should be refactored to use Redis. Definition files are versioned using their folder hierarchy, although the JSON content also contains a version key.
+
+Definitions are represented within the system as models extending `App\Models\Definitions\BaseDefinition` and implementing `App\Models\Definitions\Contracts\Definition`. Their interface is very similar to Eloquent models but they should be considered immutable objects - as objects they are intended to give definitions a proper object representation within the system. 
+
+
 #### Routes, Pages, Sites & Permissions
 Routes give hierarchy to pages within Astro and are implemented as a nested-set using Baum.
 
@@ -72,10 +78,45 @@ If a non-canoncical Route is ever involved in a path collision (i.e. by another 
 Routes and Sites are created automatically when creating a Page with a POST to `/api/v1/page`.
 
 
-#### Definitions
-At present, definition files are read from disk into the application; at a later date this should be refactored to use Redis. Definition files are versioned using their folder hierarchy, although the JSON content also contains a version key.
+#### Blocks and Pages
+Block instances are created when creating or updating a Page (by a POST to `/api/v1/page`, or a PUT to `/api/v1/page/ID`. 
 
-Definitions are represented within the system as models extending `App\Models\Definitions\BaseDefinition` and implementing `App\Models\Definitions\Contracts\Definition`. Their interface is very similar to Eloquent models but they should be considered immutable objects - as objects they are intended to give definitions a proper object representation within the system. 
+It is important to send ALL Block instances to the server when persisting a Page as **all existing block instances are removed** as a part of the persitance proces. Block instances are then re/created based on the submission **matching the order in which they were submitted**.
+
+
+````
+{
+	"data": {
+		...
+
+		"blocks": {
+			"main": [
+				{
+					"definition_name": "test-block",
+					"definition_version": 1
+				},
+
+				{
+					"definition_name": "test-block",
+					"definition_version": 1
+				},
+
+				...
+			]
+		}
+	}
+}
+````
+
+It is possible for Block definitions to contain validation rules, and for Region definitions to list compatible Blocks. This needs to be validated when persisting Block instances. This is currently implemented by the `App\Models\Api\v1\Page\PersistRequest` class using a the `BlockBroker` class:
+
+ - `PersistRequest` defines its own validation rules in the usual way (as a standard FormRequest);
+ - the `getRules()` method also loads Block and Region definitions based on the submitted data;
+ - a `App\Validation\Brokers\BlockBroker` is then instantiated for each Block instance submitted (this class transforms the validation rules in the block definition to their Laravel-compatible equivalents);
+ - the rules are then extracted from the `BlockBroker` and merged into the default ruleset within `PersistRequest`
+
+The `BlockBroker` also supports `getRegionConstraintRules`, where a Region definition is the only parameter. This validates that the `definition_name` on the Block instance is allowed in the given Region.
+
 
 ### Testing
 PHPUnit has a good level of code coverage across the entire application. 
