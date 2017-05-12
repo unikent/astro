@@ -410,8 +410,6 @@ class PageControllerTest extends ApiControllerTestCase {
      */
     public function update_WhenUnauthenticated_Returns401(){
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
-        $route->makeActive();
-
         $page = $route->page;
 
         $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $this->getAttrs());
@@ -424,8 +422,6 @@ class PageControllerTest extends ApiControllerTestCase {
      */
     public function update_WhenAuthenticated_ChecksAuthorization(){
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
-        $route->makeActive();
-
         $page = $route->page;
 
         Gate::shouldReceive('authorize')->with('update', Mockery::on(function($model) use ($page){
@@ -444,8 +440,6 @@ class PageControllerTest extends ApiControllerTestCase {
         $this->authenticatedAndUnauthorized();
 
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
-        $route->makeActive();
-
         $page = $route->page;
 
         $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $this->getAttrs());
@@ -470,8 +464,6 @@ class PageControllerTest extends ApiControllerTestCase {
         $this->authenticatedAndAuthorized();
 
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
-        $route->makeActive();
-
         $page = $route->page;
 
         $attrs = $this->getAttrs($page, $route); // Use the existing Page and Route, but update title
@@ -488,8 +480,6 @@ class PageControllerTest extends ApiControllerTestCase {
         $this->authenticatedAndAuthorized();
 
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
-        $route->makeActive();
-
         $page = $route->page;
 
         $attrs = $this->getAttrs($page, $route);

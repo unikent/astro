@@ -29,7 +29,7 @@ class Page extends Model
 
 	public function canonical()
 	{
-		return $this->hasOne(Route::class, 'page_id')->where('is_canonical', '=', true);
+		return $this->hasOne(Route::class, 'page_id')->canonical();
 	}
 
 	public function routes()
@@ -67,19 +67,10 @@ class Page extends Model
 			throw new Exception('You cannot publish a page with unsaved changes.');
 		}
 
-		// Ensure that Blocks/Canonical are both loaded and fresh
-		$this->load([ 'blocks', 'canonical' ]);
-
 		DB::beginTransaction();
 
 		try {
-			// Create our PublishedPage, bake it with Fractal
-			$published = new PublishedPage;
-			$published->page_id = $this->getKey();
-			$published->bake = fractal($this, $transformer)->parseIncludes([ 'blocks', 'canonical' ])->toJson();
-			$published->save();
-
-			// And update any inactive Routes
+			// Attempt to load any inactive routes, if there are any we need to make them active and canonical
 			$route = $this->routes()->active(false)->limit(1)->first();
 
 			if($route){
@@ -87,13 +78,20 @@ class Page extends Model
 				$route->makeCanonical();
 			}
 
+			$this->load([ 'blocks', 'canonical' ]);
+
+			// Create our PublishedPage, bake it with Fractal
+			$published = new PublishedPage;
+			$published->page_id = $this->getKey();
+			$published->bake = fractal($this, $transformer)->parseIncludes([ 'blocks', 'canonical' ])->toJson();
+			$published->save();
+
 			DB::commit();
 		} catch(Exception $e){
 			DB::rollback();
 			throw $e;
 		}
 	}
-
 
 
 	/**
