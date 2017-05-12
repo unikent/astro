@@ -440,7 +440,7 @@ class PersistRequestTest extends RequestTestCase
         $existing = factory(Route::class)->states('withPage', 'withParent')->create();
         $existing->makeCanonical();
 
-        $alternative = factory(Route::class)->create([ 'parent_id' => $existing->parent_id, 'page_id' => $existing->page_id, 'is_canonical' => false ]);
+        $alternative = factory(Route::class)->create([ 'parent_id' => $existing->parent_id, 'page_id' => $existing->page_id ]);
 
         $attrs = $this->getAttrs();
         $attrs['route']['slug'] = $alternative->slug;
