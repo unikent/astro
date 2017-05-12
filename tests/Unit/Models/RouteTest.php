@@ -14,10 +14,123 @@ class RouteTest extends TestCase
 	/**
 	 * @test
 	 */
+	function scopeActive_ReturnsActiveRoutesOnly()
+	{
+		$routes = factory(Route::class, 2)->states('withPage', 'withParent')->create()->each(function($r) {
+	        $r->makeCanonical();
+	    });
+
+		factory(Route::class, 2)->states('withPage', 'withParent')->create();
+
+		$results = Route::canonical()->get()->pluck('id');
+		$this->assertContains($routes[0]->getKey(), $results);
+		$this->assertContains($routes[1]->getKey(), $results);
+	}
+
+	/**
+	 * @test
+	 */
+	function scopeActive_WithFalseArgument_ReturnsInactiveRoutesOnly()
+	{
+		factory(Route::class, 2)->states('withPage', 'withParent')->create()->each(function($r) {
+	        $r->makeCanonical();
+	    });
+
+		$routes = factory(Route::class, 2)->states('withPage', 'withParent')->create();
+
+		$results = Route::canonical(false)->get()->pluck('id');
+		$this->assertContains($routes[0]->getKey(), $results);
+		$this->assertContains($routes[1]->getKey(), $results);
+	}
+
+
+	/**
+	 * @test
+	 */
+	function setIsActiveAttribute_WhenFalsey_ThrowsException()
+	{
+		$route = factory(Route::class)->make();
+		$this->expectException(Exception::class);
+
+		$route->is_canonical = false;
+	}
+
+	/**
+	 * @test
+	 */
+	function setIsActiveAttribute_WhenTruthy_ThrowsException()
+	{
+		$route = factory(Route::class)->make();
+		$this->expectException(Exception::class);
+
+		$route->is_canonical = true;
+	}
+
+	/**
+	 * @test
+	 */
+	public function isActive_WhenIsActiveIsTrue_ReturnsTrue()
+	{
+		$route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
+		$route->makeActive();
+
+		$this->assertTrue($route->isActive());
+	}
+
+	/**
+	 * @test
+	 */
+	public function isActive_WhenIsActiveIsFalse_ReturnsFalse()
+	{
+		$route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
+		$this->assertFalse($route->isActive());
+	}
+
+	/**
+	 * @test
+	 */
+	function makeActive_SetsIsActiveToTrue()
+	{
+		$route = factory(Route::class)->states('withParent', 'withPage')->create();
+		$route->makeActive();
+
+		$this->assertTrue($route->is_active);
+	}
+
+	/**
+	 * @test
+	 */
+	function makeActive_RemovesInactiveRoutesForPage()
+	{
+		$parents = factory(Route::class, 2)->states('withParent', 'withPage')->create();
+		$parents[0]->makeActive(0);
+
+		$routes = factory(Route::class, 3)->create([ 'parent_id' => $parents[0]->getKey(), 'page_id' => $parents[0]->page->getKey() ]);
+		$count = $parents[0]->page->routes()->active(false)->count();
+
+		$routes[2]->makeActive();
+
+		// Does not delete inactive Routes on another page
+		$this->assertEquals(1, $parents[1]->page->routes()->active(false)->count());
+
+		// Does not delete active Routes on the same page
+		$this->assertEquals(2, $parents[0]->page->routes()->active()->count());
+
+		// Does delete other inactive Routes on the same page
+		$this->assertEquals(0, $parents[0]->page->routes()->active(false)->count());
+	}
+
+
+	/**
+	 * @test
+	 */
 	function scopeCanonical_ReturnsCanonicalRoutesOnly()
 	{
-		$routes = factory(Route::class, 2)->states('withPage', 'withParent')->create([ 'is_canonical' => true ]);
-		factory(Route::class, 2)->states('withPage', 'withParent')->create([ 'is_canonical' => false ]);
+		$routes = factory(Route::class, 2)->states('withPage', 'withParent')->create()->each(function($r) {
+	        $r->makeCanonical();
+	    });
+
+		factory(Route::class, 2)->states('withPage', 'withParent')->create();
 
 		$results = Route::canonical()->get()->pluck('id');
 		$this->assertContains($routes[0]->getKey(), $results);
@@ -29,14 +142,38 @@ class RouteTest extends TestCase
 	 */
 	function scopeCanonical_WithFalseArgument_ReturnsNonCanonicalRoutesOnly()
 	{
-		factory(Route::class, 2)->states('withPage', 'withParent')->create([ 'is_canonical' => true ]);
-		$routes = factory(Route::class, 2)->states('withPage', 'withParent')->create([ 'is_canonical' => false ]);
+		factory(Route::class, 2)->states('withPage', 'withParent')->create()->each(function($r) {
+	        $r->makeCanonical();
+	    });
+
+		$routes = factory(Route::class, 2)->states('withPage', 'withParent')->create();
 
 		$results = Route::canonical(false)->get()->pluck('id');
 		$this->assertContains($routes[0]->getKey(), $results);
 		$this->assertContains($routes[1]->getKey(), $results);
 	}
 
+	/**
+	 * @test
+	 */
+	function setIsCanonicalAttribute_WhenFalsey_ThrowsException()
+	{
+		$route = factory(Route::class)->make();
+		$this->expectException(Exception::class);
+
+		$route->is_canonical = false;
+	}
+
+	/**
+	 * @test
+	 */
+	function setIsCanonicalAttribute_WhenTruthy_ThrowsException()
+	{
+		$route = factory(Route::class)->make();
+		$this->expectException(Exception::class);
+
+		$route->is_canonical = true;
+	}
 
 	/**
 	 * @test
@@ -56,11 +193,9 @@ class RouteTest extends TestCase
 	{
 		$parent = factory(Route::class)->states('withParent', 'withPage')->create();
 
-		$routes = factory(Route::class, 3)->create([
-			'is_canonical' => true,
-			'parent_id' => $parent->getKey(),
-			'page_id' => $parent->page->getKey(),
-		]);
+		$routes = factory(Route::class, 3)->create([ 'parent_id' => $parent->getKey(), 'page_id' => $parent->page->getKey() ])
+			->each(function($r){ $r->makeCanonical(); })
+		;
 
 		$routes[1]->makeCanonical();
 
@@ -73,23 +208,23 @@ class RouteTest extends TestCase
 		$this->assertFalse($routes[2]->is_canonical);
 	}
 
-
-
 	/**
 	 * @test
 	 */
 	public function isCanonical_WhenIsCanonicalIsTrue_ReturnsTrue()
 	{
-		$route = factory(Route::class)->make([ 'is_canonical' => true ]);
+		$route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
+		$route->makeCanonical();
+
 		$this->assertTrue($route->isCanonical());
 	}
 
 	/**
 	 * @test
 	 */
-	public function isCanonical_WhenIsCanonicalIsFase_ReturnsFalse()
+	public function isCanonical_WhenIsCanonicalIsFalse_ReturnsFalse()
 	{
-		$route = factory(Route::class)->make([ 'is_canonical' => false ]);
+		$route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
 		$this->assertFalse($route->isCanonical());
 	}
 

@@ -21,6 +21,7 @@ class Route extends BaumNode
 	];
 
 	protected $casts = [
+        'is_active' => 'boolean',
         'is_canonical' => 'boolean',
 	];
 
@@ -65,6 +66,62 @@ class Route extends BaumNode
 
 
     /**
+     * Scope a query to only include active routes.
+     *
+     * @param Builder $query
+     * @param boolean $value
+     * @return Builder
+     */
+	public function scopeActive(Builder $query, $value = true)
+	{
+		return $query->where('is_active', '=', $value);
+	}
+
+	/**
+	 * Returns true if is_active is true, else false
+	 * @return boolean
+	 */
+	public function isActive()
+	{
+		return $this->is_active;
+	}
+
+	/**
+	 * Sets is_active only if the value is falsey. Enforces use of makeActive()
+	 * by throwing an Exception if a truthy value is set.
+	 *
+	 * @param $value
+	 * @throws Exception
+	 */
+	public function setIsActiveAttribute($value){
+		throw new Exception('The is_active property cannot be set directly. Please use makeActive.');
+	}
+
+	/**
+	 * Sets is_active to true on this route, and destroys any other routes
+	 * that are not yet active.
+	 *
+	 * @return void
+	 */
+	public function makeActive()
+	{
+		DB::beginTransaction();
+
+		try {
+			$this->attributes['is_active'] = true;
+			$this->save();
+
+			static::where('page_id', $this->page_id)->active(false)->delete();
+
+			DB::commit();
+		} catch(Exception $e){
+			DB::rollback();
+			throw $e;
+		}
+	}
+
+
+    /**
      * Scope a query to only include canonical routes.
      *
      * @param Builder $query
@@ -74,6 +131,16 @@ class Route extends BaumNode
 	public function scopeCanonical(Builder $query, $value = true)
 	{
 		return $query->where('is_canonical', '=', $value);
+	}
+
+	/**
+	 * Ensures that is_canonical cannot be set directly.
+	 *
+	 * @param $value
+	 * @throws Exception
+	 */
+	public function setIsCanonicalAttribute($value){
+		throw new Exception('The is_canonical attribute cannot be set directly. Use makeCanonical.');
 	}
 
 	/**
@@ -91,7 +158,7 @@ class Route extends BaumNode
 				->where('is_canonical', '=', true)
 				->update([ 'is_canonical' => false ]);
 
-			$this->is_canonical = true;
+			$this->attributes['is_canonical'] = true;
 			$this->save();
 
 			DB::commit();
