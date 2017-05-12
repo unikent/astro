@@ -18,6 +18,9 @@ class CreatePublishedPagesTable extends Migration
             $table->integer('page_id')->unsigned();
 
             $table->mediumText('bake');
+
+            $table->integer('created_by')->nullable();
+            $table->integer('updated_by')->nullable();
             $table->timestamps();
 
             $table->foreign('page_id', 'published_pages_page_id_fk')->references('id')->on('pages')->onDelete('cascade');

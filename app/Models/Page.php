@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use DB;
+use Exception;
 use App\Models\Traits\Tracked;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Definitions\Layout as LayoutDefinition;
+use League\Fractal\TransformerAbstract as FractalTransformer;
 
 class Page extends Model
 {
@@ -19,7 +22,6 @@ class Page extends Model
 
 	protected $casts = [
         'options' => 'json',
-        'is_published' => 'boolean',
 	];
 
 	protected $layoutDefinition = null;
@@ -39,6 +41,59 @@ class Page extends Model
 	{
 		return $this->hasMany(Block::class, 'page_id');
 	}
+
+	public function published()
+	{
+		return $this->hasOne(PublishedPage::class, 'page_id')->latest()->limit(1);
+	}
+
+	public function history()
+	{
+		return $this->hasMany(PublishedPage::class, 'page_id');
+	}
+
+
+	/**
+	 * Creates a PublishedPage by baking the Page to JSON with Fractal.
+	 * If the Page is dirty, an exception will be thrown.
+	 *
+	 * @param \League\Fractal\TransformerAbstract $transformer
+	 * @return void
+	 * @throws Exception
+	 */
+	public function publish(FractalTransformer $transformer)
+	{
+		if($this->isDirty()){
+			throw new Exception('You cannot publish a page with unsaved changes.');
+		}
+
+		// Ensure that Blocks/Canonical are both loaded and fresh
+		$this->load([ 'blocks', 'canonical' ]);
+
+		DB::beginTransaction();
+
+		try {
+			// Create our PublishedPage, bake it with Fractal
+			$published = new PublishedPage;
+			$published->page_id = $this->getKey();
+			$published->bake = fractal($this, $transformer)->parseIncludes([ 'blocks', 'canonical' ])->toJson();
+			$published->save();
+
+			// And update any inactive Routes
+			$route = $this->routes()->active(false)->limit(1)->first();
+
+			if($route){
+				$route->makeActive();
+				$route->makeCanonical();
+			}
+
+			DB::commit();
+		} catch(Exception $e){
+			DB::rollback();
+			throw $e;
+		}
+	}
+
 
 
 	/**
