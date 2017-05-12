@@ -787,4 +787,81 @@ class PersistRequestTest extends RequestTestCase
         $validator->passes();
         $this->assertCount(1, $validator->errors()->get('site.publishing_group_id'));
     }
+
+
+
+
+    /**
+     * @test
+     * @group validation
+     * @group integration
+     */
+    public function validation_WhenBlocksArePresent_MergesBlockDefinitionRulesIntoValidator()
+    {
+        $attrs = $this->getAttrs();
+
+        $attrs['blocks'] = [
+            'test-region' => [
+                0 => [
+                    'definition_name' => 'test-block',
+                ]
+            ]
+        ];
+
+        $request = $this->mockRequest('POST', $attrs);
+        $validator = $request->getValidatorInstance();
+
+        $rules = $validator->getRules();
+        $this->assertArrayHasKey('blocks.test-region.0.fields.title_of_widget', $rules);
+        $this->assertNotEmpty($rules['blocks.test-region.0.fields.title_of_widget']);
+
+        $this->assertArrayHasKey('blocks.test-region.0.fields.number_of_widgets', $rules);
+        $this->assertNotEmpty($rules['blocks.test-region.0.fields.number_of_widgets']);
+    }
+
+    /**
+     * @test
+     * @group validation
+     * @group integration
+     */
+    public function validation_WhenBlocksArePresent_MergesRegionConstraintRulesIntoValidator()
+    {
+        $attrs = $this->getAttrs();
+
+        $attrs['blocks'] = [
+            'test-region' => [
+                0 => [
+                    'definition_name' => 'test-block',
+                ]
+            ]
+        ];
+
+        $request = $this->mockRequest('POST', $attrs);
+        $validator = $request->getValidatorInstance();
+
+        $rules = $validator->getRules();
+        $this->assertArrayHasKey('blocks.test-region.0.definition_name', $rules);
+        $this->assertEquals('in:test-block', $rules['blocks.test-region.0.definition_name'][0]);
+    }
+
+
+    /**
+     * @test
+     * @group validation
+     * @group integration
+     */
+    public function validation_WheRegionIsPresentButIsEmpty_DoesNotMergeRegionConstraintRulesIntoValidator()
+    {
+        $attrs = $this->getAttrs();
+
+        $attrs['blocks'] = [
+            'test-region' => []
+        ];
+
+        $request = $this->mockRequest('POST', $attrs);
+        $validator = $request->getValidatorInstance();
+
+        $rules = $validator->getRules();
+        $this->assertArrayNotHasKey('blocks.test-region.0.definition_name', $rules);
+    }
 }

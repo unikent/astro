@@ -18,6 +18,7 @@ class PageController extends ApiController
 
 	/**
 	 * GET /api/v1/page/{page}
+	 * This endpoint supports 'include'.
 	 *
 	 * @param  Request $request
 	 * @param  Page $page
@@ -27,7 +28,6 @@ class PageController extends ApiController
 		$this->authorize('read', $page);
 		return fractal($page, new PageTransformer)->parseIncludes($request->get('include'))->respond();
 	}
-
 
 	/**
 	 * POST /api/v1/page
@@ -123,8 +123,8 @@ class PageController extends ApiController
 			$route->makeCanonical();
 
 			// Populate the regions with Blocks
-			if($request->has('regions')){
-				foreach($request->input('regions') as $region => $blocks){
+			if($request->has('blocks')){
+				foreach($request->input('blocks') as $region => $blocks){
 					// Remove any existing Blocks in the region (to avoid re-ordering existing)
 					$page->clearRegion($region);
 
