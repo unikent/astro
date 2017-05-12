@@ -1,4 +1,5 @@
 <?php
+use App\Http\Transformers\Api\v1\PageTransformer;
 
 $factory->define(App\Models\Route::class, function (Faker\Generator $faker) {
 	return [
