@@ -64,6 +64,10 @@ class Route extends BaumNode
 		return $this->belongsTo(Page::class, 'page_id');
 	}
 
+	public function published_page()
+	{
+		return $this->hasOne(PublishedPage::class, 'page_id', 'page_id')->latest()->limit(1);
+	}
 
     /**
      * Scope a query to only include active routes.
