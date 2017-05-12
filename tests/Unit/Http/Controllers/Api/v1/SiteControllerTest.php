@@ -55,7 +55,9 @@ class SiteControllerTest extends ApiControllerTestCase {
      * @test
      */
     public function index_WhenAuthorizedAndFound_ReturnsJson(){
-        $routes = factory(Route::class, 3)->states([ 'withPage', 'withParent', 'withSite' ])->create([ 'is_canonical' => true ]);
+        $routes = factory(Route::class, 3)->states([ 'withPage', 'withParent', 'withSite' ])->create()
+            ->each(function($r){ $r->makeCanonical(); });
+
 
         factory(Route::class)->create([
             'parent_id' => $routes[0]->parent_id,
@@ -78,7 +80,9 @@ class SiteControllerTest extends ApiControllerTestCase {
      * @test
      */
     public function index_WhenAuthorizedAndFound_ReturnsCanonicalRoutesInJson(){
-        $routes = factory(Route::class, 3)->states([ 'withPage', 'withParent', 'withSite' ])->create([ 'is_canonical' => true ]);
+        $routes = factory(Route::class, 3)->states([ 'withPage', 'withParent', 'withSite' ])->create()
+            ->each(function($r){ $r->makeCanonical(); });
+
 
         $this->authenticatedAndAuthorized();
 
@@ -225,7 +229,9 @@ class SiteControllerTest extends ApiControllerTestCase {
      * @group authentication
      */
     public function tree_WhenUnauthenticated_Returns401(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent', 'withSite' ])->create([ 'is_canonical' => true ]);
+        $route = factory(Route::class)->states([ 'withPage', 'withParent', 'withSite' ])->create();
+        $route->makeCanonical();
+
         $site = $route->site;
 
         $response = $this->action('GET', SiteController::class . '@tree', [ $site->getKey() ]);
@@ -237,7 +243,9 @@ class SiteControllerTest extends ApiControllerTestCase {
      * @group authorization
      */
     public function tree_WhenAuthenticated_ChecksAuthorization(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent', 'withSite' ])->create([ 'is_canonical' => true ]);
+        $route = factory(Route::class)->states([ 'withPage', 'withParent', 'withSite' ])->create();
+        $route->makeCanonical();
+
         $site = $route->site;
 
         Gate::shouldReceive('authorize')->with('read', Mockery::type(Site::class))->once();
@@ -251,7 +259,9 @@ class SiteControllerTest extends ApiControllerTestCase {
      * @group authorization
      */
     public function tree_WhenAuthenticatedAndUnauthorized_Returns403(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent', 'withSite' ])->create([ 'is_canonical' => true ]);
+        $route = factory(Route::class)->states([ 'withPage', 'withParent', 'withSite' ])->create();
+        $route->makeCanonical();
+
         $site = $route->site;
 
         $this->authenticatedAndUnauthorized();
@@ -274,7 +284,9 @@ class SiteControllerTest extends ApiControllerTestCase {
      * @test
      */
     public function tree_WhenAuthorizedAndFound_Returns200(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent', 'withSite' ])->create([ 'is_canonical' => true ]);
+        $route = factory(Route::class)->states([ 'withPage', 'withParent', 'withSite' ])->create();
+        $route->makeCanonical();
+
         $site = $route->site;
 
         $this->authenticatedAndAuthorized();
@@ -287,10 +299,16 @@ class SiteControllerTest extends ApiControllerTestCase {
      * @test
      */
     public function tree_WhenAuthorizedAndFound_ReturnsJsonOfSiteRoutesAsHierarchy(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent', 'withSite' ])->create([ 'is_canonical' => true ]);
+        $route = factory(Route::class)->states([ 'withPage', 'withParent', 'withSite' ])->create();
+        $route->makeCanonical();
 
-        $l1 = factory(Route::class, 2)->states([ 'withPage' ])->create([ 'parent_id' => $route->getKey(), 'is_canonical' => true ]);
-        $l2 = factory(Route::class, 2)->states([ 'withPage' ])->create([ 'parent_id' => $l1[0]->getKey(), 'is_canonical' => true ]);
+        $l1 = factory(Route::class, 2)->states([ 'withPage' ])->create([ 'parent_id' => $route->getKey() ])->each(function($r){
+            $r->makeCanonical();
+        });
+
+        $l2 = factory(Route::class, 2)->states([ 'withPage' ])->create([ 'parent_id' => $l1[0]->getKey() ])->each(function($r){
+            $r->makeCanonical();
+        });
 
         $site = $route->site;
 
