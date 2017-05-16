@@ -97,6 +97,145 @@ class PageTest extends TestCase
 	/**
 	 * @test
 	 */
+	public function revert_WhenPageHasUnsavedChanges_ThrowsException()
+	{
+		$route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+		$route->page->publish(new PageTransformer);
+
+		$route->page->title = 'Foobar!';
+
+		$this->expectException(Exception::class);
+		$route->page->revert($route->page->published);
+	}
+
+	/**
+	 * @test
+	 */
+	public function revert_WhenPublishedPageIsNotAssociatedWithPage_ThrowsException()
+	{
+		$r1 = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+		$r1->page->publish(new PageTransformer);
+
+		$r2 = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+		$r2->page->publish(new PageTransformer);
+
+		$this->expectException(Exception::class);
+		$r1->page->revert($r2->page->published);
+	}
+
+	/**
+	 * @test
+	 */
+	public function revert_RevertsPageToMatchPublishedPage()
+	{
+		$route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+		$page = $route->page;
+
+		$page->publish(new PageTransformer);
+
+		$title = $page->title;
+		$page->title = 'Foobar';
+
+		$layout = $page->layout_name;
+		$page->layout_name = 'fizzbuzz17';
+
+		$page->save();
+		$this->assertEquals('Foobar', $page->title);
+		$this->assertEquals('fizzbuzz17', $page->layout_name);
+
+		$page->revert($page->published);
+		$this->assertEquals($title, $page->title);
+		$this->assertEquals($layout, $page->layout_name);
+	}
+
+	/**
+	 * @test
+	 */
+	public function revert_RevertsBlocksToMatchPublishedPage()
+	{
+		$route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+		$page = $route->page;
+
+		$blocks = factory(Block::class, 2)->create([ 'page_id' => $page->getKey(), 'region_name' => 'test-region' ]);
+		$page->publish(new PageTransformer);
+
+		$moreBlocks = factory(Block::class, 3)->create([ 'page_id' => $page->getKey(), 'region_name' => 'test-region' ]);
+
+		$page = $page->fresh();
+		$this->assertCount(5, $page->blocks);
+
+		$page->revert($page->published);
+		$this->assertCount(2, $page->blocks);
+	}
+
+	/**
+	 * @test
+	 */
+	public function revert_RemovesInactiveRoutes()
+	{
+		$r1 = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+		$r1->page->publish(new PageTransformer);
+
+		$r2 = factory(Route::class)->states([ 'isRoot' ])->create([ 'page_id' => $r1->page->getKey() ]);
+
+		$page = $r1->page->fresh();
+		$this->assertCount(1, $page->routes()->active(false)->get());
+
+		$page->revert($page->published);
+		$this->assertCount(0, $page->routes()->active(false)->get());
+		$this->assertCount(1, $page->routes);
+	}
+
+	/**
+	 * @test
+	 */
+	public function revert_RevertsCanonicalToMatchPublishedCanonical()
+	{
+		$r1 = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+		$r1->page->publish(new PageTransformer);
+
+		$r2 = factory(Route::class)->states([ 'isRoot' ])->create([ 'page_id' => $r1->page->getKey() ]);
+		$r2->makeActive();
+		$r2->makeCanonical();
+
+		$page = $r1->page->fresh();
+		$this->assertEquals($r2->getKey(), $page->canonical->getKey());
+
+		$page->revert($page->published);
+
+		$this->assertCount(2, $page->routes);
+		$this->assertEquals($r1->getKey(), $page->canonical->getKey());
+	}
+
+	/**
+	 * @test
+	 */
+	public function revert_WhenPublishedPageCanonicalHasBeenReassigned_DoesNotRevertCanonical()
+	{
+		$r1 = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
+		$r1->page->publish(new PageTransformer);
+
+		$r2 = factory(Route::class)->create([ 'page_id' => $r1->page->getKey(), 'parent_id' => $r1->parent_id ]);
+		$r2->page->publish(new PageTransformer);
+
+		$p1 = $r1->page->fresh();
+
+		// Re-assign the Route to a new Page (at the same level in the tree)
+		$p2 = factory(Page::class)->create();
+		$r1->page_id = $p2->getKey();
+		$r1->save();
+
+		$p1->revert($p1->history->first());
+
+		$this->assertCount(1, $p1->routes);
+		$this->assertEquals($r2->getKey(), $p1->canonical->getKey());
+	}
+
+
+
+	/**
+	 * @test
+	 */
 	public function clearRegion_DeletesAllBlocksForGivenPageAndRegion()
 	{
 		$page = factory(Page::class)->create();

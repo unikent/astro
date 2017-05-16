@@ -95,6 +95,68 @@ class Page extends Model
 
 
 	/**
+	 * Restores a Page from a PublishedPage instance.
+	 *
+	 * All Block instances are replaced with those defined by the bake. If
+	 * the canonical Route present in the bake is found, it is restored to
+	 * Canonical status. All inactive Routes are removed.
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function revert(PublishedPage $published){
+		if($this->getKey() !== $published->page_id){
+			throw new Exception('PublishedPage must be related to this Page');
+		}
+
+		if($this->isDirty()){
+			throw new Exception('A Page must be in a clean state in order to revert.');
+		}
+
+		DB::beginTransaction();
+
+		try {
+			$baked = json_decode($published->bake, TRUE);
+			$baked = $baked['data'];
+
+			// Restore the Page object
+			$this->fill($baked);
+			$this->save();
+
+			// Remove inactive Routes
+			$this->routes()->active(false)->delete();
+
+			// Restore the Route (provided it is still associated with this Page).
+			if(isset($baked['canonical'])){
+				$route = $this->routes->find($baked['canonical']['id']);
+				if($route) $route->makeCanonical();
+			}
+
+			// Restore the Block instances
+			$this->blocks()->delete();
+
+			if(isset($baked['blocks'])){
+				foreach($baked['blocks'] as $region => $blocks){
+					foreach($blocks as $data){
+						$block = new Block;
+						$block->page_id = $this->getKey();
+						$block->fill($data);
+						$block->save();
+					}
+				}
+			}
+
+			DB::commit();
+		} catch(Exception $e){
+			DB::rollback();
+			throw $e;
+		}
+
+		$this->load('blocks', 'canonical', 'routes');
+	}
+
+
+	/**
 	 * Loads the Layout definition, optionally including Regions
 	 *
 	 * @param boolean $includeRegions
