@@ -28,12 +28,10 @@ class PageController extends ApiController
 		return fractal($page, new PageTransformer)->parseIncludes($request->get('include'))->respond();
 	}
 
-
 	/**
 	 * POST /api/v1/page
 	 *
 	 * @param  StoreRequest $request
-	 * @param  Page $page
 	 * @return Response
 	 */
 	public function store(PersistRequest $request){
@@ -54,6 +52,20 @@ class PageController extends ApiController
 	public function update(PersistRequest $request, Page $page){
 		$this->process($request, $page); // Handles authorization and persistance
 		return fractal($page, new PageTransformer)->respond();
+	}
+
+	/**
+	 * POST /api/v1/page/{page}/publish
+	 *
+	 * @param  Request $request
+	 * @param  Page $page
+	 * @return Response
+	 */
+	public function publish(Request $request, Page $page){
+		$this->authorize('publish', $page);
+
+		$page->publish(new PageTransformer);
+		return response([ 'data' => $page->published->bake ], 200);
 	}
 
 	/**
@@ -96,14 +108,19 @@ class PageController extends ApiController
 			// Associate the Route with the Page
 			$route->page_id = $page->getKey();
 
-			// Now that we have a populated Route object, lets save the Route
+			// Now that we have a Route object, lets save it...
 			$route->save();
 
-			// Create/Update the Site, if appropriate
+			// ...and ensure that there are no other inactive Routes for this page
+			$page->routes()->where($route->getKeyName(), '!=', $route->getKey())->active(false)->delete();
+
+			// If a Site ID is present, attempt to retrieve the existing Site model.
 			if($request->has('site_id')){
 				$site = Site::findOrFail($request->get('site_id'));
 			}
 
+			// If site attributes are present, update the Site (or create a new one)
+			// Then ensure that the Route is associated with the given Site.
 			if($request->has('site')){
 				$site = isset($site) ? $site : new Site;
 				$site->fill($request->get('site'));
@@ -111,16 +128,13 @@ class PageController extends ApiController
 
 				$this->authorize($site->wasRecentlyCreated ? 'create' : 'update', $site);
 
+				// Note: makeSite takes effect immediately, and affects all published and unpublished Routes
 				$route->makeSite($site);
 			}
 
 			// Now we have a Page in a state that we can authorize, so lets do that
 			// Note: as we are within a Transaction, ALL changes will be rolled-back should authz fail
 			$this->authorize($page->wasRecentlyCreated ? 'create' : 'update', $page);
-
-			// Now we can make the Route canonical
-			// Note: we don't do this pre-authz as permissions check requires knowledge of existing canonical Route
-			$route->makeCanonical();
 
 			// Populate the regions with Blocks
 			if($request->has('regions')){

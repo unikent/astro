@@ -28,6 +28,7 @@ Route::group([ 'prefix' => 'v1', 'namespace' => 'v1' ], function(){
 	Route::delete('media/{media}', 'MediaController@destroy');
 
 	Route::resource('page', 'PageController', [ 'except' => [ 'index', 'create', 'edit' ]]);
+	Route::post('page/{page}/publish', 'PageController@publish');
 
 	Route::get('region/definitions', 'RegionController@definitions');
 	Route::get('region/{region_definition}/definition', 'RegionController@definition');
