@@ -66,7 +66,7 @@ class PageController extends ApiController
 		$this->authorize('publish', $page);
 
 		$page->publish(new PageTransformer);
-		return response([ 'data' => $page->published->bake ], 200);
+		return response($page->published->bake, 200);
 	}
 
 	/**

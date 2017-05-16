@@ -890,6 +890,34 @@ class PageControllerTest extends ApiControllerTestCase {
         $this->assertEquals($count + 1, PublishedPage::count());
     }
 
+    /**
+     * @test
+     */
+    public function publish_WhenAuthorizedAndValid_Returns200(){
+        $this->authenticatedAndAuthorized();
+
+        $route = factory(Route::class)->states('withPage', 'withParent')->create();
+        $page = $route->page;
+
+        $response = $this->action('POST', PageController::class . '@publish', [ 'page' => $page->getKey() ]);
+        $response->assertStatus(200);
+    }
+
+    /**
+     * @test
+     */
+    public function publish_WhenAuthorizedAndValid_ReturnsBakedJson(){
+        $this->authenticatedAndAuthorized();
+
+        $route = factory(Route::class)->states('withPage', 'withParent')->create();
+        $page = $route->page;
+
+        $response = $this->action('POST', PageController::class . '@publish', [ 'page' => $page->getKey() ]);
+        $json = $response->json();
+
+        $this->assertEquals(json_decode($page->published->bake, TRUE), $json);
+    }
+
 
 
     /**
