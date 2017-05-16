@@ -12,7 +12,7 @@ class PageTransformer extends FractalTransformer
 {
 
 	protected $defaultIncludes = [ 'canonical' ];
-    protected $availableIncludes = [ 'routes', 'blocks', 'layout_definition' ];
+    protected $availableIncludes = [ 'routes', 'blocks', 'layout_definition', 'published', 'history' ];
 
 	public function transform(Page $page)
 	{
@@ -87,5 +87,28 @@ class PageTransformer extends FractalTransformer
     	return new FractalItem($layoutDefinition, new LayoutDefinitionTransformer, false);
     }
 
+    /**
+     * Include Published (latest PublishedPage)
+     *
+     * @return League\Fractal\ItemResource
+     */
+    public function includePublished(Page $page)
+    {
+        if($page->published){
+            return new FractalItem($page->published, new PublishedPageTransformer, false);
+        }
+    }
+
+    /**
+     * Include History (all associated PublishedPages)
+     *
+     * @return League\Fractal\CollectionResource
+     */
+    public function includeHistory(Page $page)
+    {
+        if(!$page->history->isEmpty()){
+            return new FractalCollection($page->history, new PublishedPageTransformer, false);
+        }
+    }
 
 }

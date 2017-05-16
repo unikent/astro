@@ -233,6 +233,45 @@ class PageControllerTest extends ApiControllerTestCase {
         $this->assertEquals($block->definition_name, $json['data']['blocks']['test-region'][0]['definition']['name']);
     }
 
+    /**
+     * @test
+     */
+    public function show_WhenAuthorizedAndFoundRequestIncludesPublished_IncludesPublishedInJson(){
+        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
+        $route->page->publish(new PageTransformer);
+
+        $page = $route->page->fresh();
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('GET', PageController::class . '@show', [ 'page' => $page->getKey(), 'include' => 'published' ]);
+
+        $json = $response->json();
+        $this->assertArrayHasKey('data', $json);
+        $this->assertArrayHasKey('published', $json['data']);
+        $this->assertNotEmpty('published', $json['data']);
+    }
+
+    /**
+     * @test
+     */
+    public function show_WhenAuthorizedAndFoundRequestIncludesHistory_IncludesPublishedInHistory(){
+        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
+        $route->page->publish(new PageTransformer);
+
+        $block = factory(Block::class)->create([ 'page_id' => $route->page->getKey() ]);
+
+        $page = $route->page->fresh();
+        $route->page->publish(new PageTransformer);
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('GET', PageController::class . '@show', [ 'page' => $page->getKey(), 'include' => 'history' ]);
+
+        $json = $response->json();
+        $this->assertArrayHasKey('data', $json);
+        $this->assertArrayHasKey('history', $json['data']);
+        $this->assertCount(2, $json['data']['history']);
+    }
+
 
 
     /**
