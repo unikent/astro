@@ -57,19 +57,47 @@ The API is intended to be RESTful, uses Laravel naming conventions and should ma
 
 
 #### Routes, Pages, Sites & Permissions
-Routes give hierarchy to pages within Astro and are implemented as a nested-set using Baum.
+Pages, Routes and Sites are inter-dependent at at times it is helpful to think of them as a single conceptual unit. 
 
-A route which has neither a `slug` or a `parent_id` is considered a "root Route". All other Routes should have an ancestor within the tree and have a `slug` specified. By joining the slugs of a Route and its ancestors, a path can be generated. This is done automatically when saving a Route.
+The URL to a Page is stored by its Route, and the Route represents the position of that page within a Site's hierarchy. By associating a Site with a Route, a Page becomes the homepage of a sub-site and enters a new authorization context - a different PublishingGroup governs edit access to it.
 
-Every Route should be associated with a Page and may optionally be associated with a Site. When a Route is associated with a Site it, along with its descendants, are treated as a separate authorization context - each Site is associated with one PublishingGroup. 
+All of these objects (Page, Route, Site) are created and updated via a single API endpoint: `/api/v1/page`.
 
-When a Route is associated with a Site, its Page is the homepage of a subsite.
+Pages (and their associated Block instances) represent draft content. When a Page instance is published a new PublishedPage instance is created. The `bake` attribute a PublishedPage stores a JSON representation of the Page (its Block instances, and canonical Route) at point of publication. 
 
-It is possible for one Page to have multiple Routes (and thus multiple positions within the site hierarchy). The primary route to a page should always have the `is_canonical` flag set to true. By calling `$route->makeCanonical()` the given Route gains canonical status and all other Route instances associated with the same Page lose it. 
+A single Page may be associated with multiple PublishedPage instances (providing a publication history and audit log). The JSON `bake` stored on a PublishedPage is served as published-content via the `/api/v1/route/resolve?path=` endpoint.
 
-If a non-canoncical Route is ever involved in a path collision (i.e. by another Page at the same position in the tree), it will get re-associated.
 
-Routes and Sites are created automatically when creating a Page with a POST to `/api/v1/page`.
+##### Notes on Routes
+Routes are implemented as a tree hierarchy, using Baum (a nested-set implementation for Laravel).
+
+Normally a Route has a `parent_id` and a `slug`. The `parent_id` associates the Route with its ancestor within the tree. The `slug` provides a URL segment representing the Page. The full path to a Page is automatically generated whenever a Route is saved, by joining the slug of a Route with the slugs of its' ancestors within the tree. 
+
+There is a special case where a Route has neither a `slug` nor a `parent_id`. This is considered a "root Route" and is the start of an entirely new Route hierarchy.
+
+It is also possible for one Page to have multiple Routes (and thus multiple positions within the tree). This enables content to remain accessible via old URLs - perhaps via a 301 redirect. Only one Route per Page can have the `is_canonical` flag set to true. This cannot be set directly, but must be set by calling `$route->makeCanonical()`: the given Route gains canonical status and all other Route instances associated with the Page lose it. 
+
+When creating a new Page, if a non-canonical Route already utilises that slug and occupies the same position in the tree, it will be re-associated with the new Page object. If a similar collision occurs with a canonical Route, validation will fail.
+
+Routes also have an `is_active` flag allowing Routes associated with draft content to be inactive until publication.
+
+##### Notes on Sites
+Sites provide a useful authorization context for grouping pages. A site is associated with a PublishingGroup. A users' membership of a PublishingGroup affects their ability to edit a Page within a given Site.
+
+Sites are associated with Routes via `$route->makeSite($site)`. This will update the given Route instance, as well as all other Routes to the associated Page.
+
+To associate a Page with a site, either pass a `site_id` persisting a Page `/api/v1/page` (which will use an existing Site) or pass `site.*` parameters (which will create and associate a new Site model). 
+
+When associating a Route with a Site, the change is *immediate*, affects *all* Routes to the given Page, and is not subject to the publication/versioning system.
+
+
+##### Notes on Publishing
+Pages are published via `/api/v1/page/ID/publish`. Internally this calls `$page->publish($transformer)`. When publishing:
+ 
+ - A new PublishedPage instance is created, with the `bake` attribute populated with JSON (obtained using the Fractal `$transformer`)
+ - The latest inactive Route is made both active, and canonical. 
+ - All other inactive Routes for the given Page are purged.
+
 
 
 #### Definitions
