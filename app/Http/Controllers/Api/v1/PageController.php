@@ -8,6 +8,7 @@ use App\Models\Site;
 use App\Models\Block;
 use App\Models\Route;
 use Illuminate\Http\Request;
+use App\Models\PublishedPage;
 use App\Http\Requests\Api\v1\Page\PersistRequest;
 use App\Http\Transformers\Api\v1\PageTransformer;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -66,6 +67,22 @@ class PageController extends ApiController
 
 		$page->publish(new PageTransformer);
 		return response([ 'data' => $page->published->bake ], 200);
+	}
+
+	/**
+	 * POST /api/v1/page/{page}/revert
+	 *
+	 * @param  Request $request
+	 * @param  Page $page
+	 * @return Response
+	 */
+	public function revert(Request $request, Page $page){
+		$this->authorize('revert', $page);
+
+		$published = PublishedPage::findOrFail($request->get('published_page_id'));
+		$page->revert($published);
+
+		return fractal($page, new PageTransformer)->respond();
 	}
 
 	/**

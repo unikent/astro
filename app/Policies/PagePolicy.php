@@ -61,7 +61,7 @@ class PagePolicy
     }
 
     /**
-     * Determine whether the user can update the page.
+     * Determine whether the user can publish the page.
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\Page  $page
@@ -71,6 +71,19 @@ class PagePolicy
     {
         return true;
     }
+
+    /**
+     * Determine whether the user can revert the page.
+     *
+     * @param  \App\Models\User  $user
+     * @param  \App\Models\Page  $page
+     * @return boolean
+     */
+    public function revert(User $user, Page $page)
+    {
+        return true;
+    }
+
 
     /**
      * Determine whether the user can delete the page.

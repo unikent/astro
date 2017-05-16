@@ -896,6 +896,140 @@ class PageControllerTest extends ApiControllerTestCase {
      * @test
      * @group authentication
      */
+    public function revert_WhenUnauthenticated_Returns401(){
+        $route = factory(Route::class)->states('withPage', 'withParent')->create();
+
+        $page = $route->page;
+        $page->publish(new PageTransformer);
+
+        $response = $this->action('POST', PageController::class . '@revert', [ 'page' => $page->getKey(), 'published_page_id' => $page->published->getKey() ]);
+        $response->assertStatus(401);
+    }
+
+    /**
+     * @test
+     * @group authorization
+     */
+    public function revert_WhenAuthenticated_ChecksAuthorization(){
+        $route = factory(Route::class)->states('withPage', 'withParent')->create();
+
+        $page = $route->page;
+        $page->publish(new PageTransformer);
+
+        Gate::shouldReceive('authorize')->with('revert', Mockery::on(function($model) use ($page){
+            return (is_a($model, Page::class) && ($model->getKey() == $page->getKey()));
+        }))->once();
+
+        $this->authenticated();
+        $response = $this->action('POST', PageController::class . '@revert', [ 'page' => $page->getKey(), 'published_page_id' => $page->published->getKey() ]);
+    }
+
+    /**
+     * @test
+     * @group authorization
+     */
+    public function revert_WhenAuthenticatedAndUnauthorized_Returns403(){
+        $this->authenticatedAndUnauthorized();
+
+        $route = factory(Route::class)->states('withPage', 'withParent')->create();
+
+        $page = $route->page;
+        $page->publish(new PageTransformer);
+
+        $response = $this->action('POST', PageController::class . '@revert', [ 'page' => $page->getKey(), 'published_page_id' => $page->published->getKey() ]);
+        $response->assertStatus(403);
+    }
+
+    /**
+     * @test
+     */
+    public function revert_WhenAuthorizedAndPageNotFound_Returns404(){
+        $this->authenticatedAndAuthorized();
+
+        $response = $this->action('POST', PageController::class . '@revert', [ 123 ]);
+        $response->assertStatus(404);
+    }
+
+    /**
+     * @test
+     */
+    public function revert_WhenAuthorizedAndPublishedPageNotFound_Returns404(){
+        $this->authenticatedAndAuthorized();
+
+        $route = factory(Route::class)->states('withPage', 'withParent')->create();
+
+        $page = $route->page;
+        $page->publish(new PageTransformer);
+
+        $response = $this->action('POST', PageController::class . '@revert', [ $page->getKey(), 123 ]);
+        $response->assertStatus(404);
+    }
+
+    /**
+     * @test
+     */
+    public function revert_WhenAuthorizedAndValid_RevertsThePage(){
+        $this->authenticatedAndAuthorized();
+
+        $route = factory(Route::class)->states('withPage', 'withParent')->create();
+
+        $page = $route->page;
+        $page->publish(new PageTransformer);
+
+        $title = $page->title;
+        $page->title = 'Foobar!';
+        $page->save();
+
+        $this->assertEquals('Foobar!', $page->title);
+
+        $response = $this->action('POST', PageController::class . '@revert', [ 'page' => $page->getKey(), 'published_page_id' => $page->published->getKey() ]);
+
+        $page = $page->fresh();
+        $this->assertEquals($title, $page->title);
+    }
+
+    /**
+     * @test
+     */
+    public function revert_WhenAuthorizedAndValid_Returns200(){
+        $this->authenticatedAndAuthorized();
+
+        $route = factory(Route::class)->states('withPage', 'withParent')->create();
+
+        $page = $route->page;
+        $page->publish(new PageTransformer);
+
+        $response = $this->action('POST', PageController::class . '@revert', [ 'page' => $page->getKey(), 'published_page_id' => $page->published->getKey() ]);
+        $response->assertStatus(200);
+    }
+
+    /**
+     * @test
+     */
+    public function revert_WhenAuthorizedAndValid_ReturnsJson(){
+        $this->authenticatedAndAuthorized();
+
+        $route = factory(Route::class)->states('withPage', 'withParent')->create();
+
+        $page = $route->page;
+        $page->publish(new PageTransformer);
+
+        $response = $this->action('POST', PageController::class . '@revert', [ 'page' => $page->getKey(), 'published_page_id' => $page->published->getKey() ]);
+        $json = $response->json();
+
+        $this->assertArrayHasKey('data', $json);
+        $this->assertNotEmpty($json['data']);
+
+        $this->assertArrayHasKey('canonical', $json['data']);
+        $this->assertNotEmpty($json['data']['canonical']);
+    }
+
+
+
+    /**
+     * @test
+     * @group authentication
+     */
     public function delete_WhenUnauthenticated_Returns401(){
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
         $page = $route->page;
