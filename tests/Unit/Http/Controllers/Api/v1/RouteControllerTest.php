@@ -27,6 +27,16 @@ class RouteControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+     */
+    public function resolve_WhenAuthorizedAndRouteNotFound_Returns404(){
+        $this->authenticatedAndAuthorized();
+
+        $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => '/foobar' ]);
+        $response->assertStatus(404);
+    }
+
+    /**
+     * @test
      * @group authorization
      */
     public function resolve_WhenAuthenticated_ChecksAuthorization(){
@@ -35,7 +45,7 @@ class RouteControllerTest extends ApiControllerTestCase {
         $page = $route->page;
         $page->publish(new PageTransformer);
 
-        Gate::shouldReceive('authorize')->with('read', Mockery::type(Route::class))->once();
+        Gate::shouldReceive('allows')->with('read', Mockery::type(Route::class))->once();
 
         $this->authenticated();
         $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $route->path ]);
@@ -45,7 +55,7 @@ class RouteControllerTest extends ApiControllerTestCase {
      * @test
      * @group authorization
      */
-    public function resolve_WhenAuthenticatedAndUnauthorized_Returns403(){
+    public function resolve_WhenAuthenticatedAndUnauthorized_Returns404(){
         $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
 
         $page = $route->page;
@@ -54,27 +64,43 @@ class RouteControllerTest extends ApiControllerTestCase {
         $this->authenticatedAndUnauthorized();
         $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $route->path ]);
 
-        $response->assertStatus(403);
-    }
-
-    /**
-     * @test
-     */
-    public function resolve_WhenAuthorizedAndPathNotFound_Returns404(){
-        $this->authenticatedAndAuthorized();
-
-        $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => '/foobar' ]);
         $response->assertStatus(404);
     }
 
     /**
      * @test
      */
-    public function resolve_WhenAuthorizedAndFound_Returns200(){
+    public function resolve_WhenAuthorizedAndFoundAndNotPublished_Returns200(){
         $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
 
         $page = $route->page;
         $page->publish(new PageTransformer);
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $route->path ]);
+
+        $response->assertStatus(200);
+    }
+
+    /**
+     * @test
+     */
+    public function resolve_WhenAuthorizedAndFoundAndNotPublished_ReturnsJson(){
+        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $route->path ]);
+
+        $json = $response->json();
+        $this->assertArrayHasKey('data', $json);
+        $this->assertEquals($route->page->id, $json['data']['id']);
+    }
+
+    /**
+     * @test
+     */
+    public function resolve_WhenAuthorizedAndFoundAndPublished_Returns200(){
+        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
 
         $this->authenticatedAndAuthorized();
         $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $route->path ]);

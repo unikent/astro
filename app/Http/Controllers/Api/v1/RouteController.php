@@ -1,10 +1,11 @@
 <?php
 namespace App\Http\Controllers\Api\v1;
 
+use Gate;
 use App\Models\Route;
 use Illuminate\Http\Request;
+use App\Http\Transformers\Api\v1\PageTransformer;
 use App\Http\Requests\Api\v1\Route\ResolveRequest;
-use App\Http\Transformers\Api\v1\RouteTransformer;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class RouteController extends ApiController
@@ -19,8 +20,16 @@ class RouteController extends ApiController
 	public function resolve(ResolveRequest $request){
 		$route = Route::findByPathOrFail($request->get('path'));
 
-		$this->authorize('read', $route);
-		return response($route->published_page->bake, 200);
+		if(Gate::allows('read', $route)){
+			if($route->published_page){
+				return response($route->published_page->bake);
+			} else {
+				return fractal($route->page, new PageTransformer)->parseIncludes([ 'canonical', 'blocks' ])->respond();
+			}
+		} else {
+			return (new SymfonyResponse())->setStatusCode(404);
+		}
+
 	}
 
 }

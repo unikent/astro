@@ -10,6 +10,11 @@ class RoutePolicy
 {
     use HandlesAuthorization;
 
+    public function before($user, $ability)
+    {
+        return $user->isAdmin();
+    }
+
     /**
      * Determine whether the user can index definition.
      *
@@ -30,7 +35,13 @@ class RoutePolicy
      */
     public function read(User $user, Route $route)
     {
-        return true;
+        if($route->isActive()){
+            return true;
+        } else {
+            // TODO: Check if user is sufficiently privileged to view inactive route
+        }
+
+        return false;
     }
 
     /**

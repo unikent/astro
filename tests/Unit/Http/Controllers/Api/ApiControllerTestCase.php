@@ -23,7 +23,7 @@ abstract class ApiControllerTestCase extends HttpTestCase {
 
 
     public function unauthorized(){
-        Gate::shouldReceive('allows')->andThrow(AuthorizationException::class);
+        Gate::shouldReceive('allows')->andReturn(false);
         Gate::shouldReceive('authorize')->andThrow(AuthorizationException::class);
     }
 
