@@ -1297,7 +1297,7 @@ cliui@^3.0.3, cliui@^3.2.0:
 
 "cms-prototype-blocks@git+ssh://git@github.com/unikent/cms-prototype-blocks.git#master":
   version "0.0.1"
-  resolved "git+ssh://git@github.com/unikent/cms-prototype-blocks.git#77a0d73ff2a7edc7e1b9c7ef6c8c6b4ef0fd8abb"
+  resolved "git+ssh://git@github.com/unikent/cms-prototype-blocks.git#89039c5ac4ebb3c294ed7332277f8062cd9747bf"
 
 co@^4.6.0:
   version "4.6.0"
