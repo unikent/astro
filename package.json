@@ -8,7 +8,7 @@
     "hot": "cross-env NODE_ENV=development webpack-dev-server --hot --colors --content-base=public/",
     "production": "cross-env NODE_ENV=production webpack --progress --colors --hide-modules --display-error-details",
     "refresh": "php artisan migrate:refresh && php artisan db:seed",
-    "unit": "mocha-webpack resources/assets/js/test/unit"
+    "unit": "mocha-webpack --webpack-config resources/assets/js/test/webpack.config-test.babel.js \"resources/assets/js/test/unit/*.js\""
   },
   "dependencies": {
     "axios": "^0.15.3",
@@ -36,7 +36,7 @@
     "babel-plugin-transform-object-assign": "^6.22.0",
     "babel-plugin-transform-object-rest-spread": "^6.22.0",
     "babel-preset-env": "^1.3.2",
-    "chai": "4.0.0-canary.2",
+    "chai": "next",
     "copy-webpack-plugin": "^4.0.1",
     "cross-env": "^3.0.0",
     "css-loader": "^0.28.1",
@@ -49,7 +49,7 @@
     "file-loader": "^0.11.1",
     "friendly-errors-webpack-plugin": "^1.6.1",
     "mocha": "^3.4.1",
-    "mocha-webpack": "^0.7.0",
+    "mocha-webpack": "next",
     "node-sass": "^4.5.3",
     "resolve-url-loader": "^2.0.2",
     "sass-loader": "^6.0.5",
