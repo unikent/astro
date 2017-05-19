@@ -1,67 +1,67 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import undoRedo from '../plugins/undo-redo';
-
+import shareMutations from '../plugins/share-mutations';
+import shareDevTools from '../plugins/share-devtools';
 import page from './modules/page';
 import definition from './modules/definition';
+import Config from 'classes/Config';
 
-/* global window */
+/* global process */
 
 Vue.use(Vuex);
 
-const store = (
-	window.self === window.top ? {
+let store = new Vuex.Store({
 
-		state: {
-			over: {
-				x: 0,
-				y: 0
-			},
-			preview: {
-				visible: false,
-				url: ''
-			},
-			wrapperStyles: {},
-			showIframeOverlay: false
+	state: {
+		over: {
+			x: 0,
+			y: 0
+		},
+		preview: {
+			visible: false,
+			url: ''
+		},
+		wrapperStyles: {},
+		showIframeOverlay: false
+	},
+
+	getters: {},
+
+	mutations: {
+
+		updateOver(state, position) {
+			state.over = position;
 		},
 
-		getters: {},
-
-		mutations: {
-
-			updateOver(state, position) {
-				state.over = position;
-			},
-
-			changePreview(state, value) {
-				state.preview = value;
-			},
-
-			updateWrapperStyle(state, { prop, value }) {
-				state.wrapperStyles = { ...state.wrapperStyles, [prop]: value };
-			},
-
-			showIframeOverlay(state, yes) {
-				state.showIframeOverlay = yes;
-			}
+		changePreview(state, value) {
+			state.preview = value;
 		},
 
-		actions: {},
-
-		modules: {
-			page,
-			definition
+		updateWrapperStyle(state, { prop, value }) {
+			state.wrapperStyles = { ...state.wrapperStyles, [prop]: value };
 		},
 
-		plugins: [undoRedo]
+		showIframeOverlay(state, yes) {
+			state.showIframeOverlay = yes;
+		}
+	},
 
-	}
+	actions: {},
 
-	:
+	modules: {
+		page,
+		definition
+	},
 
-	window.top.store
-);
+	plugins: [
+		shareMutations,
+		undoRedo,
+		...(Config.get('debug', false) ? [shareDevTools] : [])
+	],
 
-window.store = store;
+	strict: process.env.NODE_ENV !== 'production'
 
-export default new Vuex.Store(store);
+});
+
+export default store;

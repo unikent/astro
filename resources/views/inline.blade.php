@@ -31,7 +31,8 @@
 		'base_url' => Request::getBaseUrl(),
 		'api_url' => '/api/v1/',
 		'username' => $user,
-		'api_token' => $api_token
+		'api_token' => $api_token,
+		'debug' => config('app.debug')
 	]); ?>;
 	window.isEditor = <?php echo json_encode(!$is_preview); ?>;
 	</script>

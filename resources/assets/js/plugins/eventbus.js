@@ -1,14 +1,17 @@
 import Vue from 'vue';
+import { isIframe } from 'classes/helpers';
 
 /* global window */
 
 export const eventBus = (
-	window.self === window.top ?
-		new Vue() :
-		window.top.eventBus
+	isIframe ?
+		window.top.eventBus :
+		new Vue()
 );
 
-window.eventBus = eventBus;
+if(!isIframe) {
+	window.eventBus = eventBus;
+}
 
 export default (Vue) => {
 	Object.defineProperties(Vue.prototype, {
