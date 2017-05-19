@@ -10,7 +10,8 @@
 
 	<title>Astro</title>
 
-	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/css/app.css') }}" />
+	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/css/vendor.css') }}" />
+	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/css/main.css') }}" />
 	@if ($is_preview)
 		<link rel="stylesheet" href="{{ url("/") }}/css/main.min.css" />
 		<link rel="stylesheet" href="https://static.kent.ac.uk/pantheon/kent-theme-assets/assets/css/kentfont.css" />
@@ -40,8 +41,8 @@
 
 	</div>
 
-	<script src="{{ url('/') }}{{ mix('js/manifest.js') }}"></script>
-	<script src="{{ url('/') }}{{ mix('js/vendor.js') }}"></script>
-	<script src="{{ url('/') }}{{ mix('js/app.js') }}"></script>
+	<script src="{{ url('/') }}{{ mix('/js/manifest.js') }}"></script>
+	<script src="{{ url('/') }}{{ mix('/js/vendor.js') }}"></script>
+	<script src="{{ url('/') }}{{ mix('/js/main.js') }}"></script>
 </body>
 </html>
