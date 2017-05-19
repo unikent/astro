@@ -51,9 +51,9 @@ Anyone wishing to access the API will need a registered user with an API Token. 
 
 API requests will need to request a JSON response with an `Accepts: application/json` header, and pass the access token with an `Authorization: Bearer TOKEN` header. Data can be passed to the API as form data or as a JSON object (with a `Content-Type: application/json` header).
 
-Fractal is used to serialize the API output in a consistent way. When an endpoint supports includes, additional data can be requested using an `?include=` get parameter.
-
 The API is intended to be RESTful, uses Laravel naming conventions and should make semantic use of HTTP status codes.
+
+Fractal is used to serialize the API output. This is covered in more depth elsewhere (see: Serialization).
 
 
 #### Definitions
@@ -61,6 +61,14 @@ At present, definition files are read from disk into the application; at a later
 
 Definitions are represented within the system as models extending `App\Models\Definitions\BaseDefinition` and implementing `App\Models\Definitions\Contracts\Definition`. Their interface is very similar to Eloquent models but they should be considered immutable objects - as objects they are intended to give definitions a proper object representation within the system. 
 
+#### Serialization
+Whenever JSON is serialized in the application, [Fractal](http://fractal.thephpleague.com/) is used to transform the data. 
+
+Serialization occurs in two main areas: `App\Http\Controllers\Api\v1\*` and when a page is published ($page->publish($transformer) requires a Fractal transformer instance to ensure that the baked JSON is in the correct format for the API to serve directly).
+
+Many of the API endpoints support Fractal 'includes' by passing an '?include=' parameter with an API request. This accepts a comma-separated list of relations to include. Where an endpoint supports includes it is noted in the docblock. 
+
+Includes will resolve deep relations, i.e. 'block,block.definitions' but please use sparingly: depth restrictions are permissive but data is often lazy-loaded.
 
 #### Routes, Pages, Sites & Permissions
 Routes give hierarchy to pages within Astro and are implemented as a nested-set using Baum.
