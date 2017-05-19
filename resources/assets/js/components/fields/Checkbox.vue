@@ -3,6 +3,7 @@
 		<el-checkbox
 				v-for="option in options"
 				:label="option.value"
+				:key="option.value"
 			>
 			{{ option.label }}
 		</el-checkbox>

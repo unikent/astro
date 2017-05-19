@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import Locale from 'element-ui/src/mixins/locale';
+import Locale from 'element-ui/lib/mixins/locale';
 
 export default {
 	mixins: [Locale],

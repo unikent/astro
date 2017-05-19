@@ -10,7 +10,7 @@
 
 			<el-tooltip class="item" effect="dark" content="Switch preview mode" placement="top">
 				<el-select placeholder="view" v-model="currentView" class="switch-view">
-					<el-option v-for="(view, key) in views" :label="view.label" :value="key">
+					<el-option v-for="(view, key) in views" :label="view.label" :value="key" :key="view.label">
 						<div class="view-icon">
 							<Icon :glyph="view.icon" aria-hidden="true" width="20" height="20" />
 						</div>
@@ -61,11 +61,11 @@ import PageSidebar from '../PageSidebar';
 import BlockSidebar from '../BlockSidebar';
 
 import Icon from '../Icon';
-import undoIcon from '!IconPath/undo.svg';
-import redoIcon from '!IconPath/redo.svg';
-import desktopIcon from '!IconPath/desktop.svg';
-import tabletIcon from '!IconPath/tablet.svg';
-import mobileIcon from '!IconPath/mobile.svg';
+import undoIcon from 'IconPath/undo.svg';
+import redoIcon from 'IconPath/redo.svg';
+import desktopIcon from 'IconPath/desktop.svg';
+import tabletIcon from 'IconPath/tablet.svg';
+import mobileIcon from 'IconPath/mobile.svg';
 
 export default {
 	name: 'editor',

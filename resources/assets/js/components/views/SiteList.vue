@@ -55,7 +55,7 @@
 						<el-form-item label="Parent site" :label-width="formLabelWidth">
 							<el-select v-model="form.parent" class="w100">
 								<el-option label="Root (none)" :value="0" />
-								<el-option v-for="site in sites" :label="site.title" :value="site.id" />
+								<el-option v-for="site in sites" :label="site.title" :value="site.id" :key="site.id" />
 							</el-select>
 						</el-form-item>
 					</el-col>
@@ -83,8 +83,8 @@
 
 <script>
 import Icon from '../Icon';
-import editIcon from '!IconPath/pencil.svg';
-import deleteIcon from '!IconPath/trash.svg';
+import editIcon from 'IconPath/pencil.svg';
+import deleteIcon from 'IconPath/trash.svg';
 
 export default {
 
