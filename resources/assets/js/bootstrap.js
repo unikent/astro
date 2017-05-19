@@ -1,8 +1,7 @@
 import Config from './classes/Config';
+import { win } from './classes/helpers';
 
-/* global window */
-
-Config.init(window.astro);
+Config.init(win.astro);
 Config.set(
 	'api_base_url',
 	Config.get('base_url', '') + Config.get('api_url', '/api/')
