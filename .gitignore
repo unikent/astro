@@ -3,6 +3,7 @@
 /storage/*.key
 /vendor
 /.idea
+/.tmp
 Homestead.json
 Homestead.yaml
 .env
@@ -10,10 +11,12 @@ auth.json
 studio.json
 
 # Built files
-/public/css/app.css
-/public/css/app.css.map
-/public/js/app.js
-/public/js/app.js.map
+/public/css/main.css
+/public/css/main.css.map
+/public/css/vendor.css
+/public/css/vendor.css.map
+/public/js/main.js
+/public/js/main.js.map
 /public/js/vendor.js
 /public/js/vendor.js.map
 /public/js/manifest.js
