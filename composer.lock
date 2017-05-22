@@ -3322,18 +3322,6 @@
             "time": "2016-09-20T12:50:39+00:00"
         },
         {
-            "name": "unikent/cms-prototype-blocks",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "git@github.com:unikent/cms-prototype-blocks.git",
-                "reference": "9eb7bb8829bff699c3db9809e7252d5f64a473da"
-            },
-            "type": "library",
-            "description": "Our block views",
-            "time": "2017-05-02 09:31:15"
-        },
-        {
             "name": "unikent/kentauth",
             "version": "dev-laravel/5.2",
             "source": {
