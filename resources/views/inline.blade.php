@@ -10,10 +10,10 @@
 
 	<title>Astro</title>
 
-	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/css/vendor.css') }}" />
-	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/css/main.css') }}" />
+	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/build/css/vendor.css') }}" />
+	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/build/css/main.css') }}" />
 	@if ($is_preview)
-		<link rel="stylesheet" href="{{ url("/") }}/css/main.min.css" />
+		<link rel="stylesheet" href="https://static.kent.ac.uk/pantheon/kent-theme-assets/assets/css/main.min.css" />
 		<link rel="stylesheet" href="https://static.kent.ac.uk/pantheon/kent-theme-assets/assets/css/kentfont.css" />
 		<style>
 		html {
@@ -42,8 +42,8 @@
 
 	</div>
 
-	<script src="{{ url('/') }}{{ mix('/js/manifest.js') }}"></script>
-	<script src="{{ url('/') }}{{ mix('/js/vendor.js') }}"></script>
-	<script src="{{ url('/') }}{{ mix('/js/main.js') }}"></script>
+	<script src="{{ url('/') }}{{ mix('/build/js/manifest.js') }}"></script>
+	<script src="{{ url('/') }}{{ mix('/build/js/vendor.js') }}"></script>
+	<script src="{{ url('/') }}{{ mix('/build/js/main.js') }}"></script>
 </body>
 </html>
