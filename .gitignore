@@ -10,15 +10,4 @@ Homestead.yaml
 auth.json
 studio.json
 
-# Built files
-/public/css/main.css
-/public/css/main.css.map
-/public/css/vendor.css
-/public/css/vendor.css.map
-/public/js/main.js
-/public/js/main.js.map
-/public/js/vendor.js
-/public/js/vendor.js.map
-/public/js/manifest.js
-/public/js/manifest.js.map
-/public/img/sprite.svg
+/public/build

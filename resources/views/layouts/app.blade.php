@@ -10,8 +10,8 @@
 
 	<title>Kent CMS</title>
 
-	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/css/vendor.css') }}" />
-	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/css/main.css') }}" />
+	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/build/css/vendor.css') }}" />
+	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/build/css/main.css') }}" />
 
 	<script>
 		window.Laravel = <?php echo json_encode([
@@ -25,9 +25,9 @@
 	<!-- @include('components.menu') -->
 	@yield('content')
 
-	<script src="{{ url('/') }}{{ mix('/js/manifest.js') }}"></script>
-	<script src="{{ url('/') }}{{ mix('/js/vendor.js') }}"></script>
-	<script src="{{ url('/') }}{{ mix('/js/main.js') }}"></script>
+	<script src="{{ url('/') }}{{ mix('/build/js/manifest.js') }}"></script>
+	<script src="{{ url('/') }}{{ mix('/build/js/vendor.js') }}"></script>
+	<script src="{{ url('/') }}{{ mix('/build/js/main.js') }}"></script>
 	<!-- TODO: move kent bar JS into bundled dependencies -->
 
 </body>
