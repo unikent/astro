@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import _ from 'lodash';
+import sinon from 'sinon';
 import { expect } from 'chai';
 import { iframeContext } from '../helpers';
 import {
@@ -13,269 +14,158 @@ Vue.use(Vuex);
 /* global setTimeout */
 
 describe('Share Mutations Plugin', () => {
-
-	it('Syncing mutations', () => {
-
-		const storeObject = {
-			state: {
-				a: 1
+	const storeObject = {
+		state: {
+			a: 0
+		},
+		getters: {
+			a: state => state.a > 0 ? 'hasAny' : 'none'
+		},
+		mutations: {
+			test(state, n) {
+				state.a += n
+			}
+		},
+		actions: {
+			check({ getters }, value) {
+				// check for exposing getters into actions
+				expect(getters.a).to.equal(value)
 			},
-			mutations: {
-				test(state, n) {
-					state.a += n;
-				}
+			testSync({ commit }, n) {
+				commit('test', n)
 			},
-			plugins: [shareMutationsMain]
-		};
+			testAsync({ commit }, n) {
+				setTimeout(() => commit('test', n), 200);
+			}
+		}
+	};
 
-		let
-			store1 = new Vuex.Store(_.cloneDeep(storeObject)),
-			store2;
+	let mainStore, iframeStore, clock;
+
+	beforeEach(() => {
+		storeObject.plugins = [shareMutationsMain];
+		mainStore = new Vuex.Store(_.cloneDeep(storeObject));
 
 		iframeContext(() => {
 			storeObject.plugins = [shareMutationsIframe];
-			store2 = new Vuex.Store(_.cloneDeep(storeObject));
+			iframeStore = new Vuex.Store(_.cloneDeep(storeObject));
 		});
+	});
 
-		store1.commit('test', 2);
+	before(() => {
+		clock = sinon.useFakeTimers();
+	});
 
-		expect(store2.state.a).to.equal(3);
+	after(() => {
+		clock.restore();
+	})
 
-		store2.commit('test', 5);
+	it('Syncs mutations', () => {
+		mainStore.commit('test', 2);
 
-		expect(store1.state.a).to.equal(8);
+		expect(iframeStore.state.a).to.equal(2);
 
-		store1.commit('test', 2);
-		store2.commit('test', 2);
+		iframeStore.commit('test', 6);
 
-		expect(store1.state.a)
-			.to.equal(store2.state.a)
+		expect(mainStore.state.a).to.equal(8);
+
+		mainStore.commit('test', 2);
+		iframeStore.commit('test', 2);
+
+		expect(mainStore.state.a)
+			.to.equal(iframeStore.state.a)
 			.to.equal(12);
 	});
 
-	it('Syncing mutations with object syntax', () => {
+	it('Syncs previous mutations after delayed iframe load', () => {
+		iframeStore = null;
 
-		const storeObject = {
-			state: {
-				a: 1
-			},
-			mutations: {
-				test(state, payload) {
-					state.a += payload.amount;
-				}
-			},
-			plugins: [shareMutationsMain]
-		};
-
-		let
-			store1 = new Vuex.Store(_.cloneDeep(storeObject)),
-			store2;
+		for(var i = 0; i < 10; i++) {
+			mainStore.commit('test', 2);
+		}
 
 		iframeContext(() => {
-			storeObject.plugins = [shareMutationsIframe];
-			store2 = new Vuex.Store(_.cloneDeep(storeObject));
+			iframeStore = new Vuex.Store(_.cloneDeep(storeObject));
 		});
 
-		store1.commit({
-			type: 'test',
-			amount: 2
-		});
-
-		expect(store2.state.a).to.equal(3);
-
-		store2.commit({
-			type: 'test',
-			amount: 5
-		});
-
-		expect(store1.state.a).to.equal(8);
-
-		store1.commit({
-			type: 'test',
-			amount: 2
-		});
-
-		store2.commit({
-			type: 'test',
-			amount: 2
-		});
-
-		expect(store1.state.a)
-			.to.equal(store2.state.a)
-			.to.equal(12);
+		expect(iframeStore.state.a).to.equal(20);
 	});
 
-	it('Syncing actions (sync & asyc)', () => {
-
-		const storeObject = {
-			state: {
-				a: 1
-			},
-			mutations: {
-				test(state, n) {
-					state.a += n;
-				}
-			},
-			actions: {
-				testSync({ commit }, n) {
-					commit('test', n)
-				},
-				testAsync({ commit }, n) {
-					setTimeout(() => commit('test', n), 200);
-				}
-			},
-			plugins: [shareMutationsMain]
-		};
-
+	it('Syncs mutations over time, in "random" order', (done) => {
 		let
-			store1 = new Vuex.Store(_.cloneDeep(storeObject)),
-			store2;
-
-		iframeContext(() => {
-			storeObject.plugins = [shareMutationsIframe];
-			store2 = new Vuex.Store(_.cloneDeep(storeObject));
-		});
-
-		store1.dispatch('testSync', 2);
-		expect(store2.state.a).to.equal(3);
-
-		store2.dispatch('testAsync', 2);
-
-		setTimeout(() => expect(store1.state.a).to.equal(5), 200);
-	});
-
-	it('Syncing mutations after delayed iframe load', () => {
-
-		const storeObject = {
-			state: {
-				a: 1
-			},
-			mutations: {
-				test(state, n) {
-					state.a += n;
-				}
-			},
-			plugins: [shareMutationsMain]
-		};
-
-		let
-			store1 = new Vuex.Store(_.cloneDeep(storeObject)),
-			store2;
-
-		store1.commit('test', 2);
-		store1.commit('test', 2);
-		store1.commit('test', 2);
-
-		iframeContext(() => {
-			storeObject.plugins = [shareMutationsIframe];
-			store2 = new Vuex.Store(_.cloneDeep(storeObject));
-		});
-
-		expect(store2.state.a).to.equal(7);
-	});
-
-	it('Syncing mutations out of order', () => {
-
-		const storeObject = {
-			state: {
-				a: 1
-			},
-			mutations: {
-				test(state, n) {
-					state.a += n;
-				}
-			},
-			plugins: [shareMutationsMain]
-		};
-
-		let
-			store1 = new Vuex.Store(_.cloneDeep(storeObject)),
-			store2;
-
-		iframeContext(() => {
-			storeObject.plugins = [shareMutationsIframe];
-			store2 = new Vuex.Store(_.cloneDeep(storeObject));
-		});
+			wait,
+			fifthCounter = 0,
+			tenthCounter = 0,
+			waitTimes = {
+				// random numbers between 0 - 500
+				fifth: [
+					208, 321, 291, 225, 14, 137, 88,
+					418, 7, 249, 490, 76, 273, 101,
+					269, 479, 484, 24, 490, 406
+				],
+				// random numbers between 0 - 1000
+				tenth: [
+					945, 265, 429, 547, 772, 172, 212, 591, 429, 614
+				]
+			};
 
 		for(var i = 1; i <= 100; i++) {
 
 			if(i % 2 === 0) {
-				store2.commit('test', 10);
+				iframeStore.commit('test', 10);
 			}
 			else {
-				store1.commit('test', 10);
+				mainStore.commit('test', 10);
 			}
 
 			if(i % 5 === 0) {
+				wait = waitTimes.fifth[fifthCounter++];
 				setTimeout(() => {
-					const store2a = store2.state.a;
-					store1.commit('test', 10);
-					expect(store2a + 10).to.equal(store1.state.a);
-				}, 200);
-
-				// periodically test states are equal
-				expect(store1.state.a).to.equal(store2.state.a);
+					mainStore.commit('test', wait);
+					expect(mainStore.state.a).to.equal(iframeStore.state.a);
+				}, wait);
 			}
 
 			if(i % 10 === 0) {
+				wait = waitTimes.tenth[tenthCounter++];
 				setTimeout(() => {
-					const store1a = store1.state.a;
-					store2.commit('test', 10);
-					expect(store1a + 10).to.equal(store2.state.a);
-				}, 300);
+					iframeStore.commit('test', wait);
+					expect(mainStore.state.a).to.equal(iframeStore.state.a);
+				}, wait);
 			}
+
+			if(i === 100) {
+				setTimeout(done, 1000);
+			}
+
+			expect(mainStore.state.a).to.equal(iframeStore.state.a);
 		}
 
-		setTimeout(() => {
-			expect(store1.state.a)
-				.to.equal(store2.state.a)
-				.to.equal(1300)
-		}, 300);
+		clock.tick(1000);
+	});
+
+	it('Syncs actions (sync & asyc)', () => {
+		mainStore.dispatch('testSync', 2);
+		expect(iframeStore.state.a).to.equal(2);
+
+		iframeStore.dispatch('testAsync', 2);
+
+		setTimeout(() => expect(mainStore.state.a).to.equal(4), 200);
 	});
 
 	it('Getters retrieving state', () => {
-		const storeObject = {
-			state: {
-				a: 0
-			},
-			getters: {
-				a: state => state.a > 0 ? 'hasAny' : 'none'
-			},
-			mutations: {
-				test(state, n) {
-					state.a += n
-				}
-			},
-			actions: {
-				check ({ getters }, value) {
-					// check for exposing getters into actions
-					expect(getters.a).to.equal(value)
-				}
-			},
-			plugins: [shareMutationsMain]
-		};
+		expect(mainStore.getters.a).to.equal('none');
+		mainStore.dispatch('check', 'none');
 
-		let
-			store1 = new Vuex.Store(_.cloneDeep(storeObject)),
-			store2;
+		iframeStore.commit('test', 1);
 
-		iframeContext(() => {
-			storeObject.plugins = [shareMutationsIframe];
-			store2 = new Vuex.Store(_.cloneDeep(storeObject));
-		});
+		expect(mainStore.getters.a).to.equal('hasAny');
+		mainStore.dispatch('check', 'hasAny');
 
-		expect(store1.getters.a).to.equal('none');
-		store1.dispatch('check', 'none');
+		mainStore.commit('test', -1);
 
-		store2.commit('test', 1);
-
-		expect(store1.getters.a).to.equal('hasAny');
-		store1.dispatch('check', 'hasAny');
-
-		store1.commit('test', -1);
-
-		expect(store2.getters.a).to.equal('none');
-		store2.dispatch('check', 'none');
+		expect(iframeStore.getters.a).to.equal('none');
+		iframeStore.dispatch('check', 'none');
 	});
 
 });
