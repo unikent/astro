@@ -15,14 +15,14 @@ export default {
 				return value !== void 0 ? value : this.default;
 			},
 			set(value) {
-				this.updateValue({ name: this.name, value });
+				this.updateFieldValue({ name: this.name, value });
 			}
 		}
 	},
 
 	methods: {
 		...mapMutations([
-			'updateValue'
+			'updateFieldValue'
 		])
 	}
 

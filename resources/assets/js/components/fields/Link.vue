@@ -18,29 +18,33 @@
 
 		computed: {
 			text: {
-				get () {
-					return this.$store.getters.getCurrentFieldValue(this.name)['text'];
+				get() {
+					return this.getField(this.name, 'text');
 				},
 				set(value) {
-					this.updateValue({
+					const url = this.getField(this.name, 'url');
+
+					this.updateFieldValue({
 						name: this.name,
 						value: {
 							text: value,
-							url: this.url
+							url
 						}
 					});
 				}
 			},
 
 			url: {
-				get () {
-					return this.$store.getters.getCurrentFieldValue(this.name)['url'];
+				get() {
+					return this.getField(this.name, 'text');
 				},
 				set(value) {
-					this.updateValue({
+					const text = this.getField(this.name, 'text');
+
+					this.updateFieldValue({
 						name: this.name,
 						value: {
-							text: this.text,
+							text,
 							url: value
 						}
 					});
@@ -50,8 +54,18 @@
 
 		methods: {
 			...mapMutations([
-				'updateValue'
-			])
+				'updateFieldValue'
+			]),
+
+			getField(name, key = false) {
+				const field = this.$store.getters.getCurrentFieldValue(name);
+
+				if(key) {
+					return field && field[key] ? field[key] : '';
+				}
+
+				return this.$store.getters.getCurrentFieldValue(name);
+			}
 		}
 
 	}

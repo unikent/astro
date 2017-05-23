@@ -34,9 +34,12 @@ export default {
 
 	computed: {
 		...mapState([
-			'pageName',
 			'wrapperStyles'
 		]),
+
+		...mapState({
+			pageName: state => state.page.pageName,
+		}),
 
 		isEditor() {
 			return window.isEditor;

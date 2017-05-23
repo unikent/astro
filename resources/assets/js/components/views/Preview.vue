@@ -1,30 +1,31 @@
 <template>
 <div>
-	<!-- <div
-		v-for="(region, name) in page.regions"
-		:id="name"
-	> -->
 	<div
 		id="main_content"
 	>
-		<div id="b-wrapper">
-			<block
-				v-for="(blockData, index) in page.regions.main_content"
-				:key="`block-${blockData.id}`"
-				:type="blockData.type"
-				:index="index"
-				:blockData="blockData"
-				:scale="scale"
+		<div id="b-wrapper" ref="wrapper" :style="wrapperStyles">
+			<template v-if="page.regions">
+				<block
+					v-for="(blockData, index) in page.regions.main"
+					:key="`block-${blockData.id}`"
+					:type="`${blockData.definition_name}-v${blockData.definition_version}`"
+					:index="index"
+					:blockData="blockData"
+					:scale="scale"
+				>
+				</block>
+			</template>
+			<div
+				class="block-overlay" :class="{ 'hide-drag': showBlockOverlayControls }"
+				:style="blockOverlayStyles"
 			>
-			</block>
-			<div class="b-block" :style="blockOverlayStyles">
-				<div class="b-block-options" @click="editBlock">⚙</div>
-				<div class="b-block-move">⇅</div>
+				<div class="block-overlay__options" @click="editBlock">⚙</div>
+				<div ref="move" class="block-overlay__move">⇅</div>
 			</div>
 		</div>
 	</div>
 	<div class="b-handle" :style="handleStyles">⇅</div>
-	<div id="b-overlay"></div>
+	<div id="b-overlay" :style="overlayStyles"></div>
 </div>
 </template>
 
@@ -32,12 +33,12 @@
 import Block from '../Block';
 import Velocity from 'velocity-animate';
 
-import { mapState, mapMutations } from 'vuex';
+import { mapState, mapActions, mapMutations } from 'vuex';
 
 /* global document, window */
 
 export default {
-	name: 'wrapper',
+	name: 'preview-wrapper',
 
 	components: {
 		Block
@@ -47,20 +48,28 @@ export default {
 		return {
 			scale: 1,
 			handleStyles: {},
-			blockOverlayStyles: {}
+			blockOverlayStyles: {},
+			showBlockOverlayControls: false,
+			overlayStyles: {},
+			wrapperStyles: {}
 		};
 	},
 
 	computed: {
 		...mapState([
-			'page',
-			'over',
-			'blockInfo',
-			'pageScale'
-		])
+			'over'
+		]),
+
+		...mapState({
+			page: state => state.page.pageData,
+			blockMeta: state => state.page.blockMeta,
+			pageScale: state => state.page.pageScale
+		})
 	},
 
 	created() {
+		this.fetchPage(this.$route.params.site_id);
+
 		this.$bus.$on('block:move', index => {
 			this.moved = index;
 		});
@@ -70,11 +79,8 @@ export default {
 	},
 
 	mounted() {
-		this.wrapper = document.querySelector('#b-wrapper');
-		this.overlay = document.querySelector('#b-overlay');
-
-		this.blockOverlay = document.querySelector('.b-block');
-		this.moveEl = document.querySelector('.b-block-move');
+		this.wrapper = this.$refs.wrapper;
+		this.moveEl = this.$refs.move;
 
 		this.scaled = false;
 		this.current = null;
@@ -89,6 +95,10 @@ export default {
 	},
 
 	methods: {
+		...mapActions([
+			'fetchPage'
+		]),
+
 		...mapMutations([
 			'setBlock',
 			'reorderBlocks',
@@ -100,7 +110,8 @@ export default {
 		},
 
 		move(e) {
-			this.updateHandleStyle(
+			this.updateStyles(
+				'handle',
 				'transform',
 				`translateY(${e.pageY - 22}px)`
 			);
@@ -114,7 +125,7 @@ export default {
 
 		hideOverlay(block) {
 			if(block !== this.current) {
-				this.blockOverlay.style.opacity = 0;
+				this.updateStyles('blockOverlay', 'opacity', 0);
 			}
 		},
 
@@ -131,11 +142,11 @@ export default {
 		mouseDown(e) {
 			switch(e.target) {
 				case this.moveEl:
-					this.wrapper.style.userSelect =  'none';
-					this.overlay.style.pointerEvents =  'auto';
+					this.updateStyles('wrapper', 'userSelect', 'none');
+					this.updateStyles('overlay', 'pointerEvents', 'auto');
 
 					if(e.button === 0) {
-						this.updateHandleStyle('opacity', 1);
+						this.updateStyles('handle', 'opacity', 1);
 						this.drag(false, e.clientY);
 
 						this.$bus.$emit('block:dragstart', {
@@ -143,7 +154,7 @@ export default {
 							el: this.current.$el
 						});
 
-						this.blockOverlay.classList.add('hide-drag');
+						this.showBlockOverlayControls = true;
 						document.addEventListener('mousemove', this.move);
 					}
 					break;
@@ -154,11 +165,11 @@ export default {
 
 		mouseUp(e) {
 			if(this.scaled) {
-				this.wrapper.style.userSelect =  'auto';
-				this.updateHandleStyle('opacity', 0);
+				this.updateStyles('wrapper', 'userSelect', 'auto');
+				this.updateStyles('handle', 'opacity', 0);
 				this.drag(true, e.clientY);
 
-				this.blockOverlay.classList.remove('hide-drag');
+				this.showBlockOverlayControls = false;
 				document.removeEventListener('mousemove', this.move);
 			}
 		},
@@ -168,19 +179,17 @@ export default {
 
 			if(data.to > data.from) {
 				for(let i = 0; i <= data.to; i++) {
-					size += this.blockInfo.sizes[i];
+					size += this.blockMeta.sizes[i];
 				}
-				size -= this.blockInfo.sizes[data.from];
+				size -= this.blockMeta.sizes[data.from];
 			}
 			else {
 				for(let i = 0; i < data.to; i++) {
-					size += this.blockInfo.sizes[i];
+					size += this.blockMeta.sizes[i];
 				}
 			}
 
-			// console.log(size, this.overlay);
-
-			this.blockOverlay.style.transform = `translateY(${(size)}px)`;
+			this.updateStyles('blockOverlay', 'transform', `translateY(${(size)}px)`);
 		},
 
 		positionOverlay(block, setCurrent) {
@@ -203,12 +212,11 @@ export default {
 				minusLeft = addWidth / 2;
 			}
 
-			this.blockOverlay.style.transform = `translateY(${(pos.top + window.scrollY - minusTop)}px)`;
-			this.blockOverlay.style.left = (pos.left + window.scrollX - minusLeft) + 'px';
-			this.blockOverlay.style.width = (pos.width + addWidth) + 'px';
-			this.blockOverlay.style.height = (pos.height + addHeight) + 'px';
-
-			this.blockOverlay.style.opacity = 1;
+			this.updateStyles('blockOverlay', 'transform', `translateY(${(pos.top + window.scrollY - minusTop)}px)`);
+			this.updateStyles('blockOverlay', 'left', (pos.left + window.scrollX - minusLeft) + 'px');
+			this.updateStyles('blockOverlay', 'width', (pos.width + addWidth) + 'px');
+			this.updateStyles('blockOverlay', 'height', (pos.height + addHeight) + 'px');
+			this.updateStyles('blockOverlay', 'opacity', 1);
 
 			if(setCurrent) {
 				this.current = block;
@@ -216,26 +224,26 @@ export default {
 		},
 
 		resetAfterDrag() {
-			this.overlay.style.pointerEvents =  'none';
+			this.updateStyles('overlay', 'pointerEvents', 'none');
 
 			this.reorderBlocks({
 				from:  this.moved.from,
 				to:    this.moved.to,
-				value: this.page.regions['main_content'][this.moved.from]
+				value: this.page.regions['main'][this.moved.from]
 			});
 
 			this.updateBlockPositionsOrder({
 				type:  'sizes',
 				from:  this.moved.from,
 				to:    this.moved.to,
-				value: this.blockInfo.sizes[this.moved.from]
+				value: this.blockMeta.sizes[this.moved.from]
 			});
 
 			this.updateBlockPositionsOrder({
 				type:  'offsets',
 				from:  this.moved.from,
 				to:    this.moved.to,
-				value: this.blockInfo.offsets[this.moved.from]
+				value: this.blockMeta.offsets[this.moved.from]
 			});
 
 			this.$bus.$emit('block:dragstop');
@@ -244,8 +252,7 @@ export default {
 		drag(revert, mouseY) {
 			var scroll = window.scrollY;
 
-			// TODO: don't actually scroll, just use transforms to scroll page?
-
+			// TODO: Use transforms to scroll page?
 			if(revert) {
 				this.scaled = false;
 
@@ -285,7 +292,8 @@ export default {
 					scrollScaleDown = scroll * this.SCALE_DOWN,
 					offsetMinusScaled = mouseY - (mouseY * this.SCALE_DOWN);
 
-				this.updateHandleStyle(
+				this.updateStyles(
+					'handle',
 					'transform',
 					'translateY(' + (((mouseY + window.scrollY) * this.SCALE_DOWN) - 22) + 'px)'
 				);
@@ -315,8 +323,11 @@ export default {
 			}
 		},
 
-		updateHandleStyle(prop, value) {
-			this.handleStyles = { ...this.handleStyles, [prop]: value };
+		updateStyles(dataName, prop, value) {
+			this[`${dataName}Styles`] = {
+				...this[`${dataName}Styles`],
+				[prop]: value
+			};
 		}
 	}
 };

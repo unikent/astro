@@ -20,12 +20,12 @@ class PageControllerTest extends ApiControllerTestCase {
         $page = $page ?: factory(Page::class)->make();
         $route = $route ?: factory(Route::class)->states('withParent')->make([ 'page_id' => $page->getKey() ]);
 
-        $block = $block ?: factory(Block::class)->make();
+        $block = $block ?: factory(Block::class)->states('useTestBlock')->make();
 
         return attrs_for($page) + [
             'route' => attrs_for($route),
 
-            'regions' => [
+            'blocks' => [
                 'test-region' => [
                     0 => attrs_for($block),
                 ],
@@ -367,14 +367,14 @@ class PageControllerTest extends ApiControllerTestCase {
         $response = $this->action('POST', PageController::class . '@store', [], $attrs);
 
         $page = Page::all()->last();
-        $regions = $page->blocks->groupBy('region_name');
+        $blocks = $page->blocks->groupBy('region_name');
 
-        $this->assertArrayHasKey('test-region', $regions);
-        $this->assertCount(1, $regions['test-region']);
+        $this->assertArrayHasKey('test-region', $blocks);
+        $this->assertCount(1, $blocks['test-region']);
 
-        $block = $regions['test-region'][0];
-        $this->assertEquals($attrs['regions']['test-region'][0]['definition_name'], $block->definition_name);
-        $this->assertEquals($attrs['regions']['test-region'][0]['definition_version'], $block->definition_version);
+        $block = $blocks['test-region'][0];
+        $this->assertEquals($attrs['blocks']['test-region'][0]['definition_name'], $block->definition_name);
+        $this->assertEquals($attrs['blocks']['test-region'][0]['definition_version'], $block->definition_version);
     }
 
     /**
@@ -636,7 +636,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $block = factory(Block::class)->create([ 'page_id' => $page->getKey() ]); // Default region is 'test-region'
 
         $attrs = $this->getAttrs($page);
-        array_set($attrs, 'regions.test-region', []);
+        array_set($attrs, 'blocks.test-region', []);
 
         $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
 
@@ -653,18 +653,19 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
         $page = $route->page;
 
-        $block = factory(Block::class)->create([ 'page_id' => $page->getKey() ]); // Default region is 'test-region'
+        $block = factory(Block::class)->states('useTestBlock')
+            ->create([ 'page_id' => $page->getKey() ]); // Default region is 'test-region'
 
         $attrs = $this->getAttrs($page, null, $block);
-        array_set($attrs, 'regions.test-region.0.fields', [ 'fizz' => 'buzz' ]);
+        array_set($attrs, 'blocks.test-region.0.fields.widget_title', 'Fizzbuzz');
 
         $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
 
         $page = $page->fresh();
-        $regions = $page->blocks->groupBy('region_name');
+        $blocks = $page->blocks->groupBy('region_name');
 
-        $this->assertCount(1, $regions);
-        $this->assertEquals($regions['test-region'][0]->fields['fizz'], 'buzz');
+        $this->assertCount(1, $blocks);
+        $this->assertEquals($blocks['test-region'][0]->fields['widget_title'], 'Fizzbuzz');
     }
 
     /**

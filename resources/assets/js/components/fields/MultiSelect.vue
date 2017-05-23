@@ -4,6 +4,7 @@
 			v-for="option in options"
 			:label="option.label"
 			:value="option.value"
+			:key="option.value"
 		>
 		</el-option>
 	</el-select>

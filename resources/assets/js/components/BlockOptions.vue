@@ -4,7 +4,7 @@
 		<i class="el-icon-arrow-left"></i>Back
 	</div>
 	<div class="block-options-list custom-scrollbar">
-		<h2 v-if="currentDefinition">Edit {{ currentDefinition.name }} Block</h2>
+		<h2 v-if="currentDefinition">Edit {{ currentDefinition.label }}</h2>
 
 		<div v-if="currentDefinition">
 			<div v-for="field in currentDefinition.fields">
@@ -24,7 +24,7 @@ export default {
 
 	computed: {
 		currentDefinition() {
-			return this.$store.state.blockDef;
+			return this.$store.state.definition.currentBlockDefinition;
 		}
 	},
 

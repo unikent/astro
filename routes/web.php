@@ -13,21 +13,19 @@
 
 use Illuminate\Support\Facades\Auth;
 
-// Overwrite routes from plugin
-Route::group(['prefix' => 'auth'], function() {
-	Route::get('login', ['as' => 'auth.login', 'uses' => '\App\Http\Controllers\Auth\AuthController@getLogin']);
-	Route::post('login', ['as' => 'auth.postlogin', 'uses' => '\App\Http\Controllers\Auth\AuthController@postLogin']);
-	Route::get('logout', ['as' => 'auth.logout', 'uses' => '\App\Http\Controllers\Auth\AuthController@getLogout']);
-	Route::get('loggedout', ['as' => 'auth.loggedout', 'uses' => '\App\Http\Controllers\Auth\AuthController@getLoggedout']);
-});
+$this->get('auth/login', 'Auth\AuthController@login')->name('auth.login');
+$this->post('auth/login', 'Auth\AuthController@loginLocal');
+$this->get('auth/sso/respond', 'Auth\AuthController@loginSSO')->name('auth.sso.respond');
+$this->post('auth/logout', 'Auth\AuthController@logout')->name('auth.logout');
 
-Route::get('/{catchall?}', function($route) {
+Route::get('/{catchall?}', function($route = '') {
 	$user = Auth::user();
 	// TODO: grab user info from endpoint, rather than inline js
 	return response()->view('inline', [
-		'route' => $route,
-		'user'  => $user->name,
-		'api_token' => $user->api_token
+		'route'      => $route,
+		'is_preview' => starts_with($route, 'preview/'),
+		'user'       => $user->name,
+		'api_token'  => $user->api_token
 	]);
 })
 ->where('catchall', '(.*)')

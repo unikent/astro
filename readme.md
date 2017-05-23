@@ -51,10 +51,24 @@ Anyone wishing to access the API will need a registered user with an API Token. 
 
 API requests will need to request a JSON response with an `Accepts: application/json` header, and pass the access token with an `Authorization: Bearer TOKEN` header. Data can be passed to the API as form data or as a JSON object (with a `Content-Type: application/json` header).
 
-Fractal is used to serialize the API output in a consistent way. When an endpoint supports includes, additional data can be requested using an `?include=` get parameter.
-
 The API is intended to be RESTful, uses Laravel naming conventions and should make semantic use of HTTP status codes.
 
+Fractal is used to serialize the API output. This is covered in more depth elsewhere (see: Serialization).
+
+
+#### Definitions
+At present, definition files are read from disk into the application; at a later date this should be refactored to use Redis. Definition files are versioned using their folder hierarchy, although the JSON content also contains a version key.
+
+Definitions are represented within the system as models extending `App\Models\Definitions\BaseDefinition` and implementing `App\Models\Definitions\Contracts\Definition`. Their interface is very similar to Eloquent models but they should be considered immutable objects - as objects they are intended to give definitions a proper object representation within the system. 
+
+#### Serialization
+Whenever JSON is serialized in the application, [Fractal](http://fractal.thephpleague.com/) is used to transform the data. 
+
+Serialization occurs in two main areas: `App\Http\Controllers\Api\v1\*` and when a page is published ($page->publish($transformer) requires a Fractal transformer instance to ensure that the baked JSON is in the correct format for the API to serve directly).
+
+Many of the API endpoints support Fractal 'includes' by passing an '?include=' parameter with an API request. This accepts a comma-separated list of relations to include. Where an endpoint supports includes it is noted in the docblock. 
+
+Includes will resolve deep relations, i.e. 'block,block.definitions' but please use sparingly: depth restrictions are permissive but data is often lazy-loaded.
 
 #### Routes, Pages, Sites & Permissions
 Pages, Routes and Sites are inter-dependent at at times it is helpful to think of them as a single conceptual unit. 
@@ -100,10 +114,45 @@ Pages are published via `/api/v1/page/ID/publish`. Internally this calls `$page-
 
 
 
-#### Definitions
-At present, definition files are read from disk into the application; at a later date this should be refactored to use Redis. Definition files are versioned using their folder hierarchy, although the JSON content also contains a version key.
+#### Blocks and Pages
+Block instances are created when creating or updating a Page (by a POST to `/api/v1/page`, or a PUT to `/api/v1/page/ID`. 
 
-Definitions are represented within the system as models extending `App\Models\Definitions\BaseDefinition` and implementing `App\Models\Definitions\Contracts\Definition`. Their interface is very similar to Eloquent models but they should be considered immutable objects - as objects they are intended to give definitions a proper object representation within the system. 
+It is important to send ALL Block instances to the server when persisting a Page as **all existing block instances are removed** as a part of the persitance proces. Block instances are then re/created based on the submission **matching the order in which they were submitted**.
+
+
+````
+{
+	"data": {
+		...
+
+		"blocks": {
+			"main": [
+				{
+					"definition_name": "test-block",
+					"definition_version": 1
+				},
+
+				{
+					"definition_name": "test-block",
+					"definition_version": 1
+				},
+
+				...
+			]
+		}
+	}
+}
+````
+
+It is possible for Block definitions to contain validation rules, and for Region definitions to list compatible Blocks. This needs to be validated when persisting Block instances. This is currently implemented by the `App\Models\Api\v1\Page\PersistRequest` class using a the `BlockBroker` class:
+
+ - `PersistRequest` defines its own validation rules in the usual way (as a standard FormRequest);
+ - the `getRules()` method also loads Block and Region definitions based on the submitted data;
+ - a `App\Validation\Brokers\BlockBroker` is then instantiated for each Block instance submitted (this class transforms the validation rules in the block definition to their Laravel-compatible equivalents);
+ - the rules are then extracted from the `BlockBroker` and merged into the default ruleset within `PersistRequest`
+
+The `BlockBroker` also supports `getRegionConstraintRules`, where a Region definition is the only parameter. This validates that the `definition_name` on the Block instance is allowed in the given Region.
+
 
 ### Testing
 PHPUnit has a good level of code coverage across the entire application. 

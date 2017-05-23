@@ -7,10 +7,6 @@
 		{
 			"url": "git@gitlab.kent.ac.uk:webdev/kentauth.git",
 			"type": "git"
-		},
-		{
-			"url": "git@github.com:unikent/cms-prototype-blocks.git",
-			"type": "git"
 		}
 	],
 	"require": {
@@ -28,8 +24,7 @@
 		"rtconner/laravel-tagging": "^2.2",
 		"spatie/laravel-fractal": "^3.5",
 		"spatie/laravel-permission": "^1.12",
-		"unikent/cms-prototype-blocks": "dev-master",
-		"unikent/kentauth": "dev-laravel/5.2"
+		"unikent/kentauth": "dev-laravel/5.3"
 	},
 	"require-dev": {
 		"fzaninotto/faker": "~1.4",

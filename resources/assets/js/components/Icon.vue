@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import astro from '!IconPath/unknown.svg';
+import astro from 'IconPath/unknown.svg';
 
 export default {
 	props: {

@@ -10,9 +10,10 @@
 
 	<title>Astro</title>
 
-	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/css/app.css') }}" />
-	@if ($route === 'preview')
-		<link rel="stylesheet" href="{{ url("/") }}/css/main.min.css" />
+	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/build/css/vendor.css') }}" />
+	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/build/css/main.css') }}" />
+	@if ($is_preview)
+		<link rel="stylesheet" href="https://static.kent.ac.uk/pantheon/kent-theme-assets/assets/css/main.min.css" />
 		<link rel="stylesheet" href="https://static.kent.ac.uk/pantheon/kent-theme-assets/assets/css/kentfont.css" />
 		<style>
 		html {
@@ -30,9 +31,10 @@
 		'base_url' => Request::getBaseUrl(),
 		'api_url' => '/api/v1/',
 		'username' => $user,
-		'api_token' => $api_token
+		'api_token' => $api_token,
+		'debug' => config('app.debug')
 	]); ?>;
-	window.isEditor = <?php echo json_encode($route !== 'preview'); ?>;
+	window.isEditor = <?php echo json_encode(!$is_preview); ?>;
 	</script>
 </head>
 <body class="custom-scrollbar">
@@ -40,8 +42,8 @@
 
 	</div>
 
-	<script src="{{ url('/') }}{{ mix('js/manifest.js') }}"></script>
-	<script src="{{ url('/') }}{{ mix('js/vendor.js') }}"></script>
-	<script src="{{ url('/') }}{{ mix('js/app.js') }}"></script>
+	<script src="{{ url('/') }}{{ mix('/build/js/manifest.js') }}"></script>
+	<script src="{{ url('/') }}{{ mix('/build/js/vendor.js') }}"></script>
+	<script src="{{ url('/') }}{{ mix('/build/js/main.js') }}"></script>
 </body>
 </html>

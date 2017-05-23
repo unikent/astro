@@ -29,7 +29,7 @@ export default {
 
 	methods: {
 		...mapMutations([
-			'updateValue'
+			'updateFieldValue'
 		]),
 
 		cleanText(txt) {
@@ -69,7 +69,7 @@ export default {
 						self.synced = false;
 					}
 					else {
-						self.updateValue({
+						self.updateFieldValue({
 							name: self.name,
 							value: self.cleanText(this.code.get())
 						});

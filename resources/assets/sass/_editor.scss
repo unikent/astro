@@ -123,7 +123,7 @@ html {
 }
 
 .b-editable,
-.b-block {
+.block-overlay {
 	border: 2px solid #2196f3;
 	position: absolute;
 	transition: border-color .3s ease-out, opacity .3s ease-out;
@@ -131,14 +131,14 @@ html {
 	pointer-events: none;
 }
 
-.b-block {
+.block-overlay {
 	top: 0;
 	opacity: 0;
 	border-width: 4px;
 }
 
-.b-block-options,
-.b-block-move {
+.block-overlay__options,
+.block-overlay__move {
 	transition: background-color .3s ease-out;
 	position: absolute;
 	background-color: #2196f3;
@@ -151,21 +151,21 @@ html {
 	text-align: center;
 }
 
-.b-block-move {
+.block-overlay__move {
 	top: 50%;
 	transform: translateY(-50%);
 	left: -4px;
 	cursor: move;
 }
 
-.b-block-options {
+.block-overlay__options {
 	top: -4px;
 	right: -4px;
 	cursor: pointer;
 	font-size: 25px;
 }
 
-.b-block-move {
+.block-overlay__move {
 	transition: background-color .3s ease-out;
 	position: absolute;
 	top: 50%;
@@ -182,8 +182,8 @@ html {
 	text-align: center;
 }
 
-.hide-drag .b-block-options,
-.hide-drag .b-block-move {
+.hide-drag .block-overlay__options,
+.hide-drag .block-overlay__move {
 	opacity: 0;
 }
 

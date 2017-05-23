@@ -24,7 +24,7 @@ export default {
 			'over'
 		]),
 		blocks() {
-			return this.$store.state.blockList;
+			return this.$store.state.definition.blockList;
 		}
 	},
 

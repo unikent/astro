@@ -8,6 +8,7 @@
 					:link="item.link"
 					:icon="item.icon"
 					:title="item.title"
+					:key="item.link"
 				/>
 			</ul>
 		</section>
@@ -20,10 +21,10 @@
 
 <script>
 import Icon from '../Icon';
-import homeIcon from '!IconPath/home.svg';
-import settingsIcon from '!IconPath/settings.svg';
-import sitesIcon from '!IconPath/files.svg';
-import mediaIcon from '!IconPath/agenda.svg';
+import homeIcon from 'IconPath/home.svg';
+import settingsIcon from 'IconPath/settings.svg';
+import sitesIcon from 'IconPath/files.svg';
+import mediaIcon from 'IconPath/agenda.svg';
 
 export default {
 	name: 'Admin',
