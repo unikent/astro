@@ -24,7 +24,7 @@
 		"rtconner/laravel-tagging": "^2.2",
 		"spatie/laravel-fractal": "^3.5",
 		"spatie/laravel-permission": "^1.12",
-		"unikent/kentauth": "dev-laravel/5.2"
+		"unikent/kentauth": "dev-laravel/5.3"
 	},
 	"require-dev": {
 		"fzaninotto/faker": "~1.4",
