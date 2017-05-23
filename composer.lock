@@ -3327,7 +3327,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/kentauth.git",
-                "reference": "fbd2d188ef59e4fa58bd60e606f2083d03c1228a"
+                "reference": "29fa4b43cdc0059d8a5b0cb410b9c3588245a40c"
             },
             "require-dev": {
                 "mockery/mockery": "0.9.*",
@@ -3352,7 +3352,7 @@
                 }
             ],
             "description": "Kent Authentiction for Laravel",
-            "time": "2017-05-23 10:28:24"
+            "time": "2017-05-23 11:17:04"
         },
         {
             "name": "vlucas/phpdotenv",
