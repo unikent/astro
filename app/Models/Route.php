@@ -5,6 +5,7 @@ use DB;
 use Exception;
 use Baum\Node as BaumNode;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 
 class Route extends BaumNode
 {
@@ -262,4 +263,61 @@ class Route extends BaumNode
 	{
 		return static::where('path', '=', $path)->firstOrFail();
 	}
+
+	/**
+	 * Clones the desendants of the given Route to the current Route instance.
+	 *
+	 * @param Route $node
+	 * @return \Illuminate\Database\Eloquent\Collection $descendants
+	 */
+	public function cloneDescendants(Route $node)
+	{
+		$tree = [];
+
+		// Ensure that existing descendants are present in the tree
+		$descendants = $this->descendants()->get()->toHierarchy();
+
+		if(!$descendants->isEmpty()){
+			$this->replicateIterator($descendants, $tree, true);
+		}
+
+		// Clone the new descendants into the tree
+		$descendants = $node->descendants()->get()->toHierarchy();
+
+		if(!$descendants->isEmpty()){
+			$this->replicateIterator($descendants, $tree, false);
+		}
+
+		// Persist
+		$this->makeTree($tree);
+
+		$model = $this->fresh();
+		return $model->descendants()->get();
+	}
+
+	/**
+	 * Recursive iterator used by replicateWithDescendants.
+	 *
+	 * @param  Collection $nodes
+	 * @param  array|null &$output
+	 * @para
+	 */
+	protected function replicateIterator(Collection $nodes, array &$output, $preserve)
+	{
+		foreach($nodes as $node){
+			$data = array_except($node->toArray(), [ 'parent_id', 'depth', 'lft', 'rgt', 'children' ]);
+
+			if(!$preserve){
+				$data = array_except($data, [ 'id', 'path', 'is_active', 'is_canonical' ]);
+			}
+
+			if(!$node->children->isEmpty()){
+				$data['children'] = [];
+				$this->replicateIterator($node->children, $data['children'], $preserve);
+			}
+
+			$output[] = $data;
+		}
+	}
+
 }
