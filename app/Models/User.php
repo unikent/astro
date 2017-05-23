@@ -23,7 +23,7 @@ class User extends KentUser
     {
    		parent::__construct($attributes);
 
-   		$this->api_token = $this->api_token ?: str_random(255);
+   		$this->api_token = $this->api_token ?: str_random(191);
 	}
 
     public function publishing_groups()
