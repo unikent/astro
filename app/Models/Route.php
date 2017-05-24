@@ -4,11 +4,14 @@ namespace App\Models;
 use DB;
 use Exception;
 use Baum\Node as BaumNode;
+use App\Models\Traits\Pathable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class Route extends BaumNode
 {
+	use Pathable;
+
 	public $timestamps = false;
 
 	protected $fillable = [
@@ -69,6 +72,35 @@ class Route extends BaumNode
 	{
 		return $this->hasOne(PublishedPage::class, 'page_id', 'page_id')->latest()->limit(1);
 	}
+
+
+
+    /**
+     * Delete the model from the database.
+     * Creates a new Redirect model to ensure that the path is not lost forever.
+     *
+     * @return bool|null
+     * @throws \Exception
+     */
+    public function delete()
+    {
+    	DB::beginTransaction();
+
+    	try {
+    		if($this->isActive()){
+    			Redirect::createFromRoute($this);
+    		}
+
+	    	parent::delete();
+
+	    	DB::commit();
+    	} catch(Exception $e){
+    		DB::rollback();
+    		throw $e;
+    	}
+    }
+
+
 
     /**
      * Scope a query to only include active routes.
@@ -239,29 +271,6 @@ class Route extends BaumNode
 		}
 
 		return $path . $this->slug;
-	}
-
-	/**
-	 * Attempts to retrieve a Route by path
-	 *
-	 * @param  string $hash
-	 * @return Route
-	 */
-	public static function findByPath($path)
-	{
-		return static::where('path', '=', $path)->first();
-	}
-
-	/**
-	 * Attempts to retrieve a Route by path, throws Exception when not found
-	 *
-	 * @param  string $path
-	 * @return Route
-	 * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
-	 */
-	public static function findByPathOrFail($path)
-	{
-		return static::where('path', '=', $path)->firstOrFail();
 	}
 
 	/**

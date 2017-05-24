@@ -6,6 +6,7 @@ use Tests\TestCase;
 use App\Models\Page;
 use App\Models\Site;
 use App\Models\Route;
+use App\Models\Redirect;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class RouteTest extends TestCase
@@ -411,6 +412,62 @@ class RouteTest extends TestCase
 	{
         $this->expectException(ModelNotFoundException::class);
 		Route::findByPathOrFail('/foobar');
+	}
+
+
+
+	/**
+	 * @test
+	 */
+	public function delete_WhenRouteIsNotActive_DeletesRoute()
+	{
+		$route = factory(Route::class)->states('withPage', 'withParent')->create();
+		$route->delete();
+
+		$this->assertNull(Route::find($route->getKey()));
+	}
+
+	/**
+	 * @test
+	 */
+	public function delete_WhenRouteIsNotActive_DoesNotCreateRedirect()
+	{
+		$count = Redirect::count();
+
+		$route = factory(Route::class)->states('withPage', 'withParent')->create();
+		$route->delete();
+
+		$this->assertEquals($count, Redirect::count());
+	}
+
+	/**
+	 * @test
+	 */
+	public function delete_WhenRouteIsActive_DeletesRoute()
+	{
+		$route = factory(Route::class)->states('withPage', 'withParent')->create();
+		$route->makeActive();
+		$route->delete();
+
+		$this->assertNull(Route::find($route->getKey()));
+	}
+
+	/**
+	 * @test
+	 */
+	public function delete_WhenRouteIsActive_CreatesNewRedirect()
+	{
+		$count = Redirect::count();
+
+		$route = factory(Route::class)->states('withPage', 'withParent')->create();
+		$route->makeActive();
+		$route->delete();
+
+		$this->assertEquals($count + 1, Redirect::count());
+
+		$redirect = Redirect::all()->last();
+		$this->assertEquals($route->path, $redirect->path);
+		$this->assertEquals($route->page_id, $redirect->page_id);
 	}
 
 }
