@@ -1,6 +1,8 @@
 <?php
 namespace App\Http\Controllers\Api\v1;
 
+use Auth;
+use Gate;
 use App\Models\Site;
 use Illuminate\Http\Request;
 use App\Http\Transformers\Api\v1\SiteTransformer;
@@ -12,14 +14,22 @@ class SiteController extends ApiController
 	/**
 	 * GET /api/v1/site
 	 *
+	 * Returns a list of sites accessible to the User. If the
+	 * User had 'index' access, this will return all Sites.
+	 *
 	 * @param  Request    $request
 	 * @return Response
 	 */
 	public function index(Request $request){
-		$this->authorize('index', Site::class);
+		$user = Auth::user();
+		$sites = Site::with('canonical');
 
-		$sites = Site::with('canonical')->get();
-		return fractal($sites, new SiteTransformer)->respond();
+		if(!Gate::allows('index', Site::class)){
+			$pgs = $user->publishing_groups->pluck('id');
+			$sites = $sites->whereIn('publishing_group_id', $pgs);
+		}
+
+		return fractal($sites->get(), new SiteTransformer)->respond();
 	}
 
 	/**

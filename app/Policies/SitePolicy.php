@@ -10,6 +10,13 @@ class SitePolicy
 {
     use HandlesAuthorization;
 
+    public function before($user, $ability)
+    {
+        if($user->isAdmin()){
+            return true;
+        }
+    }
+
     /**
      * Determine whether the user can index Site.
      *
@@ -18,7 +25,7 @@ class SitePolicy
      */
     public function index(User $user)
     {
-        return true;
+        return false;
     }
 
     /**
