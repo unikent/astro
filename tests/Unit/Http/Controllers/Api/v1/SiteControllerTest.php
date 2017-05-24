@@ -4,7 +4,9 @@ namespace Tests\Unit\Http\Controllers\Api\v1;
 use Gate;
 use Mockery;
 use App\Models\Site;
+use App\Models\User;
 use App\Models\Route;
+use App\Models\PublishingGroup;
 use App\Http\Controllers\Api\v1\SiteController;
 use Illuminate\Auth\Access\AuthorizationException;
 
@@ -24,7 +26,7 @@ class SiteControllerTest extends ApiControllerTestCase {
      * @group authorization
      */
     public function index_WhenAuthenticated_ChecksAuthorization(){
-        Gate::shouldReceive('authorize')->with('index', Site::class)->once();
+        Gate::shouldReceive('allows')->with('index', Site::class)->once();
 
         $this->authenticated();
         $this->action('GET', SiteController::class . '@index');
@@ -34,17 +36,49 @@ class SiteControllerTest extends ApiControllerTestCase {
      * @test
      * @group authorization
      */
-    public function index_WhenAuthenticatedAndUnauthorized_Returns403(){
-        $this->authenticatedAndUnauthorized();
+    public function index_WhenAuthenticatedAndUnauthorizedToIndex_Returns200(){
+        $this->authenticated();
+        Gate::shouldReceive('allows')->with('index', Site::class)->andReturn(false); // Not Admin
 
         $response = $this->action('GET', SiteController::class . '@index');
-        $response->assertStatus(403);
+        $response->assertStatus(200);
     }
 
     /**
      * @test
+     * @group authorization
      */
-    public function index_WhenAuthorized_Returns200(){
+    public function index_WhenAuthenticatedAndNotAuthorizedToIndex_ReturnsJsonOfSitePagesAssociatedWithUser(){
+        $routes = factory(Route::class, 3)->states([ 'withPage', 'withParent', 'withSite' ])->create([ 'is_canonical' => true ]);
+
+        // Create a PublishingGroup...
+        $pg = factory(PublishingGroup::class)->create();
+
+        // ...associate the Site with the PG...
+        $routes[1]->site->publishing_group_id = $pg->getKey();
+        $routes[1]->site->save();
+
+        // ...and associate the User with the PG...
+        $user = factory(User::class)->create([ 'role' => 'user' ]);
+        $user->publishing_groups()->attach($pg);
+
+        $this->authenticated($user);
+        Gate::shouldReceive('allows')->with('index', Site::class)->andReturn(false); // Not Admin
+
+        $response = $this->action('GET', SiteController::class . '@index');
+        $json = $response->json();
+
+        $this->assertArrayHasKey('data', $json);
+
+        $this->assertCount(1, $json['data']);
+        $this->assertEquals($routes[1]->site->getKey(), $json['data'][0]['id']);
+    }
+
+    /**
+     * @test
+     * @group authorization
+     */
+    public function index_WhenAuthorizedToIndex_Returns200(){
         $this->authenticatedAndAuthorized();
 
         $response = $this->action('GET', SiteController::class . '@index');
@@ -54,7 +88,7 @@ class SiteControllerTest extends ApiControllerTestCase {
     /**
      * @test
      */
-    public function index_WhenAuthorizedAndFound_ReturnsJson(){
+    public function index_WhenAuthorizedToIndex_ReturnsJsonOfAllSitePages(){
         $routes = factory(Route::class, 3)->states([ 'withPage', 'withParent', 'withSite' ])->create([ 'is_canonical' => true ]);
 
         factory(Route::class)->create([
@@ -65,19 +99,17 @@ class SiteControllerTest extends ApiControllerTestCase {
 
         $this->authenticatedAndAuthorized();
 
-        $count = Site::count();
-
         $response = $this->action('GET', SiteController::class . '@index');
         $json = $response->json();
 
         $this->assertArrayHasKey('data', $json);
-        $this->assertCount($count, $json['data']);
+        $this->assertCount(3, $json['data']);
     }
 
     /**
      * @test
      */
-    public function index_WhenAuthorizedAndFound_ReturnsCanonicalRoutesInJson(){
+    public function index_WhenAuthorized_ReturnsCanonicalRoutesInJson(){
         $routes = factory(Route::class, 3)->states([ 'withPage', 'withParent', 'withSite' ])->create([ 'is_canonical' => true ]);
 
         $this->authenticatedAndAuthorized();
