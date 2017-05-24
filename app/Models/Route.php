@@ -74,6 +74,32 @@ class Route extends BaumNode
 	}
 
 
+    /**
+     * Save the model to the database.
+     *
+     * @param  array  $options
+     * @return bool
+     */
+    public function save(array $options = [])
+    {
+    	DB::beginTransaction();
+
+    	try {
+    		if(!$this->isActive()){
+				static::where('page_id', $this->page_id)
+					->where($this->getKeyName(), '!=', $this->getKey())
+					->active(false)
+					->delete();
+    		}
+
+	    	parent::save($options);
+
+	    	DB::commit();
+    	} catch(Exception $e){
+    		DB::rollback();
+    		throw $e;
+    	}
+    }
 
     /**
      * Delete the model from the database.

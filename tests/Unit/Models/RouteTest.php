@@ -419,6 +419,67 @@ class RouteTest extends TestCase
 	/**
 	 * @test
 	 */
+	public function save_WhenRouteIsNotActive_SavesNewDraftRoute()
+	{
+		$count = Route::count();
+
+		$route = factory(Route::class)->states('isRoot', 'withPage')->make();
+		$route->save();
+
+		$this->assertEquals($count + 1, Route::count());
+
+		$route = $route->fresh();
+		$this->assertFalse($route->isActive());
+	}
+
+	/**
+	 * @test
+	 */
+	public function save_WhenRouteIsNotActive_DeletesAnyOtherInactiveRoutes()
+	{
+		$count = Route::count();
+
+		$r1 = factory(Route::class)->states('isRoot', 'withPage')->make();
+		$r1->save();
+
+		$this->assertEquals($count+1, Route::count());
+
+		$r2 = $r1->replicate();
+		$r2->save();
+
+		$this->assertEquals($count+1, Route::count()); 						// Number of routes is the same...
+		$this->assertNull(Route::find($r1->getKey())); 						// ...but $r1 is gone...
+		$this->assertInstanceOf(Route::class, Route::find($r2->getKey())); 	// ...and $r2 is present.
+	}
+
+	/**
+	 * @test
+	 *
+	 * A Route should't really be updated like this when running in a production
+	 * environment. However, we want to make sure that save still behaves normally.
+	 */
+	public function save_WhenRouteIsActive_UpdatesRoute()
+	{
+		$route = factory(Route::class)->states('withParent', 'withPage')->create();
+		$route->makeActive();
+
+		$count = Route::count();
+
+		$route->slug = 'foobar123';
+		$route->save();
+
+		$this->assertEquals($count, Route::count()); // Should not have created a new Route
+		$this->assertInstanceOf(Route::class, Route::find($route->getKey()));
+
+		$route = $route->fresh();
+		$this->assertEquals('foobar123', $route->slug);
+	}
+
+
+
+	/**
+	 * @test
+	 */
 	public function delete_WhenRouteIsNotActive_DeletesRoute()
 	{
 		$route = factory(Route::class)->states('withPage', 'withParent')->create();
