@@ -18,7 +18,7 @@ class SiteController extends ApiController
 	public function index(Request $request){
 		$this->authorize('index', Site::class);
 
-		$sites = Site::with('canonical')->get();
+		$sites = Site::with('activeRoute')->get();
 		return fractal($sites, new SiteTransformer)->respond();
 	}
 
@@ -45,7 +45,7 @@ class SiteController extends ApiController
 	public function tree(Request $request, Site $site){
 		$this->authorize('read', $site);
 
-		$qb = $site->canonical->descendantsAndSelf();
+		$qb = $site->activeRoute->descendantsAndSelf();
 		$routes = $qb->get()->toHierarchy();
 
 		return fractal($routes, new RouteTransformer)->respond();

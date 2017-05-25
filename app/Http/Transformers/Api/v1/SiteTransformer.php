@@ -10,7 +10,7 @@ use League\Fractal\TransformerAbstract as FractalTransformer;
 class SiteTransformer extends FractalTransformer
 {
 
-    protected $defaultIncludes = [ 'canonical' ];
+    protected $defaultIncludes = [ 'active_route' ];
     protected $availableIncludes = [ 'routes' ];
 
 	public function transform(Site $site)
@@ -23,10 +23,10 @@ class SiteTransformer extends FractalTransformer
      *
      * @return League\Fractal\ItemResource
      */
-    public function includeCanonical(Site $site)
+    public function includeActiveRoute(Site $site)
     {
-        if($site->canonical){
-            return new FractalItem($site->canonical, new RouteTransformer, false);
+        if($site->activeRoute){
+            return new FractalItem($site->activeRoute, new RouteTransformer, false);
         }
     }
 
