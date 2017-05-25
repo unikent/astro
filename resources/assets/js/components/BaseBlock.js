@@ -1,28 +1,42 @@
-// import inlineFieldMixin from '../mixins/inlineFieldMixin';
-// import inlineEdit from '../directives/inline-edit';
-
 export default {
 
-	// mixins: [inlineFieldMixin],
-
-	props: ['name', 'index', 'fields', 'other'],
-
-	// directives: {
-	// 	inlineEdit
-	// },
+	props: [
+		'type',
+		'index',
+		'fields',
+		'other'
+	],
 
 	data() {
-		return { ...this.fields };
+		return this.fields;
 	},
 
 	created() {
-		Object.keys(this.fields).map((name) => {
-			this.$watch(`fields.${name}`, (newVal, oldVal) => {
-				this[name] = newVal;
-			}, {
-				deep: true
-			});
+		this.watching = {};
+		this.watchFields(this.fields);
+
+		// should only be triggered when all fields are overwitten
+		this.$watch('fields', () => {
+			this.watchFields(this.fields);
 		});
+
+		// TODO: deal with fields that have nested data?
+	},
+
+	methods: {
+		watchFields(fields) {
+			Object.keys(fields).map((name) => {
+				if(!this.watching[name]) {
+					this.watching[name] = true;
+
+					this.$watch(`fields.${name}`, (newVal) => {
+						this[name] = newVal;
+					}, {
+						deep: true
+					});
+				}
+			});
+		}
 	}
 
 };
