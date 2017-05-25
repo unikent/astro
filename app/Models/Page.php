@@ -26,16 +26,21 @@ class Page extends Model
 
 	protected $layoutDefinition = null;
 
-
-	public function canonical()
-	{
-		return $this->hasOne(Route::class, 'page_id')->canonical();
-	}
-
 	public function routes()
 	{
 		return $this->hasMany(Route::class, 'page_id');
 	}
+
+	public function activeRoute()
+	{
+		return $this->hasOne(Route::class, 'page_id')->active();
+	}
+
+	public function draftRoute()
+	{
+		return $this->hasOne(Route::class, 'page_id')->active(false);
+	}
+
 
 	public function blocks()
 	{
@@ -67,23 +72,24 @@ class Page extends Model
 			throw new Exception('You cannot publish a page with unsaved changes.');
 		}
 
+		// Ensure that the draft does not have unpublished ancestors
+		if($this->draftRoute && $this->draftRoute->ancestors()->active(false)->count()){
+			throw new Exception('You cannot publish this page as it has unpublished ancestors.');
+		}
+
 		DB::beginTransaction();
 
 		try {
-			// Attempt to load any inactive routes, if there are any we need to make them active and canonical
-			$route = $this->routes()->active(false)->limit(1)->first();
+			// If there is a draft route, publish it
+			if($this->draftRoute) $this->draftRoute->makeActive();
 
-			if($route){
-				$route->makeActive();
-				$route->makeCanonical();
-			}
-
-			$this->load([ 'blocks', 'canonical' ]);
+			// Ensure that important relations are populated and up-to-date
+			$this->load([ 'blocks', 'draftRoute', 'activeRoute' ]);
 
 			// Create our PublishedPage, bake it with Fractal
 			$published = new PublishedPage;
 			$published->page_id = $this->getKey();
-			$published->bake = fractal($this, $transformer)->parseIncludes([ 'blocks', 'canonical' ])->toJson();
+			$published->bake = fractal($this, $transformer)->parseIncludes([ 'blocks', 'activeRoute' ])->toJson();
 			$published->save();
 
 			DB::commit();
@@ -91,15 +97,14 @@ class Page extends Model
 			DB::rollback();
 			throw $e;
 		}
+
+		$this->load([ 'draftRoute', 'activeRoute' ]);
 	}
 
 
 	/**
-	 * Restores a Page from a PublishedPage instance.
-	 *
-	 * All Block instances are replaced with those defined by the bake. If
-	 * the canonical Route present in the bake is found, it is restored to
-	 * Canonical status. All inactive Routes are removed.
+	 * Restores a Page from a PublishedPage instance. All Block instances are
+	 * replaced with those defined by the bake. Routes remain unaltered.
 	 *
 	 * @return void
 	 * @throws Exception
@@ -123,15 +128,6 @@ class Page extends Model
 			$this->fill($baked);
 			$this->save();
 
-			// Remove inactive Routes
-			$this->routes()->active(false)->delete();
-
-			// Restore the Route (provided it is still associated with this Page).
-			if(isset($baked['canonical'])){
-				$route = $this->routes->find($baked['canonical']['id']);
-				if($route) $route->makeCanonical();
-			}
-
 			// Restore the Block instances
 			$this->blocks()->delete();
 
@@ -152,7 +148,7 @@ class Page extends Model
 			throw $e;
 		}
 
-		$this->load('blocks', 'canonical', 'routes');
+		$this->load([ 'blocks', 'routes', 'draftRoute', 'activeRoute' ]);
 	}
 
 

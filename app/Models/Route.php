@@ -16,6 +16,7 @@ class Route extends BaumNode
 
 	protected $fillable = [
 		'slug',
+		'page_id',
 		'parent_id',
 	];
 
@@ -26,7 +27,6 @@ class Route extends BaumNode
 
 	protected $casts = [
         'is_active' => 'boolean',
-        'is_canonical' => 'boolean',
 	];
 
 
@@ -161,8 +161,8 @@ class Route extends BaumNode
 	}
 
 	/**
-	 * Sets is_active to true on this route, and destroys any other routes
-	 * that are not yet active.
+	 * Sets is_active to true on this instance, and deletes all
+	 * other Routes to the same Page. Delete ensures that a Redirect is created.
 	 *
 	 * @return void
 	 */
@@ -174,7 +174,9 @@ class Route extends BaumNode
 			$this->attributes['is_active'] = true;
 			$this->save();
 
-			static::where('page_id', $this->page_id)->active(false)->delete();
+			static::where('page_id', $this->page_id)
+				->where($this->getKeyName(), '!=', $this->getKey())
+				->each(function($model){ $model->delete(); }); // We take this approach as we want model lifecycle events.
 
 			DB::commit();
 		} catch(Exception $e){
@@ -183,62 +185,6 @@ class Route extends BaumNode
 		}
 	}
 
-
-    /**
-     * Scope a query to only include canonical routes.
-     *
-     * @param Builder $query
-     * @param boolean $value
-     * @return Builder
-     */
-	public function scopeCanonical(Builder $query, $value = true)
-	{
-		return $query->where('is_canonical', '=', $value);
-	}
-
-	/**
-	 * Ensures that is_canonical cannot be set directly.
-	 *
-	 * @param $value
-	 * @throws Exception
-	 */
-	public function setIsCanonicalAttribute($value){
-		throw new Exception('The is_canonical attribute cannot be set directly. Use makeCanonical.');
-	}
-
-	/**
-	 * Sets is_canonical to true on this route, and sets is_canonical to
-	 * false on all routes sharing the same Page destination.
-	 *
-	 * @return void
-	 */
-	public function makeCanonical()
-	{
-		DB::beginTransaction();
-
-		try {
-			static::where('page_id', '=', $this->page_id)
-				->where('is_canonical', '=', true)
-				->update([ 'is_canonical' => false ]);
-
-			$this->attributes['is_canonical'] = true;
-			$this->save();
-
-			DB::commit();
-		} catch(Exception $e){
-			DB::rollback();
-			throw $e;
-		}
-	}
-
-	/**
-	 * Returns true if is_canonical is true, else false
-	 * @return boolean
-	 */
-	public function isCanonical()
-	{
-		return $this->is_canonical;
-	}
 
 
 	/**
@@ -343,7 +289,7 @@ class Route extends BaumNode
 			$data = array_except($node->toArray(), [ 'parent_id', 'depth', 'lft', 'rgt', 'children' ]);
 
 			if(!$preserve){
-				$data = array_except($data, [ 'id', 'path', 'is_active', 'is_canonical' ]);
+				$data = array_except($data, [ 'id', 'path', 'is_active' ]);
 			}
 
 			if(!$node->children->isEmpty()){

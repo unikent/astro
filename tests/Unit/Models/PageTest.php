@@ -7,6 +7,7 @@ use Tests\TestCase;
 use App\Models\Page;
 use App\Models\Block;
 use App\Models\Route;
+use App\Models\Redirect;
 use App\Models\PublishedPage;
 use App\Http\Transformers\Api\v1\PageTransformer;
 use App\Models\Definitions\Layout as LayoutDefinition;
@@ -16,6 +17,7 @@ class PageTest extends TestCase
 
 	/**
 	 * @test
+	 * @group wip
 	 */
 	public function publish_WhenPageHasUnsavedChanges_ThrowsException()
 	{
@@ -28,6 +30,20 @@ class PageTest extends TestCase
 
 	/**
 	 * @test
+	 * @group wip
+	 */
+	public function publish_WhenPageHasUnpublishedParents_ThrowsException()
+	{
+		$parent = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+		$child = factory(Route::class)->states([ 'withPage' ])->create([ 'parent_id' => $parent->getKey() ]);
+
+		$this->expectException(Exception::class);
+		$child->page->publish(new PageTransformer);
+	}
+
+	/**
+	 * @test
+	 * @group wip
 	 */
 	public function publish_CreatesPublishedPageInstance()
 	{
@@ -40,6 +56,7 @@ class PageTest extends TestCase
 
 	/**
 	 * @test
+	 * @group wip
 	 */
 	public function publish_AssociatesPublishedPageWithPageInstance()
 	{
@@ -53,34 +70,59 @@ class PageTest extends TestCase
 
 	/**
 	 * @test
+	 * @group wip
+	 * @group integration
+	 *
+	 * This tests integration between $page->publish(), $route->makeActive() and $route->delete().
 	 */
-	public function publish_RouteIsMadeActive()
+	public function publish_WhenThereIsAnActiveRoute_ActiveRouteGetsRedirected()
+	{
+		$route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
+		$route->parent->makeActive();
+		$route->makeActive();
+
+		$draft = factory(Route::class)->create([ 'page_id' => $route->page_id, 'parent_id' => $route->parent_id, 'slug' => '/foobar' ]);
+
+		$count = Redirect::count();
+
+		$page = $route->page->fresh();
+		$page->publish(new PageTransformer);
+		$this->assertEquals($count+1, Redirect::count());
+	}
+
+	/**
+	 * @test
+	 * @group wip
+	 */
+	public function publish_DraftRouteBecomesActiveRoute()
 	{
 		$route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
-		$this->assertFalse($route->isActive());
 
-		$route->page->publish(new PageTransformer);
+		$page = $route->page->fresh();
+		$page->publish(new PageTransformer);
 
 		$route = $route->fresh();
 		$this->assertTrue($route->isActive());
+		$this->assertEquals($route->getKey(), $route->page->activeRoute->getKey());
 	}
 
 	/**
 	 * @test
+	 * @group wip
 	 */
-	public function publish_RouteIsMadeCanonical()
+	public function publish_PageOnlyHasOneRoute()
 	{
 		$route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
-		$this->assertFalse($route->isCanonical());
 
-		$route->page->publish(new PageTransformer);
+		$page = $route->page->fresh();
+		$page->publish(new PageTransformer);
 
-		$route = $route->fresh();
-		$this->assertTrue($route->isCanonical());
+		$this->assertCount(1, $page->routes);
 	}
 
 	/**
 	 * @test
+	 * @group wip
 	 */
 	public function publish_PublishedPageBakeContainsSerializedPageInstance()
 	{
@@ -96,6 +138,7 @@ class PageTest extends TestCase
 
 	/**
 	 * @test
+	 * @group wip
 	 */
 	public function revert_WhenPageHasUnsavedChanges_ThrowsException()
 	{
@@ -110,6 +153,7 @@ class PageTest extends TestCase
 
 	/**
 	 * @test
+	 * @group wip
 	 */
 	public function revert_WhenPublishedPageIsNotAssociatedWithPage_ThrowsException()
 	{
@@ -125,6 +169,7 @@ class PageTest extends TestCase
 
 	/**
 	 * @test
+	 * @group wip
 	 */
 	public function revert_RevertsPageToMatchPublishedPage()
 	{
@@ -150,6 +195,7 @@ class PageTest extends TestCase
 
 	/**
 	 * @test
+	 * @group wip
 	 */
 	public function revert_RevertsBlocksToMatchPublishedPage()
 	{
@@ -166,69 +212,6 @@ class PageTest extends TestCase
 
 		$page->revert($page->published);
 		$this->assertCount(2, $page->blocks);
-	}
-
-	/**
-	 * @test
-	 */
-	public function revert_RemovesInactiveRoutes()
-	{
-		$r1 = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
-		$r1->page->publish(new PageTransformer);
-
-		$r2 = factory(Route::class)->states([ 'isRoot' ])->create([ 'page_id' => $r1->page->getKey() ]);
-
-		$page = $r1->page->fresh();
-		$this->assertCount(1, $page->routes()->active(false)->get());
-
-		$page->revert($page->published);
-		$this->assertCount(0, $page->routes()->active(false)->get());
-		$this->assertCount(1, $page->routes);
-	}
-
-	/**
-	 * @test
-	 */
-	public function revert_RevertsCanonicalToMatchPublishedCanonical()
-	{
-		$r1 = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
-		$r1->page->publish(new PageTransformer);
-
-		$r2 = factory(Route::class)->states([ 'isRoot' ])->create([ 'page_id' => $r1->page->getKey() ]);
-		$r2->makeActive();
-		$r2->makeCanonical();
-
-		$page = $r1->page->fresh();
-		$this->assertEquals($r2->getKey(), $page->canonical->getKey());
-
-		$page->revert($page->published);
-
-		$this->assertCount(2, $page->routes);
-		$this->assertEquals($r1->getKey(), $page->canonical->getKey());
-	}
-
-	/**
-	 * @test
-	 */
-	public function revert_WhenPublishedPageCanonicalHasBeenReassigned_DoesNotRevertCanonical()
-	{
-		$r1 = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
-		$r1->page->publish(new PageTransformer);
-
-		$r2 = factory(Route::class)->create([ 'page_id' => $r1->page->getKey(), 'parent_id' => $r1->parent_id ]);
-		$r2->page->publish(new PageTransformer);
-
-		$p1 = $r1->page->fresh();
-
-		// Re-assign the Route to a new Page (at the same level in the tree)
-		$p2 = factory(Page::class)->create();
-		$r1->page_id = $p2->getKey();
-		$r1->save();
-
-		$p1->revert($p1->history->first());
-
-		$this->assertCount(1, $p1->routes);
-		$this->assertEquals($r2->getKey(), $p1->canonical->getKey());
 	}
 
 
