@@ -24,6 +24,32 @@
 	width: 100%;
 }
 
+.block-options-list	{
+	.el-form-item__label {
+		font-size: 16px;
+		display: block;
+		margin-top: 20px;
+		padding-top: 20px;
+		border-top: 1px solid rgba(191, 203, 217, 0.3);
+		font-weight: 500;
+		margin-bottom: 1em;
+	}
+
+	.is-error .el-upload-dragger {
+		width: 100%;
+		border-color: #ff4949;
+	}
+
+	.el-form-item.is-required .el-form-item__label:before {
+		content: none;
+	}
+
+	.el-form-item.is-required .el-form-item__label:after {
+		content: '*';
+		color: #ff4949;
+	}
+}
+
 .el-dialog,
 .el-message-box {
 	border: 1px solid #dce3ea;
