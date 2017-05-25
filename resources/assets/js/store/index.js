@@ -23,7 +23,8 @@ let store = new Vuex.Store({
 			url: ''
 		},
 		wrapperStyles: {},
-		showIframeOverlay: false
+		showIframeOverlay: false,
+		errors: []
 	},
 
 	getters: {},
@@ -44,6 +45,10 @@ let store = new Vuex.Store({
 
 		showIframeOverlay(state, yes) {
 			state.showIframeOverlay = yes;
+		},
+
+		updateErrors(state, errors) {
+			state.errors = errors;
 		}
 	},
 

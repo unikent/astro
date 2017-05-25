@@ -14,7 +14,7 @@
 			ref="block_fields"
 		>
 			<div v-for="field in currentDefinition.fields">
-				<el-form-item :label="field.label" :prop="field.name">
+				<el-form-item :label="field.label" :prop="field.name" :error="localErrors[field.name] || null">
 					<template slot="label">
 						<span>{{ field.label }}</span>
 						<el-tooltip v-if="field.info" :content="field.info" placement="top">
@@ -68,6 +68,11 @@ export default {
 			set() {}
 		},
 
+		localErrors() {
+			return this.errors.blocks ?
+				this.errors.blocks[this.currentRegion][this.currentIndex].fields : {};
+		},
+
 		rules() {
 			return Definition.getRules(this.currentDefinition);
 		},
@@ -75,6 +80,11 @@ export default {
 		...mapGetters([
 			'getCurrentBlock'
 		]),
+
+		...mapState([
+			'errors'
+		]),
+
 		...mapState({
 			currentIndex: state => state.page.currentBlockIndex,
 			currentRegion: state => state.page.currentRegion
@@ -92,11 +102,13 @@ export default {
 	methods: {
 		...mapMutations([
 			'setBlock',
-			'deleteBlock'
+			'deleteBlock',
+			'updateErrors'
 		]),
 
 		goBack() {
 			this.setBlock();
+			this.updateErrors({});
 		},
 
 		deleteThisBlock() {
