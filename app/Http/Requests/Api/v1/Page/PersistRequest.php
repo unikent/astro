@@ -109,6 +109,26 @@ class PersistRequest extends FormRequest
     public function messages()
     {
         return [
+            'in' => 'Please select a valid value.',
+            'integer' => 'This field must be an integer.',
+            'max' => [
+                'numeric' => 'This field may not be greater than :max.',
+                'string' => 'This field may not be greater than :max characters.',
+                'array' => 'This field may not have more than :max items.'
+            ],
+            'min' => [
+                'numeric' => 'This field must be at least :min.',
+                'string' => 'This field must be at least :min characters.',
+                'array' => 'This field must have at least :min items.'
+            ],
+            'regex' => 'This field\'s format is invalid.',
+            'required' => 'This field is required.',
+            'size' => [
+                'numeric' => 'This field must be :size.',
+                'string' => 'This field must be :size characters.',
+                'array' => 'This field must contain :size items.'
+            ],
+            'string' => 'This field must be a string.'
         ];
     }
 }
