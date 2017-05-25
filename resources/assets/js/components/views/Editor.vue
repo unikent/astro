@@ -60,6 +60,7 @@ import Config from '../../classes/Config';
 import PageSidebar from '../PageSidebar';
 import BlockSidebar from '../BlockSidebar';
 import { undoStackInstance } from 'plugins/undo-redo';
+import { onKeyDown, onKeyUp } from 'plugins/key-commands';
 
 import Icon from '../Icon';
 import undoIcon from 'IconPath/undo.svg';
@@ -67,6 +68,8 @@ import redoIcon from 'IconPath/redo.svg';
 import desktopIcon from 'IconPath/desktop.svg';
 import tabletIcon from 'IconPath/tablet.svg';
 import mobileIcon from 'IconPath/mobile.svg';
+
+/* global document */
 
 export default {
 	name: 'editor',
@@ -100,6 +103,17 @@ export default {
 				height: '568px'
 			}
 		};
+
+		this.onKeyDown = onKeyDown(undoStackInstance);
+		this.onKeyUp = onKeyUp(undoStackInstance);
+
+		document.addEventListener('keydown', this.onKeyDown);
+		document.addEventListener('keyup', this.onKeyUp);
+	},
+
+	destroyed() {
+		document.removeEventListener('keydown', this.onKeyDown);
+		document.removeEventListener('keyup', this.onKeyUp);
 	},
 
 	data() {
