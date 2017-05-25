@@ -17,7 +17,6 @@ class PageTest extends TestCase
 
 	/**
 	 * @test
-	 * @group wip
 	 */
 	public function publish_WhenPageHasUnsavedChanges_ThrowsException()
 	{
@@ -30,7 +29,6 @@ class PageTest extends TestCase
 
 	/**
 	 * @test
-	 * @group wip
 	 */
 	public function publish_WhenPageHasUnpublishedParents_ThrowsException()
 	{
@@ -43,7 +41,6 @@ class PageTest extends TestCase
 
 	/**
 	 * @test
-	 * @group wip
 	 */
 	public function publish_CreatesPublishedPageInstance()
 	{
@@ -56,7 +53,6 @@ class PageTest extends TestCase
 
 	/**
 	 * @test
-	 * @group wip
 	 */
 	public function publish_AssociatesPublishedPageWithPageInstance()
 	{
@@ -70,7 +66,6 @@ class PageTest extends TestCase
 
 	/**
 	 * @test
-	 * @group wip
 	 * @group integration
 	 *
 	 * This tests integration between $page->publish(), $route->makeActive() and $route->delete().
@@ -92,7 +87,6 @@ class PageTest extends TestCase
 
 	/**
 	 * @test
-	 * @group wip
 	 */
 	public function publish_DraftRouteBecomesActiveRoute()
 	{
@@ -108,7 +102,6 @@ class PageTest extends TestCase
 
 	/**
 	 * @test
-	 * @group wip
 	 */
 	public function publish_PageOnlyHasOneRoute()
 	{
@@ -122,7 +115,6 @@ class PageTest extends TestCase
 
 	/**
 	 * @test
-	 * @group wip
 	 */
 	public function publish_PublishedPageBakeContainsSerializedPageInstance()
 	{
@@ -138,7 +130,6 @@ class PageTest extends TestCase
 
 	/**
 	 * @test
-	 * @group wip
 	 */
 	public function revert_WhenPageHasUnsavedChanges_ThrowsException()
 	{
@@ -153,7 +144,6 @@ class PageTest extends TestCase
 
 	/**
 	 * @test
-	 * @group wip
 	 */
 	public function revert_WhenPublishedPageIsNotAssociatedWithPage_ThrowsException()
 	{
@@ -169,7 +159,6 @@ class PageTest extends TestCase
 
 	/**
 	 * @test
-	 * @group wip
 	 */
 	public function revert_RevertsPageToMatchPublishedPage()
 	{
@@ -195,7 +184,6 @@ class PageTest extends TestCase
 
 	/**
 	 * @test
-	 * @group wip
 	 */
 	public function revert_RevertsBlocksToMatchPublishedPage()
 	{
