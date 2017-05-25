@@ -75,6 +75,13 @@ html {
 	border-right: 1px solid #bcc8dc;
 }
 
+.empty-page {
+	min-height: 100vh;
+	font-size: 1.8rem;
+	text-align: center;
+	padding: 30px 0;
+}
+
 .editor-component-list {
 	box-shadow: -2px 0px 3px rgba(0, 0, 0, 0.05);
 	border-left: 1px solid #bcc8dc;
@@ -138,7 +145,8 @@ html {
 }
 
 .block-overlay__options,
-.block-overlay__move {
+.block-overlay__move,
+.block-overlay__delete {
 	transition: background-color .3s ease-out;
 	position: absolute;
 	background-color: #2196f3;
@@ -149,6 +157,7 @@ html {
 	font-size: 20px;
 	pointer-events: auto;
 	text-align: center;
+	fill: #fff;
 }
 
 .block-overlay__move {
@@ -156,13 +165,26 @@ html {
 	transform: translateY(-50%);
 	left: -4px;
 	cursor: move;
+	border-radius: 0 4px 4px 0;
 }
 
 .block-overlay__options {
 	top: -4px;
 	right: -4px;
 	cursor: pointer;
-	font-size: 25px;
+	border-radius: 0 0 0 4px;
+}
+
+.block-overlay__delete {
+	bottom: 0;
+	right: 0;
+	cursor: pointer;
+	border-radius: 4px 0 0 0;
+	background-color: #e8e8e8;
+	line-height: 30px;
+	height: 30px;
+	width: 30px;
+	fill: #c74d4d;
 }
 
 .block-overlay__move {
@@ -183,6 +205,7 @@ html {
 }
 
 .hide-drag .block-overlay__options,
+.hide-drag .block-overlay__delete,
 .hide-drag .block-overlay__move {
 	opacity: 0;
 }
@@ -275,15 +298,18 @@ html {
 	align-items: center;
 }
 
-@each $breakpoint in map-keys($grid-breakpoints) {
-	@include media-breakpoint-up($breakpoint) {
-		$infix: breakpoint-infix($breakpoint, $grid-breakpoints);
-
-		.d#{$infix}-none  { display: none; }
-		.d#{$infix}-block { display: block; }
-	}
-}
-
 .u-mla {
 	margin-left: auto;
+}
+
+.missing-definition-warning {
+	margin: 30px;
+	padding: 10px;
+	background-color: #ffe0e0;
+	border-radius: 5px
+}
+
+.placeholder-block {
+	height: 100px;
+	background-color: #cfeaff;
 }
