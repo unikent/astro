@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { Definition } from 'classes/helpers';
 import api from '../../plugins/http/api';
 
@@ -51,11 +52,22 @@ const mutations = {
 		state.blockMeta[type].splice(index, 1, value);
 	},
 
-	updateFieldValue(state, { name, value, index }) {
-		let idx = typeof index !== 'undefined' ? index : state.currentBlockIndex;
-		const block = state.pageData.regions[state.currentRegion][idx];
-		block.fields[name] = value;
-		state.pageData.regions[state.currentRegion].splice(idx, 1, block);
+	updateFieldValue(state, { index, name, value }) {
+		let
+			idx = index !== void 0 ? index : state.currentBlockIndex,
+			fields = state.pageData.blocks[state.currentRegion][idx].fields;
+
+		// if field exists just update it
+		if(fields[name] !== void 0) {
+			fields[name] = value;
+		}
+		// otherwise update all fields to maintain reactivity
+		else {
+			fields = {
+				...fields,
+				...{ [name]: value }
+			};
+		}
 	},
 
 	changePage(state, name) {
@@ -89,10 +101,43 @@ const actions = {
 
 	fetchPage({ commit }, id) {
 
+		// TODO: refactor into smaller methods
 		api
 			.get(`page/${id}?include=blocks`)
-			.then((response) => {
-				commit('setPage', tempTransform(response.data.data));
+			.then(response => {
+				const page = response.data.data;
+
+				api
+					.get(`layout/${page.layout_name}/definition?include=region_definitions.block_definitions`)
+					.then(({ data: region }) => {
+
+						region.data.region_definitions.forEach((region) => {
+							region.block_definitions.forEach(definition => {
+								Definition.set(definition);
+							});
+						});
+
+						commit('setBlockDefinitions', Definition.definitions, { root: true });
+
+						let blocks;
+
+						if(page.blocks) {
+							blocks = page.blocks;
+							delete page.blocks;
+						}
+						else {
+							blocks = {};
+						}
+
+						commit('setPage', _.cloneDeep(page));
+
+						Object.keys(blocks).forEach(region => {
+							blocks[region].forEach((block, index) => {
+								commit('addBlock', { region, index, block })
+							});
+						});
+					});
+
 			});
 	}
 };
