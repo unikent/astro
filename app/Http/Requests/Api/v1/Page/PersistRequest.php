@@ -50,14 +50,14 @@ class PersistRequest extends FormRequest
 
         $rules['route.slug'][] = Rule::unique('routes', 'slug')->where(function($q) use ($data, $page) {
             if($page){
-                $q->where('page_id', '!=', $page->getKey());        // Prevent the unique check from tripping over itself when updating
+                // Prevent the unique check from tripping over itself when updating
+                $q->where('page_id', '!=', $page->getKey());
             }
 
-            if(isset($data['route.parent_id'])){
-                $q->where('parent_id', $data['route.parent_id']);   // The slug must be unique at this level in the tree; so scope the query accordingly
+            if(isset($data['route']) && isset($data['route']['parent_id'])){
+                // The slug must be unique at this level in the tree; so scope the query accordingly
+                $q->where('parent_id', '=', $data['route']['parent_id']);
             }
-
-            $q->where('is_canonical', 1);                           // If the slug is already in use at this level but is not canonical, we can re-purpose it
         });
 
         $rules['route.parent_id'][] = Rule::exists('routes', 'id');

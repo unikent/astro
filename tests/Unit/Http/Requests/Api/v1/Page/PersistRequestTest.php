@@ -10,6 +10,7 @@ use App\Models\Block;
 use App\Models\Route;
 use App\Models\PublishingGroup;
 use Tests\Unit\Http\Requests\RequestTestCase;
+use App\Http\Transformers\Api\v1\PageTransformer;
 use App\Http\Requests\Api\v1\Page\PersistRequest;
 
 class PersistRequestTest extends RequestTestCase
@@ -403,7 +404,8 @@ class PersistRequestTest extends RequestTestCase
         $existing = factory(Route::class)->states('withPage', 'withParent')->create();
 
         $attrs = $this->getAttrs();
-        $attrs['route']['slug'] = $existing->slug;
+        array_set($attrs, 'route.parent_id', $existing->getKey());
+        array_set($attrs, 'route.slug', $existing->slug);
 
         $request = $this->mockRequest('POST', $attrs);
         $validator = $request->getValidatorInstance();
@@ -417,9 +419,10 @@ class PersistRequestTest extends RequestTestCase
      * @test
      * @group validation
      */
-    public function validation_WhenRouteSlugExistsAtSameLevelInTreeAndIsCanonical_IsInvalid(){
+    public function validation_WhenRouteSlugExistsAtSameLevelInTreeAndIsActive_IsInvalid(){
         $existing = factory(Route::class)->states('withPage', 'withParent')->create();
-        $existing->makeCanonical();
+        $existing->parent->page->publish(new PageTransformer);
+        $existing->page->publish(new PageTransformer);
 
         $attrs = $this->getAttrs();
         $attrs['route']['slug'] = $existing->slug;
@@ -436,9 +439,9 @@ class PersistRequestTest extends RequestTestCase
      * @test
      * @group validation
      */
-    public function validation_WhenRouteSlugExistsAtSameLevelInTreeAndIsNotCanonical_IsValid(){
+    public function validation_WhenRouteSlugExistsAtSameLevelInTreeAndIsNotActive_IsInvalid(){
         $existing = factory(Route::class)->states('withPage', 'withParent')->create();
-        $existing->makeCanonical();
+        $existing->parent->page->publish(new PageTransformer);
 
         $alternative = factory(Route::class)->create([ 'parent_id' => $existing->parent_id, 'page_id' => $existing->page_id ]);
 
@@ -450,7 +453,7 @@ class PersistRequestTest extends RequestTestCase
         $validator = $request->getValidatorInstance();
 
         $validator->passes();
-        $this->assertEmpty($validator->errors()->get('route.slug'));
+        $this->assertCount(1, $validator->errors()->get('route.slug'));
     }
 
     /**

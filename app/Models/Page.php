@@ -6,6 +6,7 @@ use DB;
 use Exception;
 use App\Models\Traits\Tracked;
 use Illuminate\Database\Eloquent\Model;
+use App\Exceptions\UnpublishedParentException;
 use App\Models\Definitions\Layout as LayoutDefinition;
 use League\Fractal\TransformerAbstract as FractalTransformer;
 
@@ -74,7 +75,7 @@ class Page extends Model
 
 		// Ensure that the draft does not have unpublished ancestors
 		if($this->draftRoute && $this->draftRoute->ancestors()->active(false)->count()){
-			throw new Exception('You cannot publish this page as it has unpublished ancestors.');
+			throw new UnpublishedParentException('Page cannot be published: it has unpublished ancestors.');
 		}
 
 		DB::beginTransaction();

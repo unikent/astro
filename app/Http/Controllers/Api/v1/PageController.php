@@ -9,6 +9,7 @@ use App\Models\Block;
 use App\Models\Route;
 use Illuminate\Http\Request;
 use App\Models\PublishedPage;
+use App\Exceptions\UnpublishedParentException;
 use App\Http\Requests\Api\v1\Page\PersistRequest;
 use App\Http\Transformers\Api\v1\PageTransformer;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -66,8 +67,12 @@ class PageController extends ApiController
 	public function publish(Request $request, Page $page){
 		$this->authorize('publish', $page);
 
-		$page->publish(new PageTransformer);
-		return response($page->published->bake, 200);
+		try {
+			$page->publish(new PageTransformer);
+			return response($page->published->bake, 200);
+		} catch(UnpublishedParentException $e){
+			return response([ 'errors' => [ $e->getMessage() ] ], 406);
+		}
 	}
 
 	/**
@@ -113,24 +118,35 @@ class PageController extends ApiController
 		DB::beginTransaction();
 
 		try {
-			// Create/Update the Route
-			$route = Route::firstOrNew([
-				'slug' => $request->input('route.slug'),
-				'parent_id' => $request->input('route.parent_id', null),
-			]);
-
 			// Set the Page attributes and save the Page (we need an ID for the Route)
 			$page->fill($request->all());
 			$page->save();
 
-			// Associate the Route with the Page
-			$route->page_id = $page->getKey();
+			$draftRoute = new Route([
+				'slug' => $request->input('route.slug'),
+				'page_id' => $page->getKey(),
+				'parent_id' => $request->input('route.parent_id', null),
+			]);
 
-			// Now that we have a Route object, lets save it...
-			$route->save();
+			// Runs on Update...
+			if($page->activeRoute){
+				$activeRoute = $page->activeRoute;
 
-			// ...and ensure that there are no other inactive Routes for this page
-			$page->routes()->where($route->getKeyName(), '!=', $route->getKey())->active(false)->delete();
+				// If the Route has been moved in the tree, we need to create a new Route
+				if($request->has('route.parent_id') && $request->get('route.parent_id') !== $activeRoute->parent_id){
+					$draftRoute->parent_id = $request->input('route.parent_id');
+
+					$draftRoute->save();
+					$draftRoute->cloneDescendants($activeRoute);
+
+				// If the Route has not changed position, inherit the active position in the tree
+				} else {
+					$draftRoute->parent_id = $activeRoute->parent_id;
+				}
+			}
+
+			// If $draftRoute has not already been saved, save it.
+			if($draftRoute->isDirty()) $draftRoute->save();
 
 			// If a Site ID is present, attempt to retrieve the existing Site model.
 			if($request->has('site_id')){
@@ -147,7 +163,7 @@ class PageController extends ApiController
 				$this->authorize($site->wasRecentlyCreated ? 'create' : 'update', $site);
 
 				// Note: makeSite takes effect immediately, and affects all published and unpublished Routes
-				$route->makeSite($site);
+				$draftRoute->makeSite($site);
 			}
 
 			// Now we have a Page in a state that we can authorize, so lets do that
