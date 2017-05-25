@@ -54,28 +54,41 @@ class Handler extends ExceptionHandler
 
 		switch($prefix){
 			case 'api/v1':
-				$classname = substr(strrchr(get_class($exception), '\\'), 1);;
+				$classname = substr(strrchr(get_class($exception), '\\'), 1);
 
 				switch(get_class($exception)){
 					case 'App\Exceptions\DefinitionNotFoundException':
 					case 'Illuminate\Database\Eloquent\ModelNotFoundException':
-						return response()->json([ 'errors' => [[ 'message' => 'Not Found', 'reason' => $classname ]] ], 404);
+						return $this->formatErrors(
+							'Not Found', $classname, 404, $exception
+						);
 						break;
 
 					case 'Illuminate\Auth\AuthenticationException':
-						return response()->json([ 'errors' => [[ 'message' => 'Not Authenticated', 'reason' => $classname ]] ], 401);
+						return $this->formatErrors(
+							'Not Authenticated', $classname, 401, $exception
+						);
 						break;
 
 					case 'Illuminate\Auth\Access\AuthorizationException':
-						return response()->json([ 'errors' => [[ 'message' => 'Not Authenticated', 'reason' => $classname ]] ], 403);
+						return $this->formatErrors(
+							'Not Authorized', $classname, 403, $exception
+						);
+						break;
+
+					case 'Illuminate\Validation\ValidationException':
+						return $this->formatErrors(
+							'Invalid input given',
+							$exception->validator->errors()->getMessages(),
+							422,
+							$exception
+						);
 						break;
 
 					default:
-						return response()->json([ 'errors' => [[
-							'message' => $classname,
-							'reason' => $classname,
-							'trace' => $exception->getTraceAsString(),
-						]] ], 500);
+						return $this->formatErrors(
+							$classname, $classname, 500, $exception
+						);
 						break;
 				}
 
@@ -86,6 +99,27 @@ class Handler extends ExceptionHandler
 				break;
 		}
 
+	}
+
+	// TODO: replace with fractal?
+	protected function formatErrors($message = '', $reason = 'Unknown', $code = 500, $e = null)
+	{
+		$errors = [
+			'errors' => [
+				[
+					'message' => $message,
+					'reason'  => $reason
+				]
+			]
+		];
+
+		// Only include stack trace in debug mode (as could reveal secrets)
+		if($code === 500 && config('app.debug') && isset($e))
+		{
+			$errors['errors'][0]['trace'] = $e;
+		}
+
+		return response()->json($errors, $code);
 	}
 
 	/**
@@ -99,10 +133,9 @@ class Handler extends ExceptionHandler
 	{
 		if($request->expectsJson())
 		{
-			// TODO: update this to use fractal and match general API output
-			return response()->json([
-				'errors' => 'Unauthenticated.'
-			], 401);
+			return $this->formatErrors(
+				'Unauthenticated.', 'AuthenticationException', 401, $exception
+			);
 		}
 
 		return redirect()->guest('auth/login');
