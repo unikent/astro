@@ -6,32 +6,41 @@
 	<div class="block-options-list custom-scrollbar">
 		<h2 v-if="currentDefinition">Edit {{ currentDefinition.label }}</h2>
 
-		<div v-if="currentDefinition">
+		<el-form
+			v-if="currentDefinition"
+			label-position="top"
+			:model="blockFields"
+			:rules="rules"
+			ref="block_fields"
+		>
 			<div v-for="field in currentDefinition.fields">
-				<h3 class="field-label">
-					{{ field.label }}
-					<el-tooltip v-if="field.info" :content="field.info" placement="top">
-						<icon
-							class="field-info"
-							:glyph="helpIcon"
-							width="15"
-							height="15"
-							viewBox="0 0 15 15"
-						/>
-					</el-tooltip>
-				</h3>
-				<component
-					:is="getField(field.type)"
-					:field="field"
-					:name="field.name"
-					:index="currentIndex"
-					:key="`${currentDefinition.name}-${currentIndex}`"
-				/>
+				<el-form-item :label="field.label" :prop="field.name" :error="localErrors[field.name] || null">
+					<template slot="label">
+						<span>{{ field.label }}</span>
+						<el-tooltip v-if="field.info" :content="field.info" placement="top">
+							<icon
+								class="field-info"
+								:glyph="helpIcon"
+								width="15"
+								height="15"
+								viewBox="0 0 15 15"
+							/>
+						</el-tooltip>
+					</template>
+					<component
+						:is="getField(field.type)"
+						:field="field"
+						:name="field.name"
+						:index="currentIndex"
+						:key="`${currentDefinition.name}-${currentIndex}`"
+					/>
+				</el-form-item>
 			</div>
 
+			<el-button @click="submitForm('block_fields')">Save</el-button>
 			<el-button type="danger" @click="deleteThisBlock">Remove</el-button>
 
-		</div>
+		</el-form>
 
 	</div>
 </div>
@@ -39,6 +48,7 @@
 
 <script>
 import { mapState, mapMutations, mapGetters } from 'vuex';
+import { Definition } from 'classes/helpers';
 import fields from './fields';
 
 import Icon from './Icon';
@@ -51,8 +61,28 @@ export default {
 	},
 
 	computed: {
+		blockFields: {
+			get() {
+				return this.getCurrentBlock().fields;
+			},
+			set() {}
+		},
+
+		localErrors() {
+			return this.errors.blocks ?
+				this.errors.blocks[this.currentRegion][this.currentIndex].fields : {};
+		},
+
+		rules() {
+			return Definition.getRules(this.currentDefinition);
+		},
+
 		...mapGetters([
 			'getCurrentBlock'
+		]),
+
+		...mapState([
+			'errors'
 		]),
 
 		...mapState({
@@ -72,11 +102,13 @@ export default {
 	methods: {
 		...mapMutations([
 			'setBlock',
-			'deleteBlock'
+			'deleteBlock',
+			'updateErrors'
 		]),
 
 		goBack() {
 			this.setBlock();
+			this.updateErrors({});
 		},
 
 		deleteThisBlock() {
@@ -92,6 +124,15 @@ export default {
 					template: '<div>This field type does not exist</div>'
 				}
 			);
+		},
+
+		submitForm(formName) {
+			this.$refs[formName].validate((valid) => {
+				if(!valid) {
+					this.$snackbar.open({ message: 'Validation errors'})
+					return false;
+				}
+			});
 		}
 	}
 
