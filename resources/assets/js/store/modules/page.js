@@ -1,3 +1,4 @@
+import { Definition } from 'classes/helpers';
 import api from '../../plugins/http/api';
 
 const state = {
@@ -8,14 +9,27 @@ const state = {
 		offsets: [],
 		moved: null
 	},
-	pageData: {},
+	pageData: {
+		blocks: {
+			main: []
+		}
+	},
 	pageName: '',
-	pageScale: .4
+	pageScale: .4,
+	loaded: false
 };
 
 const mutations = {
 
 	setPage(state, page) {
+		state.loaded = true;
+
+		if(!page.blocks) {
+			page.blocks = {
+				main: []
+			};
+		}
+
 		state.pageData = page;
 	},
 
@@ -24,8 +38,8 @@ const mutations = {
 	},
 
 	reorderBlocks(state, { from, to, value }) {
-		state.pageData.regions[state.currentRegion].splice(from, 1);
-		state.pageData.regions[state.currentRegion].splice(to, 0, value);
+		state.pageData.blocks[state.currentRegion].splice(from, 1);
+		state.pageData.blocks[state.currentRegion].splice(to, 0, value);
 	},
 
 	updateBlockPositionsOrder(state, { type, from, to, value }) {
@@ -48,33 +62,32 @@ const mutations = {
 		state.pageName = name;
 	},
 
-	// addBlock(state, { index, row }) {},
-	// deleteBlock(state, { index, row }) {}
+	addBlock(state, { region, index, block }) {
+		if(region === void 0) {
+			region = state.currentRegion;
+		}
+
+		if(index === void 0) {
+			index = state.pageData.blocks[state.currentRegion].length;
+		}
+
+		Definition.fillBlockFields(block);
+
+		state.pageData.blocks[state.currentRegion].splice(index, 1, block || {});
+	},
+
+	deleteBlock(state, { index } = { index: null }) {
+		if(index === null) {
+			index = state.currentBlockIndex;
+		}
+
+		state.pageData.blocks[state.currentRegion].splice(index, 1);
+	}
 };
 
 const actions = {
 
 	fetchPage({ commit }, id) {
-		const tempTransform = (data) => {
-			if(data.blocks) {
-				data.blocks.forEach((block) => {
-
-					if(data.regions === void 0) {
-						data.regions = {};
-					}
-
-					if(data.regions[block.region_name] === void 0) {
-						data.regions[block.region_name] = [];
-					}
-
-					data.regions[block.region_name].push(block);
-				});
-
-				delete data.blocks;
-			}
-
-			return data;
-		};
 
 		api
 			.get(`page/${id}?include=blocks`)
@@ -87,11 +100,15 @@ const actions = {
 const getters = {
 
 	getFieldValue: (state) => (index, name) => {
-		return state.pageData.regions[state.currentRegion][index].fields[name];
+		return state.pageData.blocks[state.currentRegion][index].fields[name];
 	},
 
 	getCurrentFieldValue: (state, getters) => (name) => {
 		return getters.getFieldValue(state.currentBlockIndex, name);
+	},
+
+	getCurrentBlock: (state) => () => {
+		return state.pageData.blocks[state.currentRegion][state.currentBlockIndex];
 	}
 };
 
