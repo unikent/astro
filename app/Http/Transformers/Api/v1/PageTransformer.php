@@ -11,8 +11,8 @@ use App\Http\Transformers\Api\v1\Definitions\LayoutTransformer as LayoutDefiniti
 class PageTransformer extends FractalTransformer
 {
 
-	protected $defaultIncludes = [ 'canonical' ];
-    protected $availableIncludes = [ 'routes', 'blocks', 'layout_definition', 'published', 'history' ];
+	protected $defaultIncludes = [ 'active_route' ];
+    protected $availableIncludes = [ 'routes', 'draft_route', 'blocks', 'layout_definition', 'published', 'history' ];
 
 	public function transform(Page $page)
 	{
@@ -20,15 +20,27 @@ class PageTransformer extends FractalTransformer
 	}
 
     /**
-     * Include associated 'Canonical' Route
+     * Include associated active Route
      *
      * @return League\Fractal\ItemResource
      */
-    public function includeCanonical(Page $page)
+    public function includeActiveRoute(Page $page)
     {
-    	if($page->canonical){
-	    	return new FractalItem($page->canonical, new RouteTransformer, false);
+    	if($page->activeRoute){
+	    	return new FractalItem($page->activeRoute, new RouteTransformer, false);
     	}
+    }
+
+    /**
+     * Include associated draft Route
+     *
+     * @return League\Fractal\ItemResource
+     */
+    public function includeDraftRoute(Page $page)
+    {
+        if($page->draftRoute){
+            return new FractalItem($page->draftRoute, new RouteTransformer, false);
+        }
     }
 
     /**

@@ -24,7 +24,7 @@ class RouteController extends ApiController
 			if($route->published_page){
 				return response($route->published_page->bake);
 			} else {
-				return fractal($route->page, new PageTransformer)->parseIncludes([ 'canonical', 'blocks' ])->respond();
+				return fractal($route->page, new PageTransformer)->parseIncludes([ 'blocks', 'active_route' ])->respond();
 			}
 		} else {
 			return (new SymfonyResponse())->setStatusCode(404);
