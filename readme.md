@@ -82,7 +82,7 @@ Pages (and their associated Block instances) represent draft content. When a Pag
 A single Page may be associated with multiple PublishedPage instances (providing a publication history and audit log). The JSON `bake` stored on a PublishedPage is served as published-content via the `/api/v1/route/resolve?path=` endpoint.
 
 
-##### Notes on Routes
+##### Notes on Routes and Redirects
 Routes are implemented as a tree hierarchy, using Baum (a nested-set implementation for Laravel).
 
 Normally a Route has a `parent_id` and a `slug`. The `parent_id` associates the Route with its ancestor within the tree. The `slug` provides a URL segment representing the Page. The full path to a Page is automatically generated whenever a Route is saved, by joining the slug of a Route with the slugs of its' ancestors within the tree. 
@@ -90,6 +90,9 @@ Normally a Route has a `parent_id` and a `slug`. The `parent_id` associates the 
 There is a special case where a Route has neither a `slug` nor a `parent_id`. This is considered a "root Route" and is the start of an entirely new Route hierarchy.
 
 A Page can have a maxiumum of two Routes: one active, one draft. When a Page is published, any draft Route is made active (replacing the current active Route). A Redirect is created to ensure that requests using the old URL can be redirected.
+
+Both Routes and Redirects implement the `App\Models\Contracts\Routable` contract, using the `App\Models\Traits\Routable` trait.
+
 
 ##### Notes on Sites
 Sites provide a useful authorization context for grouping pages. A site is associated with a PublishingGroup. A users' membership of a PublishingGroup affects their ability to edit a Page within a given Site.
@@ -108,6 +111,15 @@ Pages are published via `/api/v1/page/ID/publish`. Internally this calls `$page-
  - The latest inactive Route is made both active, and canonical. 
  - All other inactive Routes for the given Page are purged.
 
+A Page and all descendants may also be published via `/api/v1/page/ID/publish-tree`.
+
+
+##### Notes on Deleting
+Pages are deleted by a DELETE request to `/api/v1/page/ID/`. This results in a soft-delete, where the Page and its associated Routes still remain in the database.
+
+A DELETE request to `/api/v1/page/ID/force` will result in the Page being deleted entirely from the database. This will cascade at a database level to also delete Routes, Redirects. 
+
+PublishedPages will remain in the database (providing a history and allowing potential for a manual recovery process), but without Routes are not routable.
 
 
 #### Blocks and Pages
