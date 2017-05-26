@@ -44,6 +44,23 @@ composer install
 yarn install
 ```
 
+When developing definitions (blocks, layouts) including vue templates you may find it easier to yarn link to your definitions directory.
+
+Otherwise you will need to run
+```bash
+yarn update <your-definitions-repo-name>
+```
+from within your astro directory to update to the latest _committed_ version, before building with yarn.
+
+To do so:
+```bash
+cd /path/to/DEFINITIONS
+yarn link
+
+cd /path/to/astro
+yarn link <your-definitions-repo-name>
+```
+
 ## Developer Notes
 ### Approach
 #### API Requests, Authentication & Authorization
