@@ -31,6 +31,7 @@ Route::group([ 'prefix' => 'v1', 'namespace' => 'v1' ], function(){
 	Route::post('page/{page}/publish', 'PageController@publish');
 	Route::post('page/{page}/publish-tree', 'PageController@publishTree');
 	Route::post('page/{page}/revert', 'PageController@revert');
+	Route::delete('page/{page}/confirm', 'PageController@forceDestroy');
 
 	Route::get('region/definitions', 'RegionController@definitions');
 	Route::get('region/{region_definition}/definition', 'RegionController@definition');

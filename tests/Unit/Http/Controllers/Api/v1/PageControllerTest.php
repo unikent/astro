@@ -1292,7 +1292,7 @@ class PageControllerTest extends ApiControllerTestCase {
      * @test
      * @group authentication
      */
-    public function delete_WhenUnauthenticated_Returns401(){
+    public function destroy_WhenUnauthenticated_Returns401(){
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
         $page = $route->page;
 
@@ -1304,7 +1304,7 @@ class PageControllerTest extends ApiControllerTestCase {
      * @test
      * @group authorization
      */
-    public function delete_WhenAuthenticated_ChecksAuthorization(){
+    public function destroy_WhenAuthenticated_ChecksAuthorization(){
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
         $page = $route->page;
 
@@ -1320,7 +1320,7 @@ class PageControllerTest extends ApiControllerTestCase {
      * @test
      * @group authorization
      */
-    public function delete_WhenAuthenticatedAndUnauthorized_Returns403(){
+    public function destroy_WhenAuthenticatedAndUnauthorized_Returns403(){
         $this->authenticatedAndUnauthorized();
 
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
@@ -1333,7 +1333,7 @@ class PageControllerTest extends ApiControllerTestCase {
     /**
      * @test
      */
-    public function delete_WhenAuthorizedAndPageNotFound_Returns404(){
+    public function destroy_WhenAuthorizedAndPageNotFound_Returns404(){
         $this->authenticatedAndAuthorized();
 
         $response = $this->action('DELETE', PageController::class . '@destroy', [ 123 ]);
@@ -1343,44 +1343,129 @@ class PageControllerTest extends ApiControllerTestCase {
     /**
      * @test
      */
-    public function delete_WhenAuthorizedAndValid_DeletesThePage(){
-        $this->authenticatedAndAuthorized();
-
+    public function destroy_WhenAuthorizedAndValid_SoftDeletesThePage(){
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
-        $page = $route->page;
 
-        $response = $this->action('DELETE', PageController::class . '@destroy', [ $page->getKey() ]);
-        $this->assertNull(Page::find($page->id));
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('DELETE', PageController::class . '@destroy', [ $route->page->getKey() ]);
+
+        $this->assertNull(Page::find($route->page->id));
+        $this->assertEquals(1, Page::withTrashed()->where('id', '=', $route->page->getKey())->count());
     }
 
     /**
      * @test
      * @group revisit
      */
-    public function delete_WhenAuthorizedAndValid_DeletesAssociatedRoutes(){
-        $this->authenticatedAndAuthorized();
-
+    public function destroy_WhenAuthorizedAndValid_DoesNotDeleteAssociatedRoutes(){
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
-        $routes = factory(Route::class, 2)->create([ 'parent_id' => $route->parent_id, 'page_id' => $route->page->getKey() ]);
 
-        $page = $route->page;
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('DELETE', PageController::class . '@destroy', [ $route->page->getKey() ]);
 
-        $count = Route::count();
-        $response = $this->action('DELETE', PageController::class . '@destroy', [ $page->getKey() ]);
-
-        $this->assertEquals($count-3, Route::count());
+        $this->assertInstanceOf(Route::class, Route::find($route->getKey()));
     }
 
     /**
      * @test
      */
-    public function delete_WhenAuthorizedAndValid_Returns200(){
+    public function destroy_WhenAuthorizedAndValid_Returns200(){
+        $route = factory(Route::class)->states('withPage', 'withParent')->create();
+
         $this->authenticatedAndAuthorized();
+        $response = $this->action('DELETE', PageController::class . '@destroy', [ $route->page->getKey() ]);
+
+        $response->assertStatus(200);
+    }
+
+
+
+    /**
+     * @test
+     * @group authentication
+     */
+    public function forceDestroy_WhenUnauthenticated_Returns401(){
+        $route = factory(Route::class)->states('withPage', 'withParent')->create();
+        $page = $route->page;
+
+        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ $page->getKey() ]);
+        $response->assertStatus(401);
+    }
+
+    /**
+     * @test
+     * @group authorization
+     */
+    public function forceDestroy_WhenAuthenticated_ChecksAuthorization(){
+        $route = factory(Route::class)->states('withPage', 'withParent')->create();
+        $page = $route->page;
+
+        Gate::shouldReceive('authorize')->with('forceDelete', Mockery::on(function($model) use ($page){
+            return (is_a($model, Page::class) && ($model->getKey() == $page->getKey()));
+        }))->once();
+
+        $this->authenticated();
+        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ $page->getKey() ]);
+    }
+
+    /**
+     * @test
+     * @group authorization
+     */
+    public function forceDestroy_WhenAuthenticatedAndUnauthorized_Returns403(){
+        $this->authenticatedAndUnauthorized();
 
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
         $page = $route->page;
 
-        $response = $this->action('DELETE', PageController::class . '@destroy', [ $page->getKey() ]);
+        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ $page->getKey() ]);
+        $response->assertStatus(403);
+    }
+
+    /**
+     * @test
+     */
+    public function forceDestroy_WhenAuthorizedAndPageNotFound_Returns404(){
+        $this->authenticatedAndAuthorized();
+
+        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ 123 ]);
+        $response->assertStatus(404);
+    }
+
+    /**
+     * @test
+     */
+    public function forceDestroy_WhenAuthorizedAndValid_HardDeletesThePage(){
+        $route = factory(Route::class)->states('withPage', 'withParent')->create();
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ $route->page->getKey() ]);
+
+        $this->assertEquals(0, Page::withTrashed()->where('id', '=', $route->page->getKey())->count());
+    }
+
+    /**
+     * @test
+     * @group revisit
+     */
+    public function forceDestroy_WhenAuthorizedAndValid_HardDeletesAssociatedRoutes(){
+        $route = factory(Route::class)->states('withPage', 'withParent')->create();
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ $route->page->getKey() ]);
+
+        $this->assertNull(Route::find($route->getKey()));
+    }
+
+    /**
+     * @test
+     */
+    public function forceDestroy_WhenAuthorizedAndValid_Returns200(){
+        $route = factory(Route::class)->states('withPage', 'withParent')->create();
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ $route->page->getKey() ]);
+
         $response->assertStatus(200);
     }
 

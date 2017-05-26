@@ -84,7 +84,6 @@ class PagePolicy
         return true;
     }
 
-
     /**
      * Determine whether the user can delete the page.
      *
@@ -95,6 +94,18 @@ class PagePolicy
     public function delete(User $user, Page $page)
     {
         // TODO: If user has W access to site
+        return true;
+    }
+
+    /**
+     * Determine whether the user can force-delete the page.
+     *
+     * @param  \App\Models\User  $user
+     * @param  \App\Models\Page  $page
+     * @return boolean
+     */
+    public function forceDelete(User $user, Page $page)
+    {
         return true;
     }
 }

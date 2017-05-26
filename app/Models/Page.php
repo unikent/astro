@@ -6,13 +6,14 @@ use DB;
 use Exception;
 use App\Models\Traits\Tracked;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Exceptions\UnpublishedParentException;
 use App\Models\Definitions\Layout as LayoutDefinition;
 use League\Fractal\TransformerAbstract as FractalTransformer;
 
 class Page extends Model
 {
-	use Tracked;
+	use Tracked, SoftDeletes;
 
 	protected $fillable = [
 		'title',

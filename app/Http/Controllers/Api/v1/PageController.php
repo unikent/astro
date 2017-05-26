@@ -125,6 +125,8 @@ class PageController extends ApiController
 	/**
 	 * DELETE /api/v1/page/{page}
 	 *
+	 * Soft-deletes a page, leaving Routes intact.
+	 *
 	 * @param  Request    $request
 	 * @param  Definition $definition
 	 * @return SymfonyResponse
@@ -136,6 +138,22 @@ class PageController extends ApiController
     	return (new SymfonyResponse())->setStatusCode(200);
 	}
 
+	/**
+	 * DELETE /api/v1/page/{page}/confirm
+	 *
+	 * Hard-deletes a page, allowing the database to cascade and delete Routes too.
+	 *
+	 * @param  Request    $request
+	 * @param  Definition $definition
+	 * @return SymfonyResponse
+	 */
+	public function forceDestroy(Request $request, $id){
+		$page = Page::withTrashed()->where('id', '=', $id)->firstOrFail();
+		$this->authorize('forceDelete', $page);
+
+		$page->forceDelete();
+    	return (new SymfonyResponse())->setStatusCode(200);
+	}
 
 	/**
 	 * Persists Page, Route and Site objects, also persists Block object
