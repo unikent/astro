@@ -89,11 +89,7 @@ Normally a Route has a `parent_id` and a `slug`. The `parent_id` associates the 
 
 There is a special case where a Route has neither a `slug` nor a `parent_id`. This is considered a "root Route" and is the start of an entirely new Route hierarchy.
 
-It is also possible for one Page to have multiple Routes (and thus multiple positions within the tree). This enables content to remain accessible via old URLs - perhaps via a 301 redirect. Only one Route per Page can have the `is_canonical` flag set to true. This cannot be set directly, but must be set by calling `$route->makeCanonical()`: the given Route gains canonical status and all other Route instances associated with the Page lose it. 
-
-When creating a new Page, if a non-canonical Route already utilises that slug and occupies the same position in the tree, it will be re-associated with the new Page object. If a similar collision occurs with a canonical Route, validation will fail.
-
-Routes also have an `is_active` flag allowing Routes associated with draft content to be inactive until publication.
+A Page can have a maxiumum of two Routes: one active, one draft. When a Page is published, any draft Route is made active (replacing the current active Route). A Redirect is created to ensure that requests using the old URL can be redirected.
 
 ##### Notes on Sites
 Sites provide a useful authorization context for grouping pages. A site is associated with a PublishingGroup. A users' membership of a PublishingGroup affects their ability to edit a Page within a given Site.
