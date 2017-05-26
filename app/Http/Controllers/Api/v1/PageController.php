@@ -147,8 +147,7 @@ class PageController extends ApiController
 	 * @param  Definition $definition
 	 * @return SymfonyResponse
 	 */
-	public function forceDestroy(Request $request, $id){
-		$page = Page::withTrashed()->where('id', '=', $id)->firstOrFail();
+	public function forceDestroy(Request $request, Page $page){
 		$this->authorize('forceDelete', $page);
 
 		$page->forceDelete();
