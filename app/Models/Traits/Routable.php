@@ -11,7 +11,7 @@ trait Routable  {
 
 	public function page()
 	{
-		return $this->belongsTo(Page::class, 'page_id');
+		return $this->belongsTo(Page::class, 'page_id')->withTrashed();
 	}
 
 	public function published_page()

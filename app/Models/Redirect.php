@@ -17,11 +17,6 @@ class Redirect extends Model implements RoutableContract
 		'page_id',
 	];
 
-	public function page()
-	{
-		return $this->belongsTo(Page::class, 'page_id');
-	}
-
     /**
      * Creates a new Redirect from a Route object. Removes any Redirects
      * that already exist using the same path.

@@ -12,6 +12,24 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 class RedirectTest extends TestCase
 {
 
+	/**
+	 * @test
+	 * @group integration
+	 */
+	public function pageRelation_WhenPageIsSoftDeleted_ReturnsPage()
+	{
+		$route = factory(Route::class)->states('withParent', 'withPage')->create();
+		$redirect = Redirect::createFromRoute($route);
+
+		$page = $route->page;
+
+		$page->delete();
+		$redirect = $redirect->fresh();
+
+		$this->assertTrue($page->trashed());
+		$this->assertEquals($page->getKey(), $redirect->page->getKey());
+	}
+
 
 	/**
 	 * @test
