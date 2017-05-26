@@ -139,7 +139,7 @@ class PageController extends ApiController
 	}
 
 	/**
-	 * DELETE /api/v1/page/{page}/confirm
+	 * DELETE /api/v1/page/{page}/force
 	 *
 	 * Hard-deletes a page, allowing the database to cascade and delete Routes too.
 	 *
