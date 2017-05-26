@@ -310,6 +310,46 @@ class RouteControllerTest extends ApiControllerTestCase {
         $this->assertCount(1, $json['data']['blocks']);
     }
 
+    /**
+     * @test
+     * @group integration
+     *
+     * Resolves via a Route model.
+     * This test tests behaviour applied to the Route model by the Routable trait.
+     */
+    public function resolve_WhenAuthorizedAndRouteFoundAndPublishedPageIsSoftDeleted_Returns200(){
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+        $route->page->publish(new PageTransformer);
+
+        $route->page->delete();
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $route->path ]);
+
+        $response->assertStatus(200);
+    }
+
+    /**
+     * @test
+     * @group integration
+     *
+     * Resolves via a Route model.
+     * This test tests behaviour applied to the Route model by the Routable trait.
+     */
+    public function resolve_WhenAuthorizedAndRouteFoundAndPublishedPageIsSoftDeleted_ReturnsJson(){
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+        $route->page->publish(new PageTransformer);
+
+        $route->page->delete();
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $route->path ]);
+
+        $json = $response->json();
+        $this->assertArrayHasKey('data', $json);
+        $this->assertEquals($route->page->id, $json['data']['id']);
+    }
+
 
     /**
      * @test
