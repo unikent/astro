@@ -11,7 +11,7 @@
 
 <script>
 import BlockListItem from './BlockListItem';
-import { mapState, mapActions } from 'vuex';
+import { mapState } from 'vuex';
 
 export default {
 
@@ -23,19 +23,10 @@ export default {
 		...mapState([
 			'over'
 		]),
+
 		blocks() {
-			return this.$store.state.definition.blockList;
+			return this.$store.state.definition.blockDefinitions;
 		}
-	},
-
-	methods: {
-		...mapActions([
-			'fetchBlockList'
-		])
-	},
-
-	created() {
-		this.fetchBlockList();
 	}
 };
 </script>

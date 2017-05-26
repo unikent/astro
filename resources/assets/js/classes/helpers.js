@@ -1,4 +1,5 @@
 import Config from 'classes/Config';
+import DefinitionClass from 'classes/Definition';
 
 /* global self, console */
 /* eslint-disable no-console */
@@ -18,7 +19,11 @@ else {
 
 export const win = winObj;
 
-export const isIframe = win.self !== win.top;
+export const inIframeContext = () => {
+	return win.self !== win.top;
+};
+
+export const isIframe = inIframeContext();
 
 export const debug = (output) => {
 	if(!Config.get('debug', false)) {
@@ -27,3 +32,13 @@ export const debug = (output) => {
 
 	console.info(output);
 };
+
+export const uuid = (a) => {
+	return a ?
+		(a^Math.random() * 16 >> a / 4).toString(16) :
+		([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, uuid);
+};
+
+export const Definition = (
+	isIframe ? win.top.astroDefinition : (win.astroDefinition = DefinitionClass)
+);

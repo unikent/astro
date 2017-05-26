@@ -20,6 +20,15 @@ class MediaPolicyTest extends PolicyTestCase
      * @test
      * @group authorization
      */
+    public function index_WhenUserIsUnprivilegedAndAcoIsMediaClass_IsDenied(){
+        $user = factory(User::class)->make([ 'role' => 'user' ]);
+        $this->assertPolicyDenies(new MediaPolicy, 'index', $user, Media::class);
+    }
+
+    /**
+     * @test
+     * @group authorization
+     */
     public function index_WhenUserIsAdminAndAcoIsMediaClass_IsAllowed(){
         $user = factory(User::class)->make([ 'role' => 'admin' ]);
         $this->assertPolicyAllows(new MediaPolicy, 'index', $user, Media::class);

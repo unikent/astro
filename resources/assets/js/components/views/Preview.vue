@@ -4,36 +4,53 @@
 		id="main_content"
 	>
 		<div id="b-wrapper" ref="wrapper" :style="wrapperStyles">
-			<template v-if="page.regions">
+			<template v-if="page.blocks">
 				<block
-					v-for="(blockData, index) in page.regions.main"
+					v-for="(blockData, index) in page.blocks['main']"
+					v-if="blockData"
 					:key="`block-${blockData.id}`"
-					:type="`${blockData.definition_name}-v${blockData.definition_version}`"
+					:type="getBlockType(blockData)"
 					:index="index"
 					:blockData="blockData"
 					:scale="scale"
-				>
-				</block>
+				/>
 			</template>
+			<div v-if="loadedBlocks && page.blocks && !Object.keys(page.blocks).length" class="empty-page">
+				This page is empty.<br>
+				To get started drag some blocks in...
+			</div>
 			<div
 				class="block-overlay" :class="{ 'hide-drag': showBlockOverlayControls }"
 				:style="blockOverlayStyles"
 			>
-				<div class="block-overlay__options" @click="editBlock">⚙</div>
-				<div ref="move" class="block-overlay__move">⇅</div>
+				<div class="block-overlay__options" @click="editBlock">
+					<Icon :glyph="editIcon" width="20" height="20" />
+				</div>
+				<div class="block-overlay__delete" @click="removeBlock">
+					<Icon :glyph="deleteIcon" width="20" height="20" />
+				</div>
+				<div ref="move" class="block-overlay__move">
+					<Icon :glyph="moveIcon" width="20" height="20" />
+				</div>
 			</div>
 		</div>
 	</div>
-	<div class="b-handle" :style="handleStyles">⇅</div>
+	<div class="b-handle" :style="handleStyles">
+		<Icon :glyph="editIcon" width="20" height="20" />
+	</div>
 	<div id="b-overlay" :style="overlayStyles"></div>
 </div>
 </template>
 
 <script>
-import Block from '../Block';
+import { mapState, mapActions, mapMutations } from 'vuex';
 import Velocity from 'velocity-animate';
 
-import { mapState, mapActions, mapMutations } from 'vuex';
+import Block from '../Block';
+import Icon from '../Icon';
+import editIcon from 'IconPath/pencil.svg';
+import deleteIcon from 'IconPath/trash.svg';
+import moveIcon from 'IconPath/arrows-vertical.svg';
 
 /* global document, window */
 
@@ -41,6 +58,7 @@ export default {
 	name: 'preview-wrapper',
 
 	components: {
+		Icon,
 		Block
 	},
 
@@ -63,7 +81,8 @@ export default {
 		...mapState({
 			page: state => state.page.pageData,
 			blockMeta: state => state.page.blockMeta,
-			pageScale: state => state.page.pageScale
+			pageScale: state => state.page.pageScale,
+			loadedBlocks: state => state.page.loaded
 		})
 	},
 
@@ -76,6 +95,10 @@ export default {
 
 		this.SCALE_DOWN = this.pageScale;
 		this.SCALE_UP = 1 / this.SCALE_DOWN;
+
+		this.editIcon = editIcon;
+		this.deleteIcon = deleteIcon;
+		this.moveIcon = moveIcon;
 	},
 
 	mounted() {
@@ -102,11 +125,19 @@ export default {
 		...mapMutations([
 			'setBlock',
 			'reorderBlocks',
-			'updateBlockPositionsOrder'
+			'updateBlockPositionsOrder',
+			'deleteBlock',
 		]),
 
 		editBlock() {
-			this.setBlock(this.current);
+			const { index, type } = this.current;
+			this.setBlock({ index, type });
+		},
+
+		removeBlock() {
+			const { index } = this.current;
+			this.deleteBlock({ index });
+			this.hideOverlay();
 		},
 
 		move(e) {
@@ -229,7 +260,7 @@ export default {
 			this.reorderBlocks({
 				from:  this.moved.from,
 				to:    this.moved.to,
-				value: this.page.regions['main'][this.moved.from]
+				value: this.page.blocks['main'][this.moved.from]
 			});
 
 			this.updateBlockPositionsOrder({
@@ -328,6 +359,14 @@ export default {
 				...this[`${dataName}Styles`],
 				[prop]: value
 			};
+		},
+
+		getBlockType(block) {
+			return (
+				Object.keys(block).length === 0 ?
+				'placeholder' :
+				`${block.definition_name}-v${block.definition_version}`
+			);
 		}
 	}
 };

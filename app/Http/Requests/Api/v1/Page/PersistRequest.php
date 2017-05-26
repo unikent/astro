@@ -29,15 +29,15 @@ class PersistRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'title' => 'required|max:255',
+            'title' => 'required|max:190',
             'layout_name' => 'required|string|definition_exists:App\Models\Definitions\Layout,layout_version',
             'layout_version' => 'required|numeric',
 
-            'route.slug' => [ 'required_with:route.parent_id', 'max:255' ],
+            'route.slug' => [ 'required_with:route.parent_id', 'max:190' ],
             'route.parent_id' => [ 'required_with:route.slug' ],
 
             'site_id' => [],
-            'site.name' => [ 'required_with:site.publishing_group_id', 'max:255' ],
+            'site.name' => [ 'required_with:site.publishing_group_id', 'max:190' ],
             'site.publishing_group_id' => [ 'required_with:site.name' ],
 
             'is_published' => 'filled|boolean',
@@ -109,6 +109,26 @@ class PersistRequest extends FormRequest
     public function messages()
     {
         return [
+            'in' => 'Please select a valid value.',
+            'integer' => 'This field must be an integer.',
+            'max' => [
+                'numeric' => 'This field may not be greater than :max.',
+                'string' => 'This field may not be greater than :max characters.',
+                'array' => 'This field may not have more than :max items.'
+            ],
+            'min' => [
+                'numeric' => 'This field must be at least :min.',
+                'string' => 'This field must be at least :min characters.',
+                'array' => 'This field must have at least :min items.'
+            ],
+            'regex' => 'This field\'s format is invalid.',
+            'required' => 'This field is required.',
+            'size' => [
+                'numeric' => 'This field must be :size.',
+                'string' => 'This field must be :size characters.',
+                'array' => 'This field must contain :size items.'
+            ],
+            'string' => 'This field must be a string.'
         ];
     }
 }

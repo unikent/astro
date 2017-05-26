@@ -10,18 +10,19 @@
 			:style="stylesInner"
 		>
 			<component
+				v-if="type !== 'placeholder'"
 				:is="currentView"
-				:index="index"
 				:fields="blockData.fields"
 				:other="this.getData()"
 			/>
+			<!-- placeholder element -->
+			<div v-else class="placeholder-block" />
 		</div>
 	</div>
 </template>
 
 <script>
-import fieldMarkup from '../tests/stubs/block-markup';
-import fields from 'cms-prototype-blocks';
+import blocks from 'cms-prototype-blocks';
 import { mapState, mapMutations } from 'vuex';
 
 /* global document */
@@ -50,8 +51,12 @@ export default {
 			current: { ...startValues },
 			size: null,
 			prevOver: null,
-			currentView: fields[this.type] ? fields[this.type] : {
-				template: fieldMarkup[this.blockData.markup]
+			currentView: blocks[this.type] ? blocks[this.type] : {
+				template: `
+					<div class="missing-definition-warning">
+						Missing "${this.type}" block type
+					</div>
+				`
 			},
 			offset: 0
 		}

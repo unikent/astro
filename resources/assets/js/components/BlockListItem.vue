@@ -2,12 +2,14 @@
 	<div class="block-move-container" :style="offsetStyles">
 		<div class="block-move" @mousedown="handleMousedown" :style="styles">
 			{{ block.label }}
+			<span v-if="canDrop" style="float: right">Drop to add</span>
 		</div>
 	</div>
 </template>
 
 <script>
 import { mapMutations } from 'vuex';
+import { uuid } from 'classes/helpers';
 
 /* global document */
 
@@ -17,6 +19,8 @@ export default {
 	data() {
 		return {
 			dragging: false,
+			canDrop: false,
+			dropped: false,
 			mouseStart: {
 				x: 0,
 				y: 0
@@ -52,7 +56,8 @@ export default {
 						${ -this.offsetCenter.x }px,
 						${ -this.offsetCenter.y }px,
 						0
-					)`
+					)`,
+				transitionDuration: `${this.dropped ? 0 : 0.2}s`
 			};
 		}
 	},
@@ -68,11 +73,13 @@ export default {
 	methods: {
 		...mapMutations([
 			'showIframeOverlay',
-			'updateWrapperStyle'
+			'updateWrapperStyle',
+			'addBlock'
 		]),
 
 		handleMousedown(e) {
 			this.dragging = true;
+			this.dropped = false;
 
 			const {
 				left: x,
@@ -93,7 +100,7 @@ export default {
 
 			this.iframePos = this.iframe.getBoundingClientRect();
 
-			// fire before mouse moves
+			// fire once before mouse moves
 			this.handleMouseMove(e);
 
 			document.addEventListener('mousemove', this.handleMouseMove);
@@ -110,12 +117,21 @@ export default {
 			};
 
 			let [x, y] = [
-				Math.max(0, Math.min(e.clientX - this.iframePos.left, this.iframePos.width)),
-				Math.max(0, Math.min(e.clientY - this.iframePos.top, this.iframePos.height))
+				e.clientX - this.iframePos.left,
+				e.clientY - this.iframePos.top,
 			];
 
-			if(x !== 0 && y !== 0 && x !== this.iframePos.width && y !== this.iframePos.height) {
-				this.$store.commit('updateOver', {x, y});
+			let [normX, normY] = [
+				Math.max(0, Math.min(x, this.iframePos.width)),
+				Math.max(0, Math.min(y, this.iframePos.height))
+			];
+
+			if(x >= 0 && y >= 0 && x <= this.iframePos.width && y <= this.iframePos.height) {
+				this.$store.commit('updateOver', { x: normX, y: normY });
+				this.canDrop = true;
+			}
+			else {
+				this.canDrop = false;
 			}
 		},
 
@@ -124,10 +140,18 @@ export default {
 
 			this.showIframeOverlay(false);
 
-			this.transition = 'transform 0.3s ease-out';
+			if(this.canDrop) {
+				this.addThisBlockType(this.block);
+				this.dropped = true;
+			}
+
+			this.transition = `transform ${this.dropped ? 0 : 0.3}s ease-out`;
+
+			this.canDrop = false;
 
 			const onEnd = () => {
 				this.transition = null;
+				this.dropped = false;
 				this.$el.removeEventListener('transitionend', onEnd);
 			};
 
@@ -141,6 +165,18 @@ export default {
 			document.removeEventListener('mousemove', this.handleMouseMove);
 
 			this.updateWrapperStyle({ prop: 'userSelect', value: 'auto' });
+		},
+
+		addThisBlockType({ name, version }) {
+
+			const block = {
+				definition_name: name,
+				definition_version: version,
+				id: uuid(),
+				fields: {}
+			};
+
+			this.addBlock({ block });
 		}
 
 	}

@@ -14,8 +14,18 @@ class SitePolicyTest extends PolicyTestCase
      * @test
      * @group authorization
      */
-    public function index_IsAllowed(){
-    	$this->markTestIncomplete();
+    public function index_WhenUserIsAdmin_IsAllowed(){
+        $user = factory(User::class)->make([ 'role' => 'admin' ]);
+        $this->assertPolicyAllows(new SitePolicy, 'index', $user, Site::class);
+    }
+
+    /**
+     * @test
+     * @group authorization
+     */
+    public function index_WhenUserIsNotAdmin_IsDenied(){
+        $user = factory(User::class)->make([ 'role' => 'user' ]);
+        $this->assertPolicyDenies(new SitePolicy, 'index', $user, Site::class);
     }
 
 

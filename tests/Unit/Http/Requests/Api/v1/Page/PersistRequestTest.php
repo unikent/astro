@@ -87,9 +87,9 @@ class PersistRequestTest extends RequestTestCase
      * @test
      * @group validation
      */
-    public function validation_WhenTitleIs255Chars_IsValid(){
+    public function validation_WhenTitleIs190Chars_IsValid(){
         $attrs = $this->getAttrs();
-        $attrs['title'] = str_repeat('a', 255);
+        $attrs['title'] = str_repeat('a', 190);
 
         $request = $this->mockRequest('POST', $attrs);
         $validator = $request->getValidatorInstance();
@@ -370,9 +370,9 @@ class PersistRequestTest extends RequestTestCase
      * @test
      * @group validation
      */
-    public function validation_WhenRouteSlugIs255Chars_IsValid(){
+    public function validation_WhenRouteSlugIs190Chars_IsValid(){
         $attrs = $this->getAttrs();
-        $attrs['route']['slug'] = str_repeat('a', 255);
+        $attrs['route']['slug'] = str_repeat('a', 190);
 
         $request = $this->mockRequest('POST', $attrs);
         $validator = $request->getValidatorInstance();
@@ -686,9 +686,9 @@ class PersistRequestTest extends RequestTestCase
      * @test
      * @group validation
      */
-    public function validation_WhenSiteNameIs255Chars_IsValid(){
+    public function validation_WhenSiteNameIs190Chars_IsValid(){
         $attrs = $this->getAttrs();
-        $attrs['site']['name'] = str_repeat('a', 255);
+        $attrs['site']['name'] = str_repeat('a', 190);
 
         $request = $this->mockRequest('POST', $attrs);
         $validator = $request->getValidatorInstance();

@@ -1,3 +1,11 @@
+// views
+@import './views/admin';
+@import './views/app';
+@import './views/dashboard';
+@import './views/editor';
+@import './views/media';
+@import './views/site-list';
+
 // components
 @import './components/block-list';
 @import './components/block-sidebar';
@@ -7,11 +15,3 @@
 @import './components/snackbar';
 @import './components/upload-form';
 @import './components/upload-status';
-
-// views
-@import './views/admin';
-@import './views/app';
-@import './views/dashboard';
-@import './views/editor';
-@import './views/media';
-@import './views/site-list';
