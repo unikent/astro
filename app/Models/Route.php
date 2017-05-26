@@ -95,9 +95,10 @@ class Route extends BaumNode
 	    	parent::save($options);
 
 	    	DB::commit();
+	    	return true;
     	} catch(Exception $e){
     		DB::rollback();
-    		throw $e;
+    		return false;
     	}
     }
 
@@ -270,7 +271,7 @@ class Route extends BaumNode
 		}
 
 		// Persist
-		$this->makeTree($tree);
+		$foobar = $this->makeTree($tree);
 
 		$model = $this->fresh();
 		return $model->descendants()->get();
@@ -286,7 +287,7 @@ class Route extends BaumNode
 	protected function replicateIterator(Collection $nodes, array &$output, $preserve)
 	{
 		foreach($nodes as $node){
-			$data = array_except($node->toArray(), [ 'parent_id', 'depth', 'lft', 'rgt', 'children' ]);
+			$data = array_except($node->toArray(), [ 'parent_id', 'depth', 'lft', 'rgt', 'children', 'is_canonical' ]);
 
 			if(!$preserve){
 				$data = array_except($data, [ 'id', 'path', 'is_active' ]);

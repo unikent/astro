@@ -7,6 +7,7 @@ use App\Models\Page;
 use App\Models\Site;
 use App\Models\Route;
 use App\Models\Redirect;
+use App\Http\Transformers\Api\v1\PageTransformer;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class RouteTest extends TestCase
@@ -362,6 +363,132 @@ class RouteTest extends TestCase
 
 		$route = $route->fresh();
 		$this->assertEquals('foobar123', $route->slug);
+	}
+
+	/**
+	 * @test
+	 *
+	 * environment. However, we want to make sure that save still behaves normally.
+	 */
+	public function save_WhenSuccessful_ReturnsTrue()
+	{
+		$route = factory(Route::class)->states('withParent', 'withPage')->create();
+		$route->makeActive();
+
+		$count = Route::count();
+
+		$route->slug = 'foobar123';
+		$this->assertTrue($route->save());
+	}
+
+
+
+	/**
+	 * @test
+	 */
+	public function cloneDescendants_WhenAllDescendantsArePublished_ClonesAllDescendantsAsInactive()
+	{
+		$a1 = factory(Route::class)->states('withPublishedParent', 'withPage')->create();
+		$a1->page->publish(new PageTransformer);
+
+		$a2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a1->getKey() ]);
+		$a2->page->publish(new PageTransformer);
+
+		$a3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a2->getKey() ]);
+		$a3->page->publish(new PageTransformer);
+
+		$a4 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a2->getKey() ]);
+		$a4->page->publish(new PageTransformer);
+
+		$b1 = factory(Route::class)->states('withPublishedParent', 'withPage')->create();
+
+		$a1 = $a1->fresh();
+		$count = $a1->descendants()->count();
+
+		$descendants = $b1->cloneDescendants($a1);
+
+		$this->assertEquals($count, $descendants->count());
+
+		$descendant_page_ids = $descendants->pluck('page_id');
+		$this->assertContains($a2->page_id, $descendant_page_ids);
+		$this->assertContains($a3->page_id, $descendant_page_ids);
+		$this->assertContains($a4->page_id, $descendant_page_ids);
+
+		$this->assertNotContains(true, $descendants->pluck('is_active'));
+	}
+
+	/**
+	 * @test
+	 * @group integration
+	 *
+	 * This test depends upon the $route->save() function working properly. Its worth
+	 * keeping as an integration tests to prevent against regressions in this behaviour.
+	 */
+	public function cloneDescendants_WhenSomeDescendantsAreDraft_ClonesAllDescendantsAndRemovesOriginalDrafts()
+	{
+		$a1 = factory(Route::class)->states('withPublishedParent', 'withPage')->create();
+		$a1->page->publish(new PageTransformer);
+
+		$a2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a1->getKey() ]);
+		$a2->page->publish(new PageTransformer);
+
+		$a3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a2->getKey() ]);
+		$a4 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a2->getKey() ]);
+
+		$b1 = factory(Route::class)->states('withPublishedParent', 'withPage')->create();
+
+		$a1 = $a1->fresh();
+		$count = $a1->descendants()->count();
+
+		$descendants = $b1->cloneDescendants($a1);
+		$this->assertEquals($count, $descendants->count());
+
+		$a1 = $a1->fresh();
+		$this->assertEquals($count-2, $a1->descendants()->count());
+
+		$this->assertInstanceOf(Route::class, Route::find($a2->getKey()));
+		$this->assertNull(Route::find($a3->getKey()));
+		$this->assertNull(Route::find($a4->getKey()));
+	}
+
+	/**
+	 * @test
+	 */
+	public function cloneDescendants_WhenDestinationHasOwnDescendants_RetainsOriginalDescendants()
+	{
+		// Original Route, with descendants
+		$a1 = factory(Route::class)->states('withPublishedParent', 'withPage')->create();
+		$a1->page->publish(new PageTransformer);
+
+		$a2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a1->getKey() ]);
+		$a2->page->publish(new PageTransformer);
+
+		$a3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a2->getKey() ]);
+		$a4 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a2->getKey() ]);
+
+		// New Route, with own descendants
+		$b1 = factory(Route::class)->states('withPublishedParent', 'withPage')->create();
+		$b1->page->publish(new PageTransformer);
+
+		$b2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $b1->getKey() ]);
+		$b2->page->publish(new PageTransformer);
+
+		$b3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $b1->getKey() ]);
+
+		// Perform test
+		$a1 = $a1->fresh();
+		$count = $a1->descendants()->count();
+
+		$descendants = $b1->cloneDescendants($a1);
+
+		$this->assertEquals($count + 2, $descendants->count()); // Own descendants, plus cloned descendants.
+
+		$descendant_page_ids = $descendants->pluck('page_id');
+		$this->assertContains($a2->page_id, $descendant_page_ids);
+		$this->assertContains($b2->page_id, $descendant_page_ids);
+		$this->assertContains($a3->page_id, $descendant_page_ids);
+		$this->assertContains($b3->page_id, $descendant_page_ids);
+		$this->assertContains($a4->page_id, $descendant_page_ids);
 	}
 
 
