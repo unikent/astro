@@ -4,12 +4,13 @@ namespace App\Models;
 use DB;
 use Exception;
 use App\Models\Route;
-use App\Models\Traits\Pathable;
+use App\Models\Traits\Routable;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Contracts\Routable as RoutableContract;
 
-class Redirect extends Model
+class Redirect extends Model implements RoutableContract
 {
-	use Pathable;
+	use Routable;
 
 	protected $fillable = [
 		'path',

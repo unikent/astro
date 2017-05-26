@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Api\v1;
 
 use Gate;
 use App\Models\Route;
+use App\Models\Redirect;
 use Illuminate\Http\Request;
 use App\Http\Transformers\Api\v1\PageTransformer;
 use App\Http\Requests\Api\v1\Route\ResolveRequest;
@@ -18,18 +19,26 @@ class RouteController extends ApiController
 	 * @return Response
 	 */
 	public function resolve(ResolveRequest $request){
-		$route = Route::findByPathOrFail($request->get('path'));
+		// Retrieve the path from the URL
+		$path = $request->get('path');
 
-		if(Gate::allows('read', $route)){
-			if($route->published_page){
-				return response($route->published_page->bake);
-			} else {
-				return fractal($route->page, new PageTransformer)->parseIncludes([ 'blocks', 'active_route' ])->respond();
-			}
-		} else {
-			return (new SymfonyResponse())->setStatusCode(404);
+		// Attempt to resolve the Route
+		$resolve = Route::findByPath($path);
+
+		// If the Route is not found, attempt to find a Redirect
+		if(!$resolve){
+			$resolve = Redirect::findByPathOrFail($path);
 		}
 
+		if(Gate::allows('read', $resolve)){
+			if($resolve->published_page){
+				return response($resolve->published_page->bake);
+			} else {
+				return fractal($resolve->page, new PageTransformer)->parseIncludes([ 'blocks', 'active_route' ])->respond();
+			}
+		}
+
+		return (new SymfonyResponse())->setStatusCode(404);
 	}
 
 }

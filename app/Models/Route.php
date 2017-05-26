@@ -4,13 +4,14 @@ namespace App\Models;
 use DB;
 use Exception;
 use Baum\Node as BaumNode;
-use App\Models\Traits\Pathable;
+use App\Models\Traits\Routable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use App\Models\Contracts\Routable as RoutableContract;
 
-class Route extends BaumNode
+class Route extends BaumNode implements RoutableContract
 {
-	use Pathable;
+	use Routable;
 
 	public $timestamps = false;
 

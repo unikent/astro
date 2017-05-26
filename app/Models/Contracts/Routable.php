@@ -1,10 +1,11 @@
 <?php
-namespace App\Models\Traits;
+namespace App\Models\Contracts;
 
-/**
- *
- */
-trait Pathable {
+interface Routable {
+
+	public function page();
+
+	public function published_page();
 
 	/**
 	 * Attempts to retrieve a model by path
@@ -12,10 +13,7 @@ trait Pathable {
 	 * @param  string $path
 	 * @return \Illuminate\Database\Eloquent\Model
 	 */
-	public static function findByPath($path)
-	{
-		return static::where('path', '=', $path)->first();
-	}
+	public static function findByPath($path);
 
 	/**
 	 * Attempts to retrieve a model by path, throws Exception when not found
@@ -24,9 +22,6 @@ trait Pathable {
 	 * @return \Illuminate\Database\Eloquent\Model
 	 * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
 	 */
-	public static function findByPathOrFail($path)
-	{
-		return static::where('path', '=', $path)->firstOrFail();
-	}
+	public static function findByPathOrFail($path);
 
 }
