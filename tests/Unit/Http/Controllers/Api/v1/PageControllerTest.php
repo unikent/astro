@@ -1355,7 +1355,6 @@ class PageControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
-     * @group revisit
      */
     public function destroy_WhenAuthorizedAndValid_DoesNotDeleteAssociatedRoutes(){
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
@@ -1364,6 +1363,19 @@ class PageControllerTest extends ApiControllerTestCase {
         $response = $this->action('DELETE', PageController::class . '@destroy', [ $route->page->getKey() ]);
 
         $this->assertInstanceOf(Route::class, Route::find($route->getKey()));
+    }
+
+    /**
+     * @test
+     */
+    public function destroy_WhenAuthorizedAndValid_DoesNotDeleteAssociatedRedirects(){
+        $route = factory(Route::class)->states('withPage', 'withParent')->create();
+        $redirect = Redirect::createFromRoute($route);
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('DELETE', PageController::class . '@destroy', [ $route->page->getKey() ]);
+
+        $this->assertInstanceOf(Redirect::class, Redirect::find($redirect->getKey()));
     }
 
     /**
@@ -1446,7 +1458,6 @@ class PageControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
-     * @group revisit
      */
     public function forceDestroy_WhenAuthorizedAndValid_HardDeletesAssociatedRoutes(){
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
@@ -1455,6 +1466,19 @@ class PageControllerTest extends ApiControllerTestCase {
         $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ $route->page->getKey() ]);
 
         $this->assertNull(Route::find($route->getKey()));
+    }
+
+    /**
+     * @test
+     */
+    public function forceDestroy_WhenAuthorizedAndValid_HardDeletesAssociatedRedirects(){
+        $route = factory(Route::class)->states('withPage', 'withParent')->create();
+        $redirect = Redirect::createFromRoute($route);
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ $route->page->getKey() ]);
+
+        $this->assertNull(Redirect::find($redirect->getKey()));
     }
 
     /**
