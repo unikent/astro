@@ -12,7 +12,6 @@ use App\Models\PublishedPage;
 use App\Http\Controllers\Api\v1\PageController;
 use App\Http\Transformers\Api\v1\PageTransformer;
 use Illuminate\Auth\Access\AuthorizationException;
-use Tests\Unit\Http\Requests\Api\v1\Page\PageTransformer;
 
 class PageControllerTest extends ApiControllerTestCase {
 
@@ -144,9 +143,7 @@ class PageControllerTest extends ApiControllerTestCase {
      */
     public function show_WhenAuthorizedAndFoundRequestIncludesLayoutDefinition_IncludesLayoutDefinitionInJson(){
         $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
-
         $page = $route->page;
-        // $page->publish(new PageTransformer);
 
         $this->authenticatedAndAuthorized();
 
@@ -557,10 +554,7 @@ class PageControllerTest extends ApiControllerTestCase {
     public function update_WhenAuthorizedAndValid_WhenRouteHasChanged_RemovesOtherInactiveRoutesToPage(){
         $this->authenticatedAndAuthorized();
 
-        $route = factory(Route::class)->states('withPage', 'withParent')->create();
-
-        // Publish the Routes/Pages
-        $route->parent->page->publish(new PageTransformer);
+        $route = factory(Route::class)->states('withPage', 'withPublishedParent')->create();
         $route->page->publish(new PageTransformer);
 
         $inactive = factory(Route::class, 2)->create([ 'page_id' => $route->page_id, 'parent_id' => $route->parent_id ]);
@@ -582,10 +576,7 @@ class PageControllerTest extends ApiControllerTestCase {
     public function update_WhenAuthorizedAndValid_WhenRouteIsMoved_CreatesInactiveRouteAtNewLocation(){
         $this->authenticatedAndAuthorized();
 
-        $root = factory(Route::class)->states('withPage', 'isRoot')->create();
-        $root->page->publish(new PageTransformer);
-
-        $l1 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $root->getKey() ]);
+        $l1 = factory(Route::class)->states('withPage', 'withPublishedParent')->create();
         $l1->page->publish(new PageTransformer);
 
         $l2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l1->getKey() ]);
@@ -597,7 +588,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $page = $l2->page;
 
         $attrs = $this->getAttrs($page);
-        array_set($attrs, 'route.parent_id', $root->getKey());
+        array_set($attrs, 'route.parent_id', $l1->parent_id);
 
         $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
 
@@ -607,7 +598,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $this->assertEquals($l1->getKey(), $activeRoute->parent_id);    // $activeRoute is unchanged
 
         $draftRoute = $page->draftRoute;
-        $this->assertEquals($root->getKey(), $draftRoute->parent_id);   // $draftRoute has been created
+        $this->assertEquals($l1->parent_id, $draftRoute->parent_id);   // $draftRoute has been created
     }
 
     /**
@@ -1004,6 +995,147 @@ class PageControllerTest extends ApiControllerTestCase {
         $json = $response->json();
 
         $this->assertEquals(json_decode($page->published->bake, TRUE), $json);
+    }
+
+
+
+    /**
+     * @test
+     * @group authentication
+     */
+    public function publishTree_WhenUnauthenticated_Returns401(){
+        $route = factory(Route::class)->states('withPage', 'withPublishedParent')->create();
+
+        $l1 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $route->getKey() ]);
+        $l2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l1->getKey() ]);
+        $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
+
+        $response = $this->action('POST', PageController::class . '@publishTree', [ $l1->page->getKey() ]);
+        $response->assertStatus(401);
+    }
+
+    /**
+     * @test
+     * @group authorization
+     */
+    public function publishTree_WhenAuthenticated_ChecksAuthorization(){
+        $l1 = factory(Route::class)->states('withPage', 'withPublishedParent')->create();
+        $l2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l1->getKey() ]);
+        $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
+
+        Gate::shouldReceive('authorize')->with('publish', Mockery::type(Page::class))->times(3)->andReturn(true);
+
+        $this->authenticated();
+        $response = $this->action('POST', PageController::class . '@publishTree', [ $l1->page->getKey() ]);
+    }
+
+    /**
+     * @test
+     * @group authorization
+     */
+    public function publishTree_WhenAuthenticatedAndUnauthorized_Returns403(){
+        $l1 = factory(Route::class)->states('withPage', 'withPublishedParent')->create();
+        $l2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l1->getKey() ]);
+        $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
+
+        $this->authenticatedAndUnauthorized();
+        $response = $this->action('POST', PageController::class . '@publishTree', [ $l1->page->getKey() ]);
+
+        $response->assertStatus(403);
+    }
+
+    /**
+     * @test
+     */
+    public function publishTree_WhenAuthorizedAndPageNotFound_Returns404(){
+        $this->authenticatedAndAuthorized();
+
+        $response = $this->action('POST', PageController::class . '@publishTree', [ 123 ]);
+        $response->assertStatus(404);
+    }
+
+    /**
+     * @test
+     */
+    public function publishTree_WhenAuthorizedHasUnpublishedParents_Returns406(){
+        $l1 = factory(Route::class)->states('withPage', 'withParent')->create();
+        $l2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l1->getKey() ]);
+        $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('POST', PageController::class . '@publishTree', [ $l1->page->getKey() ]);
+
+        $response->assertStatus(406);
+
+        $json = $response->json();
+        $this->assertArrayHasKey('errors', $json);
+        $this->assertNotEmpty($json['errors']);
+    }
+
+    /**
+     * @test
+     */
+    public function publishTree_WhenAuthenticatedAndAuthorizes_AllRoutesInTreeAreMadeActive(){
+        $l1 = factory(Route::class)->states('withPage', 'withPublishedParent')->create();
+        $l2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l1->getKey() ]);
+        $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('POST', PageController::class . '@publishTree', [ $l1->page->getKey() ]);
+
+        $l1 = $l1->fresh();
+        $this->assertTrue($l1->isActive());
+
+        $l2 = $l2->fresh();
+        $this->assertTrue($l2->isActive());
+
+        $l3 = $l3->fresh();
+        $this->assertTrue($l3->isActive());
+    }
+
+    /**
+     * @test
+     */
+    public function publishTree_WhenAuthenticatedAndAuthorizes_AllPagesArePublished(){
+        $l1 = factory(Route::class)->states('withPage', 'withPublishedParent')->create();
+        $l2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l1->getKey() ]);
+        $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
+
+        $count = PublishedPage::count();
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('POST', PageController::class . '@publishTree', [ $l1->page->getKey() ]);
+
+        $this->assertEquals($count+3, PublishedPage::count());
+    }
+
+    /**
+     * @test
+     */
+    public function publishTree_WhenAuthorizedAndValid_Returns200(){
+        $l1 = factory(Route::class)->states('withPage', 'withPublishedParent')->create();
+        $l2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l1->getKey() ]);
+        $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('POST', PageController::class . '@publishTree', [ $l1->page->getKey() ]);
+
+        $response->assertStatus(200);
+    }
+
+    /**
+     * @test
+     */
+    public function publishTree_WhenAuthorizedAndValid_ReturnsBakedJson(){
+        $l1 = factory(Route::class)->states('withPage', 'withPublishedParent')->create();
+        $l2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l1->getKey() ]);
+        $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('POST', PageController::class . '@publishTree', [ $l1->page->getKey() ]);
+
+        $json = $response->json();
+        $this->assertEquals(json_decode($l1->page->published->bake, TRUE), $json);
     }
 
 

@@ -76,6 +76,37 @@ class PageController extends ApiController
 	}
 
 	/**
+	 * POST /api/v1/page/{page}/publish-tree
+	 *
+	 * @param  Request $request
+	 * @param  Page $page
+	 * @return Response
+	 */
+	public function publishTree(Request $request, Page $page){
+		$routes = $page->draftRoute->descendantsAndSelf()->get();
+
+		DB::beginTransaction();
+
+		try {
+			foreach($routes as $route){
+				$this->authorize('publish', $route->page);
+				$route->page->publish(new PageTransformer);
+			}
+
+			DB::commit();
+			return response($page->published->bake, 200);
+
+		} catch(UnpublishedParentException $e){
+			DB::rollBack();
+			return response([ 'errors' => [ $e->getMessage() ] ], 406);
+
+		} catch(Exception $e){
+			DB::rollBack();
+			throw $e;
+		}
+	}
+
+	/**
 	 * POST /api/v1/page/{page}/revert
 	 *
 	 * @param  Request $request

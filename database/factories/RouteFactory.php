@@ -30,6 +30,17 @@ $factory->state(App\Models\Route::class, 'withParent', function ($faker) {
     ];
 });
 
+$factory->state(App\Models\Route::class, 'withPublishedParent', function ($faker) {
+    $parent = factory(App\Models\Route::class)->states('withPage', 'isRoot')->create();
+    $parent->page->publish(new PageTransformer);
+
+    $parent = $parent->fresh();
+
+    return [
+        'parent_id' => $parent->getKey(),
+    ];
+});
+
 $factory->state(App\Models\Route::class, 'withSite', function ($faker) {
     $site = factory(App\Models\Site::class)->states('withPublishingGroup')->create();
 
