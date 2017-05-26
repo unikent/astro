@@ -15,15 +15,13 @@ class CreatePublishedPagesTable extends Migration
     {
         Schema::create('published_pages', function(Blueprint $table) {
             $table->increments('id');
-            $table->integer('page_id')->unsigned();
+            $table->integer('page_id')->unsigned()->index();
 
             $table->mediumText('bake');
 
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
             $table->timestamps();
-
-            $table->foreign('page_id', 'published_pages_page_id_fk')->references('id')->on('pages')->onDelete('cascade');
         });
     }
 
@@ -34,10 +32,6 @@ class CreatePublishedPagesTable extends Migration
      */
     public function down()
     {
-        Schema::table('published_pages', function(Blueprint $table) {
-            $table->dropForeign('published_pages_page_id_fk');
-        });
-
         Schema::drop('published_pages');
     }
 }

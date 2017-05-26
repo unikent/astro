@@ -1484,6 +1484,21 @@ class PageControllerTest extends ApiControllerTestCase {
     /**
      * @test
      */
+    public function forceDestroy_WhenAuthorizedAndValid_DoesNotDeletePublishedPages(){
+        $route = factory(Route::class)->states('withPage', 'withPublishedParent')->create();
+        $route->page->publish(new PageTransformer);
+
+        $published = $route->page->published;
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ $route->page->getKey() ]);
+
+        $this->assertInstanceOf(PublishedPage::class, PublishedPage::find($published->getKey()));
+    }
+
+    /**
+     * @test
+     */
     public function forceDestroy_WhenAuthorizedAndValid_Returns200(){
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
 
