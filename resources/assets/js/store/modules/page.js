@@ -1,7 +1,9 @@
 import _ from 'lodash';
+import Vue from 'vue';
 import { Definition } from 'classes/helpers';
 import api from 'plugins/http/api';
 import { undoStackInstance } from 'plugins/undo-redo';
+import { eventBus } from 'plugins/eventbus';
 
 const state = {
 	currentBlockIndex: null,
@@ -24,8 +26,6 @@ const state = {
 const mutations = {
 
 	setPage(state, page) {
-		state.loaded = true;
-
 		if(!page.blocks) {
 			page.blocks = {
 				main: []
@@ -33,6 +33,10 @@ const mutations = {
 		}
 
 		state.pageData = page;
+	},
+
+	setLoaded(state, loaded = true) {
+		state.loaded = loaded;
 	},
 
 	setBlock(state, { index } = { index: null }) {
@@ -68,6 +72,9 @@ const mutations = {
 			_.set(clone, name, value);
 			fields = clone;
 		}
+
+		// TODO: use state for this
+		Vue.nextTick(() => eventBus.$emit('block:updateOverlay'));
 	},
 
 	changePage(state, name) {
@@ -94,12 +101,15 @@ const mutations = {
 		}
 
 		state.pageData.blocks[state.currentRegion].splice(index, 1);
+
+		// TODO: use state for this
+		Vue.nextTick(() => eventBus.$emit('block:updateOverlay'));
 	}
 };
 
 const actions = {
 
-	fetchPage({ commit }, id) {
+	fetchPage({ state, commit }, id) {
 
 		// TODO: refactor into smaller methods
 		api
@@ -136,6 +146,10 @@ const actions = {
 								commit('addBlock', { region, index, block })
 							});
 						});
+
+						commit('setLoaded');
+
+						undoStackInstance.init(state.pageData);
 					});
 
 			});

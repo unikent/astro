@@ -42,3 +42,39 @@ export const uuid = (a) => {
 export const Definition = (
 	isIframe ? win.top.astroDefinition : (win.astroDefinition = DefinitionClass)
 );
+
+const matchByNodeName = (node, search) => {
+	return node.nodeName.toLowerCase() === search;
+};
+
+const matchExactly = (node, search) => {
+	return node === search;
+};
+
+export const findParent = (searchFor, el, exact = false, ignore = false) => {
+	const match = exact ? matchExactly : matchByNodeName;
+
+	if(match(el, searchFor) && !ignore) {
+		return el;
+	}
+
+	while(el) {
+		if(match(el, searchFor) && !ignore) {
+			return el;
+		}
+		el = el.parentNode;
+	}
+
+	return null;
+};
+
+export const getTopOffset = (el) => {
+	let pos = 0;
+
+	while(el) {
+		pos += (el.offsetTop - el.scrollTop + el.clientTop);
+		el = el.offsetParent;
+	}
+
+	return pos;
+}

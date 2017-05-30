@@ -34,8 +34,11 @@ export default {
 
 		cleanText(txt) {
 			this.tempHTML.innerHTML = txt;
-			return this.tempHTML.children.length === 1 ?
-				this.tempHTML.firstChild.innerHTML : txt;
+			return (
+				this.tempHTML.children.length === 1 &&
+				this.tempHTML.children[0].tagName.toLowerCase() === 'p' ?
+					this.tempHTML.firstChild.innerHTML : txt
+			);
 		}
 	},
 
@@ -63,6 +66,8 @@ export default {
 		this.editor = $(this.$refs.redactor);
 
 		this.editor.redactor({
+			toolbarFixed: true,
+			toolbarFixedTarget: '.block-options-list',
 			callbacks: {
 				change() {
 					if(self.synced) {

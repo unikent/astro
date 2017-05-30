@@ -34,7 +34,6 @@
 		'api_token' => $api_token,
 		'debug' => config('app.debug')
 	]); ?>;
-	window.isEditor = <?php echo json_encode(!$is_preview); ?>;
 	</script>
 </head>
 <body class="custom-scrollbar">

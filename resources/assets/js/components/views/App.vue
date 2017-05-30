@@ -22,6 +22,7 @@
 <script>
 import { mapState } from 'vuex';
 import SnackBar from '../SnackBar';
+import { undoStackInstance } from 'plugins/undo-redo';
 
 /* global window */
 
@@ -42,16 +43,15 @@ export default {
 		}),
 
 		isEditor() {
-			return window.isEditor;
+			return this.$route.name !== 'preview';
+		},
+
+		showBack() {
+			return ['site', 'page'].indexOf(this.$route.name) !== -1;
 		},
 
 		username() {
 			return window.astro.username;
-		},
-
-		// TODO: clean up hack
-		showBack() {
-			return !!this.$route.path.match(/\/site\/[^\/]+(\/page\/[^\/]+)?/)
 		}
 	},
 
@@ -64,7 +64,10 @@ export default {
 
 		backToSites() {
 			this.$store.commit('changePage', '');
-			this.$router.push('/sites')
+			this.$store.commit('setPage', {});
+			this.$store.commit('setLoaded', false);
+			undoStackInstance.clear();
+			this.$router.push('/sites');
 		}
 	}
 };

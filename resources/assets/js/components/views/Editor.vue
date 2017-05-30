@@ -29,17 +29,35 @@
 			</el-button-group>
 
 			<el-button class="save-button" @click="savePage">Save</el-button>
+
+			<div
+				class="page-status"
+				:class="{'page-status--is-published' : page.is_published}"
+			>{{ page.is_published ? 'published' : 'draft'}}</div>
+
 		</footer>
 	</div>
 
-	<nav :style="{marginLeft: sideBarOpen ? 0 : '-250px'}" class="editor-nav editor-sidebar">
+	<nav
+		:style="{marginLeft: sideBarOpen ? 0 : '-250px'}"
+		class="editor-nav editor-sidebar"
+		:class="{ 'editor-nav--is-over': sideBarHover || !sideBarOpen }"
+		@mouseenter="sideBarHover = true"
+		@mouseleave="sideBarHover = false"
+	>
 		<page-sidebar></page-sidebar>
 		<div class="left-collapse" @click="sideBarOpen = !sideBarOpen">
 			<i :class="{'el-icon-arrow-left' : sideBarOpen, 'el-icon-arrow-right' : !sideBarOpen }" :style="{ marginLeft: sideBarOpen ? '2px' : '5px'}"></i>
 		</div>
 	</nav>
 
-	<aside :style="{marginRight: blockListOpen ? 0 : '-380px'}" class="editor-component-list editor-sidebar">
+	<aside
+		:style="{marginRight: blockListOpen ? 0 : '-380px'}"
+		class="editor-component-list editor-sidebar"
+		:class="{ 'editor-component-list--is-over': blockListHover || !blockListOpen }"
+		@mouseenter="blockListHover = true"
+		@mouseleave="blockListHover = false"
+	>
 		<div class="right-collapse" @click="blockListOpen = !blockListOpen">
 			<i :class="{'el-icon-arrow-right' : blockListOpen, 'el-icon-arrow-left' : !blockListOpen}" :style="{ marginLeft: blockListOpen ? '5px' : '3px'}"></i>
 		</div>
@@ -120,7 +138,9 @@ export default {
 		return {
 			currentView: 'desktop',
 			sideBarOpen: true,
-			blockListOpen: true
+			blockListOpen: true,
+			blockListHover: false,
+			sideBarHover: false
 		};
 	},
 
@@ -132,7 +152,8 @@ export default {
 		]),
 
 		...mapState({
-			page: state => state.page.pageData
+			page: state => state.page.pageData,
+			pageLoaded: state => state.page.loaded
 		}),
 
 		getPreviewUrl() {
@@ -147,19 +168,18 @@ export default {
 		}
 	},
 
-	mounted() {
-		const
-			loader = Loading.service({
-				target: this.$refs.editor,
-				text: 'Loading preview...',
-				customClass: 'loading-overlay'
-			}),
-			removeLoader = () => {
-				loader.close();
-				this.$refs.iframe.removeEventListener('load', removeLoader);
-			};
+	watch: {
+		pageLoaded() {
+			this.loader.close();
+		}
+	},
 
-		this.$refs.iframe.addEventListener('load', removeLoader);
+	mounted() {
+		this.loader = Loading.service({
+			target: this.$refs.editor,
+			text: 'Loading preview...',
+			customClass: 'loading-overlay'
+		});
 	},
 
 	methods: {

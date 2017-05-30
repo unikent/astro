@@ -1,11 +1,11 @@
 .block-options {
-	transition: transform .2s ease-in-out;
+	transition: transform .3s cubic-bezier(.19, 1, .22, 1);
 	transform: translateX(100%);
 	position: absolute;
 	top: 0;
 	left: 1px;
 	background-color: #f5f7fa;
-	height: calc(100vh - 50px);
+	height: calc(100vh - #{get-height(top-bar)});
 	width: calc(100% - 1px);
 }
 .options-visible {
@@ -19,8 +19,13 @@
 }
 
 .block-options-list {
-	height: calc(100vh - 92px);
-	padding: 0 20px 80px;
+	$height: (
+		#{get-height(top-bar)} -
+		#{get-height(block-back-bar)} -
+		#{get-height(block-bottom-bar)}
+	);
+
+	height: calc(100vh - #{$height});
+	padding: 30px 20px 80px;
 	overflow: auto;
-	margin-bottom: 80px;
 }

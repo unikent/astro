@@ -1,4 +1,5 @@
 const state = {
+	currentBlockIndex: null,
 	currentBlockDefinition: null,
 	blockDefinitions: {}
 };
@@ -13,8 +14,17 @@ const mutations = {
 		state.blockDefinitions = list;
 	},
 
-	setBlock(state, { type } = { type: null }) {
+	// TODO: move to shared action?
+	setBlock(state, { index, type } = { index: null, type: null }) {
+		state.currentBlockIndex = index;
 		state.currentBlockDefinition = state.blockDefinitions[type];
+	},
+
+	deleteBlock(state, { index } = { index: null }) {
+		if(index !== null && index === state.currentBlockIndex) {
+			state.currentBlockDefinition = null;
+			state.currentBlockIndex = null;
+		}
 	}
 };
 

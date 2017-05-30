@@ -1,0 +1,6 @@
+/*---- functions ----*/
+
+@function get-height($key) {
+	$height: map-get($heights, $key);
+	@return nth($height, 1) + nth($height, 2);
+}

@@ -29,6 +29,7 @@
     "vuex": "^2.1.1"
   },
   "devDependencies": {
+    "@epegzz/sass-vars-loader": "git+ssh://git@github.com/theninja/sass-vars-loader.git#bugfix/nested-lists",
     "axios-mock-adapter": "^1.8.1",
     "babel-core": "^6.24.1",
     "babel-eslint": "^7.2.1",

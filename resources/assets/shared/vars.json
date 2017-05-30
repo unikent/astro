@@ -1,0 +1,7 @@
+{
+	"heights": {
+		"top-bar": [50, "px"],
+		"block-back-bar": [42, "px"],
+		"block-bottom-bar": [56, "px"]
+	}
+}
