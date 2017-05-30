@@ -104,6 +104,22 @@ html {
 	user-select: none;
 }
 
+.page-status {
+	background-color: #a7b5c8;
+	color: #fff;
+	font-size: .8em;
+	text-align: right;
+	padding: 0 10px;
+	display: inline-block;
+	border-radius: 4px;
+	float: right;
+	margin: 4px 10px 0;
+}
+
+.page-status--is-published {
+	background-color: #65c38f;
+}
+
 .b-button {
 	float: right;
 	clear: both;
@@ -144,6 +160,11 @@ html {
 	border-width: 4px;
 }
 
+.block-overlay--removed {
+	transition: none;
+	opacity: 0;
+}
+
 .block-overlay__options,
 .block-overlay__move,
 .block-overlay__delete {
@@ -171,8 +192,8 @@ html {
 .block-overlay__options {
 	top: -4px;
 	right: -4px;
-	cursor: pointer;
 	border-radius: 0 0 0 4px;
+	pointer-events: none;
 }
 
 .block-overlay__delete {
