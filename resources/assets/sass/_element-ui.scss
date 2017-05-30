@@ -28,11 +28,14 @@
 	.el-form-item__label {
 		font-size: 16px;
 		display: block;
-		margin-top: 20px;
-		padding-top: 20px;
-		border-top: 1px solid rgba(191, 203, 217, 0.3);
 		font-weight: 500;
 		margin-bottom: 1em;
+	}
+
+	.el-form > .el-form-item + .el-form-item {
+		margin-top: 30px;
+		padding-top: 20px;
+		border-top: 1px solid rgba(191, 203, 217, 0.3);
 	}
 
 	.is-error .el-upload-dragger {
@@ -44,9 +47,38 @@
 		content: none;
 	}
 
-	.el-form-item.is-required .el-form-item__label:after {
-		content: '*';
-		color: #ff4949;
+	.el-form-item.is-error .collection-field .el-input__inner,
+	.el-form-item.is-error .collection-field .el-textarea__inner,
+	.el-form-item.is-error .collection-field .el-upload-dragger {
+		border-color: #bfcbd9;
+	}
+
+	.el-form-item.is-error {
+		.collection-field {
+
+			.el-input__inner,
+			.el-textarea__inner,
+			.el-upload-dragger {
+				border-color: #bfcbd9;
+
+				&:hover {
+					border-color: #8391a5
+				}
+				&:focus {
+					outline: 0;
+					border-color: #20a0ff;
+				}
+			}
+
+			.el-form-item.is-error {
+
+				.el-input__inner,
+				.el-textarea__inner,
+				.el-upload-dragger {
+					border-color: #ff4949;
+				}
+			}
+		}
 	}
 }
 
