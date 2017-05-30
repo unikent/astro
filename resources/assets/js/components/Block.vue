@@ -2,8 +2,9 @@
 	<div
 		class="b-block-container"
 		:style="stylesOuter"
-		@mouseover="showOverlay"
-		@mouseout="hideOverlay"
+		@mouseenter="showOverlay"
+		@mouseleave="hideOverlay"
+		@click="editBlock"
 	>
 		<div
 			class="block"
@@ -83,13 +84,15 @@ export default {
 		},
 
 		...mapState({
-			blockMeta: state => state.page.blockMeta
+			blockMeta: state => state.page.blockMeta,
+			currentBlockIndex: state => state.definition.currentBlockIndex
 		})
 	},
 
 	methods: {
 		...mapMutations([
-			'updateBlockPositions'
+			'updateBlockPositions',
+			'setBlock'
 		]),
 
 		listen() {
@@ -105,8 +108,6 @@ export default {
 
 			this.$bus.$on('block:move', index => {
 				const after = index.from <= index.to;
-
-				console.log(after ? 'after' : 'not after');
 
 				if(after && this.index > index.from && this.index <= index.to) {
 					this.offset = -this.blockMeta.sizes[index.from];
@@ -133,6 +134,12 @@ export default {
 					value: 0
 				});
 			});
+		},
+
+		editBlock() {
+			if(this.currentBlockIndex !== this.index) {
+				this.setBlock({ index: this.index, type: this.type });
+			}
 		},
 
 		getData() {
