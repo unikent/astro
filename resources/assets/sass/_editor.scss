@@ -59,8 +59,8 @@ html {
 
 .editor-content {
 	transition: width .3s ease-out, height .3s ease-out;
-	max-height: calc(100vh - 106px);
-	margin-bottom: 56px;
+	max-height: calc(100vh - 111px);
+	margin-bottom: 60px;
 }
 
 .editor-nav,
@@ -274,8 +274,30 @@ html {
 	background-color: #fff;
 	cursor: pointer;
 
+	.block-title {
+		font-weight: 500;
+		float: right;
+	}
+
 	i {
 		margin-right: 10px;
+	}
+}
+
+.b-bottom-bar {
+	padding: 0 10px;
+	height: 56px;
+	border-top: 1px solid #d1dbe5;
+	background-color: #fff;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-content: flex-start;
+	align-items: center;
+
+	.button {
+		flex: 0 1 auto;
+		align-self: auto;
 	}
 }
 

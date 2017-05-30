@@ -67,3 +67,14 @@ export const findParent = (searchFor, el, exact = false, ignore = false) => {
 
 	return null;
 };
+
+export const getTopOffset = (el) => {
+	let pos = 0;
+
+	while(el) {
+		pos += (el.offsetTop - el.scrollTop + el.clientTop);
+		el = el.offsetParent;
+	}
+
+	return pos;
+}

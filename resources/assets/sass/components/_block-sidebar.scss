@@ -1,5 +1,5 @@
 .block-options {
-	transition: transform .2s ease-in-out;
+	transition: transform .3s cubic-bezier(.19, 1, .22, 1);
 	transform: translateX(100%);
 	position: absolute;
 	top: 0;
@@ -26,7 +26,6 @@
 	);
 
 	height: calc(100vh - #{$height});
-	padding: 0 20px 80px;
+	padding: 30px 20px 80px;
 	overflow: auto;
-	margin-bottom: 80px;
 }
