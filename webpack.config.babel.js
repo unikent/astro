@@ -5,6 +5,7 @@ import SvgStorePlugin from 'external-svg-sprite-loader/lib/SvgStorePlugin';
 import WebpackNotifierPlugin from 'webpack-notifier';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import FriendlyErrorsPlugin from 'friendly-errors-webpack-plugin';
+import CircularDependencyPlugin from 'circular-dependency-plugin';
 
 /* global __dirname, process */
 
@@ -150,6 +151,11 @@ export default {
 
 		new FriendlyErrorsPlugin(),
 
+		new CircularDependencyPlugin({
+			exclude: /node_modules/,
+			failOnError: true
+		}),
+
 		...(
 			isProduction ?
 			[
@@ -193,5 +199,5 @@ export default {
 		}
 	},
 
-	devtool: isProduction ? false : 'cheap-eval-source-map',
+	devtool: isProduction ? false : 'source-map',
 };
