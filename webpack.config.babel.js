@@ -72,6 +72,14 @@ export default {
 								outputStyle: 'expanded',
 								sourceMap: true
 							}
+						},
+						{
+							loader: '@epegzz/sass-vars-loader',
+							options: {
+								files: [
+									resolve('shared/vars.json')
+								]
+							}
 						}
 					]
 				})
