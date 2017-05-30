@@ -52,6 +52,9 @@ import editIcon from 'IconPath/pencil.svg';
 import deleteIcon from 'IconPath/trash.svg';
 import moveIcon from 'IconPath/arrows-vertical.svg';
 
+import { undoStackInstance } from 'plugins/undo-redo';
+import { onKeyDown, onKeyUp } from 'plugins/key-commands';
+
 /* global document, window */
 
 export default {
@@ -99,6 +102,17 @@ export default {
 		this.editIcon = editIcon;
 		this.deleteIcon = deleteIcon;
 		this.moveIcon = moveIcon;
+
+		this.onKeyDown = onKeyDown(undoStackInstance);
+		this.onKeyUp = onKeyUp(undoStackInstance);
+
+		document.addEventListener('keydown', this.onKeyDown);
+		document.addEventListener('keyup', this.onKeyUp);
+	},
+
+	destroyed() {
+		document.removeEventListener('keydown', this.onKeyDown);
+		document.removeEventListener('keyup', this.onKeyUp);
 	},
 
 	mounted() {

@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { Definition } from 'classes/helpers';
 import api from '../../plugins/http/api';
+import { undoStackInstance } from 'plugins/undo-redo';
 
 const state = {
 	currentBlockIndex: null,
@@ -136,6 +137,8 @@ const actions = {
 								commit('addBlock', { region, index, block })
 							});
 						});
+
+						undoStackInstance.init(page);
 					});
 
 			});

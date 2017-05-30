@@ -1,7 +1,7 @@
 <template>
 <div class="editor-body">
 	<div class="editor-wrapper" ref="editor">
-		<iframe ref="iframe" class="editor-content" :style="dimensions" :src="getPreviewUrl" frameborder="0"></iframe>
+		<iframe ref="iframe" class="editor-content" :style="dimensions" :src="getPreviewUrl" frameborder="0" />
 		<div
 			class="iframe-overlay"
 			:style="{ 'position' : showIframeOverlay ? 'absolute' : null }"
@@ -20,8 +20,12 @@
 			</el-tooltip>
 
 			<el-button-group class="undo-redo">
-				<el-button disabled><Icon :glyph="undoIcon" aria-hidden="true" width="14" height="14" class="ico" /></i></el-button>
-				<el-button disabled><Icon :glyph="redoIcon" aria-hidden="true" width="14" height="14" class="ico" /></el-button>
+				<el-button :disabled="!undoRedo.canUndo" @click="undo">
+					<Icon :glyph="undoIcon" aria-hidden="true" width="14" height="14" class="ico" />
+				</el-button>
+				<el-button :disabled="!undoRedo.canRedo" @click="redo">
+					<Icon :glyph="redoIcon" aria-hidden="true" width="14" height="14" class="ico" />
+				</el-button>
 			</el-button-group>
 
 			<el-button class="save-button" @click="savePage">Save</el-button>
@@ -42,11 +46,7 @@
 		<block-sidebar></block-sidebar>
 	</aside>
 
-	<el-dialog title="Current page data" v-model="showPageData">
-		<pre class="tmp-preview">{{ JSON.stringify(page, null, 4) }}</pre>
-	</el-dialog>
-
-	<el-dialog v-model="preview.visible">
+	<el-dialog v-model="preview.visible" style="text-align: center;">
 		<img :src="preview.url" />
 	</el-dialog>
 </div>
@@ -59,6 +59,8 @@ import { mapState } from 'vuex';
 import Config from '../../classes/Config';
 import PageSidebar from '../PageSidebar';
 import BlockSidebar from '../BlockSidebar';
+import { undoStackInstance } from 'plugins/undo-redo';
+import { onKeyDown, onKeyUp } from 'plugins/key-commands';
 
 import Icon from '../Icon';
 import undoIcon from 'IconPath/undo.svg';
@@ -66,6 +68,8 @@ import redoIcon from 'IconPath/redo.svg';
 import desktopIcon from 'IconPath/desktop.svg';
 import tabletIcon from 'IconPath/tablet.svg';
 import mobileIcon from 'IconPath/mobile.svg';
+
+/* global document */
 
 export default {
 	name: 'editor',
@@ -99,12 +103,22 @@ export default {
 				height: '568px'
 			}
 		};
+
+		this.onKeyDown = onKeyDown(undoStackInstance);
+		this.onKeyUp = onKeyUp(undoStackInstance);
+
+		document.addEventListener('keydown', this.onKeyDown);
+		document.addEventListener('keyup', this.onKeyUp);
+	},
+
+	destroyed() {
+		document.removeEventListener('keydown', this.onKeyDown);
+		document.removeEventListener('keyup', this.onKeyUp);
 	},
 
 	data() {
 		return {
 			currentView: 'desktop',
-			showPageData: false,
 			sideBarOpen: true,
 			blockListOpen: true
 		};
@@ -113,7 +127,8 @@ export default {
 	computed: {
 		...mapState([
 			'preview',
-			'showIframeOverlay'
+			'showIframeOverlay',
+			'undoRedo'
 		]),
 
 		...mapState({
@@ -140,7 +155,7 @@ export default {
 				customClass: 'loading-overlay'
 			}),
 			removeLoader = () => {
-				loader.close()
+				loader.close();
 				this.$refs.iframe.removeEventListener('load', removeLoader);
 			};
 
@@ -149,17 +164,19 @@ export default {
 
 	methods: {
 		savePage() {
-			// this.showPageData = true;
-
 			this.$api
-				.put('page/1', this.page)
+				.put(`page/${this.$route.params.site_id}`, this.page)
 				.then((response) => {
 					console.log(response.data);
 				});
+		},
 
-			console.log(
-				JSON.stringify(this.page, null, 4)
-			);
+		undo() {
+			return undoStackInstance.undo();
+		},
+
+		redo() {
+			return undoStackInstance.redo();
 		}
 	}
 };

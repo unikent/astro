@@ -24,7 +24,11 @@ let store = new Vuex.Store({
 		},
 		wrapperStyles: {},
 		showIframeOverlay: false,
-		errors: []
+		errors: [],
+		undoRedo: {
+			canUndo: false,
+			canRedo: false
+		}
 	},
 
 	getters: {},
@@ -49,6 +53,10 @@ let store = new Vuex.Store({
 
 		updateErrors(state, errors) {
 			state.errors = errors;
+		},
+
+		updateUndoRedo(state, canUndoRedo) {
+			state.undoRedo = canUndoRedo;
 		}
 	},
 

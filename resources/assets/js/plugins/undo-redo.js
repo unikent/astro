@@ -1,21 +1,37 @@
-const undoStack = [];
-let timeout = null;
+import { win, isIframe } from 'classes/helpers';
+import UndoStack from 'classes/UndoStack';
+
+const trackedMutations = {
+	updateFieldValue: 'Update to block field',
+	addBlock: 'Added block to page',
+	deleteBlock: 'Deleted block on page'
+};
+
+const undoStack = new UndoStack({ lock: true });
 
 const undoRedo = store => {
+	if(isIframe) {
+		return;
+	}
+
+	undoStack.setUndoRedo(
+		(pageData) => store.commit('setPage', JSON.parse(pageData))
+	);
+
+	undoStack.setCallback(({ canUndo, canRedo }) => {
+		store.commit('updateUndoRedo', { canUndo, canRedo });
+	});
+
 	store.subscribe((mutation, state) => {
-		// TODO: figure out logic for what mutations can be reverted
-		// and ideally do so in a clever manner (by grouping edits together)
-		// clearTimeout(timeout);
+		if(!trackedMutations[mutation.type]) {
+			return;
+		}
 
-		// timeout = setTimeout(() => {
-		// 	undoStack.push({
-		// 		...mutation
-		// 	});
-		// 	console.log(undoStack);
-		// }, 1000);
-
-		// console.log(mutation.type, mutation.payload, window.self === window.top ? 'top window' : 'iframe window');
-	})
-}
+		undoStack.add(state.page.pageData);
+	});
+};
 
 export default undoRedo;
+
+export const undoStackInstance = isIframe ?
+	win.top.astroUndoStack : (win.astroUndoStack = undoStack);
