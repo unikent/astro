@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { Definition } from 'classes/helpers';
-import api from '../../plugins/http/api';
+import api from 'plugins/http/api';
 import { undoStackInstance } from 'plugins/undo-redo';
 
 const state = {
@@ -59,15 +59,14 @@ const mutations = {
 			fields = state.pageData.blocks[state.currentRegion][idx].fields;
 
 		// if field exists just update it
-		if(fields[name] !== void 0) {
-			fields[name] = value;
+		if(_.has(fields, name)) {
+			_.set(fields, name, value);
 		}
 		// otherwise update all fields to maintain reactivity
 		else {
-			fields = {
-				...fields,
-				...{ [name]: value }
-			};
+			const clone = _.clone(fields);
+			_.set(clone, name, value);
+			fields = clone;
 		}
 	},
 
@@ -137,8 +136,6 @@ const actions = {
 								commit('addBlock', { region, index, block })
 							});
 						});
-
-						undoStackInstance.init(page);
 					});
 
 			});
@@ -148,7 +145,13 @@ const actions = {
 const getters = {
 
 	getFieldValue: (state) => (index, name) => {
-		return state.pageData.blocks[state.currentRegion][index].fields[name];
+		const block = state.pageData.blocks[state.currentRegion][index];
+
+		if(!block) {
+			return null;
+		}
+
+		return _.get(block.fields, name, null);
 	},
 
 	getCurrentFieldValue: (state, getters) => (name) => {

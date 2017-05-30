@@ -18,7 +18,18 @@ export default class Definition {
 		date       : 'date',
 		time       : '*',
 		datetime   : '*',
-		nested     : 'array'
+		nested     : 'array',
+		collection : 'array',
+		group      : 'object'
+	};
+
+	static messages = {
+		'min':        (val) => `This field needs at least ${val} items.`,
+		'max':        (val) => `This field can't have more than ${val} items.`,
+		'min_value':  (val) => `This number must be more than ${val}.`,
+		'max_value':  (val) => `This number must be less than ${val}.`,
+		'min_length': (val) => `This field must be at least ${val} characters long.`,
+		'max_length': (val) => `This field can't be more than ${val} characters long.`
 	};
 
 	static definitions = {};
@@ -97,9 +108,29 @@ export default class Definition {
 			Definition.get(type).fields.forEach(field => {
 
 				if(block.fields[field.name] === void 0) {
-					const value = Definition.initialiseField(
-						field.type || 'text', field.default
-					);
+					let value;
+
+					if(field.type === 'collection') {
+						value = [{}];
+						field.fields.forEach(collection => {
+							value[0][collection.name] = Definition.initialiseField(
+								collection.type || 'text', collection.default
+							);
+						});
+					}
+					else if(field.type === 'group' || field.nested) {
+						value = {};
+						field.fields.forEach(nested => {
+							value[nested.name] = Definition.initialiseField(
+								nested.type || 'text', nested.default
+							);
+						});
+					}
+					else {
+						value = Definition.initialiseField(
+							field.type || 'text', field.default
+						);
+					}
 
 					block.fields[field.name] = value;
 				}
@@ -118,14 +149,21 @@ export default class Definition {
 		});
 
 		if(!rules.length) {
-			return {};
+			let ret = {};
+			let fieldType = Definition.getFieldType(field.type);
+
+			if(fieldType && fieldType !== '*') {
+				ret.type = fieldType;
+			}
+
+			return ret;
 		}
 
 		return rules;
 	}
 
 	static transformValidationRule(validationRule, { type }) {
-		let tranformedRule;
+		let tranformedRule = {};
 
 		let [rule, value] = validationRule.split(':');
 
@@ -133,27 +171,34 @@ export default class Definition {
 			[
 				'min_value', 'max_value',
 				'min_length', 'max_length',
-				'length'
+				'min', 'max', 'length'
 			].indexOf(rule) !== -1
 		) {
 			value = parseFloat(value, 2);
 		}
 
 		switch(rule) {
-			case 'required':
-			case 'present':
-				tranformedRule = {
-					required: true,
-					message: 'This field is required.'
-				};
-				break;
-
 			case 'string':
 				tranformedRule = { type: 'string' };
 				break;
 
 			case 'integer':
 				tranformedRule = { type: 'integer' };
+				break;
+
+			case 'in':
+				tranformedRule = {
+					type: 'enum',
+					enum: value.split(',')
+				};
+				break;
+
+			case 'required':
+			case 'present':
+				tranformedRule = {
+					required: true,
+					message: 'This field is required.'
+				};
 				break;
 
 			// These are possible client-side but don't currently
@@ -179,11 +224,13 @@ export default class Definition {
 			// 	tranformedRule = { type: 'object' };
 			// 	break;
 
+			case 'min':
 			case 'min_value':
 			case 'min_length':
 				tranformedRule = { min: value };
 				break;
 
+			case 'max':
 			case 'max_value':
 			case 'max_length':
 				tranformedRule = { max: value };
@@ -196,14 +243,14 @@ export default class Definition {
 			case 'regex':
 				tranformedRule = { regexp: value };
 				break;
+		}
 
-			case 'in':
-				tranformedRule = { type: 'enum', enum: value.split(',') };
-				break;
+		if(Definition.messages[rule]) {
+			tranformedRule.message = Definition.messages[rule](value);
 		}
 
 		// only infer type validation if it's not explicitly defined
-		if(!tranformedRule.type) {
+		if(tranformedRule.type === void 0) {
 			let fieldType = Definition.getFieldType(type);
 
 			if(fieldType && fieldType !== '*') {
@@ -214,11 +261,28 @@ export default class Definition {
 		return tranformedRule;
 	}
 
-	static getRules(definition) {
+	static getRules(definition, includeNestedRules = true) {
 		let rules = {};
 
 		definition.fields.forEach(field => {
 			rules[field.name] = Definition.transformValidation(field);
+
+			if(field.fields !== void 0 && ['collection', 'group'].indexOf(field.type) > -1) {
+				let fields = {};
+
+				if(includeNestedRules) {
+					field.fields.forEach(nestedField => {
+						fields[nestedField.name] = Definition.transformValidation(nestedField);
+					});
+				}
+
+				if(Array.isArray(rules[field.name])) {
+					rules[field.name].push({ type: rules[field.name][0].type, fields });
+				}
+				else {
+					rules[field.name] = { ...rules[field.name], fields };
+				}
+			}
 		});
 
 		return rules;
