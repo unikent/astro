@@ -29,10 +29,12 @@ export const onKeyDown = (ctx) => {
 		}
 
 		if(e.ctrlKey && keys.z) {
+			e.preventDefault();
 			ctx.undo();
 		}
 
 		if(e.ctrlKey && keys.y) {
+			e.preventDefault();
 			ctx.redo();
 		}
 	};
