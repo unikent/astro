@@ -1,9 +1,7 @@
 import _ from 'lodash';
-import { isIframe } from 'classes/helpers';
+import { isIframe, win } from 'classes/helpers';
 
-/* global window */
-
-const parentDevtoolHook = isIframe && window.top.__VUE_DEVTOOLS_GLOBAL_HOOK__;
+const parentDevtoolHook = isIframe && win.top.__VUE_DEVTOOLS_GLOBAL_HOOK__;
 
 export default (store) => {
 	if(!parentDevtoolHook) {

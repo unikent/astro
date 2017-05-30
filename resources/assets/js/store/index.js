@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import undoRedo from '../plugins/undo-redo';
 import shareMutations from '../plugins/share-mutations';
-import shareDevTools from '../plugins/share-devtools';
+import shareTimeTravel from '../plugins/share-time-travel';
 import page from './modules/page';
 import definition from './modules/definition';
 import Config from 'classes/Config';
@@ -70,7 +70,7 @@ let store = new Vuex.Store({
 	plugins: [
 		shareMutations,
 		undoRedo,
-		...(Config.get('debug', false) ? [shareDevTools] : [])
+		...(Config.get('debug', false) ? [shareTimeTravel] : [])
 	],
 
 	strict: process.env.NODE_ENV !== 'production'
