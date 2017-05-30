@@ -36,7 +36,7 @@
 		</div>
 	</div>
 	<div class="b-handle" :style="handleStyles">
-		<Icon :glyph="editIcon" width="20" height="20" />
+		<Icon :glyph="moveIcon" width="20" height="20" />
 	</div>
 	<div id="b-overlay" :style="overlayStyles"></div>
 </div>
@@ -51,6 +51,8 @@ import Icon from '../Icon';
 import editIcon from 'IconPath/pencil.svg';
 import deleteIcon from 'IconPath/trash.svg';
 import moveIcon from 'IconPath/arrows-vertical.svg';
+
+import { findParent } from 'classes/helpers';
 
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
@@ -68,7 +70,9 @@ export default {
 	data() {
 		return {
 			scale: 1,
-			handleStyles: {},
+			handleStyles: {
+				fill: '#fff'
+			},
 			blockOverlayStyles: {},
 			showBlockOverlayControls: false,
 			overlayStyles: {},
@@ -108,11 +112,20 @@ export default {
 
 		document.addEventListener('keydown', this.onKeyDown);
 		document.addEventListener('keyup', this.onKeyUp);
+
+		this.cancelClicks = (e) => {
+			if(findParent('a', e.target, false, e.ctrlKey)) {
+				e.preventDefault();
+			}
+		};
+
+		document.addEventListener('click', this.cancelClicks);
 	},
 
 	destroyed() {
 		document.removeEventListener('keydown', this.onKeyDown);
 		document.removeEventListener('keyup', this.onKeyUp);
+		document.removeEventListener('click', this.cancelClicks);
 	},
 
 	mounted() {
