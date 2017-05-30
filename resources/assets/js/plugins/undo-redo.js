@@ -1,4 +1,5 @@
 import { win, isIframe } from 'classes/helpers';
+import { eventBus } from './eventbus';
 import UndoStack from 'classes/UndoStack';
 
 const trackedMutations = {
@@ -14,9 +15,10 @@ const undoRedo = store => {
 		return;
 	}
 
-	undoStack.setUndoRedo(
-		(pageData) => store.commit('setPage', JSON.parse(pageData))
-	);
+	undoStack.setUndoRedo((pageData) => {
+		store.commit('setPage', JSON.parse(pageData));
+		eventBus.$emit('block:hideOverlay', null);
+	});
 
 	undoStack.setCallback(({ canUndo, canRedo }) => {
 		store.commit('updateUndoRedo', { canUndo, canRedo });
