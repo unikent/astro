@@ -9,7 +9,6 @@ import Settings from './components/views/Settings'
 
 import Editor from './components/views/Editor';
 import Preview from './components/views/Preview';
-import Test from './components/views/Test';
 import NotFound from './components/views/NotFound';
 import Config from './classes/Config';
 
@@ -39,19 +38,18 @@ const routes = [
 	},
 	{
 		path: '/site/:site_id',
-		component: Editor
+		component: Editor,
+		name: 'site'
 	},
 	{
 		path: '/site/:site_id/page/:page_id',
-		component: Editor
+		component: Editor,
+		name: 'page'
 	},
 	{
 		path: '/preview/:site_id',
-		component: Preview
-	},
-	{
-		path: '/test',
-		component: Test
+		component: Preview,
+		name: 'preview'
 	},
 	{
 		path: '*',

@@ -42,16 +42,15 @@ export default {
 		}),
 
 		isEditor() {
-			return window.isEditor;
+			return this.$route.name !== 'preview';
+		},
+
+		showBack() {
+			return ['site', 'page'].indexOf(this.$route.name) !== -1;
 		},
 
 		username() {
 			return window.astro.username;
-		},
-
-		// TODO: clean up hack
-		showBack() {
-			return !!this.$route.path.match(/\/site\/[^\/]+(\/page\/[^\/]+)?/)
 		}
 	},
 
@@ -64,7 +63,7 @@ export default {
 
 		backToSites() {
 			this.$store.commit('changePage', '');
-			this.$router.push('/sites')
+			this.$router.push('/sites');
 		}
 	}
 };
