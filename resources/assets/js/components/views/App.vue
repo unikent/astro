@@ -22,6 +22,7 @@
 <script>
 import { mapState } from 'vuex';
 import SnackBar from '../SnackBar';
+import { undoStackInstance } from 'plugins/undo-redo';
 
 /* global window */
 
@@ -63,6 +64,9 @@ export default {
 
 		backToSites() {
 			this.$store.commit('changePage', '');
+			this.$store.commit('setPage', {});
+			this.$store.commit('setLoaded', false);
+			undoStackInstance.clear();
 			this.$router.push('/sites');
 		}
 	}
