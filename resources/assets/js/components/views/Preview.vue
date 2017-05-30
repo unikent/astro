@@ -15,15 +15,11 @@
 					:scale="scale"
 				/>
 			</template>
-			<div v-if="loadedBlocks && page.blocks && !Object.keys(page.blocks).length" class="empty-page">
-				This page is empty.<br>
-				To get started drag some blocks in...
-			</div>
 			<div
 				class="block-overlay" :class="{ 'hide-drag': showBlockOverlayControls }"
 				:style="blockOverlayStyles"
 			>
-				<div class="block-overlay__options" @click="editBlock">
+				<div class="block-overlay__options">
 					<Icon :glyph="editIcon" width="20" height="20" />
 				</div>
 				<div class="block-overlay__delete" @click="removeBlock">
@@ -33,6 +29,14 @@
 					<Icon :glyph="moveIcon" width="20" height="20" />
 				</div>
 			</div>
+		</div>
+
+		<div
+			v-if="loadedBlocks && (!Object.keys(page.blocks).length || !page.blocks.main.length)"
+			class="empty-page"
+		>
+			This page is blank.<br>
+			To get started drag some blocks in...
 		</div>
 	</div>
 	<div class="b-handle" :style="handleStyles">
@@ -45,6 +49,7 @@
 <script>
 import { mapState, mapActions, mapMutations } from 'vuex';
 import Velocity from 'velocity-animate';
+import _ from 'lodash';
 
 import Block from '../Block';
 import Icon from '../Icon';
@@ -52,7 +57,7 @@ import editIcon from 'IconPath/pencil.svg';
 import deleteIcon from 'IconPath/trash.svg';
 import moveIcon from 'IconPath/arrows-vertical.svg';
 
-import { findParent } from 'classes/helpers';
+import { win, findParent } from 'classes/helpers';
 
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
@@ -126,6 +131,10 @@ export default {
 		document.removeEventListener('keydown', this.onKeyDown);
 		document.removeEventListener('keyup', this.onKeyUp);
 		document.removeEventListener('click', this.cancelClicks);
+		document.removeEventListener('mousedown', this.mouseDown);
+		document.removeEventListener('mouseup', this.mouseUp);
+		document.removeEventListener('mousemove', this.move);
+		win.removeEventListener('resize', this.onResize);
 	},
 
 	mounted() {
@@ -138,28 +147,16 @@ export default {
 		this.initEvents();
 	},
 
-	beforeDestroy() {
-		document.removeEventListener('mousedown', this.mouseDown);
-		document.removeEventListener('mouseup', this.mouseUp);
-		document.removeEventListener('mousemove', this.move);
-	},
-
 	methods: {
 		...mapActions([
 			'fetchPage'
 		]),
 
 		...mapMutations([
-			'setBlock',
 			'reorderBlocks',
 			'updateBlockPositionsOrder',
 			'deleteBlock',
 		]),
-
-		editBlock() {
-			const { index, type } = this.current;
-			this.setBlock({ index, type });
-		},
 
 		removeBlock() {
 			const { index } = this.current;
@@ -187,37 +184,52 @@ export default {
 			}
 		},
 
+		updateOverlay() {
+			if(this.current) {
+				this.positionOverlay(this.current);
+			}
+			else {
+				this.hideOverlay();
+			}
+		},
+
 		initEvents() {
 			this.$bus.$on('block:showOverlay', this.showOverlay);
 			this.$bus.$on('block:hideOverlay', this.hideOverlay);
-
 			this.$bus.$on('block:move', this.repositionOverlay);
+
+
+			this.$bus.$on('block:updateOverlay', this.updateOverlay);
 
 			document.addEventListener('mousedown', this.mouseDown);
 			document.addEventListener('mouseup', this.mouseUp);
+
+			this.onResize = _.throttle(() => {
+				if(this.current) {
+					this.positionOverlay(this.current);
+				}
+			}, 50, { trailing: true });
+
+			win.addEventListener('resize', this.onResize);
 		},
 
 		mouseDown(e) {
-			switch(e.target) {
-				case this.moveEl:
-					this.updateStyles('wrapper', 'userSelect', 'none');
-					this.updateStyles('overlay', 'pointerEvents', 'auto');
+			if(findParent(this.moveEl, e.target, true)) {
+				this.updateStyles('wrapper', 'userSelect', 'none');
+				this.updateStyles('overlay', 'pointerEvents', 'auto');
 
-					if(e.button === 0) {
-						this.updateStyles('handle', 'opacity', 1);
-						this.drag(false, e.clientY);
+				if(e.button === 0) {
+					this.updateStyles('handle', 'opacity', 1);
+					this.drag(false, e.clientY);
 
-						this.$bus.$emit('block:dragstart', {
-							event: e,
-							el: this.current.$el
-						});
+					this.$bus.$emit('block:dragstart', {
+						event: e,
+						el: this.current.$el
+					});
 
-						this.showBlockOverlayControls = true;
-						document.addEventListener('mousemove', this.move);
-					}
-					break;
-
-				default:
+					this.showBlockOverlayControls = true;
+					document.addEventListener('mousemove', this.move);
+				}
 			}
 		},
 
@@ -284,25 +296,27 @@ export default {
 		resetAfterDrag() {
 			this.updateStyles('overlay', 'pointerEvents', 'none');
 
-			this.reorderBlocks({
-				from:  this.moved.from,
-				to:    this.moved.to,
-				value: this.page.blocks['main'][this.moved.from]
-			});
+			if(this.moved) {
+				this.reorderBlocks({
+					from:  this.moved.from,
+					to:    this.moved.to,
+					value: this.page.blocks['main'][this.moved.from]
+				});
 
-			this.updateBlockPositionsOrder({
-				type:  'sizes',
-				from:  this.moved.from,
-				to:    this.moved.to,
-				value: this.blockMeta.sizes[this.moved.from]
-			});
+				this.updateBlockPositionsOrder({
+					type:  'sizes',
+					from:  this.moved.from,
+					to:    this.moved.to,
+					value: this.blockMeta.sizes[this.moved.from]
+				});
 
-			this.updateBlockPositionsOrder({
-				type:  'offsets',
-				from:  this.moved.from,
-				to:    this.moved.to,
-				value: this.blockMeta.offsets[this.moved.from]
-			});
+				this.updateBlockPositionsOrder({
+					type:  'offsets',
+					from:  this.moved.from,
+					to:    this.moved.to,
+					value: this.blockMeta.offsets[this.moved.from]
+				});
+			}
 
 			this.$bus.$emit('block:dragstop');
 		},
