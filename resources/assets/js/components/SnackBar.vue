@@ -1,8 +1,8 @@
 <template>
 	<div
 		class="snackbar-container"
-		@mouseover="clearTimer"
-		@mouseout="startCloseTimer"
+		@mouseenter="clearTimer"
+		@mouseleave="() => startCloseTimer()"
 	>
 		<transition name="snackbar-toggle">
 			<div v-show="isOpen" class="snackbar">
@@ -30,10 +30,6 @@ export default {
 			action: null,
 			message: ''
 		};
-	},
-
-	created() {
-		this.timer = null;
 	},
 
 	methods: {
