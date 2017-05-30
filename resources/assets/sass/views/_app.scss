@@ -1,5 +1,5 @@
 .top-bar {
-	height: 50px;
+	height: get-height(top-bar);
 	border-bottom: 1px solid #dce3ea;
 	background-color: white;
 	box-shadow: 0 0px 10px rgba(0, 0, 0, 0.05);
