@@ -2,7 +2,7 @@ import { mapMutations } from 'vuex';
 
 export default {
 
-	props: ['field'],
+	props: ['field', 'name'],
 
 	data() {
 		return this.field;
