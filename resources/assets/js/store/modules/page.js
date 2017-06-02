@@ -103,7 +103,7 @@ const mutations = {
 		state.pageData.blocks[state.currentRegion].splice(index, 1);
 
 		// TODO: use state for this
-		Vue.nextTick(() => eventBus.$emit('block:updateOverlay'));
+		Vue.nextTick(() => eventBus.$emit('block:updateOverlay', index));
 	}
 };
 
