@@ -9,6 +9,6 @@ export default (store) => {
 	}
 
 	parentDevtoolHook.on('vuex:travel-to-state', targetState => {
-		store.replaceState(_.cloneDeep(targetState))
+		store.replaceState(_.cloneDeep(targetState));
 	});
 }

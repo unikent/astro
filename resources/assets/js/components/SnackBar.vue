@@ -32,6 +32,10 @@ export default {
 		};
 	},
 
+	created() {
+		this.timer = null;
+	},
+
 	methods: {
 		open({ message = '', duration = null, action = null }) {
 			const newDuration = duration ?

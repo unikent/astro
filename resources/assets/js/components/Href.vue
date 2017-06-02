@@ -1,5 +1,5 @@
 <template>
-<el-tooltip content="ctrl + click to open" placement="bottom">
+<el-tooltip content="ctrl + click to open link" placement="bottom">
 	<a :href="href">
 		<slot></slot>
 	</a>

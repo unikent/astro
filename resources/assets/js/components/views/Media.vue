@@ -51,6 +51,7 @@
 					<el-slider
 						v-model="imageSize"
 						:step="25"
+						:show-tooltip="false"
 						style="margin: 0 5px;"
 					/>
 				</el-col>

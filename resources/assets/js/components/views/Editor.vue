@@ -65,7 +65,7 @@
 	</aside>
 
 	<el-dialog v-model="preview.visible" style="text-align: center;">
-		<img :src="preview.url" />
+		<img :src="preview.url" style="max-width: 95%;" />
 	</el-dialog>
 </div>
 </template>
