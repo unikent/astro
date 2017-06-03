@@ -28,7 +28,7 @@ class CreateRoutes extends Migration
 			$table->integer('rgt')->nullable();
 			$table->integer('depth')->nullable();
 
-            $table->foreign('site_id', 'site_id_fk')->references('id')->on('sites')->onDelete('cascade');
+            $table->foreign('site_id', 'site_id_fk')->references('id')->on('sites');
             $table->foreign('page_id', 'page_id_fk')->references('id')->on('pages')->onDelete('cascade');
 		});
 	}

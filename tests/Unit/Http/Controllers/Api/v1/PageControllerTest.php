@@ -7,7 +7,10 @@ use App\Models\Page;
 use App\Models\Site;
 use App\Models\Block;
 use App\Models\Route;
+use App\Models\Redirect;
+use App\Models\PublishedPage;
 use App\Http\Controllers\Api\v1\PageController;
+use App\Http\Transformers\Api\v1\PageTransformer;
 use Illuminate\Auth\Access\AuthorizationException;
 
 class PageControllerTest extends ApiControllerTestCase {
@@ -37,10 +40,11 @@ class PageControllerTest extends ApiControllerTestCase {
      * @group authentication
      */
     public function show_WhenUnauthenticated_Returns401(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
-        $page = $route->page;
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
 
-        $response = $this->action('GET', PageController::class . '@show', [ $page->getKey() ]);
+        // $page->publish(new PageTransformer);
+
+        $response = $this->action('GET', PageController::class . '@show', [ $route->page->getKey() ]);
         $response->assertStatus(401);
     }
 
@@ -49,13 +53,14 @@ class PageControllerTest extends ApiControllerTestCase {
      * @group authorization
      */
     public function show_WhenAuthenticated_ChecksAuthorization(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
-        $page = $route->page;
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+
+        // $page->publish(new PageTransformer);
 
         Gate::shouldReceive('authorize')->with('read', Mockery::type(Page::class))->once();
 
         $this->authenticated();
-        $response = $this->action('GET', PageController::class . '@show', [ $page->getKey() ]);
+        $response = $this->action('GET', PageController::class . '@show', [ $route->page->getKey() ]);
     }
 
     /**
@@ -63,12 +68,13 @@ class PageControllerTest extends ApiControllerTestCase {
      * @group authorization
      */
     public function show_WhenAuthenticatedAndUnauthorized_Returns403(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
-        $page = $route->page;
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+
+        // $page->publish(new PageTransformer);
 
         $this->authenticatedAndUnauthorized();
 
-        $response = $this->action('GET', PageController::class . '@show', [ $page->getKey() ]);
+        $response = $this->action('GET', PageController::class . '@show', [ $route->page->getKey() ]);
         $response->assertStatus(403);
     }
 
@@ -86,12 +92,13 @@ class PageControllerTest extends ApiControllerTestCase {
      * @test
      */
     public function show_WhenAuthorizedAndFound_Returns200(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
-        $page = $route->page;
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+
+        // $page->publish(new PageTransformer);
 
         $this->authenticatedAndAuthorized();
 
-        $response = $this->action('GET', PageController::class . '@show', [ $page->getKey() ]);
+        $response = $this->action('GET', PageController::class . '@show', [ $route->page->getKey() ]);
         $response->assertStatus(200);
     }
 
@@ -99,35 +106,36 @@ class PageControllerTest extends ApiControllerTestCase {
      * @test
      */
     public function show_WhenAuthorizedAndFound_ReturnsJson(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
-        $page = $route->page;
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+
+        // $page->publish(new PageTrasformer);
 
         $this->authenticatedAndAuthorized();
 
-        $response = $this->action('GET', PageController::class . '@show', [ $page->getKey() ]);
+        $response = $this->action('GET', PageController::class . '@show', [ $route->page->getKey() ]);
         $json = $response->json();
 
         $this->assertArrayHasKey('data', $json);
-        $this->assertEquals($page->title, $json['data']['title']);
+        $this->assertEquals($route->page->title, $json['data']['title']);
     }
 
     /**
      * @test
      */
-    public function show_WhenAuthorizedAndFound_ReturnsCanonicalRouteInJson(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
-        $route->makeCanonical();
+    public function show_WhenAuthorizedAndFoundAndPublished_ReturnsActiveRouteInJson(){
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+        $route->page->publish(new PageTransformer);
 
-        $page = $route->page;
+        // $page->publish(new PageTransformer);
 
         $this->authenticatedAndAuthorized();
 
-        $response = $this->action('GET', PageController::class . '@show', [ $page->getKey() ]);
+        $response = $this->action('GET', PageController::class . '@show', [ $route->page->getKey() ]);
         $json = $response->json();
 
         $this->assertArrayHasKey('data', $json);
-        $this->assertArrayHasKey('canonical', $json['data']);
-        $this->assertEquals($route->slug, $json['data']['canonical']['slug']);
+        $this->assertArrayHasKey('active_route', $json['data']);
+        $this->assertEquals($route->slug, $json['data']['active_route']['slug']);
     }
 
     /**
@@ -135,8 +143,6 @@ class PageControllerTest extends ApiControllerTestCase {
      */
     public function show_WhenAuthorizedAndFoundRequestIncludesLayoutDefinition_IncludesLayoutDefinitionInJson(){
         $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
-        $route->makeCanonical();
-
         $page = $route->page;
 
         $this->authenticatedAndAuthorized();
@@ -157,17 +163,15 @@ class PageControllerTest extends ApiControllerTestCase {
      * @test
      */
     public function show_WhenAuthorizedAndFoundRequestIncludesRoutes_IncludesRoutesInJson(){
-        $r1 = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
-        $r2 = factory(Route::class)->create([ 'page_id' => $r1->page_id, 'parent_id' => $r1->parent_id ]);
+        $r1 = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+        $r1->page->publish(new PageTransformer);
 
-        $r1->makeCanonical();
-
-        $page = $r1->page;
+        $r2 = factory(Route::class)->create(array_except(attrs_for($r1), [ 'id', 'is_active' ]));
 
         $this->authenticatedAndAuthorized();
 
         $response = $this->action('GET', PageController::class . '@show', [
-            'page' => $page->getKey(),
+            'page' => $r1->page->getKey(),
             'include' => 'routes',
         ]);
 
@@ -182,16 +186,13 @@ class PageControllerTest extends ApiControllerTestCase {
      * @test
      */
     public function show_WhenAuthorizedAndFoundRequestIncludesBlocks_IncludesBlocksByRegionInJson(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
-        $route->makeCanonical();
-
-        $page = $route->page;
-        $block = factory(Block::class)->create([ 'page_id' => $page->getKey() ]);
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+        $block = factory(Block::class)->create([ 'page_id' => $route->page->getKey() ]);
 
         $this->authenticatedAndAuthorized();
 
         $response = $this->action('GET', PageController::class . '@show', [
-            'page' => $page->getKey(),
+            'page' => $route->page->getKey(),
             'include' => 'blocks',
         ]);
 
@@ -207,16 +208,13 @@ class PageControllerTest extends ApiControllerTestCase {
      * @test
      */
     public function show_WhenAuthorizedAndFoundRequestIncludesBlocksDefinition_IncludesBlocksAndDefinitionsInJson(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
-        $route->makeCanonical();
-
-        $page = $route->page;
-        $block = factory(Block::class)->create([ 'page_id' => $page->getKey() ]);
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+        $block = factory(Block::class)->create([ 'page_id' => $route->page->getKey() ]);
 
         $this->authenticatedAndAuthorized();
 
         $response = $this->action('GET', PageController::class . '@show', [
-            'page' => $page->getKey(),
+            'page' => $route->page->getKey(),
             'include' => 'blocks.definition',
         ]);
 
@@ -229,6 +227,47 @@ class PageControllerTest extends ApiControllerTestCase {
         $this->assertCount(1, $json['data']['blocks']['test-region']);
         $this->assertArrayHasKey('definition', $json['data']['blocks']['test-region'][0]);
         $this->assertEquals($block->definition_name, $json['data']['blocks']['test-region'][0]['definition']['name']);
+    }
+
+    /**
+     * @test
+     */
+    public function show_WhenAuthorizedAndFoundRequestIncludesPublished_IncludesPublishedInJson(){
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+        $route->page->publish(new PageTransformer);
+
+        $this->authenticatedAndAuthorized();
+
+        $response = $this->action('GET', PageController::class . '@show', [
+            'page' => $route->page->getKey(),
+            'include' => 'published'
+        ]);
+
+        $json = $response->json();
+        $this->assertArrayHasKey('data', $json);
+        $this->assertArrayHasKey('published', $json['data']);
+        $this->assertNotEmpty('published', $json['data']);
+    }
+
+    /**
+     * @test
+     */
+    public function show_WhenAuthorizedAndFoundRequestIncludesHistory_IncludesPublishedInHistory(){
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+        $page = $route->page;
+
+        $block = factory(Block::class)->create([ 'page_id' => $page->getKey() ]);
+
+        $page->publish(new PageTransformer);
+        $page->publish(new PageTransformer);
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('GET', PageController::class . '@show', [ 'page' => $page->getKey(), 'include' => 'history' ]);
+
+        $json = $response->json();
+        $this->assertArrayHasKey('data', $json);
+        $this->assertArrayHasKey('history', $json['data']);
+        $this->assertCount(2, $json['data']['history']);
     }
 
 
@@ -293,14 +332,14 @@ class PageControllerTest extends ApiControllerTestCase {
     /**
      * @test
      */
-    public function store_WhenAuthorizedAndValid_CreatedRouteIsCanonical(){
+    public function store_WhenAuthorizedAndValid_CreatedRouteIsInactive(){
         $this->authenticatedAndAuthorized();
 
         $attrs = $this->getAttrs();
         $response = $this->action('POST', PageController::class . '@store', [], $attrs);
 
         $page = Page::all()->last();
-        $this->assertEquals($page->routes[0]->getKey(), $page->canonical->getKey());
+        $this->assertFalse($page->routes[0]->isActive());
     }
 
     /**
@@ -325,7 +364,6 @@ class PageControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
-     * @group wip
      * @group authorization
      */
     public function store_WhenAuthorizedAndValidPageIsASite_WhenSiteFieldArePresent_AuthorizesSiteOperation(){
@@ -348,7 +386,6 @@ class PageControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
-     * @group wip
      * @group authorization
      */
     public function store_WhenAuthorizedAndValidPageIsASite_WhenSiteFieldArePresentButUnauthorizedOnSite_Returns403(){
@@ -371,7 +408,6 @@ class PageControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
-     * @group wip
      */
     public function store_WhenAuthorizedAndValidAndSiteFieldsArePresent_CreatesSiteAndAssociatesWithRoute(){
         $this->authenticatedAndAuthorized();
@@ -387,7 +423,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $response = $this->action('POST', PageController::class . '@store', [], $attrs);
 
         $page = Page::all()->last();
-        $this->assertEquals($attrs['site']['name'], $page->canonical->site->name);
+        $this->assertEquals($attrs['site']['name'], $page->routes[0]->site->name);
     }
 
     /**
@@ -491,11 +527,17 @@ class PageControllerTest extends ApiControllerTestCase {
     /**
      * @test
      */
-    public function update_WhenAuthorizedAndValid_WhenRouteHasChanged_CreatesNewRouteAndAssociatesWithPage(){
+    public function update_WhenAuthorizedAndValid_WhenRouteHasChanged_CreatesNewInactiveRouteToPage(){
         $this->authenticatedAndAuthorized();
 
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
+
+        // Publish the Routes/Pages
+        $route->parent->page->publish(new PageTransformer);
+        $route->page->publish(new PageTransformer);
+
         $page = $route->page;
+        $count = $page->routes->count();
 
         $attrs = $this->getAttrs($page);
         array_set($attrs, 'route.parent_id', $route->parent_id);
@@ -503,17 +545,21 @@ class PageControllerTest extends ApiControllerTestCase {
         $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
 
         $page = $page->fresh();
-        $this->assertCount(2, $page->routes);
+        $this->assertEquals($count + 1, $page->routes->count());
     }
 
     /**
      * @test
      */
-    public function update_WhenAuthorizedAndValid_WhenRouteHasChanged_NewRouteIsCanonical(){
+    public function update_WhenAuthorizedAndValid_WhenRouteHasChanged_RemovesOtherInactiveRoutesToPage(){
         $this->authenticatedAndAuthorized();
 
-        $route = factory(Route::class)->states('withPage', 'withParent')->create();
-        $page = $route->page;
+        $route = factory(Route::class)->states('withPage', 'withPublishedParent')->create();
+        $route->page->publish(new PageTransformer);
+
+        $inactive = factory(Route::class, 2)->create([ 'page_id' => $route->page_id, 'parent_id' => $route->parent_id ]);
+
+        $page = $route->page->fresh();
 
         $attrs = $this->getAttrs($page);
         array_set($attrs, 'route.parent_id', $route->parent_id);
@@ -521,7 +567,74 @@ class PageControllerTest extends ApiControllerTestCase {
         $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
 
         $page = $page->fresh();
-        $this->assertEquals($page->routes[1]->getKey(), $page->canonical->getKey());
+        $this->assertEquals(1, $page->routes()->active(false)->count());
+    }
+
+    /**
+     * @test
+     */
+    public function update_WhenAuthorizedAndValid_WhenRouteIsMoved_CreatesInactiveRouteAtNewLocation(){
+        $this->authenticatedAndAuthorized();
+
+        $l1 = factory(Route::class)->states('withPage', 'withPublishedParent')->create();
+        $l1->page->publish(new PageTransformer);
+
+        $l2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l1->getKey() ]);
+        $l2->page->publish(new PageTransformer);
+
+        $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
+        $l3->page->publish(new PageTransformer);
+
+        $page = $l2->page;
+
+        $attrs = $this->getAttrs($page);
+        array_set($attrs, 'route.parent_id', $l1->parent_id);
+
+        $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
+
+        $page = $page->fresh();
+
+        $activeRoute = $page->activeRoute;
+        $this->assertEquals($l1->getKey(), $activeRoute->parent_id);    // $activeRoute is unchanged
+
+        $draftRoute = $page->draftRoute;
+        $this->assertEquals($l1->parent_id, $draftRoute->parent_id);   // $draftRoute has been created
+    }
+
+    /**
+     * @test
+     */
+    public function update_WhenAuthorizedAndValid_WhenRouteHasChildrenAndIsMoved_CreatesInactiveRoutesForChildren(){
+        $this->authenticatedAndAuthorized();
+
+        $root = factory(Route::class)->states('withPage', 'isRoot')->create();
+        $root->page->publish(new PageTransformer);
+
+        $l1 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $root->getKey() ]);
+        $l1->page->publish(new PageTransformer);
+
+        $l2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l1->getKey() ]);
+        $l2->page->publish(new PageTransformer);
+
+        $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
+        $l3->page->publish(new PageTransformer);
+
+        $page = $l2->page;
+        $childPage = $l3->page;
+
+        $attrs = $this->getAttrs($page);
+        array_set($attrs, 'route.parent_id', $root->getKey());
+
+        $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
+
+        $page = $page->fresh();
+        $childPage = $childPage->fresh();
+
+        $activeRoute = $childPage->activeRoute;
+        $this->assertEquals($l2->getKey(), $activeRoute->parent_id);    // child $activeRoute is unchanged
+
+        $draftRoute = $childPage->draftRoute;
+        $this->assertEquals($page->draftRoute->getKey(), $draftRoute->parent_id);   // child $draftRoute has been created
     }
 
     /**
@@ -570,12 +683,12 @@ class PageControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
-     * @group wip
      */
-    public function update_WhenAuthorizedAndValidPageIsASite_WhenSiteIdIsAbsent_DoesNotBreakSiteAssociation(){
+    public function update_WhenAuthorizedAndValidAndIsASite_WhenSiteIdIsAbsent_DoesNotBreakSiteAssociation(){
         $this->authenticatedAndAuthorized();
 
         $route = factory(Route::class)->states('withPage', 'withParent', 'withSite')->create();
+        $route->makeActive();
 
         $page = $route->page;
         $site = $route->site;
@@ -589,12 +702,12 @@ class PageControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
-     * @group wip
      */
     public function update_WhenAuthorizedAndValidPageIsASite_WhenSiteIdIsPresent_DoesNotBreakSiteAssociation(){
         $this->authenticatedAndAuthorized();
 
         $route = factory(Route::class)->states('withPage', 'withParent', 'withSite')->create();
+        $route->makeActive();
 
         $page = $route->page;
         $site = $route->site;
@@ -611,12 +724,12 @@ class PageControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
-     * @group wip
      */
     public function update_WhenAuthorizedAndValidPageIsASite_WhenSiteIdIsPresent_DoesNotEditSite(){
         $this->authenticatedAndAuthorized();
 
         $route = factory(Route::class)->states('withPage', 'withParent', 'withSite')->create();
+        $route->makeActive();
 
         $page = $route->page;
         $site = $route->site;
@@ -630,13 +743,13 @@ class PageControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
-     * @group wip
      * @group authorization
      */
     public function update_WhenAuthorizedAndValidPageIsASite_WhenSiteFieldArePresent_AuthorizesSiteOperation(){
         $this->authenticated();
 
         $route = factory(Route::class)->states('withPage', 'withParent', 'withSite')->create();
+        $route->makeActive();
 
         $page = $route->page;
         $site = $route->site;
@@ -659,13 +772,13 @@ class PageControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
-     * @group wip
      * @group authorization
      */
     public function update_WhenAuthorizedAndValidPageIsASite_WhenSiteFieldArePresentButUnauthorizedOnSite_Returns403(){
         $this->authenticated();
 
         $route = factory(Route::class)->states('withPage', 'withParent', 'withSite')->create();
+        $route->makeActive();
 
         $page = $route->page;
         $site = $route->site;
@@ -686,12 +799,12 @@ class PageControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
-     * @group wip
      */
     public function update_WhenAuthorizedAndValidPageIsASite_WhenSiteIdIsPresentAndSiteFieldsArePresent_UpdatesSite(){
         $this->authenticatedAndAuthorized();
 
         $route = factory(Route::class)->states('withPage', 'withParent', 'withSite')->create();
+        $route->makeActive();
 
         $page = $route->page;
         $site = $route->site;
@@ -724,12 +837,462 @@ class PageControllerTest extends ApiControllerTestCase {
 
 
 
+    /**
+     * @test
+     * @group authentication
+     */
+    public function publish_WhenUnauthenticated_Returns401(){
+        $route = factory(Route::class)->states('withPage', 'isRoot')->create();
+        $page = $route->page;
+
+        $response = $this->action('POST', PageController::class . '@publish', [ $page->getKey() ]);
+        $response->assertStatus(401);
+    }
+
+    /**
+     * @test
+     * @group authorization
+     */
+    public function publish_WhenAuthenticated_ChecksAuthorization(){
+        $route = factory(Route::class)->states('withPage', 'isRoot')->create();
+        $page = $route->page;
+
+        Gate::shouldReceive('authorize')->with('publish', Mockery::on(function($model) use ($page){
+            return (is_a($model, Page::class) && ($model->getKey() == $page->getKey()));
+        }))->once();
+
+        $this->authenticated();
+        $response = $this->action('POST', PageController::class . '@publish', [ $page->getKey() ]);
+    }
+
+    /**
+     * @test
+     * @group authorization
+     */
+    public function publish_WhenAuthenticatedAndUnauthorized_Returns403(){
+        $this->authenticatedAndUnauthorized();
+
+        $route = factory(Route::class)->states('withPage', 'isRoot')->create();
+        $page = $route->page;
+
+        $response = $this->action('POST', PageController::class . '@publish', [ $page->getKey() ]);
+        $response->assertStatus(403);
+    }
+
+    /**
+     * @test
+     */
+    public function publish_WhenAuthorizedAndPageNotFound_Returns404(){
+        $this->authenticatedAndAuthorized();
+
+        $response = $this->action('POST', PageController::class . '@publish', [ 123 ]);
+        $response->assertStatus(404);
+    }
+
+    /**
+     * @test
+     */
+    public function publish_WhenAuthorizedHasUnpublishedParents_Returns406(){
+        $this->authenticatedAndAuthorized();
+
+        $route = factory(Route::class)->states('withPage', 'withParent')->create();
+        $page = $route->page;
+
+        $response = $this->action('POST', PageController::class . '@publish', [ $page->getKey() ]);
+
+        $response->assertStatus(406);
+
+        $json = $response->json();
+        $this->assertArrayHasKey('errors', $json);
+        $this->assertNotEmpty($json['errors']);
+    }
+
+    /**
+     * @test
+     */
+    public function publish_WhenAuthorizedAndValid_CreatesNewPublishedPage(){
+        $this->authenticatedAndAuthorized();
+
+        $route = factory(Route::class)->states('withPage', 'isRoot')->create();
+        $page = $route->page;
+
+        $count = PublishedPage::count();
+
+        $response = $this->action('POST', PageController::class . '@publish', [ $page->getKey() ]);
+        $this->assertEquals($count + 1, PublishedPage::count());
+    }
+
+    /**
+     * @test
+     * @group integration
+     *
+     * This test covers deep functionality within $page->publish(); its important from
+     * a behavioural perspective so have gone for a belt-and-braces integration test.
+     */
+    public function publish_WhenAuthorizedAndValidAndHasDraftRoute_DraftRouteBecomesActive(){
+        $this->authenticatedAndAuthorized();
+
+        $active = factory(Route::class)->states('withPage', 'isRoot')->create();
+
+        $page = $active->page;
+        $page->publish(new PageTransformer);
+
+        $draft = factory(Route::class)->create(array_except(attrs_for($active), [ 'id', 'is_active' ]));
+
+        $this->action('POST', PageController::class . '@publish', [ 'page' => $page->getKey() ]);
+
+        $page = $page->fresh();
+        $this->assertCount(1, $page->routes);
+        $this->assertEquals($draft->getKey(), $page->activeRoute->getKey());
+    }
+
+    /**
+     * @test
+     * @group integration
+     *
+     * This test covers deep functionality within $page->publish(); its important from
+     * a behavioural perspective so have gone for a belt-and-braces integration test.
+     */
+    public function publish_WhenAuthorizedAndValidAndHasDraftRoute_CreatesNewRedirect(){
+        $this->authenticatedAndAuthorized();
+
+        $active = factory(Route::class)->states('withPage', 'isRoot')->create();
+
+        $page = $active->page;
+        $page->publish(new PageTransformer);
+
+        $draft = factory(Route::class)->create(array_except(attrs_for($active), [ 'id', 'is_active' ]));
+
+        $count = Redirect::count();
+
+        $this->action('POST', PageController::class . '@publish', [ 'page' => $page->getKey() ]);
+        $this->assertEquals($count+1, Redirect::count());
+    }
+
+    /**
+     * @test
+     */
+    public function publish_WhenAuthorizedAndValid_Returns200(){
+        $this->authenticatedAndAuthorized();
+
+        $route = factory(Route::class)->states('withPage', 'isRoot')->create();
+        $page = $route->page;
+
+        $response = $this->action('POST', PageController::class . '@publish', [ 'page' => $page->getKey() ]);
+        $response->assertStatus(200);
+    }
+
+    /**
+     * @test
+     */
+    public function publish_WhenAuthorizedAndValid_ReturnsBakedJson(){
+        $this->authenticatedAndAuthorized();
+
+        $route = factory(Route::class)->states('withPage', 'isRoot')->create();
+        $page = $route->page;
+
+        $response = $this->action('POST', PageController::class . '@publish', [ 'page' => $page->getKey() ]);
+        $json = $response->json();
+
+        $this->assertEquals(json_decode($page->published->bake, TRUE), $json);
+    }
+
+
 
     /**
      * @test
      * @group authentication
      */
-    public function delete_WhenUnauthenticated_Returns401(){
+    public function publishTree_WhenUnauthenticated_Returns401(){
+        $route = factory(Route::class)->states('withPage', 'withPublishedParent')->create();
+
+        $l1 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $route->getKey() ]);
+        $l2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l1->getKey() ]);
+        $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
+
+        $response = $this->action('POST', PageController::class . '@publishTree', [ $l1->page->getKey() ]);
+        $response->assertStatus(401);
+    }
+
+    /**
+     * @test
+     * @group authorization
+     */
+    public function publishTree_WhenAuthenticated_ChecksAuthorization(){
+        $l1 = factory(Route::class)->states('withPage', 'withPublishedParent')->create();
+        $l2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l1->getKey() ]);
+        $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
+
+        Gate::shouldReceive('authorize')->with('publish', Mockery::type(Page::class))->times(3)->andReturn(true);
+
+        $this->authenticated();
+        $response = $this->action('POST', PageController::class . '@publishTree', [ $l1->page->getKey() ]);
+    }
+
+    /**
+     * @test
+     * @group authorization
+     */
+    public function publishTree_WhenAuthenticatedAndUnauthorized_Returns403(){
+        $l1 = factory(Route::class)->states('withPage', 'withPublishedParent')->create();
+        $l2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l1->getKey() ]);
+        $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
+
+        $this->authenticatedAndUnauthorized();
+        $response = $this->action('POST', PageController::class . '@publishTree', [ $l1->page->getKey() ]);
+
+        $response->assertStatus(403);
+    }
+
+    /**
+     * @test
+     */
+    public function publishTree_WhenAuthorizedAndPageNotFound_Returns404(){
+        $this->authenticatedAndAuthorized();
+
+        $response = $this->action('POST', PageController::class . '@publishTree', [ 123 ]);
+        $response->assertStatus(404);
+    }
+
+    /**
+     * @test
+     */
+    public function publishTree_WhenAuthorizedHasUnpublishedParents_Returns406(){
+        $l1 = factory(Route::class)->states('withPage', 'withParent')->create();
+        $l2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l1->getKey() ]);
+        $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('POST', PageController::class . '@publishTree', [ $l1->page->getKey() ]);
+
+        $response->assertStatus(406);
+
+        $json = $response->json();
+        $this->assertArrayHasKey('errors', $json);
+        $this->assertNotEmpty($json['errors']);
+    }
+
+    /**
+     * @test
+     */
+    public function publishTree_WhenAuthenticatedAndAuthorizes_AllRoutesInTreeAreMadeActive(){
+        $l1 = factory(Route::class)->states('withPage', 'withPublishedParent')->create();
+        $l2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l1->getKey() ]);
+        $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('POST', PageController::class . '@publishTree', [ $l1->page->getKey() ]);
+
+        $l1 = $l1->fresh();
+        $this->assertTrue($l1->isActive());
+
+        $l2 = $l2->fresh();
+        $this->assertTrue($l2->isActive());
+
+        $l3 = $l3->fresh();
+        $this->assertTrue($l3->isActive());
+    }
+
+    /**
+     * @test
+     */
+    public function publishTree_WhenAuthenticatedAndAuthorizes_AllPagesArePublished(){
+        $l1 = factory(Route::class)->states('withPage', 'withPublishedParent')->create();
+        $l2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l1->getKey() ]);
+        $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
+
+        $count = PublishedPage::count();
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('POST', PageController::class . '@publishTree', [ $l1->page->getKey() ]);
+
+        $this->assertEquals($count+3, PublishedPage::count());
+    }
+
+    /**
+     * @test
+     */
+    public function publishTree_WhenAuthorizedAndValid_Returns200(){
+        $l1 = factory(Route::class)->states('withPage', 'withPublishedParent')->create();
+        $l2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l1->getKey() ]);
+        $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('POST', PageController::class . '@publishTree', [ $l1->page->getKey() ]);
+
+        $response->assertStatus(200);
+    }
+
+    /**
+     * @test
+     */
+    public function publishTree_WhenAuthorizedAndValid_ReturnsBakedJson(){
+        $l1 = factory(Route::class)->states('withPage', 'withPublishedParent')->create();
+        $l2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l1->getKey() ]);
+        $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('POST', PageController::class . '@publishTree', [ $l1->page->getKey() ]);
+
+        $json = $response->json();
+        $this->assertEquals(json_decode($l1->page->published->bake, TRUE), $json);
+    }
+
+
+
+    /**
+     * @test
+     * @group authentication
+     */
+    public function revert_WhenUnauthenticated_Returns401(){
+        $route = factory(Route::class)->states('withPage', 'isRoot')->create();
+
+        $page = $route->page;
+        $page->publish(new PageTransformer);
+
+        $response = $this->action('POST', PageController::class . '@revert', [
+            'page' => $page->getKey(),
+            'published_page_id' => $page->published->getKey()
+        ]);
+
+        $response->assertStatus(401);
+    }
+
+    /**
+     * @test
+     * @group authorization
+     */
+    public function revert_WhenAuthenticated_ChecksAuthorization(){
+        $route = factory(Route::class)->states('withPage', 'isRoot')->create();
+
+        $page = $route->page;
+        $page->publish(new PageTransformer);
+
+        Gate::shouldReceive('authorize')->with('revert', Mockery::on(function($model) use ($page){
+            return (is_a($model, Page::class) && ($model->getKey() == $page->getKey()));
+        }))->once();
+
+        $this->authenticated();
+        $response = $this->action('POST', PageController::class . '@revert', [
+            'page' => $page->getKey(),
+            'published_page_id' => $page->published->getKey()
+        ]);
+    }
+
+    /**
+     * @test
+     * @group authorization
+     */
+    public function revert_WhenAuthenticatedAndUnauthorized_Returns403(){
+        $this->authenticatedAndUnauthorized();
+
+        $route = factory(Route::class)->states('withPage', 'isRoot')->create();
+
+        $page = $route->page;
+        $page->publish(new PageTransformer);
+
+        $response = $this->action('POST', PageController::class . '@revert', [ 'page' => $page->getKey(), 'published_page_id' => $page->published->getKey() ]);
+        $response->assertStatus(403);
+    }
+
+    /**
+     * @test
+     */
+    public function revert_WhenAuthorizedAndPageNotFound_Returns404(){
+        $this->authenticatedAndAuthorized();
+
+        $response = $this->action('POST', PageController::class . '@revert', [ 123 ]);
+        $response->assertStatus(404);
+    }
+
+    /**
+     * @test
+     */
+    public function revert_WhenAuthorizedAndPublishedPageNotFound_Returns404(){
+        $this->authenticatedAndAuthorized();
+
+        $route = factory(Route::class)->states('withPage', 'isRoot')->create();
+
+        $page = $route->page;
+        $page->publish(new PageTransformer);
+
+        $response = $this->action('POST', PageController::class . '@revert', [ $page->getKey(), 123 ]);
+        $response->assertStatus(404);
+    }
+
+    /**
+     * @test
+     */
+    public function revert_WhenAuthorizedAndValid_RevertsThePage(){
+        $this->authenticatedAndAuthorized();
+
+        $route = factory(Route::class)->states('withPage', 'isRoot')->create();
+
+        $page = $route->page;
+        $page->publish(new PageTransformer);
+
+        $title = $page->title;
+        $page->title = 'Foobar!';
+        $page->save();
+
+        $this->assertEquals('Foobar!', $page->title);
+
+        $response = $this->action('POST', PageController::class . '@revert', [
+            'page' => $page->getKey(),
+            'published_page_id' => $page->published->getKey()
+        ]);
+
+        $page = $page->fresh();
+        $this->assertEquals($title, $page->title);
+    }
+
+    /**
+     * @test
+     */
+    public function revert_WhenAuthorizedAndValid_Returns200(){
+        $this->authenticatedAndAuthorized();
+
+        $route = factory(Route::class)->states('withPage', 'isRoot')->create();
+
+        $page = $route->page;
+        $page->publish(new PageTransformer);
+
+        $response = $this->action('POST', PageController::class . '@revert', [
+            'page' => $page->getKey(),
+            'published_page_id' => $page->published->getKey()
+        ]);
+
+        $response->assertStatus(200);
+    }
+
+    /**
+     * @test
+     */
+    public function revert_WhenAuthorizedAndValid_ReturnsJson(){
+        $this->authenticatedAndAuthorized();
+
+        $route = factory(Route::class)->states('withPage', 'isRoot')->create();
+
+        $page = $route->page;
+        $page->publish(new PageTransformer);
+
+        $response = $this->action('POST', PageController::class . '@revert', [ 'page' => $page->getKey(), 'published_page_id' => $page->published->getKey() ]);
+        $json = $response->json();
+
+        $this->assertArrayHasKey('data', $json);
+        $this->assertNotEmpty($json['data']);
+
+        $this->assertArrayHasKey('active_route', $json['data']);
+        $this->assertNotEmpty($json['data']['active_route']);
+    }
+
+
+
+    /**
+     * @test
+     * @group authentication
+     */
+    public function destroy_WhenUnauthenticated_Returns401(){
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
         $page = $route->page;
 
@@ -741,7 +1304,7 @@ class PageControllerTest extends ApiControllerTestCase {
      * @test
      * @group authorization
      */
-    public function delete_WhenAuthenticated_ChecksAuthorization(){
+    public function destroy_WhenAuthenticated_ChecksAuthorization(){
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
         $page = $route->page;
 
@@ -757,7 +1320,7 @@ class PageControllerTest extends ApiControllerTestCase {
      * @test
      * @group authorization
      */
-    public function delete_WhenAuthenticatedAndUnauthorized_Returns403(){
+    public function destroy_WhenAuthenticatedAndUnauthorized_Returns403(){
         $this->authenticatedAndUnauthorized();
 
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
@@ -770,7 +1333,7 @@ class PageControllerTest extends ApiControllerTestCase {
     /**
      * @test
      */
-    public function delete_WhenAuthorizedAndPageNotFound_Returns404(){
+    public function destroy_WhenAuthorizedAndPageNotFound_Returns404(){
         $this->authenticatedAndAuthorized();
 
         $response = $this->action('DELETE', PageController::class . '@destroy', [ 123 ]);
@@ -780,43 +1343,168 @@ class PageControllerTest extends ApiControllerTestCase {
     /**
      * @test
      */
-    public function delete_WhenAuthorizedAndValid_DeletesThePage(){
-        $this->authenticatedAndAuthorized();
-
+    public function destroy_WhenAuthorizedAndValid_SoftDeletesThePage(){
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
-        $page = $route->page;
 
-        $response = $this->action('DELETE', PageController::class . '@destroy', [ $page->getKey() ]);
-        $this->assertNull(Page::find($page->id));
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('DELETE', PageController::class . '@destroy', [ $route->page->getKey() ]);
+
+        $this->assertNull(Page::find($route->page->id));
+        $this->assertEquals(1, Page::withTrashed()->where('id', '=', $route->page->getKey())->count());
     }
 
     /**
      * @test
      */
-    public function delete_WhenAuthorizedAndValid_DeletesAssociatedRoutes(){
-        $this->authenticatedAndAuthorized();
-
+    public function destroy_WhenAuthorizedAndValid_DoesNotDeleteAssociatedRoutes(){
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
-        $routes = factory(Route::class, 2)->create([ 'parent_id' => $route->parent_id, 'page_id' => $route->page->getKey() ]);
 
-        $page = $route->page;
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('DELETE', PageController::class . '@destroy', [ $route->page->getKey() ]);
 
-        $count = Route::count();
-        $response = $this->action('DELETE', PageController::class . '@destroy', [ $page->getKey() ]);
-
-        $this->assertEquals($count-3, Route::count());
+        $this->assertInstanceOf(Route::class, Route::find($route->getKey()));
     }
 
     /**
      * @test
      */
-    public function delete_WhenAuthorizedAndValid_Returns200(){
+    public function destroy_WhenAuthorizedAndValid_DoesNotDeleteAssociatedRedirects(){
+        $route = factory(Route::class)->states('withPage', 'withParent')->create();
+        $redirect = Redirect::createFromRoute($route);
+
         $this->authenticatedAndAuthorized();
+        $response = $this->action('DELETE', PageController::class . '@destroy', [ $route->page->getKey() ]);
+
+        $this->assertInstanceOf(Redirect::class, Redirect::find($redirect->getKey()));
+    }
+
+    /**
+     * @test
+     */
+    public function destroy_WhenAuthorizedAndValid_Returns200(){
+        $route = factory(Route::class)->states('withPage', 'withParent')->create();
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('DELETE', PageController::class . '@destroy', [ $route->page->getKey() ]);
+
+        $response->assertStatus(200);
+    }
+
+
+
+    /**
+     * @test
+     * @group authentication
+     */
+    public function forceDestroy_WhenUnauthenticated_Returns401(){
+        $route = factory(Route::class)->states('withPage', 'withParent')->create();
+        $page = $route->page;
+
+        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ $page->getKey() ]);
+        $response->assertStatus(401);
+    }
+
+    /**
+     * @test
+     * @group authorization
+     */
+    public function forceDestroy_WhenAuthenticated_ChecksAuthorization(){
+        $route = factory(Route::class)->states('withPage', 'withParent')->create();
+        $page = $route->page;
+
+        Gate::shouldReceive('authorize')->with('forceDelete', Mockery::on(function($model) use ($page){
+            return (is_a($model, Page::class) && ($model->getKey() == $page->getKey()));
+        }))->once();
+
+        $this->authenticated();
+        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ $page->getKey() ]);
+    }
+
+    /**
+     * @test
+     * @group authorization
+     */
+    public function forceDestroy_WhenAuthenticatedAndUnauthorized_Returns403(){
+        $this->authenticatedAndUnauthorized();
 
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
         $page = $route->page;
 
-        $response = $this->action('DELETE', PageController::class . '@destroy', [ $page->getKey() ]);
+        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ $page->getKey() ]);
+        $response->assertStatus(403);
+    }
+
+    /**
+     * @test
+     */
+    public function forceDestroy_WhenAuthorizedAndPageNotFound_Returns404(){
+        $this->authenticatedAndAuthorized();
+
+        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ 123 ]);
+        $response->assertStatus(404);
+    }
+
+    /**
+     * @test
+     */
+    public function forceDestroy_WhenAuthorizedAndValid_HardDeletesThePage(){
+        $route = factory(Route::class)->states('withPage', 'withParent')->create();
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ $route->page->getKey() ]);
+
+        $this->assertEquals(0, Page::withTrashed()->where('id', '=', $route->page->getKey())->count());
+    }
+
+    /**
+     * @test
+     */
+    public function forceDestroy_WhenAuthorizedAndValid_HardDeletesAssociatedRoutes(){
+        $route = factory(Route::class)->states('withPage', 'withParent')->create();
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ $route->page->getKey() ]);
+
+        $this->assertNull(Route::find($route->getKey()));
+    }
+
+    /**
+     * @test
+     */
+    public function forceDestroy_WhenAuthorizedAndValid_HardDeletesAssociatedRedirects(){
+        $route = factory(Route::class)->states('withPage', 'withParent')->create();
+        $redirect = Redirect::createFromRoute($route);
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ $route->page->getKey() ]);
+
+        $this->assertNull(Redirect::find($redirect->getKey()));
+    }
+
+    /**
+     * @test
+     */
+    public function forceDestroy_WhenAuthorizedAndValid_DoesNotDeletePublishedPages(){
+        $route = factory(Route::class)->states('withPage', 'withPublishedParent')->create();
+        $route->page->publish(new PageTransformer);
+
+        $published = $route->page->published;
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ $route->page->getKey() ]);
+
+        $this->assertInstanceOf(PublishedPage::class, PublishedPage::find($published->getKey()));
+    }
+
+    /**
+     * @test
+     */
+    public function forceDestroy_WhenAuthorizedAndValid_Returns200(){
+        $route = factory(Route::class)->states('withPage', 'withParent')->create();
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ $route->page->getKey() ]);
+
         $response->assertStatus(200);
     }
 

@@ -6,6 +6,8 @@ use Tests\TestCase;
 use App\Models\Page;
 use App\Models\Site;
 use App\Models\Route;
+use App\Models\Redirect;
+use App\Http\Transformers\Api\v1\PageTransformer;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class RouteTest extends TestCase
@@ -13,86 +15,128 @@ class RouteTest extends TestCase
 
 	/**
 	 * @test
+	 * @group integration
 	 */
-	function scopeCanonical_ReturnsCanonicalRoutesOnly()
-	{
-		$routes = factory(Route::class, 2)->states('withPage', 'withParent')->create([ 'is_canonical' => true ]);
-		factory(Route::class, 2)->states('withPage', 'withParent')->create([ 'is_canonical' => false ]);
-
-		$results = Route::canonical()->get()->pluck('id');
-		$this->assertContains($routes[0]->getKey(), $results);
-		$this->assertContains($routes[1]->getKey(), $results);
-	}
-
-	/**
-	 * @test
-	 */
-	function scopeCanonical_WithFalseArgument_ReturnsNonCanonicalRoutesOnly()
-	{
-		factory(Route::class, 2)->states('withPage', 'withParent')->create([ 'is_canonical' => true ]);
-		$routes = factory(Route::class, 2)->states('withPage', 'withParent')->create([ 'is_canonical' => false ]);
-
-		$results = Route::canonical(false)->get()->pluck('id');
-		$this->assertContains($routes[0]->getKey(), $results);
-		$this->assertContains($routes[1]->getKey(), $results);
-	}
-
-
-	/**
-	 * @test
-	 */
-	function makeCanonical_SetsIsCanonicalToTrue()
+	public function pageRelation_WhenPageIsSoftDeleted_ReturnsPage()
 	{
 		$route = factory(Route::class)->states('withParent', 'withPage')->create();
-		$route->makeCanonical();
+		$redirect = Redirect::createFromRoute($route);
 
-		$this->assertTrue($route->is_canonical);
+		$page = $route->page;
+
+		$page->delete();
+		$redirect = $redirect->fresh();
+
+		$this->assertTrue($page->trashed());
+		$this->assertEquals($page->getKey(), $redirect->page->getKey());
 	}
 
 	/**
 	 * @test
 	 */
-	function makeCanonical_SetsIsCanonicalToFalseOnOtherRoutesToPage()
+	function scopeActive_ReturnsActiveRoutesOnly()
 	{
-		$parent = factory(Route::class)->states('withParent', 'withPage')->create();
+		$routes = factory(Route::class, 2)->states('withPage', 'withParent')->create()->each(function($model){
+			$model->makeActive();
+		});
 
-		$routes = factory(Route::class, 3)->create([
-			'is_canonical' => true,
-			'parent_id' => $parent->getKey(),
-			'page_id' => $parent->page->getKey(),
-		]);
+		factory(Route::class, 2)->states('withPage', 'withParent')->create();
 
-		$routes[1]->makeCanonical();
-
-		foreach($routes as $key => $route){ // For some reason, pass-by-reference isn't working here...
-			$routes[$key] = $route->fresh();
-		}
-
-		$this->assertFalse($routes[0]->is_canonical);
-		$this->assertTrue($routes[1]->is_canonical);
-		$this->assertFalse($routes[2]->is_canonical);
-	}
-
-
-
-	/**
-	 * @test
-	 */
-	public function isCanonical_WhenIsCanonicalIsTrue_ReturnsTrue()
-	{
-		$route = factory(Route::class)->make([ 'is_canonical' => true ]);
-		$this->assertTrue($route->isCanonical());
+		$results = Route::active()->get()->pluck('id');
+		$this->assertContains($routes[0]->getKey(), $results);
+		$this->assertContains($routes[1]->getKey(), $results);
 	}
 
 	/**
 	 * @test
 	 */
-	public function isCanonical_WhenIsCanonicalIsFase_ReturnsFalse()
+	function scopeActive_WithFalseArgument_ReturnsInactiveRoutesOnly()
 	{
-		$route = factory(Route::class)->make([ 'is_canonical' => false ]);
-		$this->assertFalse($route->isCanonical());
+		factory(Route::class, 2)->states('withPage', 'withParent')->create();
+
+		$routes = factory(Route::class, 2)->states('withPage', 'withParent')->create();
+
+		$results = Route::active(false)->get()->pluck('id');
+		$this->assertContains($routes[0]->getKey(), $results);
+		$this->assertContains($routes[1]->getKey(), $results);
 	}
 
+
+	/**
+	 * @test
+	 */
+	function setIsActiveAttribute_WhenFalsey_ThrowsException()
+	{
+		$route = factory(Route::class)->make();
+		$this->expectException(Exception::class);
+
+		$route->is_active = false;
+	}
+
+	/**
+	 * @test
+	 */
+	function setIsActiveAttribute_WhenTruthy_ThrowsException()
+	{
+		$route = factory(Route::class)->make();
+		$this->expectException(Exception::class);
+
+		$route->is_active = true;
+	}
+
+	/**
+	 * @test
+	 */
+	public function isActive_WhenIsActiveIsTrue_ReturnsTrue()
+	{
+		$route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
+		$route->makeActive();
+
+		$this->assertTrue($route->isActive());
+	}
+
+	/**
+	 * @test
+	 */
+	public function isActive_WhenIsActiveIsFalse_ReturnsFalse()
+	{
+		$route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
+		$this->assertFalse($route->isActive());
+	}
+
+	/**
+	 * @test
+	 */
+	function makeActive_SetsIsActiveToTrue()
+	{
+		$route = factory(Route::class)->states('withParent', 'withPage')->create();
+		$route->makeActive();
+
+		$this->assertTrue($route->is_active);
+	}
+
+	/**
+	 * @test
+	 */
+	function makeActive_RemovesAllOtherRoutesForPage()
+	{
+		$active = factory(Route::class)->states('withParent', 'withPage')->create();
+		$active->makeActive();
+
+		$page = $active->page;
+
+		$draft = factory(Route::class)->create([ 'parent_id' => $active->parent_id, 'page_id' => $page->getKey() ]);
+
+		$page = $page->fresh();
+		$this->assertCount(2, $page->routes);
+
+		$draft->makeActive();
+
+		$page = $page->fresh();
+		$this->assertCount(1, $page->routes);
+
+		$this->assertEquals($draft->getKey(), $page->activeRoute->getKey());
+	}
 
 
 
@@ -116,10 +160,12 @@ class RouteTest extends TestCase
 	function makeSite_WithSiteInstance_SetsSiteIdOnAllOtherRoutesToPage()
 	{
 		$r1 = factory(Route::class)->states('withPage', 'withParent')->create();
+		$r1->makeActive();
+
 		$r2 = factory(Route::class)->create([ 'page_id' => $r1->page_id, 'parent_id' => $r1->parent_id ]);
 
 		$site = factory(Site::class)->states('withPublishingGroup')->create();
-		$r2->makeSite($site);
+		$r1->makeSite($site);
 
 		$r1 = $r1->fresh();
 		$this->assertEquals($r1->site_id, $site->getKey());
@@ -148,6 +194,8 @@ class RouteTest extends TestCase
 	function makeSite_WithSiteId_SetsSiteIdOnAllOtherRoutesToPage()
 	{
 		$r1 = factory(Route::class)->states('withPage', 'withParent')->create();
+		$r1->makeActive();
+
 		$r2 = factory(Route::class)->create([ 'page_id' => $r1->page_id, 'parent_id' => $r1->parent_id ]);
 
 		$site = factory(Site::class)->states('withPublishingGroup')->create();
@@ -209,11 +257,9 @@ class RouteTest extends TestCase
 	 */
 	function generatePath_WhenHasParents_SetsPathUsingParentSlugs()
 	{
-		$page = factory(Page::class)->create();
-
-		$r1 = factory(Route::class)->states('isRoot')->create([ 'page_id' => $page->getKey() ]);
-		$r2 = factory(Route::class)->create([ 'page_id' => $page->getKey(), 'parent_id' => $r1->getKey() ]);
-		$r3 = factory(Route::class)->make([ 'page_id' => $page->getKey(), 'parent_id' => $r2->getKey() ]);
+		$r1 = factory(Route::class)->states('isRoot', 'withPage')->create();
+		$r2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $r1->getKey() ]);
+		$r3 = factory(Route::class)->states('withPage')->make([ 'parent_id' => $r2->getKey() ]);
 
 		$path = $r3->generatePath();
 		$this->assertEquals('/' . $r2->slug . '/' . $r3->slug, $path); // $r1 is a root node, so has no slug
@@ -226,11 +272,9 @@ class RouteTest extends TestCase
 	 */
 	function whenSaving_GeneratesPath()
 	{
-		$page = factory(Page::class)->create();
-
-		$r1 = factory(Route::class)->states('isRoot')->create([ 'page_id' => $page->getKey() ]);
-		$r2 = factory(Route::class)->create([ 'page_id' => $page->getKey(), 'parent_id' => $r1->getKey() ]);
-		$r3 = factory(Route::class)->make([ 'page_id' => $page->getKey(), 'parent_id' => $r2->getKey() ]);
+		$r1 = factory(Route::class)->states('isRoot', 'withPage')->create();
+		$r2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $r1->getKey() ]);
+		$r3 = factory(Route::class)->states('withPage')->make([ 'parent_id' => $r2->getKey() ]);
 
 		$r3->save();
 		$this->assertEquals('/' . $r2->slug . '/' . $r3->slug, $r3->path); // $r1 is a root node, so has no slug
@@ -276,6 +320,249 @@ class RouteTest extends TestCase
 	{
         $this->expectException(ModelNotFoundException::class);
 		Route::findByPathOrFail('/foobar');
+	}
+
+
+
+	/**
+	 * @test
+	 */
+	public function save_WhenRouteIsNotActive_SavesNewDraftRoute()
+	{
+		$count = Route::count();
+
+		$route = factory(Route::class)->states('isRoot', 'withPage')->make();
+		$route->save();
+
+		$this->assertEquals($count + 1, Route::count());
+
+		$route = $route->fresh();
+		$this->assertFalse($route->isActive());
+	}
+
+	/**
+	 * @test
+	 */
+	public function save_WhenRouteIsNotActive_DeletesAnyOtherInactiveRoutes()
+	{
+		$count = Route::count();
+
+		$r1 = factory(Route::class)->states('isRoot', 'withPage')->make();
+		$r1->save();
+
+		$this->assertEquals($count+1, Route::count());
+
+		$r2 = $r1->replicate();
+		$r2->save();
+
+		$this->assertEquals($count+1, Route::count()); 						// Number of routes is the same...
+		$this->assertNull(Route::find($r1->getKey())); 						// ...but $r1 is gone...
+		$this->assertInstanceOf(Route::class, Route::find($r2->getKey())); 	// ...and $r2 is present.
+	}
+
+	/**
+	 * @test
+	 *
+	 * A Route should't really be updated like this when running in a production
+	 * environment. However, we want to make sure that save still behaves normally.
+	 */
+	public function save_WhenRouteIsActive_UpdatesRoute()
+	{
+		$route = factory(Route::class)->states('withParent', 'withPage')->create();
+		$route->makeActive();
+
+		$count = Route::count();
+
+		$route->slug = 'foobar123';
+		$route->save();
+
+		$this->assertEquals($count, Route::count()); // Should not have created a new Route
+		$this->assertInstanceOf(Route::class, Route::find($route->getKey()));
+
+		$route = $route->fresh();
+		$this->assertEquals('foobar123', $route->slug);
+	}
+
+	/**
+	 * @test
+	 *
+	 * environment. However, we want to make sure that save still behaves normally.
+	 */
+	public function save_WhenSuccessful_ReturnsTrue()
+	{
+		$route = factory(Route::class)->states('withParent', 'withPage')->create();
+		$route->makeActive();
+
+		$count = Route::count();
+
+		$route->slug = 'foobar123';
+		$this->assertTrue($route->save());
+	}
+
+
+
+	/**
+	 * @test
+	 */
+	public function cloneDescendants_WhenAllDescendantsArePublished_ClonesAllDescendantsAsInactive()
+	{
+		$a1 = factory(Route::class)->states('withPublishedParent', 'withPage')->create();
+		$a1->page->publish(new PageTransformer);
+
+		$a2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a1->getKey() ]);
+		$a2->page->publish(new PageTransformer);
+
+		$a3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a2->getKey() ]);
+		$a3->page->publish(new PageTransformer);
+
+		$a4 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a2->getKey() ]);
+		$a4->page->publish(new PageTransformer);
+
+		$b1 = factory(Route::class)->states('withPublishedParent', 'withPage')->create();
+
+		$a1 = $a1->fresh();
+		$count = $a1->descendants()->count();
+
+		$descendants = $b1->cloneDescendants($a1);
+
+		$this->assertEquals($count, $descendants->count());
+
+		$descendant_page_ids = $descendants->pluck('page_id');
+		$this->assertContains($a2->page_id, $descendant_page_ids);
+		$this->assertContains($a3->page_id, $descendant_page_ids);
+		$this->assertContains($a4->page_id, $descendant_page_ids);
+
+		$this->assertNotContains(true, $descendants->pluck('is_active'));
+	}
+
+	/**
+	 * @test
+	 * @group integration
+	 *
+	 * This test depends upon the $route->save() function working properly. Its worth
+	 * keeping as an integration tests to prevent against regressions in this behaviour.
+	 */
+	public function cloneDescendants_WhenSomeDescendantsAreDraft_ClonesAllDescendantsAndRemovesOriginalDrafts()
+	{
+		$a1 = factory(Route::class)->states('withPublishedParent', 'withPage')->create();
+		$a1->page->publish(new PageTransformer);
+
+		$a2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a1->getKey() ]);
+		$a2->page->publish(new PageTransformer);
+
+		$a3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a2->getKey() ]);
+		$a4 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a2->getKey() ]);
+
+		$b1 = factory(Route::class)->states('withPublishedParent', 'withPage')->create();
+
+		$a1 = $a1->fresh();
+		$count = $a1->descendants()->count();
+
+		$descendants = $b1->cloneDescendants($a1);
+		$this->assertEquals($count, $descendants->count());
+
+		$a1 = $a1->fresh();
+		$this->assertEquals($count-2, $a1->descendants()->count());
+
+		$this->assertInstanceOf(Route::class, Route::find($a2->getKey()));
+		$this->assertNull(Route::find($a3->getKey()));
+		$this->assertNull(Route::find($a4->getKey()));
+	}
+
+	/**
+	 * @test
+	 */
+	public function cloneDescendants_WhenDestinationHasOwnDescendants_RetainsOriginalDescendants()
+	{
+		// Original Route, with descendants
+		$a1 = factory(Route::class)->states('withPublishedParent', 'withPage')->create();
+		$a1->page->publish(new PageTransformer);
+
+		$a2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a1->getKey() ]);
+		$a2->page->publish(new PageTransformer);
+
+		$a3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a2->getKey() ]);
+		$a4 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a2->getKey() ]);
+
+		// New Route, with own descendants
+		$b1 = factory(Route::class)->states('withPublishedParent', 'withPage')->create();
+		$b1->page->publish(new PageTransformer);
+
+		$b2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $b1->getKey() ]);
+		$b2->page->publish(new PageTransformer);
+
+		$b3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $b1->getKey() ]);
+
+		// Perform test
+		$a1 = $a1->fresh();
+		$count = $a1->descendants()->count();
+
+		$descendants = $b1->cloneDescendants($a1);
+
+		$this->assertEquals($count + 2, $descendants->count()); // Own descendants, plus cloned descendants.
+
+		$descendant_page_ids = $descendants->pluck('page_id');
+		$this->assertContains($a2->page_id, $descendant_page_ids);
+		$this->assertContains($b2->page_id, $descendant_page_ids);
+		$this->assertContains($a3->page_id, $descendant_page_ids);
+		$this->assertContains($b3->page_id, $descendant_page_ids);
+		$this->assertContains($a4->page_id, $descendant_page_ids);
+	}
+
+
+
+	/**
+	 * @test
+	 */
+	public function delete_WhenRouteIsNotActive_DeletesRoute()
+	{
+		$route = factory(Route::class)->states('withPage', 'withParent')->create();
+		$route->delete();
+
+		$this->assertNull(Route::find($route->getKey()));
+	}
+
+	/**
+	 * @test
+	 */
+	public function delete_WhenRouteIsNotActive_DoesNotCreateRedirect()
+	{
+		$count = Redirect::count();
+
+		$route = factory(Route::class)->states('withPage', 'withParent')->create();
+		$route->delete();
+
+		$this->assertEquals($count, Redirect::count());
+	}
+
+	/**
+	 * @test
+	 */
+	public function delete_WhenRouteIsActive_DeletesRoute()
+	{
+		$route = factory(Route::class)->states('withPage', 'withParent')->create();
+		$route->makeActive();
+		$route->delete();
+
+		$this->assertNull(Route::find($route->getKey()));
+	}
+
+	/**
+	 * @test
+	 */
+	public function delete_WhenRouteIsActive_CreatesNewRedirect()
+	{
+		$count = Redirect::count();
+
+		$route = factory(Route::class)->states('withPage', 'withParent')->create();
+		$route->makeActive();
+		$route->delete();
+
+		$this->assertEquals($count + 1, Redirect::count());
+
+		$redirect = Redirect::all()->last();
+		$this->assertEquals($route->path, $redirect->path);
+		$this->assertEquals($route->page_id, $redirect->page_id);
 	}
 
 }

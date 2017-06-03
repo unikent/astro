@@ -11,8 +11,8 @@ use App\Http\Transformers\Api\v1\Definitions\LayoutTransformer as LayoutDefiniti
 class PageTransformer extends FractalTransformer
 {
 
-	protected $defaultIncludes = [ 'canonical' ];
-    protected $availableIncludes = [ 'routes', 'blocks', 'layout_definition' ];
+	protected $defaultIncludes = [ 'active_route' ];
+    protected $availableIncludes = [ 'routes', 'draft_route', 'blocks', 'layout_definition', 'published', 'history' ];
 
 	public function transform(Page $page)
 	{
@@ -20,15 +20,27 @@ class PageTransformer extends FractalTransformer
 	}
 
     /**
-     * Include associated 'Canonical' Route
+     * Include associated active Route
      *
      * @return League\Fractal\ItemResource
      */
-    public function includeCanonical(Page $page)
+    public function includeActiveRoute(Page $page)
     {
-    	if($page->canonical){
-	    	return new FractalItem($page->canonical, new RouteTransformer, false);
+    	if($page->activeRoute){
+	    	return new FractalItem($page->activeRoute, new RouteTransformer, false);
     	}
+    }
+
+    /**
+     * Include associated draft Route
+     *
+     * @return League\Fractal\ItemResource
+     */
+    public function includeDraftRoute(Page $page)
+    {
+        if($page->draftRoute){
+            return new FractalItem($page->draftRoute, new RouteTransformer, false);
+        }
     }
 
     /**
@@ -87,5 +99,28 @@ class PageTransformer extends FractalTransformer
     	return new FractalItem($layoutDefinition, new LayoutDefinitionTransformer, false);
     }
 
+    /**
+     * Include Published (latest PublishedPage)
+     *
+     * @return League\Fractal\ItemResource
+     */
+    public function includePublished(Page $page)
+    {
+        if($page->published){
+            return new FractalItem($page->published, new PublishedPageTransformer, false);
+        }
+    }
+
+    /**
+     * Include History (all associated PublishedPages)
+     *
+     * @return League\Fractal\CollectionResource
+     */
+    public function includeHistory(Page $page)
+    {
+        if(!$page->history->isEmpty()){
+            return new FractalCollection($page->history, new PublishedPageTransformer, false);
+        }
+    }
 
 }

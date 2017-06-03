@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Route;
 use App\Models\PublishingGroup;
 use App\Http\Controllers\Api\v1\SiteController;
+use App\Http\Transformers\Api\v1\PageTransformer;
 use Illuminate\Auth\Access\AuthorizationException;
 
 class SiteControllerTest extends ApiControllerTestCase {
@@ -49,7 +50,7 @@ class SiteControllerTest extends ApiControllerTestCase {
      * @group authorization
      */
     public function index_WhenAuthenticatedAndNotAuthorizedToIndex_ReturnsJsonOfSitePagesAssociatedWithUser(){
-        $routes = factory(Route::class, 3)->states([ 'withPage', 'withParent', 'withSite' ])->create([ 'is_canonical' => true ]);
+        $routes = factory(Route::class, 3)->states([ 'withPage', 'withParent', 'withSite' ])->create();
 
         // Create a PublishingGroup...
         $pg = factory(PublishingGroup::class)->create();
@@ -89,13 +90,13 @@ class SiteControllerTest extends ApiControllerTestCase {
      * @test
      */
     public function index_WhenAuthorizedToIndex_ReturnsJsonOfAllSitePages(){
-        $routes = factory(Route::class, 3)->states([ 'withPage', 'withParent', 'withSite' ])->create([ 'is_canonical' => true ]);
+        $parent = factory(Route::class)->states([ 'isRoot', 'withPage' ])->create();
+        $parent->page->publish(new PageTransformer);
 
-        factory(Route::class)->create([
-            'parent_id' => $routes[0]->parent_id,
-            'page_id' => $routes[0]->page_id,
-            'site_id' => $routes[0]->site_id,
-        ]);
+        $routes = factory(Route::class, 3)->states([ 'withPage', 'withSite' ])->create([ 'parent_id' => $parent->getKey() ])
+            ->each(function($route){
+                $route->page->publish(new PageTransformer);
+            });
 
         $this->authenticatedAndAuthorized();
 
@@ -109,8 +110,14 @@ class SiteControllerTest extends ApiControllerTestCase {
     /**
      * @test
      */
-    public function index_WhenAuthorized_ReturnsCanonicalRoutesInJson(){
-        $routes = factory(Route::class, 3)->states([ 'withPage', 'withParent', 'withSite' ])->create([ 'is_canonical' => true ]);
+    public function index_WhenAuthorizedAndFound_ReturnsActiveRoutesInJson(){
+        $parent = factory(Route::class)->states([ 'isRoot', 'withPage' ])->create();
+        $parent->page->publish(new PageTransformer);
+
+        $routes = factory(Route::class, 3)->states([ 'withPage', 'withSite' ])->create([ 'parent_id' => $parent->getKey() ])
+            ->each(function($route){
+                $route->page->publish(new PageTransformer);
+            });
 
         $this->authenticatedAndAuthorized();
 
@@ -118,7 +125,7 @@ class SiteControllerTest extends ApiControllerTestCase {
         $json = $response->json();
 
         $this->assertArrayHasKey('data', $json);
-        $this->assertArrayHasKey('canonical', $json['data'][0]);
+        $this->assertArrayHasKey('active_route', $json['data'][0]);
     }
 
 
@@ -128,7 +135,9 @@ class SiteControllerTest extends ApiControllerTestCase {
      * @group authentication
      */
     public function show_WhenUnauthenticated_Returns401(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent', 'withSite' ])->create();
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot', 'withSite' ])->create();
+        $route->page->publish(new PageTransformer);
+
         $site = $route->site;
 
         $response = $this->action('GET', SiteController::class . '@show', [ $site->getKey() ]);
@@ -140,7 +149,9 @@ class SiteControllerTest extends ApiControllerTestCase {
      * @group authorization
      */
     public function show_WhenAuthenticated_ChecksAuthorization(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent', 'withSite' ])->create();
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot', 'withSite' ])->create();
+        $route->page->publish(new PageTransformer);
+
         $site = $route->site;
 
         Gate::shouldReceive('authorize')->with('read', Mockery::type(Site::class))->once();
@@ -154,7 +165,9 @@ class SiteControllerTest extends ApiControllerTestCase {
      * @group authorization
      */
     public function show_WhenAuthenticatedAndUnauthorized_Returns403(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent', 'withSite' ])->create();
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot', 'withSite' ])->create();
+        $route->page->publish(new PageTransformer);
+
         $site = $route->site;
 
         $this->authenticatedAndUnauthorized();
@@ -177,7 +190,9 @@ class SiteControllerTest extends ApiControllerTestCase {
      * @test
      */
     public function show_WhenAuthorizedAndFound_Returns200(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent', 'withSite' ])->create();
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot', 'withSite' ])->create();
+        $route->page->publish(new PageTransformer);
+
         $site = $route->site;
 
         $this->authenticatedAndAuthorized();
@@ -190,7 +205,9 @@ class SiteControllerTest extends ApiControllerTestCase {
      * @test
      */
     public function show_WhenAuthorizedAndFound_ReturnsJsonOfSite(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent', 'withSite' ])->create();
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot', 'withSite' ])->create();
+        $route->page->publish(new PageTransformer);
+
         $site = $route->site;
 
         $this->authenticatedAndAuthorized();
@@ -205,9 +222,9 @@ class SiteControllerTest extends ApiControllerTestCase {
     /**
      * @test
      */
-    public function show_WhenAuthorizedAndFound_ReturnsCanonicalRouteInJson(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent', 'withSite' ])->create();
-        $route->makeCanonical();
+    public function show_WhenAuthorizedAndFound_ReturnsActiveRouteInJson(){
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot', 'withSite' ])->create();
+        $route->page->publish(new PageTransformer);
 
         $site = $route->site;
 
@@ -217,24 +234,20 @@ class SiteControllerTest extends ApiControllerTestCase {
         $json = $response->json();
 
         $this->assertArrayHasKey('data', $json);
-        $this->assertArrayHasKey('canonical', $json['data']);
-        $this->assertEquals($route->slug, $json['data']['canonical']['slug']);
+        $this->assertArrayHasKey('active_route', $json['data']);
+        $this->assertEquals($route->slug, $json['data']['active_route']['slug']);
     }
 
     /**
      * @test
      */
     public function show_WhenAuthorizedAndFoundRequestIncludesRoutes_IncludesRoutesInJson(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent', 'withSite' ])->create();
-        $route->makeCanonical();
+        $active = factory(Route::class)->states([ 'withPage', 'isRoot', 'withSite' ])->create();
+        $active->page->publish(new PageTransformer);
 
-        $routes = factory(Route::class, 2)->create([
-            'site_id' => $route->site_id,
-            'page_id' => $route->page_id,
-            'parent_id' => $route->parent_id,
-        ]);
+        $draft = factory(Route::class)->create(array_except(attrs_for($active), [ 'id', 'is_active' ]));
 
-        $site = $route->site;
+        $site = $active->site;
 
         $this->authenticatedAndAuthorized();
 
@@ -247,7 +260,7 @@ class SiteControllerTest extends ApiControllerTestCase {
 
         $this->assertArrayHasKey('data', $json);
         $this->assertArrayHasKey('routes', $json['data']);
-        $this->assertCount(3, $json['data']['routes']);
+        $this->assertCount(2, $json['data']['routes']);
     }
 
 
@@ -257,7 +270,9 @@ class SiteControllerTest extends ApiControllerTestCase {
      * @group authentication
      */
     public function tree_WhenUnauthenticated_Returns401(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent', 'withSite' ])->create([ 'is_canonical' => true ]);
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot', 'withSite' ])->create();
+        $route->page->publish(new PageTransformer);
+
         $site = $route->site;
 
         $response = $this->action('GET', SiteController::class . '@tree', [ $site->getKey() ]);
@@ -269,7 +284,9 @@ class SiteControllerTest extends ApiControllerTestCase {
      * @group authorization
      */
     public function tree_WhenAuthenticated_ChecksAuthorization(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent', 'withSite' ])->create([ 'is_canonical' => true ]);
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot', 'withSite' ])->create();
+        $route->page->publish(new PageTransformer);
+
         $site = $route->site;
 
         Gate::shouldReceive('authorize')->with('read', Mockery::type(Site::class))->once();
@@ -283,7 +300,9 @@ class SiteControllerTest extends ApiControllerTestCase {
      * @group authorization
      */
     public function tree_WhenAuthenticatedAndUnauthorized_Returns403(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent', 'withSite' ])->create([ 'is_canonical' => true ]);
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot', 'withSite' ])->create();
+        $route->page->publish(new PageTransformer);
+
         $site = $route->site;
 
         $this->authenticatedAndUnauthorized();
@@ -295,7 +314,7 @@ class SiteControllerTest extends ApiControllerTestCase {
     /**
      * @test
      */
-    public function tree_WhenAuthorizedAndPageNotFound_Returns404(){
+    public function tree_WhenAuthorizedAndNotFound_Returns404(){
         $this->authenticatedAndAuthorized();
 
         $response = $this->action('GET', SiteController::class . '@tree', [ 123 ]);
@@ -306,7 +325,9 @@ class SiteControllerTest extends ApiControllerTestCase {
      * @test
      */
     public function tree_WhenAuthorizedAndFound_Returns200(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent', 'withSite' ])->create([ 'is_canonical' => true ]);
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot', 'withSite' ])->create();
+        $route->page->publish(new PageTransformer);
+
         $site = $route->site;
 
         $this->authenticatedAndAuthorized();
@@ -319,10 +340,16 @@ class SiteControllerTest extends ApiControllerTestCase {
      * @test
      */
     public function tree_WhenAuthorizedAndFound_ReturnsJsonOfSiteRoutesAsHierarchy(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent', 'withSite' ])->create([ 'is_canonical' => true ]);
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot', 'withSite' ])->create();
+        $route->page->publish(new PageTransformer);
 
-        $l1 = factory(Route::class, 2)->states([ 'withPage' ])->create([ 'parent_id' => $route->getKey(), 'is_canonical' => true ]);
-        $l2 = factory(Route::class, 2)->states([ 'withPage' ])->create([ 'parent_id' => $l1[0]->getKey(), 'is_canonical' => true ]);
+        $l1 = factory(Route::class, 2)->states([ 'withPage' ])->create([ 'parent_id' => $route->getKey() ])->each(function($r){
+            $r->page->publish(new PageTransformer);
+        });
+
+        $l2 = factory(Route::class, 2)->states([ 'withPage' ])->create([ 'parent_id' => $l1[0]->getKey() ])->each(function($r){
+            $r->page->publish(new PageTransformer);
+        });
 
         $site = $route->site;
 

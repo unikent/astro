@@ -15,9 +15,9 @@ class Site extends Model
 
 	protected $definition = null;
 
-	public function canonical()
+	public function activeRoute()
 	{
-		return $this->hasOne(Route::class, 'site_id')->where('is_canonical', '=', true);
+		return $this->hasOne(Route::class, 'site_id')->active();
 	}
 
 	public function routes()

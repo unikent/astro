@@ -3,9 +3,12 @@ namespace Tests\Unit\Http\Controllers\Api\v1;
 
 use Gate;
 use Mockery;
+use App\Models\Page;
 use App\Models\Block;
 use App\Models\Route;
+use App\Models\Redirect;
 use App\Http\Controllers\Api\v1\RouteController;
+use App\Http\Transformers\Api\v1\PageTransformer;
 use Illuminate\Auth\Access\AuthorizationException;
 
 class RouteControllerTest extends ApiControllerTestCase {
@@ -15,7 +18,11 @@ class RouteControllerTest extends ApiControllerTestCase {
      * @group authentication
      */
     public function resolve_WhenUnauthenticated_Returns401(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+        $route->page->publish(new PageTransformer);
+
+        $page = $route->page;
+        $page->publish(new PageTransformer);
 
         $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $route->path ]);
         $response->assertStatus(401);
@@ -24,11 +31,17 @@ class RouteControllerTest extends ApiControllerTestCase {
     /**
      * @test
      * @group authorization
+     *
+     * Resolves via a Route model
      */
-    public function resolve_WhenAuthenticated_ChecksAuthorization(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
+    public function resolve_WhenAuthenticatedAndRouteFound_ChecksAuthorization(){
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+        $route->page->publish(new PageTransformer);
 
-        Gate::shouldReceive('authorize')->with('read', Mockery::type(Route::class))->once();
+        $page = $route->page;
+        $page->publish(new PageTransformer);
+
+        Gate::shouldReceive('allows')->with('read', Mockery::type(Route::class))->once();
 
         $this->authenticated();
         $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $route->path ]);
@@ -37,215 +50,316 @@ class RouteControllerTest extends ApiControllerTestCase {
     /**
      * @test
      * @group authorization
+     *
+     * Resolves via a Route model
      */
-    public function resolve_WhenAuthenticatedAndUnauthorized_Returns403(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
+    public function resolve_WhenAuthenticatedAndRouteFoundButUnauthorized_Returns404(){
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+        $route->page->publish(new PageTransformer);
+
+        $page = $route->page;
+        $page->publish(new PageTransformer);
 
         $this->authenticatedAndUnauthorized();
-
         $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $route->path ]);
-        $response->assertStatus(403);
+        $response->assertStatus(404);
     }
 
     /**
      * @test
+     *
+     * Resolves via a Route model
      */
-    public function resolve_WhenAuthorizedAndPathNotFound_Returns404(){
+    public function resolve_WhenAuthorizedAndRouteFoundButNotPublished_Returns200(){
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+        $route->page->publish(new PageTransformer);
+
+        $page = $route->page;
+        $page->publish(new PageTransformer);
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $route->path ]);
+
+        $response->assertStatus(200);
+    }
+
+    /**
+     * @test
+     *
+     * Resolves via a Route model
+     */
+    public function resolve_WhenAuthorizedAndRouteFoundButNotPublished_ReturnsJson(){
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+        $route->page->publish(new PageTransformer);
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $route->path ]);
+
+        $json = $response->json();
+        $this->assertArrayHasKey('data', $json);
+        $this->assertEquals($route->page->id, $json['data']['id']);
+    }
+
+    /**
+     * @test
+     *
+     * Resolves via a Route model
+     */
+    public function resolve_WhenAuthorizedAndRouteFoundAndPublished_Returns200(){
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+        $route->page->publish(new PageTransformer);
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $route->path ]);
+
+        $response->assertStatus(200);
+    }
+
+    /**
+     * @test
+     *
+     * Resolves via a Route model
+     */
+    public function resolve_WhenAuthorizedAndRouteFoundAndPublished_ReturnsJson(){
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+        $route->page->publish(new PageTransformer);
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $route->path ]);
+
+        $json = $response->json();
+        $this->assertArrayHasKey('data', $json);
+        $this->assertEquals($route->page->id, $json['data']['id']);
+    }
+
+    /**
+     * @test
+     *
+     * Resolves via a Route model
+     */
+    public function resolve_WhenAuthorizedAndRouteFoundAndPublished_IncludesActiveRouteInJson(){
+        $active = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+        $active->page->publish(new PageTransformer);
+
+        sleep(1);
+
+        $draft = factory(Route::class)->create(array_except(attrs_for($active), [ 'id', 'is_active' ]));
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $active->path ]);
+
+        $json = $response->json();
+        $this->assertArrayHasKey('data', $json);
+        $this->assertArrayHasKey('active_route', $json['data']);
+        $this->assertEquals($active->slug, $json['data']['active_route']['slug']);
+    }
+
+    /**
+     * @test
+     *
+     * Resolves via a Route model
+     */
+    public function resolve_WhenAuthorizedAndRouteFoundAndPublished_IncludesPageBlocksByRegionInJson(){
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+        $block = factory(Block::class)->create([ 'page_id' => $route->page->getKey() ]);
+
+        $route->page->publish(new PageTransformer);
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $route->path ]);
+
+        $json = $response->json();
+        $this->assertArrayHasKey('data', $json);
+        $this->assertArrayHasKey('blocks', $json['data']);
+        $this->assertArrayHasKey('test-region', $json['data']['blocks']);
+        $this->assertCount(1, $json['data']['blocks']);
+    }
+
+    /**
+     * @test
+     * @group authorization
+     *
+     * Resolves via a Redirect model
+     */
+    public function resolve_WhenAuthenticatedAndRedirectFound_ChecksAuthorization(){
+        $page = factory(Page::class)->create();
+        $page->publish(new PageTransformer);
+
+        $redirect = new Redirect([ 'path' => '/foobar', 'page_id' => $page->getKey() ]);
+        $redirect->save();
+
+        Gate::shouldReceive('allows')->with('read', Mockery::type(Redirect::class))->once();
+
+        $this->authenticated();
+        $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $redirect->path ]);
+    }
+
+    /**
+     * @test
+     * @group authorization
+     *
+     * Resolves via a Redirect model
+     */
+    public function resolve_WhenAuthenticatedAndRedirectFoundButUnauthorized_Returns404(){
+        $page = factory(Page::class)->create();
+        $page->publish(new PageTransformer);
+
+        $redirect = new Redirect([ 'path' => '/foobar', 'page_id' => $page->getKey() ]);
+        $redirect->save();
+
+        $this->authenticatedAndUnauthorized();
+        $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $redirect->path ]);
+        $response->assertStatus(404);
+    }
+
+    /**
+     * @test
+     *
+     * Resolves via a Redirect model
+     */
+    public function resolve_WhenAuthorizedAndRedirectFoundButNotPublished_Returns200(){
+        $page = factory(Page::class)->create();
+
+        $redirect = new Redirect([ 'path' => '/foobar', 'page_id' => $page->getKey() ]);
+        $redirect->save();
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $redirect->path ]);
+
+        $response->assertStatus(200);
+    }
+
+    /**
+     * @test
+     *
+     * Resolves via a Redirect model
+     */
+    public function resolve_WhenAuthorizedAndRedirectFoundButNotPublished_ReturnsJson(){
+        $page = factory(Page::class)->create();
+
+        $redirect = new Redirect([ 'path' => '/foobar', 'page_id' => $page->getKey() ]);
+        $redirect->save();
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $redirect->path ]);
+
+        $json = $response->json();
+        $this->assertArrayHasKey('data', $json);
+        $this->assertEquals($redirect->page->id, $json['data']['id']);
+    }
+
+    /**
+     * @test
+     *
+     * Resolves via a Redirect model
+     */
+    public function resolve_WhenAuthorizedAndRedirectFoundAndPublished_Returns200(){
+        $page = factory(Page::class)->create();
+        $page->publish(new PageTransformer);
+
+        $redirect = new Redirect([ 'path' => '/foobar', 'page_id' => $page->getKey() ]);
+        $redirect->save();
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $redirect->path ]);
+
+        $response->assertStatus(200);
+    }
+
+    /**
+     * @test
+     *
+     * Resolves via a Redirect model
+     */
+    public function resolve_WhenAuthorizedAndRedirectFoundAndPublished_ReturnsJson(){
+        $page = factory(Page::class)->create();
+        $page->publish(new PageTransformer);
+
+        $redirect = new Redirect([ 'path' => '/foobar', 'page_id' => $page->getKey() ]);
+        $redirect->save();
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $redirect->path ]);
+
+        $json = $response->json();
+        $this->assertArrayHasKey('data', $json);
+        $this->assertEquals($redirect->page->id, $json['data']['id']);
+    }
+
+    /**
+     * @test
+     *
+     * Resolves via a Redirect model
+     */
+    public function resolve_WhenAuthorizedAndRedirectFoundAndPublished_IncludesPageBlocksByRegionInJson(){
+        $page = factory(Page::class)->create();
+        $block = factory(Block::class)->create([ 'page_id' => $page->getKey() ]);
+
+        $page->publish(new PageTransformer);
+
+        $redirect = new Redirect([ 'path' => '/foobar', 'page_id' => $page->getKey() ]);
+        $redirect->save();
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $redirect->path ]);
+
+        $json = $response->json();
+        $this->assertArrayHasKey('data', $json);
+        $this->assertArrayHasKey('blocks', $json['data']);
+        $this->assertArrayHasKey('test-region', $json['data']['blocks']);
+        $this->assertCount(1, $json['data']['blocks']);
+    }
+
+    /**
+     * @test
+     * @group integration
+     *
+     * Resolves via a Route model.
+     * This test tests behaviour applied to the Route model by the Routable trait.
+     */
+    public function resolve_WhenAuthorizedAndRouteFoundAndPublishedPageIsSoftDeleted_Returns200(){
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+        $route->page->publish(new PageTransformer);
+
+        $route->page->delete();
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $route->path ]);
+
+        $response->assertStatus(200);
+    }
+
+    /**
+     * @test
+     * @group integration
+     *
+     * Resolves via a Route model.
+     * This test tests behaviour applied to the Route model by the Routable trait.
+     */
+    public function resolve_WhenAuthorizedAndRouteFoundAndPublishedPageIsSoftDeleted_ReturnsJson(){
+        $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
+        $route->page->publish(new PageTransformer);
+
+        $route->page->delete();
+
+        $this->authenticatedAndAuthorized();
+        $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $route->path ]);
+
+        $json = $response->json();
+        $this->assertArrayHasKey('data', $json);
+        $this->assertEquals($route->page->id, $json['data']['id']);
+    }
+
+
+    /**
+     * @test
+     */
+    public function resolve_WhenBothRouteAndRedirectAreNotFound_Returns404(){
         $this->authenticatedAndAuthorized();
 
         $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => '/foobar' ]);
         $response->assertStatus(404);
     }
 
-    /**
-     * @test
-     */
-    public function resolve_WhenAuthorizedAndFound_Returns200(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
-
-        $this->authenticatedAndAuthorized();
-
-        $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $route->path ]);
-        $response->assertStatus(200);
-    }
-
-    /**
-     * @test
-     */
-    public function resolve_WhenAuthorizedAndFound_ReturnsJson(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
-
-        $this->authenticatedAndAuthorized();
-
-        $response = $this->action('GET', RouteController::class . '@resolve', [ 'path' => $route->path ]);
-        $json = $response->json();
-
-        $this->assertArrayHasKey('data', $json);
-        $this->assertEquals($route->id, $json['data']['id']);
-    }
-
-    /**
-     * @test
-     */
-    public function resolve_WhenAuthorizedAndFoundRequestIncludesParent_IncludesParentRouteInJson(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
-
-        $this->authenticatedAndAuthorized();
-
-        $response = $this->action('GET', RouteController::class . '@resolve', [
-            'path' => $route->path,
-            'include' => 'parent',
-        ]);
-
-        $json = $response->json();
-
-        $this->assertArrayHasKey('data', $json);
-        $this->assertArrayHasKey('parent', $json['data']);
-        $this->assertEquals($route->parent->slug, $json['data']['parent']['slug']);
-    }
-
-    /**
-     * @test
-     */
-    public function resolve_WhenAuthorizedAndFoundRequestIncludesSite_IncludesSiteInJson(){
-        $route = factory(Route::class)->states([ 'withPage', 'withSite', 'withParent' ])->create();
-
-        $this->authenticatedAndAuthorized();
-
-        $response = $this->action('GET', RouteController::class . '@resolve', [
-            'path' => $route->path,
-            'include' => 'site',
-        ]);
-
-        $json = $response->json();
-
-        $this->assertArrayHasKey('data', $json);
-        $this->assertArrayHasKey('site', $json['data']);
-        $this->assertEquals($route->site->name, $json['data']['site']['name']);
-    }
-
-    /**
-     * @test
-     */
-    public function resolve_WhenAuthorizedAndFoundRequestIncludesPageLayoutDefinition_IncludesPageLayoutDefinitionInJson(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
-
-        $page = $route->page;
-
-        $this->authenticatedAndAuthorized();
-
-        $response = $this->action('GET', RouteController::class . '@resolve', [
-            'path' => $route->path,
-            'include' => 'page.layout_definition',
-        ]);
-
-        $json = $response->json();
-
-        $this->assertArrayHasKey('data', $json);
-        $this->assertArrayHasKey('page', $json['data']);
-        $this->assertArrayHasKey('layout_definition', $json['data']['page']);
-        $this->assertEquals($page->layout_name, $json['data']['page']['layout_definition']['name']);
-    }
-
-    /**
-     * @test
-     */
-    public function resolve_WhenAuthorizedAndFoundRequestIncludesPageCanonical_IncludesPageCanonicalRouteInJson(){
-        $r1 = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
-        $r2 = factory(Route::class)->create([ 'page_id' => $r1->page_id, 'parent_id' => $r1->parent_id ]);
-
-        $r1->makeCanonical();
-
-        $this->authenticatedAndAuthorized();
-
-        $response = $this->action('GET', RouteController::class . '@resolve', [
-            'path' => $r2->path,
-            'include' => 'page.canonical',
-        ]);
-
-        $json = $response->json();
-
-        $this->assertArrayHasKey('data', $json);
-        $this->assertArrayHasKey('page', $json['data']);
-        $this->assertArrayHasKey('canonical', $json['data']['page']);
-        $this->assertEquals($r1->slug, $json['data']['page']['canonical']['slug']);
-    }
-
-    /**
-     * @test
-     */
-    public function resolve_WhenAuthorizedAndFoundRequestIncludesPageRoutes_IncludesPageRoutesInJson(){
-        $r1 = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
-        $r2 = factory(Route::class)->create([ 'page_id' => $r1->page_id, 'parent_id' => $r1->parent_id ]);
-
-        $page = $r1->page;
-
-        $this->authenticatedAndAuthorized();
-
-        $response = $this->action('GET', RouteController::class . '@resolve', [
-            'path' => $r1->path,
-            'include' => 'page.routes',
-        ]);
-
-        $json = $response->json();
-
-        $this->assertArrayHasKey('data', $json);
-        $this->assertArrayHasKey('page', $json['data']);
-        $this->assertArrayHasKey('routes', $json['data']['page']);
-        $this->assertCount(2, $json['data']['page']['routes']);
-    }
-
-    /**
-     * @test
-     */
-    public function resolve_WhenAuthorizedAndFoundRequestIncludesPageBlocks_IncludesPageBlocksByRegionInJson(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
-
-        $page = $route->page;
-        $block = factory(Block::class)->create([ 'page_id' => $page->getKey() ]);
-
-        $this->authenticatedAndAuthorized();
-
-        $response = $this->action('GET', RouteController::class . '@resolve', [
-            'path' => $route->path,
-            'include' => 'page.blocks',
-        ]);
-
-        $json = $response->json();
-
-        $this->assertArrayHasKey('data', $json);
-        $this->assertArrayHasKey('page', $json['data']);
-        $this->assertArrayHasKey('blocks', $json['data']['page']);
-        $this->assertArrayHasKey('test-region', $json['data']['page']['blocks']);
-        $this->assertCount(1, $json['data']['page']['blocks']);
-    }
-
-    /**
-     * @test
-     */
-    public function resolve_WhenAuthorizedAndFoundRequestIncludesPageBlocksDefinition_IncludesPageBlocksAndDefinitionsInJson(){
-        $route = factory(Route::class)->states([ 'withPage', 'withParent' ])->create();
-
-        $page = $route->page;
-        $block = factory(Block::class)->create([ 'page_id' => $page->getKey() ]);
-
-        $this->authenticatedAndAuthorized();
-
-        $response = $this->action('GET', RouteController::class . '@resolve', [
-            'path' => $route->path,
-            'include' => 'page.blocks.definition',
-        ]);
-
-        $json = $response->json();
-
-        $this->assertArrayHasKey('data', $json);
-        $this->assertArrayHasKey('page', $json['data']);
-        $this->assertArrayHasKey('blocks', $json['data']['page']);
-        $this->assertArrayHasKey('test-region', $json['data']['page']['blocks']);
-        $this->assertCount(1, $json['data']['page']['blocks']['test-region']);
-
-        $this->assertArrayHasKey('definition', $json['data']['page']['blocks']['test-region'][0]);
-        $this->assertEquals($block->definition_name, $json['data']['page']['blocks']['test-region'][0]['definition']['name']);
-    }
 
 }

@@ -4,14 +4,20 @@ namespace App\Models;
 use DB;
 use Exception;
 use Baum\Node as BaumNode;
+use App\Models\Traits\Routable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use App\Models\Contracts\Routable as RoutableContract;
 
-class Route extends BaumNode
+class Route extends BaumNode implements RoutableContract
 {
+	use Routable;
+
 	public $timestamps = false;
 
 	protected $fillable = [
 		'slug',
+		'page_id',
 		'parent_id',
 	];
 
@@ -21,7 +27,7 @@ class Route extends BaumNode
 	];
 
 	protected $casts = [
-        'is_canonical' => 'boolean',
+        'is_active' => 'boolean',
 	];
 
 
@@ -63,36 +69,116 @@ class Route extends BaumNode
 		return $this->belongsTo(Page::class, 'page_id');
 	}
 
+	public function published_page()
+	{
+		return $this->hasOne(PublishedPage::class, 'page_id', 'page_id')->latest()->limit(1);
+	}
+
 
     /**
-     * Scope a query to only include canonical routes.
+     * Save the model to the database.
+     *
+     * @param  array  $options
+     * @return bool
+     */
+    public function save(array $options = [])
+    {
+    	DB::beginTransaction();
+
+    	try {
+    		if(!$this->isActive()){
+				static::where('page_id', $this->page_id)
+					->where($this->getKeyName(), '!=', $this->getKey())
+					->active(false)
+					->delete();
+    		}
+
+	    	parent::save($options);
+
+	    	DB::commit();
+	    	return true;
+    	} catch(Exception $e){
+    		DB::rollback();
+    		return false;
+    	}
+    }
+
+    /**
+     * Delete the model from the database.
+     * Creates a new Redirect model to ensure that the path is not lost forever.
+     *
+     * @return bool|null
+     * @throws \Exception
+     */
+    public function delete()
+    {
+    	DB::beginTransaction();
+
+    	try {
+    		if($this->isActive()){
+    			Redirect::createFromRoute($this);
+    		}
+
+	    	parent::delete();
+
+	    	DB::commit();
+    	} catch(Exception $e){
+    		DB::rollback();
+    		throw $e;
+    	}
+    }
+
+
+
+    /**
+     * Scope a query to only include active routes.
      *
      * @param Builder $query
      * @param boolean $value
      * @return Builder
      */
-	public function scopeCanonical(Builder $query, $value = true)
+	public function scopeActive(Builder $query, $value = true)
 	{
-		return $query->where('is_canonical', '=', $value);
+		return $query->where('is_active', '=', $value);
 	}
 
 	/**
-	 * Sets is_canonical to true on this route, and sets is_canonical to
-	 * false on all routes sharing the same Page destination.
+	 * Returns true if is_active is true, else false
+	 * @return boolean
+	 */
+	public function isActive()
+	{
+		return $this->is_active;
+	}
+
+	/**
+	 * Sets is_active only if the value is falsey. Enforces use of makeActive()
+	 * by throwing an Exception if a truthy value is set.
+	 *
+	 * @param $value
+	 * @throws Exception
+	 */
+	public function setIsActiveAttribute($value){
+		throw new Exception('The is_active property cannot be set directly. Please use makeActive.');
+	}
+
+	/**
+	 * Sets is_active to true on this instance, and deletes all
+	 * other Routes to the same Page. Delete ensures that a Redirect is created.
 	 *
 	 * @return void
 	 */
-	public function makeCanonical()
+	public function makeActive()
 	{
 		DB::beginTransaction();
 
 		try {
-			static::where('page_id', '=', $this->page_id)
-				->where('is_canonical', '=', true)
-				->update([ 'is_canonical' => false ]);
-
-			$this->is_canonical = true;
+			$this->attributes['is_active'] = true;
 			$this->save();
+
+			static::where('page_id', $this->page_id)
+				->where($this->getKeyName(), '!=', $this->getKey())
+				->each(function($model){ $model->delete(); }); // We take this approach as we want model lifecycle events.
 
 			DB::commit();
 		} catch(Exception $e){
@@ -101,14 +187,6 @@ class Route extends BaumNode
 		}
 	}
 
-	/**
-	 * Returns true if is_canonical is true, else false
-	 * @return boolean
-	 */
-	public function isCanonical()
-	{
-		return $this->is_canonical;
-	}
 
 
 	/**
@@ -170,25 +248,59 @@ class Route extends BaumNode
 	}
 
 	/**
-	 * Attempts to retrieve a Route by path
+	 * Clones the desendants of the given Route to the current Route instance.
 	 *
-	 * @param  string $hash
-	 * @return Route
+	 * @param Route $node
+	 * @return \Illuminate\Database\Eloquent\Collection $descendants
 	 */
-	public static function findByPath($path)
+	public function cloneDescendants(Route $node)
 	{
-		return static::where('path', '=', $path)->first();
+		$tree = [];
+
+		// Ensure that existing descendants are present in the tree
+		$descendants = $this->descendants()->get()->toHierarchy();
+
+		if(!$descendants->isEmpty()){
+			$this->replicateIterator($descendants, $tree, true);
+		}
+
+		// Clone the new descendants into the tree
+		$descendants = $node->descendants()->get()->toHierarchy();
+
+		if(!$descendants->isEmpty()){
+			$this->replicateIterator($descendants, $tree, false);
+		}
+
+		// Persist
+		$foobar = $this->makeTree($tree);
+
+		$model = $this->fresh();
+		return $model->descendants()->get();
 	}
 
 	/**
-	 * Attempts to retrieve a Route by path, throws Exception when not found
+	 * Recursive iterator used by replicateWithDescendants.
 	 *
-	 * @param  string $path
-	 * @return Route
-	 * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+	 * @param  Collection $nodes
+	 * @param  array|null &$output
+	 * @para
 	 */
-	public static function findByPathOrFail($path)
+	protected function replicateIterator(Collection $nodes, array &$output, $preserve)
 	{
-		return static::where('path', '=', $path)->firstOrFail();
+		foreach($nodes as $node){
+			$data = array_except($node->toArray(), [ 'parent_id', 'depth', 'lft', 'rgt', 'children', 'is_canonical' ]);
+
+			if(!$preserve){
+				$data = array_except($data, [ 'id', 'path', 'is_active' ]);
+			}
+
+			if(!$node->children->isEmpty()){
+				$data['children'] = [];
+				$this->replicateIterator($node->children, $data['children'], $preserve);
+			}
+
+			$output[] = $data;
+		}
 	}
+
 }

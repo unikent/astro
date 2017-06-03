@@ -3,10 +3,10 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\Route;
+use App\Models\Redirect;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class RoutePolicy
+class RedirectPolicy
 {
     use HandlesAuthorization;
 
@@ -33,28 +33,22 @@ class RoutePolicy
      * Determine whether the user can view the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Route  $route
+     * @param  \App\Models\Redirect  $redirect
      * @return boolean
      */
-    public function read(User $user, Route $route)
+    public function read(User $user, Redirect $redirect)
     {
-        if($route->isActive()){
-            return true;
-        } else {
-            // TODO: Check if user is sufficiently privileged to view inactive route
-        }
-
-        return false;
+        return true; // TODO: Under what circumstances should a Redirect not return a Page?
     }
 
     /**
      * Determine whether the user can create definitions.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Route  $route
+     * @param  \App\Models\Redirect  $redirect
      * @return boolean
      */
-    public function create(User $user, Route $route)
+    public function create(User $user, Redirect $redirect)
     {
         return true;
     }
@@ -63,10 +57,10 @@ class RoutePolicy
      * Determine whether the user can update the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Route  $route
+     * @param  \App\Models\Redirect  $redirect
      * @return boolean
      */
-    public function update(User $user, Route $route)
+    public function update(User $user, Redirect $redirect)
     {
         return true;
     }
@@ -75,10 +69,10 @@ class RoutePolicy
      * Determine whether the user can delete the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Route  $route
+     * @param  \App\Models\Redirect  $redirect
      * @return boolean
      */
-    public function delete(User $user, Route $route)
+    public function delete(User $user, Redirect $redirect)
     {
         return true;
     }

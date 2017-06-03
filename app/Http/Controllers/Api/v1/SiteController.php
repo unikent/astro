@@ -22,7 +22,7 @@ class SiteController extends ApiController
 	 */
 	public function index(Request $request){
 		$user = Auth::user();
-		$sites = Site::with('canonical');
+		$sites = Site::with('routes');
 
 		if(!Gate::allows('index', Site::class)){
 			$pgs = $user->publishing_groups->pluck('id');
@@ -55,7 +55,7 @@ class SiteController extends ApiController
 	public function tree(Request $request, Site $site){
 		$this->authorize('read', $site);
 
-		$qb = $site->canonical->descendantsAndSelf();
+		$qb = $site->activeRoute->descendantsAndSelf();
 		$routes = $qb->get()->toHierarchy();
 
 		return fractal($routes, new RouteTransformer)->respond();

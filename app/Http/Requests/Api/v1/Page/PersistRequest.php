@@ -29,15 +29,15 @@ class PersistRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'title' => 'required|max:255',
+            'title' => 'required|max:190',
             'layout_name' => 'required|string|definition_exists:App\Models\Definitions\Layout,layout_version',
             'layout_version' => 'required|numeric',
 
-            'route.slug' => [ 'required_with:route.parent_id', 'max:255' ],
+            'route.slug' => [ 'required_with:route.parent_id', 'max:190' ],
             'route.parent_id' => [ 'required_with:route.slug' ],
 
             'site_id' => [],
-            'site.name' => [ 'required_with:site.publishing_group_id', 'max:255' ],
+            'site.name' => [ 'required_with:site.publishing_group_id', 'max:190' ],
             'site.publishing_group_id' => [ 'required_with:site.name' ],
 
             'is_published' => 'filled|boolean',
@@ -50,14 +50,14 @@ class PersistRequest extends FormRequest
 
         $rules['route.slug'][] = Rule::unique('routes', 'slug')->where(function($q) use ($data, $page) {
             if($page){
-                $q->where('page_id', '!=', $page->getKey());        // Prevent the unique check from tripping over itself when updating
+                // Prevent the unique check from tripping over itself when updating
+                $q->where('page_id', '!=', $page->getKey());
             }
 
-            if(isset($data['route.parent_id'])){
-                $q->where('parent_id', $data['route.parent_id']);   // The slug must be unique at this level in the tree; so scope the query accordingly
+            if(isset($data['route']) && isset($data['route']['parent_id'])){
+                // The slug must be unique at this level in the tree; so scope the query accordingly
+                $q->where('parent_id', '=', $data['route']['parent_id']);
             }
-
-            $q->where('is_canonical', 1);                           // If the slug is already in use at this level but is not canonical, we can re-purpose it
         });
 
         $rules['route.parent_id'][] = Rule::exists('routes', 'id');

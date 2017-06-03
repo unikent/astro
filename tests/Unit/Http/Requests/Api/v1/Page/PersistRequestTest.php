@@ -10,6 +10,7 @@ use App\Models\Block;
 use App\Models\Route;
 use App\Models\PublishingGroup;
 use Tests\Unit\Http\Requests\RequestTestCase;
+use App\Http\Transformers\Api\v1\PageTransformer;
 use App\Http\Requests\Api\v1\Page\PersistRequest;
 
 class PersistRequestTest extends RequestTestCase
@@ -86,9 +87,9 @@ class PersistRequestTest extends RequestTestCase
      * @test
      * @group validation
      */
-    public function validation_WhenTitleIs255Chars_IsValid(){
+    public function validation_WhenTitleIs190Chars_IsValid(){
         $attrs = $this->getAttrs();
-        $attrs['title'] = str_repeat('a', 255);
+        $attrs['title'] = str_repeat('a', 190);
 
         $request = $this->mockRequest('POST', $attrs);
         $validator = $request->getValidatorInstance();
@@ -369,9 +370,9 @@ class PersistRequestTest extends RequestTestCase
      * @test
      * @group validation
      */
-    public function validation_WhenRouteSlugIs255Chars_IsValid(){
+    public function validation_WhenRouteSlugIs190Chars_IsValid(){
         $attrs = $this->getAttrs();
-        $attrs['route']['slug'] = str_repeat('a', 255);
+        $attrs['route']['slug'] = str_repeat('a', 190);
 
         $request = $this->mockRequest('POST', $attrs);
         $validator = $request->getValidatorInstance();
@@ -403,7 +404,8 @@ class PersistRequestTest extends RequestTestCase
         $existing = factory(Route::class)->states('withPage', 'withParent')->create();
 
         $attrs = $this->getAttrs();
-        $attrs['route']['slug'] = $existing->slug;
+        array_set($attrs, 'route.parent_id', $existing->getKey());
+        array_set($attrs, 'route.slug', $existing->slug);
 
         $request = $this->mockRequest('POST', $attrs);
         $validator = $request->getValidatorInstance();
@@ -417,9 +419,10 @@ class PersistRequestTest extends RequestTestCase
      * @test
      * @group validation
      */
-    public function validation_WhenRouteSlugExistsAtSameLevelInTreeAndIsCanonical_IsInvalid(){
+    public function validation_WhenRouteSlugExistsAtSameLevelInTreeAndIsActive_IsInvalid(){
         $existing = factory(Route::class)->states('withPage', 'withParent')->create();
-        $existing->makeCanonical();
+        $existing->parent->page->publish(new PageTransformer);
+        $existing->page->publish(new PageTransformer);
 
         $attrs = $this->getAttrs();
         $attrs['route']['slug'] = $existing->slug;
@@ -436,11 +439,11 @@ class PersistRequestTest extends RequestTestCase
      * @test
      * @group validation
      */
-    public function validation_WhenRouteSlugExistsAtSameLevelInTreeAndIsNotCanonical_IsValid(){
+    public function validation_WhenRouteSlugExistsAtSameLevelInTreeAndIsNotActive_IsInvalid(){
         $existing = factory(Route::class)->states('withPage', 'withParent')->create();
-        $existing->makeCanonical();
+        $existing->parent->page->publish(new PageTransformer);
 
-        $alternative = factory(Route::class)->create([ 'parent_id' => $existing->parent_id, 'page_id' => $existing->page_id, 'is_canonical' => false ]);
+        $alternative = factory(Route::class)->create([ 'parent_id' => $existing->parent_id, 'page_id' => $existing->page_id ]);
 
         $attrs = $this->getAttrs();
         $attrs['route']['slug'] = $alternative->slug;
@@ -450,7 +453,7 @@ class PersistRequestTest extends RequestTestCase
         $validator = $request->getValidatorInstance();
 
         $validator->passes();
-        $this->assertEmpty($validator->errors()->get('route.slug'));
+        $this->assertCount(1, $validator->errors()->get('route.slug'));
     }
 
     /**
@@ -683,9 +686,9 @@ class PersistRequestTest extends RequestTestCase
      * @test
      * @group validation
      */
-    public function validation_WhenSiteNameIs255Chars_IsValid(){
+    public function validation_WhenSiteNameIs190Chars_IsValid(){
         $attrs = $this->getAttrs();
-        $attrs['site']['name'] = str_repeat('a', 255);
+        $attrs['site']['name'] = str_repeat('a', 190);
 
         $request = $this->mockRequest('POST', $attrs);
         $validator = $request->getValidatorInstance();
