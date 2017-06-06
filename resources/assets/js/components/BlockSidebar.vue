@@ -1,5 +1,8 @@
 <template>
-	<div>
+	<div style="
+		height: 100%;
+		background-color: #f5f7fa;
+	">
 		<block-list></block-list>
 		<block-options class="block-options" :class="{'options-visible' : mode === 'edit'}"></block-options>
 	</div>

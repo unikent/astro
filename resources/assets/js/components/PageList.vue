@@ -31,8 +31,6 @@
 import PageListItem from './PageListItem';
 import { Loading } from 'element-ui';
 
-import pageStructure from '../tests/stubs/page-structure.json';
-
 const order = {
 
 	title(hierarchy) {
@@ -82,7 +80,7 @@ export default {
 			// 		}
 			// 	});
 
-			this.hierarchy = pageStructure;
+			// this.hierarchy = pageStructure;
 
 			this.loading = false;
 			if(this.loadingInstance) {

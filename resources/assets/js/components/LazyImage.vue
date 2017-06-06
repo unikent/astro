@@ -1,8 +1,5 @@
 <template>
-	<div
-		v-if="bg && !template"
-		:style="bgStyle"
-	/>
+	<div v-if="bg && !template" :style="bgStyle" />
 	<img v-else-if="!template" :src="imageSrc" />
 	<component v-else :is="template" />
 </template>

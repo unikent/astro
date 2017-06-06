@@ -111,12 +111,30 @@ export default class Definition {
 					let value;
 
 					if(field.type === 'collection') {
-						value = [{}];
-						field.fields.forEach(collection => {
-							value[0][collection.name] = Definition.initialiseField(
-								collection.type || 'text', collection.default
-							);
+						const validation = Definition.transformValidation(field);
+						let initialise = false;
+
+						value = [];
+
+						validation.some((rule) => {
+							if(rule.min !== void 0) {
+								initialise = rule.min;
+								return true;
+							}
 						});
+
+						if(initialise) {
+
+							for(var i = 0; i < initialise; i++) {
+								value.push({});
+
+								field.fields.forEach((collection) => {
+									value[i][collection.name] = Definition.initialiseField(
+										collection.type || 'text', collection.default
+									);
+								});
+							}
+						}
 					}
 					else if(field.type === 'group' || field.nested) {
 						value = {};
@@ -266,26 +284,29 @@ export default class Definition {
 
 		definition.fields.forEach(field => {
 			rules[field.name] = Definition.transformValidation(field);
-
-			if(field.fields !== void 0 && ['collection', 'group'].indexOf(field.type) > -1) {
-				let fields = {};
-
-				if(includeNestedRules) {
-					field.fields.forEach(nestedField => {
-						fields[nestedField.name] = Definition.transformValidation(nestedField);
-					});
-				}
-
-				if(Array.isArray(rules[field.name])) {
-					rules[field.name].push({ type: rules[field.name][0].type, fields });
-				}
-				else {
-					rules[field.name] = { ...rules[field.name], fields };
-				}
-			}
+			Definition.addNestedRules(field, rules, includeNestedRules);
 		});
 
 		return rules;
+	}
+
+	static addNestedRules(field, rules, includeNestedRules) {
+		if(field.fields !== void 0 && ['collection', 'group'].indexOf(field.type) > -1) {
+			let fields = {};
+
+			if(includeNestedRules) {
+				field.fields.forEach(nestedField => {
+					fields[nestedField.name] = Definition.transformValidation(nestedField);
+				});
+			}
+
+			if(Array.isArray(rules[field.name])) {
+				rules[field.name].push({ type: rules[field.name][0].type, fields });
+			}
+			else {
+				rules[field.name] = { ...rules[field.name], fields };
+			}
+		}
 	}
 
 }

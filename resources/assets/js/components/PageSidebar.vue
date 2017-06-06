@@ -1,5 +1,5 @@
 <template>
-	<el-tabs v-model="activeName" @tab-click="handleClick">
+	<el-tabs v-model="activeName" @tab-click="handleClick" style="background-color: #f5f7fa; height: 100%;">
 		<el-tab-pane label="Site" name="first">
 			<page-list></page-list>
 		</el-tab-pane>

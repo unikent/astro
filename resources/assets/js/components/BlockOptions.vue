@@ -1,7 +1,9 @@
 <template>
 <div>
-	<div class="b-back-button" @click="goBack">
-		<i class="el-icon-arrow-left"></i>Back
+	<div class="b-back-button">
+		<span class="back" @click="goBack">
+			<i class="el-icon-arrow-left"></i>Add more blocks
+		</span>
 		<span v-if="currentDefinition && currentDefinition.label" class="block-title">
 			{{ currentDefinition.label }}
 		</span>
@@ -121,6 +123,10 @@ export default {
 
 	watch: {
 		currentBlock(val, oldVal) {
+			// if block is removed hide sidebar
+			if(val === void 0) {
+				this.setBlock();
+			}
 			// if block changes scroll to top
 			if(val && oldVal && val.id !== oldVal.id) {
 				this.$refs['options-list'].scrollTop = 0;

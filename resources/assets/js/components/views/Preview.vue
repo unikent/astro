@@ -16,12 +16,12 @@
 				/>
 			</template>
 			<div
-				class="block-overlay" :class="{ 'hide-drag': showBlockOverlayControls }"
+				class="block-overlay" :class="{
+					'hide-drag': showBlockOverlayControls,
+					'block-overlay--hidden': overlayHidden
+				}"
 				:style="blockOverlayStyles"
 			>
-				<div class="block-overlay__options">
-					<Icon :glyph="editIcon" width="20" height="20" />
-				</div>
 				<div class="block-overlay__delete" @click="removeBlock">
 					<Icon :glyph="deleteIcon" width="20" height="20" />
 				</div>
@@ -43,6 +43,7 @@
 		<Icon :glyph="moveIcon" width="20" height="20" />
 	</div>
 	<div id="b-overlay" :style="overlayStyles"></div>
+	<resize-shim :onResize="onResize" />
 </div>
 </template>
 
@@ -50,12 +51,14 @@
 import { mapState, mapActions, mapMutations } from 'vuex';
 import Velocity from 'velocity-animate';
 import _ from 'lodash';
+import imagesLoaded from 'imagesLoaded';
 
 import Block from '../Block';
 import Icon from '../Icon';
 import editIcon from 'IconPath/pencil.svg';
 import deleteIcon from 'IconPath/trash.svg';
 import moveIcon from 'IconPath/arrows-vertical.svg';
+import ResizeShim from 'components/ResizeShim';
 
 import { win, findParent } from 'classes/helpers';
 
@@ -69,7 +72,8 @@ export default {
 
 	components: {
 		Icon,
-		Block
+		Block,
+		ResizeShim
 	},
 
 	data() {
@@ -81,7 +85,8 @@ export default {
 			blockOverlayStyles: {},
 			showBlockOverlayControls: false,
 			overlayStyles: {},
-			wrapperStyles: {}
+			wrapperStyles: {},
+			overlayHidden: true
 		};
 	},
 
@@ -123,6 +128,12 @@ export default {
 				e.preventDefault();
 			}
 		};
+
+		this.onResize = _.throttle(() => {
+			if(this.current) {
+				this.positionOverlay(this.current);
+			}
+		}, 50, { trailing: true });
 
 		document.addEventListener('click', this.cancelClicks);
 	},
@@ -174,19 +185,28 @@ export default {
 
 		showOverlay(block) {
 			if(block !== this.current) {
-				this.positionOverlay(block, true);
+				// wait for images to load before displaying overlay
+				imagesLoaded(block.$el, () => {
+					this.positionOverlay(block, true);
+				});
 			}
 		},
 
 		hideOverlay(block) {
 			if(block !== this.current) {
-				this.updateStyles('blockOverlay', 'opacity', 0);
+				this.overlayHidden = true;
+				this.updateStyles('blockOverlay', 'transform', 'translateY(0)');
 			}
 		},
 
-		updateOverlay() {
-			if(this.current) {
+		updateOverlay(index = null) {
+			// block is hovered and wasn't just deleted
+			if(this.current && this.current.index !== index) {
 				this.positionOverlay(this.current);
+			}
+			else if(this.current && this.current.index === index) {
+				this.hideOverlay();
+				this.current = null;
 			}
 			else {
 				this.hideOverlay();
@@ -198,17 +218,10 @@ export default {
 			this.$bus.$on('block:hideOverlay', this.hideOverlay);
 			this.$bus.$on('block:move', this.repositionOverlay);
 
-
 			this.$bus.$on('block:updateOverlay', this.updateOverlay);
 
 			document.addEventListener('mousedown', this.mouseDown);
 			document.addEventListener('mouseup', this.mouseUp);
-
-			this.onResize = _.throttle(() => {
-				if(this.current) {
-					this.positionOverlay(this.current);
-				}
-			}, 50, { trailing: true });
 
 			win.addEventListener('resize', this.onResize);
 		},
@@ -259,6 +272,7 @@ export default {
 				}
 			}
 
+			this.overlayHidden = false;
 			this.updateStyles('blockOverlay', 'transform', `translateY(${(size)}px)`);
 		},
 
@@ -282,11 +296,11 @@ export default {
 				minusLeft = addWidth / 2;
 			}
 
+			this.overlayHidden = false;
+
 			this.updateStyles('blockOverlay', 'transform', `translateY(${(pos.top + window.scrollY - minusTop)}px)`);
 			this.updateStyles('blockOverlay', 'left', (pos.left + window.scrollX - minusLeft) + 'px');
-			this.updateStyles('blockOverlay', 'width', (pos.width + addWidth) + 'px');
 			this.updateStyles('blockOverlay', 'height', (pos.height + addHeight) + 'px');
-			this.updateStyles('blockOverlay', 'opacity', 1);
 
 			if(setCurrent) {
 				this.current = block;

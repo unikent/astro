@@ -1,7 +1,6 @@
 <style>
 .group-field {
 	margin-bottom: 10px;
-	padding: 10px;
 }
 
 .group-field__field-list {

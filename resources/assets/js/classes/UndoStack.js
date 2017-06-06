@@ -10,7 +10,7 @@ export default class UndoStack {
 		callback: () => {}
 	};
 
-	constructor(opts) {
+	constructor(opts = {}) {
 		opts = { ...this.defaultOptions, ...opts };
 		this.stack = [];
 		this.index = -1;
@@ -63,9 +63,10 @@ export default class UndoStack {
 		}
 
 		this.timer = setTimeout(() => {
-			// if called after undoing remove upper
+			// if called after undoing, remove stack above this index
 			this.stack.splice(this.index + 1, this.stack.length - this.index);
 
+			// remove oldest item if we surpass maxSize
 			if(this.stack.length === this.maxSize) {
 				this.stack.shift();
 			}

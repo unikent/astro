@@ -60,7 +60,7 @@ describe('Share Mutations Plugin', () => {
 		clock.restore();
 	})
 
-	it('Syncs mutations', () => {
+	it('Should sync mutations', () => {
 		mainStore.commit('test', 2);
 
 		expect(iframeStore.state.a).to.equal(2);
@@ -77,7 +77,7 @@ describe('Share Mutations Plugin', () => {
 			.to.equal(12);
 	});
 
-	it('Syncs previous mutations after delayed iframe load', () => {
+	it('Should sync previous mutations after delayed iframe load', () => {
 		iframeStore = null;
 
 		for(var i = 0; i < 10; i++) {
@@ -91,7 +91,7 @@ describe('Share Mutations Plugin', () => {
 		expect(iframeStore.state.a).to.equal(20);
 	});
 
-	it('Syncs mutations over time, in "random" order', (done) => {
+	it('Should sync mutations over time, in "random" order', (done) => {
 		let
 			wait,
 			fifthCounter = 0,
@@ -144,16 +144,21 @@ describe('Share Mutations Plugin', () => {
 		clock.tick(1000);
 	});
 
-	it('Syncs actions (sync & asyc)', () => {
+	it('Should sync actions (sync & asyc)', (done) => {
 		mainStore.dispatch('testSync', 2);
 		expect(iframeStore.state.a).to.equal(2);
 
 		iframeStore.dispatch('testAsync', 2);
 
-		setTimeout(() => expect(mainStore.state.a).to.equal(4), 200);
+		setTimeout(() => {
+			expect(mainStore.state.a).to.equal(4)
+			done()
+		}, 200);
+
+		clock.tick(200);
 	});
 
-	it('Getters retrieving state', () => {
+	it('Should not affect getters retrieving correct state', () => {
 		expect(mainStore.getters.a).to.equal('none');
 		mainStore.dispatch('check', 'none');
 

@@ -29,7 +29,7 @@ export const shareMutationsMain = store => {
 		}
 
 		if(!sync.iframeIsSyncing) {
-			debug(`[Syncing top -> iframe] ${mutation.type} mutation`);
+			debug(`[Syncing top -> iframe] ${mutation.type}`);
 
 			syncMutation(
 				sync,
@@ -55,7 +55,7 @@ export const shareMutationsIframe = store => {
 		}
 
 		if(!sync.parentIsSyncing) {
-			debug(`[Syncing iframe -> top] ${mutation.type} mutation`);
+			debug(`[Syncing iframe -> top] ${mutation.type}`);
 
 			syncMutation(
 				sync,
