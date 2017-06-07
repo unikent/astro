@@ -47,7 +47,7 @@ class DatabaseSeeder extends Seeder
 			$route->page->layout_name = 'astro17';
 			$route->page->save();
 
-			$route->makeCanonical();
+			$route->makeActive();
 		}
 
 		factory(Block::class)->create([
