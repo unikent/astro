@@ -4,7 +4,7 @@
 		<component :is="layout" />
 		<div
 			class="block-overlay" :class="{
-				'hide-drag': showBlockOverlayControls,
+				'hide-drag': hideBlockOverlayControls,
 				'block-overlay--hidden': overlayHidden
 			}"
 			:style="blockOverlayStyles"
@@ -12,7 +12,7 @@
 			<div class="block-overlay__delete" @click="removeBlock">
 				<Icon :glyph="deleteIcon" width="20" height="20" />
 			</div>
-			<div ref="move" class="block-overlay__move">
+			<div ref="move" class="block-overlay__move" v-show="blocks.length > 1">
 				<Icon :glyph="moveIcon" width="20" height="20" />
 			</div>
 		</div>
@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import { mapState, mapActions, mapMutations } from 'vuex';
+import { mapState, mapActions, mapMutations, mapGetters } from 'vuex';
 import _ from 'lodash';
 import imagesLoaded from 'imagesLoaded';
 
@@ -59,7 +59,7 @@ export default {
 				fill: '#fff'
 			},
 			blockOverlayStyles: {},
-			showBlockOverlayControls: false,
+			hideBlockOverlayControls: false,
 			overlayStyles: {},
 			wrapperStyles: {},
 			overlayHidden: true
@@ -72,17 +72,31 @@ export default {
 		]),
 
 		...mapState({
-			page: state => state.page.pageData,
-			blockMeta: state => state.page.blockMeta,
-			pageScale: state => state.page.pageScale,
 			loadedBlocks: state => state.page.loaded,
 			currentLayout: state => state.page.currentLayout,
-			layoutVersion: state => state.page.currentLayoutVersion
+			layoutVersion: state => state.page.currentLayoutVersion,
+			blockMeta: state => state.page.blockMeta.blocks[state.page.currentRegion],
+			blocks: state => state.page.pageData.blocks[state.page.currentRegion]
 		}),
+
+		...mapGetters([
+			'scaleDown',
+			'scaleUp'
+		]),
 
 		layout() {
 			return this.currentLayout ?
 				layouts[`${this.currentLayout}-v${this.layoutVersion}`] : null;
+		},
+
+		dragging: {
+			get() {
+				return this.$store.state.page.dragging;
+			},
+
+			set(val) {
+				return this.$store.commit('setDragging', val);
+			}
 		}
 	},
 
@@ -93,18 +107,12 @@ export default {
 			this.moved = index;
 		});
 
-		this.SCALE_DOWN = this.pageScale;
-		this.SCALE_UP = 1 / this.SCALE_DOWN;
-
 		this.editIcon = editIcon;
 		this.deleteIcon = deleteIcon;
 		this.moveIcon = moveIcon;
 
 		this.onKeyDown = onKeyDown(undoStackInstance);
 		this.onKeyUp = onKeyUp(undoStackInstance);
-
-		document.addEventListener('keydown', this.onKeyDown);
-		document.addEventListener('keyup', this.onKeyUp);
 
 		this.cancelClicks = (e) => {
 			if(!e.ctrlKey && findParent('a', e.target, false)) {
@@ -117,8 +125,6 @@ export default {
 				this.positionOverlay(this.current);
 			}
 		}, 50, { trailing: true });
-
-		document.addEventListener('click', this.cancelClicks);
 	},
 
 	destroyed() {
@@ -127,17 +133,14 @@ export default {
 		document.removeEventListener('click', this.cancelClicks);
 		document.removeEventListener('mousedown', this.mouseDown);
 		document.removeEventListener('mouseup', this.mouseUp);
-		document.removeEventListener('mousemove', this.move);
+		document.removeEventListener('mousemove', this.handlerMove);
 		win.removeEventListener('resize', this.onResize);
 	},
 
 	mounted() {
 		this.wrapper = this.$refs.wrapper;
 		this.moveEl = this.$refs.move;
-
-		this.scaled = false;
 		this.current = null;
-
 		this.initEvents();
 	},
 
@@ -148,17 +151,33 @@ export default {
 
 		...mapMutations([
 			'reorderBlocks',
-			'updateBlockPositionsOrder',
 			'deleteBlock',
+			'updateBlockMeta',
+			'setScale'
 		]),
+
+		initEvents() {
+			document.addEventListener('keydown', this.onKeyDown);
+			document.addEventListener('keyup', this.onKeyUp);
+			document.addEventListener('click', this.cancelClicks);
+			document.addEventListener('mousedown', this.mouseDown);
+			document.addEventListener('mouseup', this.mouseUp);
+			win.addEventListener('resize', this.onResize);
+
+			this.$bus.$on('block:showOverlay', this.showOverlay);
+			this.$bus.$on('block:hideOverlay', this.hideOverlay);
+			this.$bus.$on('block:updateOverlay', this.updateOverlay);
+			this.$bus.$on('block:move', this.repositionOverlay);
+		},
 
 		removeBlock() {
 			const { index } = this.current;
 			this.deleteBlock({ index });
 			this.hideOverlay();
+			this.current = null;
 		},
 
-		move(e) {
+		handlerMove(e) {
 			this.updateStyles(
 				'handle',
 				'transform',
@@ -196,70 +215,77 @@ export default {
 			}
 		},
 
-		initEvents() {
-			this.$bus.$on('block:showOverlay', this.showOverlay);
-			this.$bus.$on('block:hideOverlay', this.hideOverlay);
-			this.$bus.$on('block:move', this.repositionOverlay);
-
-			this.$bus.$on('block:updateOverlay', this.updateOverlay);
-
-			document.addEventListener('mousedown', this.mouseDown);
-			document.addEventListener('mouseup', this.mouseUp);
-
-			win.addEventListener('resize', this.onResize);
-		},
-
 		mouseDown(e) {
-			if(findParent(this.moveEl, e.target, true)) {
+			if(e.button === 0 && findParent(this.moveEl, e.target, true)) {
 				this.updateStyles('wrapper', 'userSelect', 'none');
 				this.updateStyles('overlay', 'pointerEvents', 'auto');
+				this.updateStyles('handle', 'opacity', 1);
 
-				if(e.button === 0) {
-					this.updateStyles('handle', 'opacity', 1);
-					this.drag(false, e.clientY);
+				const
+					thirdOfScreen = window.innerHeight / 3,
+					scale = Math.min(
+						Math.round(
+							(thirdOfScreen / this.current.$el.getBoundingClientRect().height) * 100
+						) / 100,
+						.6
+					);
 
-					this.$bus.$emit('block:dragstart', {
-						event: e,
-						el: this.current.$el
-					});
+				this.setScale(scale);
 
-					this.showBlockOverlayControls = true;
-					document.addEventListener('mousemove', this.move);
+				if(this.scaleDown() < 1) {
+					this.scale(false, e.clientY);
 				}
+
+				this.updateBlockMeta({
+					index: this.current.index,
+					type: 'dragging',
+					value: true
+				});
+
+				this.hideBlockOverlayControls = true;
+				document.addEventListener('mousemove', this.handlerMove);
+
+				this.dragging = true;
 			}
 		},
 
 		mouseUp(e) {
-			if(this.scaled) {
+			if(this.dragging) {
 				this.updateStyles('wrapper', 'userSelect', 'auto');
 				this.updateStyles('handle', 'opacity', 0);
-				this.drag(true, e.clientY);
 
-				this.showBlockOverlayControls = false;
-				document.removeEventListener('mousemove', this.move);
+				if(this.scaleDown() < 1) {
+					this.scale(true, e.clientY);
+				}
+				else {
+					this.resetAfterDrag();
+				}
+
+				this.hideBlockOverlayControls = false;
+				document.removeEventListener('mousemove', this.handlerMove);
 			}
 		},
 
 		repositionOverlay(data) {
-			let size = 0;
+			let
+				offset = 0,
+				to = data.to > data.from ? data.to : data.to - 1;
 
-			if(data.to > data.from) {
-				for(let i = 0; i <= data.to; i++) {
-					size += this.blockMeta.sizes[i];
-				}
-				size -= this.blockMeta.sizes[data.from];
-			}
-			else {
-				for(let i = 0; i < data.to; i++) {
-					size += this.blockMeta.sizes[i];
+			for(let i = 0; i <= to; i++) {
+				if(i !== data.from) {
+					offset += this.blockMeta[i].size;
 				}
 			}
 
 			this.overlayHidden = false;
-			this.updateStyles('blockOverlay', 'transform', `translateY(${(size)}px)`);
+			this.updateStyles('blockOverlay', 'transform', `translateY(${offset}px)`);
 		},
 
 		positionOverlay(block, setCurrent) {
+			if(this.dragging) {
+				return;
+			}
+
 			var
 				pos = block.$el.getBoundingClientRect(),
 				heightDiff = Math.round(pos.height - 30),
@@ -281,10 +307,12 @@ export default {
 
 			this.overlayHidden = false;
 
-			this.updateStyles('blockOverlay', 'transform', `translateY(${(pos.top + window.scrollY - minusTop)}px)`);
-			this.updateStyles('blockOverlay', 'left', (pos.left + window.scrollX - minusLeft) + 'px');
-			this.updateStyles('blockOverlay', 'width', (pos.width + addWidth) + 'px');
-			this.updateStyles('blockOverlay', 'height', (pos.height + addHeight) + 'px');
+			this.updateStyles('blockOverlay', {
+				transform: `translateY(${(pos.top + window.scrollY - minusTop)}px)`,
+				left     : `${(pos.left + window.scrollX - minusLeft)}px`,
+				width    : `${(pos.width + addWidth)}px`,
+				height   : `${(pos.height + addHeight)}px`
+			});
 
 			if(setCurrent) {
 				this.current = block;
@@ -298,36 +326,36 @@ export default {
 				this.reorderBlocks({
 					from:  this.moved.from,
 					to:    this.moved.to,
-					value: this.page.blocks['main'][this.moved.from]
-				});
-
-				this.updateBlockPositionsOrder({
-					type:  'sizes',
-					from:  this.moved.from,
-					to:    this.moved.to,
-					value: this.blockMeta.sizes[this.moved.from]
-				});
-
-				this.updateBlockPositionsOrder({
-					type:  'offsets',
-					from:  this.moved.from,
-					to:    this.moved.to,
-					value: this.blockMeta.offsets[this.moved.from]
+					value: this.blocks[this.moved.from]
 				});
 			}
 
-			this.$bus.$emit('block:dragstop');
+			this.dragging = false;
+
+			for(var i = 0; i < this.blocks.length; i++) {
+				this.updateBlockMeta({
+					type: 'offset',
+					index: i,
+					value: 0
+				});
+			}
+
+			this.updateBlockMeta({
+				index: this.moved ? this.moved.to : this.current.index,
+				type: 'dragging',
+				value: false
+			});
+
+			this.moved = false;
 		},
 
-		drag(revert, mouseY) {
-			var scroll = window.scrollY;
+		scale(revert, mouseY) {
+			const scroll = window.scrollY;
 
 			if(revert) {
-				this.scaled = false;
-
 				const
-					scrollScaleUp = scroll * this.SCALE_UP,
-					offsetPlusScaled = (mouseY * this.SCALE_UP) - mouseY;
+					scrollScaleUp = scroll * this.scaleUp(),
+					offsetPlusScaled = (mouseY * this.scaleUp()) - mouseY;
 
 				smoothScrollTo({ y: scrollScaleUp + offsetPlusScaled });
 
@@ -344,22 +372,20 @@ export default {
 				this.wrapper.addEventListener('transitionend', onEnd);
 			}
 			else {
-				this.scaled = true;
-
 				const
-					scrollScaleDown = scroll * this.SCALE_DOWN,
-					offsetMinusScaled = mouseY - (mouseY * this.SCALE_DOWN);
+					scrollScaleDown = scroll * this.scaleDown(),
+					offsetMinusScaled = mouseY - (mouseY * this.scaleDown());
 
 				this.updateStyles(
 					'handle',
 					'transform',
-					'translateY(' + (((mouseY + window.scrollY) * this.SCALE_DOWN) - 22) + 'px)'
+					'translateY(' + (((mouseY + window.scrollY) * this.scaleDown()) - 22) + 'px)'
 				);
 
 				smoothScrollTo({ y: scrollScaleDown - offsetMinusScaled });
 
 				this.wrapperStyles = Object.assign(this.wrapperStyles, {
-					transform: `scale(${this.SCALE_DOWN})`,
+					transform: `scale(${this.scaleDown()})`,
 					transition: 'transform 0.3s ease-out'
 				});
 			}
@@ -368,7 +394,10 @@ export default {
 		updateStyles(dataName, prop, value) {
 			this[`${dataName}Styles`] = {
 				...this[`${dataName}Styles`],
-				[prop]: value
+				...(
+					typeof prop === 'object' ?
+						prop : { [prop]: value }
+				)
 			};
 		}
 	}

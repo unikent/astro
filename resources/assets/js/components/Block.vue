@@ -14,7 +14,6 @@
 				v-if="type !== 'placeholder'"
 				:is="currentView"
 				:fields="blockData.fields"
-				:other="this.getData()"
 			/>
 			<!-- placeholder element -->
 			<div v-else class="placeholder-block" />
@@ -23,8 +22,10 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import blocks from 'cms-prototype-blocks';
-import { mapState, mapMutations } from 'vuex';
+import { mapState, mapGetters, mapMutations } from 'vuex';
+import imagesLoaded from 'imagesLoaded';
 
 /* global document */
 
@@ -32,7 +33,7 @@ export default {
 
 	name: 'block',
 
-	props: ['scale', 'index', 'type', 'blockData'],
+	props: ['index', 'type', 'blockData'],
 
 	data() {
 
@@ -47,7 +48,6 @@ export default {
 		};
 
 		return {
-			dragging: false,
 			start: { ...startValues },
 			current: { ...startValues },
 			size: null,
@@ -58,18 +58,29 @@ export default {
 						Missing "${this.type}" block type
 					</div>
 				`
-			},
-			offset: 0
+			}
 		}
 	},
 
 	computed: {
+
+		...mapState({
+			currentBlockIndex: state => state.definition.currentBlockIndex,
+			blockMeta: state => state.page.blockMeta.blocks[state.page.currentRegion],
+			draggingBlocks: state => state.page.dragging
+		}),
+
+		...mapGetters([
+			'getBlockMeta',
+			'scaleUp'
+		]),
+
 		stylesOuter() {
 			return {
-				transform: !this.dragging ?
+				transform: !this.draggingBlocks && this.offset === 0 ?
 					'' : `translate3d(0, ${ this.offset + this.current.y }px, 0)`,
 				zIndex: this.current.z,
-				transition: this.current.y === 0 ? this.current.transition : 'none',
+				transition: this.current.y === 0 && this.draggingBlocks ? this.current.transition : 'none',
 				pointerEvents: this.current.pointer
 			}
 		},
@@ -78,73 +89,56 @@ export default {
 			// TODO: animate opacity, not box-shadow, for buttery smooth animation
 			return {
 				transform: `scale(${this.current.scale})`,
-				boxShadow: `rgba(0, 0, 0, 0.2) 0px ${this.current.shadow * (1 / this.scale)}px ${this.current.shadow * (2 / this.scale)}px 0px`,
+				boxShadow: `rgba(0, 0, 0, 0.2) 0px ${this.current.shadow * this.scaleUp()}px ${this.current.shadow * this.scaleUp() * 2}px 0px`,
 				transition: this.current.transition
 			}
 		},
 
-		...mapState({
-			blockMeta: state => state.page.blockMeta,
-			currentBlockIndex: state => state.definition.currentBlockIndex
-		})
+		isDragging() {
+			return this.getBlockMeta(this.index, 'dragging');
+		},
+
+		blockSizes() {
+			return this.blockMeta.map(block => block.size);
+		},
+
+		offset() {
+			return this.blockMeta[this.index].offset;
+		}
+	},
+
+	watch: {
+		isDragging(dragging) {
+			dragging ? this.startDrag() : this.endDrag();
+		}
+	},
+
+	mounted() {
+		imagesLoaded(this.$el, () => {
+			this.size = this.$el.getBoundingClientRect();
+
+			this.updateBlockMeta({
+				index: this.index,
+				type: 'size',
+				value: this.size.height
+			});
+		});
+	},
+
+	beforeDestroy() {
+		document.removeEventListener('mousemove', this.onDrag);
 	},
 
 	methods: {
 		...mapMutations([
-			'updateBlockPositions',
+			'updateBlockMeta',
 			'setBlock'
 		]),
-
-		listen() {
-			this.$bus.$on('block:dragstart', info => {
-				if(info.el === this.$el) {
-					this.startDrag(info.event, info.el);
-				}
-			});
-
-			this.$bus.$on('block:dragstart', () => {
-				this.dragging = true;
-			});
-
-			this.$bus.$on('block:move', index => {
-				const after = index.from <= index.to;
-
-				if(after && this.index > index.from && this.index <= index.to) {
-					this.offset = -this.blockMeta.sizes[index.from];
-				}
-				else if(!after && this.index >= index.to && this.index < index.from) {
-					this.offset = this.blockMeta.sizes[index.from];
-				}
-				else {
-					this.offset = 0;
-				}
-
-				this.updateBlockPositions({
-					type: 'offsets',
-					index: this.index,
-					value: this.offset
-				});
-			});
-
-			this.$bus.$on('block:dragstop', () => {
-				this.dragging = false;
-				this.updateBlockPositions({
-					type: 'offsets',
-					index: this.index,
-					value: 0
-				});
-			});
-		},
 
 		editBlock() {
 			if(this.currentBlockIndex !== this.index) {
 				this.setBlock({ index: this.index, type: this.type });
 			}
-		},
-
-		getData() {
-			const {_type, _fields, ...other} = this.blockData;
-			return other;
 		},
 
 		showOverlay() {
@@ -161,14 +155,14 @@ export default {
 			}
 		},
 
-		addTransition(dragstart) {
+		addTransition(dragstart = false) {
 			this.current.transition = `
 				${dragstart ? '.1s': ''} box-shadow 0.3s ease-out,
 				${dragstart ? '.1s': ''} transform 0.3s ease-out
 			`;
 
 			const onEnd = () => {
-				this.current.transition = 'none';
+				this.current.transition = this.start.transition;
 				this.$el.removeEventListener('transitionend', onEnd);
 
 				if(!dragstart) {
@@ -180,132 +174,126 @@ export default {
 		},
 
 		updateY(e) {
-			const
-				scale = (1 / 0.4),
-				offset = e.pageY * scale;
+			const offset = e.pageY * this.scaleUp();
 
 			this.mouseY = offset;
 			this.current.y = offset - (this.size.height / 2) - this.start.y;
 		},
 
-		startDrag(e) {
-			if(e.button === 0) {
-				this.addTransition(true);
+		startDrag() {
+			this.addTransition(true);
 
-				this.size = this.$el.getBoundingClientRect();
-				this.start.y = this.$el.offsetTop;
+			this.start.y = this.$el.offsetTop;
+			this.size = this.$el.getBoundingClientRect();
 
-				this.dragging = true;
+			this.updateBlockMeta({
+				index: this.index,
+				type: 'size',
+				value: this.size.height
+			});
 
-				this.current = {
-					...this.current,
-					y: 0,
-					z: 20,
-					scale: 1.05,
-					pointer: 'none',
-					shadow: 10
-				};
+			this.current = {
+				...this.current,
+				y: 0,
+				z: 20,
+				scale: 1.05,
+				pointer: 'none',
+				shadow: 10
+			};
 
-				let top = 0;
-				// this.sizeCacheAll = [];
-				this.centerPoints = {};
-				this.lastHover = this.index;
+			let top = 0;
+			this.centerPoints = [];
+			this.lastOver = this.index;
+			this.sizes = [...this.blockSizes];
 
-				for(var i = 0; i < this.blockMeta.sizes.length; i++) {
-					// this.sizeCacheAll[i] = {
-					// 	top,
-					// 	height: this.blockMeta.sizes[i],
-					// 	mid: top + (this.blockMeta.sizes[i] / 2),
-					// 	bottom: top + this.blockMeta.sizes[i]
-					// };
-
-					this.centerPoints[
-						(top + this.blockMeta.sizes[i] / 2).toFixed(3)
-					] = i;
-
-					top += this.blockMeta.sizes[i];
-				}
-
-				document.addEventListener('mousemove', this.onDrag);
-				document.addEventListener('mouseup', this.stopDrag)
+			for(var i = 0; i < this.sizes.length; i++) {
+				this.centerPoints[i] = parseFloat((top + this.sizes[i] / 2).toFixed(3));
+				top += this.sizes[i];
 			}
+
+			document.addEventListener('mousemove', this.onDrag);
+			document.addEventListener('mouseup', this.stopDrag);
 		},
 
 		onDrag(e) {
-			this.updateY(e);
+			if(this.isDragging) {
+				this.updateY(e);
 
-			let
-				currentIndex = 0,
-				offset = this.lastHover && this.blockMeta.offsets[this.lastHover] ?
-					this.blockMeta.offsets[this.lastHover] + this.blockMeta.sizes[this.index] : 0;
+				let currentIndex = 0;
 
-			for(let size in this.centerPoints) {
-				if(this.mouseY - offset > size) {
-					currentIndex = this.centerPoints[size];
-				}
-			}
-
-			if(currentIndex < this.lastHover) {
-				offset = this.lastHover && this.blockMeta.offsets[this.lastHover] ?
-					this.blockMeta.offsets[this.lastHover] : 0;
-
-				for(let size in this.centerPoints) {
-					if(this.mouseY - offset > size) {
-						currentIndex = this.centerPoints[size];
+				for(var c = 0; c < this.centerPoints.length; c++) {
+					if(this.mouseY > this.centerPoints[c]) {
+						currentIndex = c;
 					}
 				}
-			}
 
-			if(this.lastHover !== currentIndex) {
-				this.onDragOver(this.mouseY, currentIndex);
-			}
+				// if we're moving the block backwards and we're beyond the first element
+				if(currentIndex < this.lastOver && this.mouseY > this.centerPoints[0]) {
+					currentIndex++;
+				}
 
-			this.lastHover = currentIndex;
+				if(this.lastOver !== currentIndex && currentIndex < this.centerPoints.length) {
+					this.onDragOver(this.index, currentIndex)
+				}
+			}
 		},
 
-		onDragOver(mouseY, idx) {
-			// console.log('drag over', {
-			// 	from: this.index,
-			// 	to: idx
-			// });
+		onDragOver(from, to) {
+			const size = this.sizes.splice(this.lastOver, 1);
+			this.sizes.splice(to, 0, size[0]);
 
-			this.$bus.$emit('block:move', {
-				from: this.index,
-				to: idx
-			});
+			let top = 0;
+
+			this.centerPoints = [];
+
+			for(var i = 0; i < this.sizes.length; i++) {
+				this.centerPoints[i] = parseFloat((top + this.sizes[i] / 2).toFixed(3));
+
+				if(i === to) {
+					this.offsetY = top - this.start.y;
+				}
+
+				top += this.sizes[i];
+
+				let offset = 0;
+
+				if(i > from && i <= to) {
+					offset = -this.blockMeta[from].size;
+				}
+				else if(i >= to && i < from) {
+					offset = this.blockMeta[from].size;
+				}
+
+				this.updateBlockMeta({
+					type: 'offset',
+					index: i,
+					value: offset
+				});
+			}
+
+			this.lastOver = to;
+			this.$bus.$emit('block:move', { from, to });
 		},
 
 		stopDrag() {
-			this.size = this.$el.getBoundingClientRect();
-			this.addTransition();
-
-			this.current.scale = this.start.scale;
-			this.current.pointer = this.start.pointer;
-			this.current.y = 0;
-			this.current.shadow = 1;
-			this.current.scroll = 0;
-			this.prevOver = null;
-
 			document.removeEventListener('mousemove', this.onDrag);
 			document.removeEventListener('mouseup', this.stopDrag);
+
+			this.addTransition();
+
+			this.current = {
+				..._.cloneDeep(this.start),
+				y: this.offsetY
+			};
+
+			this.offsetY = 0;
+			this.start.y = 0;
+			this.prevOver = null;
+		},
+
+		endDrag() {
+			this.current.y = 0;
 		}
-	},
-
-	mounted() {
-		this.size = this.$el.getBoundingClientRect();
-
-		this.updateBlockPositions({
-			type: 'sizes',
-			index: this.index,
-			value: this.size.height
-		});
-
-		this.listen();
-	},
-
-	beforeDestroy() {
-		document.removeEventListener('mousemove', this.onDrag);
-		document.removeEventListener('mouseup', this.stopDrag);
 	}
 };
 </script>
