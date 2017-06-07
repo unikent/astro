@@ -1,7 +1,7 @@
 import Config from 'classes/Config';
 import DefinitionClass from 'classes/Definition';
 
-/* global self, console */
+/* global self, console, document */
 /* eslint-disable no-console */
 
 let winObj;
@@ -77,4 +77,56 @@ export const getTopOffset = (el) => {
 	}
 
 	return pos;
-}
+};
+
+const clamp = ({ val, min, max }) => {
+	return Math.max(Math.min(val, max), min);
+};
+
+// Adapted from https://gist.github.com/desandro/4206095
+export const smoothScrollTo = (options) => {
+	const { element: el, y, x, duration, easing } = Object.assign(
+		{
+			element: document.body,
+			x: 0,
+			y: 0,
+			duration: '0.3s',
+			easing: 'ease-out'
+		},
+		options
+	);
+
+	// clamp values to min & max scroll
+	// then remove the current scroll position
+	let
+		targetX = clamp({
+			val: x,
+			min: 0,
+			max: el.scrollWidth - win.innerWidth
+		}) - win.scrollX,
+
+		targetY = clamp({
+			val: y,
+			min: 0,
+			max: el.scrollHeight - win.innerHeight
+		}) - win.scrollY;
+
+	el.style.transition = `transform ${duration} ${easing}`;
+	el.style.transform = `translate(${-targetX}px, ${-targetY}px)`;
+
+	const onEnd = (e) => {
+		if(e.target !== el) {
+			return;
+		}
+
+		el.style.transition = null;
+		el.style.transform = null;
+
+		win.scrollTo(x, y);
+
+		el.removeEventListener('transitionend', onEnd, false);
+	};
+
+	el.addEventListener('transitionend', onEnd, false);
+};
+
