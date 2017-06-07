@@ -1,42 +1,20 @@
 <template>
 <div>
-	<div
-		id="main_content"
-	>
-		<div id="b-wrapper" ref="wrapper" :style="wrapperStyles">
-			<template v-if="page.blocks">
-				<block
-					v-for="(blockData, index) in page.blocks['main']"
-					v-if="blockData"
-					:key="`block-${blockData.id}`"
-					:type="getBlockType(blockData)"
-					:index="index"
-					:blockData="blockData"
-					:scale="scale"
-				/>
-			</template>
-			<div
-				class="block-overlay" :class="{
-					'hide-drag': showBlockOverlayControls,
-					'block-overlay--hidden': overlayHidden
-				}"
-				:style="blockOverlayStyles"
-			>
-				<div class="block-overlay__delete" @click="removeBlock">
-					<Icon :glyph="deleteIcon" width="20" height="20" />
-				</div>
-				<div ref="move" class="block-overlay__move">
-					<Icon :glyph="moveIcon" width="20" height="20" />
-				</div>
-			</div>
-		</div>
-
+	<div id="b-wrapper" ref="wrapper" :style="wrapperStyles">
+		<component :is="layout" />
 		<div
-			v-if="loadedBlocks && (!Object.keys(page.blocks).length || !page.blocks.main.length)"
-			class="empty-page"
+			class="block-overlay" :class="{
+				'hide-drag': showBlockOverlayControls,
+				'block-overlay--hidden': overlayHidden
+			}"
+			:style="blockOverlayStyles"
 		>
-			This page is blank.<br>
-			To get started drag some blocks in...
+			<div class="block-overlay__delete" @click="removeBlock">
+				<Icon :glyph="deleteIcon" width="20" height="20" />
+			</div>
+			<div ref="move" class="block-overlay__move">
+				<Icon :glyph="moveIcon" width="20" height="20" />
+			</div>
 		</div>
 	</div>
 	<div class="b-handle" :style="handleStyles">
@@ -52,7 +30,6 @@ import { mapState, mapActions, mapMutations } from 'vuex';
 import _ from 'lodash';
 import imagesLoaded from 'imagesLoaded';
 
-import Block from '../Block';
 import Icon from '../Icon';
 import editIcon from 'IconPath/pencil.svg';
 import deleteIcon from 'IconPath/trash.svg';
@@ -64,6 +41,8 @@ import { win, findParent, smoothScrollTo } from 'classes/helpers';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
 
+import { layouts } from 'cms-prototype-blocks/layouts';
+
 /* global document, window */
 
 export default {
@@ -71,13 +50,11 @@ export default {
 
 	components: {
 		Icon,
-		Block,
 		ResizeShim
 	},
 
 	data() {
 		return {
-			scale: 1,
 			handleStyles: {
 				fill: '#fff'
 			},
@@ -98,8 +75,15 @@ export default {
 			page: state => state.page.pageData,
 			blockMeta: state => state.page.blockMeta,
 			pageScale: state => state.page.pageScale,
-			loadedBlocks: state => state.page.loaded
-		})
+			loadedBlocks: state => state.page.loaded,
+			currentLayout: state => state.page.currentLayout,
+			layoutVersion: state => state.page.currentLayoutVersion
+		}),
+
+		layout() {
+			return this.currentLayout ?
+				layouts[`${this.currentLayout}-v${this.layoutVersion}`] : null;
+		}
 	},
 
 	created() {
@@ -299,6 +283,7 @@ export default {
 
 			this.updateStyles('blockOverlay', 'transform', `translateY(${(pos.top + window.scrollY - minusTop)}px)`);
 			this.updateStyles('blockOverlay', 'left', (pos.left + window.scrollX - minusLeft) + 'px');
+			this.updateStyles('blockOverlay', 'width', (pos.width + addWidth) + 'px');
 			this.updateStyles('blockOverlay', 'height', (pos.height + addHeight) + 'px');
 
 			if(setCurrent) {
@@ -385,14 +370,6 @@ export default {
 				...this[`${dataName}Styles`],
 				[prop]: value
 			};
-		},
-
-		getBlockType(block) {
-			return (
-				Object.keys(block).length === 0 ?
-				'placeholder' :
-				`${block.definition_name}-v${block.definition_version}`
-			);
 		}
 	}
 };
