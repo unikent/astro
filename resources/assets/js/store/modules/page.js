@@ -11,9 +11,9 @@ const state = {
 	currentBlockIndex: null,
 	currentRegion: 'main',
 	blockMeta: {
-		sizes: [],
-		offsets: [],
-		moved: null
+		blocks: {
+			main: []
+		}
 	},
 	pageData: {
 		blocks: {
@@ -21,8 +21,9 @@ const state = {
 		}
 	},
 	pageName: '',
-	pageScale: .4,
-	loaded: false
+	scale: .4,
+	loaded: false,
+	dragging: false
 };
 
 const mutations = {
@@ -44,6 +45,14 @@ const mutations = {
 		state.loaded = loaded;
 	},
 
+	setDragging(state, isDragging) {
+		state.dragging = isDragging;
+	},
+
+	setScale(state, scale) {
+		state.scale = scale;
+	},
+
 	setBlock(state, { index } = { index: null }) {
 		state.currentBlockIndex = index;
 	},
@@ -51,15 +60,15 @@ const mutations = {
 	reorderBlocks(state, { from, to, value }) {
 		state.pageData.blocks[state.currentRegion].splice(from, 1);
 		state.pageData.blocks[state.currentRegion].splice(to, 0, value);
+
+		// update metadata order
+		const val = state.blockMeta.blocks[state.currentRegion].splice(from, 1);
+		state.blockMeta.blocks[state.currentRegion].splice(to, 0, val[0]);
 	},
 
-	updateBlockPositionsOrder(state, { type, from, to, value }) {
-		state.blockMeta[type].splice(from, 1);
-		state.blockMeta[type].splice(to, 0, value);
-	},
-
-	updateBlockPositions(state, { type, index, value }) {
-		state.blockMeta[type].splice(index, 1, value);
+	updateBlockMeta(state, { type, index, value }) {
+		let blockData = state.blockMeta.blocks[state.currentRegion];
+		blockData.splice(index, 1, { ...blockData[index], [type]: value })
 	},
 
 	updateFieldValue(state, { index, name, value }) {
@@ -98,6 +107,11 @@ const mutations = {
 		Definition.fillBlockFields(block);
 
 		state.pageData.blocks[state.currentRegion].splice(index, 1, block || {});
+		state.blockMeta.blocks[state.currentRegion].splice(index, 1, {
+			size: 0,
+			offset: 0,
+			dragging: false
+		});
 	},
 
 	deleteBlock(state, { index } = { index: null }) {
@@ -106,6 +120,7 @@ const mutations = {
 		}
 
 		state.pageData.blocks[state.currentRegion].splice(index, 1);
+		state.blockMeta.blocks[state.currentRegion].splice(index, 1);
 
 		// TODO: use state for this
 		Vue.nextTick(() => eventBus.$emit('block:updateOverlay', index));
@@ -179,6 +194,20 @@ const getters = {
 
 	getCurrentBlock: (state) => () => {
 		return state.pageData.blocks[state.currentRegion][state.currentBlockIndex];
+	},
+
+	getBlockMeta: (state) => (index, prop = false) => {
+		const blockMeta = state.blockMeta.blocks[state.currentRegion][index];
+		return prop ? blockMeta[prop] : blockMeta;
+	},
+
+	scaleDown: (state) => () => {
+		return state.scale;
+	},
+
+	scaleUp: (state) => () => {
+		// return scale with three digits after decimal point
+		return state.scale !== 0 ? Math.round(1 / state.scale * 1000) / 1000 : 1;
 	}
 };
 
