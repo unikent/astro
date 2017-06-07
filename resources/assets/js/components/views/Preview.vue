@@ -49,7 +49,6 @@
 
 <script>
 import { mapState, mapActions, mapMutations } from 'vuex';
-import Velocity from 'velocity-animate';
 import _ from 'lodash';
 import imagesLoaded from 'imagesLoaded';
 
@@ -60,7 +59,7 @@ import deleteIcon from 'IconPath/trash.svg';
 import moveIcon from 'IconPath/arrows-vertical.svg';
 import ResizeShim from 'components/ResizeShim';
 
-import { win, findParent } from 'classes/helpers';
+import { win, findParent, smoothScrollTo } from 'classes/helpers';
 
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
@@ -338,43 +337,31 @@ export default {
 		drag(revert, mouseY) {
 			var scroll = window.scrollY;
 
-			// TODO: Use transforms to scroll page?
 			if(revert) {
 				this.scaled = false;
 
-				var
+				const
 					scrollScaleUp = scroll * this.SCALE_UP,
 					offsetPlusScaled = (mouseY * this.SCALE_UP) - mouseY;
 
-				Velocity(
-					document.body,
-					'scroll',
-					{
-						offset: scrollScaleUp + offsetPlusScaled,
-						queue: false,
-						duration: 300,
-						easing: 'swing'
-					}
-				);
+				smoothScrollTo({ y: scrollScaleUp + offsetPlusScaled });
 
-				Velocity(
-					this.wrapper,
-					{
-						scale: 1,
-						queue: false
-					},
-					{
-						duration: 300,
-						easing: 'swing',
-						complete: this.resetAfterDrag
-					}
-				);
+				this.wrapperStyles = Object.assign(this.wrapperStyles, {
+					transform: null,
+					transition: 'transform 0.3s ease-out'
+				});
 
+				const onEnd = () => {
+					this.resetAfterDrag();
+					this.wrapper.removeEventListener('transitionend', onEnd);
+				};
+
+				this.wrapper.addEventListener('transitionend', onEnd);
 			}
 			else {
 				this.scaled = true;
 
-				var
+				const
 					scrollScaleDown = scroll * this.SCALE_DOWN,
 					offsetMinusScaled = mouseY - (mouseY * this.SCALE_DOWN);
 
@@ -384,28 +371,12 @@ export default {
 					'translateY(' + (((mouseY + window.scrollY) * this.SCALE_DOWN) - 22) + 'px)'
 				);
 
-				Velocity(
-					document.body,
-					'scroll',
-					{
-						offset: scrollScaleDown - offsetMinusScaled,
-						queue: false,
-						duration: 300,
-						easing: 'swing'
-					}
-				);
+				smoothScrollTo({ y: scrollScaleDown - offsetMinusScaled });
 
-				Velocity(
-					this.wrapper,
-					{
-						scale: this.SCALE_DOWN,
-						queue: false
-					},
-					{
-						duration: 300,
-						easing: 'swing'
-					}
-				);
+				this.wrapperStyles = Object.assign(this.wrapperStyles, {
+					transform: `scale(${this.SCALE_DOWN})`,
+					transition: 'transform 0.3s ease-out'
+				});
 			}
 		},
 
