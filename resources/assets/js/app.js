@@ -11,8 +11,6 @@ import eventBusPlugin from './plugins/eventbus';
 import snackBarPlugin from './plugins/snackbar';
 import App from './components/views/App';
 
-import './redactor';
-
 /* global document */
 
 Vue.use(VueRouter);
