@@ -51,15 +51,15 @@ const matchExactly = (node, search) => {
 	return node === search;
 };
 
-export const findParent = (searchFor, el, exact = false, ignore = false) => {
+export const findParent = (searchFor, el, exact = false) => {
 	const match = exact ? matchExactly : matchByNodeName;
 
-	if(match(el, searchFor) && !ignore) {
+	if(match(el, searchFor)) {
 		return el;
 	}
 
 	while(el) {
-		if(match(el, searchFor) && !ignore) {
+		if(match(el, searchFor)) {
 			return el;
 		}
 		el = el.parentNode;

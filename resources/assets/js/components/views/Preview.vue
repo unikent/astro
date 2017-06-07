@@ -107,7 +107,7 @@ export default {
 		document.addEventListener('keyup', this.onKeyUp);
 
 		this.cancelClicks = (e) => {
-			if(findParent('a', e.target, false, e.ctrlKey)) {
+			if(!e.ctrlKey && findParent('a', e.target, false)) {
 				e.preventDefault();
 			}
 		};
