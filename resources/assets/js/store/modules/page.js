@@ -6,6 +6,8 @@ import { undoStackInstance } from 'plugins/undo-redo';
 import { eventBus } from 'plugins/eventbus';
 
 const state = {
+	currentLayout: null,
+	currentLayoutVersion: 1,
 	currentBlockIndex: null,
 	currentRegion: 'main',
 	blockMeta: {
@@ -31,6 +33,9 @@ const mutations = {
 				main: []
 			};
 		}
+
+		state.currentLayout = page.layout_name;
+		state.currentLayoutVersion = page.layout_version;
 
 		state.pageData = page;
 	},
