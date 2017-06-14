@@ -14,6 +14,7 @@
 				v-if="type !== 'placeholder'"
 				:is="currentView"
 				:fields="blockData.fields"
+				:index="this.index"
 			/>
 			<!-- placeholder element -->
 			<div v-else class="placeholder-block" />
@@ -147,9 +148,13 @@ export default {
 
 		hideOverlay(e) {
 			if(
-				!e.relatedTarget ||
-				!e.relatedTarget.hasAttribute('class') ||
-				e.relatedTarget.getAttribute('class').indexOf('b-block') === -1
+				e.relatedTarget !== null ||
+				(
+					e.relatedTarget && (
+						!e.relatedTarget.hasAttribute('class') ||
+						e.relatedTarget.getAttribute('class').indexOf('b-block') === -1
+					)
+				)
 			) {
 				this.$bus.$emit('block:hideOverlay', this);
 			}

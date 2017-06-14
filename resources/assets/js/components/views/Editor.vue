@@ -4,7 +4,7 @@
 		<iframe ref="iframe" class="editor-content" :style="dimensions" :src="getPreviewUrl" frameborder="0" />
 		<div
 			class="iframe-overlay"
-			:style="{ 'position' : showIframeOverlay ? 'absolute' : null }"
+			:style="{ 'position' : displayIframeOverlay ? 'absolute' : null }"
 		/>
 		<footer class="b-bar">
 
@@ -39,7 +39,7 @@
 	</div>
 
 	<nav
-		:style="{marginLeft: sideBarOpen ? 0 : '-250px'}"
+		:style="{marginLeft: sideBarOpen ? 0 : '-250px', maxWidth: 0, minWidth: '249px'}"
 		class="editor-nav editor-sidebar"
 		:class="{ 'editor-nav--is-over': sideBarHover || !sideBarOpen }"
 		@mouseenter="sideBarHover = true"
@@ -140,7 +140,7 @@ export default {
 	computed: {
 		...mapState([
 			'preview',
-			'showIframeOverlay',
+			'displayIframeOverlay',
 			'undoRedo'
 		]),
 
