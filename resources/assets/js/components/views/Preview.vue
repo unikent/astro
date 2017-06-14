@@ -9,16 +9,16 @@
 			}"
 			:style="blockOverlayStyles"
 		>
-			<div class="block-overlay__delete" @click="removeBlock">
-				<Icon :glyph="deleteIcon" width="20" height="20" />
+			<div class="block-overlay__delete" @click="removeDialog(removeBlock)">
+				<Icon name="delete" width="20" height="20" />
 			</div>
 			<div ref="move" class="block-overlay__move" v-show="blocks.length > 1">
-				<Icon :glyph="moveIcon" width="20" height="20" />
+				<Icon name="move" width="20" height="20" />
 			</div>
 		</div>
 	</div>
 	<div class="b-handle" :style="handleStyles">
-		<Icon :glyph="moveIcon" width="20" height="20" />
+		<Icon name="move" width="20" height="20" />
 	</div>
 	<div id="b-overlay" :style="overlayStyles"></div>
 	<resize-shim :onResize="onResize" />
@@ -31,9 +31,6 @@ import _ from 'lodash';
 import imagesLoaded from 'imagesLoaded';
 
 import Icon from '../Icon';
-import editIcon from 'IconPath/pencil.svg';
-import deleteIcon from 'IconPath/trash.svg';
-import moveIcon from 'IconPath/arrows-vertical.svg';
 import ResizeShim from 'components/ResizeShim';
 
 import { win, findParent, smoothScrollTo } from 'classes/helpers';
@@ -107,10 +104,6 @@ export default {
 			this.moved = index;
 		});
 
-		this.editIcon = editIcon;
-		this.deleteIcon = deleteIcon;
-		this.moveIcon = moveIcon;
-
 		this.onKeyDown = onKeyDown(undoStackInstance);
 		this.onKeyUp = onKeyUp(undoStackInstance);
 
@@ -168,6 +161,15 @@ export default {
 			this.$bus.$on('block:hideOverlay', this.hideOverlay);
 			this.$bus.$on('block:updateOverlay', this.updateOverlay);
 			this.$bus.$on('block:move', this.repositionOverlay);
+		},
+
+		removeDialog(done) {
+			this
+				.$confirm('Are you sure you want to remove this block?')
+				.then(_ => {
+					done();
+				})
+				.catch(_ => {});
 		},
 
 		removeBlock() {
