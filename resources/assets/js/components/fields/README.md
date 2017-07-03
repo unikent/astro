@@ -169,10 +169,10 @@ Input fields share some attributes:
 	"type":     "media",
 	"name":     "name",
 	"label":    "Media Field",
-	"settings": [
-		"media_type": "image|document|video|audio"
+	"settings": {
+		"media_type": "image|document|video|audio",
 		...etc
-	],
+	},
 	"info":     "Info here"
 }
 ```
@@ -253,7 +253,7 @@ If none are supplied, only the type of a field is validated.
 #### Rules
 
 | Rule | Argument(s) | Format | Description |
-| --- | --- | --- | --- | --- |
+| --- | --- | --- | --- |
 | required | none | required | Whether this field is required. |
 | string | none | string | Only length. |
 | integer | none | integer | Only length. |
@@ -275,9 +275,9 @@ Validation rules are defined as an array like so:
 	"name":    "name",
 	"label":   "A field",
 	"info":    "Info here",
-	validation: [
-		'required',
-		'in:list,of,words'
+	"validation": [
+		"required",
+		"in:list,of,words"
 	]
 }
 ```
