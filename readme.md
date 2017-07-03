@@ -1,5 +1,5 @@
 <p align="center">
-	<img src="https://github.com/unikent/astro/blob/develop/public/img/logo-full.svg?raw=true" alt="Astro"/>
+	<img src="https://cdn.rawgit.com/unikent/astro/develop/public/img/logo-full.svg" alt="Astro" width="85%" height="auto" />
 </p>
 
 ## Description
