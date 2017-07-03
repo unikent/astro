@@ -49,12 +49,12 @@ Layout, Page & Site Options
 Layouts can specify options in a similar manner to blocks. Each option can be marked as available at "page", "site",
 or both levels.
 
-  * Page-only options can be specified by editors on a per-page basis.
-  * Site-only options can be specified by administrators on a per-site basis, and are available to all layouts on all pages.
-  * Both-level options can have a default value specified by administrators on a per-site basis, which can be overridden
-    on a per-page basis by editors.
-  * If a page-level or both-level option is marked as inheritable, then a page can use the value specified for an ancestor page
-    instead of setting its own value.
+* Page-only options can be specified by editors on a per-page basis.
+* Site-only options can be specified by administrators on a per-site basis, and are available to all layouts on all pages.
+* Both-level options can have a default value specified by administrators on a per-site basis, which can be overridden
+  on a per-page basis by editors.
+* If a page-level or both-level option is marked as inheritable, then a page can use the value specified for an ancestor page
+  instead of setting its own value.
 
 Blocks with Dynamic Data
 ------------------------
@@ -67,10 +67,10 @@ The Renderer
 To support form posting or dynamic updates using ajax, the renderer must provide blocks with the ability to request
 data. Any request to /valid/url/ajax/block/[operation] will result in the renderer:
 
-  * Loading the requested route / page / layout definitions as usual for that route
-  * Creating the block object (if a block class exists)
-  * Calling the block object's ajax() method.
-  * Returning the output to the browser.
+* Loading the requested route / page / layout definitions as usual for that route
+* Creating the block object (if a block class exists)
+* Calling the block object's ajax() method.
+* Returning the output to the browser.
 
 It is up to the blocks (and their templates) whether what is returned is json data or pure html.
 
@@ -86,8 +86,8 @@ The Editor
 
 Blocks may need to make ajax requests for data under two circumstances:
 
-  * Requesting data for dymanic fields, for example a select dropdown to choose a blog category.
-  * Dynamically updating their displayed content.
+* Requesting data for dymanic fields, for example a select dropdown to choose a blog category.
+* Dynamically updating their displayed content.
 
 
 
