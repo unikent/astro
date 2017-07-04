@@ -12,7 +12,7 @@ use App\Http\Requests\Api\v1\Media\DeleteRequest;
 use App\Http\Requests\Api\v1\Media\StoreRequest;
 use App\Http\Transformers\Api\v1\MediaTransformer;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-
+use App\Jobs\ProcessMedia;
 
 class MediaController extends ApiController
 {
@@ -101,6 +101,9 @@ class MediaController extends ApiController
 			DB::rollBack();
 			throw $e;
 		}
+
+		// TODO: implement job for processing media based on content type
+		// dispatch(new ProcessMedia($media));
 
 		return fractal($media, new MediaTransformer)->respond(201);
 	}
