@@ -144,8 +144,17 @@ return [
 	| Where to locate uploaded media.
 	|
 	*/
-	'media_path' => env('MEDIA_PATH', 'uploads/media'),
+	'media_path' => env('MEDIA_PATH', base_path('storage/app/public/uploads/media')),
 
+	/*
+	|--------------------------------------------------------------------------
+	| Astro: Media URL
+	|--------------------------------------------------------------------------
+	|
+	| Where to locate uploaded media, from front-end.
+	|
+	*/
+	'media_url' => env('MEDIA_URL', '/uploads/media'),
 
 	/*
 	|--------------------------------------------------------------------------
