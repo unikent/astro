@@ -36,7 +36,7 @@ class Media extends Model
 	];
 
 	protected $appends = [
-		'src',
+		'url',
 		'file',
 	];
 
@@ -45,73 +45,85 @@ class Media extends Model
 	protected $fileUrl;
 	protected $filePath;
 
-    /**
-     * Create a new Eloquent model instance.
-     *
-     * @param  array  $attributes
-     * @return void
-     */
-    public function __construct($attributes = []){
-        parent::__construct($attributes);
+	/**
+	 * Create a new Eloquent model instance.
+	 *
+	 * @param  array  $attributes
+	 * @return void
+	 */
+	public function __construct($attributes = []){
+		parent::__construct($attributes);
 
 		$this->fileUrl = Config::get('app.media_url');
 		$this->filePath = Config::get('app.media_path');
-    }
+	}
 
 
-    /**
-     * Scope a query to include Media items associated with the given Sites.
-     *
-     * @param Builder $query
-     * @param Array $site_ids
-     * @return Builder
-     */
+	/**
+	 * Scope a query to include Media items associated with the given Sites.
+	 *
+	 * @param Builder $query
+	 * @param Array $site_ids
+	 * @return Builder
+	 */
 	public function scopeSites(Builder $query, Array $site_ids)
 	{
 		$query->whereHas('sites', function($q) use ($site_ids) {
-		    $q->whereIn('sites.id', $site_ids);
+			$q->whereIn('sites.id', $site_ids);
 		});
 	}
 
-    /**
-     * Scope a query to include Media items associated with the given PracticeGroups.
-     *
-     * @param Builder $query
-     * @param Array $publishing_groups
-     * @return Builder
-     */
+	/**
+	 * Scope a query to include Media items associated with the given PublishingGroups.
+	 *
+	 * @param Builder $query
+	 * @param Array $publishing_groups
+	 * @return Builder
+	 */
 	public function scopePublishingGroups(Builder $query, Array $publishing_groups)
 	{
 		$query->whereHas('publishing_groups', function($q) use ($publishing_groups) {
-		    $q->whereIn('publishing_groups.id', $publishing_groups);
+			$q->whereIn('publishing_groups.id', $publishing_groups);
 		});
 	}
 
-    /**
-     * Scope a query to include Media items of the given types.
-     *
-     * @param Builder $query
-     * @param Array $types
-     * @return Builder
-     */
+	/**
+	 * Scope a query to include Media items associated with the given Blocks.
+	 *
+	 * @param Builder $query
+	 * @param Array $block_ids
+	 * @return Builder
+	 */
+	public function scopeBlocks(Builder $query, Array $block_ids)
+	{
+		$query->whereHas('blocks', function($q) use ($block_ids) {
+			$q->whereIn('blocks.id', $block_ids);
+		});
+	}
+
+	/**
+	 * Scope a query to include Media items of the given types.
+	 *
+	 * @param Builder $query
+	 * @param Array $types
+	 * @return Builder
+	 */
 	public function scopeTypes(Builder $query, Array $types)
 	{
 		$query->whereIn('type', $types);
 	}
 
-    /**
-     * Scope a query to include Media items of the given types.
-     *
-     * @param Builder $query
-     * @param Array $mime_types
-     * @return Builder
-     */
+	/**
+	 * Scope a query to include Media items of the given types.
+	 *
+	 * @param Builder $query
+	 * @param Array $mime_types
+	 * @return Builder
+	 */
 	public function scopeMimeTypes(Builder $query, Array $mime_types)
 	{
 		$query->whereIn('mime_type', $mime_types);
 	}
-
-
 
 	public function publishing_groups()
 	{
@@ -123,6 +135,10 @@ class Media extends Model
 		return $this->belongsToMany(Site::class, 'media_sites');
 	}
 
+	public function blocks()
+	{
+		return $this->belongsToMany(Block::class, 'media_blocks');
+	}
 
 	/**
 	 * Sanitizes the filename to a safe set of characters
@@ -180,25 +196,25 @@ class Media extends Model
 	 * Returns an HTML-friendly src attribute
 	 * @return string
 	 */
-	public function getSrcAttribute()
+	public function getUrlAttribute()
 	{
 		return ($this->id && !empty($this->filename)) ? sprintf('%s/%d/%s', $this->fileUrl, $this->id, $this->filename) : '';
 	}
 
-    /**
-     * Save the model to the database.
-     *
-     * We wrap the save operation in a transaction, to ensure that we have an ID assigned
-     * before writing the file to disk. Any failure should bail out safely.
-     *
-     * @param  array  $options
-     * @return bool
-     */
-    public function save(array $options = [])
-    {
-    	DB::beginTransaction();
+	/**
+	 * Save the model to the database.
+	 *
+	 * We wrap the save operation in a transaction, to ensure that we have an ID assigned
+	 * before writing the file to disk. Any failure should bail out safely.
+	 *
+	 * @param  array  $options
+	 * @return bool
+	 */
+	public function save(array $options = [])
+	{
+		DB::beginTransaction();
 
-    	try {
+		try {
 			if(is_a($this->file, File::class)){
 				$this->hash = static::hash($this->file);
 				$this->filename = $this->file->getFilename();
@@ -236,22 +252,22 @@ class Media extends Model
 			DB::rollBack();
 			throw $e;
 		}
-    }
+	}
 
 
-    /**
-     * Force a hard delete on a soft deleted model.
-     *
-     * This method protects developers from running forceDelete when trait is missing.
-     *
-     * @return bool|null
-     */
-    public function forceDelete()
-    {
-      	DB::beginTransaction();
+	/**
+	 * Force a hard delete on a soft deleted model.
+	 *
+	 * This method protects developers from running forceDelete when trait is missing.
+	 *
+	 * @return bool|null
+	 */
+	public function forceDelete()
+	{
+		DB::beginTransaction();
 
-    	try {
-    		FS::deleteDirectory($this->filePath);
+		try {
+			FS::deleteDirectory($this->filePath);
 			parent::forceDelete();
 
 			DB::commit();
@@ -259,15 +275,15 @@ class Media extends Model
 			DB::rollBack();
 			throw $e;
 		}
-    }
+	}
 
 
-    /**
-     * Transforms the getID3 metadata into something a little friendlier...
-     *
-     * @param  array $meta
-     * @return array
-     */
+	/**
+	 * Transforms the getID3 metadata into something a little friendlier...
+	 *
+	 * @param  array $meta
+	 * @return array
+	 */
 	public static function extractMeta(File $file)
 	{
 		$meta = (new getID3)->analyze($file->getRealPath());

@@ -135,7 +135,7 @@ class PageController extends ApiController
 		$this->authorize('delete', $page);
 
 		$page->delete();
-    	return (new SymfonyResponse())->setStatusCode(200);
+		return (new SymfonyResponse())->setStatusCode(200);
 	}
 
 	/**
@@ -151,7 +151,7 @@ class PageController extends ApiController
 		$this->authorize('forceDelete', $page);
 
 		$page->forceDelete();
-    	return (new SymfonyResponse())->setStatusCode(200);
+		return (new SymfonyResponse())->setStatusCode(200);
 	}
 
 	/**
@@ -220,31 +220,52 @@ class PageController extends ApiController
 
 			// Populate the regions with Blocks
 			if($request->has('blocks')){
-				foreach($request->input('blocks') as $region => $blocks){
-					// Remove any existing Blocks in the region (to avoid re-ordering existing)
-					$page->clearRegion($region);
-
-					// Re/create all the blocks
-					if(!empty($blocks)){
-						foreach($blocks as $delta => $data){
-							$block = new Block;
-
-							$block->page_id = $page->getKey();
-
-							$block->order = $delta;
-							$block->region_name = $region;
-
-							$block->fill($data);
-							$block->save();
-						}
-					}
-				}
+				$this->processBlocks($page, $request->input('blocks'));
 			}
 
 			DB::commit();
 		} catch(Exception $e){
 			DB::rollBack();
 			throw $e;
+		}
+	}
+
+	protected function processBlocks($page, $regions) {
+		foreach($regions as $region => $blocks) {
+			// Remove any existing Blocks in the region (to avoid re-ordering existing)
+			// TODO: explore updating block order rather than deleting each time
+			$page->clearRegion($region);
+
+			// Re/create all the blocks
+			if(!empty($blocks)) {
+				foreach($blocks as $delta => $data) {
+					$block = new Block;
+
+					$block->fill($data);
+
+					$block->page_id = $page->getKey();
+
+					$block->order = $delta;
+					$block->region_name = $region;
+
+					$block->save();
+
+					// associate media items with this block
+					if(isset($data['media']) && is_array($data['media'])) {
+						$media_block_ids = [];
+
+						foreach($data['media'] as $media) {
+							if(isset($media['id'], $media['associated_field'])) {
+								$media_block_ids[$media['id']] = [
+									'block_associated_field' => $media['associated_field']
+								];
+							}
+						}
+
+						$block->media()->sync($media_block_ids);
+					}
+				}
+			}
 		}
 	}
 
