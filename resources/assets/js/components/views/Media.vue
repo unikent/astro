@@ -25,7 +25,7 @@
 
 		<el-col :span="18">
 
-			<el-select style="max-width: 120px" placeholder="Filter by">
+			<el-select class="media__filter-by" placeholder="Filter by" value="">
 				<el-option label="All media" value="media" />
 				<el-option label="Image" value="image" />
 				<el-option label="Document" value="document" />
@@ -33,10 +33,10 @@
 				<el-option label="Audio" value="audio" />
 			</el-select>
 
-			<el-select style="max-width: 140px" placeholder="Order by">
+			<el-select class="media__order-by" placeholder="Order by" value="">
 				<el-option label="Date added" value="creation">
-					<span style="float: left">Date Added</span>
-					<span style="float: right; color: #8492a6; font-size: 13px">asc</span>
+					<span class="media__order-attr">Date Added</span>
+					<span class="media__order-sort">asc</span>
 				</el-option>
 				<el-option label="Name" value="name" />
 				<el-option label="Resolution" value="resolution" />
@@ -84,8 +84,8 @@
 					<lazy-img
 						class="img-grid"
 						:bg="true"
-						:src="getThumbnail(rowIndex, colIndex).src"
-						:smallSrc="getThumbnail(rowIndex, colIndex).src"
+						:src="getThumbnail(rowIndex, colIndex).url"
+						:smallSrc="getThumbnail(rowIndex, colIndex).url"
 					/>
 					<div class="image-grid__item-overlay" />
 					<div class="item-grid__edit">
@@ -94,6 +94,7 @@
 							<i class="el-icon-more"></i>
 							<el-dropdown-menu slot="dropdown">
 								<el-dropdown-item>Refresh Thumbnails</el-dropdown-item>
+								<el-dropdown-item>Download</el-dropdown-item>
 								<el-dropdown-item>Delete</el-dropdown-item>
 							</el-dropdown-menu>
 						</el-dropdown>
@@ -119,27 +120,34 @@
 		</el-pagination>
 	</el-row>
 
-	<el-dialog :title="`Upload ${uploadType}`" v-model="showUploadForm">
-		<div style="margin-bottom: 20px; text-align: right">
-			Upload type
-			<el-select style="max-width: 120px" v-model="uploadType" placeholder="Filter files" @change="handleChange">
-				<el-option label="All" value="media" />
-				<el-option label="Image" value="image" />
-				<el-option label="Document" value="document" />
-				<el-option label="Video" value="video" />
-				<el-option label="Audio" value="audio" />
-			</el-select>
-		</div>
-		<upload-form :accept="accept" />
+	<el-dialog title="Upload Media" v-model="showUploadForm">
+		<media-upload />
 	</el-dialog>
 
 	<el-dialog title="Details" v-model="showMediaDetails" size="large">
 		<div v-if="filteredImages[media]" class="columns">
 			<div class="column">
-				<img :src="filteredImages[media].src" />
+				<div class="preview-dialog__image-outer">
+					<div class="preview-dialog__image-wrapper">
+						<div class="preview-dialog__image-img" :style="`
+							background: url('${filteredImages[media].url}') center center / contain no-repeat;
+						`" />
+					</div>
+				</div>
 			</div>
 			<div class="column is-one-third">
-
+				<div class="preview-dialog__details-wrapper">
+					<div v-for="(value, key) in getAttributes(filteredImages[media])" v-if="value">
+						<h3>{{ prettyName(key) }}</h3>
+						<p>{{ transformAttr(key, value) }}</p>
+					</div>
+					<div v-if="filteredImages[media].colours">
+						<h3>Colour palette</h3>
+						<div class="preview-dialog__details-colour-wrapper">
+							<div v-for="rgb in filteredImages[media].colours" class="preview-dialog__details-colours" :style="`background-color: rgb(${rgb.join(',')})`" />
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</el-dialog>
@@ -147,13 +155,17 @@
 </template>
 
 <script>
-import UploadForm from '../UploadForm';
+import _ from 'lodash';
+import ColorThief from 'color-thief-standalone';
+import MediaUpload from '../MediaUpload';
 import LazyImg from '../LazyImage';
+
+/* global Image */
 
 export default {
 
 	components: {
-		UploadForm,
+		MediaUpload,
 		LazyImg
 	},
 
@@ -162,8 +174,6 @@ export default {
 			searchTerm: '',
 			showUploadForm: false,
 			showMediaDetails: false,
-			accept: '*/*',
-			uploadType: 'media',
 			imageSize: 25,
 
 			currentPage: 1,
@@ -172,6 +182,35 @@ export default {
 			images: [],
 
 			media: 0
+		};
+	},
+
+	watch: {
+		showMediaDetails(show) {
+			if(show) {
+				const img = new Image();
+
+				img.addEventListener('load', () => {
+					const colorThief = new ColorThief();
+					this.filteredImages.splice(this.media, 1, {
+						...this.filteredImages[this.media],
+						colours: colorThief.getPalette(img, 6)
+					});
+				});
+
+				img.src = this.filteredImages[this.media].url;
+			}
+		}
+	},
+
+	created() {
+		this.prettyNames = {
+			'filename'    : 'Filename',
+			'filesize'    : 'File size',
+			'type'        : 'File type',
+			'height'      : 'Height',
+			'width'       : 'Width',
+			'aspect_ratio': 'Aspect ratio'
 		};
 	},
 
@@ -197,8 +236,13 @@ export default {
 		},
 
 		filteredImages() {
-			const start = (this.currentPage - 1) * this.mediaCount;
-			return this.images.slice(start, start + this.mediaCount);
+			const
+				from = (this.currentPage - 1) * this.mediaCount,
+				to = from + this.mediaCount;
+
+			return (
+				this.total < to ? this.images : this.images.slice(from, to)
+			);
 		},
 
 		total() {
@@ -209,25 +253,6 @@ export default {
 	methods: {
 		search() {
 			// TODO: filter media by "this.searchTerm"
-		},
-
-		handleChange(val) {
-			switch(val) {
-				case 'image':
-					this.accept = '.jpg,.jpeg,.png,.gif,.bmp,.svg';
-					break;
-				case 'document':
-					this.accept = '.pdf,.doc,.docx,.key,.ppt,.pptx,.pps,.ppsx,.odt,.xls,.xlsx,.zip';
-					break;
-				case 'video':
-					this.accept = '.mp3,.m4a,.ogg,.wav,.mp4';
-					break;
-				case 'audio':
-					this.accept = '.mp4,.m4v,.mov,.wmv,.avi,.mpg,.ogv';
-					break;
-				default:
-					this.accept = '*/*';
-			}
 		},
 
 		getThumbnail(row, col) {
@@ -246,11 +271,41 @@ export default {
 			this.currentPage = pageNumber;
 		},
 
+		getAttributes(media) {
+			return _.pick(media, [
+				'type', 'filename', 'filesize',
+				'height', 'width', 'aspect_ratio'
+			]);
+		},
+
+		prettyName(attr) {
+			return this.prettyNames[attr] ? this.prettyNames[attr] : attr;
+		},
+
+		formatBytes(size, precision = 2) {
+			const
+				base = Math.log(size) / Math.log(1024),
+				floored = Math.floor(base),
+				unit = ['bytes', 'KB', 'MB', 'GB', 'TB'][floored],
+				formattedBytes = Math.pow(1024, base - floored).toFixed(precision);
+
+			return `${formattedBytes} ${unit}`;
+		},
+
+		transformAttr(name, attr) {
+			switch(name) {
+				case 'filesize':
+					return this.formatBytes(attr);
+			}
+
+			return attr;
+		},
+
 		fetchMedia() {
 			this.$api
 				.get('media')
-				.then((response) => {
-					this.images = response.data;
+				.then(({ data: json }) => {
+					this.images = json.data;
 				});
 		}
 
