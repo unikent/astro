@@ -28,7 +28,7 @@
 <script>
 import { mapState, mapActions, mapMutations, mapGetters } from 'vuex';
 import _ from 'lodash';
-import imagesLoaded from 'imagesLoaded';
+import imagesLoaded from 'imagesloaded';
 
 import Icon from '../Icon';
 import editIcon from 'IconPath/pencil.svg';
