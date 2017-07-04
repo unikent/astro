@@ -84,4 +84,17 @@ class Block extends Model
 		return $this->belongsToMany(Media::class, 'media_blocks')->withPivot('block_associated_field');
 	}
 
+	public function embedMedia()
+	{
+		$block = $this->media->each(function($mediaItem) {
+			$field = $mediaItem->pivot->block_associated_field;
+			$fields = $this->fields;
+			unset($mediaItem->pivot);
+
+			$this->associated_field = $field;
+
+			$this->fields = array_set($fields, $field, $mediaItem);
+		});
+	}
+
 }
