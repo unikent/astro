@@ -7,12 +7,12 @@
 		:on-error="handleError"
 		:on-progress="handleProgress"
 		:http-request="upload"
-		multiple
+		:multiple="multiple"
 		:accept="accept"
 		style="margin: 0 5px;"
 	>
 		<i class="el-icon-upload"></i>
-		<div class="el-upload__text">Drop file(s) here or <em>click to upload</em></div>
+		<div class="el-upload__text">Drop {{ multiple ? 'file(s)' : 'single file' }} here or <em>click to upload</em></div>
 		<div class="el-upload__tip" slot="tip">
 			Files must be less than 5MB. If this dialog is closed uploads will happen in the background.
 			<upload-fail-list
@@ -31,7 +31,8 @@ import UploadFailList from './UploadFailList';
 
 export default {
 	props: [
-		'accept'
+		'accept',
+		'multiple'
 	],
 
 	components: {
@@ -58,6 +59,12 @@ export default {
 		},
 
 		upload(options) {
+			if(!options.data) {
+				options.data = {};
+			}
+
+			// TODO: add actual publishing group here, when available
+			options.data['publishing_group_ids[]'] = 1;
 			return upload(options);
 		}
 	}
