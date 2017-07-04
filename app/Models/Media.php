@@ -36,7 +36,7 @@ class Media extends Model
 	];
 
 	protected $appends = [
-		'src',
+		'url',
 		'file',
 	];
 
@@ -74,7 +74,7 @@ class Media extends Model
 	}
 
 	/**
-	 * Scope a query to include Media items associated with the given PracticeGroups.
+	 * Scope a query to include Media items associated with the given PublishingGroups.
 	 *
 	 * @param Builder $query
 	 * @param Array $publishing_groups
@@ -111,8 +111,6 @@ class Media extends Model
 		$query->whereIn('mime_type', $mime_types);
 	}
 
-
-
 	public function publishing_groups()
 	{
 		return $this->belongsToMany(PublishingGroup::class, 'media_publishing_groups');
@@ -122,7 +120,6 @@ class Media extends Model
 	{
 		return $this->belongsToMany(Site::class, 'media_sites');
 	}
-
 
 	/**
 	 * Sanitizes the filename to a safe set of characters
@@ -180,7 +177,7 @@ class Media extends Model
 	 * Returns an HTML-friendly src attribute
 	 * @return string
 	 */
-	public function getSrcAttribute()
+	public function getUrlAttribute()
 	{
 		return ($this->id && !empty($this->filename)) ? sprintf('%s/%d/%s', $this->fileUrl, $this->id, $this->filename) : '';
 	}
