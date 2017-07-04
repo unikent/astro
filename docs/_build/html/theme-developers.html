@@ -75,27 +75,37 @@ supporting data.</p>
 </div>
 <div class="section" id="user-roles">
 <h3>User Roles<a class="headerlink" href="#user-roles" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li><strong>Developers</strong>:<ul>
+<div class="section" id="developers">
+<h4>Developers<a class="headerlink" href="#developers" title="Permalink to this headline">¶</a></h4>
+<blockquote>
+<div><ul class="simple">
 <li>Create <em>Layout</em> templates in HTML / PHP / Twig</li>
 <li>Create <em>Block</em> templates in HTML / PHP / Twig</li>
 <li>Create optional PHP helper classes for each <em>Layout</em> or <em>Block</em> which requires extra business logic.</li>
 <li>Creates json-format definition files for each <em>Layout</em>, <em>Block</em> and <em>Region</em>.</li>
 </ul>
-</li>
-<li><strong>Administrators</strong>:<ul>
+</div></blockquote>
+</div>
+<div class="section" id="administrators">
+<h4>Administrators<a class="headerlink" href="#administrators" title="Permalink to this headline">¶</a></h4>
+<blockquote>
+<div><ul class="simple">
 <li>Create Publishing Groups and add Users to them.</li>
 <li>Create Sites and assign a Publishing Group to each to determine who can edit each site.</li>
 <li>Specify which Layouts can be used with which Site.</li>
 </ul>
-</li>
-<li><strong>Users</strong> or <strong>Editors</strong>:<ul>
+</div></blockquote>
+</div>
+<div class="section" id="users-or-editors">
+<h4>Users or Editors<a class="headerlink" href="#users-or-editors" title="Permalink to this headline">¶</a></h4>
+<blockquote>
+<div><ul class="simple">
 <li>Add Pages to Sites they are members of the Publishing Group for.</li>
 <li>Add and configure the Blocks on each Page.</li>
 <li>Publish the Pages to the live site once they are ready.</li>
 </ul>
-</li>
-</ul>
+</div></blockquote>
+</div>
 </div>
 </div>
 <div class="section" id="data">
@@ -108,7 +118,7 @@ supporting data.</p>
 <div class="section" id="regions">
 <h3>Regions<a class="headerlink" href="#regions" title="Permalink to this headline">¶</a></h3>
 <p>Regions are defined entirely in a definition.json file stored in a directory named:</p>
-<p><code class="docutils literal"><span class="pre">/regions/REGION_NAME/REGION_VERSION/definition.json</span></code></p>
+<p><code class="docutils literal"><span class="pre">/regions/{REGION_NAME}/V{REGION_VERSION}/definition.json</span></code></p>
 <div class="highlight-json"><div class="highlight"><pre><span></span><span class="p">{</span>
    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;REGION_NAME&quot;</span><span class="p">,</span>
    <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span>
@@ -122,8 +132,9 @@ supporting data.</p>
 </div>
 <div class="section" id="layouts">
 <h3>Layouts<a class="headerlink" href="#layouts" title="Permalink to this headline">¶</a></h3>
-<p>Layouts are defined by a json definition file, layout template and vue template all stored in a directory named
-<code class="docutils literal"><span class="pre">/layouts/{LAYOUT_NAME}/V{LAYOUT_VERSION}/</span></code> They may optionally have a
+<p>Layouts are defined by a json definition file, layout template and vue template all stored in a directory named:</p>
+<p><code class="docutils literal"><span class="pre">/layouts/{LAYOUT_NAME}/V{LAYOUT_VERSION}/</span></code></p>
+<p>They may optionally have a
 <code class="docutils literal"><span class="pre">Layout.php</span></code> file containing a Layout class providing additional functionality beyond basic template logic.</p>
 <p>The Layout definition json file contains basic information about the Layout including which regions it supports:</p>
 <p><code class="docutils literal"><span class="pre">definition.json</span></code></p>
@@ -137,6 +148,47 @@ supporting data.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
+<p>Layouts require two templates:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">template.twig</span></code> - a Twig template that the Renderer will use to render the Layout.</li>
+<li><code class="docutils literal"><span class="pre">template.vue</span></code> - A Vue.js template that represents the Layout inside of the Editor.</li>
+</ul>
+</div></blockquote>
+<div class="section" id="example-template-vue">
+<h4>Example template.vue:<a class="headerlink" href="#example-template-vue" title="Permalink to this headline">¶</a></h4>
+<p>The Vue.js template typically just needs to include references to the Region component
+to allow the Editor to determine where to place Blocks.</p>
+<div class="highlight-html"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">template</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;main_content&quot;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;inner inner1&quot;</span> <span class="na">style</span><span class="o">=</span><span class="s">&quot;background-color: #eee&quot;</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">region</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;main&quot;</span> <span class="na">version</span><span class="o">=</span><span class="s">&quot;1&quot;</span> <span class="p">/&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">template</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
+    <span class="kr">import</span> <span class="nx">Region</span> <span class="nx">from</span> <span class="s1">&#39;components/Region&#39;</span><span class="p">;</span>
+
+    <span class="kr">export</span> <span class="k">default</span> <span class="p">{</span>
+        <span class="nx">components</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">Region</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="example-template-twig">
+<h4>Example template.twig:<a class="headerlink" href="#example-template-twig" title="Permalink to this headline">¶</a></h4>
+<p>The Twig template should include the logic to render all of the Blocks assigned to the various regions of an
+instance of the Layout.</p>
+<div class="highlight-twig"><div class="highlight"><pre><span></span><span class="x">TODO</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="php-layout-class">
+<h4>PHP Layout Class<a class="headerlink" href="#php-layout-class" title="Permalink to this headline">¶</a></h4>
 <p>The <em>optional</em> PHP Layout class should be named <code class="docutils literal"><span class="pre">{LAYOUT_NAME}V{LAYOUT_VERSION}Layout</span></code> and be saved
 in a file called <code class="docutils literal"><span class="pre">Layout.php</span></code> in the main directory for that Layout.</p>
 <p>It must implement the interface <code class="docutils literal"><span class="pre">Astro\Renderer\Contracts\Layout</span></code>:</p>
@@ -196,10 +248,14 @@ in a file called <code class="docutils literal"><span class="pre">Layout.php</sp
 </pre></div>
 </div>
 </div>
+</div>
 <div class="section" id="blocks">
 <h3>Blocks<a class="headerlink" href="#blocks" title="Permalink to this headline">¶</a></h3>
-<p>Similar to Layouts, Blocks are defined by a json definition file, block template and vue template. They may optionally
-have a <code class="docutils literal"><span class="pre">Block.php</span></code> file containing a Block class providing additional functionality beyond basic template logic.</p>
+<p>Similar to Layouts, Blocks are defined by a json definition file, block template and vue template living in a directory
+named:</p>
+<p><code class="docutils literal"><span class="pre">/blocks/{BLOCK_NAME}/V{BLOCK_VERSION}/</span></code>.</p>
+<p>They may optionally have a <code class="docutils literal"><span class="pre">Block.php</span></code> file containing a Block
+class providing additional functionality beyond basic template logic.</p>
 <p>The Block definition file contains basic information about the Block including the <em>Fields</em> which comprise its user-editable
 data and any restrictions on validation for these fields:</p>
 <div class="highlight-json"><div class="highlight"><pre><span></span><span class="p">{</span>
@@ -367,13 +423,23 @@ is authorised by the API to make requests for this site and block.</p>
 <li><a class="reference internal" href="#">Developers Guide</a><ul>
 <li><a class="reference internal" href="#glossary">Glossary</a><ul>
 <li><a class="reference internal" href="#components">Components</a></li>
-<li><a class="reference internal" href="#user-roles">User Roles</a></li>
+<li><a class="reference internal" href="#user-roles">User Roles</a><ul>
+<li><a class="reference internal" href="#developers">Developers</a></li>
+<li><a class="reference internal" href="#administrators">Administrators</a></li>
+<li><a class="reference internal" href="#users-or-editors">Users or Editors</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a class="reference internal" href="#data">Data</a></li>
 <li><a class="reference internal" href="#definitions">Definitions</a><ul>
 <li><a class="reference internal" href="#regions">Regions</a></li>
-<li><a class="reference internal" href="#layouts">Layouts</a></li>
+<li><a class="reference internal" href="#layouts">Layouts</a><ul>
+<li><a class="reference internal" href="#example-template-vue">Example template.vue:</a></li>
+<li><a class="reference internal" href="#example-template-twig">Example template.twig:</a></li>
+<li><a class="reference internal" href="#php-layout-class">PHP Layout Class</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#blocks">Blocks</a></li>
 </ul>
 </li>

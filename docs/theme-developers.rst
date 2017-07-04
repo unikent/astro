@@ -33,20 +33,23 @@ Components
 User Roles
 ..........
 
-* **Developers**:
+Developers
+~~~~~~~~~~
 
   * Create *Layout* templates in HTML / PHP / Twig
   * Create *Block* templates in HTML / PHP / Twig
   * Create optional PHP helper classes for each *Layout* or *Block* which requires extra business logic.
   * Creates json-format definition files for each *Layout*, *Block* and *Region*.
 
-* **Administrators**:
+Administrators
+~~~~~~~~~~~~~~
 
   * Create Publishing Groups and add Users to them.
   * Create Sites and assign a Publishing Group to each to determine who can edit each site.
   * Specify which Layouts can be used with which Site.
 
-* **Users** or **Editors**:
+Users or Editors
+~~~~~~~~~~~~~~~~
 
   * Add Pages to Sites they are members of the Publishing Group for.
   * Add and configure the Blocks on each Page.
@@ -67,7 +70,7 @@ Regions
 
 Regions are defined entirely in a definition.json file stored in a directory named:
 
-``/regions/REGION_NAME/REGION_VERSION/definition.json``
+``/regions/{REGION_NAME}/V{REGION_VERSION}/definition.json``
 
 .. code-block:: json
 
@@ -83,8 +86,11 @@ Regions are defined entirely in a definition.json file stored in a directory nam
 Layouts
 .......
 
-Layouts are defined by a json definition file, layout template and vue template all stored in a directory named
-``/layouts/{LAYOUT_NAME}/V{LAYOUT_VERSION}/`` They may optionally have a
+Layouts are defined by a json definition file, layout template and vue template all stored in a directory named:
+
+``/layouts/{LAYOUT_NAME}/V{LAYOUT_VERSION}/``
+
+They may optionally have a
 ``Layout.php`` file containing a Layout class providing additional functionality beyond basic template logic.
 
 The Layout definition json file contains basic information about the Layout including which regions it supports:
@@ -102,20 +108,52 @@ The Layout definition json file contains basic information about the Layout incl
     ]
  }
 
+Layouts require two templates:
+
+  * ``template.twig`` - a Twig template that the Renderer will use to render the Layout.
+  * ``template.vue`` - A Vue.js template that represents the Layout inside of the Editor.
+
+Example template.vue:
+~~~~~~~~~~~~~~~~~~~~~
+
+The Vue.js template typically just needs to include references to the Region component
+to allow the Editor to determine where to place Blocks.
+
+.. literalinclude:: ./examples/simple-vue-layout.vue
+   :language: html
+
+Example template.twig:
+~~~~~~~~~~~~~~~~~~~~~~
+
+The Twig template should include the logic to render all of the Blocks assigned to the various regions of an
+instance of the Layout.
+
+.. literalinclude:: ./examples/simple-twig-layout.twig
+   :language: twig
+
+PHP Layout Class
+~~~~~~~~~~~~~~~~
+
 The *optional* PHP Layout class should be named ``{LAYOUT_NAME}V{LAYOUT_VERSION}Layout`` and be saved
 in a file called ``Layout.php`` in the main directory for that Layout.
 
 It must implement the interface ``Astro\Renderer\Contracts\Layout``:
 
-
 .. literalinclude:: ../../astro-renderer/src/Contracts/Layout.php
     :language: php
+
+
 
 Blocks
 ......
 
-Similar to Layouts, Blocks are defined by a json definition file, block template and vue template. They may optionally
-have a ``Block.php`` file containing a Block class providing additional functionality beyond basic template logic.
+Similar to Layouts, Blocks are defined by a json definition file, block template and vue template living in a directory
+named:
+
+``/blocks/{BLOCK_NAME}/V{BLOCK_VERSION}/``.
+
+They may optionally have a ``Block.php`` file containing a Block
+class providing additional functionality beyond basic template logic.
 
 The Block definition file contains basic information about the Block including the *Fields* which comprise its user-editable
 data and any restrictions on validation for these fields:
