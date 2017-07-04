@@ -88,6 +88,20 @@ class Media extends Model
 	}
 
 	/**
+	 * Scope a query to include Media items associated with the given Blocks.
+	 *
+	 * @param Builder $query
+	 * @param Array $block_ids
+	 * @return Builder
+	 */
+	public function scopeBlocks(Builder $query, Array $block_ids)
+	{
+		$query->whereHas('blocks', function($q) use ($block_ids) {
+			$q->whereIn('blocks.id', $block_ids);
+		});
+	}
+
+	/**
 	 * Scope a query to include Media items of the given types.
 	 *
 	 * @param Builder $query
@@ -119,6 +133,11 @@ class Media extends Model
 	public function sites()
 	{
 		return $this->belongsToMany(Site::class, 'media_sites');
+	}
+
+	public function blocks()
+	{
+		return $this->belongsToMany(Block::class, 'media_blocks');
 	}
 
 	/**
