@@ -12,7 +12,7 @@ use App\Http\Requests\Api\v1\Media\DeleteRequest;
 use App\Http\Requests\Api\v1\Media\StoreRequest;
 use App\Http\Transformers\Api\v1\MediaTransformer;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-
+use App\Jobs\ProcessMedia;
 
 class MediaController extends ApiController
 {
@@ -61,7 +61,7 @@ class MediaController extends ApiController
 			$query->mimeTypes($request->get('mime_types'));
 		}
 
-		return fractal($query->get(), new MediaTransformer)->respond(200);
+		return fractal($query->orderBy('id', 'desc')->get(), new MediaTransformer)->respond(200);
 	}
 
 
@@ -83,17 +83,17 @@ class MediaController extends ApiController
 		$media = Media::findByHash($hash);
 		$media = $media ?: new Media([ 'file' => $file ]);
 
-		$this->authorizeAll($request, 'create', $media); // Ensures that the user can sync with Sites / Practice Groups
+		$this->authorizeAll($request, 'create', $media); // Ensures that the user can sync with Sites / Publishing Groups
 
 		DB::beginTransaction();
 
 		try {
 			$media->save();
 
-			$site_ids = array_merge($media->sites()->allRelatedIds()->toArray(), $request->get('site_ids'));
+			$site_ids = array_merge($media->sites()->allRelatedIds()->toArray(), $request->get('site_ids', []));
 			$media->sites()->sync($site_ids);
 
-			$pg_ids = array_merge($media->publishing_groups()->allRelatedIds()->toArray(), $request->get('publishing_group_ids'));
+			$pg_ids = array_merge($media->publishing_groups()->allRelatedIds()->toArray(), $request->get('publishing_group_ids', []));
 			$media->publishing_groups()->sync($pg_ids);
 
 			DB::commit();
@@ -101,6 +101,9 @@ class MediaController extends ApiController
 			DB::rollBack();
 			throw $e;
 		}
+
+		// TODO: implement job for processing media based on content type
+		// dispatch(new ProcessMedia($media));
 
 		return fractal($media, new MediaTransformer)->respond(201);
 	}
@@ -117,7 +120,7 @@ class MediaController extends ApiController
 	 * @return SymfonyResponse
 	 */
 	public function destroy(DeleteRequest $request, Media $media){
-		$this->authorizeAll($request, 'delete', $media); // Ensures that the user can sync with Sites / Practice Groups
+		$this->authorizeAll($request, 'delete', $media); // Ensures that the user can sync with Sites / Publishing Groups
 
 		if($request->has('site_ids')){
 			$site_ids = array_diff($media->sites()->allRelatedIds()->toArray(), $request->get('site_ids'));

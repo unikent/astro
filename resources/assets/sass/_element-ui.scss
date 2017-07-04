@@ -6,6 +6,10 @@
 	font-size: 14px;
 }
 
+.el-dialog__title {
+	font-weight: 500;
+}
+
 .editor-nav {
 	.el-tabs__nav {
 		float: none;
@@ -18,6 +22,10 @@
 		text-align: center;
 		background-color: #fff;
 	}
+}
+
+.el-upload {
+	width: 100%;
 }
 
 .el-upload-dragger {
