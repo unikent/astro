@@ -249,6 +249,21 @@ class PageController extends ApiController
 					$block->region_name = $region;
 
 					$block->save();
+
+					// associate media items with this block
+					if(isset($data['media']) && is_array($data['media'])) {
+						$media_block_ids = [];
+
+						foreach($data['media'] as $media) {
+							if(isset($media['id'], $media['associated_field'])) {
+								$media_block_ids[$media['id']] = [
+									'block_associated_field' => $media['associated_field']
+								];
+							}
+						}
+
+						$block->media()->sync($media_block_ids);
+					}
 				}
 			}
 		}
