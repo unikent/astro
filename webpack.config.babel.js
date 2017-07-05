@@ -15,6 +15,7 @@ const
 
 export default {
 	entry: [
+		'babel-polyfill',
 		resolve('js/app.js'),
 		resolve('sass/app.scss')
 	],
@@ -125,9 +126,6 @@ export default {
 
 	plugins: [
 		new webpack.ProvidePlugin({
-			$: 'jquery',
-			jQuery: 'jquery',
-			'window.jQuery': 'jquery',
 			'window.axios': 'axios'
 		}),
 
@@ -196,6 +194,8 @@ export default {
 		alias: {
 			// necessary for vue
 			'vue$'      : 'vue/dist/vue.common.js',
+
+			// Astro aliases
 			'classes'   : resolve('js/classes'),
 			'components': resolve('js/components'),
 			'directives': resolve('js/directives'),

@@ -18,22 +18,22 @@ class Block extends Model
 	];
 
 	protected $casts = [
-        'fields' => 'json',
+		'fields' => 'json',
 	];
 
 	protected $definition = null;
 
 
-    /**
-     * Create a new Eloquent model instance.
-     *
-     * @param  array  $attributes
-     * @return void
-     */
-    public function __construct($attributes = []){
-        parent::__construct($attributes);
-        $this->fields = $this->fields ?: [];
-    }
+	/**
+	 * Create a new Eloquent model instance.
+	 *
+	 * @param  array  $attributes
+	 * @return void
+	 */
+	public function __construct($attributes = []){
+		parent::__construct($attributes);
+		$this->fields = $this->fields ?: [];
+	}
 
 
 	/**
@@ -71,7 +71,30 @@ class Block extends Model
 	public static function deleteForPageRegion($page_or_id, $region)
 	{
 		$page_id = is_numeric($page_or_id) ? $page_or_id : $page_or_id->getKey();
-		static::where('page_id', '=', $page_id)->where('region_name', '=', $region)->delete();
+		static::where('page_id', '=', $page_id)
+			->where('region_name', '=', $region)
+			->delete();
+	}
+
+	/**
+	 * Each block can have mutliple media items associated with it.
+	 */
+	public function media()
+	{
+		return $this->belongsToMany(Media::class, 'media_blocks')->withPivot('block_associated_field');
+	}
+
+	public function embedMedia()
+	{
+		$block = $this->media->each(function($mediaItem) {
+			$field = $mediaItem->pivot->block_associated_field;
+			$fields = $this->fields;
+			unset($mediaItem->pivot);
+
+			$this->associated_field = $field;
+
+			$this->fields = array_set($fields, $field, $mediaItem);
+		});
 	}
 
 }

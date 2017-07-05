@@ -26,7 +26,7 @@
 import _ from 'lodash';
 import blocks from 'cms-prototype-blocks';
 import { mapState, mapGetters, mapMutations } from 'vuex';
-import imagesLoaded from 'imagesLoaded';
+import imagesLoaded from 'imagesloaded';
 
 /* global document */
 
