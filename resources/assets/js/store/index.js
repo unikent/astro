@@ -4,6 +4,7 @@ import undoRedo from '../plugins/undo-redo';
 import shareMutations from '../plugins/share-mutations';
 import shareTimeTravel from '../plugins/share-time-travel';
 import page from './modules/page';
+import site from './modules/site';
 import definition from './modules/definition';
 import Config from 'classes/Config';
 
@@ -64,7 +65,8 @@ let store = new Vuex.Store({
 
 	modules: {
 		page,
-		definition
+		definition,
+		site
 	},
 
 	plugins: [
