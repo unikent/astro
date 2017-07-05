@@ -10,8 +10,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends KentUser
 {
 
-	protected $hidden = [ 'api_token', 'created_at', 'updated_at', 'created_by', 'updated_by' ];
+    protected $casts = [
+        'settings' => 'json'
+    ];
 
+	protected $hidden = [ 'api_token', 'created_at', 'updated_at', 'created_by', 'updated_by' ];
 
     /**
      * Create a new Eloquent model instance.
