@@ -1,3 +1,5 @@
+import inlineFieldMixin from 'mixins/inlineFieldMixin';
+
 export default {
 
 	props: [
@@ -7,11 +9,14 @@ export default {
 		'other'
 	],
 
+	mixins: [inlineFieldMixin],
+
 	data() {
-		return this.fields;
+		return { ...this.fields };
 	},
 
 	created() {
+		this.fieldElements = {};
 		this.watching = {};
 		this.watchFields(this.fields);
 
@@ -19,8 +24,6 @@ export default {
 		this.$watch('fields', () => {
 			this.watchFields(this.fields);
 		});
-
-		// TODO: deal with fields that have nested data?
 	},
 
 	methods: {
@@ -30,6 +33,11 @@ export default {
 					this.watching[name] = true;
 
 					this.$watch(`fields.${name}`, (newVal) => {
+						if(this.internalChange) {
+							this.internalChange = false;
+							return;
+						}
+
 						this[name] = newVal;
 					}, {
 						deep: true

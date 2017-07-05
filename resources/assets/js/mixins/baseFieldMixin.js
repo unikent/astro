@@ -15,7 +15,10 @@ export default {
 				return value !== void 0 ? value : this.default;
 			},
 			set(value) {
-				this.updateFieldValue({ name: this.name, value });
+				this.updateFieldValue({
+					name: this.name,
+					value: this.transformValue(value)
+				});
 			}
 		}
 	},
@@ -23,7 +26,12 @@ export default {
 	methods: {
 		...mapMutations([
 			'updateFieldValue'
-		])
+		]),
+
+		// Here so we can override this at some point
+		transformValue(value) {
+			return value;
+		}
 	}
 
 };

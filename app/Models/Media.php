@@ -58,7 +58,6 @@ class Media extends Model
 		$this->filePath = Config::get('app.media_path');
 	}
 
-
 	/**
 	 * Scope a query to include Media items associated with the given Sites.
 	 *
@@ -186,11 +185,12 @@ class Media extends Model
 	 */
 	protected function loadFile()
 	{
-		if($this->exists){
-			$this->setFileAttribute(new File($this->filePath . '/' . $this->id . '/' . $this->filename));
+		$filepath = sprintf('%s/%d/%s', $this->filePath, $this->id, $this->filename);
+
+		if(file_exists($filepath)){
+			$this->setFileAttribute(new File($filepath));
 		}
 	}
-
 
 	/**
 	 * Returns an HTML-friendly src attribute
@@ -254,7 +254,6 @@ class Media extends Model
 		}
 	}
 
-
 	/**
 	 * Force a hard delete on a soft deleted model.
 	 *
@@ -276,7 +275,6 @@ class Media extends Model
 			throw $e;
 		}
 	}
-
 
 	/**
 	 * Transforms the getID3 metadata into something a little friendlier...

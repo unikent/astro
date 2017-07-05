@@ -30,11 +30,11 @@
 						<div>
 							<router-link :to="`/site/${sites[$index].id}`">
 								<el-button type="default" size="small">
-									<Icon :glyph="editIcon" width="14" height="14" />
+									<Icon name="edit" width="14" height="14" />
 								</el-button>
 							</router-link>
 							<el-button @click="askRemove($index)" type="default" size="small">
-								<Icon :glyph="deleteIcon" width="14" height="14" />
+								<Icon name="delete" width="14" height="14" />
 							</el-button>
 						</div>
 					</el-table-column>
@@ -83,8 +83,6 @@
 
 <script>
 import Icon from '../Icon';
-import editIcon from 'IconPath/pencil.svg';
-import deleteIcon from 'IconPath/trash.svg';
 
 export default {
 
@@ -95,8 +93,6 @@ export default {
 	data() {
 		return {
 			sites: [],
-			editIcon,
-			deleteIcon,
 
 			dialogFormVisible: false,
 			formLabelWidth: '120px',

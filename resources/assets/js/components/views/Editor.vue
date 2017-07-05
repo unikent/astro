@@ -4,7 +4,7 @@
 		<iframe ref="iframe" class="editor-content" :style="dimensions" :src="getPreviewUrl" frameborder="0" />
 		<div
 			class="iframe-overlay"
-			:style="{ 'position' : showIframeOverlay ? 'absolute' : null }"
+			:style="{ 'position' : displayIframeOverlay ? 'absolute' : null }"
 		/>
 		<footer class="b-bar">
 
@@ -12,7 +12,7 @@
 				<el-select placeholder="view" v-model="currentView" class="switch-view">
 					<el-option v-for="(view, key) in views" :label="view.label" :value="key" :key="view.label">
 						<div class="view-icon">
-							<Icon :glyph="view.icon" aria-hidden="true" width="20" height="20" />
+							<Icon :name="view.icon" aria-hidden="true" width="20" height="20" />
 						</div>
 						<span class="view-label">{{ view.label }}</span>
 					</el-option>
@@ -21,10 +21,10 @@
 
 			<el-button-group class="undo-redo">
 				<el-button :disabled="!undoRedo.canUndo" @click="undo">
-					<Icon :glyph="undoIcon" aria-hidden="true" width="14" height="14" class="ico" />
+					<Icon name="undo" aria-hidden="true" width="14" height="14" class="ico" />
 				</el-button>
 				<el-button :disabled="!undoRedo.canRedo" @click="redo">
-					<Icon :glyph="redoIcon" aria-hidden="true" width="14" height="14" class="ico" />
+					<Icon name="redo" aria-hidden="true" width="14" height="14" class="ico" />
 				</el-button>
 			</el-button-group>
 
@@ -39,7 +39,7 @@
 	</div>
 
 	<nav
-		:style="{marginLeft: sideBarOpen ? 0 : '-250px'}"
+		:style="{marginLeft: sideBarOpen ? 0 : '-250px', maxWidth: 0, minWidth: '249px'}"
 		class="editor-nav editor-sidebar"
 		:class="{ 'editor-nav--is-over': sideBarHover || !sideBarOpen }"
 		@mouseenter="sideBarHover = true"
@@ -81,11 +81,6 @@ import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
 
 import Icon from '../Icon';
-import undoIcon from 'IconPath/undo.svg';
-import redoIcon from 'IconPath/redo.svg';
-import desktopIcon from 'IconPath/desktop.svg';
-import tabletIcon from 'IconPath/tablet.svg';
-import mobileIcon from 'IconPath/mobile.svg';
 
 /* global document */
 
@@ -99,23 +94,21 @@ export default {
 	},
 
 	created() {
-		this.undoIcon = undoIcon;
-		this.redoIcon = redoIcon;
 		this.views = {
 			desktop: {
-				icon: desktopIcon,
+				icon: 'desktop',
 				label: 'Desktop',
 				width: '100%',
 				height: '100vh'
 			},
 			tablet: {
-				icon: tabletIcon,
+				icon: 'tablet',
 				label: 'Tablet',
 				width: '768px',
 				height: '1024px'
 			},
 			mobile: {
-				icon: mobileIcon,
+				icon: 'mobile',
 				label: 'Mobile',
 				width: '320px',
 				height: '568px'
@@ -147,7 +140,7 @@ export default {
 	computed: {
 		...mapState([
 			'preview',
-			'showIframeOverlay',
+			'displayIframeOverlay',
 			'undoRedo'
 		]),
 

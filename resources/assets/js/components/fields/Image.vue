@@ -1,41 +1,54 @@
-<style lang="scss">
-.upload-demo .el-upload {
-	width: 100%;
-}
-</style>
-
 <template>
 <el-upload
-	class="upload-demo"
+	class="upload-form"
 	drag
-	action=""
-	:on-preview="handlePreview"
-	:on-remove="handleRemove"
-	:on-success="handleSuccess"
+	action="media"
+	name="upload"
 	:on-error="handleError"
+	:on-success="handleSuccess"
+	:on-remove="handleRemove"
+	:on-preview="handlePreview"
+	:http-request="upload"
+	:accept="accept"
 	:file-list="fileList"
+	style="margin: 0 5px;"
 >
 	<i class="el-icon-upload"></i>
-	<div class="el-upload__text">Drop file here or <em>click to upload</em></div>
-	<div class="el-upload__tip" slot="tip">Must be jpg/png files smaller than 500kb</div>
+	<div class="el-upload__text">Drop a file here or <em>click to upload</em></div>
+	<div class="el-upload__tip" slot="tip">
+		Files must be less than 20MB.
+		<upload-fail-list
+			listType="text"
+			:files="failedUploads"
+		/>
+	</div>
 </el-upload>
 </template>
 
 <script>
-import { mapMutations, mapState } from 'vuex';
-import _ from 'lodash';
+import upload from 'plugins/http/upload';
+import UploadFailList from '../UploadFailList';
 
-/* global URL */
+import { mapMutations, mapState } from 'vuex';
 
 export default {
 
 	name: 'image-field',
 
-	props: ['name'],
+	components: {
+		UploadFailList
+	},
+
+	props: [
+		'name',
+		'accept',
+		'multiple'
+	],
 
 	data() {
 		return {
-			showPreview: false
+			showPreview: false,
+			failedUploads: []
 		};
 	},
 
@@ -43,12 +56,19 @@ export default {
 		fileList: {
 			get() {
 				const val = this.$store.getters.getCurrentFieldValue(this.name);
-				return val ? [val] : [];
+				return val ? [{...val, name: val.filename }] : [];
 			},
 			set(value) {
 				this.updateFieldValue({
 					name: this.name,
-					value: value ? _.pick(value, 'name', 'url') : value
+					value
+				});
+
+				this.updateBlockMedia({
+					value: {
+						...value,
+						associated_field: this.name
+					}
 				});
 			}
 		},
@@ -61,29 +81,42 @@ export default {
 	methods: {
 
 		...mapMutations([
-			'updateFieldValue'
+			'updateFieldValue',
+			'updateBlockMedia'
 		]),
 
-		handleRemove(file, fileList) {
+		handleError(err, file) {
+			if(err.response && err.response.status === 422) {
+				file.error = err.response.data.errors[0].message;
+			}
+
+			this.failedUploads.push(file);
+		},
+
+		handleSuccess({ data: json }) {
+			this.fileList = json.data;
+		},
+
+		upload(options) {
+			if(!options.data) {
+				options.data = {};
+			}
+
+			// TODO: update with real site or publishing group id
+			options.data['publishing_group_ids[]'] = 1;
+
+			return upload(options);
+		},
+
+		handleRemove() {
 			this.fileList = null;
 		},
 
-		handlePreview(file) {
+		handlePreview() {
 			this.$store.commit('changePreview', {
 				visible: true,
 				url: this.fileList[0].url
 			});
-		},
-
-		handleSuccess(file) {
-			console.log(file);
-		},
-
-		handleError(res, file) {
-			this.fileList = {
-				name: file.name,
-				url: URL.createObjectURL(file.raw)
-			};
 		}
 
 	}

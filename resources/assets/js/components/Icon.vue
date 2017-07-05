@@ -5,12 +5,12 @@
 </template>
 
 <script>
-import astro from 'IconPath/unknown.svg';
+import * as icons from './icons';
 
 export default {
 	props: {
-		glyph: {
-			default: () => astro
+		name: {
+			default: 'unknown'
 		},
 
 		width: {
@@ -23,6 +23,12 @@ export default {
 
 		className: {
 			default: 'icon'
+		}
+	},
+
+	computed: {
+		glyph() {
+			return icons[this.name] || icons.unknown;
 		}
 	}
 };

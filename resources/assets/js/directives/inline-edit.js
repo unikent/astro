@@ -1,22 +1,19 @@
-export default {
-	bind(el, binding, vnode) {
-		console.log('inline-edit');
-		const {expression, value} = binding;
-		el.innerHTML = value;
+import Vue from 'vue';
 
-		const block = vnode.context;
-
-		// block.markAsInline(expression);
+Vue.directive('inline-edit', {
+	bind(el, { expression, value }, { context: block }) {
+		console.log(value);
 		block.inlineFields[expression] = el;
 	},
 
-	update(el, { value, oldValue }, { context: block }) {
-
-		if(value !== oldValue && !block.internalChange) {
-			$(el).redactor('code.set', value);
-			console.log(value);
+	update(el, { value, oldValue }) {
+		if(value !== oldValue) {
+			console.log('updated from outside', value, oldValue);
+			el.classList.add('flash');
+			// el.addEventListener('animationend', (e) => {
+			// 	console.log(e);
+			// 	e.target.classList.remove('flash');
+			// })
 		}
-
-		block.internalChange = false;
 	}
-};
+});
