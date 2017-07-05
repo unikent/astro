@@ -48,7 +48,7 @@
 
 	.is-error .el-upload-dragger {
 		width: 100%;
-		border-color: #ff4949;
+		border-color: #d65757;
 	}
 
 	.el-form-item.is-required .el-form-item__label:before {
@@ -58,7 +58,7 @@
 	.el-form-item.is-error .collection-field .el-input__inner,
 	.el-form-item.is-error .collection-field .el-textarea__inner,
 	.el-form-item.is-error .collection-field .el-upload-dragger {
-		border-color: #bfcbd9;
+		border-color: #b7c2d4;
 	}
 
 	.el-form-item.is-error {
@@ -67,14 +67,14 @@
 			.el-input__inner,
 			.el-textarea__inner,
 			.el-upload-dragger {
-				border-color: #bfcbd9;
+				border-color: #b7c2d4;
 
 				&:hover {
 					border-color: #8391a5
 				}
 				&:focus {
 					outline: 0;
-					border-color: #20a0ff;
+					border-color: #03a9f4;
 				}
 			}
 
@@ -83,20 +83,20 @@
 				.el-input__inner,
 				.el-textarea__inner,
 				.el-upload-dragger {
-					border-color: #ff4949;
+					border-color: #d65757;
 				}
 			}
 		}
 
 		.redactorWrapper {
-			border: 1px solid #ff4949;
+			border: 1px solid #d65757;
 		}
 	}
 }
 
 .el-dialog,
 .el-message-box {
-	border: 1px solid #dce3ea;
+	border: 1px solid #dadde2;
 	box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 10px;
 }
 
@@ -112,16 +112,16 @@
 }
 
 .el-table th {
-	background-color: #f0f6f9;
+	background-color: #f7f9fb;
 }
 
 .el-table__fixed-header-wrapper thead div,
 .el-table__header-wrapper thead div {
-	background-color: #f0f6f9;
+	background-color: #f7f9fb;
 }
 
 .el-table--striped .el-table__body tr:nth-child(2n) td {
-	background-color: #f7fafc;
+	background-color: #f7f9fb;
 }
 
 .el-dialog {

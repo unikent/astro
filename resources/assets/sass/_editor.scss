@@ -39,7 +39,7 @@ html {
 
 .editor-sidebar {
 	width: 250px;
-	background-color: #f5f7fa;
+	background-color: #f7f9fb;
 	z-index: 0;
 	min-width: 210px;
 	font-size: 14px;
@@ -50,7 +50,7 @@ html {
 	width: 100%;
 	min-width: 320px; // HVGA upwards
 	position: relative;
-	background-color: #f7f7f7;
+	background-color: #f7f9fb;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -71,7 +71,7 @@ html {
 .editor-nav {
 	order: -1;
 	box-shadow: 2px 0px 3px rgba(0, 0, 0, 0.05);
-	border-right: 1px solid #bcc8dc;
+	border-right: 1px solid #b7c2d4;
 }
 
 .empty-page {
@@ -83,12 +83,12 @@ html {
 
 .editor-component-list {
 	box-shadow: -2px 0px 3px rgba(0, 0, 0, 0.05);
-	border-left: 1px solid #bcc8dc;
+	border-left: 1px solid #b7c2d4;
 	position: relative;
 	width: 380px;
 }
 #main_content {
-	background-color: #f7f7f7;
+	background-color: #f7f9fb;
 }
 
 .b-bar {
@@ -97,14 +97,14 @@ html {
 	left: 0;
 	bottom: 0;
 	background-color: #fff;
-	border-top: 1px solid #eee;
+	border-top: 1px solid #e5e7ec;
 	padding: 10px;
 	box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.05);
 	user-select: none;
 }
 
 .page-status {
-	background-color: #a7b5c8;
+	background-color: #b7c2d4;
 	color: #fff;
 	font-size: .8em;
 	text-align: right;
@@ -129,7 +129,7 @@ html {
 	background-color: #fff;
 	transform-origin: top center;
 	backface-visibility: hidden;
-	outline: 2px solid #ddd;
+	outline: 2px solid #dadde2;
 }
 
 #b-overlay {
@@ -147,7 +147,7 @@ html {
 
 .b-editable,
 .block-overlay {
-	border: 2px solid #2196f3;
+	border: 2px solid #03a9f4;
 	position: absolute;
 	transition: border-color .3s ease-out, opacity .3s ease-out;
 	border-radius: 3px;
@@ -173,7 +173,7 @@ html {
 .block-overlay__delete {
 	transition: background-color .3s ease-out;
 	position: absolute;
-	background-color: #2196f3;
+	background-color: #03a9f4;
 	color: #fff;
 	line-height: 44px;
 	height: 44px;
@@ -204,7 +204,7 @@ html {
 	right: 0;
 	cursor: pointer;
 	border-radius: 4px 0 0 0;
-	background-color: #e8e8e8;
+	background-color: #e5e7ec;
 	line-height: 30px;
 	height: 30px;
 	width: 30px;
@@ -217,7 +217,7 @@ html {
 	top: 50%;
 	transform: translateY(-50%);
 	left: -4px;
-	background-color: #2196f3;
+	background-color: #03a9f4;
 	color: #fff;
 	line-height: 44px;
 	height: 44px;
@@ -234,32 +234,6 @@ html {
 	opacity: 0;
 }
 
-// .b-editable:after {
-// 	transition: background-color .3s ease-out;
-// 	content: '⚙';
-// 	position: absolute;
-// 	top: -1px;
-// 	right: -1px;
-// 	background-color: #2196f3;
-// 	color: #fff;
-// 	line-height: 22px;
-// 	height: 22px;
-// 	width: 22px;
-// 	pointer-events: auto;
-// 	cursor: pointer;
-// 	text-align: center;
-// 	z-index: 1;
-// }
-
-.b-editable:hover {
-	border-color: #1b73b9;
-}
-
-.b-editable:before:hover {
-	background-color: #1b73b9;
-	color: #fff;
-}
-
 .b-block-container {
 	position: relative;
 	will-change: transform;
@@ -267,7 +241,7 @@ html {
 
 .block {
 	background-color: #fff;
-	border: 1px solid #eee;
+	border: 1px solid #e5e7ec;
 	border-left-width: 0;
 	border-right-width: 0;
 	will-change: transform, box-shadow;
@@ -278,7 +252,7 @@ html {
 	top: 0;
 	transform: translateY(0);
 	left: 0;
-	background-color: #2196f3;
+	background-color: #03a9f4;
 	color: #fff;
 	line-height: 44px;
 	height: 44px;
@@ -291,10 +265,10 @@ html {
 }
 
 .b-back-button {
-	padding: 0 16px 0 10px;
+	padding: 0 10px 0 16px;
 	height: 42px;
 	line-height: 42px;
-	border-bottom: 1px solid #d1dbe5;
+	border-bottom: 1px solid #dadde2;
 	background-color: #fff;
 
 	.back {
@@ -303,7 +277,6 @@ html {
 
 	.block-title {
 		font-weight: 500;
-		float: right;
 	}
 
 	i {
@@ -314,7 +287,7 @@ html {
 .b-bottom-bar {
 	padding: 0 10px;
 	height: 56px;
-	border-top: 1px solid #d1dbe5;
+	border-top: 1px solid #dadde2;
 	background-color: #fff;
 	display: flex;
 	flex-direction: row;
@@ -338,7 +311,7 @@ html {
 
 .main-header {
 	text-transform: uppercase;
-	color: #888;
+	color: #71787f;
 }
 
 
@@ -354,11 +327,11 @@ html {
 .missing-definition-warning {
 	margin: 30px;
 	padding: 10px;
-	background-color: #ffe0e0;
+	background-color: lighten(#d65757, 33%);
 	border-radius: 5px
 }
 
 .placeholder-block {
 	height: 100px;
-	background-color: #cfeaff;
+	background-color: #b7c2d4;
 }
