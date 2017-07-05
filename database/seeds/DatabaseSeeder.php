@@ -34,7 +34,8 @@ class DatabaseSeeder extends Seeder
 		factory(User::class)->create([
 			'username' => 'admin',
 			'name'=> 'Admin',
-			'password'=> Hash::make('admin')
+			'password'=> Hash::make('admin'),
+			'role' => 'admin'
 		]);
 
 		$routes = [];

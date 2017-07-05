@@ -28,7 +28,7 @@
 					<el-tooltip v-if="field.info" :content="field.info" placement="top">
 						<icon
 							class="field-info"
-							:glyph="helpIcon"
+							name="help"
 							width="15"
 							height="15"
 							viewBox="0 0 15 15"
@@ -63,7 +63,6 @@ import containers from 'components/fields/containers';
 import { heights } from 'classes/sass';
 
 import Icon from './Icon';
-import helpIcon from 'IconPath/help.svg';
 
 /* global document */
 
@@ -115,10 +114,6 @@ export default {
 
 			currentDefinition: state => state.definition.currentBlockDefinition
 		})
-	},
-
-	created() {
-		this.helpIcon = helpIcon;
 	},
 
 	watch: {

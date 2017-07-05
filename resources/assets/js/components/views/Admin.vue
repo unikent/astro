@@ -1,6 +1,6 @@
 <template>
 <div class="admin-wrapper">
-	<aside class="left-side sidebar-offcanvas">
+	<aside class="left-side">
 		<section class="sidebar">
 			<ul class="app-sidebar" role="navigation">
 				<side-menu-item
@@ -21,10 +21,6 @@
 
 <script>
 import Icon from '../Icon';
-import homeIcon from 'IconPath/home.svg';
-import settingsIcon from 'IconPath/settings.svg';
-import sitesIcon from 'IconPath/files.svg';
-import mediaIcon from 'IconPath/agenda.svg';
 
 export default {
 	name: 'Admin',
@@ -40,7 +36,7 @@ export default {
 			template: `
 				<li>
 					<router-link :to="link">
-						<Icon :glyph="icon" className="menu-icon" />
+						<Icon :name="icon" className="menu-icon" />
 						<span>{{ title }}</span>
 					</router-link>
 				</li>
@@ -53,22 +49,22 @@ export default {
 			menu: [
 				{
 					link: '/home',
-					icon: homeIcon,
+					icon: 'home',
 					title: 'Home'
 				},
 				{
 					link: '/sites',
-					icon: sitesIcon,
+					icon: 'sites',
 					title: 'Sites'
 				},
 				{
 					link: '/media',
-					icon: mediaIcon,
+					icon: 'media',
 					title: 'Media Manager'
 				},
 				{
 					link: '/settings',
-					icon: settingsIcon,
+					icon: 'settings',
 					title: 'General Settings'
 				}
 			]

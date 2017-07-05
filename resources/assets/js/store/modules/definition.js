@@ -17,7 +17,7 @@ const mutations = {
 	// TODO: move to shared action?
 	setBlock(state, { index, type } = { index: null, type: null }) {
 		state.currentBlockIndex = index;
-		state.currentBlockDefinition = state.blockDefinitions[type];
+		state.currentBlockDefinition = type ? state.blockDefinitions[type] : null;
 	},
 
 	deleteBlock(state, { index } = { index: null }) {

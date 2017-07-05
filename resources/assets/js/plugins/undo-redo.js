@@ -5,6 +5,7 @@ import UndoStack from 'classes/UndoStack';
 const trackedMutations = {
 	updateFieldValue: 'Update to block field',
 	addBlock: 'Added block to page',
+	reorderBlocks: 'Reordered blocks on page',
 	deleteBlock: 'Deleted block on page'
 };
 

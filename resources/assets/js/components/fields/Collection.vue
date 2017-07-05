@@ -15,7 +15,7 @@
 .is-error .collection-field {
 	border: 1px solid #ff4949;
 	border-radius: 4px;
-    background-color: rgba(255, 73, 73, .08);
+	background-color: rgba(255, 73, 73, .08);
 }
 
 .ci-field + .ci-field {
@@ -47,7 +47,7 @@
 						<el-tooltip v-if="f.info" :content="f.info" placement="top">
 							<icon
 								class="f-info"
-								:glyph="helpIcon"
+								name="help"
 								width="15"
 								height="15"
 								viewBox="0 0 15 15"
@@ -66,7 +66,7 @@
 		</template>
 
 		<div @click="removeItem(index)" class="block-overlay__delete">
-			<Icon :glyph="deleteIcon" width="20" height="20" />
+			<Icon name="delete" width="20" height="20" />
 		</div>
 	</div>
 
@@ -88,7 +88,6 @@ import getFieldMixin from 'mixins/getFieldMixin';
 import { Definition } from 'classes/helpers';
 
 import Icon from '../Icon';
-import deleteIcon from 'IconPath/trash.svg';
 
 export default {
 
@@ -116,10 +115,6 @@ export default {
 		currentValue() {
 			return this.getCurrentFieldValue(this.name);
 		}
-	},
-
-	created() {
-		this.deleteIcon = deleteIcon;
 	},
 
 	methods: {
@@ -167,7 +162,7 @@ export default {
 			// I don't like that I'm forced to use $parent here
 			Vue.nextTick(() => {
 				this.$parent.validate()
-			})
+			});
 		}
 	}
 };

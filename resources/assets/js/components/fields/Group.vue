@@ -43,7 +43,7 @@
 						<el-tooltip v-if="f.info" :content="f.info" placement="top">
 							<icon
 								class="f-info"
-								:glyph="helpIcon"
+								name="help"
 								width="15"
 								height="15"
 								viewBox="0 0 15 15"
