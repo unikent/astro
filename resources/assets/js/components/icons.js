@@ -3,7 +3,7 @@ export { default as help }      from 'IconPath/help.svg';
 export { default as delete }    from 'IconPath/trash.svg';
 export { default as bold }      from 'IconPath/bold.svg';
 export { default as underline } from 'IconPath/underline.svg';
-export { default as italic }    from 'IconPath/Italic.svg';
+export { default as italic }    from 'IconPath/italic.svg';
 export { default as center }    from 'IconPath/align-center.svg';
 export { default as justify }   from 'IconPath/align-justify.svg';
 export { default as left }      from 'IconPath/align-left.svg';
