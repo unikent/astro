@@ -91,6 +91,21 @@ const mutations = {
 		Vue.nextTick(() => eventBus.$emit('block:updateOverlay'));
 	},
 
+	updateBlockMedia(state, { index, value }) {
+		let
+			idx = index !== void 0 ? index : state.currentBlockIndex,
+			blockData = state.pageData.blocks[state.currentRegion];
+
+		if(!blockData[idx].media) {
+			blockData[idx].media = [value];
+		}
+		else {
+			blockData[idx].media.push(value);
+		}
+
+		blockData.splice(idx, 1, { ...blockData[idx] })
+	},
+
 	changePage(state, name) {
 		state.pageName = name;
 	},
@@ -133,7 +148,7 @@ const actions = {
 
 		// TODO: refactor into smaller methods
 		api
-			.get(`page/${id}?include=blocks`)
+			.get(`page/${id}?include=blocks.media`)
 			.then(response => {
 				const page = response.data.data;
 
