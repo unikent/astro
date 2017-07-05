@@ -74,13 +74,13 @@
 import { Loading } from 'element-ui';
 import { mapState } from 'vuex';
 
-import Config from '../../classes/Config';
-import PageSidebar from '../PageSidebar';
-import BlockSidebar from '../BlockSidebar';
+import Config from 'classes/Config';
+import PageSidebar from 'components/PageSidebar';
+import BlockSidebar from 'components/BlockSidebar';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
 
-import Icon from '../Icon';
+import Icon from 'components/Icon';
 
 /* global document */
 

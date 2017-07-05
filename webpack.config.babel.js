@@ -202,7 +202,7 @@ export default {
 			'mixins'    : resolve('js/mixins'),
 			'plugins'   : resolve('js/plugins'),
 			'store'     : resolve('js/store'),
-			'views'     : resolve('js/components/views'),
+			'views'     : resolve('js/views'),
 			'IconPath'  : resolve('icons')
 		}
 	},

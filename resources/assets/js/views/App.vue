@@ -21,7 +21,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import SnackBar from '../SnackBar';
+import SnackBar from 'components/SnackBar';
 import { undoStackInstance } from 'plugins/undo-redo';
 
 /* global window */
