@@ -19,7 +19,7 @@ import scribePluginUnderlineCommand from 'plugins/scribe/ux/underline';
 import scribePluginBoldCommand from 'plugins/scribe/ux/bold';
 import scribePluginUnlinkCommand from 'plugins/scribe/ux/unlink';
 
-import RichtextToolbar from './toolbar';
+import RichtextToolbar from './Toolbar';
 
 export default {
 
