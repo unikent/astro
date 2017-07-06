@@ -40,15 +40,27 @@ class CheckDefns extends Command
      */
     public function handle()
     {
-        $this->checkBlocks();
+        $all_blocks = $this->checkBlocks();
         $index = $this->checkBlockIndex();
-        echo "\n****** Exported Blocks (index.js) ******\n\n";
+        $this->line("\n****** Exported Blocks (index.js) ******\n");
         if($index['errors']){
             $this->error("*** index.js ***\n\n" . join("\n", $index['errors']));
-            echo "\n";
+            $this->line("");
         }
-        $this->info("The following blocks are exported:\n\n\t" . join("\n\t", $index['exported']) . "\n");
-        $this->alert("I do not check:\n\t* layouts (definition.json and layouts.js file)\n\t* regions (definition.json).");
+
+        $unused = [];
+        foreach($all_blocks as $block => $status){
+            $block = str_replace('/', '-', $block);
+            if(!in_array($block, $index['exported'])){
+                $unused[] = $block;
+            }
+        }
+
+        $this->info("The following blocks are exported:\n\n" . join("\n", $index['exported']) . "\n");
+        if(count($unused)){
+            $this->comment("The following blocks are NOT exported:\n\n\t" . join("\n\t", $unused) . "\n");
+        }
+        $this->alert("Not checked: - layouts (definition.json and layouts.js file) and regions (definition.json).");
     }
 
     public function checkBlocks()
@@ -98,6 +110,7 @@ class CheckDefns extends Command
             }else{
             }
         }
+        return $results;
     }
 
     public function checkBlockIndex()
