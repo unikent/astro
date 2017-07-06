@@ -41,6 +41,14 @@ class CheckDefns extends Command
     public function handle()
     {
         $this->checkBlocks();
+        $index = $this->checkBlockIndex();
+        echo "\n****** Exported Blocks (index.js) ******\n\n";
+        if($index['errors']){
+            $this->error("*** index.js ***\n\n" . join("\n", $index['errors']));
+            echo "\n";
+        }
+        $this->info("The following blocks are exported:\n\n\t" . join("\n\t", $index['exported']) . "\n");
+        $this->alert("I do not check:\n\t* layouts (definition.json and layouts.js file)\n\t* regions (definition.json).");
     }
 
     public function checkBlocks()
@@ -90,6 +98,46 @@ class CheckDefns extends Command
             }else{
             }
         }
+    }
+
+    public function checkBlockIndex()
+    {
+        $ok = [];
+        $errors = [];
+        $file = Config::get('app.definitions_path') . '/index.js';
+        if(!file_exists($file)){
+            $errors[] = "Missing index.js in " . Config.get('app.definitions_path');
+        }else{
+            $index = file_get_contents($file);
+            $imports = [];
+            if( preg_match_all('/^\s*import\s+([a-z0-9_]+)\s+from\s+([\'"])\.\/blocks\/([a-z0-9_-]+)\/v([0-9]+)\/[a-z0-9_.-]+\2;$/im', $index, $matches)){
+                for($i = 0; $i < count($matches[0]); $i++){
+                   $imports[$matches[1][$i]] = ['name' => $matches[3][$i], 'version' => $matches[4][$i]];
+                }
+            }
+
+            $exports = [];
+            if( preg_match('/^.*?export\s+default\s*{\s*([^}]+?)\s*}.*?$/im', $index, $matches)){
+                $index = $matches[1];
+                if( preg_match_all('/\s*([\'"])([a-z0-9_-]+)\1\s*:\s*([a-z0-9_]+)[\s,]/im', $index, $matches)){
+                    for($i = 0; $i < count($matches[1]);$i++){
+                        $exports[$matches[2][$i]] = $matches[3][$i];
+                    }
+                }
+            }
+            ksort($imports);
+            ksort($exports);
+            foreach($exports as $k =>$v){
+                if(!isset($imports[$v])){
+                    $errors[] = "\"$k\" is exported but not imported.";
+                }elseif($imports[$v]['name'].'-v' . $imports[$v]['version'] != $k) {
+                    $errors[] = "No matching import for export \"$k\": \"$v\"";
+                }else{
+                    $ok[] = $k;
+                }
+            }
+        }
+        return ['errors' => $errors, 'exported' => $ok];
     }
 
     public function checkBlockJSON($json, $name, $version)
