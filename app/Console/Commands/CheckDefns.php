@@ -57,10 +57,9 @@ class CheckDefns extends Command
             $defn = file_exists($block.'/definition.json');
             $name = str_replace($path, '', $block);
             $info = '';
-            echo $name;
+            echo $name . '...';
             $err = '';
             if( $vue_template && $twig_template && $defn ) {
-                $info .= '...OK';
             }else{
                 $err .= !$vue_template ? $missing_prefix . "Vue Template\n" : "";
                 $err .= !$twig_template ? $missing_prefix . "Twig Template\n" : "";
@@ -74,16 +73,21 @@ class CheckDefns extends Command
                     list($basename,$version) = explode('/v', $name);
                     $errors = $this->checkBlockJSON($json, $basename, $version);
                     if($errors){
-                        $err .= " *** definition.json ERRORS:\n\t" . join("\n\t", $errors);
+                        $err .= "\n*** definition.json ***\n\n" . join("\n", $errors) . "\n";
                     }
                 }
             }
-            $this->info($info);
+            if(!$err){
+                $info .= 'OK';
+                $this->info($info);
+            }
             $results[$name] = true;
             if( $err ){
+                $this->error('*ERROR*');
                 $results[$name] = false;
                 $this->error($err);
-                echo "\n\n";
+                echo "\n";
+            }else{
             }
         }
     }
@@ -102,6 +106,71 @@ class CheckDefns extends Command
         if(!empty($json['version']) && $json['version'] != $version){
             $errors[] = "Value for \"version\": (\"{$json['version']}\") does not match definition directory version: \"$version\"";
         }
+        if(!empty($json['fields'])) {
+            $err = $this->checkBlockFields($json['fields']);
+            if($err){
+                $errors[] = "Invalid field definitions:\n\t" . join("\n\t", $err) . "\n";
+            }
+        }
         return $errors;
+    }
+
+    public function checkBlockFields($fields)
+    {
+        $errors = [];
+        $valid_fields = [
+            'text' => '',
+        	'textarea' => '',
+            'richtext' => '',
+            'switch' => '',
+            'checkbox' => '',
+            'select' => '',
+            'multiselect' => '',
+            'radio' => '',
+            'buttongroup' => '',
+            'link' => '',
+            'image' => '',
+            'file' => '',
+            'number' => '',
+            'slider' => '',
+            'date' => '',
+            'time' => '',
+            'datetime' => '',
+            'nested' => '',
+            'collection' => '',
+            'group' => ''
+        ];
+        if(!is_array($fields)){
+            $errors[] = 'fields must be an array if present.';
+        }
+        foreach($fields as $field){
+            if( !is_array($field)){
+                $errors[] = $field . ' is not a valid field definition (array required).';
+            }else{
+                if(empty($field['name'])){
+                    $errors[] = 'Field missing name.';
+                }else{
+                    if(empty($field['type'])){
+                        $errors[] = "Field \"{$field['name']}\": \"type\" is required.";
+                    }elseif(!isset($valid_fields[$field['type']])){
+                        $errors[] = "Field \"{$field['name']}\": \"{$field['type']}\" is not a valid type.";
+                    }elseif(!empty($field['validation'])){ // checking validation requires a valid type
+                        $err = $this->checkFieldValidation($field['name'], $field['type'], $field['validation']);
+                        if($err){
+                            $errors[] = "Field \"{$field['name']}\": Invalid validation rules: \n\t" . join("\n\t", $err);
+                        }
+                    }
+                    if(empty($field['label'])){
+                        $errors[] = "Field \"{$field['name']}\": \"label\" is required.";
+                    }
+                }
+            }
+        }
+        return $errors;
+    }
+
+    public function checkFieldValidation($name, $type, $rules)
+    {
+        return [];
     }
 }
