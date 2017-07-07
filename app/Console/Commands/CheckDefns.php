@@ -132,7 +132,7 @@ class CheckDefns extends Command
             $exports = [];
             if( preg_match('/^.*?export\s+default\s*{\s*([^}]+?)\s*}.*?$/im', $index, $matches)){
                 $index = $matches[1];
-                if( preg_match_all('/\s*([\'"])([a-z0-9_-]+)\1\s*:\s*([a-z0-9_]+)[\s,]/im', $index, $matches)){
+                if( preg_match_all('/\s*([\'"])([a-z0-9_-]+)\1\s*:\s*([a-z0-9_]+)[\s,]?/im', $index, $matches)){
                     for($i = 0; $i < count($matches[1]);$i++){
                         $exports[$matches[2][$i]] = $matches[3][$i];
                     }
