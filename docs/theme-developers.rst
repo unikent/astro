@@ -116,11 +116,21 @@ Layouts require two templates:
 Example template.vue:
 ~~~~~~~~~~~~~~~~~~~~~
 
-The Vue.js template typically just needs to include references to the Region component
-to allow the Editor to determine where to place Blocks.
+The Vue.js template must include a <region> component for each region it defines (this is how the editor knows where
+to put blocks).
 
 .. literalinclude:: ./examples/simple-vue-layout.vue
    :language: html
+
+The markup **must** be wrapped in ``<template>...</template>`` tags and **must** contain a single root element, eg:
+
+ .. code-block: html
+
+ <template>
+   <div>
+
+   </div>
+ </template>
 
 Example template.twig:
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -163,10 +173,24 @@ data and any restrictions on validation for these fields:
  {
     "name": "BLOCK_NAME",
     "version": "1",
+    "label": "Human Readable Block Name",
     "fields": [
 
     ]
  }
+
+Example template.vue
+~~~~~~~~~~~~~~~~~~~~
+
+At a minimum each block's vue template must include:
+
+ # <template>...</template> tags.
+
+.. literalinclude:: ./examples/basic-vue-block.vue
+    :language: html
+
+Example PHP Block Class
+~~~~~~~~~~~~~~~~~~~~~~~
 
 The *optional* PHP Block class should implement the interface ``Astro\Renderer\Contracts\Block``:
 
