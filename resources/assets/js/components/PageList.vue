@@ -1,5 +1,6 @@
 <template>
 <div>
+	<back-bar :title="title" />
 	<ul v-if="pages" v-for="page in pages" class="page-list">
 		<PageListItem class="item" :site="site" :page="page" :editing="edit"></PageListItem>
 	</ul>
@@ -8,11 +9,18 @@
 
 <script>
 import PageListItem from './PageListItem';
-import { Loading } from 'element-ui';
+import BackBar from './BackBar';
 import { mapState, mapActions } from 'vuex';
 
 
 export default {
+
+	props: ['title'],
+
+	components: {
+		PageListItem,
+		BackBar
+	},
 
 	data() {
 		return {
@@ -20,10 +28,6 @@ export default {
 			edit: null,
 			loading: true
 		};
-	},
-
-	components: {
-		PageListItem
 	},
 
 	computed: {

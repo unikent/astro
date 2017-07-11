@@ -1,13 +1,11 @@
 <template>
-<div>
-	<div class="b-back-button">
-		<span class="back" @click="goBack">
-			<i class="el-icon-arrow-left"></i>Add more blocks
-		</span>
-		<span v-if="currentDefinition && currentDefinition.label" class="block-title">
-			{{ currentDefinition.label }}
-		</span>
-	</div>
+<div class="block-options" :class="{'options-visible' : mode === 'edit'}">
+	<back-bar
+		:title="
+			currentDefinition && currentDefinition.label ?
+				currentDefinition.label : title
+		"
+	 />
 	<div ref="options-list" class="block-options-list custom-scrollbar">
 		<el-form
 			v-if="currentDefinition"
@@ -71,6 +69,7 @@
 import { mapState, mapMutations, mapGetters } from 'vuex';
 import Vue from 'vue';
 import { Definition, getTopOffset, smoothScrollTo } from 'classes/helpers';
+import BackBar from './BackBar';
 import fields from 'components/fields';
 import containers from 'components/fields/containers';
 import { heights } from 'classes/sass';
@@ -83,29 +82,14 @@ export default {
 
 	name: 'block-options',
 
+	props: ['title'],
+
 	components: {
-		Icon
+		Icon,
+		BackBar
 	},
 
 	computed: {
-		blockFields: {
-			get() {
-				const currentBlock = this.getCurrentBlock();
-				if(currentBlock) {
-					return currentBlock.fields;
-				}
-			},
-			set() {}
-		},
-
-		localErrors() {
-			return this.errors.blocks ?
-				this.errors.blocks[this.currentRegion][this.currentIndex].fields : {};
-		},
-
-		rules() {
-			return Definition.getRules(this.currentDefinition, false);
-		},
 
 		...mapGetters([
 			'getCurrentBlock'
@@ -126,7 +110,30 @@ export default {
 			},
 
 			currentDefinition: state => state.definition.currentBlockDefinition
-		})
+		}),
+
+		mode() {
+			return this.currentDefinition ? 'edit' : 'list';
+		},
+
+		blockFields: {
+			get() {
+				const currentBlock = this.getCurrentBlock();
+				if(currentBlock) {
+					return currentBlock.fields;
+				}
+			},
+			set() {}
+		},
+
+		localErrors() {
+			return this.errors.blocks ?
+				this.errors.blocks[this.currentRegion][this.currentIndex].fields : {};
+		},
+
+		rules() {
+			return Definition.getRules(this.currentDefinition, false);
+		}
 	},
 
 	watch: {
