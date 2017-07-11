@@ -1,31 +1,72 @@
 <template>
 <div>
-	<h2 class="block-list-header">Available blocks</h2>
-	<ul class="block-list">
-		<li v-for="block in blocks" v-if="block">
-			<block-list-item :block="block" />
-		</li>
-	</ul>
+	<div class="block-list columns is-multiline">
+		<div
+			v-for="(block, key) in blocks"
+			v-if="block"
+			class="column is-one-quarter"
+		>
+			<div
+				class="block-move"
+				:class="{ 'block-move--selected': selected.indexOf(key) !== -1 }"
+				@mousedown="handleMousedown(key)"
+			>
+				{{ block.label }}
+			</div>
+		</div>
+	</div>
+	<span v-if="selected.length">
+		Selected:
+		<ul>
+			<li v-for="label in labels">{{ label }}</li>
+		</ul>
+	</span>
 </div>
 </template>
 
 <script>
-import BlockListItem from './BlockListItem';
-import { mapState } from 'vuex';
-
 export default {
 
-	components: {
-		BlockListItem
+	props: {
+		'selectedBlocks': {
+			required: true
+		}
+	},
+
+	data() {
+		return {
+			selected: this.selectedBlocks
+		};
+	},
+
+	watch: {
+		selectedBlocks(val) {
+			if(val.length === 0) {
+				this.selected = val;
+			}
+		}
 	},
 
 	computed: {
-		...mapState([
-			'over'
-		]),
-
 		blocks() {
 			return this.$store.state.definition.blockDefinitions;
+		},
+
+		labels() {
+			return this.selected.map(name => this.blocks[name].label);
+		}
+	},
+
+	methods: {
+		handleMousedown(name) {
+			const current = this.selected.indexOf(name);
+
+			if(current === -1) {
+				this.selected.push(name);
+			}
+			else {
+				this.selected.splice(current, 1);
+			}
 		}
 	}
 };

@@ -42,6 +42,7 @@
 	</div>
 
 	<sidebar />
+	<block-picker />
 </div>
 </template>
 
@@ -51,6 +52,7 @@ import { Loading } from 'element-ui';
 
 import Config from 'classes/Config';
 import Sidebar from 'components/Sidebar';
+import BlockPicker from 'components/BlockPicker';
 import Icon from 'components/Icon';
 
 import { undoStackInstance } from 'plugins/undo-redo';
@@ -63,6 +65,7 @@ export default {
 
 	components: {
 		Sidebar,
+		BlockPicker,
 		Icon
 	},
 
