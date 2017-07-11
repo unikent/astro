@@ -82,7 +82,7 @@
 </template>
 
 <script>
-import Icon from '../Icon';
+import Icon from 'components/Icon';
 
 export default {
 

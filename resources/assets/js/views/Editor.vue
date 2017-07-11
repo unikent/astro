@@ -1,11 +1,14 @@
 <template>
 <div class="editor-body">
+
 	<div class="editor-wrapper" ref="editor">
-		<iframe ref="iframe" class="editor-content" :style="dimensions" :src="getPreviewUrl" frameborder="0" />
+		<iframe :src="getPreviewUrl" class="editor-content" :style="dimensions" frameborder="0" />
 		<div
 			class="iframe-overlay"
 			:style="{ 'position' : displayIframeOverlay ? 'absolute' : null }"
 		/>
+
+		<!-- TODO: Move this bottom bar to its own component -->
 		<footer class="b-bar">
 
 			<el-tooltip class="item" effect="dark" content="Switch preview mode" placement="top">
@@ -38,49 +41,20 @@
 		</footer>
 	</div>
 
-	<nav
-		:style="{marginLeft: sideBarOpen ? 0 : '-250px', maxWidth: 0, minWidth: '249px'}"
-		class="editor-nav editor-sidebar"
-		:class="{ 'editor-nav--is-over': sideBarHover || !sideBarOpen }"
-		@mouseenter="sideBarHover = true"
-		@mouseleave="sideBarHover = false"
-	>
-		<page-sidebar></page-sidebar>
-		<div class="left-collapse" @click="sideBarOpen = !sideBarOpen">
-			<i :class="{'el-icon-arrow-left' : sideBarOpen, 'el-icon-arrow-right' : !sideBarOpen }" :style="{ marginLeft: sideBarOpen ? '2px' : '5px'}"></i>
-		</div>
-	</nav>
-
-	<aside
-		:style="{marginRight: blockListOpen ? 0 : '-380px'}"
-		class="editor-component-list editor-sidebar"
-		:class="{ 'editor-component-list--is-over': blockListHover || !blockListOpen }"
-		@mouseenter="blockListHover = true"
-		@mouseleave="blockListHover = false"
-	>
-		<div class="right-collapse" @click="blockListOpen = !blockListOpen">
-			<i :class="{'el-icon-arrow-right' : blockListOpen, 'el-icon-arrow-left' : !blockListOpen}" :style="{ marginLeft: blockListOpen ? '5px' : '3px'}"></i>
-		</div>
-		<block-sidebar></block-sidebar>
-	</aside>
-
-	<el-dialog v-model="preview.visible" style="text-align: center;">
-		<img :src="preview.url" style="max-width: 95%;" />
-	</el-dialog>
+	<sidebar />
 </div>
 </template>
 
 <script>
-import { Loading } from 'element-ui';
 import { mapState } from 'vuex';
+import { Loading } from 'element-ui';
 
-import Config from '../../classes/Config';
-import PageSidebar from '../PageSidebar';
-import BlockSidebar from '../BlockSidebar';
+import Config from 'classes/Config';
+import Sidebar from 'components/Sidebar';
+import Icon from 'components/Icon';
+
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
-
-import Icon from '../Icon';
 
 /* global document */
 
@@ -88,8 +62,7 @@ export default {
 	name: 'editor',
 
 	components: {
-		PageSidebar,
-		BlockSidebar,
+		Sidebar,
 		Icon
 	},
 
@@ -129,11 +102,7 @@ export default {
 
 	data() {
 		return {
-			currentView: 'desktop',
-			sideBarOpen: true,
-			blockListOpen: true,
-			blockListHover: false,
-			sideBarHover: false
+			currentView: 'desktop'
 		};
 	},
 
@@ -179,9 +148,12 @@ export default {
 		savePage() {
 			this.$api
 				.put(`page/${this.$route.params.site_id}`, this.page)
-				.then((response) => {
-					console.log(response.data);
-				});
+				.then(() => {
+					this.$snackbar.open({
+						message: 'Successfully saved page'
+					})
+				})
+				.catch(() => {});
 		},
 
 		undo() {

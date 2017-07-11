@@ -26,3 +26,5 @@ export { default as edit }      from 'IconPath/pencil.svg';
 export { default as move }      from 'IconPath/arrows-vertical.svg';
 export { default as eye }       from 'IconPath/eye.svg';
 export { default as layers }    from 'IconPath/layers.svg';
+export { default as plus }      from 'IconPath/plus.svg';
+export { default as menualt }   from 'IconPath/menu-alt.svg';

@@ -116,12 +116,14 @@ export default class Definition {
 
 						value = [];
 
-						validation.some((rule) => {
-							if(rule.min !== void 0) {
-								initialise = rule.min;
-								return true;
-							}
-						});
+						if(Array.isArray(validation)) {
+							validation.some((rule) => {
+								if(rule.min !== void 0) {
+									initialise = rule.min;
+									return true;
+								}
+							});
+						}
 
 						if(initialise) {
 

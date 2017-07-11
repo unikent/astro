@@ -30,7 +30,7 @@ import { mapState, mapActions, mapMutations, mapGetters } from 'vuex';
 import _ from 'lodash';
 import imagesLoaded from 'imagesloaded';
 
-import Icon from '../Icon';
+import Icon from 'components/Icon';
 import ResizeShim from 'components/ResizeShim';
 
 import { win, findParent, smoothScrollTo } from 'classes/helpers';

@@ -1,15 +1,15 @@
 import VueRouter from 'vue-router';
 
-import Admin from './components/views/Admin';
+import Admin from './views/Admin';
 
-import Dashboard from './components/views/Dashboard';
-import SiteList from './components/views/SiteList';
-import Media from './components/views/Media';
-import Settings from './components/views/Settings'
+import Dashboard from './views/Dashboard';
+import SiteList from './views/SiteList';
+import Media from './views/Media';
+import Settings from './views/Settings'
 
-import Editor from './components/views/Editor';
-import Preview from './components/views/Preview';
-import NotFound from './components/views/NotFound';
+import Editor from './views/Editor';
+import Preview from './views/Preview';
+import NotFound from './views/NotFound';
 import Config from './classes/Config';
 
 const routes = [
