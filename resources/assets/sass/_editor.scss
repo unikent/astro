@@ -38,10 +38,8 @@ html {
 }
 
 .editor-sidebar {
-	width: 250px;
 	background-color: #f7f9fb;
 	z-index: 0;
-	min-width: 210px;
 	font-size: 14px;
 }
 
@@ -265,6 +263,7 @@ html {
 }
 
 .b-back-button {
+	display: flex;
 	padding: 0 10px 0 16px;
 	height: 42px;
 	line-height: 42px;
@@ -273,14 +272,18 @@ html {
 
 	.back {
 		cursor: pointer;
+		margin-left: auto;
+		white-space: nowrap;
 	}
 
 	.block-title {
 		font-weight: 500;
+		white-space: nowrap;
 	}
 
 	i {
-		margin-right: 10px;
+		font-size: .7rem;
+		margin-left: 5px;
 	}
 }
 
@@ -335,3 +338,4 @@ html {
 	height: 100px;
 	background-color: #b7c2d4;
 }
+
