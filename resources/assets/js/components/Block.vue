@@ -133,11 +133,14 @@ export default {
 	methods: {
 		...mapMutations([
 			'updateBlockMeta',
-			'setBlock'
+			'setBlock',
+			'collapseSidebar',
+			'revealSidebar'
 		]),
 
 		editBlock() {
 			if(this.currentBlockIndex !== this.index) {
+				this.collapseSidebar();
 				this.setBlock({ index: this.index, type: this.type });
 			}
 		},

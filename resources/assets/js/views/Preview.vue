@@ -9,11 +9,25 @@
 			}"
 			:style="blockOverlayStyles"
 		>
-			<div class="block-overlay__delete" @click="removeDialog(removeBlock)">
+			<div class="block-overlay__delete" @click="removeBlock"> <!-- removeDialog(removeBlock) -->
 				<Icon name="delete" width="20" height="20" />
 			</div>
 			<div ref="move" class="block-overlay__move" v-show="blocks.length > 1">
 				<Icon name="move" width="20" height="20" />
+			</div>
+			<div
+				class="add-before"
+				:class="{ 'add-before--first' : currentBlockIsFirst }"
+				@click="showBlockList()"
+			>
+				<icon name="plus" width="15" height="15" viewBox="0 0 15 15" />
+			</div>
+			<div
+				class="add-after"
+				:class="{ 'add-after--last' : currentBlockIsLast }"
+				@click="showBlockList(1)"
+			>
+				<icon name="plus" width="15" height="15" viewBox="0 0 15 15" />
 			</div>
 		</div>
 	</div>
@@ -82,8 +96,19 @@ export default {
 		]),
 
 		layout() {
-			return this.currentLayout ?
-				layouts[`${this.currentLayout}-v${this.layoutVersion}`] : null;
+			if(!this.currentLayout) {
+				return null;
+			}
+
+			const
+				layoutName = `${this.currentLayout}-v${this.layoutVersion}`,
+				layout = layouts[layoutName];
+
+			if(!layout) {
+				console.warn(`"${layoutName}" layout not found.`)
+			}
+
+			return layout || null;
 		},
 
 		dragging: {
@@ -94,6 +119,14 @@ export default {
 			set(val) {
 				return this.$store.commit('setDragging', val);
 			}
+		},
+
+		currentBlockIsFirst() {
+			return this.current && this.current.index === 0;
+		},
+
+		currentBlockIsLast() {
+			return this.current && this.current.index === this.blocks.length - 1;
 		}
 	},
 
@@ -117,7 +150,7 @@ export default {
 			if(this.current) {
 				this.positionOverlay(this.current);
 			}
-		}, 50, { trailing: true });
+		}, 16, { trailing: true });
 	},
 
 	destroyed() {
@@ -146,7 +179,9 @@ export default {
 			'reorderBlocks',
 			'deleteBlock',
 			'updateBlockMeta',
-			'setScale'
+			'setScale',
+			'addBlock',
+			'showBlockPicker'
 		]),
 
 		initEvents() {
@@ -166,10 +201,10 @@ export default {
 		removeDialog(done) {
 			this
 				.$confirm('Are you sure you want to remove this block?')
-				.then(_ => {
+				.then(() => {
 					done();
 				})
-				.catch(_ => {});
+				.catch(() => {});
 		},
 
 		removeBlock() {
@@ -401,6 +436,10 @@ export default {
 						prop : { [prop]: value }
 				)
 			};
+		},
+
+		showBlockList(offset = 0) {
+			this.showBlockPicker();
 		}
 	}
 };

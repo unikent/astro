@@ -104,7 +104,9 @@
 .hide-drag {
 	.block-overlay__options,
 	.block-overlay__delete,
-	.block-overlay__move {
+	.block-overlay__move,
+	.add-before,
+	.add-after {
 		opacity: 0;
 	}
 }
@@ -137,4 +139,58 @@
 	user-select: none;
 	text-align: center;
 	opacity: 0;
+}
+
+.add-before,
+.add-after {
+	border-radius: 4px;
+	width: 30px;
+	height: 30px;
+	background-color: #fff;
+	border: 1px solid #c4c4c4;
+	position: absolute;
+	left: 50%;
+	pointer-events: auto;
+	transition: .3s border-color ease-out;
+	text-align: center;
+
+	&:hover {
+		border-color: #20a0ff;
+		cursor: pointer;
+		transition: .3s border-color ease-out, transform .2s ease-out;
+	}
+}
+
+.add-before {
+	top: 0;
+	transform: translate(-50%, -50%) translateY(-4px);
+
+	&:hover {
+		transform: translate(-50%, -50%) translateY(-4px) scale(1.2);
+	}
+}
+
+.add-after {
+	bottom: 0;
+	transform: translate(-50%, 50%) translateY(4px);
+
+	&:hover {
+		transform: translate(-50%, 50%) translateY(4px) scale(1.2);
+	}
+}
+
+.add-before--first {
+	transform: translate(-50%, 0);
+
+	&:hover {
+		transform: translate(-50%, 0) scale(1.2);
+	}
+}
+
+.add-after--last {
+	transform: translate(-50%, 0);
+
+	&:hover {
+		transform: translate(-50%, 0) scale(1.2);
+	}
 }

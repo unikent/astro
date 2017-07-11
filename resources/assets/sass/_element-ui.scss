@@ -127,3 +127,22 @@
 .el-dialog {
 	border-radius: 4px;
 }
+
+.tabbed-dialog {
+	.el-tabs--border-card > .el-tabs__header {
+		background-color: #f7f9fb;
+	}
+
+	.el-dialog__body {
+		padding: 30px 0;
+	}
+
+	.el-tabs--border-card {
+		border: 0;
+		border-top: 1px solid #dadde2;
+	}
+
+	.el-tabs--border-card {
+		box-shadow: none;
+	}
+}
