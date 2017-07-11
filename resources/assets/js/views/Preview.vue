@@ -73,7 +73,8 @@ export default {
 			hideBlockOverlayControls: false,
 			overlayStyles: {},
 			wrapperStyles: {},
-			overlayHidden: true
+			overlayHidden: true,
+			current: null
 		};
 	},
 
@@ -167,7 +168,6 @@ export default {
 	mounted() {
 		this.wrapper = this.$refs.wrapper;
 		this.moveEl = this.$refs.move;
-		this.current = null;
 		this.initEvents();
 	},
 
