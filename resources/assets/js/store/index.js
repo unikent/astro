@@ -29,7 +29,8 @@ let store = new Vuex.Store({
 		undoRedo: {
 			canUndo: false,
 			canRedo: false
-		}
+		},
+		sidebarCollapsed: false
 	},
 
 	getters: {},
@@ -58,6 +59,14 @@ let store = new Vuex.Store({
 
 		updateUndoRedo(state, canUndoRedo) {
 			state.undoRedo = canUndoRedo;
+		},
+
+		collapseSidebar(state) {
+			state.sidebarCollapsed = true;
+		},
+
+		revealSidebar(state) {
+			state.sidebarCollapsed = false;
 		}
 	},
 
