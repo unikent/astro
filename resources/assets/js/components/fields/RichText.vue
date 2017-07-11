@@ -1,5 +1,5 @@
 <template>
-	<div class="redactorWrapper">
+	<div class="richtext-wrapper">
 		<rich-text v-model="value" />
 	</div>
 </template>
