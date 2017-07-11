@@ -76,7 +76,7 @@ import { mapState } from 'vuex';
 
 import Config from 'classes/Config';
 import PageSidebar from 'components/PageSidebar';
-import BlockSidebar from 'components/BlockSidebar';
+import BlockSidebar from 'components/Sidebar/BlockSidebar';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
 
