@@ -128,3 +128,15 @@
 	background-color: #f7f9fb;
 	white-space: pre-wrap;
 }
+
+.todo {
+	background-color: lighten(#4eadda, 30%);
+	color: #48576a;
+	margin: 20px;
+	padding: 14px;
+	border: 1px solid #b7c2d4;
+
+	&:before {
+		content: 'TODO: ';
+	}
+}
