@@ -24,7 +24,19 @@
 				:key="field.name"
 			>
 				<template slot="label">
-					<span>{{ field.label }}</span>
+					<div style="display: flex;">
+						<span>{{ field.label }}</span>
+						<el-tooltip content="View field" placement="top">
+							<icon
+								style="margin-left: auto; fill: #a0a0a0; align-self: flex-end;"
+								name="eye"
+								width="14"
+								height="14"
+								viewBox="0 0 14 14"
+								@click="viewField(field.name)"
+							/>
+						</el-tooltip>
+					</div>
 					<el-tooltip v-if="field.info" :content="field.info" placement="top">
 						<icon
 							class="field-info"
@@ -41,6 +53,7 @@
 					:name="field.name"
 					:index="currentIndex"
 					:key="`${currentDefinition.name}-${currentIndex}`"
+					:scrollTo="scrollTo"
 				/>
 			</el-form-item>
 		</el-form>
@@ -49,7 +62,7 @@
 
 	<div class="b-bottom-bar">
 		<el-button :plain="true" type="danger" @click="deleteThisBlock">Remove</el-button>
-		<el-button @click="submitForm('block_fields')">Save</el-button>
+		<el-button @click="submitForm('block_fields')">Validate</el-button>
 	</div>
 </div>
 </template>
@@ -57,7 +70,7 @@
 <script>
 import { mapState, mapMutations, mapGetters } from 'vuex';
 import Vue from 'vue';
-import { Definition, getTopOffset } from 'classes/helpers';
+import { Definition, getTopOffset, smoothScrollTo } from 'classes/helpers';
 import fields from 'components/fields';
 import containers from 'components/fields/containers';
 import { heights } from 'classes/sass';
@@ -156,6 +169,13 @@ export default {
 			);
 		},
 
+		scrollTo(el) {
+			// Vue.nextTick(() => {
+			// 	smoothScrollTo()
+			// });
+			console.log(el);
+		},
+
 		submitForm(formName) {
 			this.$refs[formName].validate((valid) => {
 				if(!valid) {
@@ -176,7 +196,15 @@ export default {
 					return false;
 				}
 			});
+		},
+
+		viewField(fieldName) {
+			console.log(this.currentBlock, fieldName);
+			if(this.currentBlock.fieldElements[fieldName]) {
+				console.log(this.currentBlock.fieldElements[fieldName]);
+			}
 		}
+
 	}
 
 };
