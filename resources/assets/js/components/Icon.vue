@@ -28,7 +28,7 @@ export default {
 
 	computed: {
 		glyph() {
-			return icons[this.name] || icons.unknown;
+			return icons[this.name.replace(/[^a-z]/g, '')] || icons.unknown;
 		}
 	}
 };
