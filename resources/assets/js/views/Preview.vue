@@ -85,6 +85,7 @@ export default {
 		...mapState({
 			loadedBlocks: state => state.page.loaded,
 			currentLayout: state => state.page.currentLayout,
+			currentRegion: state => state.page.currentRegion,
 			layoutVersion: state => state.page.currentLayoutVersion,
 			blockMeta: state => state.page.blockMeta.blocks[state.page.currentRegion],
 			blocks: state => state.page.pageData.blocks[state.page.currentRegion]
@@ -181,7 +182,9 @@ export default {
 			'updateBlockMeta',
 			'setScale',
 			'addBlock',
-			'showBlockPicker'
+			'showBlockPicker',
+			'updateInsertIndex',
+			'updateInsertRegion'
 		]),
 
 		initEvents() {
@@ -208,8 +211,8 @@ export default {
 		},
 
 		removeBlock() {
-			const { index } = this.current;
-			this.deleteBlock({ index });
+			const { index, region } = this.current;
+			this.deleteBlock({ index, region });
 			this.hideOverlay();
 			this.current = null;
 		},
@@ -275,6 +278,7 @@ export default {
 
 				this.updateBlockMeta({
 					index: this.current.index,
+					region: this.current.region,
 					type: 'dragging',
 					value: true
 				});
@@ -372,6 +376,7 @@ export default {
 			for(var i = 0; i < this.blocks.length; i++) {
 				this.updateBlockMeta({
 					type: 'offset',
+					region: this.current.region,
 					index: i,
 					value: 0
 				});
@@ -379,6 +384,7 @@ export default {
 
 			this.updateBlockMeta({
 				index: this.moved ? this.moved.to : this.current.index,
+				region: this.current.region,
 				type: 'dragging',
 				value: false
 			});
@@ -439,6 +445,9 @@ export default {
 		},
 
 		showBlockList(offset = 0) {
+			const { index, region } = this.current;
+			this.updateInsertIndex(index + offset);
+			this.updateInsertRegion(region);
 			this.showBlockPicker();
 		}
 	}
