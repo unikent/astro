@@ -163,10 +163,24 @@ data and any restrictions on validation for these fields:
  {
     "name": "BLOCK_NAME",
     "version": "1",
+    "label": "Human Readable Block Name",
     "fields": [
 
     ]
  }
+
+Example template.vue
+~~~~~~~~~~~~~~~~~~~~
+
+At a minimum each block's vue template must include:
+
+ # <template>...</template> tags.
+
+.. literalinclude:: ./examples/basic-vue-block.vue
+    :language: html
+
+Example PHP Block Class
+~~~~~~~~~~~~~~~~~~~~~~~
 
 The *optional* PHP Block class should implement the interface ``Astro\Renderer\Contracts\Block``:
 

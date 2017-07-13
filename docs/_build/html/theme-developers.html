@@ -261,12 +261,37 @@ data and any restrictions on validation for these fields:</p>
 <div class="highlight-json"><div class="highlight"><pre><span></span><span class="p">{</span>
    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;BLOCK_NAME&quot;</span><span class="p">,</span>
    <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span>
+   <span class="nt">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Human Readable Block Name&quot;</span><span class="p">,</span>
    <span class="nt">&quot;fields&quot;</span><span class="p">:</span> <span class="p">[</span>
 
    <span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
+<div class="section" id="id1">
+<h4>Example template.vue<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<p>At a minimum each block’s vue template must include:</p>
+<blockquote>
+<div># &lt;template&gt;…&lt;/template&gt; tags.</div></blockquote>
+<div class="highlight-html"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">template</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">style</span><span class="o">=</span><span class="s">&quot;min-height:50px;&quot;</span><span class="p">&gt;</span>
+        {{ lead }}
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">template</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
+    <span class="kr">import</span> <span class="nx">BaseBlock</span> <span class="nx">from</span> <span class="s1">&#39;components/BaseBlock&#39;</span><span class="p">;</span>
+    <span class="kr">export</span> <span class="k">default</span> <span class="p">{</span>
+        <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;lead&#39;</span><span class="p">,</span>
+        <span class="kr">extends</span><span class="o">:</span> <span class="nx">BaseBlock</span><span class="p">,</span>
+
+    <span class="p">};</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="example-php-block-class">
+<h4>Example PHP Block Class<a class="headerlink" href="#example-php-block-class" title="Permalink to this headline">¶</a></h4>
 <p>The <em>optional</em> PHP Block class should implement the interface <code class="docutils literal"><span class="pre">Astro\Renderer\Contracts\Block</span></code>:</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 
@@ -324,6 +349,7 @@ data and any restrictions on validation for these fields:</p>
 </div>
 </div>
 </div>
+</div>
 <div class="section" id="pages">
 <h2>Pages<a class="headerlink" href="#pages" title="Permalink to this headline">¶</a></h2>
 </div>
@@ -332,8 +358,8 @@ data and any restrictions on validation for these fields:</p>
 <p>Astro includes a number of fields by default. It is not currently possible to create new fields without editing
 Astro directly.</p>
 </div>
-<div class="section" id="id1">
-<h2>Definitions<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id2">
+<h2>Definitions<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>Definitions from multiple repositories can be used in the same instance of Astro.</p>
 <p>The definitions available to the Editor are defined at build time, whilst those for the</p>
 <p>The Editor, API and Renderer all need to be configured with which repositories should be used, and all definitions should be namespaced.</p>
@@ -346,8 +372,8 @@ Astro directly.</p>
 <div class="section" id="editor">
 <h3>Editor<a class="headerlink" href="#editor" title="Permalink to this headline">¶</a></h3>
 </div>
-<div class="section" id="id2">
-<h3>Blocks<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h3>Blocks<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <p>Each Block __may__ define a class implementing AstroRendererContractsBlock which will be available when rendering the block.</p>
 <p>Any business logic or data-retrieval too complex to include in the template should be performed here.</p>
 <p>If no class is defined then an instance of AstroRendererAPIBaseBlock will be used instead.</p>
@@ -383,8 +409,8 @@ data. Any request to /valid/url/ajax/block/[operation] will result in the render
 </ul>
 <p>It is up to the blocks (and their templates) whether what is returned is json data or pure html.</p>
 </div>
-<div class="section" id="id3">
-<h3>The API<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id4">
+<h3>The API<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <p>The API has its own /ajax endpoint. As with the editor it will initialise the relevant block class (if it exists)
 and call its ajaxAdmin() method. The block can assume that the user making this request has been authenticated and
 is authorised by the API to make requests for this site and block.</p>
@@ -440,22 +466,26 @@ is authorised by the API to make requests for this site and block.</p>
 <li><a class="reference internal" href="#php-layout-class">PHP Layout Class</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#blocks">Blocks</a></li>
+<li><a class="reference internal" href="#blocks">Blocks</a><ul>
+<li><a class="reference internal" href="#id1">Example template.vue</a></li>
+<li><a class="reference internal" href="#example-php-block-class">Example PHP Block Class</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a class="reference internal" href="#pages">Pages</a></li>
 <li><a class="reference internal" href="#fields">Fields</a></li>
-<li><a class="reference internal" href="#id1">Definitions</a><ul>
+<li><a class="reference internal" href="#id2">Definitions</a><ul>
 <li><a class="reference internal" href="#renderer">Renderer</a></li>
 <li><a class="reference internal" href="#the-api">The API</a></li>
 <li><a class="reference internal" href="#editor">Editor</a></li>
-<li><a class="reference internal" href="#id2">Blocks</a></li>
+<li><a class="reference internal" href="#id3">Blocks</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#layout-page-site-options">Layout, Page &amp; Site Options</a></li>
 <li><a class="reference internal" href="#blocks-with-dynamic-data">Blocks with Dynamic Data</a><ul>
 <li><a class="reference internal" href="#the-renderer">The Renderer</a></li>
-<li><a class="reference internal" href="#id3">The API</a></li>
+<li><a class="reference internal" href="#id4">The API</a></li>
 <li><a class="reference internal" href="#the-editor">The Editor</a></li>
 </ul>
 </li>
