@@ -9,11 +9,25 @@
 			}"
 			:style="blockOverlayStyles"
 		>
-			<div class="block-overlay__delete" @click="removeDialog(removeBlock)">
+			<div class="block-overlay__delete" @click="removeBlock"> <!-- removeDialog(removeBlock) -->
 				<Icon name="delete" width="20" height="20" />
 			</div>
 			<div ref="move" class="block-overlay__move" v-show="blocks.length > 1">
 				<Icon name="move" width="20" height="20" />
+			</div>
+			<div
+				class="add-before"
+				:class="{ 'add-before--first' : currentBlockIsFirst }"
+				@click="showBlockList()"
+			>
+				<icon name="plus" width="15" height="15" viewBox="0 0 15 15" />
+			</div>
+			<div
+				class="add-after"
+				:class="{ 'add-after--last' : currentBlockIsLast }"
+				@click="showBlockList(1)"
+			>
+				<icon name="plus" width="15" height="15" viewBox="0 0 15 15" />
 			</div>
 		</div>
 	</div>
@@ -59,7 +73,8 @@ export default {
 			hideBlockOverlayControls: false,
 			overlayStyles: {},
 			wrapperStyles: {},
-			overlayHidden: true
+			overlayHidden: true,
+			current: null
 		};
 	},
 
@@ -71,6 +86,7 @@ export default {
 		...mapState({
 			loadedBlocks: state => state.page.loaded,
 			currentLayout: state => state.page.currentLayout,
+			currentRegion: state => state.page.currentRegion,
 			layoutVersion: state => state.page.currentLayoutVersion,
 			blockMeta: state => state.page.blockMeta.blocks[state.page.currentRegion],
 			blocks: state => state.page.pageData.blocks[state.page.currentRegion]
@@ -82,8 +98,19 @@ export default {
 		]),
 
 		layout() {
-			return this.currentLayout ?
-				layouts[`${this.currentLayout}-v${this.layoutVersion}`] : null;
+			if(!this.currentLayout) {
+				return null;
+			}
+
+			const
+				layoutName = `${this.currentLayout}-v${this.layoutVersion}`,
+				layout = layouts[layoutName];
+
+			if(!layout) {
+				console.warn(`"${layoutName}" layout not found.`)
+			}
+
+			return layout || null;
 		},
 
 		dragging: {
@@ -94,6 +121,14 @@ export default {
 			set(val) {
 				return this.$store.commit('setDragging', val);
 			}
+		},
+
+		currentBlockIsFirst() {
+			return this.current && this.current.index === 0;
+		},
+
+		currentBlockIsLast() {
+			return this.current && this.current.index === this.blocks.length - 1;
 		}
 	},
 
@@ -117,7 +152,7 @@ export default {
 			if(this.current) {
 				this.positionOverlay(this.current);
 			}
-		}, 50, { trailing: true });
+		}, 16, { trailing: true });
 	},
 
 	destroyed() {
@@ -133,7 +168,6 @@ export default {
 	mounted() {
 		this.wrapper = this.$refs.wrapper;
 		this.moveEl = this.$refs.move;
-		this.current = null;
 		this.initEvents();
 	},
 
@@ -146,7 +180,11 @@ export default {
 			'reorderBlocks',
 			'deleteBlock',
 			'updateBlockMeta',
-			'setScale'
+			'setScale',
+			'addBlock',
+			'showBlockPicker',
+			'updateInsertIndex',
+			'updateInsertRegion'
 		]),
 
 		initEvents() {
@@ -166,15 +204,15 @@ export default {
 		removeDialog(done) {
 			this
 				.$confirm('Are you sure you want to remove this block?')
-				.then(_ => {
+				.then(() => {
 					done();
 				})
-				.catch(_ => {});
+				.catch(() => {});
 		},
 
 		removeBlock() {
-			const { index } = this.current;
-			this.deleteBlock({ index });
+			const { index, region } = this.current;
+			this.deleteBlock({ index, region });
 			this.hideOverlay();
 			this.current = null;
 		},
@@ -240,6 +278,7 @@ export default {
 
 				this.updateBlockMeta({
 					index: this.current.index,
+					region: this.current.region,
 					type: 'dragging',
 					value: true
 				});
@@ -337,6 +376,7 @@ export default {
 			for(var i = 0; i < this.blocks.length; i++) {
 				this.updateBlockMeta({
 					type: 'offset',
+					region: this.current.region,
 					index: i,
 					value: 0
 				});
@@ -344,6 +384,7 @@ export default {
 
 			this.updateBlockMeta({
 				index: this.moved ? this.moved.to : this.current.index,
+				region: this.current.region,
 				type: 'dragging',
 				value: false
 			});
@@ -401,6 +442,13 @@ export default {
 						prop : { [prop]: value }
 				)
 			};
+		},
+
+		showBlockList(offset = 0) {
+			const { index, region } = this.current;
+			this.updateInsertIndex(index + offset);
+			this.updateInsertRegion(region);
+			this.showBlockPicker();
 		}
 	}
 };

@@ -66,8 +66,8 @@ const mutations = {
 		state.blockMeta.blocks[state.currentRegion].splice(to, 0, val[0]);
 	},
 
-	updateBlockMeta(state, { type, index, value }) {
-		let blockData = state.blockMeta.blocks[state.currentRegion];
+	updateBlockMeta(state, { type, region, index, value }) {
+		let blockData = state.blockMeta.blocks[region];
 		blockData.splice(index, 1, { ...blockData[index], [type]: value })
 	},
 
@@ -115,27 +115,38 @@ const mutations = {
 			region = state.currentRegion;
 		}
 
-		if(index === void 0) {
-			index = state.pageData.blocks[state.currentRegion].length;
+		if(state.pageData.blocks[region] === void 0) {
+			state.blockMeta.blocks = { ... state.blockMeta.blocks, [region]: [] };
+			state.pageData.blocks = { ... state.pageData.blocks, [region]: [] };
 		}
 
-		Definition.fillBlockFields(block);
+		if(index === void 0) {
+			index = state.pageData.blocks[region].length;
+		}
 
-		state.pageData.blocks[state.currentRegion].splice(index, 1, block || {});
-		state.blockMeta.blocks[state.currentRegion].splice(index, 1, {
+		if(block) {
+			Definition.fillBlockFields(block);
+		}
+
+		state.blockMeta.blocks[region].splice(index, 0, {
 			size: 0,
 			offset: 0,
 			dragging: false
 		});
+		state.pageData.blocks[region].splice(index, 0, block || {});
 	},
 
-	deleteBlock(state, { index } = { index: null }) {
+	deleteBlock(state,  { region, index } = { region: 'main', index: null }) {
+		if(region === null) {
+			region = state.currentRegion;
+		}
+
 		if(index === null) {
 			index = state.currentBlockIndex;
 		}
 
-		state.pageData.blocks[state.currentRegion].splice(index, 1);
-		state.blockMeta.blocks[state.currentRegion].splice(index, 1);
+		state.pageData.blocks[region].splice(index, 1);
+		state.blockMeta.blocks[region].splice(index, 1);
 
 		// TODO: use state for this
 		Vue.nextTick(() => eventBus.$emit('block:updateOverlay', index));
@@ -211,8 +222,8 @@ const getters = {
 		return state.pageData.blocks[state.currentRegion][state.currentBlockIndex];
 	},
 
-	getBlockMeta: (state) => (index, prop = false) => {
-		const blockMeta = state.blockMeta.blocks[state.currentRegion][index];
+	getBlockMeta: (state) => (index, region, prop = false) => {
+		const blockMeta = state.blockMeta.blocks[region][index];
 		return prop ? blockMeta[prop] : blockMeta;
 	},
 

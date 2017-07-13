@@ -34,7 +34,7 @@ export default {
 
 	name: 'block',
 
-	props: ['index', 'type', 'blockData'],
+	props: ['index', 'region', 'type', 'blockData'],
 
 	data() {
 
@@ -66,9 +66,10 @@ export default {
 	computed: {
 
 		...mapState({
+			currentRegion: state => state.page.currentRegion,
 			currentBlockIndex: state => state.definition.currentBlockIndex,
-			blockMeta: state => state.page.blockMeta.blocks[state.page.currentRegion],
-			draggingBlocks: state => state.page.dragging
+			draggingBlocks: state => state.page.dragging,
+			allBlockMeta: state => state.page.blockMeta.blocks
 		}),
 
 		...mapGetters([
@@ -96,15 +97,19 @@ export default {
 		},
 
 		isDragging() {
-			return this.getBlockMeta(this.index, 'dragging');
+			return this.getBlockMeta(this.index, this.region, 'dragging');
+		},
+
+		blockMeta() {
+			return this.getBlockMeta(this.index, this.region);
 		},
 
 		blockSizes() {
-			return this.blockMeta.map(block => block.size);
+			return this.allBlockMeta[this.region].map(block => block.size);
 		},
 
 		offset() {
-			return this.blockMeta[this.index].offset;
+			return this.blockMeta.offset;
 		}
 	},
 
@@ -120,6 +125,7 @@ export default {
 
 			this.updateBlockMeta({
 				index: this.index,
+				region: this.region,
 				type: 'size',
 				value: this.size.height
 			});
@@ -133,11 +139,14 @@ export default {
 	methods: {
 		...mapMutations([
 			'updateBlockMeta',
-			'setBlock'
+			'setBlock',
+			'collapseSidebar',
+			'revealSidebar'
 		]),
 
 		editBlock() {
-			if(this.currentBlockIndex !== this.index) {
+			if(this.currentBlockIndex !== this.index || this.currentRegion !== this.region) {
+				this.collapseSidebar();
 				this.setBlock({ index: this.index, type: this.type });
 			}
 		},
@@ -193,6 +202,7 @@ export default {
 
 			this.updateBlockMeta({
 				index: this.index,
+				region: this.region,
 				type: 'size',
 				value: this.size.height
 			});
@@ -262,15 +272,18 @@ export default {
 
 				let offset = 0;
 
+				const size = this.getBlockMeta(from, this.region).size;
+
 				if(i > from && i <= to) {
-					offset = -this.blockMeta[from].size;
+					offset = -size;
 				}
 				else if(i >= to && i < from) {
-					offset = this.blockMeta[from].size;
+					offset = size;
 				}
 
 				this.updateBlockMeta({
 					type: 'offset',
+					region: this.region,
 					index: i,
 					value: offset
 				});

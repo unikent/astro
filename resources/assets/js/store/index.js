@@ -30,7 +30,12 @@ let store = new Vuex.Store({
 			canUndo: false,
 			canRedo: false
 		},
-		sidebarCollapsed: false
+		sidebarCollapsed: false,
+		blockPicker: {
+			visible: false,
+			insertIndex: 0,
+			insertRegion: 'main'
+		}
 	},
 
 	getters: {},
@@ -67,6 +72,22 @@ let store = new Vuex.Store({
 
 		revealSidebar(state) {
 			state.sidebarCollapsed = false;
+		},
+
+		showBlockPicker(state) {
+			state.blockPicker.visible = true;
+		},
+
+		hideBlockPicker(state) {
+			state.blockPicker.visible = false;
+		},
+
+		updateInsertIndex(state, val) {
+			state.blockPicker.insertIndex = val;
+		},
+
+		updateInsertRegion(state, val) {
+			state.blockPicker.insertRegion = val;
 		}
 	},
 
