@@ -116,11 +116,21 @@ Layouts require two templates:
 Example template.vue:
 ~~~~~~~~~~~~~~~~~~~~~
 
-The Vue.js template typically just needs to include references to the Region component
-to allow the Editor to determine where to place Blocks.
+The Vue.js template must include a <region> component for each region it defines (this is how the editor knows where
+to put blocks).
 
 .. literalinclude:: ./examples/simple-vue-layout.vue
    :language: html
+
+The markup **must** be wrapped in ``<template>...</template>`` tags and **must** contain a single root element, eg:
+
+ .. code-block: html
+
+ <template>
+   <div>
+
+   </div>
+ </template>
 
 Example template.twig:
 ~~~~~~~~~~~~~~~~~~~~~~

@@ -157,8 +157,8 @@ supporting data.</p>
 </div></blockquote>
 <div class="section" id="example-template-vue">
 <h4>Example template.vue:<a class="headerlink" href="#example-template-vue" title="Permalink to this headline">¶</a></h4>
-<p>The Vue.js template typically just needs to include references to the Region component
-to allow the Editor to determine where to place Blocks.</p>
+<p>The Vue.js template must include a &lt;region&gt; component for each region it defines (this is how the editor knows where
+to put blocks).</p>
 <div class="highlight-html"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">template</span><span class="p">&gt;</span>
     <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;main_content&quot;</span><span class="p">&gt;</span>
         <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;inner inner1&quot;</span> <span class="na">style</span><span class="o">=</span><span class="s">&quot;background-color: #eee&quot;</span><span class="p">&gt;</span>
@@ -178,6 +178,16 @@ to allow the Editor to determine where to place Blocks.</p>
 <span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 </pre></div>
 </div>
+<p>The markup <strong>must</strong> be wrapped in <code class="docutils literal"><span class="pre">&lt;template&gt;...&lt;/template&gt;</span></code> tags and <strong>must</strong> contain a single root element, eg:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>&lt;template&gt;</dt>
+<dd><p class="first">&lt;div&gt;</p>
+<p class="last">&lt;/div&gt;</p>
+</dd>
+</dl>
+<p>&lt;/template&gt;</p>
+</div></blockquote>
 </div>
 <div class="section" id="example-template-twig">
 <h4>Example template.twig:<a class="headerlink" href="#example-template-twig" title="Permalink to this headline">¶</a></h4>
