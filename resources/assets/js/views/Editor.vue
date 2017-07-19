@@ -42,7 +42,7 @@ import { mapState, mapMutations } from 'vuex';
 import { Loading } from 'element-ui';
 
 import Config from 'classes/Config';
-import Sidebar from 'components/Sidebar';
+import Sidebar from 'components/sidebar';
 import BlockPicker from 'components/BlockPicker';
 import Icon from 'components/Icon';
 
