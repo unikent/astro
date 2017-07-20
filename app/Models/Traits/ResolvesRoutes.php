@@ -9,11 +9,11 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Gate;
 
 /**
- * Trait RouteResolver
+ * Trait ResolvesRoutes
  * Resolves a Route based on a path.
  * @package App\Models\Traits
  */
-trait RouteResolver
+trait ResolvesRoutes
 {
     public function resolveRoute($path)
     {

@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Api\v1;
 
+use App\Http\Requests\Api\v1\Site\StoreRequest;
 use Auth;
 use Gate;
 use App\Models\Site;
@@ -31,6 +32,43 @@ class SiteController extends ApiController
 
 		return fractal($sites->get(), new SiteTransformer)->respond();
 	}
+
+    /**
+     * POST /api/v1/site
+     *
+     * Create a new site.
+     * @return Response
+     *
+     */
+	public function store(StoreRequest $request)
+    {
+        $site = new Site($request->all());
+        $this->authorize( 'create', $site);
+        $site->save();
+        return fractal($site, new SiteTransformer)->respond(201);
+    }
+
+    /**
+     * PUT/PATCH /api/v1/site/{site}
+     *
+     * Update an existing site.
+     * @return \Response
+     */
+    public function update(Request $request, Site $site)
+    {
+        return null;
+    }
+
+    /**
+     * DELETE /api/v1/site/{site}
+     *
+     * Delete an existing site.
+     */
+    public function destroy(Request $request, Site $site)
+    {
+        $this->authorize('delete', $site);
+        return null;
+    }
 
 	/**
 	 * GET /api/v1/site/{site}

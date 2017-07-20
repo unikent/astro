@@ -2,7 +2,7 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Requests\Api\v1\Route\ResolveRequest;
-use App\Models\Traits\RouteResolver;
+use App\Models\Traits\ResolvesRoutes;
 
 use App\Models\Route;
 use App\Models\Redirect;
@@ -12,7 +12,7 @@ use Gate;
 
 class RouteController extends ApiController
 {
-    use RouteResolver;
+    use ResolvesRoutes;
 
 	/**
 	 * GET /api/v1/route/resolve?path=...

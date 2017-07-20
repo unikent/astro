@@ -11,6 +11,8 @@ class Site extends Model
 	public $fillable = [
 		'name',
 		'publishing_group_id',
+        'host',
+        'path'
 	];
 
 	protected $definition = null;
