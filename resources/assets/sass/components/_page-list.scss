@@ -34,8 +34,8 @@
 		margin-left: 4px;
 	}
 
-	.item:hover > div .move,
-	.item:hover > div .options {
+	.page-list__item:hover > div .move,
+	.page-list__item:hover > div .options {
 		opacity: 1;
 	}
 
