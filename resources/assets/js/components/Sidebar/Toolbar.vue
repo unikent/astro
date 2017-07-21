@@ -2,7 +2,7 @@
 <div class="toolbar">
 
 	<el-tooltip class="item" effect="dark" content="Switch preview mode" placement="top">
-		<el-select placeholder="view" v-model="currentView" class="switch-view">
+		<el-select placeholder="view" v-model="view" class="switch-view">
 			<el-option v-for="(view, key) in views" :label="view.label" :value="key" :key="view.label">
 				<div class="view-icon">
 					<Icon :name="view.icon" aria-hidden="true" width="20" height="20" />
@@ -35,7 +35,7 @@
 
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 import Icon from 'components/Icon';
 import { undoStackInstance } from 'plugins/undo-redo';
 
@@ -50,13 +50,34 @@ export default {
 		...mapState([
 			'preview',
 			'displayIframeOverlay',
-			'undoRedo'
+			'undoRedo',
+			'currentView'
 		]),
 
 		...mapState({
 			page: state => state.page.pageData,
 			pageLoaded: state => state.page.loaded
-		})
+		}),
+
+		getPreviewUrl() {
+			return `${Config.get('base_url', '')}/preview/${this.$route.params.site_id}`;
+		},
+
+		dimensions() {
+			return {
+				width: this.views[this.currentView].width,
+				height: this.views[this.currentView].height
+			};
+		},
+
+		view: {
+			get() {
+				return this.currentView;
+			},
+			set(value) {
+				this.changeView(value);
+			}
+		}
 	},
 
 	created() {
@@ -82,13 +103,10 @@ export default {
 		};
 	},
 
-	data() {
-		return {
-			currentView: 'desktop'
-		};
-	},
-
 	methods: {
+		...mapMutations([
+			'changeView'
+		]),
 		savePage() {
 			this.$api
 				.put(`page/${this.$route.params.site_id}`, this.page)

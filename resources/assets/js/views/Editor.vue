@@ -1,19 +1,23 @@
 <template>
-<div class="editor-body">
+<main>
+	<toolbar/>
 
-	<div class="editor-wrapper" ref="editor">
-		<iframe :src="getPreviewUrl" class="editor-content" :style="dimensions" frameborder="0" />
-		<div
-			class="iframe-overlay"
-			:style="{ 'position' : displayIframeOverlay ? 'absolute' : null }"
-		/>
+	<div class="editor-body">
+
+		<div class="editor-wrapper" ref="editor">
+			<iframe :src="getPreviewUrl" class="editor-content" :style="dimensions" frameborder="0" />
+			<div
+				class="iframe-overlay"
+				:style="{ 'position' : displayIframeOverlay ? 'absolute' : null }"
+			/>
 
 
+		</div>
+
+		<sidebar />
+		<block-picker />
 	</div>
-
-	<sidebar />
-	<block-picker />
-</div>
+</main>
 </template>
 
 <script>
@@ -28,6 +32,9 @@ import Icon from 'components/Icon';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
 
+import Toolbar from 'components/Sidebar/Toolbar';
+
+
 /* global document */
 
 export default {
@@ -36,7 +43,8 @@ export default {
 	components: {
 		Sidebar,
 		BlockPicker,
-		Icon
+		Icon,
+		Toolbar
 	},
 
 	created() {
@@ -73,16 +81,11 @@ export default {
 		document.removeEventListener('keyup', this.onKeyUp);
 	},
 
-	data() {
-		return {
-			currentView: 'desktop'
-		};
-	},
-
 	computed: {
 
 		...mapState([
-			'displayIframeOverlay'
+			'displayIframeOverlay',
+			'currentView'
 		]),
 
 		...mapState({

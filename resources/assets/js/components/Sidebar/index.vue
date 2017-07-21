@@ -36,7 +36,7 @@
 
 		<section class="sidebar" :class="{ 'collapsed': collapsed }">
 
-			<toolbar/>
+
 
 			<ul class="app-sidebar" role="navigation">
 				<side-menu-item
@@ -72,7 +72,6 @@ import BlockSidebar from 'components/Sidebar/BlockSidebar';
 import Navigation from 'components/Sidebar/Navigation';
 import Settings from 'components/Sidebar/Settings';
 import HelpCentre from 'components/Sidebar/HelpCentre';
-import Toolbar from 'components/Sidebar/Toolbar';
 
 import { clamp } from 'classes/helpers';
 
@@ -83,8 +82,7 @@ export default {
 
 	components: {
 		Icon,
-		SideMenuItem,
-		Toolbar
+		SideMenuItem
 	},
 
 	data() {

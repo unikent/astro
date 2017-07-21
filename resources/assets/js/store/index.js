@@ -35,12 +35,17 @@ let store = new Vuex.Store({
 			visible: false,
 			insertIndex: 0,
 			insertRegion: 'main'
-		}
+		},
+		currentView: 'desktop'
 	},
 
 	getters: {},
 
 	mutations: {
+
+		changeView(state, currentView) {
+			state.currentView = currentView;
+		},
 
 		updateOver(state, position) {
 			state.over = position;
