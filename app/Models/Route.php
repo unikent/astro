@@ -19,6 +19,8 @@ class Route extends BaumNode implements RoutableContract
 		'slug',
 		'page_id',
 		'parent_id',
+        'site_id',
+        'path'
 	];
 
 	protected $hidden = [
@@ -27,9 +29,10 @@ class Route extends BaumNode implements RoutableContract
 	];
 
 	protected $casts = [
-        'is_active' => 'boolean',
+        'is_active' => 'boolean'
 	];
 
+    protected $scoped = ['site_id'];
 
     /**
      * Create a new Eloquent model instance.
@@ -83,7 +86,8 @@ class Route extends BaumNode implements RoutableContract
      */
     public function save(array $options = [])
     {
-    	DB::beginTransaction();
+    	//DB::beginTransaction();
+        return parent::save($options);
 
     	try {
     		if(!$this->isActive()){

@@ -50,6 +50,16 @@ class StoreRequest extends FormRequest
                 'regex:/^(\/[a-z0-9_-]+)*$/i',
                 'unique:sites,path,null,id,host,' . $this->input('host')
             ],
+            'default_layout_name' => [
+                'required',
+                'string',
+                'max:100',
+//                'regex:/^[a-z0-9_.-]+-v[0-9.+]$/i'
+            ],
+            'default_layout_version' => [
+                'required',
+                'integer'
+            ]
         ];
         $rules['publishing_group_id'][] = Rule::exists('publishing_groups', 'id');
         return $rules;

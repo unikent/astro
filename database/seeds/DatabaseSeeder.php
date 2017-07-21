@@ -35,7 +35,8 @@ class DatabaseSeeder extends Seeder
 			'username' => 'admin',
 			'name'=> 'Admin',
 			'password'=> Hash::make('admin'),
-			'role' => 'admin'
+			'role' => 'admin',
+            'api_token' => 'test'
 		]);
 
 		$routes = [];
@@ -48,7 +49,7 @@ class DatabaseSeeder extends Seeder
 			$route->page->layout_name = 'astro17';
 			$route->page->save();
 
-			$route->makeActive();
+			//$route->makeActive();
 		}
 
 		factory(Block::class)->create([

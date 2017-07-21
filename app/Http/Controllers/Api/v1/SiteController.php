@@ -2,9 +2,12 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Requests\Api\v1\Site\StoreRequest;
+use App\Models\Route;
 use Auth;
 use Gate;
+use DB;
 use App\Models\Site;
+use App\Models\Page;
 use Illuminate\Http\Request;
 use App\Http\Transformers\Api\v1\SiteTransformer;
 use App\Http\Transformers\Api\v1\RouteTransformer;
@@ -42,9 +45,35 @@ class SiteController extends ApiController
      */
 	public function store(StoreRequest $request)
     {
-        $site = new Site($request->all());
+        $site = new Site([
+            'name' => $request->input('name'),
+            'publishing_group_id' => $request->input('publishing_group_id'),
+            'host' => $request->input('host'),
+            'path' => $request->input('path'),
+            'options' => [
+                'default_layout_name' => $request->input('default_layout_name'),
+                'default_layout_version' => $request->input('default_layout_version'),
+            ]
+        ]);
         $this->authorize( 'create', $site);
-        $site->save();
+        DB::transaction(function() use($site) {
+            $site->save();
+
+            // every route must have a draft OR a published page
+            $page = new Page([
+                'title' => 'Home Page',
+                'created_by' => Auth::user()->id,
+                'updated_by' => Auth::user()->id,
+                'options' => [],
+                'layout_name' => $site->options['default_layout_name'],
+                'layout_version' => $site->options['default_layout_version']
+            ]);
+            $page->save();
+
+            // every site must have a root route...
+            $route = Route::create(['path' => '/', 'slug' => null, 'site_id' => $site->id, 'page_id' => $page->id]);
+            $route->save();
+        });
         return fractal($site, new SiteTransformer)->respond(201);
     }
 

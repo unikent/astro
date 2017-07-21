@@ -12,8 +12,13 @@ class Site extends Model
 		'name',
 		'publishing_group_id',
         'host',
-        'path'
+        'path',
+        'options'
 	];
+
+	protected $casts = [
+        'options' => 'json'
+    ];
 
 	protected $definition = null;
 
