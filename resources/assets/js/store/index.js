@@ -36,7 +36,10 @@ let store = new Vuex.Store({
 			insertIndex: 0,
 			insertRegion: 'main'
 		},
-		currentView: 'desktop'
+		currentView: 'desktop',
+		publishModal: {
+			visible: false
+		}
 	},
 
 	getters: {},
@@ -93,6 +96,14 @@ let store = new Vuex.Store({
 
 		updateInsertRegion(state, val) {
 			state.blockPicker.insertRegion = val;
+		},
+
+		showPublishModal(state) {
+			state.publishModal.visible = true;
+		},
+
+		hidePublishModal(state) {
+			state.publishModal.visible = false;
 		}
 	},
 

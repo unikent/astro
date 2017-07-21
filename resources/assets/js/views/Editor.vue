@@ -1,6 +1,8 @@
 <template>
-<main>
+<div class="page">
 	<toolbar/>
+
+
 
 	<div class="editor-body">
 
@@ -16,12 +18,32 @@
 
 		<sidebar />
 		<block-picker />
+
+
+
+		<el-dialog
+			title="Publish"
+			v-model="modal"
+			:modal-append-to-body="true"
+		>
+			<el-form :model="form">
+				<el-form-item label="Publish label">
+					<el-input v-model="form.message" auto-complete="off"></el-input>
+				</el-form-item>
+			</el-form>
+			<span slot="footer" class="dialog-footer">
+				<el-button @click="cancel">Cancel</el-button>
+				<el-button type="primary" @click="publishPage">Publish</el-button>
+			</span>
+		</el-dialog>
+
+
 	</div>
-</main>
+</div>
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 import { Loading } from 'element-ui';
 
 import Config from 'classes/Config';
@@ -45,6 +67,15 @@ export default {
 		BlockPicker,
 		Icon,
 		Toolbar
+	},
+
+
+	data() {
+		return {
+			form: {
+				message: ''
+			}
+		}
 	},
 
 	created() {
@@ -81,11 +112,29 @@ export default {
 		document.removeEventListener('keyup', this.onKeyUp);
 	},
 
+	methods: {
+		...mapMutations([
+			'changeView',
+			'showPublishModal',
+			'hidePublishModal'
+		]),
+
+		// TODO - this is just the same as save at the moment
+		publishPage() {
+			this.hidePublishModal();
+		},
+
+		cancel() {
+			this.hidePublishModal();
+		}
+	},
+
 	computed: {
 
 		...mapState([
 			'displayIframeOverlay',
-			'currentView'
+			'currentView',
+			'publishModal'
 		]),
 
 		...mapState({
@@ -102,6 +151,20 @@ export default {
 				width: this.views[this.currentView].width,
 				height: this.views[this.currentView].height
 			};
+		},
+
+		modal: {
+			get() {
+				return this.publishModal.visible;
+			},
+			set(value) {
+				if(value) {
+					this.showPublishModal();
+				}
+				else {
+					this.hidePublishModal();
+				}
+			}
 		}
 	},
 

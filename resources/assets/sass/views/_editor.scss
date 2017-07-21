@@ -1,3 +1,10 @@
+.toolbar__button-save {
+	margin-left: 10px;
+}
+.toolbar__button-publish {
+	margin-left: 50px !important;
+}
+
 .el-select-dropdown__item {
 	.view-icon {
 		width: 22px;
@@ -118,10 +125,6 @@
 		max-width: 100%;
 		height: auto;
 	}
-}
-
-.save-button {
-	float: right;
 }
 
 .tmp-preview {

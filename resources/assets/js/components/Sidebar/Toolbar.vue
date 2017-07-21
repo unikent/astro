@@ -21,21 +21,24 @@
 		</el-button>
 	</el-button-group>
 
-	<el-button class="save-button" @click="savePage">Save</el-button>
+	<el-button class="toolbar__button-save" type="success" @click="savePage">Save</el-button>
 
-	<el-button class="publish-button" @click="publishPage">Publish</el-button>
+	<el-button class="toolbar__button-preview" @click="previewPage">Preview</el-button>
 
-	<div
-		class="page-status"
-		:class="{'page-status--is-published' : page.is_published}"
-	>{{ page.is_published ? 'published' : 'draft'}}</div>
+	<el-button class="toolbar__button-publish" type="danger">Publish</el-button>
+
+
+
 
 </div>
+
+
 </template>
 
 
 <script>
 import { mapState, mapMutations } from 'vuex';
+
 import Icon from 'components/Icon';
 import { undoStackInstance } from 'plugins/undo-redo';
 
@@ -118,13 +121,13 @@ export default {
 				.catch(() => {});
 		},
 
-		// TODO - this is just the same as save at the moment
-		publishPage() {
+		// TODO - add preview the page functionality
+		previewPage() {
 			this.$api
 				.put(`page/${this.$route.params.site_id}`, this.page)
 				.then(() => {
 					this.$snackbar.open({
-						message: 'Successfully saved page'
+						message: 'Previewing page...'
 					})
 				})
 				.catch(() => {});
