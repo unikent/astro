@@ -2,7 +2,7 @@
 <div>
 	<back-bar :title="title" />
 	<ul v-if="pages" v-for="page in pages" class="page-list">
-		<PageListItem class="item" :site="site" :page="page" :editing="edit"></PageListItem>
+		<PageListItem :site="site" :page="page" :editing="edit" :root="true"></PageListItem>
 	</ul>
 </div>
 </template>
