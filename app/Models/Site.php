@@ -22,15 +22,25 @@ class Site extends Model
 
 	protected $definition = null;
 
-	public function activeRoute()
+	public function rootRoute()
 	{
-		return $this->hasOne(Route::class, 'site_id')->active();
+		return $this->hasOne(Route::class, 'site_id')->root();
 	}
 
 	public function routes()
 	{
 		return $this->hasMany(Route::class, 'site_id');
 	}
+
+	public function publishedRoutes()
+    {
+
+    }
+
+    public function draftRoutes()
+    {
+
+    }
 
 	public function publishing_group()
 	{

@@ -28,10 +28,6 @@ class Route extends BaumNode implements RoutableContract
 		'rgt'
 	];
 
-	protected $casts = [
-        'is_active' => 'boolean'
-	];
-
     protected $scoped = ['site_id'];
 
     /**
@@ -61,20 +57,19 @@ class Route extends BaumNode implements RoutableContract
 		});
 	}
 
-
 	public function site()
 	{
 		return $this->belongsTo(Site::class, 'site_id');
 	}
 
-	public function page()
+	public function draft()
 	{
 		return $this->belongsTo(Page::class, 'page_id');
 	}
 
 	public function published_page()
 	{
-		return $this->hasOne(PublishedPage::class, 'page_id', 'page_id')->latest()->limit(1);
+	    return $this->belongsTo( PublishedPage::class, 'published_page-id' );
 	}
 
 
@@ -307,4 +302,31 @@ class Route extends BaumNode implements RoutableContract
 		}
 	}
 
+    /**
+     * Does this route have a draft?
+     * @return bool
+     */
+	public function hasDraft()
+    {
+        return $this->draft ? true : false;
+    }
+
+    /**
+     * Set the draft version of this route.
+     * @param null|Page $page
+     */
+    public function setDraft($page)
+    {
+        $this->page_id = $page ? $page->id : null;
+    }
+
+    /**
+     * Get the child of this route with the given slug.
+     * @param string $slug The slug of the route to retrieve.
+     * @return Route The child Route with the given slug or null.
+     */
+    public function getChildWithSlug($slug)
+    {
+        return $this->immediateDescendants()->where('slug', $slug)->first();
+    }
 }
