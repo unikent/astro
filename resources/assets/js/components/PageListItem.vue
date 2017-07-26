@@ -1,145 +1,163 @@
 <template>
-<li :class="root ? '' : 'page-list__item'">
-
+<div
+	:class="{
+		'page-list__item': !root,
+		'page-list__root': root && hasChildren && flatten,
+		'page-list__first': root && !(hasChildren && flatten),
+		'add-gutter-bottom': depth > 2
+	}"
+>
 	<!-- Expand tree icon -->
-	<div v-if="this.getDepth !== 0 && hasChildren" class="chevron" :class="{'open': open }" @click="toggle">
-		<Icon :name="open ? 'minus' : 'plus'" width="10" height="10" />
+	<div v-if="!root && hasChildren" class="page-list__item__expand" @click="toggle">
+		<icon v-show="open" name="minus" width="10" height="10" />
+		<icon v-show="!open" name="plus" width="10" height="10" />
 	</div>
 	<!-- End expand tree icon -->
 
-	<div style="display: flex; align-items: center;">
-		<div class="inner" style="flex: 1 0 auto;">
-			{{ page.slug || page.path }}
+	<div class="page-list__title">
+		<span class="page-list__item__drag-handle">
+			<icon v-if="!root" name="arrow" width="14" height="14" />
+		</span>
 
-			<!-- Page options dropdown -->
-			<el-dropdown trigger="click" @command="handleCommand" size="small" class="options" style="float: right;">
-				<el-button type="text" class="option-button">
-					<i class="el-icon-more el-icon--right side-caret"></i>
-				</el-button>
+		<span ref="name" style=" flex: 1 0 auto; cursor: pointer;" @click="edit">
+			{{ page.path === '/' ? 'Home page' : (page.title || page.slug) }}
+		</span>
 
-				<el-dropdown-menu slot="dropdown">
-					<el-dropdown-item command="edit">Edit</el-dropdown-item>
-					<el-dropdown-item command="move">Move</el-dropdown-item>
-					<el-dropdown-item v-show="isParent && this.getDepth <= 2" command="openModal">Add page</el-dropdown-item>
-					<el-dropdown-item v-show="this.getDepth !== 0" command="openRename">Rename</el-dropdown-item>
-					<el-dropdown-item v-show="this.getDepth !== 0" command="remove" divided>Delete</el-dropdown-item>
-				</el-dropdown-menu>
-			</el-dropdown>
-			<!-- End page options dropdown -->
-		</div>
+		<!-- Page options dropdown -->
+		<el-dropdown trigger="click" @command="handleCommand" size="small" class="page-list__options">
+			<el-button type="text" style="padding: 0;">
+				<icon name="more-alt" width="14" height="14" class="page-list__option-icon" />
+			</el-button>
+
+			<el-dropdown-menu slot="dropdown">
+				<el-dropdown-item command="openModal">Settings</el-dropdown-item>
+				<el-dropdown-item v-show="!root" :disabled="depth > 2" command="openModal">Add subpage</el-dropdown-item>
+				<el-dropdown-item v-show="!root" command="remove" divided>Delete</el-dropdown-item>
+			</el-dropdown-menu>
+		</el-dropdown>
+		<!-- End page options dropdown -->
 	</div>
 
-	<!-- Create Page Modal -->
-	<div id="create-form">
-		<el-dialog title="Create Page" v-if="createFormVisible" :visible.sync="createFormVisible" :modal-append-to-body=false >
-			<el-form :model="createForm">
-				<el-form-item label="Page title">
-					<el-input name="title" v-model="createForm.title" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-select name="layout_name" v-model="createForm.layout_name" placeholder="Select">
-					<el-option
-							v-for="item in layouts"
-							:key="item"
-							:label="item"
-							:value="item">
-					</el-option>
-				</el-select>
-				<el-form-item label="Layout Version">
-					<el-input name="layout_version" v-model="createForm.layout_version" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="slug">
-					<el-input name="slug" v-model="createForm.route.slug" auto-complete="off"></el-input>
-				</el-form-item>
-			</el-form>
-			<span slot="footer" class="dialog-footer">
-			<el-button @click="createFormVisible = false">Cancel</el-button>
-			<el-button type="primary" @click="addChild">Confirm</el-button>
-		</span>
-		</el-dialog>
-	</div>
-	<!-- End create page modal -->
-
-	<!-- Rename page modal -->
-	<el-dialog title="Rename Page" :visible.sync="renameFormVisible" :modal-append-to-body=false>
-		<el-form :model="page">
-			<el-form-item label="Page title">
-				<el-input name=slug v-model="page.slug" auto-complete="off"></el-input>
-			</el-form-item>
-		</el-form>
-		<span slot="footer" class="dialog-footer">
-			<el-button @click="renameFormVisible = false">Cancel</el-button>
-			<el-button type="primary" @click="saveEdit">Confirm</el-button>
-		</span>
-	</el-dialog>
-	<!-- End rename page modal-->
-
-	<ul class="page-list__children" :class="{'collapsed': !open && page.depth !== 0}" v-if="isParent">
-		<page-list-item
-			v-for="child in page.children"
-			:page="child"
-			:key="child.path"
-			:layouts="layouts"
-		/>
-	</ul>
-</li>
+	<draggable
+		v-model="children"
+		:options="{
+			group: 'pages',
+			chosenClass: 'page-list__item--dragging',
+			handle: '.page-list__item__drag-handle'
+		}"
+		@end="handleDragEnd"
+		class="add-gutter"
+		v-if="depth <= 2"
+		:move="handleMove"
+	>
+		<template v-if="hasChildren">
+			<page-list-item
+				:class="{'page-list__item--collapsed': !open && depth !== 0}"
+				v-for="(child, index) in page.children"
+				:page="child"
+				:site="site"
+				:key="child.id"
+				:open-modal="openModal"
+				:path="`${path}.${index}`"
+				:depth="depth + 1"
+			/>
+		</template>
+	</draggable>
+</div>
 </template>
 
 <script>
-import Vue from 'vue';
-import { mapActions } from 'vuex';
+import { mapState, mapActions, mapMutations } from 'vuex';
+import Draggable from 'vuedraggable';
 import Icon from 'components/Icon';
-
-/* global clearTimeout, setTimeout */
-var timer = null
 
 export default {
 	name: 'page-list-item',
 
-	props: ['page', 'site', 'editing', 'layouts', 'root'],
+	props: ['page', 'on-add', 'flatten', 'open-modal', 'path', 'depth'],
 
 	components: {
-		Icon
+		Icon,
+		Draggable
 	},
 
 	data() {
 		return {
-			open: false,
-			createFormVisible: false,
-			renameFormVisible: false,
-			createForm: {
-				title: 'Unnamed Page',
-				layout_name: 'kent-homepage',
-				layout_version: 1,
-				route: {
-					slug: 'testing',
-					parent_id: this.page.id
-				},
-				options: {}
-			}
+			open: false
 		}
 	},
 
 	computed: {
-		isParent() {
-			return this.page.children.length;
+
+		...mapState('site', {
+			site: state => state.site
+		}),
+
+		root() {
+			return this.depth === 0;
 		},
 
 		hasChildren() {
 			return this.page.children.length;
 		},
 
-		getDepth() {
-			return this.page.depth;
-		},
-
 		leftPadding() {
 			return {
-				paddingLeft: (this.getDepth * 10) + (this.isParent ? 10 : 0) + 'px'
+				paddingLeft: (this.depth * 10) + (this.hasChildren ? 10 : 0) + 'px'
 			}
+		},
+
+		children: {
+			get() {
+				return this.page.children;
+			},
+			// don't set directly (use vuex instead)
+			set() {}
 		}
 	},
 
 	methods: {
+
+		...mapMutations([
+			'setLoaded'
+		]),
+
+		...mapActions({
+			movePage: 'site/movePage',
+			deletePage: 'site/deletePage',
+			updatePage: 'site/updatePage'
+		}),
+
+		handleDragEnd() {
+			if(this.move) {
+				this.movePage(this.move);
+			}
+
+			this.move = null;
+		},
+
+		handleMove(e) {
+			const
+				draggingPath = e.dragged.__vue__.path,
+				parentPath = e.to.__vue__.$parent.path,
+				// don't allow dragging into own or child's "list"
+				allowDrag = !parentPath.startsWith(draggingPath),
+				paths = {
+					from: draggingPath,
+					to: `${parentPath}.${e.draggedContext.futureIndex}`
+				};
+
+			if(allowDrag) {
+				this.move = {
+					fromPath: paths.from,
+					toPath: paths.to
+				};
+			}
+
+			// returning false cancels drag action
+			return allowDrag;
+		},
+
 		handleClose(done) {
 			this.$confirm('Are you sure to close this dialog?')
 				.then(() => {
@@ -148,65 +166,29 @@ export default {
 				.catch(() => {});
 		},
 
-		addDummyElement() {
-			if(!this.hasChildren) {
-				this.fakePage(this.page)
-				this.open = true
-			}
-		},
-
-		clearDummyElement() {
-			if(this.hasChildren) {
-				this.removeFakePage()
-			}
+		openPage() {
+			this.open = true;
 		},
 
 		toggle() {
-			if(this.isParent) {
+			if(this.hasChildren) {
 				this.open = !this.open;
 			}
 		},
 
-		waitAndEdit() {
-			clearTimeout(timer);
-			timer = setTimeout(this.edit, 400);
-		},
-
 		edit() {
-			clearTimeout(timer);
-			this.$router.push(`/site/${this.site}/page/${this.page.id}`);
-			this.$store.commit('changePage', this.page.title);
-		},
-
-		rename() {
-			clearTimeout(timer);
-
-			this.$bus.$emit('rename-page', this.page.id);
-
-			var nameWidth = Math.max(50, this.$refs.name.offsetWidth);
-
-			/* TODO: Move into component to avoid refs? */
-			Vue.nextTick(() => {
-				var input = this.$refs.input;
-				input.style.width = (nameWidth + 4) + 'px';
-				input.focus();
-			});
-		},
-
-		saveEdit() {
-			console.log(this.page)
-			this.renameFormVisible = false
-				this.updatePage({
-					title: this.page.title,
-					id: this.page.id,
-					page_id: this.page.page_id,
-					layout_name: this.layout_name,
-					layout_version: this.layout_version,
-					route: {
-						slug: this.page.slug,
-						parent_id: this.page.parent_id
-					}
+			if(Number.parseInt(this.$route.params.page_id) !== this.page.id) {
+				this.setLoaded(false);
+				this.$router.push(`/site/${this.site}/page/${this.page.id}`);
+				this.$store.commit('changePage', this.page.path);
+			}
+			else {
+				this.$snackbar.open({
+					message: `
+						You are currently editing this page.
+					`
 				});
+			}
 		},
 
 		remove() {
@@ -221,38 +203,12 @@ export default {
 			});
 		},
 
-		addChild() {
-			this.createPage(this.createForm);
-			this.createFormVisible = false;
-		},
-
-		openModal() {
-			this.createFormVisible = true
-		},
-
-		openRename() {
-			this.renameFormVisible = true
-		},
-
 		handleCommand(command) {
 			if(this[command]) {
-				this[command]();
+				this[command](this);
 			}
-		},
+		}
 
-		move(parent) {
-			let parent_id = parent._props.page.id;
-			this.page.parent_id = parent_id;
-			//this.saveEdit();
-		},
-
-		...mapActions({
-			deletePage: 'site/deletePage',
-			createPage: 'site/createPage',
-			updatePage: 'site/updatePage',
-			fakePage: 'site/fakePage',
-			removeFakePage: 'site/removeFakePage'
-		})
 	}
 };
 </script>
