@@ -1,34 +1,3 @@
-<style>
-.collection-field {
-	margin-bottom: 10px;
-	padding: 10px;
-}
-
-.collection-field__field-list {
-	border: 1px solid #e8e8e8;
-	background-color: #fff;
-	padding: 20px 20px 40px;
-	border-radius: 4px;
-	position: relative;
-}
-
-.is-error .collection-field {
-	border: 1px solid #ff4949;
-	border-radius: 4px;
-	background-color: rgba(255, 73, 73, .08);
-}
-
-.ci-field + .ci-field {
-	border-top: 1px solid rgba(191, 203, 217, 0.3);
-	margin-top: 24px;
-	padding-top: 20px;
-}
-
-.collection-field__field-list +
-.collection-field__field-list {
-	margin-top: 24px;
-}
-</style>
 <template>
 <div class="collection-field">
 	<div
@@ -46,8 +15,8 @@
 						<span>{{ f.label }}</span>
 						<el-tooltip v-if="f.info" :content="f.info" placement="top">
 							<icon
-								class="f-info"
-								name="help"
+								class="el-form-item__icon-help"
+								name="help-circle"
 								width="15"
 								height="15"
 								viewBox="0 0 15 15"

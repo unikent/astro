@@ -1,0 +1,33 @@
+/**
+_collection-field.scss
+
+- collections of fields, for example a collection of cards in a card panel
+
+*/
+.collection-field {
+	margin-bottom: 10px;
+	padding: 10px;
+}
+
+.collection-field__field-list {
+	border: 1px solid #e8e8e8;
+	background-color: #fff;
+	padding: 20px 20px 40px;
+	border-radius: 4px;
+	position: relative;
+}
+
+.is-error .collection-field {
+	border: 1px solid #ff4949;
+	border-radius: 4px;
+	background-color: rgba(255, 73, 73, .08);
+}
+
+.ci-field + .ci-field {
+	margin-top: 20px;
+}
+
+.collection-field__field-list +
+.collection-field__field-list {
+	margin-top: 24px;
+}
