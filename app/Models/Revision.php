@@ -5,18 +5,18 @@ namespace App\Models;
 use App\Models\Traits\Tracked;
 use Illuminate\Database\Eloquent\Model;
 
-class PublishedPage extends Model
+class Revision extends Model
 {
 	use Tracked;
 
 	protected $fillable = [
-		'page_id',
+		'page_content_id',
 		'bake',
 	];
 
-	public function page()
+	public function pagecontent()
 	{
-		return $this->belongsTo(Page::class, 'page_id');
+		return $this->belongsTo(PageContent::class, 'page_content_id');
 	}
 
 }

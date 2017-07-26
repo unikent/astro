@@ -3,8 +3,8 @@
 namespace App\Models\APICommands;
 
 use App\Models\Site;
+use App\Models\PageContent;
 use App\Models\Page;
-use App\Models\Route;
 use DB;
 use App\Models\Contracts\APICommand;
 use Illuminate\Support\Collection;
@@ -37,7 +37,7 @@ class CreateSite implements APICommand
             $site->save();
 
             // every route must have a draft OR a published page
-            $page = new Page([
+            $page = new PageContent([
                 'title' => 'Home Page',
                 'created_by' => $user->getAuthIdentifier(),
                 'updated_by' => $user->getAuthIdentifier(),

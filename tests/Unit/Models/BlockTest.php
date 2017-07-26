@@ -3,7 +3,7 @@ namespace Tests\Unit\Models;
 
 use Mockery;
 use Tests\TestCase;
-use App\Models\Page;
+use App\Models\PageContent;
 use App\Models\Block;
 use App\Models\Definitions\Block as BlockDefinition;
 
@@ -15,7 +15,7 @@ class BlockTest extends TestCase
 	 */
 	public function deleteForPageRegion_WhenPageIsGiven_DeletesAllBlocksForGivenPageAndRegion()
 	{
-		$page = factory(Page::class)->create();
+		$page = factory(PageContent::class)->create();
 		factory(Block::class, 3)->create([ 'page_id' => $page->getKey() ]);
 
 		$count = Block::count();
@@ -29,7 +29,7 @@ class BlockTest extends TestCase
 	 */
 	public function deleteForPageRegion_WhenPageIdInstanceIsGiven_DeletesAllBlocksForGivenPageAndRegion()
 	{
-		$page = factory(Page::class)->create();
+		$page = factory(PageContent::class)->create();
 		factory(Block::class, 3)->create([ 'page_id' => $page->getKey() ]);
 
 		$count = Block::count();
@@ -43,7 +43,7 @@ class BlockTest extends TestCase
 	 */
 	public function deleteForPageRegion_DoesNotDeleteBlocksInOtherRegions()
 	{
-		$page = factory(Page::class)->create();
+		$page = factory(PageContent::class)->create();
 
 		factory(Block::class, 3)->create([ 'page_id' => $page->getKey() ]);
 		factory(Block::class, 2)->create([ 'page_id' => $page->getKey(), 'region_name' => 'foobar' ]);

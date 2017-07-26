@@ -3,9 +3,9 @@ namespace Tests\Unit\Models;
 
 use Exception;
 use Tests\TestCase;
-use App\Models\Page;
+use App\Models\PageContent;
 use App\Models\Site;
-use App\Models\Route;
+use App\Models\Page;
 use App\Models\Redirect;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 

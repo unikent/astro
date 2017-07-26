@@ -4,12 +4,12 @@ namespace Tests\Unit\Models;
 use Mockery;
 use Exception;
 use Tests\TestCase;
-use App\Models\Page;
+use App\Models\PageContent;
 use App\Models\Block;
-use App\Models\Route;
+use App\Models\Page;
 use App\Models\Redirect;
-use App\Models\PublishedPage;
-use App\Http\Transformers\Api\v1\PageTransformer;
+use App\Models\Revision;
+use App\Http\Transformers\Api\v1\PageContentTransformer;
 use App\Models\Definitions\Layout as LayoutDefinition;
 
 class PageTest extends TestCase
@@ -24,7 +24,7 @@ class PageTest extends TestCase
 		$route->page->title = 'Foobar!';
 
 		$this->expectException(Exception::class);
-		$route->page->publish(new PageTransformer);
+		$route->page->publish(new PageContentTransformer);
 	}
 
 	/**
@@ -36,7 +36,7 @@ class PageTest extends TestCase
 		$child = factory(Route::class)->states([ 'withPage' ])->create([ 'parent_id' => $parent->getKey() ]);
 
 		$this->expectException(Exception::class);
-		$child->page->publish(new PageTransformer);
+		$child->page->publish(new PageContentTransformer);
 	}
 
 	/**
@@ -45,10 +45,10 @@ class PageTest extends TestCase
 	public function publish_CreatesPublishedPageInstance()
 	{
 		$route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
-		$count = PublishedPage::count();
+		$count = Revision::count();
 
-		$route->page->publish(new PageTransformer);
-		$this->assertEquals($count + 1, PublishedPage::count());
+		$route->page->publish(new PageContentTransformer);
+		$this->assertEquals($count + 1, Revision::count());
 	}
 
 	/**
@@ -59,7 +59,7 @@ class PageTest extends TestCase
 		$route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
 		$count = $route->page->history()->count();
 
-		$route->page->publish(new PageTransformer);
+		$route->page->publish(new PageContentTransformer);
 		$this->assertEquals($count + 1, $route->page->history()->count());
 		$this->assertNotNull($route->page->published);
 	}
@@ -81,7 +81,7 @@ class PageTest extends TestCase
 		$count = Redirect::count();
 
 		$page = $route->page->fresh();
-		$page->publish(new PageTransformer);
+		$page->publish(new PageContentTransformer);
 		$this->assertEquals($count+1, Redirect::count());
 	}
 
@@ -93,7 +93,7 @@ class PageTest extends TestCase
 		$route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
 
 		$page = $route->page->fresh();
-		$page->publish(new PageTransformer);
+		$page->publish(new PageContentTransformer);
 
 		$route = $route->fresh();
 		$this->assertTrue($route->isActive());
@@ -108,7 +108,7 @@ class PageTest extends TestCase
 		$route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
 
 		$page = $route->page->fresh();
-		$page->publish(new PageTransformer);
+		$page->publish(new PageContentTransformer);
 
 		$this->assertCount(1, $page->routes);
 	}
@@ -119,9 +119,9 @@ class PageTest extends TestCase
 	public function publish_PublishedPageBakeContainsSerializedPageInstance()
 	{
 		$route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
-		$route->page->publish(new PageTransformer);
+		$route->page->publish(new PageContentTransformer);
 
-		$json = fractal($route->page, new PageTransformer)->parseIncludes([ 'blocks', 'canonical' ])->toJson();
+		$json = fractal($route->page, new PageContentTransformer)->parseIncludes([ 'blocks', 'canonical' ])->toJson();
 
 		$this->assertEquals($json, $route->published_page->bake);
 	}
@@ -134,7 +134,7 @@ class PageTest extends TestCase
 	public function revert_WhenPageHasUnsavedChanges_ThrowsException()
 	{
 		$route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
-		$route->page->publish(new PageTransformer);
+		$route->page->publish(new PageContentTransformer);
 
 		$route->page->title = 'Foobar!';
 
@@ -148,10 +148,10 @@ class PageTest extends TestCase
 	public function revert_WhenPublishedPageIsNotAssociatedWithPage_ThrowsException()
 	{
 		$r1 = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
-		$r1->page->publish(new PageTransformer);
+		$r1->page->publish(new PageContentTransformer);
 
 		$r2 = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
-		$r2->page->publish(new PageTransformer);
+		$r2->page->publish(new PageContentTransformer);
 
 		$this->expectException(Exception::class);
 		$r1->page->revert($r2->page->published);
@@ -165,7 +165,7 @@ class PageTest extends TestCase
 		$route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
 		$page = $route->page;
 
-		$page->publish(new PageTransformer);
+		$page->publish(new PageContentTransformer);
 
 		$title = $page->title;
 		$page->title = 'Foobar';
@@ -191,7 +191,7 @@ class PageTest extends TestCase
 		$page = $route->page;
 
 		$blocks = factory(Block::class, 2)->create([ 'page_id' => $page->getKey(), 'region_name' => 'test-region' ]);
-		$page->publish(new PageTransformer);
+		$page->publish(new PageContentTransformer);
 
 		$moreBlocks = factory(Block::class, 3)->create([ 'page_id' => $page->getKey(), 'region_name' => 'test-region' ]);
 
@@ -209,7 +209,7 @@ class PageTest extends TestCase
 	 */
 	public function clearRegion_DeletesAllBlocksForGivenPageAndRegion()
 	{
-		$page = factory(Page::class)->create();
+		$page = factory(PageContent::class)->create();
 		factory(Block::class, 3)->create([ 'page_id' => $page->getKey() ]);
 
 		$page->clearRegion('test-region');
@@ -221,7 +221,7 @@ class PageTest extends TestCase
 	 */
 	public function clearRegion_DoesNotDeleteBlocksInOtherRegions()
 	{
-		$page = factory(Page::class)->create();
+		$page = factory(PageContent::class)->create();
 
 		factory(Block::class, 3)->create([ 'page_id' => $page->getKey() ]);
 		factory(Block::class, 2)->create([ 'page_id' => $page->getKey(), 'region_name' => 'foobar' ]);
@@ -236,7 +236,7 @@ class PageTest extends TestCase
 	 * @test
 	 */
 	public function getPageDefinition_ReturnLayoutDefinition(){
-		$page = factory(Page::class)->make();
+		$page = factory(PageContent::class)->make();
 		$this->assertInstanceOf(LayoutDefinition::class, $page->getLayoutDefinition());
 	}
 
@@ -246,7 +246,7 @@ class PageTest extends TestCase
 	 * @test
 	 */
 	public function getLayoutDefinition_WhenPageDefinitionIsNotLoaded_LoadsSupportedLayoutDefinition(){
-		$page = factory(Page::class)->make();
+		$page = factory(PageContent::class)->make();
 		$definition = $page->getLayoutDefinition();
 
 		$this->assertNotEmpty($definition);
@@ -257,7 +257,7 @@ class PageTest extends TestCase
 	 * @test
 	 */
 	public function getLayoutDefinition_WhenLayoutDefinitionIsLoaded_DoesNotReloadLayoutDefinition(){
-		$page = factory(Page::class)->make();
+		$page = factory(PageContent::class)->make();
 		$page->getLayoutDefinition(); 					// This should populate $pageDefinition
 
 		$page = Mockery::mock($page)->makePartial()->shouldAllowMockingProtectedMethods();
@@ -272,7 +272,7 @@ class PageTest extends TestCase
 	 */
 	public function getLayoutDefinition_WithRegionDefinitionsWhenLayoutDefinitionIsLoadedWithoutRegions_HasRegionDefinitions()
 	{
-		$page = factory(Page::class)->make();
+		$page = factory(PageContent::class)->make();
 		$page->loadLayoutDefinition();
 
 		$definition = $page->getLayoutDefinition(true);
@@ -289,7 +289,7 @@ class PageTest extends TestCase
 	 */
 	public function getLayoutDefinition_WithRegionDefinitionsWhenLayoutDefinitionIsLoadedWithRegions_HasRegionDefinitions()
 	{
-		$page = factory(Page::class)->make();
+		$page = factory(PageContent::class)->make();
 		$definition = $page->getLayoutDefinition(true);
 
 		// Ensure that our assertion does not trigger loading of Region definitions

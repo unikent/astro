@@ -4,24 +4,24 @@ namespace Tests\Unit\Http\Requests\Api\v1\Page;
 use Faker;
 use Mockery;
 use Validator;
-use App\Models\Page;
+use App\Models\PageContent;
 use App\Models\Site;
 use App\Models\Block;
-use App\Models\Route;
+use App\Models\Page;
 use App\Models\PublishingGroup;
 use Tests\Unit\Http\Requests\RequestTestCase;
-use App\Http\Transformers\Api\v1\PageTransformer;
+use App\Http\Transformers\Api\v1\PageContentTransformer;
 use App\Http\Requests\Api\v1\Page\PersistRequest;
 
 class PersistRequestTest extends RequestTestCase
 {
 
-    protected static $modelClass = Page::class;
+    protected static $modelClass = PageContent::class;
     protected static $requestClass = PersistRequest::class;
 
-    protected function getAttrs(Page $page = null, Route $route = null, Block $block = null, Site $site = null)
+    protected function getAttrs(PageContent $page = null, Page $route = null, Block $block = null, Site $site = null)
     {
-        $page = $page ?: factory(Page::class)->make();
+        $page = $page ?: factory(PageContent::class)->make();
         $route = $route ?: factory(Route::class)->states('withParent')->make([ 'page_id' => $page->getKey() ]);
 
         $site = $site ?: factory(Site::class)->states('withPublishingGroup')->make();
@@ -421,8 +421,8 @@ class PersistRequestTest extends RequestTestCase
      */
     public function validation_WhenRouteSlugExistsAtSameLevelInTreeAndIsActive_IsInvalid(){
         $existing = factory(Route::class)->states('withPage', 'withParent')->create();
-        $existing->parent->page->publish(new PageTransformer);
-        $existing->page->publish(new PageTransformer);
+        $existing->parent->page->publish(new PageContentTransformer);
+        $existing->page->publish(new PageContentTransformer);
 
         $attrs = $this->getAttrs();
         $attrs['route']['slug'] = $existing->slug;
@@ -441,7 +441,7 @@ class PersistRequestTest extends RequestTestCase
      */
     public function validation_WhenRouteSlugExistsAtSameLevelInTreeAndIsNotActive_IsInvalid(){
         $existing = factory(Route::class)->states('withPage', 'withParent')->create();
-        $existing->parent->page->publish(new PageTransformer);
+        $existing->parent->page->publish(new PageContentTransformer);
 
         $alternative = factory(Route::class)->create([ 'parent_id' => $existing->parent_id, 'page_id' => $existing->page_id ]);
 
@@ -461,7 +461,7 @@ class PersistRequestTest extends RequestTestCase
      * @group validation
      */
     public function validation_WhenUpdatingAndRouteSlugDoesNotChange_IsValid(){
-        $page = factory(Page::class)->create();
+        $page = factory(PageContent::class)->create();
         $route = factory(Route::class)->states('withParent')->create([ 'page_id' => $page->getKey() ]);
 
         $attrs = $this->getAttrs($page, $route);         // Ensure that our attrs match the created page/route

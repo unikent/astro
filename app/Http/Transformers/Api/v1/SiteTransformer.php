@@ -2,7 +2,7 @@
 namespace App\Http\Transformers\Api\v1;
 
 use App\Models\Site;
-use App\Models\Route;
+use App\Models\Page;
 use League\Fractal\Resource\Item as FractalItem;
 use League\Fractal\Resource\Collection as FractalCollection;
 use League\Fractal\TransformerAbstract as FractalTransformer;
@@ -26,7 +26,7 @@ class SiteTransformer extends FractalTransformer
     public function includeActiveRoute(Site $site)
     {
         if($site->activeRoute){
-            return new FractalItem($site->activeRoute, new RouteTransformer, false);
+            return new FractalItem($site->activeRoute, new PageTransformer, false);
         }
     }
 
@@ -38,7 +38,7 @@ class SiteTransformer extends FractalTransformer
     public function includeRoutes(Site $site)
     {
         if(!$site->routes->isEmpty()){
-            return new FractalCollection($site->routes, new RouteTransformer, false);
+            return new FractalCollection($site->routes, new PageTransformer, false);
         }
     }
 

@@ -3,22 +3,22 @@ namespace Tests\Unit\Http\Controllers\Api\v1;
 
 use Gate;
 use Mockery;
-use App\Models\Page;
+use App\Models\PageContent;
 use App\Models\Site;
 use App\Models\Block;
-use App\Models\Route;
+use App\Models\Page;
 use App\Models\Redirect;
-use App\Models\PublishedPage;
-use App\Http\Controllers\Api\v1\PageController;
-use App\Http\Transformers\Api\v1\PageTransformer;
+use App\Models\Revision;
+use App\Http\Controllers\Api\v1\PageContentController;
+use App\Http\Transformers\Api\v1\PageContentTransformer;
 use Illuminate\Auth\Access\AuthorizationException;
 
 class PageControllerTest extends ApiControllerTestCase {
 
 
-    protected function getAttrs(Page $page = null, Route $route = null, Block $block = null)
+    protected function getAttrs(PageContent $page = null, Page $route = null, Block $block = null)
     {
-        $page = $page ?: factory(Page::class)->make();
+        $page = $page ?: factory(PageContent::class)->make();
         $route = $route ?: factory(Route::class)->states('withParent')->make([ 'page_id' => $page->getKey() ]);
 
         $block = $block ?: factory(Block::class)->states('useTestBlock')->make();
@@ -42,9 +42,9 @@ class PageControllerTest extends ApiControllerTestCase {
     public function show_WhenUnauthenticated_Returns401(){
         $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
 
-        // $page->publish(new PageTransformer);
+        // $page->publish(new PageContentTransformer);
 
-        $response = $this->action('GET', PageController::class . '@show', [ $route->page->getKey() ]);
+        $response = $this->action('GET', PageContentController::class . '@show', [ $route->page->getKey() ]);
         $response->assertStatus(401);
     }
 
@@ -55,12 +55,12 @@ class PageControllerTest extends ApiControllerTestCase {
     public function show_WhenAuthenticated_ChecksAuthorization(){
         $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
 
-        // $page->publish(new PageTransformer);
+        // $page->publish(new PageContentTransformer);
 
-        Gate::shouldReceive('authorize')->with('read', Mockery::type(Page::class))->once();
+        Gate::shouldReceive('authorize')->with('read', Mockery::type(PageContent::class))->once();
 
         $this->authenticated();
-        $response = $this->action('GET', PageController::class . '@show', [ $route->page->getKey() ]);
+        $response = $this->action('GET', PageContentController::class . '@show', [ $route->page->getKey() ]);
     }
 
     /**
@@ -70,11 +70,11 @@ class PageControllerTest extends ApiControllerTestCase {
     public function show_WhenAuthenticatedAndUnauthorized_Returns403(){
         $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
 
-        // $page->publish(new PageTransformer);
+        // $page->publish(new PageContentTransformer);
 
         $this->authenticatedAndUnauthorized();
 
-        $response = $this->action('GET', PageController::class . '@show', [ $route->page->getKey() ]);
+        $response = $this->action('GET', PageContentController::class . '@show', [ $route->page->getKey() ]);
         $response->assertStatus(403);
     }
 
@@ -84,7 +84,7 @@ class PageControllerTest extends ApiControllerTestCase {
     public function show_WhenAuthorizedAndPageNotFound_Returns404(){
         $this->authenticatedAndAuthorized();
 
-        $response = $this->action('GET', PageController::class . '@show', [ 123 ]);
+        $response = $this->action('GET', PageContentController::class . '@show', [ 123 ]);
         $response->assertStatus(404);
     }
 
@@ -94,11 +94,11 @@ class PageControllerTest extends ApiControllerTestCase {
     public function show_WhenAuthorizedAndFound_Returns200(){
         $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
 
-        // $page->publish(new PageTransformer);
+        // $page->publish(new PageContentTransformer);
 
         $this->authenticatedAndAuthorized();
 
-        $response = $this->action('GET', PageController::class . '@show', [ $route->page->getKey() ]);
+        $response = $this->action('GET', PageContentController::class . '@show', [ $route->page->getKey() ]);
         $response->assertStatus(200);
     }
 
@@ -112,7 +112,7 @@ class PageControllerTest extends ApiControllerTestCase {
 
         $this->authenticatedAndAuthorized();
 
-        $response = $this->action('GET', PageController::class . '@show', [ $route->page->getKey() ]);
+        $response = $this->action('GET', PageContentController::class . '@show', [ $route->page->getKey() ]);
         $json = $response->json();
 
         $this->assertArrayHasKey('data', $json);
@@ -124,13 +124,13 @@ class PageControllerTest extends ApiControllerTestCase {
      */
     public function show_WhenAuthorizedAndFoundAndPublished_ReturnsActiveRouteInJson(){
         $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
-        $route->page->publish(new PageTransformer);
+        $route->page->publish(new PageContentTransformer);
 
-        // $page->publish(new PageTransformer);
+        // $page->publish(new PageContentTransformer);
 
         $this->authenticatedAndAuthorized();
 
-        $response = $this->action('GET', PageController::class . '@show', [ $route->page->getKey() ]);
+        $response = $this->action('GET', PageContentController::class . '@show', [ $route->page->getKey() ]);
         $json = $response->json();
 
         $this->assertArrayHasKey('data', $json);
@@ -147,7 +147,7 @@ class PageControllerTest extends ApiControllerTestCase {
 
         $this->authenticatedAndAuthorized();
 
-        $response = $this->action('GET', PageController::class . '@show', [
+        $response = $this->action('GET', PageContentController::class . '@show', [
             'page' => $page->getKey(),
             'include' => 'layout_definition',
         ]);
@@ -164,13 +164,13 @@ class PageControllerTest extends ApiControllerTestCase {
      */
     public function show_WhenAuthorizedAndFoundRequestIncludesRoutes_IncludesRoutesInJson(){
         $r1 = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
-        $r1->page->publish(new PageTransformer);
+        $r1->page->publish(new PageContentTransformer);
 
         $r2 = factory(Route::class)->create(array_except(attrs_for($r1), [ 'id', 'is_active' ]));
 
         $this->authenticatedAndAuthorized();
 
-        $response = $this->action('GET', PageController::class . '@show', [
+        $response = $this->action('GET', PageContentController::class . '@show', [
             'page' => $r1->page->getKey(),
             'include' => 'routes',
         ]);
@@ -191,7 +191,7 @@ class PageControllerTest extends ApiControllerTestCase {
 
         $this->authenticatedAndAuthorized();
 
-        $response = $this->action('GET', PageController::class . '@show', [
+        $response = $this->action('GET', PageContentController::class . '@show', [
             'page' => $route->page->getKey(),
             'include' => 'blocks',
         ]);
@@ -213,7 +213,7 @@ class PageControllerTest extends ApiControllerTestCase {
 
         $this->authenticatedAndAuthorized();
 
-        $response = $this->action('GET', PageController::class . '@show', [
+        $response = $this->action('GET', PageContentController::class . '@show', [
             'page' => $route->page->getKey(),
             'include' => 'blocks.definition',
         ]);
@@ -234,11 +234,11 @@ class PageControllerTest extends ApiControllerTestCase {
      */
     public function show_WhenAuthorizedAndFoundRequestIncludesPublished_IncludesPublishedInJson(){
         $route = factory(Route::class)->states([ 'withPage', 'isRoot' ])->create();
-        $route->page->publish(new PageTransformer);
+        $route->page->publish(new PageContentTransformer);
 
         $this->authenticatedAndAuthorized();
 
-        $response = $this->action('GET', PageController::class . '@show', [
+        $response = $this->action('GET', PageContentController::class . '@show', [
             'page' => $route->page->getKey(),
             'include' => 'published'
         ]);
@@ -258,11 +258,11 @@ class PageControllerTest extends ApiControllerTestCase {
 
         $block = factory(Block::class)->create([ 'page_id' => $page->getKey() ]);
 
-        $page->publish(new PageTransformer);
-        $page->publish(new PageTransformer);
+        $page->publish(new PageContentTransformer);
+        $page->publish(new PageContentTransformer);
 
         $this->authenticatedAndAuthorized();
-        $response = $this->action('GET', PageController::class . '@show', [ 'page' => $page->getKey(), 'include' => 'history' ]);
+        $response = $this->action('GET', PageContentController::class . '@show', [ 'page' => $page->getKey(), 'include' => 'history' ]);
 
         $json = $response->json();
         $this->assertArrayHasKey('data', $json);
@@ -277,7 +277,7 @@ class PageControllerTest extends ApiControllerTestCase {
      * @group authentication
      */
     public function store_WhenUnauthenticated_Returns401(){
-        $response = $this->action('POST', PageController::class . '@store', [], $this->getAttrs());
+        $response = $this->action('POST', PageContentController::class . '@store', [], $this->getAttrs());
         $response->assertStatus(401);
     }
 
@@ -286,10 +286,10 @@ class PageControllerTest extends ApiControllerTestCase {
      * @group authorization
      */
     public function store_WhenAuthenticated_ChecksAuthorization(){
-        Gate::shouldReceive('authorize')->with('create', Mockery::type(Page::class))->once();
+        Gate::shouldReceive('authorize')->with('create', Mockery::type(PageContent::class))->once();
 
         $this->authenticated();
-        $response = $this->action('POST', PageController::class . '@store', [], $this->getAttrs());
+        $response = $this->action('POST', PageContentController::class . '@store', [], $this->getAttrs());
     }
 
     /**
@@ -299,7 +299,7 @@ class PageControllerTest extends ApiControllerTestCase {
     public function store_WhenAuthenticatedAndUnauthorized_Returns403(){
         $this->authenticatedAndUnauthorized();
 
-        $response = $this->action('POST', PageController::class . '@store', [], $this->getAttrs());
+        $response = $this->action('POST', PageContentController::class . '@store', [], $this->getAttrs());
         $response->assertStatus(403);
     }
 
@@ -310,9 +310,9 @@ class PageControllerTest extends ApiControllerTestCase {
         $this->authenticatedAndAuthorized();
 
         $attrs = $this->getAttrs();
-        $response = $this->action('POST', PageController::class . '@store', [], $attrs);
+        $response = $this->action('POST', PageContentController::class . '@store', [], $attrs);
 
-        $page = Page::all()->last();
+        $page = PageContent::all()->last();
         $this->assertEquals($attrs['title'], $page->title);
     }
 
@@ -323,9 +323,9 @@ class PageControllerTest extends ApiControllerTestCase {
         $this->authenticatedAndAuthorized();
 
         $attrs = $this->getAttrs();
-        $response = $this->action('POST', PageController::class . '@store', [], $attrs);
+        $response = $this->action('POST', PageContentController::class . '@store', [], $attrs);
 
-        $page = Page::all()->last();
+        $page = PageContent::all()->last();
         $this->assertCount(1, $page->routes);
     }
 
@@ -336,9 +336,9 @@ class PageControllerTest extends ApiControllerTestCase {
         $this->authenticatedAndAuthorized();
 
         $attrs = $this->getAttrs();
-        $response = $this->action('POST', PageController::class . '@store', [], $attrs);
+        $response = $this->action('POST', PageContentController::class . '@store', [], $attrs);
 
-        $page = Page::all()->last();
+        $page = PageContent::all()->last();
         $this->assertFalse($page->routes[0]->isActive());
     }
 
@@ -349,9 +349,9 @@ class PageControllerTest extends ApiControllerTestCase {
         $this->authenticatedAndAuthorized();
 
         $attrs = $this->getAttrs();
-        $response = $this->action('POST', PageController::class . '@store', [], $attrs);
+        $response = $this->action('POST', PageContentController::class . '@store', [], $attrs);
 
-        $page = Page::all()->last();
+        $page = PageContent::all()->last();
         $blocks = $page->blocks->groupBy('region_name');
 
         $this->assertArrayHasKey('test-region', $blocks);
@@ -381,7 +381,7 @@ class PageControllerTest extends ApiControllerTestCase {
             'publishing_group_id' => $site->publishing_group_id,
         ]);
 
-        $this->action('POST', PageController::class . '@store', [], $attrs);
+        $this->action('POST', PageContentController::class . '@store', [], $attrs);
     }
 
     /**
@@ -402,7 +402,7 @@ class PageControllerTest extends ApiControllerTestCase {
             'publishing_group_id' => $site->publishing_group_id,
         ]);
 
-        $response = $this->action('POST', PageController::class . '@store', [], $attrs);
+        $response = $this->action('POST', PageContentController::class . '@store', [], $attrs);
         $response->assertStatus(403);
     }
 
@@ -420,9 +420,9 @@ class PageControllerTest extends ApiControllerTestCase {
             'publishing_group_id' => $site->publishing_group_id,
         ]);
 
-        $response = $this->action('POST', PageController::class . '@store', [], $attrs);
+        $response = $this->action('POST', PageContentController::class . '@store', [], $attrs);
 
-        $page = Page::all()->last();
+        $page = PageContent::all()->last();
         $this->assertEquals($attrs['site']['name'], $page->routes[0]->site->name);
     }
 
@@ -432,7 +432,7 @@ class PageControllerTest extends ApiControllerTestCase {
     public function store_WhenAuthorizedAndValid_Returns201(){
         $this->authenticatedAndAuthorized();
 
-        $response = $this->action('POST', PageController::class . '@store', [], $this->getAttrs());
+        $response = $this->action('POST', PageContentController::class . '@store', [], $this->getAttrs());
         $response->assertStatus(201);
     }
 
@@ -447,7 +447,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
         $page = $route->page;
 
-        $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $this->getAttrs());
+        $response = $this->action('PUT', PageContentController::class . '@update', [ $page->getKey() ], $this->getAttrs());
         $response->assertStatus(401);
     }
 
@@ -460,11 +460,11 @@ class PageControllerTest extends ApiControllerTestCase {
         $page = $route->page;
 
         Gate::shouldReceive('authorize')->with('update', Mockery::on(function($model) use ($page){
-            return (is_a($model, Page::class) && ($model->getKey() == $page->getKey()));
+            return (is_a($model, PageContent::class) && ($model->getKey() == $page->getKey()));
         }))->once();
 
         $this->authenticated();
-        $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $this->getAttrs());
+        $response = $this->action('PUT', PageContentController::class . '@update', [ $page->getKey() ], $this->getAttrs());
     }
 
     /**
@@ -477,7 +477,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
         $page = $route->page;
 
-        $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $this->getAttrs());
+        $response = $this->action('PUT', PageContentController::class . '@update', [ $page->getKey() ], $this->getAttrs());
         $response->assertStatus(403);
     }
 
@@ -488,7 +488,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $this->authenticatedAndAuthorized();
 
         $attrs = $this->getAttrs();
-        $response = $this->action('PUT', PageController::class . '@update', [ 123 ], $attrs);
+        $response = $this->action('PUT', PageContentController::class . '@update', [ 123 ], $attrs);
         $response->assertStatus(404);
     }
 
@@ -502,7 +502,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $page = $route->page;
 
         $attrs = $this->getAttrs($page, $route); // Use the existing Page and Route, but update title
-        $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
+        $response = $this->action('PUT', PageContentController::class . '@update', [ $page->getKey() ], $attrs);
 
         $page = $page->fresh();
         $this->assertEquals($attrs['title'], $page->title);
@@ -518,7 +518,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $page = $route->page;
 
         $attrs = $this->getAttrs($page, $route);
-        $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
+        $response = $this->action('PUT', PageContentController::class . '@update', [ $page->getKey() ], $attrs);
 
         $page = $page->fresh();
         $this->assertCount(1, $page->routes);
@@ -533,8 +533,8 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
 
         // Publish the Routes/Pages
-        $route->parent->page->publish(new PageTransformer);
-        $route->page->publish(new PageTransformer);
+        $route->parent->page->publish(new PageContentTransformer);
+        $route->page->publish(new PageContentTransformer);
 
         $page = $route->page;
         $count = $page->routes->count();
@@ -542,7 +542,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $attrs = $this->getAttrs($page);
         array_set($attrs, 'route.parent_id', $route->parent_id);
 
-        $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
+        $response = $this->action('PUT', PageContentController::class . '@update', [ $page->getKey() ], $attrs);
 
         $page = $page->fresh();
         $this->assertEquals($count + 1, $page->routes->count());
@@ -555,7 +555,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $this->authenticatedAndAuthorized();
 
         $route = factory(Route::class)->states('withPage', 'withPublishedParent')->create();
-        $route->page->publish(new PageTransformer);
+        $route->page->publish(new PageContentTransformer);
 
         $inactive = factory(Route::class, 2)->create([ 'page_id' => $route->page_id, 'parent_id' => $route->parent_id ]);
 
@@ -564,7 +564,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $attrs = $this->getAttrs($page);
         array_set($attrs, 'route.parent_id', $route->parent_id);
 
-        $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
+        $response = $this->action('PUT', PageContentController::class . '@update', [ $page->getKey() ], $attrs);
 
         $page = $page->fresh();
         $this->assertEquals(1, $page->routes()->active(false)->count());
@@ -577,20 +577,20 @@ class PageControllerTest extends ApiControllerTestCase {
         $this->authenticatedAndAuthorized();
 
         $l1 = factory(Route::class)->states('withPage', 'withPublishedParent')->create();
-        $l1->page->publish(new PageTransformer);
+        $l1->page->publish(new PageContentTransformer);
 
         $l2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l1->getKey() ]);
-        $l2->page->publish(new PageTransformer);
+        $l2->page->publish(new PageContentTransformer);
 
         $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
-        $l3->page->publish(new PageTransformer);
+        $l3->page->publish(new PageContentTransformer);
 
         $page = $l2->page;
 
         $attrs = $this->getAttrs($page);
         array_set($attrs, 'route.parent_id', $l1->parent_id);
 
-        $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
+        $response = $this->action('PUT', PageContentController::class . '@update', [ $page->getKey() ], $attrs);
 
         $page = $page->fresh();
 
@@ -608,16 +608,16 @@ class PageControllerTest extends ApiControllerTestCase {
         $this->authenticatedAndAuthorized();
 
         $root = factory(Route::class)->states('withPage', 'isRoot')->create();
-        $root->page->publish(new PageTransformer);
+        $root->page->publish(new PageContentTransformer);
 
         $l1 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $root->getKey() ]);
-        $l1->page->publish(new PageTransformer);
+        $l1->page->publish(new PageContentTransformer);
 
         $l2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l1->getKey() ]);
-        $l2->page->publish(new PageTransformer);
+        $l2->page->publish(new PageContentTransformer);
 
         $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
-        $l3->page->publish(new PageTransformer);
+        $l3->page->publish(new PageContentTransformer);
 
         $page = $l2->page;
         $childPage = $l3->page;
@@ -625,7 +625,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $attrs = $this->getAttrs($page);
         array_set($attrs, 'route.parent_id', $root->getKey());
 
-        $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
+        $response = $this->action('PUT', PageContentController::class . '@update', [ $page->getKey() ], $attrs);
 
         $page = $page->fresh();
         $childPage = $childPage->fresh();
@@ -651,7 +651,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $attrs = $this->getAttrs($page);
         array_set($attrs, 'blocks.test-region', []);
 
-        $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
+        $response = $this->action('PUT', PageContentController::class . '@update', [ $page->getKey() ], $attrs);
 
         $page = $page->fresh();
         $this->assertArrayNotHasKey('test-region', $page->blocks->groupBy('region_name'));
@@ -672,7 +672,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $attrs = $this->getAttrs($page, null, $block);
         array_set($attrs, 'blocks.test-region.0.fields.widget_title', 'Fizzbuzz');
 
-        $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
+        $response = $this->action('PUT', PageContentController::class . '@update', [ $page->getKey() ], $attrs);
 
         $page = $page->fresh();
         $blocks = $page->blocks->groupBy('region_name');
@@ -694,7 +694,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $site = $route->site;
 
         $attrs = $this->getAttrs($page);
-        $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
+        $response = $this->action('PUT', PageContentController::class . '@update', [ $page->getKey() ], $attrs);
 
         $route = $route->fresh();
         $this->assertEquals($site->getKey(), $route->site->getKey());
@@ -715,7 +715,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $attrs = $this->getAttrs($page);
         array_set($attrs, 'site_id', $site->getKey());
 
-        $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
+        $response = $this->action('PUT', PageContentController::class . '@update', [ $page->getKey() ], $attrs);
 
         $route = $route->fresh();
         $this->assertEquals($site->getKey(), $route->site->getKey());
@@ -735,7 +735,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $site = $route->site;
 
         $attrs = $this->getAttrs($page);
-        $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
+        $response = $this->action('PUT', PageContentController::class . '@update', [ $page->getKey() ], $attrs);
 
         $route = $route->fresh();
         $this->assertEquals($site->name, $route->site->name);
@@ -767,7 +767,7 @@ class PageControllerTest extends ApiControllerTestCase {
             'publishing_group_id' => $site->publishing_group_id,
         ]);
 
-        $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
+        $this->action('PUT', PageContentController::class . '@update', [ $page->getKey() ], $attrs);
     }
 
     /**
@@ -793,7 +793,7 @@ class PageControllerTest extends ApiControllerTestCase {
             'publishing_group_id' => $site->publishing_group_id,
         ]);
 
-        $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
+        $response = $this->action('PUT', PageContentController::class . '@update', [ $page->getKey() ], $attrs);
         $response->assertStatus(403);
     }
 
@@ -816,7 +816,7 @@ class PageControllerTest extends ApiControllerTestCase {
             'publishing_group_id' => $site->publishing_group_id,
         ]);
 
-        $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $attrs);
+        $response = $this->action('PUT', PageContentController::class . '@update', [ $page->getKey() ], $attrs);
 
         $route = $route->fresh();
         $this->assertEquals('Foobar!', $route->site->name);
@@ -831,7 +831,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
         $page = $route->page;
 
-        $response = $this->action('PUT', PageController::class . '@update', [ $page->getKey() ], $this->getAttrs());
+        $response = $this->action('PUT', PageContentController::class . '@update', [ $page->getKey() ], $this->getAttrs());
         $response->assertStatus(200);
     }
 
@@ -845,7 +845,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'isRoot')->create();
         $page = $route->page;
 
-        $response = $this->action('POST', PageController::class . '@publish', [ $page->getKey() ]);
+        $response = $this->action('POST', PageContentController::class . '@publish', [ $page->getKey() ]);
         $response->assertStatus(401);
     }
 
@@ -858,11 +858,11 @@ class PageControllerTest extends ApiControllerTestCase {
         $page = $route->page;
 
         Gate::shouldReceive('authorize')->with('publish', Mockery::on(function($model) use ($page){
-            return (is_a($model, Page::class) && ($model->getKey() == $page->getKey()));
+            return (is_a($model, PageContent::class) && ($model->getKey() == $page->getKey()));
         }))->once();
 
         $this->authenticated();
-        $response = $this->action('POST', PageController::class . '@publish', [ $page->getKey() ]);
+        $response = $this->action('POST', PageContentController::class . '@publish', [ $page->getKey() ]);
     }
 
     /**
@@ -875,7 +875,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'isRoot')->create();
         $page = $route->page;
 
-        $response = $this->action('POST', PageController::class . '@publish', [ $page->getKey() ]);
+        $response = $this->action('POST', PageContentController::class . '@publish', [ $page->getKey() ]);
         $response->assertStatus(403);
     }
 
@@ -885,7 +885,7 @@ class PageControllerTest extends ApiControllerTestCase {
     public function publish_WhenAuthorizedAndPageNotFound_Returns404(){
         $this->authenticatedAndAuthorized();
 
-        $response = $this->action('POST', PageController::class . '@publish', [ 123 ]);
+        $response = $this->action('POST', PageContentController::class . '@publish', [ 123 ]);
         $response->assertStatus(404);
     }
 
@@ -898,7 +898,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
         $page = $route->page;
 
-        $response = $this->action('POST', PageController::class . '@publish', [ $page->getKey() ]);
+        $response = $this->action('POST', PageContentController::class . '@publish', [ $page->getKey() ]);
 
         $response->assertStatus(406);
 
@@ -916,10 +916,10 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'isRoot')->create();
         $page = $route->page;
 
-        $count = PublishedPage::count();
+        $count = Revision::count();
 
-        $response = $this->action('POST', PageController::class . '@publish', [ $page->getKey() ]);
-        $this->assertEquals($count + 1, PublishedPage::count());
+        $response = $this->action('POST', PageContentController::class . '@publish', [ $page->getKey() ]);
+        $this->assertEquals($count + 1, Revision::count());
     }
 
     /**
@@ -935,11 +935,11 @@ class PageControllerTest extends ApiControllerTestCase {
         $active = factory(Route::class)->states('withPage', 'isRoot')->create();
 
         $page = $active->page;
-        $page->publish(new PageTransformer);
+        $page->publish(new PageContentTransformer);
 
         $draft = factory(Route::class)->create(array_except(attrs_for($active), [ 'id', 'is_active' ]));
 
-        $this->action('POST', PageController::class . '@publish', [ 'page' => $page->getKey() ]);
+        $this->action('POST', PageContentController::class . '@publish', [ 'page' => $page->getKey() ]);
 
         $page = $page->fresh();
         $this->assertCount(1, $page->routes);
@@ -959,13 +959,13 @@ class PageControllerTest extends ApiControllerTestCase {
         $active = factory(Route::class)->states('withPage', 'isRoot')->create();
 
         $page = $active->page;
-        $page->publish(new PageTransformer);
+        $page->publish(new PageContentTransformer);
 
         $draft = factory(Route::class)->create(array_except(attrs_for($active), [ 'id', 'is_active' ]));
 
         $count = Redirect::count();
 
-        $this->action('POST', PageController::class . '@publish', [ 'page' => $page->getKey() ]);
+        $this->action('POST', PageContentController::class . '@publish', [ 'page' => $page->getKey() ]);
         $this->assertEquals($count+1, Redirect::count());
     }
 
@@ -978,7 +978,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'isRoot')->create();
         $page = $route->page;
 
-        $response = $this->action('POST', PageController::class . '@publish', [ 'page' => $page->getKey() ]);
+        $response = $this->action('POST', PageContentController::class . '@publish', [ 'page' => $page->getKey() ]);
         $response->assertStatus(200);
     }
 
@@ -991,7 +991,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'isRoot')->create();
         $page = $route->page;
 
-        $response = $this->action('POST', PageController::class . '@publish', [ 'page' => $page->getKey() ]);
+        $response = $this->action('POST', PageContentController::class . '@publish', [ 'page' => $page->getKey() ]);
         $json = $response->json();
 
         $this->assertEquals(json_decode($page->published->bake, TRUE), $json);
@@ -1010,7 +1010,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $l2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l1->getKey() ]);
         $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
 
-        $response = $this->action('POST', PageController::class . '@publishTree', [ $l1->page->getKey() ]);
+        $response = $this->action('POST', PageContentController::class . '@publishTree', [ $l1->page->getKey() ]);
         $response->assertStatus(401);
     }
 
@@ -1023,10 +1023,10 @@ class PageControllerTest extends ApiControllerTestCase {
         $l2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l1->getKey() ]);
         $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
 
-        Gate::shouldReceive('authorize')->with('publish', Mockery::type(Page::class))->times(3)->andReturn(true);
+        Gate::shouldReceive('authorize')->with('publish', Mockery::type(PageContent::class))->times(3)->andReturn(true);
 
         $this->authenticated();
-        $response = $this->action('POST', PageController::class . '@publishTree', [ $l1->page->getKey() ]);
+        $response = $this->action('POST', PageContentController::class . '@publishTree', [ $l1->page->getKey() ]);
     }
 
     /**
@@ -1039,7 +1039,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
 
         $this->authenticatedAndUnauthorized();
-        $response = $this->action('POST', PageController::class . '@publishTree', [ $l1->page->getKey() ]);
+        $response = $this->action('POST', PageContentController::class . '@publishTree', [ $l1->page->getKey() ]);
 
         $response->assertStatus(403);
     }
@@ -1050,7 +1050,7 @@ class PageControllerTest extends ApiControllerTestCase {
     public function publishTree_WhenAuthorizedAndPageNotFound_Returns404(){
         $this->authenticatedAndAuthorized();
 
-        $response = $this->action('POST', PageController::class . '@publishTree', [ 123 ]);
+        $response = $this->action('POST', PageContentController::class . '@publishTree', [ 123 ]);
         $response->assertStatus(404);
     }
 
@@ -1063,7 +1063,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
 
         $this->authenticatedAndAuthorized();
-        $response = $this->action('POST', PageController::class . '@publishTree', [ $l1->page->getKey() ]);
+        $response = $this->action('POST', PageContentController::class . '@publishTree', [ $l1->page->getKey() ]);
 
         $response->assertStatus(406);
 
@@ -1081,7 +1081,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
 
         $this->authenticatedAndAuthorized();
-        $response = $this->action('POST', PageController::class . '@publishTree', [ $l1->page->getKey() ]);
+        $response = $this->action('POST', PageContentController::class . '@publishTree', [ $l1->page->getKey() ]);
 
         $l1 = $l1->fresh();
         $this->assertTrue($l1->isActive());
@@ -1101,12 +1101,12 @@ class PageControllerTest extends ApiControllerTestCase {
         $l2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l1->getKey() ]);
         $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
 
-        $count = PublishedPage::count();
+        $count = Revision::count();
 
         $this->authenticatedAndAuthorized();
-        $response = $this->action('POST', PageController::class . '@publishTree', [ $l1->page->getKey() ]);
+        $response = $this->action('POST', PageContentController::class . '@publishTree', [ $l1->page->getKey() ]);
 
-        $this->assertEquals($count+3, PublishedPage::count());
+        $this->assertEquals($count+3, Revision::count());
     }
 
     /**
@@ -1118,7 +1118,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
 
         $this->authenticatedAndAuthorized();
-        $response = $this->action('POST', PageController::class . '@publishTree', [ $l1->page->getKey() ]);
+        $response = $this->action('POST', PageContentController::class . '@publishTree', [ $l1->page->getKey() ]);
 
         $response->assertStatus(200);
     }
@@ -1132,7 +1132,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $l3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $l2->getKey() ]);
 
         $this->authenticatedAndAuthorized();
-        $response = $this->action('POST', PageController::class . '@publishTree', [ $l1->page->getKey() ]);
+        $response = $this->action('POST', PageContentController::class . '@publishTree', [ $l1->page->getKey() ]);
 
         $json = $response->json();
         $this->assertEquals(json_decode($l1->page->published->bake, TRUE), $json);
@@ -1148,9 +1148,9 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'isRoot')->create();
 
         $page = $route->page;
-        $page->publish(new PageTransformer);
+        $page->publish(new PageContentTransformer);
 
-        $response = $this->action('POST', PageController::class . '@revert', [
+        $response = $this->action('POST', PageContentController::class . '@revert', [
             'page' => $page->getKey(),
             'published_page_id' => $page->published->getKey()
         ]);
@@ -1166,14 +1166,14 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'isRoot')->create();
 
         $page = $route->page;
-        $page->publish(new PageTransformer);
+        $page->publish(new PageContentTransformer);
 
         Gate::shouldReceive('authorize')->with('revert', Mockery::on(function($model) use ($page){
-            return (is_a($model, Page::class) && ($model->getKey() == $page->getKey()));
+            return (is_a($model, PageContent::class) && ($model->getKey() == $page->getKey()));
         }))->once();
 
         $this->authenticated();
-        $response = $this->action('POST', PageController::class . '@revert', [
+        $response = $this->action('POST', PageContentController::class . '@revert', [
             'page' => $page->getKey(),
             'published_page_id' => $page->published->getKey()
         ]);
@@ -1189,9 +1189,9 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'isRoot')->create();
 
         $page = $route->page;
-        $page->publish(new PageTransformer);
+        $page->publish(new PageContentTransformer);
 
-        $response = $this->action('POST', PageController::class . '@revert', [ 'page' => $page->getKey(), 'published_page_id' => $page->published->getKey() ]);
+        $response = $this->action('POST', PageContentController::class . '@revert', [ 'page' => $page->getKey(), 'published_page_id' => $page->published->getKey() ]);
         $response->assertStatus(403);
     }
 
@@ -1201,7 +1201,7 @@ class PageControllerTest extends ApiControllerTestCase {
     public function revert_WhenAuthorizedAndPageNotFound_Returns404(){
         $this->authenticatedAndAuthorized();
 
-        $response = $this->action('POST', PageController::class . '@revert', [ 123 ]);
+        $response = $this->action('POST', PageContentController::class . '@revert', [ 123 ]);
         $response->assertStatus(404);
     }
 
@@ -1214,9 +1214,9 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'isRoot')->create();
 
         $page = $route->page;
-        $page->publish(new PageTransformer);
+        $page->publish(new PageContentTransformer);
 
-        $response = $this->action('POST', PageController::class . '@revert', [ $page->getKey(), 123 ]);
+        $response = $this->action('POST', PageContentController::class . '@revert', [ $page->getKey(), 123 ]);
         $response->assertStatus(404);
     }
 
@@ -1229,7 +1229,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'isRoot')->create();
 
         $page = $route->page;
-        $page->publish(new PageTransformer);
+        $page->publish(new PageContentTransformer);
 
         $title = $page->title;
         $page->title = 'Foobar!';
@@ -1237,7 +1237,7 @@ class PageControllerTest extends ApiControllerTestCase {
 
         $this->assertEquals('Foobar!', $page->title);
 
-        $response = $this->action('POST', PageController::class . '@revert', [
+        $response = $this->action('POST', PageContentController::class . '@revert', [
             'page' => $page->getKey(),
             'published_page_id' => $page->published->getKey()
         ]);
@@ -1255,9 +1255,9 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'isRoot')->create();
 
         $page = $route->page;
-        $page->publish(new PageTransformer);
+        $page->publish(new PageContentTransformer);
 
-        $response = $this->action('POST', PageController::class . '@revert', [
+        $response = $this->action('POST', PageContentController::class . '@revert', [
             'page' => $page->getKey(),
             'published_page_id' => $page->published->getKey()
         ]);
@@ -1274,9 +1274,9 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'isRoot')->create();
 
         $page = $route->page;
-        $page->publish(new PageTransformer);
+        $page->publish(new PageContentTransformer);
 
-        $response = $this->action('POST', PageController::class . '@revert', [ 'page' => $page->getKey(), 'published_page_id' => $page->published->getKey() ]);
+        $response = $this->action('POST', PageContentController::class . '@revert', [ 'page' => $page->getKey(), 'published_page_id' => $page->published->getKey() ]);
         $json = $response->json();
 
         $this->assertArrayHasKey('data', $json);
@@ -1296,7 +1296,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
         $page = $route->page;
 
-        $response = $this->action('DELETE', PageController::class . '@destroy', [ $page->getKey() ]);
+        $response = $this->action('DELETE', PageContentController::class . '@destroy', [ $page->getKey() ]);
         $response->assertStatus(401);
     }
 
@@ -1309,11 +1309,11 @@ class PageControllerTest extends ApiControllerTestCase {
         $page = $route->page;
 
         Gate::shouldReceive('authorize')->with('delete', Mockery::on(function($model) use ($page){
-            return (is_a($model, Page::class) && ($model->getKey() == $page->getKey()));
+            return (is_a($model, PageContent::class) && ($model->getKey() == $page->getKey()));
         }))->once();
 
         $this->authenticated();
-        $response = $this->action('DELETE', PageController::class . '@destroy', [ $page->getKey() ]);
+        $response = $this->action('DELETE', PageContentController::class . '@destroy', [ $page->getKey() ]);
     }
 
     /**
@@ -1326,7 +1326,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
         $page = $route->page;
 
-        $response = $this->action('DELETE', PageController::class . '@destroy', [ $page->getKey() ]);
+        $response = $this->action('DELETE', PageContentController::class . '@destroy', [ $page->getKey() ]);
         $response->assertStatus(403);
     }
 
@@ -1336,7 +1336,7 @@ class PageControllerTest extends ApiControllerTestCase {
     public function destroy_WhenAuthorizedAndPageNotFound_Returns404(){
         $this->authenticatedAndAuthorized();
 
-        $response = $this->action('DELETE', PageController::class . '@destroy', [ 123 ]);
+        $response = $this->action('DELETE', PageContentController::class . '@destroy', [ 123 ]);
         $response->assertStatus(404);
     }
 
@@ -1347,10 +1347,10 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
 
         $this->authenticatedAndAuthorized();
-        $response = $this->action('DELETE', PageController::class . '@destroy', [ $route->page->getKey() ]);
+        $response = $this->action('DELETE', PageContentController::class . '@destroy', [ $route->page->getKey() ]);
 
-        $this->assertNull(Page::find($route->page->id));
-        $this->assertEquals(1, Page::withTrashed()->where('id', '=', $route->page->getKey())->count());
+        $this->assertNull(PageContent::find($route->page->id));
+        $this->assertEquals(1, PageContent::withTrashed()->where('id', '=', $route->page->getKey())->count());
     }
 
     /**
@@ -1360,7 +1360,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
 
         $this->authenticatedAndAuthorized();
-        $response = $this->action('DELETE', PageController::class . '@destroy', [ $route->page->getKey() ]);
+        $response = $this->action('DELETE', PageContentController::class . '@destroy', [ $route->page->getKey() ]);
 
         $this->assertInstanceOf(Route::class, Route::find($route->getKey()));
     }
@@ -1373,7 +1373,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $redirect = Redirect::createFromRoute($route);
 
         $this->authenticatedAndAuthorized();
-        $response = $this->action('DELETE', PageController::class . '@destroy', [ $route->page->getKey() ]);
+        $response = $this->action('DELETE', PageContentController::class . '@destroy', [ $route->page->getKey() ]);
 
         $this->assertInstanceOf(Redirect::class, Redirect::find($redirect->getKey()));
     }
@@ -1385,7 +1385,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
 
         $this->authenticatedAndAuthorized();
-        $response = $this->action('DELETE', PageController::class . '@destroy', [ $route->page->getKey() ]);
+        $response = $this->action('DELETE', PageContentController::class . '@destroy', [ $route->page->getKey() ]);
 
         $response->assertStatus(200);
     }
@@ -1400,7 +1400,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
         $page = $route->page;
 
-        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ $page->getKey() ]);
+        $response = $this->action('DELETE', PageContentController::class . '@forceDestroy', [ $page->getKey() ]);
         $response->assertStatus(401);
     }
 
@@ -1413,11 +1413,11 @@ class PageControllerTest extends ApiControllerTestCase {
         $page = $route->page;
 
         Gate::shouldReceive('authorize')->with('forceDelete', Mockery::on(function($model) use ($page){
-            return (is_a($model, Page::class) && ($model->getKey() == $page->getKey()));
+            return (is_a($model, PageContent::class) && ($model->getKey() == $page->getKey()));
         }))->once();
 
         $this->authenticated();
-        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ $page->getKey() ]);
+        $response = $this->action('DELETE', PageContentController::class . '@forceDestroy', [ $page->getKey() ]);
     }
 
     /**
@@ -1430,7 +1430,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
         $page = $route->page;
 
-        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ $page->getKey() ]);
+        $response = $this->action('DELETE', PageContentController::class . '@forceDestroy', [ $page->getKey() ]);
         $response->assertStatus(403);
     }
 
@@ -1440,7 +1440,7 @@ class PageControllerTest extends ApiControllerTestCase {
     public function forceDestroy_WhenAuthorizedAndPageNotFound_Returns404(){
         $this->authenticatedAndAuthorized();
 
-        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ 123 ]);
+        $response = $this->action('DELETE', PageContentController::class . '@forceDestroy', [ 123 ]);
         $response->assertStatus(404);
     }
 
@@ -1451,9 +1451,9 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
 
         $this->authenticatedAndAuthorized();
-        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ $route->page->getKey() ]);
+        $response = $this->action('DELETE', PageContentController::class . '@forceDestroy', [ $route->page->getKey() ]);
 
-        $this->assertEquals(0, Page::withTrashed()->where('id', '=', $route->page->getKey())->count());
+        $this->assertEquals(0, PageContent::withTrashed()->where('id', '=', $route->page->getKey())->count());
     }
 
     /**
@@ -1463,7 +1463,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
 
         $this->authenticatedAndAuthorized();
-        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ $route->page->getKey() ]);
+        $response = $this->action('DELETE', PageContentController::class . '@forceDestroy', [ $route->page->getKey() ]);
 
         $this->assertNull(Route::find($route->getKey()));
     }
@@ -1476,7 +1476,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $redirect = Redirect::createFromRoute($route);
 
         $this->authenticatedAndAuthorized();
-        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ $route->page->getKey() ]);
+        $response = $this->action('DELETE', PageContentController::class . '@forceDestroy', [ $route->page->getKey() ]);
 
         $this->assertNull(Redirect::find($redirect->getKey()));
     }
@@ -1486,14 +1486,14 @@ class PageControllerTest extends ApiControllerTestCase {
      */
     public function forceDestroy_WhenAuthorizedAndValid_DoesNotDeletePublishedPages(){
         $route = factory(Route::class)->states('withPage', 'withPublishedParent')->create();
-        $route->page->publish(new PageTransformer);
+        $route->page->publish(new PageContentTransformer);
 
         $published = $route->page->published;
 
         $this->authenticatedAndAuthorized();
-        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ $route->page->getKey() ]);
+        $response = $this->action('DELETE', PageContentController::class . '@forceDestroy', [ $route->page->getKey() ]);
 
-        $this->assertInstanceOf(PublishedPage::class, PublishedPage::find($published->getKey()));
+        $this->assertInstanceOf(Revision::class, Revision::find($published->getKey()));
     }
 
     /**
@@ -1503,7 +1503,7 @@ class PageControllerTest extends ApiControllerTestCase {
         $route = factory(Route::class)->states('withPage', 'withParent')->create();
 
         $this->authenticatedAndAuthorized();
-        $response = $this->action('DELETE', PageController::class . '@forceDestroy', [ $route->page->getKey() ]);
+        $response = $this->action('DELETE', PageContentController::class . '@forceDestroy', [ $route->page->getKey() ]);
 
         $response->assertStatus(200);
     }

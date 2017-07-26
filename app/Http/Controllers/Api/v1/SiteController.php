@@ -3,15 +3,14 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Requests\Api\v1\Site\StoreRequest;
 use App\Models\LocalAPIClient;
-use App\Models\Route;
+use App\Models\Page;
 use Auth;
 use Gate;
 use DB;
 use App\Models\Site;
-use App\Models\Page;
 use Illuminate\Http\Request;
 use App\Http\Transformers\Api\v1\SiteTransformer;
-use App\Http\Transformers\Api\v1\RouteTransformer;
+use App\Http\Transformers\Api\v1\PageTransformer;
 use Illuminate\Validation\ValidationException;
 
 class SiteController extends ApiController
@@ -28,7 +27,7 @@ class SiteController extends ApiController
 	 */
 	public function index(Request $request){
 		$user = Auth::user();
-		$sites = Site::with('routes');
+		$sites = Site::with('pages');
 
 		if(!Gate::allows('index', Site::class)){
 			$pgs = $user->publishing_groups->pluck('id');
@@ -112,7 +111,7 @@ class SiteController extends ApiController
 		$qb = $site->activeRoute->descendantsAndSelf();
 		$routes = $qb->get()->toHierarchy();
 
-		return fractal($routes, new RouteTransformer)->respond();
+		return fractal($routes, new PageTransformer)->respond();
 	}
 
 }

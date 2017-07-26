@@ -1,206 +1,258 @@
 <?php
-
 namespace App\Models;
 
 use DB;
 use Exception;
-use App\Models\Traits\Tracked;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Exceptions\UnpublishedParentException;
-use App\Models\Definitions\Layout as LayoutDefinition;
-use League\Fractal\TransformerAbstract as FractalTransformer;
+use Baum\Node as BaumNode;
+use App\Models\Traits\Routable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use App\Models\Contracts\Routable as RoutableContract;
 
-class Page extends Model
+class Page extends BaumNode implements RoutableContract
 {
-	use Tracked, SoftDeletes;
+	use Routable;
+
+	public $timestamps = false;
 
 	protected $fillable = [
-		'title',
-		'options',
-		'layout_name',
-		'layout_version',
+		'slug',
+		'draft_page_content_id',
+		'parent_id',
+        'site_id',
+        'path'
 	];
 
-	protected $casts = [
-        'options' => 'json',
+	protected $hidden = [
+		'lft',
+		'rgt'
 	];
 
-	protected $layoutDefinition = null;
+    protected $scoped = ['site_id'];
 
-	public function routes()
+    /**
+     * Create a new Eloquent model instance.
+     *
+     * @param  array  $attributes
+     * @return void
+     */
+    public function __construct($attributes = []){
+        parent::__construct($attributes);
+
+        $this->parent_id = $this->parent_id ?: null;
+    }
+
+
+	/**
+	 * The "booting" method of the model.
+	 *
+	 * @return void
+	 */
+	protected static function boot()
 	{
-		return $this->hasMany(Route::class, 'page_id');
+		parent::boot();
+
+		static::saving(function($node){
+			$node->path = $node->generatePath();
+		});
 	}
 
-	public function activeRoute()
+	public function site()
 	{
-		return $this->hasOne(Route::class, 'page_id')->active();
+		return $this->belongsTo(Site::class, 'site_id');
 	}
 
-	public function draftRoute()
+	public function draft()
 	{
-		return $this->hasOne(Route::class, 'page_id')->active(false);
+		return $this->belongsTo(PageContent::class, 'draft_page_content_id');
+	}
+
+	public function published_page()
+	{
+	    return $this->belongsTo( Revision::class, 'published_revision_id' );
 	}
 
 
-	public function blocks()
+    /**
+     * Save the model to the database.
+     *
+     * @param  array  $options
+     * @return bool
+     */
+    public function save(array $options = [])
+    {
+    	DB::beginTransaction();
+    	try{
+	    	parent::save($options);
+	    	DB::commit();
+	    	return true;
+    	} catch(Exception $e){
+    		DB::rollback();
+    		return false;
+    	}
+    }
+
+    /**
+     * Delete the model from the database.
+     * Creates a new Redirect model to ensure that the path is not lost forever.
+     *
+     * @return bool|null
+     * @throws \Exception
+     */
+    public function delete()
+    {
+    	DB::beginTransaction();
+
+    	try {
+    		if($this->isActive()){
+    			Redirect::createFromRoute($this);
+    		}
+
+	    	parent::delete();
+
+	    	DB::commit();
+    	} catch(Exception $e){
+    		DB::rollback();
+    		throw $e;
+    	}
+    }
+
+
+
+    /**
+     * Scope a query to only include active routes.
+     *
+     * @param Builder $query
+     * @param boolean $value
+     * @return Builder
+     */
+	public function scopeActive(Builder $query, $value = true)
 	{
-		return $this->hasMany(Block::class, 'page_id');
+		return $query->whereNotNull('published_revision_id');
 	}
 
-	public function published()
+	/**
+	 * Returns true if is_active is true, else false
+	 * @return boolean
+	 */
+	public function isActive()
 	{
-		return $this->hasOne(PublishedPage::class, 'page_id')->latest()->limit(1);
+		return null != $this->published_revision_id;
 	}
 
-	public function history()
+	/**
+	 * Returns true if site_id is set, else false
+	 * @return boolean
+	 */
+	public function isSite()
 	{
-		return $this->hasMany(PublishedPage::class, 'page_id');
+	    return $this->isRoot();
 	}
 
 
 	/**
-	 * Creates a PublishedPage by baking the Page to JSON with Fractal.
-	 * If the Page is dirty, an exception will be thrown.
-	 *
-	 * @param \League\Fractal\TransformerAbstract $transformer
-	 * @return void
-	 * @throws Exception
+	 * Assembles a path using the ancestor slugs within the Route tree
+	 * @return string
 	 */
-	public function publish(FractalTransformer $transformer)
+	public function generatePath()
 	{
-		if($this->isDirty()){
-			throw new Exception('You cannot publish a page with unsaved changes.');
+		if(!$this->parent_id && $this->slug){
+			throw new Exception('A root Page cannot have a slug.');
 		}
 
-		// Ensure that the draft does not have unpublished ancestors
-		if($this->draftRoute && $this->draftRoute->ancestors()->active(false)->count()){
-			throw new UnpublishedParentException('Page cannot be published: it has unpublished ancestors.');
+		$path = '/';
+
+		$chain = $this->parent_id ? $this->parent->ancestorsAndSelf([ 'slug' ])->get() : [];
+
+		foreach($chain as $ancestor){
+			if(empty($ancestor->slug)) continue; // If there are any ancestors without a path, skip.
+			$path .= $ancestor->slug . '/';
 		}
 
-		DB::beginTransaction();
-
-		try {
-			// If there is a draft route, publish it
-			if($this->draftRoute) $this->draftRoute->makeActive();
-
-			// Ensure that important relations are populated and up-to-date
-			$this->load([ 'blocks', 'draftRoute', 'activeRoute' ]);
-
-			// Create our PublishedPage, bake it with Fractal
-			$published = new PublishedPage;
-			$published->page_id = $this->getKey();
-			$published->bake = fractal($this, $transformer)->parseIncludes([ 'blocks', 'activeRoute' ])->toJson();
-			$published->save();
-
-			DB::commit();
-		} catch(Exception $e){
-			DB::rollback();
-			throw $e;
-		}
-
-		$this->load([ 'draftRoute', 'activeRoute' ]);
+		return $path . $this->slug;
 	}
 
+	/**
+	 * Clones the desendants of the given Route to the current Route instance.
+	 *
+	 * @param Page $node
+	 * @return \Illuminate\Database\Eloquent\Collection $descendants
+	 */
+	public function cloneDescendants(Page $node)
+	{
+		$tree = [];
+
+		// Ensure that existing descendants are present in the tree
+		$descendants = $this->descendants()->get()->toHierarchy();
+
+		if(!$descendants->isEmpty()){
+			$this->replicateIterator($descendants, $tree, true);
+		}
+
+		// Clone the new descendants into the tree
+		$descendants = $node->descendants()->get()->toHierarchy();
+
+		if(!$descendants->isEmpty()){
+			$this->replicateIterator($descendants, $tree, false);
+		}
+
+		// Persist
+		$foobar = $this->makeTree($tree);
+
+		$model = $this->fresh();
+		return $model->descendants()->get();
+	}
 
 	/**
-	 * Restores a Page from a PublishedPage instance. All Block instances are
-	 * replaced with those defined by the bake. Routes remain unaltered.
+	 * Recursive iterator used by replicateWithDescendants.
 	 *
-	 * @return void
-	 * @throws Exception
+	 * @param  Collection $nodes
+	 * @param  array|null &$output
+	 * @para
 	 */
-	public function revert(PublishedPage $published){
-		if($this->getKey() !== $published->page_id){
-			throw new Exception('PublishedPage must be related to this Page');
-		}
+	protected function replicateIterator(Collection $nodes, array &$output, $preserve)
+	{
+		foreach($nodes as $node){
+			$data = array_except($node->toArray(), [ 'parent_id', 'depth', 'lft', 'rgt', 'children', 'is_canonical' ]);
 
-		if($this->isDirty()){
-			throw new Exception('A Page must be in a clean state in order to revert.');
-		}
-
-		DB::beginTransaction();
-
-		try {
-			$baked = json_decode($published->bake, TRUE);
-			$baked = $baked['data'];
-
-			// Restore the Page object
-			$this->fill($baked);
-			$this->save();
-
-			// Restore the Block instances
-			$this->blocks()->delete();
-
-			if(isset($baked['blocks'])){
-				foreach($baked['blocks'] as $region => $blocks){
-					foreach($blocks as $data){
-						$block = new Block;
-						$block->page_id = $this->getKey();
-						$block->fill($data);
-						$block->save();
-					}
-				}
+			if(!$preserve){
+				$data = array_except($data, [ 'id', 'path', 'is_active' ]);
 			}
 
-			DB::commit();
-		} catch(Exception $e){
-			DB::rollback();
-			throw $e;
+			if(!$node->children->isEmpty()){
+				$data['children'] = [];
+				$this->replicateIterator($node->children, $data['children'], $preserve);
+			}
+
+			$output[] = $data;
 		}
-
-		$this->load([ 'blocks', 'routes', 'draftRoute', 'activeRoute' ]);
 	}
 
+    /**
+     * Does this route have a draft?
+     * @return bool
+     */
+	public function hasDraft()
+    {
+        return $this->draft ? true : false;
+    }
 
-	/**
-	 * Loads the Layout definition, optionally including Regions
-	 *
-	 * @param boolean $includeRegions
-	 * @return void
-	 */
-	public function loadLayoutDefinition($includeRegions = false)
-	{
-		$file = LayoutDefinition::locateDefinition($this->layout_name, $this->layout_version);
-		$definition = LayoutDefinition::fromDefinitionFile($file);
+    /**
+     * Set the draft version of this route.
+     * @param null|PageContent $page
+     */
+    public function setDraft($pagecontent)
+    {
+        $this->page_content_id = $pagecontent ? $pagecontent->id : null;
+    }
 
-		if($includeRegions) $definition->loadRegionDefinitions();
-
-		$this->layoutDefinition = $definition;
-	}
-
-	/**
-	 * Returns the layoutDefinitions Collection, loading from disk if necessary,
-	 * optionally including Regions.
-	 *
-	 * @param boolean $includeRegions
-	 * @return LayoutDefinition
-	 */
-	public function getLayoutDefinition($includeRegions = false){
-		if(!$this->layoutDefinition){
-			$this->loadLayoutDefinition($includeRegions);
-
-		} elseif($includeRegions) {
-			// If using a previously-loaded $layoutDefinition, region definitions may not be present.
-			// By calling getRegionDefinitions rather than loadRegionDefinitions, RegionDefinitions get loaded,
-			// but only if they are not already present. A call to laodRegionDefinitions would force a new load
-			// operation regardless.
-			$this->layoutDefinition->getRegionDefinitions();
-		}
-
-		return $this->layoutDefinition;
-	}
-
-
-	/**
-	 * Deletes all blocks in the given Region
-	 *
-	 * @param  string $region
-	 * @return void
-	 */
-	public function clearRegion($region){
-		Block::deleteForPageRegion($this, $region);
-	}
-
+    /**
+     * Get the child of this route with the given slug.
+     * @param string $slug The slug of the route to retrieve.
+     * @return Page The child Route with the given slug or null.
+     */
+    public function getChildWithSlug($slug)
+    {
+        return $this->immediateDescendants()->where('slug', $slug)->first();
+    }
 }

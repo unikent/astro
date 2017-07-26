@@ -2,9 +2,9 @@
 
 namespace App\Providers;
 
-use App\Models\Page;
+use App\Models\PageContent;
 use App\Models\Site;
-use App\Models\Route;
+use App\Models\Page;
 use App\Models\Media;
 use App\Policies\PagePolicy;
 use App\Policies\SitePolicy;
@@ -27,8 +27,8 @@ class AuthServiceProvider extends ServiceProvider
 	 * @var array
 	 */
 	protected $policies = [
-		Page::class => PagePolicy::class,
-		Route::class => RoutePolicy::class,
+		PageContent::class => PagePolicy::class,
+		Page::class => RoutePolicy::class,
 		Site::class => SitePolicy::class,
 		Media::class => MediaPolicy::class,
 		BlockDefinition::class => BlockDefinitionPolicy::class,

@@ -1,5 +1,5 @@
 <?php
-use App\Http\Transformers\Api\v1\PageTransformer;
+use App\Http\Transformers\Api\v1\PageContentTransformer;
 
 $factory->define(App\Models\Route::class, function (Faker\Generator $faker) {
 	return [
@@ -15,7 +15,7 @@ $factory->state(App\Models\Route::class, 'isRoot', function ($faker) {
 });
 
 $factory->state(App\Models\Route::class, 'withPage', function ($faker) {
-    $page = factory(App\Models\Page::class)->create();
+    $page = factory(App\Models\PageContent::class)->create();
 
     return [
         'page_id' => $page->getKey(),
@@ -32,7 +32,7 @@ $factory->state(App\Models\Route::class, 'withParent', function ($faker) {
 
 $factory->state(App\Models\Route::class, 'withPublishedParent', function ($faker) {
     $parent = factory(App\Models\Route::class)->states('withPage', 'isRoot')->create();
-    $parent->page->publish(new PageTransformer);
+    $parent->page->publish(new PageContentTransformer);
 
     $parent = $parent->fresh();
 

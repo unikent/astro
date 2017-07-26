@@ -13,16 +13,16 @@ Route::group([ 'prefix' => 'v1', 'namespace' => 'v1' ], function(){
 	Route::post('media', 'MediaController@store');
 	Route::delete('media/{media}', 'MediaController@destroy');
 
-	Route::resource('page', 'PageController', [ 'except' => [ 'index', 'create', 'edit' ]]);
-	Route::post('page/{page}/publish', 'PageController@publish');
-	Route::post('page/{page}/publish-tree', 'PageController@publishTree');
-	Route::post('page/{page}/revert', 'PageController@revert');
-	Route::delete('page/{page}/force', 'PageController@forceDestroy');
+	Route::resource('page', 'PageContentController', [ 'except' => [ 'index', 'create', 'edit' ]]);
+	Route::post('page/{page}/publish', 'PageContentController@publish');
+	Route::post('page/{page}/publish-tree', 'PageContentController@publishTree');
+	Route::post('page/{page}/revert', 'PageContentController@revert');
+	Route::delete('page/{page}/force', 'PageContentController@forceDestroy');
 
 	Route::get('region/definitions', 'RegionController@definitions');
 	Route::get('region/{region_definition}/definition', 'RegionController@definition');
 
-	Route::get('route/resolve', 'RouteController@resolve');
+	Route::get('route/resolve', 'PageController@resolve');
 
 	Route::resource('site', 'SiteController', [ 'only' => [ 'index', 'show', 'store', 'update', 'destroy' ]]);
 	Route::get('site/{site}/tree', 'SiteController@tree');

@@ -3,11 +3,11 @@ namespace Tests\Unit\Models;
 
 use Exception;
 use Tests\TestCase;
-use App\Models\Page;
+use App\Models\PageContent;
 use App\Models\Site;
-use App\Models\Route;
+use App\Models\Page;
 use App\Models\Redirect;
-use App\Http\Transformers\Api\v1\PageTransformer;
+use App\Http\Transformers\Api\v1\PageContentTransformer;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class RouteTest extends TestCase
@@ -407,16 +407,16 @@ class RouteTest extends TestCase
 	public function cloneDescendants_WhenAllDescendantsArePublished_ClonesAllDescendantsAsInactive()
 	{
 		$a1 = factory(Route::class)->states('withPublishedParent', 'withPage')->create();
-		$a1->page->publish(new PageTransformer);
+		$a1->page->publish(new PageContentTransformer);
 
 		$a2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a1->getKey() ]);
-		$a2->page->publish(new PageTransformer);
+		$a2->page->publish(new PageContentTransformer);
 
 		$a3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a2->getKey() ]);
-		$a3->page->publish(new PageTransformer);
+		$a3->page->publish(new PageContentTransformer);
 
 		$a4 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a2->getKey() ]);
-		$a4->page->publish(new PageTransformer);
+		$a4->page->publish(new PageContentTransformer);
 
 		$b1 = factory(Route::class)->states('withPublishedParent', 'withPage')->create();
 
@@ -445,10 +445,10 @@ class RouteTest extends TestCase
 	public function cloneDescendants_WhenSomeDescendantsAreDraft_ClonesAllDescendantsAndRemovesOriginalDrafts()
 	{
 		$a1 = factory(Route::class)->states('withPublishedParent', 'withPage')->create();
-		$a1->page->publish(new PageTransformer);
+		$a1->page->publish(new PageContentTransformer);
 
 		$a2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a1->getKey() ]);
-		$a2->page->publish(new PageTransformer);
+		$a2->page->publish(new PageContentTransformer);
 
 		$a3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a2->getKey() ]);
 		$a4 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a2->getKey() ]);
@@ -476,20 +476,20 @@ class RouteTest extends TestCase
 	{
 		// Original Route, with descendants
 		$a1 = factory(Route::class)->states('withPublishedParent', 'withPage')->create();
-		$a1->page->publish(new PageTransformer);
+		$a1->page->publish(new PageContentTransformer);
 
 		$a2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a1->getKey() ]);
-		$a2->page->publish(new PageTransformer);
+		$a2->page->publish(new PageContentTransformer);
 
 		$a3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a2->getKey() ]);
 		$a4 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $a2->getKey() ]);
 
 		// New Route, with own descendants
 		$b1 = factory(Route::class)->states('withPublishedParent', 'withPage')->create();
-		$b1->page->publish(new PageTransformer);
+		$b1->page->publish(new PageContentTransformer);
 
 		$b2 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $b1->getKey() ]);
-		$b2->page->publish(new PageTransformer);
+		$b2->page->publish(new PageContentTransformer);
 
 		$b3 = factory(Route::class)->states('withPage')->create([ 'parent_id' => $b1->getKey() ]);
 

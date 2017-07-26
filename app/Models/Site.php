@@ -1,7 +1,7 @@
 <?php
 namespace App\Models;
 
-use App\Models\Route;
+use App\Models\Page;
 use App\Models\PublishingGroup;
 use Illuminate\Database\Eloquent\Model;
 
@@ -22,25 +22,15 @@ class Site extends Model
 
 	protected $definition = null;
 
-	public function rootRoute()
+	public function activeRoute()
 	{
-		return $this->hasOne(Route::class, 'site_id')->root();
+		return $this->hasOne(Page::class, 'site_id')->root();
 	}
 
-	public function routes()
+	public function pages()
 	{
-		return $this->hasMany(Route::class, 'site_id');
+		return $this->hasMany(Page::class, 'site_id');
 	}
-
-	public function publishedRoutes()
-    {
-
-    }
-
-    public function draftRoutes()
-    {
-
-    }
 
 	public function publishing_group()
 	{

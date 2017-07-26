@@ -2,9 +2,9 @@
 
 namespace App\Models\Traits;
 
-use App\Models\Route;
+use App\Models\Page;
 use App\Models\Redirect;
-use App\Http\Transformers\Api\v1\PageTransformer;
+use App\Http\Transformers\Api\v1\PageContentTransformer;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Gate;
 
@@ -18,7 +18,7 @@ trait ResolvesRoutes
     public function resolveRoute($path)
     {
         // Attempt to resolve the Route
-        $resolve = Route::findByPath($path);
+        $resolve = Page::findByPath($path);
 
         // If the Route is not found, attempt to find a Redirect
         if(!$resolve){
@@ -29,7 +29,7 @@ trait ResolvesRoutes
             if($resolve->published_page){
                 return response($resolve->published_page->bake);
             } else {
-                return fractal($resolve->page, new PageTransformer)->parseIncludes([ 'blocks', 'active_route' ])->respond();
+                return fractal($resolve->page, new PageContentTransformer)->parseIncludes([ 'blocks', 'active_route' ])->respond();
             }
         }
 

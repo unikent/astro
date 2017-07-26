@@ -2,8 +2,8 @@
 
 namespace App\Models\APICommands;
 
-use App\Models\Route;
 use App\Models\Page;
+use App\Models\PageContent;
 use App\Models\Contracts\APICommand;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Collection;
@@ -38,7 +38,7 @@ class AddPage implements APICommand
                 $route->makeChildOf($parent);
             }
         }
-        $page = new Page([]);
+        $page = new PageContent([]);
         $route->setDraft($page);
         $route->save();
         return $route;

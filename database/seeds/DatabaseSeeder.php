@@ -2,7 +2,7 @@
 
 use App\Models\User;
 use App\Models\Block;
-use App\Models\Route;
+use App\Models\Page;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder

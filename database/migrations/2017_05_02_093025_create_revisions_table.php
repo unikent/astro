@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePublishedPagesTable extends Migration
+class CreateRevisionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,18 @@ class CreatePublishedPagesTable extends Migration
      */
     public function up()
     {
-        Schema::create('published_pages', function(Blueprint $table) {
+        Schema::create('revisions', function(Blueprint $table) {
             $table->increments('id');
-            $table->integer('page_id')->unsigned()->index();
+            $table->integer('page_content_id')->unsigned()->index();
 
             $table->mediumText('bake');
 
+            $table->string('type')->default('published');
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
             $table->timestamps();
+
+            $table->foreign('page_content_id', 'page_content_id_fk')->references('id')->on('page_content');
         });
     }
 
@@ -32,6 +35,9 @@ class CreatePublishedPagesTable extends Migration
      */
     public function down()
     {
-        Schema::drop('published_pages');
+        Schema::table('revisions', function(Blueprint $table) {
+            $table->dropForeign('page_content_id_fk');
+        });
+        Schema::drop('revisions');
     }
 }
