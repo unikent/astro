@@ -31,14 +31,13 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex';
-import { Loading } from 'element-ui';
+import { mapState } from 'vuex';
 import Icon from 'components/Icon';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
 import Toolbar from 'components/Sidebar/Toolbar';
 
-/* global window */
+/* global window, document */
 
 export default {
 
@@ -50,12 +49,16 @@ export default {
 	},
 
 	created() {
-
 		this.onKeyDown = onKeyDown(undoStackInstance);
 		this.onKeyUp = onKeyUp(undoStackInstance);
 
 		document.addEventListener('keydown', this.onKeyDown);
 		document.addEventListener('keyup', this.onKeyUp);
+	},
+
+	destroyed() {
+		document.removeEventListener('keydown', this.onKeyDown);
+		document.removeEventListener('keyup', this.onKeyUp);
 	},
 
 	computed: {
