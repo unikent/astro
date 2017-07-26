@@ -9,9 +9,16 @@
 			}"
 			:style="blockOverlayStyles"
 		>
-			<div class="block-overlay__delete" @click="removeBlock"> <!-- removeDialog(removeBlock) -->
-				<Icon name="delete" width="20" height="20" />
-			</div>
+
+			<el-dropdown class="block-overlay__delete" @command="removeBlock">
+				<el-button>
+					<Icon name="delete" width="20" height="20" /> <i class="el-icon-caret-bottom el-icon--right"></i>
+				</el-button>
+				<el-dropdown-menu slot="dropdown">
+					<el-dropdown-item command="delete">Delete</el-dropdown-item>
+				</el-dropdown-menu>
+			</el-dropdown>
+
 			<div ref="move" class="block-overlay__move" v-show="blocks.length > 1">
 				<Icon name="move" width="20" height="20" />
 			</div>
@@ -210,11 +217,15 @@ export default {
 				.catch(() => {});
 		},
 
-		removeBlock() {
+		removeBlock(command) {
 			const { index, region } = this.current;
 			this.deleteBlock({ index, region });
 			this.hideOverlay();
 			this.current = null;
+			this.$message({
+				message: 'Block removed',
+				type: 'success'
+			});
 		},
 
 		handlerMove(e) {
