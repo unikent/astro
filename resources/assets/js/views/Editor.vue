@@ -1,8 +1,6 @@
 <template>
 <div class="page">
 
-
-
 	<div class="editor-body">
 
 		<div class="editor-wrapper" ref="editor">
@@ -11,18 +9,14 @@
 				class="iframe-overlay"
 				:style="{ 'position' : displayIframeOverlay ? 'absolute' : null }"
 			/>
-
-
 		</div>
 
 		<sidebar />
 		<block-picker />
 
-
-
 		<el-dialog
 			title="Publish"
-			v-model="publish_modal"
+			v-model="publishModalVisible"
 			:modal-append-to-body="true"
 			:before-close="handleClose"
 		>
@@ -39,7 +33,6 @@
 			</span>
 		</el-dialog>
 
-
 	</div>
 </div>
 </template>
@@ -53,8 +46,6 @@ import Sidebar from 'components/Sidebar';
 import BlockPicker from 'components/BlockPicker';
 import Icon from 'components/Icon';
 
-/* global document */
-
 export default {
 	name: 'editor',
 
@@ -63,7 +54,6 @@ export default {
 		BlockPicker,
 		Icon
 	},
-
 
 	data() {
 		return {
@@ -96,11 +86,6 @@ export default {
 		};
 	},
 
-	destroyed() {
-		document.removeEventListener('keydown', this.onKeyDown);
-		document.removeEventListener('keyup', this.onKeyUp);
-	},
-
 	methods: {
 		...mapMutations([
 			'changeView',
@@ -128,7 +113,7 @@ export default {
 			this.form.message = '';
 		},
 
-		handleClose(done) {
+		handleClose() {
 			this.hidePublishModal();
 			this.form.message = '';
 		}
@@ -158,7 +143,7 @@ export default {
 			};
 		},
 
-		publish_modal: {
+		publishModalVisible: {
 			get() {
 				return this.publishModal.visible;
 			},
