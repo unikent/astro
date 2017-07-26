@@ -35,6 +35,13 @@ let store = new Vuex.Store({
 			visible: false,
 			insertIndex: 0,
 			insertRegion: 'main'
+		},
+		currentView: 'desktop',
+		publishModal: {
+			visible: false
+		},
+		menu: {
+			active: "pages"
 		}
 	},
 
@@ -88,6 +95,18 @@ let store = new Vuex.Store({
 
 		updateInsertRegion(state, val) {
 			state.blockPicker.insertRegion = val;
+		},
+
+		showPublishModal(state) {
+			state.publishModal.visible = true;
+		},
+
+		hidePublishModal(state) {
+			state.publishModal.visible = false;
+		},
+
+		updateMenuActive(state, id) {
+			state.menu.active = id;
 		}
 	},
 

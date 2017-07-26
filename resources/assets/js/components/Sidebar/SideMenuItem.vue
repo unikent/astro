@@ -1,5 +1,13 @@
 <template>
-<li :class="{ active }">
+<li v-if="id===active" class="active">
+	<el-tooltip :content="title" placement="left" :disabled="!showTooltip">
+		<a href="#" @click.prevent="handleClick">
+			<Icon :name="icon" className="menu-icon" />
+			<span>{{ title }}</span>
+		</a>
+	</el-tooltip>
+</li>
+<li v-else>
 	<el-tooltip :content="title" placement="left" :disabled="!showTooltip">
 		<a href="#" @click.prevent="handleClick">
 			<Icon :name="icon" className="menu-icon" />
@@ -23,6 +31,7 @@ export default {
 		'link',
 		'icon',
 		'title',
+		'id',
 		'active',
 		'onClick'
 	],

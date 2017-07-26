@@ -25,7 +25,7 @@
 			<component
 				v-for="(item, index) in menu"
 				v-if="item.component"
-				v-show="item.active"
+				v-show="item.id===active"
 				:is="item.component"
 				:key="`component-${item.link}`"
 				:title="item.title"
@@ -39,9 +39,10 @@
 					:link="item.link"
 					:icon="item.icon"
 					:title="item.title"
+					:id="item.id"
 					:key="item.link"
 					:index="index"
-					:active="item.active && collapsed"
+					:active="active"
 					:onClick="openItem"
 				/>
 			</ul>
@@ -89,36 +90,15 @@ export default {
 					link: '/pages',
 					icon: 'sites',
 					title: 'Pages',
-					component: PageList,
-					active: false
+					id: 'pages',
+					component: PageList
 				},
 				{
 					link: '/media',
 					icon: 'layers',
 					title: 'Edit blocks',
-					component: BlockSidebar,
-					active: false
-				},
-				{
-					link: '/settings',
-					icon: 'menu-alt',
-					title: 'Navigation',
-					component: Navigation,
-					active: false
-				},
-				{
-					link: '/settings',
-					icon: 'settings',
-					title: 'UI Settings',
-					component: Settings,
-					active: false
-				},
-				{
-					link: '/settings',
-					icon: 'unknown',
-					title: 'Help Centre',
-					component: HelpCentre,
-					active: false
+					id: 'blocks',
+					component: BlockSidebar
 				}
 			],
 
@@ -137,14 +117,16 @@ export default {
 		...mapState({
 			collapsed: state => state.sidebarCollapsed,
 			page: state => state.page.pageData,
-			pageLoaded: state => state.page.loaded
+			pageLoaded: state => state.page.loaded,
+			active: state => state.menu.active
 		})
 	},
 
 	methods: {
 		...mapMutations([
 			'showIframeOverlay',
-			'collapseSidebar'
+			'collapseSidebar',
+			'updateMenuActive'
 		]),
 
 		dragStart(e) {
@@ -178,10 +160,10 @@ export default {
 
 		openItem(e, index) {
 			this.collapseSidebar();
+			this.updateMenuActive(this.menu[index].id);
 
-			this.menu.forEach((item, i) => {
-				item.active = i === index;
-			});
+
+
 		}
 	}
 };
