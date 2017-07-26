@@ -34,9 +34,24 @@
 
 .block-options-list	{
 	.el-form-item__label {
+		padding: 0 0 5px;
 		font-size: 14px;
-		display: block;
 		font-weight: 500;
+		width:100%;
+	}
+
+	.el-form--label-top .el-form-item__label {
+		padding: 0 0 5px;
+	}
+
+	.el-form-item__icon-help {
+		margin-left: 5px;
+	}
+
+	.el-form-item__icon-view {
+		margin-left: auto;
+		fill: #a0a0a0;
+		float: right;
 	}
 
 	.el-form > .el-form-item + .el-form-item {
