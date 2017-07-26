@@ -1,10 +1,11 @@
 <template>
-	<div class="top-bar">
+	<div class="top-bar" v-if="showBack">
 		<div v-show="showBack" @click="backToSites" class="top-bar-backbutton">
 			<i class="el-icon-arrow-left backbutton-icon"></i>Site list
 		</div>
 
 		<div class="top-bar__tools">
+
 			<toolbar/>
 
 			<el-dropdown trigger="click" @command="handleCommand" class="user-menu-button">
@@ -16,6 +17,16 @@
 				</el-dropdown-menu>
 			</el-dropdown>
 		</div>
+	</div>
+	<div v-else class="top-bar top-bar--homepage">
+		<el-dropdown trigger="click" @command="handleCommand" class="user-menu-button">
+			<span class="el-dropdown-link">
+				{{ username }}<i class="el-icon-caret-bottom el-icon--right"></i>
+			</span>
+			<el-dropdown-menu slot="dropdown">
+				<el-dropdown-item command="sign-out">Sign out</el-dropdown-item>
+			</el-dropdown-menu>
+		</el-dropdown>
 	</div>
 </template>
 
