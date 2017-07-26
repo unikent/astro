@@ -12,6 +12,7 @@ use App\Models\Page;
 use Illuminate\Http\Request;
 use App\Http\Transformers\Api\v1\SiteTransformer;
 use App\Http\Transformers\Api\v1\RouteTransformer;
+use Illuminate\Validation\ValidationException;
 
 class SiteController extends ApiController
 {
@@ -44,7 +45,7 @@ class SiteController extends ApiController
      * @return Response
      *
      */
-	public function store(StoreRequest $request)
+	public function store(Request $request)
     {
         $api = new LocalAPIClient();
         $site = $api->createSite(
@@ -56,7 +57,11 @@ class SiteController extends ApiController
             $request->get('layout_version'),
             $request->get('options')
         );
-        return fractal($site, new SiteTransformer)->respond(201);
+        if($site instanceof Site) {
+            return fractal($site, new SiteTransformer)->respond(201);
+        }else{
+            throw new ValidationException($site);
+        }
     }
 
     /**

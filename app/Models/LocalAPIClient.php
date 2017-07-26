@@ -6,9 +6,10 @@ use Astro\Renderer\API\Exception\APIErrorException;
 use Astro\Renderer\API\Data\PageData;
 use Astro\Renderer\API\Data\RouteData;
 use App\Models\Traits\ResolvesRoutes;
-use Validator;
+use Illuminate\Support\Facades\Validator;
 use App\Models\APICommands\CreateSite;
 use App\Models\APICommands\AddPage;
+use Auth;
 
 /**
  * Prototyping
@@ -71,12 +72,12 @@ class LocalAPIClient implements \Astro\Renderer\Contracts\APIClient
     {
         $command = new $class();
         $data = collect($data);
-        $validator = Validator::make($data, $command->rules($data));
-        $validator->setCustomMessages($command->messages($data));
+        $validator = Validator::make($data->toArray(), $command->rules($data, Auth::user()));
+        $validator->setCustomMessages($command->messages($data,Auth::user()));
         if($validator->fails()){
             return $validator;
         }else{
-            return $command->execute($data);
+            return $command->execute($data,Auth::user());
         }
     }
 
@@ -140,5 +141,45 @@ class LocalAPIClient implements \Astro\Renderer\Contracts\APIClient
         return $this->execute( DeletePage::class, [
             'page_id' => $id
         ]);
+    }
+
+    public function updatePageContent()
+    {
+
+    }
+
+    public function movePage()
+    {
+
+    }
+
+    public function publishPage()
+    {
+
+    }
+
+    public function unpublishPage()
+    {
+
+    }
+
+    public function copyPage()
+    {
+
+    }
+
+    public function updateSite()
+    {
+
+    }
+
+    public function deleteSite()
+    {
+
+    }
+
+    public function updatePage()
+    {
+
     }
 }

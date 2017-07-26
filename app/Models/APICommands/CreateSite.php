@@ -88,7 +88,7 @@ class CreateSite implements APICommand
             'path' =>[
                 'nullable',
                 'regex:/^(\/[a-z0-9_-]+)*$/i',
-                'unique:sites,path,null,id,host,' . $this->get('host')
+                'unique:sites,path,null,id,host,' . $data->get('host')
             ],
             'default_layout_name' => [
                 'required',
