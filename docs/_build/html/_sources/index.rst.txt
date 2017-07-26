@@ -11,7 +11,6 @@ Welcome to Astro's documentation!
    :caption: Contents:
 
 
-
 Indices and tables
 ==================
 
