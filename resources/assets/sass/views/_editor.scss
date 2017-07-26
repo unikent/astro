@@ -2,7 +2,10 @@
 	margin-left: 30px;
 }
 .toolbar__button-publish {
-	margin: 0 20px !important;
+	// extra specificity to override .el-button sibling selector
+	&.el-button {
+		margin: 0 20px;
+	}
 }
 
 .el-select-dropdown__item {
