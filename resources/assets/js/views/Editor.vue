@@ -1,6 +1,5 @@
 <template>
 <div class="page">
-	<toolbar/>
 
 
 
@@ -23,17 +22,20 @@
 
 		<el-dialog
 			title="Publish"
-			v-model="modal"
+			v-model="publish_modal"
 			:modal-append-to-body="true"
+			:before-close="handleClose"
 		>
 			<el-form :model="form">
-				<el-form-item label="Publish label">
+				<el-form-item label="Before you publish this page, give it an audit message">
 					<el-input v-model="form.message" auto-complete="off"></el-input>
+					<span class="help">This is used for an audit trail of your previously published pages</span>
 				</el-form-item>
 			</el-form>
 			<span slot="footer" class="dialog-footer">
-				<el-button @click="cancel">Cancel</el-button>
-				<el-button type="primary" @click="publishPage">Publish</el-button>
+				<el-button @click="cancelPublish">Cancel and don't publish</el-button>
+				<el-button v-if="form.message === ''" disabled type="primary" @click="publishPage">Publish now</el-button>
+				<el-button v-else type="danger" @click="publishPage">Publish now</el-button>
 			</span>
 		</el-dialog>
 
@@ -54,8 +56,6 @@ import Icon from 'components/Icon';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
 
-import Toolbar from 'components/Sidebar/Toolbar';
-
 
 /* global document */
 
@@ -65,8 +65,7 @@ export default {
 	components: {
 		Sidebar,
 		BlockPicker,
-		Icon,
-		Toolbar
+		Icon
 	},
 
 
@@ -99,12 +98,6 @@ export default {
 				height: '568px'
 			}
 		};
-
-		this.onKeyDown = onKeyDown(undoStackInstance);
-		this.onKeyUp = onKeyUp(undoStackInstance);
-
-		document.addEventListener('keydown', this.onKeyDown);
-		document.addEventListener('keyup', this.onKeyUp);
 	},
 
 	destroyed() {
@@ -119,13 +112,29 @@ export default {
 			'hidePublishModal'
 		]),
 
-		// TODO - this is just the same as save at the moment
 		publishPage() {
-			this.hidePublishModal();
+			this.$api
+				.post(`page/${this.$route.params.site_id}/publish`, this.page)
+				.then(() => {
+					this.hidePublishModal();
+					this.$message({
+						message: 'Published page',
+						type: 'success',
+						duration: 2000
+					});
+					this.form.message = '';
+				})
+				.catch(() => {});
 		},
 
-		cancel() {
+		cancelPublish() {
 			this.hidePublishModal();
+			this.form.message = '';
+		},
+
+		handleClose(done) {
+			this.hidePublishModal();
+			this.form.message = '';
 		}
 	},
 
@@ -153,7 +162,7 @@ export default {
 			};
 		},
 
-		modal: {
+		publish_modal: {
 			get() {
 				return this.publishModal.visible;
 			},

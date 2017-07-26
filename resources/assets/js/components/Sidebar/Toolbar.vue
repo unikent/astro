@@ -23,9 +23,7 @@
 
 	<el-button class="toolbar__button-save" type="success" @click="savePage">Save</el-button>
 
-	<el-button class="toolbar__button-preview" @click="previewPage">Preview</el-button>
-
-	<el-button class="toolbar__button-publish" type="danger">Publish</el-button>
+	<el-button class="toolbar__button-publish" type="danger" @click="showPublishModal">Publish</el-button>
 
 
 
@@ -108,29 +106,29 @@ export default {
 
 	methods: {
 		...mapMutations([
-			'changeView'
+			'changeView',
+			'showPublishModal'
 		]),
 		savePage() {
 			this.$api
 				.put(`page/${this.$route.params.site_id}`, this.page)
 				.then(() => {
-					this.$snackbar.open({
-						message: 'Successfully saved page'
-					})
+					this.$message({
+						message: 'Page saved',
+						type: 'success',
+						duration: 2000
+					});
 				})
 				.catch(() => {});
 		},
 
 		// TODO - add preview the page functionality
 		previewPage() {
-			this.$api
-				.put(`page/${this.$route.params.site_id}`, this.page)
-				.then(() => {
-					this.$snackbar.open({
-						message: 'Previewing page...'
-					})
-				})
-				.catch(() => {});
+			this.$message({
+				message: 'TODO: previewing page...',
+				type: 'success',
+				duration: 2000
+			});
 		},
 
 		undo() {
