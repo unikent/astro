@@ -3,9 +3,9 @@
 	<span class="block-title">
 		{{ title }}
 	</span>
-	<span class="back" @click="handleClick">
+	<!--<span class="back" @click="handleClick">
 		Menu<i class="el-icon-arrow-right"></i>
-	</span>
+	</span>-->
 </div>
 </template>
 
