@@ -141,12 +141,14 @@ export default {
 			'updateBlockMeta',
 			'setBlock',
 			'collapseSidebar',
-			'revealSidebar'
+			'revealSidebar',
+			'updateMenuActive'
 		]),
 
 		editBlock() {
 			if(this.currentBlockIndex !== this.index || this.currentRegion !== this.region) {
 				this.collapseSidebar();
+				this.updateMenuActive("blocks");
 				this.setBlock({ index: this.index, type: this.type });
 			}
 		},

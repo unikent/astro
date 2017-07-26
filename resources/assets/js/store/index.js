@@ -39,6 +39,9 @@ let store = new Vuex.Store({
 		currentView: 'desktop',
 		publishModal: {
 			visible: false
+		},
+		menu: {
+			active: "pages"
 		}
 	},
 
@@ -104,6 +107,10 @@ let store = new Vuex.Store({
 
 		hidePublishModal(state) {
 			state.publishModal.visible = false;
+		},
+
+		updateMenuActive(state, id) {
+			state.menu.active = id;
 		}
 	},
 
