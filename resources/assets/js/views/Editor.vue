@@ -116,6 +116,14 @@ export default {
 		handleClose() {
 			this.hidePublishModal();
 			this.form.message = '';
+		},
+
+		showLoader() {
+			this.loader = Loading.service({
+				target: this.$refs.editor,
+				text: 'Loading preview...',
+				customClass: 'loading-overlay'
+			});
 		}
 	},
 
@@ -133,7 +141,8 @@ export default {
 		}),
 
 		getPreviewUrl() {
-			return `${Config.get('base_url', '')}/preview/${this.$route.params.site_id}`;
+			// TODO: Don't reload page when page_id changes, use state instead
+			return `${Config.get('base_url', '')}/preview/${this.$route.params.page_id}`;
 		},
 
 		dimensions() {
@@ -159,17 +168,18 @@ export default {
 	},
 
 	watch: {
-		pageLoaded() {
-			this.loader.close();
+		pageLoaded(hideLoader) {
+			if(hideLoader) {
+				this.loader.close();
+			}
+			else {
+				this.showLoader();
+			}
 		}
 	},
 
 	mounted() {
-		this.loader = Loading.service({
-			target: this.$refs.editor,
-			text: 'Loading preview...',
-			customClass: 'loading-overlay'
-		});
+		this.showLoader();
 	}
 };
 </script>
