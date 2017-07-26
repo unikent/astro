@@ -108,11 +108,6 @@ export default {
 	},
 
 	computed: {
-		...mapState([
-			'preview',
-			'displayIframeOverlay',
-			'undoRedo'
-		]),
 
 		...mapState({
 			collapsed: state => state.sidebarCollapsed,

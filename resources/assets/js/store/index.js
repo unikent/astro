@@ -49,6 +49,10 @@ let store = new Vuex.Store({
 
 	mutations: {
 
+		changeView(state, currentView) {
+			state.currentView = currentView;
+		},
+
 		updateOver(state, position) {
 			state.over = position;
 		},

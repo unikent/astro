@@ -56,8 +56,7 @@ html {
 
 .editor-content {
 	transition: width .3s ease-out, height .3s ease-out;
-	max-height: calc(100vh - 111px);
-	margin-bottom: 60px;
+	max-height: calc(100vh - 50px);
 }
 
 .editor-nav,
@@ -89,16 +88,12 @@ html {
 	background-color: #f7f9fb;
 }
 
-.b-bar {
-	position: absolute;
-	width: 100%;
-	left: 0;
-	bottom: 0;
+.toolbar {
 	background-color: #fff;
-	border-top: 1px solid #e5e7ec;
 	padding: 10px;
-	box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.05);
 	user-select: none;
+	display: flex;
+	align-items: center;
 }
 
 .page-status {
@@ -174,4 +169,3 @@ html {
 	height: 100px;
 	background-color: #b7c2d4;
 }
-
