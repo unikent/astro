@@ -53,10 +53,6 @@ import Sidebar from 'components/Sidebar';
 import BlockPicker from 'components/BlockPicker';
 import Icon from 'components/Icon';
 
-import { undoStackInstance } from 'plugins/undo-redo';
-import { onKeyDown, onKeyUp } from 'plugins/key-commands';
-
-
 /* global document */
 
 export default {

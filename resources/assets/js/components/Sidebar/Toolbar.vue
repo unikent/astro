@@ -16,14 +16,14 @@
 		<el-button :disabled="!undoRedo.canUndo" @click="undo">
 			<Icon name="undo" aria-hidden="true" width="14" height="14" class="ico" />
 		</el-button>
-		<el-button :disabled="!undoRedo.canUndo" @click="redo">
+		<el-button :disabled="!undoRedo.canRedo" @click="redo">
 			<Icon name="redo" aria-hidden="true" width="14" height="14" class="ico" />
 		</el-button>
 	</el-button-group>
 
 	<el-button class="toolbar__button-save" type="success" @click="savePage">Save</el-button>
 
-	<el-button class="toolbar__button-publish" type="danger" @click="showPublishModal">Publish</el-button>
+	<el-button class="toolbar__button-publish" type="danger" @click="showPublishModal">Publish ...</el-button>
 
 
 
