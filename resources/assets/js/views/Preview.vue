@@ -11,7 +11,7 @@
 		>
 
 			<el-dropdown class="block-overlay__delete" @command="removeBlock">
-				<el-button>
+				<el-button size="mini">
 					<Icon name="delete" width="20" height="20" /> <i class="el-icon-caret-bottom el-icon--right"></i>
 				</el-button>
 				<el-dropdown-menu slot="dropdown">
