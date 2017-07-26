@@ -82,7 +82,7 @@ const mutations = {
 		}
 		// otherwise update all fields to maintain reactivity
 		else {
-			const clone = _.clone(fields);
+			const clone = { ...fields };
 			_.set(clone, name, value);
 			fields = clone;
 		}
@@ -107,7 +107,8 @@ const mutations = {
 	},
 
 	changePage(state, name) {
-		state.pageName = name;
+		// TODO: replace this with actual domain when that info is available
+		state.pageName = `kent.ac.uk/site-name${name}`;
 	},
 
 	addBlock(state, { region, index, block }) {
