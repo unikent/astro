@@ -32,7 +32,7 @@
 			/>
 		</div>
 
-		<section class="sidebar" :class="{ 'collapsed': collapsed }">
+		<section class="sidebar collapsed"">
 			<ul class="app-sidebar" role="navigation">
 				<side-menu-item
 					v-for="(item, index) in menu"
