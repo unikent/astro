@@ -44,6 +44,13 @@
 		padding: 0 0 5px;
 	}
 
+	.el-form-item.is-required .el-form-item__label span {
+		&::before {
+			content: "*";
+			color: #ff0000;
+		}
+	}
+
 	.el-form-item__icon-help {
 		margin-left: 5px;
 	}
