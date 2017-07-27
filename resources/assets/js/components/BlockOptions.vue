@@ -25,7 +25,11 @@
 					<div class="el-form-item__label">
 						<span>{{ field.label }}</span>
 
-						<el-tooltip v-if="field.info" :content="field.info" placement="top">
+						<el-tooltip
+							v-if="field.info"
+							popper-class="el-tooltip__popper--narrow"
+							:content="field.info"
+							placement="top">
 							<icon
 								class="el-form-item__icon-help"
 								name="help-circle"

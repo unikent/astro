@@ -11,7 +11,12 @@
 				>
 					<template slot="label">
 						<span>{{ f.label }}</span>
-						<el-tooltip v-if="f.info" :content="f.info" placement="top">
+
+						<el-tooltip
+							v-if="f.info"
+							popper-class="el-tooltip__popper--narrow"
+							:content="f.info"
+							placement="top">
 							<icon
 								class="el-form-item__icon-help"
 								name="help-circle"
