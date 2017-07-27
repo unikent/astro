@@ -26,6 +26,8 @@
 	);
 
 	height: calc(100vh - #{$height});
+
+	height: 100vh; // get rid of this thing for now till we know what we're doing with validation
 	padding: 30px 20px 80px;
 	overflow: auto;
 	will-change: transform; // stop repaint on scroll
