@@ -76,6 +76,8 @@ class BlockBroker extends DefinitionBroker
 						$field['name'],
 						$nested['name']
 					);
+
+					$rules[$nestedName] = $nested['validation'];
 				}
 			}
 		}
