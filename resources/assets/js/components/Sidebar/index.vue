@@ -156,9 +156,6 @@ export default {
 		openItem(e, index) {
 			this.collapseSidebar();
 			this.updateMenuActive(this.menu[index].id);
-
-
-
 		}
 	}
 };
