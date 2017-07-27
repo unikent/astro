@@ -38,16 +38,16 @@
 			</div>
 		</template>
 
-		<div @click="removeItem(index)" class="block-overlay__delete">
+		<div @click="removeItem(index)" class="block-overlay__delete block-overlay__delete--sidebar">
 			<Icon name="delete" width="20" height="20" />
 		</div>
 	</div>
 
-	<div style="clear: both; margin-top: 24px">
-		<span style="font-size: .8rem; color: #48576a;">
-			{{ currentValue.length }} item{{ currentValue.length === 1 ? '' : 's' }}
+	<div class="collection-add">
+		<span class="collection-add__counter">
+			{{ currentValue.length }} {{ this.label.slice(0, -1).toLowerCase() }}{{ currentValue.length === 1 ? '' : 's' }}
 		</span>
-		<el-button @click="addItem" style="float: right;">Add item</el-button>
+		<el-button @click="addItem" class="collection-add__button">Add {{ this.label.slice(0, -1).toLowerCase() }}</el-button>
 	</div>
 </div>
 </template>

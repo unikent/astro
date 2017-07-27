@@ -31,3 +31,17 @@ _collection-field.scss
 .collection-field__field-list {
 	margin-top: 24px;
 }
+
+.collection-add {
+	clear: both;
+	margin-top: 24px;
+}
+
+.collection-add__counter {
+	font-size: .8rem;
+	color: #48576a;
+}
+
+.collection-add__button {
+	float: right;
+}

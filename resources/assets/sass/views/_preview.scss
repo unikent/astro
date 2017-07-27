@@ -84,6 +84,11 @@
 	fill: #c74d4d;
 }
 
+.block-overlay__delete--sidebar {
+	bottom: 0;
+	right: 0;
+}
+
 .block-overlay__move {
 	transition: background-color .3s ease-out;
 	position: absolute;
