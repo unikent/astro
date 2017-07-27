@@ -4,6 +4,8 @@ _ide_helper*
 /public/storage
 /public/uploads
 /storage/*.key
+/storage
+/uploads
 /vendor
 /.idea
 /.tmp

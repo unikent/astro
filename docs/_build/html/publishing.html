@@ -1,0 +1,405 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Astro Functionality &#8212; Astro 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="astro-functionality">
+<h1>Astro Functionality<a class="headerlink" href="#astro-functionality" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="sites">
+<h1>Sites<a class="headerlink" href="#sites" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Each site has a domain name and a root URL</li>
+<li>Multiple sites can have the same domain name, but:<ul>
+<li>Root URL must be different for each</li>
+<li>A site cannot have any pages under the root URL of another site.</li>
+</ul>
+</li>
+<li>Sites can only be created and modified by administrators.</li>
+<li>Each site belongs to a Publishing Group.</li>
+<li>Only members of that publishing group can edit pages within the site.</li>
+<li>The layouts available to a site should be selected by the administrator when creating the site.</li>
+</ul>
+<div class="section" id="adding-a-site">
+<h2>Adding a Site<a class="headerlink" href="#adding-a-site" title="Permalink to this headline">¶</a></h2>
+<p>Administrators add a site using a form, specifying:</p>
+<ul class="simple">
+<li>Site Title</li>
+<li>Site Domain Name</li>
+<li>Site URL</li>
+<li>Site Publishing Group</li>
+<li>Site Description</li>
+<li>Available layout templates.</li>
+</ul>
+</div>
+<div class="section" id="modifying-a-site">
+<h2>Modifying a Site<a class="headerlink" href="#modifying-a-site" title="Permalink to this headline">¶</a></h2>
+<p>Existing sites can only be modified by administrators.</p>
+<div class="section" id="site-meta">
+<h3>Site Meta<a class="headerlink" href="#site-meta" title="Permalink to this headline">¶</a></h3>
+<p>Administrators can change settings including the title, description and publishing group for a site.</p>
+</div>
+<div class="section" id="changing-the-url-or-domain-name">
+<h3>Changing the URL or Domain Name<a class="headerlink" href="#changing-the-url-or-domain-name" title="Permalink to this headline">¶</a></h3>
+<p>Administrators can change URL and domain name of a site if this does not clash with the site structure of any
+other existing site.</p>
+</div>
+<div class="section" id="changing-the-layouts-available">
+<h3>Changing the layouts available<a class="headerlink" href="#changing-the-layouts-available" title="Permalink to this headline">¶</a></h3>
+<p>Administrators can change the selection of layouts which are available to a site, but must specify an alternative for
+any layout currently in use by any existing pages.</p>
+</div>
+</div>
+<div class="section" id="deleting-a-site">
+<h2>Deleting a Site<a class="headerlink" href="#deleting-a-site" title="Permalink to this headline">¶</a></h2>
+<p>???</p>
+</div>
+</div>
+<div class="section" id="publishing">
+<h1>Publishing<a class="headerlink" href="#publishing" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Publishers always edit, move and delete pages in draft mode.</li>
+<li>Changes must be published for them to take effect on the live site.</li>
+<li>A page can be published <strong>without</strong> also publishing changes to its subpages, with the exception of
+moves and deletes which always cascade.</li>
+<li>When editing a page, until that page is published, only the latest edits to the draft are saved.</li>
+<li>Once a page is published, the published version is always available in the revisions history.</li>
+</ul>
+<div class="section" id="managing-pages">
+<h2>Managing Pages<a class="headerlink" href="#managing-pages" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="site-hierarchy">
+<h3>Site Hierarchy<a class="headerlink" href="#site-hierarchy" title="Permalink to this headline">¶</a></h3>
+<p>The site navigation view lists all pages of the site as a hierarchical structure. The view can be filtered as:</p>
+<div class="section" id="draft-view">
+<h4>Draft View<a class="headerlink" href="#draft-view" title="Permalink to this headline">¶</a></h4>
+<p>This shows the current “draft” version of the site, ie. what it would look like if ALL current changes were published.</p>
+</div>
+<div class="section" id="published-view">
+<h4>Published View<a class="headerlink" href="#published-view" title="Permalink to this headline">¶</a></h4>
+<p>This shows the current “live” version of the site.</p>
+</div>
+<div class="section" id="deleted-view">
+<h4>Deleted View<a class="headerlink" href="#deleted-view" title="Permalink to this headline">¶</a></h4>
+<p>This view shows all pages and subpages that have been deleted, but not yet published.</p>
+</div>
+<div class="section" id="unpublished-view">
+<h4>Unpublished View<a class="headerlink" href="#unpublished-view" title="Permalink to this headline">¶</a></h4>
+<p>This view displays all modifications that have not yet been published.</p>
+</div>
+<div class="section" id="combined-view">
+<h4>Combined view<a class="headerlink" href="#combined-view" title="Permalink to this headline">¶</a></h4>
+<p>This view is similar to draft view with the exceptions that:</p>
+<ul class="simple">
+<li>Unpublished deletions are visible (highlighted)</li>
+<li>The current (original) location of moved pages are shown in relation to their new (unpublished) positions.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="adding-a-page">
+<h3>Adding a Page<a class="headerlink" href="#adding-a-page" title="Permalink to this headline">¶</a></h3>
+<p>Editors can add a page before, after or as a child page of any existing page.</p>
+<p>When adding a page, a template (layout) must be selected from those available for the site using the <a class="reference internal" href="#template-picker">template picker</a>.</p>
+<p>Users will be prompted to enter a reason for the page’s existence.</p>
+</div>
+<div class="section" id="deleting-a-page">
+<h3>Deleting a Page<a class="headerlink" href="#deleting-a-page" title="Permalink to this headline">¶</a></h3>
+<p>When a page is deleted all its child pages will also be deleted.</p>
+<p>Pages are not deleted from the live site until the deletion is “published”.</p>
+<p>Pending-deletes can be cancelled by the user, but pages in this state cannot be moved.</p>
+<p>Deleting a page can be initiated with the delete button within the editor for that page.</p>
+</div>
+<div class="section" id="moving-a-page">
+<h3>Moving a Page<a class="headerlink" href="#moving-a-page" title="Permalink to this headline">¶</a></h3>
+<p>Moving a page also moves all its child pages (they are still located under it).</p>
+<p>Moved pages must be “published” for the move to be live.</p>
+<p>Publishing a moved page also moves all its child pages but <strong>does not automatically publish</strong> any draft version of those pages.</p>
+<p>A page can <strong>not</strong> be moved to be a child page of itself or any of its descendants.</p>
+</div>
+<div class="section" id="copying-a-page">
+<h3>Copying a Page<a class="headerlink" href="#copying-a-page" title="Permalink to this headline">¶</a></h3>
+<p>A page can be copied <strong>with or without</strong> its child pages.</p>
+</div>
+<div class="section" id="changing-a-page-s-template">
+<h3>Changing a page’s template<a class="headerlink" href="#changing-a-page-s-template" title="Permalink to this headline">¶</a></h3>
+<p>Users can change the template associated with a page using the <a class="reference internal" href="#template-picker">template picker</a>. If both old and new templates contain
+regions with the same name then any blocks within these regions will be retained. Blocks within regions not in the
+new template will be discarded.</p>
+</div>
+<div class="section" id="changing-a-page-s-url-slug">
+<h3>Changing a page’s URL / slug<a class="headerlink" href="#changing-a-page-s-url-slug" title="Permalink to this headline">¶</a></h3>
+<p>The part of the page url after the last forward slash is called the page’s “slug”. Users can edit this.</p>
+</div>
+<div class="section" id="editing-a-page-s-meta">
+<h3>Editing a page’s meta<a class="headerlink" href="#editing-a-page-s-meta" title="Permalink to this headline">¶</a></h3>
+<p>A page may have metadata such as title, description, etc associated with it.
+Users can edit this.</p>
+</div>
+</div>
+<div class="section" id="previewing-changes">
+<h2>Previewing Changes<a class="headerlink" href="#previewing-changes" title="Permalink to this headline">¶</a></h2>
+<p>When editing a page, users can click the “Preview Page” button to view the preview the currently saved draft version of that page.
+From that page they will be able to browse the rest of the site in preview-mode. Only authenticated users in the publishing
+group for a page can view the preview version of the page / site.</p>
+<div class="section" id="published-page-revisions">
+<h3>Published Page Revisions<a class="headerlink" href="#published-page-revisions" title="Permalink to this headline">¶</a></h3>
+<p>A copy of every published version of each page is stored. The user can access this list of revisions, view them and make
+one the current draft version of the page.</p>
+</div>
+<div class="section" id="listing-revisions">
+<h3>Listing Revisions<a class="headerlink" href="#listing-revisions" title="Permalink to this headline">¶</a></h3>
+<p>The listing of revisions for a page includes:
+* The title of the page when it was published.
+* The date and time the page was published.
+* A link or button to view the revision.
+* A link or button to replace the current draft page with the revision.</p>
+</div>
+<div class="section" id="viewing-a-revision">
+<h3>Viewing a Revision<a class="headerlink" href="#viewing-a-revision" title="Permalink to this headline">¶</a></h3>
+<p>When the user clicks to view a revision of a page that page is opened up in a new browser tab. The URL to view the
+revision can be shared but will only be accessible by authenticated users in the publishing group for that page.</p>
+</div>
+<div class="section" id="reverting-to-a-revision">
+<h3>Reverting to a Revision<a class="headerlink" href="#reverting-to-a-revision" title="Permalink to this headline">¶</a></h3>
+<p>When the user clicks to revert to a previous revision they should be prompted to confirm they want to override the
+current draft version of the page. Any work they have in draft mode will be lost.</p>
+</div>
+</div>
+<div class="section" id="view-unpublished-changes">
+<h2>View Unpublished Changes<a class="headerlink" href="#view-unpublished-changes" title="Permalink to this headline">¶</a></h2>
+<p>Users may be making simple, quickly published updates to a page, or might be working on one or more sets of pages
+over a number of months. Multiple users may be responsible for the same page or set of pages, and due to leave,
+working patterns or other circumstances may not know what their colleagues have worked on.</p>
+<p>Viewing all unpublished changes makes it clearer what has changed and what can be published.</p>
+<div class="section" id="updated-pages">
+<h3>Updated Pages<a class="headerlink" href="#updated-pages" title="Permalink to this headline">¶</a></h3>
+<p>The updated pages view shows all pages which have been edited, moved, created or deleted without those changes
+being published.</p>
+</div>
+<div class="section" id="moved-pages">
+<h3>Moved Pages<a class="headerlink" href="#moved-pages" title="Permalink to this headline">¶</a></h3>
+<p>The moved pages view shows only those pages and subpages which have been moved without having those changes published.</p>
+</div>
+<div class="section" id="deleted-pages">
+<h3>Deleted Pages<a class="headerlink" href="#deleted-pages" title="Permalink to this headline">¶</a></h3>
+<p>The deleted pages view shows only those pages and subpages which have been deleted without that being published.</p>
+</div>
+</div>
+<div class="section" id="publishing-a-page">
+<h2>Publishing a Page<a class="headerlink" href="#publishing-a-page" title="Permalink to this headline">¶</a></h2>
+<p>Publishing a page is the action resulting in any changes to a page being replicated to the live site.</p>
+<p>Changes include one or more of:</p>
+<ul class="simple">
+<li>Modifications to the page content.</li>
+<li>Modifications to the page meta data.</li>
+<li>Moving the page.</li>
+<li>Deleting the page.</li>
+</ul>
+<p>Publishing may be initiated via a button on the editor for a single page, from within the <strong>unpublished pages</strong> or
+from the page navigation.</p>
+<p>When publishing, users should enter a brief summary of what is being published, moved or deleted which will be
+visible in the activity log for the site.</p>
+<div class="section" id="publish-a-single-page">
+<h3>Publish a Single Page<a class="headerlink" href="#publish-a-single-page" title="Permalink to this headline">¶</a></h3>
+<p>Users can publish a single page by selecting the “Publish” -&gt; “This Page Only” option. Any modified subpages will
+not be updated <strong>unless</strong> the page being published has been moved or deleted, as these actions cascade. A page can
+only be published if its parent page is published.</p>
+</div>
+<div class="section" id="publish-a-page-subpages">
+<h3>Publish a Page &amp; Subpages<a class="headerlink" href="#publish-a-page-subpages" title="Permalink to this headline">¶</a></h3>
+<p>Users can publish a single page and its subpages by selecting the “Publish -&gt; This page &amp; Subpages” option.</p>
+</div>
+<div class="section" id="publish-a-selection-of-pages">
+<h3>Publish a selection of pages<a class="headerlink" href="#publish-a-selection-of-pages" title="Permalink to this headline">¶</a></h3>
+<p>Users can publish a selection of pages by repeatedly following the steps to publish a single page or a single page
+and its subpages.</p>
+</div>
+<div class="section" id="unpublish-a-page">
+<h3>Unpublish a Page<a class="headerlink" href="#unpublish-a-page" title="Permalink to this headline">¶</a></h3>
+<p>Users can “unpublish” a page (set it to draft). This will also set all subpages of that page to draft mode.</p>
+</div>
+</div>
+</div>
+<div class="section" id="ui-components">
+<h1>UI Components<a class="headerlink" href="#ui-components" title="Permalink to this headline">¶</a></h1>
+<p>The main UI components used within the Editor are:</p>
+<div class="section" id="media-manager">
+<h2>Media Manager<a class="headerlink" href="#media-manager" title="Permalink to this headline">¶</a></h2>
+<p>The media manager is used to manage all uploaded media (images, pdfs, etc) within Astro.</p>
+<p>Visibility and editability of a media item can be restricted by site or publishing group.</p>
+<p>Media can be tagged and can be searched by tag.</p>
+<p>Media can be cropped within the media manager.</p>
+<p>Media can be viewed as thumbnails or as a detailed list.</p>
+</div>
+<div class="section" id="page-selector">
+<h2>Page Selector<a class="headerlink" href="#page-selector" title="Permalink to this headline">¶</a></h2>
+<p>When adding a link to an existing page, users can use the page selector to select that page.</p>
+<p>The page selector displays all the pages in the current site.</p>
+<p>Perhaps it should display all pages in all sites?</p>
+<p>When users move a page, all links to that page should be updated.</p>
+</div>
+<div class="section" id="template-picker">
+<h2>Template Picker<a class="headerlink" href="#template-picker" title="Permalink to this headline">¶</a></h2>
+<p>The template picker allows a user to select a template to use for a page from the list of available templates.</p>
+<p>Each template is displayed with:
+* A thumbnail image.
+* A title.
+* A description.
+* A list of “do’s and don’ts” for when to use this template.</p>
+<p>The template picker should scroll appropriately if more templates are available than can be displayed at once.</p>
+<p>The template picker includes recently used templates at the top.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Astro</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Astro Functionality</a></li>
+<li><a class="reference internal" href="#sites">Sites</a><ul>
+<li><a class="reference internal" href="#adding-a-site">Adding a Site</a></li>
+<li><a class="reference internal" href="#modifying-a-site">Modifying a Site</a><ul>
+<li><a class="reference internal" href="#site-meta">Site Meta</a></li>
+<li><a class="reference internal" href="#changing-the-url-or-domain-name">Changing the URL or Domain Name</a></li>
+<li><a class="reference internal" href="#changing-the-layouts-available">Changing the layouts available</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#deleting-a-site">Deleting a Site</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#publishing">Publishing</a><ul>
+<li><a class="reference internal" href="#managing-pages">Managing Pages</a><ul>
+<li><a class="reference internal" href="#site-hierarchy">Site Hierarchy</a><ul>
+<li><a class="reference internal" href="#draft-view">Draft View</a></li>
+<li><a class="reference internal" href="#published-view">Published View</a></li>
+<li><a class="reference internal" href="#deleted-view">Deleted View</a></li>
+<li><a class="reference internal" href="#unpublished-view">Unpublished View</a></li>
+<li><a class="reference internal" href="#combined-view">Combined view</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#adding-a-page">Adding a Page</a></li>
+<li><a class="reference internal" href="#deleting-a-page">Deleting a Page</a></li>
+<li><a class="reference internal" href="#moving-a-page">Moving a Page</a></li>
+<li><a class="reference internal" href="#copying-a-page">Copying a Page</a></li>
+<li><a class="reference internal" href="#changing-a-page-s-template">Changing a page’s template</a></li>
+<li><a class="reference internal" href="#changing-a-page-s-url-slug">Changing a page’s URL / slug</a></li>
+<li><a class="reference internal" href="#editing-a-page-s-meta">Editing a page’s meta</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#previewing-changes">Previewing Changes</a><ul>
+<li><a class="reference internal" href="#published-page-revisions">Published Page Revisions</a></li>
+<li><a class="reference internal" href="#listing-revisions">Listing Revisions</a></li>
+<li><a class="reference internal" href="#viewing-a-revision">Viewing a Revision</a></li>
+<li><a class="reference internal" href="#reverting-to-a-revision">Reverting to a Revision</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#view-unpublished-changes">View Unpublished Changes</a><ul>
+<li><a class="reference internal" href="#updated-pages">Updated Pages</a></li>
+<li><a class="reference internal" href="#moved-pages">Moved Pages</a></li>
+<li><a class="reference internal" href="#deleted-pages">Deleted Pages</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#publishing-a-page">Publishing a Page</a><ul>
+<li><a class="reference internal" href="#publish-a-single-page">Publish a Single Page</a></li>
+<li><a class="reference internal" href="#publish-a-page-subpages">Publish a Page &amp; Subpages</a></li>
+<li><a class="reference internal" href="#publish-a-selection-of-pages">Publish a selection of pages</a></li>
+<li><a class="reference internal" href="#unpublish-a-page">Unpublish a Page</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ui-components">UI Components</a><ul>
+<li><a class="reference internal" href="#media-manager">Media Manager</a></li>
+<li><a class="reference internal" href="#page-selector">Page Selector</a></li>
+<li><a class="reference internal" href="#template-picker">Template Picker</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Sam Yapp.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/publishing.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
