@@ -5,7 +5,7 @@ use App\Models\PageContent;
 use App\Models\Revision;
 
 /**
- *
+ * @deprecated
  */
 trait Routable  {
 

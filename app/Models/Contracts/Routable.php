@@ -1,6 +1,10 @@
 <?php
 namespace App\Models\Contracts;
-
+/**
+ * Interface Routable
+ * @package App\Models\Contracts
+ * @deprecated
+ */
 interface Routable {
 
 	public function page();

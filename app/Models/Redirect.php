@@ -34,8 +34,10 @@ class Redirect extends Model implements RoutableContract
     		// Check for (and remove) duplicates
     		static::where('path', $route->path)->delete();
 
+    		$published_page = $route->published_page;
+//    		var_dump($published_page);
     		// Create a new Redirect
-    		$redirect = new Redirect([ 'path' => $route->path, 'page_content_id' => $route->page_content_id ]);
+    		$redirect = new Redirect([ 'path' => $route->path, 'page_content_id' => $published_page->page_content_id ]);
     		$redirect->save();
 
 	    	DB::commit();

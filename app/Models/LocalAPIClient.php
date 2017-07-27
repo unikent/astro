@@ -24,6 +24,21 @@ class LocalAPIClient implements \Astro\Renderer\Contracts\APIClient
 {
     use ResolvesRoutes;
 
+    private $user = null;
+
+    public function __construct(User $user = null)
+    {
+        if(null == $user){
+            $user = Auth::user();
+        }
+        $this->user = $user;
+    }
+
+    public function setUser(User $user)
+    {
+        $this->user = $user;
+    }
+
     public function getRouteDefinition($path)
     {
         $json = $this->resolveRoute($path);
@@ -63,43 +78,43 @@ class LocalAPIClient implements \Astro\Renderer\Contracts\APIClient
     }
 
     /**
-     * Run a App\Models\Contracts\APICommand.
+     * Run an APICommand.
      * @param string $class The name of the command class.
      * @param array $data
-     * @return \Illuminate\Validation\Validator
+     * @return Validator
      */
     public function execute($class, array $data)
     {
         $command = new $class();
         $data = collect($data);
-        $validator = Validator::make($data->toArray(), $command->rules($data, Auth::user()));
-        $validator->setCustomMessages($command->messages($data,Auth::user()));
+        $validator = Validator::make($data->toArray(), $command->rules($data, $this->user));
+        $validator->setCustomMessages($command->messages($data,$this->user));
         if($validator->fails()){
             return $validator;
         }else{
-            return $command->execute($data,Auth::user());
+            return $command->execute($data,$this->user);
         }
     }
 
     /**
      * Create a new site.
      * @param int $publishing_group_id ID of the publishing group for the new site.
-     * @param $name Name for the new site.
-     * @param $host Hostname for the new site.
-     * @param $path Path for the new site.
-     * @param $layout_name Default layout name to use for this site.
-     * @param $layout_version Version of the layout to use for this site.
+     * @param string $name Name for the new site.
+     * @param string $host Hostname for the new site.
+     * @param string $path Path for the new site.
+     * @param string $layout_name Default layout name to use for this site.
+     * @param int $layout_version Version of the layout to use for this site.
      * @param array $options Other options.
      */
-    public function createSite($publishing_group_id, $name, $host, $path, $layout_name, $layout_version, $options = [])
+    public function createSite($publishing_group_id, $name, $host, $path, $default_layout_name, $default_layout_version, $options = [])
     {
         return $this->execute(CreateSite::class, [
             'publishing_group_id' => $publishing_group_id,
             'name' => $name,
             'host' => $host,
             'path' => $path,
-            'layout_name' => $layout_name,
-            'layout_version' => $layout_version,
+            'default_layout_name' => $default_layout_name,
+            'default_layout_version' => $default_layout_version,
             'options' => $options
         ]);
     }
@@ -108,7 +123,7 @@ class LocalAPIClient implements \Astro\Renderer\Contracts\APIClient
      * Adds a subpage to a site.
      * @param int $site_id
      * @param int $parent_id
-     * @param int|null $after_id
+     * @param int|null $before_id
      * @param string $slug
      * @param string $layout_name
      * @param int $layout_version
@@ -116,16 +131,35 @@ class LocalAPIClient implements \Astro\Renderer\Contracts\APIClient
      * @return string json
      * @throws
      */
-    public function addPage($site_id, $parent_id, $after_id, $slug, $layout_name, $layout_version, $title)
+    public function addPage($site_id, $parent_id, $before_id, $slug, $layout_name, $layout_version, $title)
     {
         return $this->execute(AddPage::class, [
             'parent_id' => $parent_id,
-            'after_id' => $after_id,
+            'before_id' => $before_id,
             'slug' => $slug,
             'layout_name' => $layout_name,
             'layout_version' => $layout_version,
             'title' => $title
         ]);
+    }
+
+    public function addTree($site_id, $parent_id, $before_id, $tree)
+    {
+        foreach( $tree as $page ) {
+            $added = $this->addPage(
+                $site_id,
+                $parent_id,
+                $before_id,
+                $page['slug'],
+                $page['layout_name'],
+                $page['layout_version'],
+                $page['title']
+            );
+            if(!empty($page['children'])){
+                $this->addTree($site_id, $added->id, null, $page['children']);
+            }
+        }
+        return true;
     }
 
     public function renamePage($page_id, $new_slug)

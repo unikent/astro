@@ -15,11 +15,14 @@ class PageContent extends Model
 {
 	use Tracked, SoftDeletes;
 
+	protected $table = 'page_content';
+
 	protected $fillable = [
 		'title',
 		'options',
 		'layout_name',
 		'layout_version',
+        'site_id'
 	];
 
 	protected $casts = [

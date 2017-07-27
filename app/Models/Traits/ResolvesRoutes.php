@@ -12,17 +12,18 @@ use Gate;
  * Trait ResolvesRoutes
  * Resolves a Route based on a path.
  * @package App\Models\Traits
+ * @deprecated
  */
 trait ResolvesRoutes
 {
-    public function resolveRoute($path)
+    public function resolveRoute($site_id, $path)
     {
         // Attempt to resolve the Route
-        $resolve = Page::findByPath($path);
+        $page = Page::findBySiteAndPath($site_id, $path);
 
         // If the Route is not found, attempt to find a Redirect
-        if(!$resolve){
-            $resolve = Redirect::findByPathOrFail($path);
+        if(!$page){
+            $redirect = Redirect::findByPathOrFail($path);
         }
 
         if(Gate::allows('read', $resolve)){

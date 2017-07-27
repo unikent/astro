@@ -17,7 +17,7 @@ class Page extends BaumNode implements RoutableContract
 
 	protected $fillable = [
 		'slug',
-		'draft_page_content_id',
+		'draft_id',
 		'parent_id',
         'site_id',
         'path'
@@ -64,7 +64,7 @@ class Page extends BaumNode implements RoutableContract
 
 	public function draft()
 	{
-		return $this->belongsTo(PageContent::class, 'draft_page_content_id');
+		return $this->belongsTo(PageContent::class, 'draft_id');
 	}
 
 	public function published_page()
@@ -72,25 +72,35 @@ class Page extends BaumNode implements RoutableContract
 	    return $this->belongsTo( Revision::class, 'published_revision_id' );
 	}
 
+    /**
+     * Restrict query to specific site.
+     * @param $query
+     * @param $site_id
+     * @return mixed
+     */
+    public function scopeforSite($query, $site_id)
+    {
+        return $query->where('site_id', $site_id);
+    }
 
     /**
-     * Save the model to the database.
-     *
-     * @param  array  $options
-     * @return bool
+     * Restrict query to page on site with specific path.
+     * @param $query
+     * @param $site_id
+     * @param $path
+     * @return mixed
      */
-    public function save(array $options = [])
+    public function scopeForSiteAndPath($query, $site_id, $path)
     {
-    	DB::beginTransaction();
-    	try{
-	    	parent::save($options);
-	    	DB::commit();
-	    	return true;
-    	} catch(Exception $e){
-    		DB::rollback();
-    		return false;
-    	}
+        return $query->where('site_id', $site_id)
+                    ->where('path', $path);
     }
+
+    public function findBySiteAndPath($site_id, $path)
+    {
+        return $this->forSiteAndPath($site_id,$path)->first();
+    }
+
 
     /**
      * Delete the model from the database.
@@ -234,16 +244,16 @@ class Page extends BaumNode implements RoutableContract
      */
 	public function hasDraft()
     {
-        return $this->draft ? true : false;
+        return $this->draft_id ? true : false;
     }
 
     /**
      * Set the draft version of this route.
-     * @param null|PageContent $page
+     * @param null|PageContent $pagecontent
      */
     public function setDraft($pagecontent)
     {
-        $this->page_content_id = $pagecontent ? $pagecontent->id : null;
+        $this->draft_id = $pagecontent ? $pagecontent->id : null;
     }
 
     /**

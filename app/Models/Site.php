@@ -24,8 +24,13 @@ class Site extends Model
 
 	public function activeRoute()
 	{
-		return $this->hasOne(Page::class, 'site_id')->root();
+		return $this->hasOne(Page::class, 'site_id')->whereNull('parent_id');
 	}
+
+	public function homePage()
+    {
+        return $this->activeRoute();
+    }
 
 	public function pages()
 	{

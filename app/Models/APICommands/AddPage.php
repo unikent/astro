@@ -2,6 +2,7 @@
 
 namespace App\Models\APICommands;
 
+use DB;
 use App\Models\Page;
 use App\Models\PageContent;
 use App\Models\Contracts\APICommand;
@@ -23,25 +24,36 @@ class AddPage implements APICommand
      */
     public function execute($input, Authenticatable $user)
     {
-        $parent = Route::find($input['parent_id']);
-        $after = Route::find($input['after_id']);
-        $route = $parent->getChildWithSlug($input['slug']);
-        if($route){
-            if($route->hasDraft()){
-                throw new DraftExistsException($route);
+        $page = null;
+        DB::beginTransaction();
+        $parent = Page::find($input['parent_id']);
+        $before = Page::find($input['before_id']);
+        $page = $parent->getChildWithSlug($input['slug']);
+        if ($page) {
+            if ($page->hasDraft()) {
+                throw new DraftExistsException($page);
             }
-        }else{
-            $route = Route::create(['site_id' => $parent->site_id, 'parent_id' => $parent->id, 'slug' => $input['slug']]);
-            if ($after) {
-                $route->makeNextSiblingOf($after);
-            } else {
-                $route->makeChildOf($parent);
+        } else {
+            $page = $parent->children()->create([
+                'site_id' => $parent->site_id,
+                'slug' => $input['slug'],
+                'parent_id' => $parent->id
+            ]);
+            if ($before) {
+                $page->makePreviousSiblingOf($before);
             }
         }
-        $page = new PageContent([]);
-        $route->setDraft($page);
-        $route->save();
-        return $route;
+        $pagecontent = PageContent::create([
+            'title' => $input['title'],
+            'site_id' => $parent->site_id,
+            'options' => [],
+            'layout_name' => $input['layout_name'],
+            'layout_version' => $input['layout_version']
+        ]);
+        $page->setDraft($pagecontent);
+        $page->save();
+        DB::commit();
+        return $page;
     }
 
     public function messages(Collection $data, Authenticatable $user)
@@ -54,22 +66,22 @@ class AddPage implements APICommand
         return [
             'parent_id' => [
                 'required',
-                'exists:routes,id'
+                'exists:pages,id'
              ],
-            // if after_id exists it must have the parent_id specified for the new route / page.
-            'after_id' => [
+            // if before_id exists it must have the parent_id specified for the new route / page.
+            'before_id' => [
                 'nullable',
-                Rule::exists('routes','id')
+                Rule::exists('pages','id')
                     ->where('parent_id', $data->get('parent_id'))
             ],
             'slug' => [
                 // slug is required and can only contain lowercase letters, numbers, hyphen or underscore.
                 'required',
-                'regex:/^[a-z0-9_-]+/$',
+                'regex:/^[a-z0-9_-]+$/',
                 // there must not be an existing draft route with the same slug under the parent page
-                Rule::unique('routes', 'slug')
+                Rule::unique('pages', 'slug')
                    ->where('parent_id', $data->get('parent_id'))
-                   ->whereNotNull('page_id'),
+                   ->whereNotNull('draft_id'),
             ],
             'layout_name' => [
                 'string',

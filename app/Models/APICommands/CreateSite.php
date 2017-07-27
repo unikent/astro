@@ -37,7 +37,8 @@ class CreateSite implements APICommand
             $site->save();
 
             // every route must have a draft OR a published page
-            $page = new PageContent([
+            $pagecontent = new PageContent([
+                'site_id' => $site->id,
                 'title' => 'Home Page',
                 'created_by' => $user->getAuthIdentifier(),
                 'updated_by' => $user->getAuthIdentifier(),
@@ -45,12 +46,13 @@ class CreateSite implements APICommand
                 'layout_name' => $site->options['default_layout_name'],
                 'layout_version' => $site->options['default_layout_version']
             ]);
-            $page->save();
+            $pagecontent->save();
 
             // every site must have a root route...
-            $route = Route::create(['path' => '/', 'slug' => null, 'site_id' => $site->id, 'page_id' => $page->id]);
-            $route->save();
+            $page = Page::create(['path' => '/', 'slug' => null, 'site_id' => $site->id, 'draft_id' => $pagecontent->id]);
         });
+        $site->refresh();
+        return $site;
     }
 
     /**
@@ -94,7 +96,7 @@ class CreateSite implements APICommand
                 'required',
                 'string',
                 'max:100',
-//                'regex:/^[a-z0-9_.-]+-v[0-9.+]$/i'
+                'regex:/^[a-z0-9_.-]+$/i'
             ],
             'default_layout_version' => [
                 'required',

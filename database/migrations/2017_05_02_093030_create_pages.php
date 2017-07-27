@@ -21,7 +21,7 @@ class CreatePages extends Migration
 
             $table->integer('site_id')->unsigned();
 
-			$table->integer('draft_id')->unsigned();
+			$table->integer('draft_id')->unsigned()->nullable();
             $table->integer('published_revision_id', false, true)->nullable();
 
 			$table->integer('parent_id')->nullable();

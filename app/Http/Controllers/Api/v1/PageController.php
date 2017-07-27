@@ -4,12 +4,6 @@ namespace App\Http\Controllers\Api\v1;
 use App\Http\Requests\Api\v1\Route\ResolveRequest;
 use App\Models\Traits\ResolvesRoutes;
 
-use App\Models\Page;
-use App\Models\Redirect;
-use App\Http\Transformers\Api\v1\PageContentTransformer;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-use Gate;
-
 class PageController extends ApiController
 {
     use ResolvesRoutes;
