@@ -42,7 +42,7 @@ import { mapState, mapMutations } from 'vuex';
 import { Loading } from 'element-ui';
 
 import Config from 'classes/Config';
-import Sidebar from 'components/Sidebar';
+import Sidebar from 'components/sidebar';
 import BlockPicker from 'components/BlockPicker';
 import Icon from 'components/Icon';
 
@@ -116,6 +116,14 @@ export default {
 		handleClose() {
 			this.hidePublishModal();
 			this.form.message = '';
+		},
+
+		showLoader() {
+			this.loader = Loading.service({
+				target: this.$refs.editor,
+				text: 'Loading preview...',
+				customClass: 'loading-overlay'
+			});
 		}
 	},
 
@@ -133,7 +141,8 @@ export default {
 		}),
 
 		getPreviewUrl() {
-			return `${Config.get('base_url', '')}/preview/${this.$route.params.site_id}`;
+			// TODO: Don't reload page when page_id changes, use state instead
+			return `${Config.get('base_url', '')}/preview/${this.$route.params.page_id}`;
 		},
 
 		dimensions() {
@@ -159,17 +168,18 @@ export default {
 	},
 
 	watch: {
-		pageLoaded() {
-			this.loader.close();
+		pageLoaded(hideLoader) {
+			if(hideLoader) {
+				this.loader.close();
+			}
+			else {
+				this.showLoader();
+			}
 		}
 	},
 
 	mounted() {
-		this.loader = Loading.service({
-			target: this.$refs.editor,
-			text: 'Loading preview...',
-			customClass: 'loading-overlay'
-		});
+		this.showLoader();
 	}
 };
 </script>

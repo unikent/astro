@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import ElementUI from 'element-ui';
-import { Vue2Dragula } from 'vue2-dragula';
 
 import './bootstrap';
 import locale from './locale';
@@ -17,13 +16,6 @@ import './directives/field';
 import App from './views/App';
 
 /* global document */
-
-
-Vue.use(Vue2Dragula, {
-	// logging: {
-	// 	service: true
-	// }
-});
 
 Vue.use(VueRouter);
 Vue.use(ElementUI, { locale });

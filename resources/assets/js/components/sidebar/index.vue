@@ -62,12 +62,12 @@
 import { mapState, mapMutations } from 'vuex';
 
 import Icon from 'components/Icon';
-import SideMenuItem from 'components/Sidebar/SideMenuItem';
+import SideMenuItem from 'components/sidebar/SideMenuItem';
 import PageList from 'components/PageList';
-import BlockSidebar from 'components/Sidebar/BlockSidebar';
-import Navigation from 'components/Sidebar/Navigation';
-import Settings from 'components/Sidebar/Settings';
-import HelpCentre from 'components/Sidebar/HelpCentre';
+import BlockSidebar from 'components/sidebar/BlockSidebar';
+import Navigation from 'components/sidebar/Navigation';
+import Settings from 'components/sidebar/Settings';
+import HelpCentre from 'components/sidebar/HelpCentre';
 
 import { clamp } from 'classes/helpers';
 
