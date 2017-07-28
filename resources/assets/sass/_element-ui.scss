@@ -6,6 +6,11 @@
 	font-size: 14px;
 }
 
+.el-dialog {
+	// would use will-change but makes the dialog blurry
+	transfrom: translate3d(0, 0, 0);
+}
+
 .el-dialog__title {
 	font-weight: 500;
 }
@@ -172,4 +177,10 @@
 // allows a narrower tooltip in some cases
 .el-tooltip__popper--narrow {
 	max-width: 200px;
+}
+
+@each $status, $colour in $status-colours {
+	.el-button--#{$status} {
+		@include button-variant($colour);
+	}
 }
