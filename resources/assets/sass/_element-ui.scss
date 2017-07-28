@@ -173,3 +173,9 @@
 .el-tooltip__popper--narrow {
 	max-width: 200px;
 }
+
+@each $status, $colour in $status-colours {
+	.el-button--#{$status} {
+		@include button-variant($colour);
+	}
+}

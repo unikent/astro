@@ -5,3 +5,23 @@ $grid-breakpoints: (
 	lg: 992px,
 	xl: 1200px
 ) !default;
+
+// TODO: decide on colour names
+$theme-colours: (
+	c1: #48576a,
+	c2: #71787f,
+	c3: #8391a5,
+	c4: #b7c2d4,
+	c5: #dadde2,
+	c6: #e5e7ec,
+	c7: #f7f9fb,
+	lightest: #fff,
+	selected: #03a9f4
+) !default;
+
+$status-colours: (
+	success: #5ab181,
+	info: #4eadda,
+	warning: #e5ce66,
+	danger: #d65757
+) !default;

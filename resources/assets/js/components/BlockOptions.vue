@@ -39,7 +39,7 @@
 							/>
 						</el-tooltip>
 
-						<el-tooltip content="View field" placement="top">
+						<el-tooltip content="Highlight field" placement="top">
 							<icon
 								class="el-form-item__icon-view"
 								name="eye"
@@ -67,7 +67,8 @@
 
 	</div>
 
-	<div class="b-bottom-bar">
+	<!-- hide until we know what we're doing with validation -->
+	<div class="b-bottom-bar" v-show="false">
 		<el-button :plain="true" type="danger" @click="deleteThisBlock">Remove</el-button>
 		<el-button @click="submitForm('block_fields')">Validate</el-button>
 	</div>
