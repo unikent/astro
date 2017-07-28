@@ -69,7 +69,8 @@ export default {
 			currentRegion: state => state.page.currentRegion,
 			currentBlockIndex: state => state.definition.currentBlockIndex,
 			draggingBlocks: state => state.page.dragging,
-			allBlockMeta: state => state.page.blockMeta.blocks
+			allBlockMeta: state => state.page.blockMeta.blocks,
+			activeMenuItem: state => state.menu.active
 		}),
 
 		...mapGetters([
@@ -146,10 +147,14 @@ export default {
 		]),
 
 		editBlock() {
+			// set the block in the sidebar if the user clicks on a different block (including one with the same index but in a different region)
 			if(this.currentBlockIndex !== this.index || this.currentRegion !== this.region) {
 				this.collapseSidebar();
-				this.updateMenuActive("blocks");
 				this.setBlock({ index: this.index, type: this.type });
+			}
+			// make sure we get to see the block menu if we're currently seeing the pages menu and a user clicks on any block
+			if(this.activeMenuItem!=='blocks') {
+				this.updateMenuActive('blocks');
 			}
 		},
 
