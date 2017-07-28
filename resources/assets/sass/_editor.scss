@@ -56,7 +56,7 @@ html {
 
 .editor-content {
 	transition: width .3s ease-out, height .3s ease-out;
-	max-height: calc(100vh - 50px);
+	max-height: calc(100vh - #{get-height(top-bar)});
 }
 
 .editor-nav,
@@ -133,6 +133,8 @@ html {
 		flex: 0 1 auto;
 		align-self: auto;
 	}
+
+	display: none; // hides this for now until we know what we're doing with validation
 }
 
 

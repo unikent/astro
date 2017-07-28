@@ -1,34 +1,3 @@
-<style>
-.collection-field {
-	margin-bottom: 10px;
-	padding: 10px;
-}
-
-.collection-field__field-list {
-	border: 1px solid #e8e8e8;
-	background-color: #fff;
-	padding: 20px 20px 40px;
-	border-radius: 4px;
-	position: relative;
-}
-
-.is-error .collection-field {
-	border: 1px solid #ff4949;
-	border-radius: 4px;
-	background-color: rgba(255, 73, 73, .08);
-}
-
-.ci-field + .ci-field {
-	border-top: 1px solid rgba(191, 203, 217, 0.3);
-	margin-top: 24px;
-	padding-top: 20px;
-}
-
-.collection-field__field-list +
-.collection-field__field-list {
-	margin-top: 24px;
-}
-</style>
 <template>
 <div class="collection-field">
 	<div
@@ -44,10 +13,14 @@
 				>
 					<template slot="label">
 						<span>{{ f.label }}</span>
-						<el-tooltip v-if="f.info" :content="f.info" placement="top">
+						<el-tooltip
+							v-if="f.info"
+							popper-class="el-tooltip__popper--narrow"
+							:content="f.info"
+							placement="top">
 							<icon
-								class="f-info"
-								name="help"
+								class="el-form-item__icon-help"
+								name="help-circle"
 								width="15"
 								height="15"
 								viewBox="0 0 15 15"
@@ -65,16 +38,16 @@
 			</div>
 		</template>
 
-		<div @click="removeItem(index)" class="block-overlay__delete">
+		<div @click="removeItem(index)" class="block-overlay__delete block-overlay__delete--sidebar">
 			<Icon name="delete" width="20" height="20" />
 		</div>
 	</div>
 
-	<div style="clear: both; margin-top: 24px">
-		<span style="font-size: .8rem; color: #48576a;">
-			{{ currentValue.length }} item{{ currentValue.length === 1 ? '' : 's' }}
+	<div class="collection-add">
+		<span class="collection-add__counter">
+			{{ currentValue.length }} {{ this.label.slice(0, -1).toLowerCase() }}{{ currentValue.length === 1 ? '' : 's' }}
 		</span>
-		<el-button @click="addItem" style="float: right;">Add item</el-button>
+		<el-button @click="addItem" class="collection-add__button">Add {{ this.label.slice(0, -1).toLowerCase() }}</el-button>
 	</div>
 </div>
 </template>

@@ -1,32 +1,3 @@
-<style>
-.group-field {
-	margin-bottom: 10px;
-}
-
-.group-field__field-list {
-	border: 1px solid #e8e8e8;
-	background-color: #fff;
-	padding: 20px 20px 40px;
-	border-radius: 4px;
-	position: relative;
-}
-
-.is-error .group-field {
-	border: 1px solid #ff4949;
-	border-radius: 4px;
-}
-
-.ci-field + .ci-field {
-	border-top: 1px solid rgba(191, 203, 217, 0.3);
-	margin-top: 24px;
-	padding-top: 20px;
-}
-
-.group-field__field-list +
-.group-field__field-list {
-	margin-top: 24px;
-}
-</style>
 <template>
 <div class="group-field">
 
@@ -40,10 +11,15 @@
 				>
 					<template slot="label">
 						<span>{{ f.label }}</span>
-						<el-tooltip v-if="f.info" :content="f.info" placement="top">
+
+						<el-tooltip
+							v-if="f.info"
+							popper-class="el-tooltip__popper--narrow"
+							:content="f.info"
+							placement="top">
 							<icon
-								class="f-info"
-								name="help"
+								class="el-form-item__icon-help"
+								name="help-circle"
 								width="15"
 								height="15"
 								viewBox="0 0 15 15"
@@ -70,11 +46,16 @@ import { mapState } from 'vuex';
 import baseFieldMixin from 'mixins/baseFieldMixin';
 import getFieldMixin from 'mixins/getFieldMixin';
 import { Definition } from 'classes/helpers';
+import Icon from '../Icon';
 
 export default {
 
 	name: 'group-field',
 	mixins: [baseFieldMixin, getFieldMixin],
+
+	components: {
+		Icon
+	},
 
 	computed: {
 		...mapState({
