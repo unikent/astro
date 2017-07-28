@@ -153,7 +153,7 @@ export default {
 				this.setBlock({ index: this.index, type: this.type });
 			}
 			// make sure we get to see the block menu if we're currently seeing the pages menu and a user clicks on any block
-			if(this.active==='pages') {
+			if(this.active!=='blocks') {
 				this.updateMenuActive('blocks');
 			}
 		},
