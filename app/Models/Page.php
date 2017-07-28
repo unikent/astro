@@ -62,7 +62,7 @@ class Page extends BaumNode implements RoutableContract
 		return $this->belongsTo(Site::class, 'site_id');
 	}
 
-	public function draft()
+	public function draft_page()
 	{
 		return $this->belongsTo(PageContent::class, 'draft_id');
 	}

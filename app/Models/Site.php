@@ -32,6 +32,16 @@ class Site extends Model
         return $this->activeRoute();
     }
 
+    public function draftPages()
+    {
+        return $this->hasMany(Page::class, 'site_id')->whereNotNull('draft_id');
+    }
+
+    public function publishedPages()
+    {
+        return $this->hasMany(Page::class, 'site_id')->whereNotNull('published_revision_id');
+    }
+
 	public function pages()
 	{
 		return $this->hasMany(Page::class, 'site_id');

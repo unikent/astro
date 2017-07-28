@@ -110,8 +110,14 @@ class SiteController extends ApiController
 
 		$qb = $site->activeRoute->descendantsAndSelf();
 		$routes = $qb->get()->toHierarchy();
-
-		return fractal($routes, new PageTransformer)->respond();
+        $site->load([
+            'pages' => function($query) {
+                return $query->orderBy('pages.lft');
+            },
+            'pages.draft_page',
+            'pages.published_page.pagecontent'
+        ]);
+		return fractal($site->pages->toHierarchy(), new PageTransformer)->respond();
 	}
 
 }
