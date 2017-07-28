@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Api\v1;
 
+use App\Models\APICommands\AddPage;
 use App\Models\LocalAPIClient;
 use Auth;
 use DB;
@@ -36,12 +37,13 @@ class PageContentController extends ApiController
 	/**
 	 * POST /api/v1/page
 	 *
-	 * @param  StoreRequest $request
+	 * @param  Request $request
 	 * @return Response
 	 */
-	public function store(PersistRequest $request){
-        $pagecontent = new PageContent;
-		$this->process($request, $pagecontent); // Handles authorization and persistance
+	public function store(Request $request){
+	    $this->authorize('create', new PageContent);
+	    $api = new LocalAPIClient(Auth::user());
+	    $pagecontent = $api->execute(AddPage::class, $request->all());
 
 		return fractal($pagecontent, new PageContentTransformer)->respond(201);
 	}

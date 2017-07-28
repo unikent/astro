@@ -27,7 +27,7 @@ class AddPage implements APICommand
         $page = null;
         DB::beginTransaction();
         $parent = Page::find($input['parent_id']);
-        $before = Page::find($input['before_id']);
+        $before = !empty($input['before_id']) ? Page::find($input['before_id']) : null;
         $page = $parent->getChildWithSlug($input['slug']);
         if ($page) {
             if ($page->hasDraft()) {
@@ -53,7 +53,7 @@ class AddPage implements APICommand
         $page->setDraft($pagecontent);
         $page->save();
         DB::commit();
-        return $page;
+        return $pagecontent;
     }
 
     public function messages(Collection $data, Authenticatable $user)
