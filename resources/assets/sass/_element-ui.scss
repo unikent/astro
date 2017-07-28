@@ -6,11 +6,6 @@
 	font-size: 14px;
 }
 
-.el-dialog {
-	// would use will-change but makes the dialog blurry
-	transfrom: translate3d(0, 0, 0);
-}
-
 .el-dialog__title {
 	font-weight: 500;
 }
