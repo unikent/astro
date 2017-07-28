@@ -23,6 +23,8 @@ class Block extends Model
 
 	protected $definition = null;
 
+	// Eager-load media to avoid slow n+1 queries
+	protected $with = ['media'];
 
 	/**
 	 * Create a new Eloquent model instance.
@@ -88,12 +90,15 @@ class Block extends Model
 	{
 		$block = $this->media->each(function($mediaItem) {
 			$field = $mediaItem->pivot->block_associated_field;
-			$fields = $this->fields;
 			unset($mediaItem->pivot);
+
+			$fields = $this->fields;
 
 			$this->associated_field = $field;
 
-			$this->fields = array_set($fields, $field, $mediaItem);
+			array_set($fields, $field, $mediaItem->toArray());
+
+			$this->fields = $fields;
 		});
 	}
 
