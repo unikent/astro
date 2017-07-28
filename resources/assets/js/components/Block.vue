@@ -70,7 +70,7 @@ export default {
 			currentBlockIndex: state => state.definition.currentBlockIndex,
 			draggingBlocks: state => state.page.dragging,
 			allBlockMeta: state => state.page.blockMeta.blocks,
-			active: state => state.menu.active
+			activeMenuItem: state => state.menu.active
 		}),
 
 		...mapGetters([
@@ -153,7 +153,7 @@ export default {
 				this.setBlock({ index: this.index, type: this.type });
 			}
 			// make sure we get to see the block menu if we're currently seeing the pages menu and a user clicks on any block
-			if(this.active!=='blocks') {
+			if(this.activeMenuItem!=='blocks') {
 				this.updateMenuActive('blocks');
 			}
 		},

@@ -25,7 +25,7 @@
 			<component
 				v-for="(item, index) in menu"
 				v-if="item.component"
-				v-show="item.id===active"
+				v-show="item.id===activeMenuItem"
 				:is="item.component"
 				:key="`component-${item.link}`"
 				:title="item.title"
@@ -42,7 +42,7 @@
 					:id="item.id"
 					:key="item.link"
 					:index="index"
-					:active="active"
+					:active="activeMenuItem"
 					:onClick="openItem"
 				/>
 			</ul>
@@ -113,7 +113,7 @@ export default {
 			collapsed: state => state.sidebarCollapsed,
 			page: state => state.page.pageData,
 			pageLoaded: state => state.page.loaded,
-			active: state => state.menu.active
+			activeMenuItem: state => state.menu.active
 		})
 	},
 
