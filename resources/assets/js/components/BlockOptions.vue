@@ -39,7 +39,7 @@
 							/>
 						</el-tooltip>
 
-						<el-tooltip content="View field" placement="top">
+						<el-tooltip content="Highlight field" placement="top">
 							<icon
 								class="el-form-item__icon-view"
 								name="eye"

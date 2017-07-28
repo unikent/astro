@@ -5,7 +5,7 @@
 		<el-select placeholder="view" v-model="view" class="switch-view">
 			<el-option v-for="(view, key) in views" :label="view.label" :value="key" :key="view.label">
 				<div class="view-icon">
-					<Icon :name="view.icon" aria-hidden="true" width="20" height="20" />
+					<icon :name="view.icon" aria-hidden="true" width="20" height="20" />
 				</div>
 				<span class="view-label">{{ view.label }}</span>
 			</el-option>
@@ -14,10 +14,10 @@
 
 	<el-button-group class="undo-redo">
 		<el-button :disabled="!undoRedo.canUndo" @click="undo">
-			<Icon name="undo" aria-hidden="true" width="14" height="14" class="ico" />
+			<icon name="undo" aria-hidden="true" width="14" height="14" class="ico" />
 		</el-button>
 		<el-button :disabled="!undoRedo.canRedo" @click="redo">
-			<Icon name="redo" aria-hidden="true" width="14" height="14" class="ico" />
+			<icon name="redo" aria-hidden="true" width="14" height="14" class="ico" />
 		</el-button>
 	</el-button-group>
 
