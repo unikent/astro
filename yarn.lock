@@ -3373,9 +3373,9 @@ jsx-ast-utils@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/jsx-ast-utils/-/jsx-ast-utils-1.4.1.tgz#3867213e8dd79bf1e8f2300c0cfc1efb182c0df1"
 
-"kent-font@git+ssh://git@gitlab.kent.ac.uk/webdev/kent-font.git#1.0.4":
+"kent-font@git+ssh://git@gitlab.kent.ac.uk/webdev/kent-font.git#master":
   version "1.0.4"
-  resolved "git+ssh://git@gitlab.kent.ac.uk/webdev/kent-font.git#d7905b07f7349ca2ea3a2109fa84c4db29d1fb59"
+  resolved "git+ssh://git@gitlab.kent.ac.uk/webdev/kent-font.git#b08e01bc777744466c6455649bb0a48c0da7e463"
   dependencies:
     grunt "*"
 
