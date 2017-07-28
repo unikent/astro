@@ -1,6 +1,8 @@
 <?php
 namespace App\Http\Controllers\Api\v1;
 
+use App\Models\LocalAPIClient;
+use Auth;
 use DB;
 use Exception;
 use App\Models\PageContent;
@@ -48,12 +50,14 @@ class PageContentController extends ApiController
 	 * PUT /api/v1/page/{page}
 	 * PATCH /api/v1/page/{page}
 	 *
-	 * @param PersistRequest $request
+	 * @param Request $request
 	 * @param PageContent $pagecontent
 	 * @return Response
 	 */
-	public function update(PersistRequest $request, PageContent $pagecontent){
-		$this->process($request, $pagecontent); // Handles authorization and persistance
+	public function update(Request $request, PageContent $pagecontent){
+        $this->authorize('update', $pagecontent);
+        $api = new LocalAPIClient(Auth::user());
+        $pagecontent = $api->updatePageContent($pagecontent->id, $request->input('blocks'));
 		return fractal($pagecontent, new PageContentTransformer)->respond();
 	}
 

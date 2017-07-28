@@ -33,18 +33,18 @@ class PageContent extends Model
 
 	public function routes()
 	{
-		return $this->hasMany(Page::class, 'draft_page_content_id');
+		return $this->hasMany(Page::class, 'draft_id');
 	}
 
 	public function activeRoute()
 	{
-	    throw new Exception('Not implemented');
-		return $this->hasOne(Page::class, 'published_revision_id');
+
+		return $this->belongsTo(Page::class, 'draft_id');
 	}
 
 	public function draftRoute()
 	{
-		return $this->hasOne(Page::class, 'draft_page_content_id');
+		return $this->hasOne(Page::class, 'draft_id');
 	}
 
 

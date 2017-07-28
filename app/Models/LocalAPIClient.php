@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\APICommands\UpdateContent;
 use Astro\Renderer\API\Exception\APIErrorException;
 use Astro\Renderer\API\Data\PageData;
 use Astro\Renderer\API\Data\RouteData;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\APICommands\CreateSite;
 use App\Models\APICommands\AddPage;
 use Auth;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Prototyping
@@ -82,6 +84,7 @@ class LocalAPIClient implements \Astro\Renderer\Contracts\APIClient
      * @param string $class The name of the command class.
      * @param array $data
      * @return Validator
+     * @throws ValidationException
      */
     public function execute($class, array $data)
     {
@@ -90,7 +93,7 @@ class LocalAPIClient implements \Astro\Renderer\Contracts\APIClient
         $validator = Validator::make($data->toArray(), $command->rules($data, $this->user));
         $validator->setCustomMessages($command->messages($data,$this->user));
         if($validator->fails()){
-            return $validator;
+            throw new ValidationException($validator);
         }else{
             return $command->execute($data,$this->user);
         }
@@ -143,6 +146,19 @@ class LocalAPIClient implements \Astro\Renderer\Contracts\APIClient
         ]);
     }
 
+    /**
+     * Add a hierarchy of pages to a site.
+     * @param int $site_id
+     * @param int $parent_id
+     * @param int $before_id
+     * @param array $tree array of pages attributes, each of which may have a children array containing subpage definitions.
+     * Required attributes are:
+     * - slug
+     * - title
+     * - layout_name
+     * - layout_version
+     * @return bool True if successful.
+     */
     public function addTree($site_id, $parent_id, $before_id, $tree)
     {
         foreach( $tree as $page ) {
@@ -162,6 +178,18 @@ class LocalAPIClient implements \Astro\Renderer\Contracts\APIClient
         return true;
     }
 
+    /**
+     * @param $draft_id int The id of the draft page content to update.
+     * @param array $regions Array of [region-name] => [block1, block2, etc]
+     */
+    public function updatePageContent($draft_id,$regions)
+    {
+        return $this->execute(UpdateContent::class, [
+           'draft_id' => $draft_id,
+            'blocks' => $regions
+        ]);
+    }
+
     public function renamePage($page_id, $new_slug)
     {
         return $this->execute(RenamePage::class, [
@@ -175,11 +203,6 @@ class LocalAPIClient implements \Astro\Renderer\Contracts\APIClient
         return $this->execute( DeletePage::class, [
             'page_id' => $id
         ]);
-    }
-
-    public function updatePageContent()
-    {
-
     }
 
     public function movePage()
