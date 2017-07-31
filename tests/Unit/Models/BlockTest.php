@@ -3,7 +3,7 @@ namespace Tests\Unit\Models;
 
 use Mockery;
 use Tests\TestCase;
-use App\Models\Page;
+use App\Models\PageContent;
 use App\Models\Block;
 use App\Models\Definitions\Block as BlockDefinition;
 
@@ -15,12 +15,12 @@ class BlockTest extends TestCase
 	 */
 	public function deleteForPageRegion_WhenPageIsGiven_DeletesAllBlocksForGivenPageAndRegion()
 	{
-		$page = factory(Page::class)->create();
-		factory(Block::class, 3)->create([ 'page_id' => $page->getKey() ]);
+		$pagecontent = factory(PageContent::class)->create();
+		factory(Block::class, 3)->create([ 'page_content_id' => $pagecontent->getKey() ]);
 
 		$count = Block::count();
 
-		Block::deleteForPageRegion($page, 'test-region');
+		Block::deleteForPageRegion($pagecontent, 'test-region');
 		$this->assertEquals($count - 3, Block::count());
 	}
 
@@ -29,8 +29,8 @@ class BlockTest extends TestCase
 	 */
 	public function deleteForPageRegion_WhenPageIdInstanceIsGiven_DeletesAllBlocksForGivenPageAndRegion()
 	{
-		$page = factory(Page::class)->create();
-		factory(Block::class, 3)->create([ 'page_id' => $page->getKey() ]);
+		$page = factory(PageContent::class)->create();
+		factory(Block::class, 3)->create([ 'page_content_id' => $page->getKey() ]);
 
 		$count = Block::count();
 
@@ -43,10 +43,10 @@ class BlockTest extends TestCase
 	 */
 	public function deleteForPageRegion_DoesNotDeleteBlocksInOtherRegions()
 	{
-		$page = factory(Page::class)->create();
+		$page = factory(PageContent::class)->create();
 
-		factory(Block::class, 3)->create([ 'page_id' => $page->getKey() ]);
-		factory(Block::class, 2)->create([ 'page_id' => $page->getKey(), 'region_name' => 'foobar' ]);
+		factory(Block::class, 3)->create([ 'page_content_id' => $page->getKey() ]);
+		factory(Block::class, 2)->create([ 'page_content_id' => $page->getKey(), 'region_name' => 'foobar' ]);
 
 		$count = Block::count();
 

@@ -1,22 +1,22 @@
 <?php
 namespace App\Models\Traits;
 
-use App\Models\Page;
-use App\Models\PublishedPage;
+use App\Models\PageContent;
+use App\Models\Revision;
 
 /**
- *
+ * @deprecated
  */
 trait Routable  {
 
 	public function page()
 	{
-		return $this->belongsTo(Page::class, 'page_id')->withTrashed();
+		return $this->belongsTo(PageContent::class, 'page_id')->withTrashed();
 	}
 
 	public function published_page()
 	{
-		return $this->hasOne(PublishedPage::class, 'page_id', 'page_id')->latest()->limit(1);
+		return $this->hasOne(Revision::class, 'page_id', 'page_id')->latest()->limit(1);
 	}
 
 

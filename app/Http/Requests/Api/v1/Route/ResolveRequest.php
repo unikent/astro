@@ -2,7 +2,7 @@
 namespace App\Http\Requests\Api\v1\Route;
 
 use Gate;
-use App\Models\Route;
+use App\Models\Page;
 use Illuminate\Validation\Rule;
 use App\Http\Requests\FormRequest;
 

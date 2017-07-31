@@ -2,7 +2,7 @@
 
 namespace App\Policies;
 
-use App\Models\Page;
+use App\Models\PageContent;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -25,10 +25,10 @@ class PagePolicy
      * Determine whether the user can view the page.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Page  $page
+     * @param  \App\Models\PageContent  $page
      * @return boolean
      */
-    public function read(User $user, Page $page)
+    public function read(User $user, PageContent $page)
     {
         // TODO: If page is published, OR if user has R/W access to site
         return true;
@@ -38,10 +38,10 @@ class PagePolicy
      * Determine whether the user can create pages.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Page  $page
+     * @param  \App\Models\PageContent  $page
      * @return boolean
      */
-    public function create(User $user, Page $page)
+    public function create(User $user, PageContent $page)
     {
         // TODO: If user has W access to site
         return true;
@@ -51,10 +51,10 @@ class PagePolicy
      * Determine whether the user can update the page.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Page  $page
+     * @param  \App\Models\PageContent  $page
      * @return boolean
      */
-    public function update(User $user, Page $page)
+    public function update(User $user, PageContent $page)
     {
         // TODO: If user has W access to site
         return true;
@@ -64,10 +64,10 @@ class PagePolicy
      * Determine whether the user can publish the page.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Page  $page
+     * @param  \App\Models\PageContent  $page
      * @return boolean
      */
-    public function publish(User $user, Page $page)
+    public function publish(User $user, PageContent $page)
     {
         return true;
     }
@@ -76,10 +76,10 @@ class PagePolicy
      * Determine whether the user can revert the page.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Page  $page
+     * @param  \App\Models\PageContent  $page
      * @return boolean
      */
-    public function revert(User $user, Page $page)
+    public function revert(User $user, PageContent $page)
     {
         return true;
     }
@@ -88,10 +88,10 @@ class PagePolicy
      * Determine whether the user can delete the page.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Page  $page
+     * @param  \App\Models\PageContent  $page
      * @return boolean
      */
-    public function delete(User $user, Page $page)
+    public function delete(User $user, PageContent $page)
     {
         // TODO: If user has W access to site
         return true;
@@ -101,10 +101,10 @@ class PagePolicy
      * Determine whether the user can force-delete the page.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Page  $page
+     * @param  \App\Models\PageContent  $page
      * @return boolean
      */
-    public function forceDelete(User $user, Page $page)
+    public function forceDelete(User $user, PageContent $page)
     {
         return true;
     }

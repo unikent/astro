@@ -1,7 +1,11 @@
+.phpstorm*
+_ide_helper*
 /node_modules
 /public/storage
 /public/uploads
 /storage/*.key
+/storage
+/uploads
 /vendor
 /.idea
 /.tmp
@@ -10,5 +14,6 @@ Homestead.yaml
 .env
 auth.json
 studio.json
-
+uploads
+storage/public
 /public/build

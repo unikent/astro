@@ -1,12 +1,17 @@
 <?php
 namespace App\Http\Controllers\Api\v1;
 
+use App\Http\Requests\Api\v1\Site\StoreRequest;
+use App\Models\LocalAPIClient;
+use App\Models\Page;
 use Auth;
 use Gate;
+use DB;
 use App\Models\Site;
 use Illuminate\Http\Request;
 use App\Http\Transformers\Api\v1\SiteTransformer;
-use App\Http\Transformers\Api\v1\RouteTransformer;
+use App\Http\Transformers\Api\v1\PageTransformer;
+use Illuminate\Validation\ValidationException;
 
 class SiteController extends ApiController
 {
@@ -22,7 +27,7 @@ class SiteController extends ApiController
 	 */
 	public function index(Request $request){
 		$user = Auth::user();
-		$sites = Site::with('routes');
+		$sites = Site::with('pages');
 
 		if(!Gate::allows('index', Site::class)){
 			$pgs = $user->publishing_groups->pluck('id');
@@ -31,6 +36,54 @@ class SiteController extends ApiController
 
 		return fractal($sites->get(), new SiteTransformer)->respond();
 	}
+
+    /**
+     * POST /api/v1/site
+     *
+     * Create a new site.
+     * @return Response
+     *
+     */
+	public function store(Request $request)
+    {
+        $api = new LocalAPIClient();
+        $site = $api->createSite(
+            $request->get('publishing_group_id'),
+            $request->get('name'),
+            $request->get('host'),
+            $request->get('path'),
+            $request->get('default_layout_name'),
+            $request->get('default_layout_version'),
+            $request->get('options')
+        );
+        if($site instanceof Site) {
+            return fractal($site, new SiteTransformer)->respond(201);
+        }else{
+            throw new ValidationException($site);
+        }
+    }
+
+    /**
+     * PUT/PATCH /api/v1/site/{site}
+     *
+     * Update an existing site.
+     * @return \Response
+     */
+    public function update(Request $request, Site $site)
+    {
+        return null;
+    }
+
+    /**
+     * DELETE /api/v1/site/{site}
+     *
+     * Delete an existing site.
+     */
+    public function destroy(Request $request, Site $site)
+    {
+        $this->authorize('delete', $site);
+        return null;
+    }
 
 	/**
 	 * GET /api/v1/site/{site}
@@ -57,8 +110,14 @@ class SiteController extends ApiController
 
 		$qb = $site->activeRoute->descendantsAndSelf();
 		$routes = $qb->get()->toHierarchy();
-
-		return fractal($routes, new RouteTransformer)->respond();
+        $site->load([
+            'pages' => function($query) {
+                return $query->orderBy('pages.lft');
+            },
+            'pages.draft_page',
+            'pages.published_page.pagecontent'
+        ]);
+		return fractal($site->pages->toHierarchy(), new PageTransformer)->respond();
 	}
 
 }

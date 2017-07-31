@@ -91,38 +91,38 @@ Many of the API endpoints support Fractal 'includes' by passing an '?include=' p
 
 Includes will resolve deep relations, i.e. 'block,block.definitions' but please use sparingly: depth restrictions are permissive but data is often lazy-loaded.
 
-#### Routes, Pages, Sites & Permissions
-Pages, Routes and Sites are inter-dependent, at times it is helpful to think of them as a single conceptual unit.
+#### Pages, Revisions, Sites & Permissions
 
-The URL to a Page is stored by its Route, and the Route represents the position of that page within a Site's hierarchy. By associating a Site with a Route, a Page becomes the homepage of a sub-site and enters a new authorization context - a different PublishingGroup governs edit access to it.
+A **Site** has a host (domain) name, an optional path prefix, a hierarchical structure and at least one **Page**.
 
-All of these objects (Page, Route, Site) are created and updated via a single API endpoint: `/api/v1/page`.
+The **Site** structure is comprised of **Pages**, stored as a nested set (using Baum, a nested-set implementation for Laravel)
+, scoped to that **Site**.
 
-Pages (and their associated Block instances) represent draft content. When a Page instance is published a new PublishedPage instance is created. The `bake` attribute a PublishedPage stores a JSON representation of the Page (its Block instances, and canonical Route) at point of publication.
+A **Page** has zero or one draft **Revision** and zero or one published **Revision**. A **Page** with no **Revisions** 
+should not exist.
 
-A single Page may be associated with multiple PublishedPage instances (providing a publication history and audit log). The JSON `bake` stored on a PublishedPage is served as published-content via the `/api/v1/route/resolve?path=` endpoint.
+A **Revision** includes the content (blocks) that make up a **Page** as well as the title, meta data, layout name and version.
+ 
+A new **Revision** is created every time page content or definition is updated. **Revisions** have a type, which can be
+one of "draft", "published", "archived" or "deleted".
+ 
+The URL to a **Page** is represented by concatenating its **Site's** hostname and path and the **Page's** path. 
+The **Page's** path is generated automatically when saved by appending its slug to the end of its parent's path.
 
+A single **Page** may be associated with multiple **Revisions** (providing a publication history and audit log)
 
-##### Notes on Routes and Redirects
-Routes are implemented as a tree hierarchy, using Baum (a nested-set implementation for Laravel).
+When a **Page** is moved, a **Redirect** is created to point the old path to the new. If a new **Page** is created at
+the old location, the redirection is removed.
 
-Normally a Route has a `parent_id` and a `slug`. The `parent_id` associates the Route with its ancestor within the tree. The `slug` provides a URL segment representing the Page. The full path to a Page is automatically generated whenever a Route is saved, by joining the slug of a Route with the slugs of its' ancestors within the tree.
+All changes to **Pages** including edits, moves, deletions and additions are made in draft mode, and must be published
+in order for them to take effect on the live version of the site.
 
-There is a special case where a Route has neither a `slug` nor a `parent_id`. This is considered a "root Route" and is the start of an entirely new Route hierarchy.
+##### Authorization 
 
-A Page can have a maxiumum of two Routes: one active, one draft. When a Page is published, any draft Route is made active (replacing the current active Route). A Redirect is created to ensure that requests using the old URL can be redirected.
+Only admin users can create and manage **Sites**.
 
-Both Routes and Redirects implement the `App\Models\Contracts\Routable` contract, using the `App\Models\Traits\Routable` trait.
-
-
-##### Notes on Sites
-Sites provide a useful authorization context for grouping pages. A site is associated with a PublishingGroup. A users' membership of a PublishingGroup affects their ability to edit a Page within a given Site.
-
-Sites are associated with Routes via `$route->makeSite($site)`. This will update the given Route instance, as well as all other Routes to the associated Page.
-
-To associate a Page with a site, either pass a `site_id` persisting a Page `/api/v1/page` (which will use an existing Site) or pass `site.*` parameters (which will create and associate a new Site model).
-
-When associating a Route with a Site, the change is *immediate*, affects *all* Routes to the given Page, and is not subject to the publication/versioning system.
+Each **Site** has a **PublishingGroup** (which can have many **Sites**), and only users who are members of that 
+**PublishingGroup** have the ability to edit a **Page** within that Site.
 
 
 ##### Notes on Publishing
@@ -146,7 +146,8 @@ PublishedPages will remain in the database (providing a history and allowing pot
 #### Blocks and Pages
 Block instances are created when creating or updating a Page (by a POST to `/api/v1/page`, or a PUT to `/api/v1/page/ID`.
 
-It is important to send ALL Block instances to the server when persisting a Page as **all existing block instances are removed** as a part of the persitance proces. Block instances are then re/created based on the submission **matching the order in which they were submitted**.
+It is important to send ALL Block instances to the server when persisting a Page as **all existing block instances are removed** as a part of the persitance proces. 
+Block instances are then re/created based on the submission **matching the order in which they were submitted**.
 
 
 ````
@@ -173,7 +174,9 @@ It is important to send ALL Block instances to the server when persisting a Page
 }
 ````
 
-It is possible for Block definitions to contain validation rules, and for Region definitions to list compatible Blocks. This needs to be validated when persisting Block instances. This is currently implemented by the `App\Models\Api\v1\Page\PersistRequest` class using a the `BlockBroker` class:
+It is possible for Block definitions to contain validation rules, and for Region definitions to list compatible Blocks. 
+This needs to be validated when persisting Block instances. 
+This is currently implemented by the `App\Models\Api\v1\Page\PersistRequest` class using a the `BlockBroker` class:
 
  - `PersistRequest` defines its own validation rules in the usual way (as a standard FormRequest);
  - the `getRules()` method also loads Block and Region definitions based on the submitted data;

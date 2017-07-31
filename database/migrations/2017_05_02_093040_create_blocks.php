@@ -16,20 +16,23 @@ class CreateBlocks extends Migration
 		Schema::create('blocks', function (Blueprint $table) {
 			$table->increments('id');
 
-			$table->integer('page_id')->index();
+			$table->integer('page_content_id')->unsigned()->index();
 			$table->integer('order')->default(0);;
 
 			$table->string('definition_name');
             $table->integer('definition_version');
             $table->string('region_name')->index();
 
-			$table->text('fields');
+			$table->mediumText('fields');
 
 			// Keep track
 			$table->integer('created_by')->nullable();
 			$table->integer('updated_by')->nullable();
 			$table->timestamps();
-		});
+
+            //$table->foreign('page_content_id', 'page_content_id_fk')->references('id')->on('page_content');
+
+        });
 	}
 
 	/**
@@ -39,6 +42,9 @@ class CreateBlocks extends Migration
 	 */
 	public function down()
 	{
+        Schema::table('blocks', function(Blueprint $table) {
+  //          $table->dropForeign('page_content_id_fk');
+        });
 		Schema::drop('blocks');
 	}
 }

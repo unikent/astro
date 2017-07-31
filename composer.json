@@ -11,6 +11,10 @@
 		{
 			"url": "git@github.com:theninja/framework.git",
 			"type": "git"
+		},
+		{
+			"url": "git@github.com:unikent/astro-renderer.git",
+			"type": "git"
 		}
 	],
 	"require": {
@@ -28,7 +32,8 @@
 		"rtconner/laravel-tagging": "^2.2",
 		"spatie/laravel-fractal": "^3.5",
 		"spatie/laravel-permission": "^1.12",
-		"unikent/kentauth": "dev-laravel/5.3"
+		"unikent/kentauth": "dev-laravel/5.3",
+		"unikent/astro-renderer": "dev-develop"
 	},
 	"require-dev": {
 		"fzaninotto/faker": "~1.4",
