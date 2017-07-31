@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import Icon from '../Icon';
+import Icon from 'components/Icon';
 
 export default {
 	name: 'Admin',
@@ -36,7 +36,7 @@ export default {
 			template: `
 				<li>
 					<router-link :to="link">
-						<Icon :name="icon" className="menu-icon" />
+						<icon :name="icon" className="menu-icon" />
 						<span>{{ title }}</span>
 					</router-link>
 				</li>

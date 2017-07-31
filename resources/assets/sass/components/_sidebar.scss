@@ -1,0 +1,84 @@
+.editor-sidebar {
+	max-width: 50vw;
+	min-width: 398px;
+
+	.resize-sidebar {
+		position: absolute;
+		top: 0;
+		left: 0;
+		height: 100%;
+		width: 8px;
+		transform: translateX(-2px);
+		cursor: ew-resize
+	}
+
+	.sidebar-wrapper {
+		height: 100vh;
+		background-color: #f5f7fa;
+	}
+
+	.sidebar {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-color: #fff;
+		transition: transform .5s cubic-bezier(.19, 1, .22, 1);
+		border-left: 1px solid transparent;
+
+		.app-sidebar {
+			li {
+				border-left: 3px solid transparent;
+			}
+
+			a {
+				padding: 14px 18px 14px 15px;
+			}
+		}
+
+		&.collapsed {
+			border-left: 1px solid #d7deea;
+			transform: translateX(100%) translateX(-53px);
+			span {
+				opacity: 0;
+				transition: opacity .3s ease-out;
+			}
+
+			.active {
+				border-left: 3px solid #03a9f4;
+			}
+		}
+	}
+
+	.app-sidebar {
+		list-style: none;
+	}
+
+	.editor-component-list--is-collapsed {
+		.resize-sidebar {
+			transform: translateX(0);
+		}
+	}
+
+	.editor-component-list--is-dragging {
+		user-select: none;
+	}
+
+	.sidebar-component-wrapper {
+		width: calc(100% - 53px);
+		height: 100%;
+		overflow: hidden;
+		position: relative;
+
+		.block-options {
+			transform: translateX(0);
+			height: 100vh;
+		}
+
+		.options-visible {
+			transform: translateX(-1px);
+		}
+
+	}
+}

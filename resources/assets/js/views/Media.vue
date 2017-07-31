@@ -157,8 +157,8 @@
 <script>
 import _ from 'lodash';
 import ColorThief from 'color-thief-standalone';
-import MediaUpload from '../MediaUpload';
-import LazyImg from '../LazyImage';
+import MediaUpload from 'components/MediaUpload';
+import LazyImg from 'components/LazyImage';
 
 /* global Image */
 

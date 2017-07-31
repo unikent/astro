@@ -1,14 +1,12 @@
 <template>
-	<div class="redactorWrapper">
+	<div class="richtext-wrapper">
 		<rich-text v-model="value" />
 	</div>
 </template>
 
 <script>
 import baseFieldMixin from '../../mixins/baseFieldMixin';
-import RichText from 'components/RichText';
-
-/* global document */
+import RichText from 'components/richtext';
 
 export default {
 

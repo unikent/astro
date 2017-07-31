@@ -30,11 +30,11 @@
 						<div>
 							<router-link :to="`/site/${sites[$index].id}`">
 								<el-button type="default" size="small">
-									<Icon name="edit" width="14" height="14" />
+									<icon name="edit" width="14" height="14" />
 								</el-button>
 							</router-link>
 							<el-button @click="askRemove($index)" type="default" size="small">
-								<Icon name="delete" width="14" height="14" />
+								<icon name="delete" width="14" height="14" />
 							</el-button>
 						</div>
 					</el-table-column>
@@ -43,29 +43,32 @@
 		</el-row>
 
 		<el-dialog title="Site Options" v-model="dialogFormVisible">
-			<el-form :model="form">
+			<el-form :model="form" label-position="top">
 				<el-row type="flex" :gutter="20">
 					<el-col :span="11">
-						<el-form-item label="Title" :label-width="formLabelWidth">
+						<el-form-item label="Title">
 							<el-input v-model="form.title" auto-complete="off"></el-input>
 						</el-form-item>
-						<el-form-item label="URL" :label-width="formLabelWidth">
+						<el-form-item label="URL">
 							<el-input v-model="form.url" auto-complete="off"></el-input>
 						</el-form-item>
-						<el-form-item label="Parent site" :label-width="formLabelWidth">
+						<el-form-item label="Parent site">
 							<el-select v-model="form.parent" class="w100">
 								<el-option label="Root (none)" :value="0" />
 								<el-option v-for="site in sites" :label="site.title" :value="site.id" :key="site.id" />
 							</el-select>
 						</el-form-item>
 					</el-col>
-					<el-col :span="11">
-						<el-form-item label="Layout" :label-width="formLabelWidth">
+					<el-col :span="11" :offset="2">
+						<el-form-item label="Home page layout">
 							<el-select v-model="form.layout" class="w100">
 								<el-option label="Default" value="" />
 							</el-select>
 						</el-form-item>
-						<el-form-item label="Description" :label-width="formLabelWidth">
+						<el-form-item label="Max page depth">
+							<el-input-number v-model="form.maxDepth"></el-input-number>
+						</el-form-item>
+						<el-form-item label="Description">
 							<el-input v-model="form.options.description" type="textarea" />
 						</el-form-item>
 					</el-col>
@@ -82,7 +85,7 @@
 </template>
 
 <script>
-import Icon from '../Icon';
+import Icon from 'components/Icon';
 
 export default {
 
@@ -93,10 +96,7 @@ export default {
 	data() {
 		return {
 			sites: [],
-
 			dialogFormVisible: false,
-			formLabelWidth: '120px',
-
 			loading: true,
 
 			form: {
@@ -106,6 +106,7 @@ export default {
 				layout: '',
 				options: {
 					description: '',
+					maxDepth: 3
 				}
 			}
 		};

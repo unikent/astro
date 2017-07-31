@@ -1,0 +1,24 @@
+.b-back-button {
+	display: flex;
+	padding: 0 10px 0 16px;
+	height: 42px;
+	line-height: 42px;
+	border-bottom: 1px solid #dadde2;
+	background-color: #fff;
+
+	.back {
+		cursor: pointer;
+		margin-left: auto;
+		white-space: nowrap;
+	}
+
+	.block-title {
+		font-weight: 500;
+		white-space: nowrap;
+	}
+
+	i {
+		font-size: .7rem;
+		margin-left: 5px;
+	}
+}

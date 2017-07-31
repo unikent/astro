@@ -17,11 +17,11 @@
 	}
 
 	a {
-		color: #666;
+		color: #71787f;
 		position: relative;
 		transition: color .2s ease-out;
 		font-size: 14px;
-    	padding: 14px 20px;
+		padding: 14px 20px;
 		display : flex;
 		align-items : center;
 		text-decoration: none;
@@ -33,9 +33,10 @@
 		}
 	}
 
-	.router-link-active {
+	.router-link-active,
+	.active {
 		border-right: 3px solid #03a9f4;
-		background-color: #f2f7fd;
+		background-color: #f7f9fb;
 		color: #03a9f4;
 	}
 }
@@ -48,6 +49,6 @@
 	padding: 30px;
 	flex: 1 1 auto;
 	min-width: 350px;
-	background-color: #f7f7f7;
+	background-color: #f7f9fb;
 	min-height: calc(100vh - 60px);
 }

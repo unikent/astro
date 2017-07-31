@@ -4,3 +4,6 @@ Changes by github.com/theninja
 
 Added:
 undo, redo, bold, italic, table
+
+Modified:
+eye

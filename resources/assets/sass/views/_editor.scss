@@ -1,3 +1,13 @@
+.toolbar__button-save {
+	margin-left: 30px;
+}
+.toolbar__button-publish {
+	// extra specificity to override .el-button sibling selector
+	&.el-button {
+		margin: 0 20px;
+	}
+}
+
 .el-select-dropdown__item {
 	.view-icon {
 		width: 22px;
@@ -11,7 +21,7 @@
 	}
 	.view-label {
 		float: right;
-		color: #8492a6;
+		color: #8391a5;
 		font-size: 13px;
 	}
 	&.selected {
@@ -47,7 +57,7 @@
 
 .undo-redo {
 	margin-left: 10px;
-	color: #1f2d3d;
+	color: #48576a;
 
 	.ico {
 		fill: #555;
@@ -56,19 +66,20 @@
 
 .left-collapse,
 .right-collapse {
-	background-color: #f5f7fa;
+	background-color: #f7f9fb;
 	width: 24px;
 	height: 40px;
 	position: absolute;
-	border: 1px solid #bcc8dc;
+	border: 1px solid #b7c2d4;
 	transform: translate(0, -50%);
 	top: 50%;
-	color: #666;
+	color: #71787f;
 	line-height: 38px;
 	font-size: 13px;
 	pointer-events: none;
 	transition: transform .2s ease-out;
 	z-index: -1;
+	cursor: pointer;
 
 	i {
 		opacity: 0;
@@ -120,11 +131,19 @@
 	}
 }
 
-.save-button {
-	float: right;
+.tmp-preview {
+	background-color: #f7f9fb;
+	white-space: pre-wrap;
 }
 
-.tmp-preview {
-	background-color: #f3f7fd;
-	white-space: pre-wrap;
+.todo {
+	background-color: lighten(#4eadda, 30%);
+	color: #48576a;
+	margin: 20px;
+	padding: 14px;
+	border: 1px solid #b7c2d4;
+
+	&:before {
+		content: 'TODO: ';
+	}
 }

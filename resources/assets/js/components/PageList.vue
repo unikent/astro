@@ -1,107 +1,140 @@
 <template>
-	<div id="js-app">
-		<!-- <div class="row">
-			<div class="col-5 offset-7">
-				<label class="">Sort by</label>
-				<select class="form-control form-control-sm">
-					<option>Title</option>
-					<option>Date modified</option>
-					<option>Date created</option>
-				</select>
-			</div>
-		</div>
+<div>
+	<back-bar :title="title" />
 
-		<div class="form-group search">
-			<label for="search" class="sr-only">Search</label>
-			<div class="input-group input-group-md">
-				<input type="search" class="form-control" placeholder="Search... " autocomplete="off" value="">
-				<span class="input-group-btn">
-					<button type="submit" class="btn btn-accent btn-icon kf-search active" aria-label="Search"><span class="sr-only">Search</span></button>
-				</span>
-			</div>
-		</div> -->
-
-		<ul class="page-list">
-			<PageListItem class="item" :site="site" :page="orderedHierarchy" :editing="edit"></PageListItem>
-		</ul>
+	<div v-if="pages" v-for="page in pages" class="page-list">
+		<page-list-item
+			:key="page.id"
+			:page="page"
+			:flatten="true"
+			:open-modal="openModal"
+			path="0"
+			:depth="0"
+		/>
 	</div>
+
+	<!-- TODO: move out into a container fo all modal windows -->
+	<div id="create-form">
+		<el-dialog title="Create Page" v-if="createFormVisible" :visible.sync="createFormVisible" :modal-append-to-body=false >
+			<el-form :model="createForm">
+				<el-form-item label="Page title">
+					<el-input name="title" v-model="createForm.title" auto-complete="off"></el-input>
+				</el-form-item>
+				<el-select name="layout_name" v-model="createForm.layout_name" placeholder="Select">
+					<el-option
+							v-for="item in layouts"
+							:key="item"
+							:label="item"
+							:value="item">
+					</el-option>
+				</el-select>
+				<el-form-item label="Layout Version">
+					<el-input name="layout_version" v-model="createForm.layout_version" auto-complete="off"></el-input>
+				</el-form-item>
+				<el-form-item label="slug">
+					<el-input name="slug" v-model="createForm.route.slug" auto-complete="off"></el-input>
+				</el-form-item>
+			</el-form>
+			<span slot="footer" class="dialog-footer">
+			<el-button @click="createFormVisible = false">Cancel</el-button>
+			<el-button type="primary" @click="addChild">Confirm</el-button>
+		</span>
+		</el-dialog>
+	</div>
+
+	<div class="b-bottom-bar">
+		<el-button class="u-mla" @click="() => { this.openModal(this.$children[2]) }">+ Add Page</el-button>
+	</div>
+</div>
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex';
+import Draggable from 'vuedraggable';
+
 import PageListItem from './PageListItem';
-import { Loading } from 'element-ui';
-
-const order = {
-
-	title(hierarchy) {
-		return hierarchy;
-	},
-
-	modified(hierarchy) {
-		return null;
-	},
-
-	created(hierarchy) {
-		return null;
-	}
-}
+import BackBar from './BackBar';
 
 export default {
 
+	name: 'page-list',
+
+	props: ['title'],
+
+	components: {
+		PageListItem,
+		BackBar,
+		Draggable
+	},
+
 	data() {
 		return {
-			site: 1,
-			hierarchy: null,
-			edit: null,
-			order: 'title',
-			loading: true
+			loading: true,
+			createFormVisible: false,
+			settingsFormVisible: false,
+			layouts: [],
+			createForm: {
+				title: 'Unnamed Page',
+				layout_name: 'kent-homepage',
+				layout_version: 1,
+				route: {
+					slug: 'testing',
+					parent_id: 1
+				},
+				options: {}
+			}
 		};
 	},
 
-	components: {
-		PageListItem
-	},
-
 	computed: {
-		orderedHierarchy() {
-			return order[this.order](this.hierarchy)
-		}
+		...mapState('site', {
+			pages: state => state.pages
+		})
 	},
 
 	methods: {
-		fetchData() {
-			// this.$api
-			// 	.get(`sites/structure/${this.site}`)
-			// 	.then((response) => {
-			// 		this.hierarchy = response.data;
-			// 		this.loading = false;
-			// 		if(this.loadingInstance) {
-			// 			this.loadingInstance.close();
-			// 		}
-			// 	});
+		...mapActions({
+			fetchSite: 'site/fetchSite',
+			createPage: 'site/createPage'
+		}),
 
-			// this.hierarchy = pageStructure;
+		openModal(pageItem) {
+			this.currentPage = pageItem;
+			this.createFormVisible = true;
+			this.createForm.route.parent_id = pageItem.page.id;
+		},
 
-			this.loading = false;
-			if(this.loadingInstance) {
-				this.loadingInstance.close();
-			}
+		addChild() {
+			this.createPage(this.createForm);
+			this.createFormVisible = false;
+			this.currentPage.openPage();
+			this.currentPage = null;
+		},
+
+		openRename() {
+			this.renameFormVisible = true;
+		},
+
+		saveEdit() {
+			this.renameFormVisible = false;
+			// TODO: when endpoint is ready, update this
+			// this.updatePage({
+			// 	title: this.currentPage.title,
+			// 	id: this.currentPage.id,
+			// 	page_id: this.currentPage.page_id,
+			// 	layout_name: this.layout_name,
+			// 	layout_version: this.layout_version,
+			// 	route: {
+			// 		slug: this.currentPage.slug,
+			// 		parent_id: this.currentPage.parent_id
+			// 	}
+			// });
 		}
 	},
 
 	created() {
-		this.fetchData();
+		this.fetchSite();
 		this.$bus.$on('rename-page', (id) => this.edit = id);
-	},
-
-	mounted() {
-		if(this.loading) {
-			this.loadingInstance = Loading.service({
-				target: this.$el,
-				text: 'Loading...',
-				customClass: 'kkjdhgs'
-			});
-		}
 	}
 };
 </script>
