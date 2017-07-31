@@ -11,8 +11,8 @@ use League\Fractal\TransformerAbstract as FractalTransformer;
 class SiteTransformer extends FractalTransformer
 {
 
-    protected $defaultIncludes = [ 'active_route' ];
-    protected $availableIncludes = [ 'routes' ];
+    protected $defaultIncludes = [ ];
+    protected $availableIncludes = [ 'drafts,pages,published' ];
 
 	public function transform(Site $site)
 	{
