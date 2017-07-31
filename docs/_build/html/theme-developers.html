@@ -202,61 +202,6 @@ instance of the Layout.</p>
 <p>The <em>optional</em> PHP Layout class should be named <code class="docutils literal"><span class="pre">{LAYOUT_NAME}V{LAYOUT_VERSION}Layout</span></code> and be saved
 in a file called <code class="docutils literal"><span class="pre">Layout.php</span></code> in the main directory for that Layout.</p>
 <p>It must implement the interface <code class="docutils literal"><span class="pre">Astro\Renderer\Contracts\Layout</span></code>:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
-
-<span class="k">namespace</span> <span class="nx">Astro\Renderer\Contracts</span><span class="p">;</span>
-
-<span class="k">use</span> <span class="nx">Astro\Renderer\API\Data\PageData</span><span class="p">;</span>
-
-<span class="sd">/**</span>
-<span class="sd"> * Interface for Layout.</span>
-<span class="sd"> * @package Astro\Renderer\Contracts</span>
-<span class="sd"> */</span>
-<span class="k">interface</span> <span class="nx">Layout</span>
-<span class="p">{</span>
-	<span class="sd">/**</span>
-<span class="sd">	 * Perform any initialisation.</span>
-<span class="sd">	 * @param PageData $page The PageData with values set for fields for this layout.</span>
-<span class="sd">	 * @param Engine The Engine that will be used to render this layout.</span>
-<span class="sd">	 * @param Locator The Locator currently being used.</span>
-<span class="sd">	 */</span>
-	<span class="k">public</span> <span class="k">function</span> <span class="nf">boot</span><span class="p">(</span><span class="nx">PageData</span> <span class="nv">$page</span><span class="p">,</span> <span class="nx">Engine</span> <span class="nv">$renderer</span><span class="p">,</span> <span class="nx">Locator</span> <span class="nv">$locator</span><span class="p">);</span>
-
-	<span class="sd">/**</span>
-<span class="sd">	 * Perform any initialisation / filtering based on the provided blocks.</span>
-<span class="sd">	 * At this point, the blocks will have been boot()ed but not yet rendered.</span>
-<span class="sd">	 * The Layout can filter out or modify any blocks if required.</span>
-<span class="sd">	 * @param array $blocks Array of arrays of blocks, indexed by region id.</span>
-<span class="sd">	 * @return array Array of arrays of blocks, indexed by region id.</span>
-<span class="sd">	 */</span>
-	<span class="k">public</span> <span class="k">function</span> <span class="nf">filterBlocks</span><span class="p">(</span><span class="k">array</span> <span class="nv">$blocks</span><span class="p">);</span>
-
-	<span class="sd">/**</span>
-<span class="sd">	 * Gets a list of name =&gt; value pairs which should be available as variables within the layout template.</span>
-<span class="sd">	 * @return array Array of key =&gt; value</span>
-<span class="sd">	 */</span>
-	<span class="k">public</span> <span class="k">function</span> <span class="nf">getData</span><span class="p">();</span>
-
-	<span class="sd">/**</span>
-<span class="sd">	 * Gets the Locator associated with this Layout.</span>
-<span class="sd">	 * @return Locator</span>
-<span class="sd">	 */</span>
-	<span class="k">public</span> <span class="k">function</span> <span class="nf">getLocator</span><span class="p">();</span>
-
-	<span class="sd">/**</span>
-<span class="sd">	 * Gets the Engine associated which is rendering this Layout.</span>
-<span class="sd">	 * @return Engine</span>
-<span class="sd">	 */</span>
-	<span class="k">public</span> <span class="k">function</span> <span class="nf">getEngine</span><span class="p">();</span>
-
-	<span class="sd">/**</span>
-<span class="sd">	 * Get the PageData associated with this Layout</span>
-<span class="sd">	 * @return PageData The Page associated with this Layout.</span>
-<span class="sd">	 */</span>
-	<span class="k">public</span> <span class="k">function</span> <span class="nf">getPage</span><span class="p">();</span>
-<span class="p">}</span>
-</pre></div>
-</div>
 </div>
 </div>
 <div class="section" id="blocks">
@@ -303,60 +248,6 @@ data and any restrictions on validation for these fields:</p>
 <div class="section" id="example-php-block-class">
 <h4>Example PHP Block Class<a class="headerlink" href="#example-php-block-class" title="Permalink to this headline">¶</a></h4>
 <p>The <em>optional</em> PHP Block class should implement the interface <code class="docutils literal"><span class="pre">Astro\Renderer\Contracts\Block</span></code>:</p>
-<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
-
-<span class="k">namespace</span> <span class="nx">Astro\Renderer\Contracts</span><span class="p">;</span>
-
-<span class="k">use</span> <span class="nx">Astro\Renderer\API\Data\BlockData</span><span class="p">;</span>
-
-<span class="sd">/**</span>
-<span class="sd"> * Interface representing a Block renderer.</span>
-<span class="sd"> * @author Sam Yapp &lt;s.yapp@kent.ac.uk&gt;</span>
-<span class="sd"> * @package Astro\Engine\Contracts</span>
-<span class="sd"> */</span>
-<span class="k">interface</span> <span class="nx">Block</span>
-<span class="p">{</span>
-	<span class="sd">/**</span>
-<span class="sd">	 * Initialise this block and optionally determine not to render it.</span>
-<span class="sd">	 * @param BlockData $definition The block definition with values set for fields for this block.</span>
-<span class="sd">	 * @param Layout $layout The Layout object into which this block will be rendered.</span>
-<span class="sd">	 * @return bool True to continue with this block, false to ignore this block.</span>
-<span class="sd">	 */</span>
-	<span class="k">public</span> <span class="k">function</span> <span class="nf">boot</span><span class="p">(</span><span class="nx">BlockData</span> <span class="nv">$definition</span><span class="p">,</span><span class="nx">Layout</span> <span class="nv">$layout</span><span class="p">);</span>
-
-	<span class="sd">/**</span>
-<span class="sd">	 * Gets data for the block that should be in the scope of a template.</span>
-<span class="sd">	 * @return array Array of key =&gt; value</span>
-<span class="sd">	 */</span>
-	<span class="k">public</span> <span class="k">function</span> <span class="nf">getData</span><span class="p">();</span>
-
-	<span class="sd">/**</span>
-<span class="sd">	 * Gets the BlockData associated with this Block.</span>
-<span class="sd">	 * @return BlockData</span>
-<span class="sd">	 */</span>
-	<span class="k">public</span> <span class="k">function</span> <span class="nf">getBlockData</span><span class="p">();</span>
-
-	<span class="sd">/**</span>
-<span class="sd">	 * Gets the Layout object for this Block.</span>
-<span class="sd">	 * @return Layout</span>
-<span class="sd">	 */</span>
-	<span class="k">public</span> <span class="k">function</span> <span class="nf">getLayout</span><span class="p">();</span>
-
-	<span class="sd">/**</span>
-<span class="sd">	 * Gets the rendered content that should be displayed for this block.</span>
-<span class="sd">	 * @return string The rendered content to get. This should be set by the rendering engine.</span>
-<span class="sd">	 */</span>
-	<span class="k">public</span> <span class="k">function</span> <span class="nf">getContent</span><span class="p">();</span>
-
-	<span class="sd">/**</span>
-<span class="sd">	 * Sets the rendered content that should be displayed for this block.</span>
-<span class="sd">	 * @param string $content The rendered output to be displayed for this block.</span>
-<span class="sd">	 */</span>
-	<span class="k">public</span> <span class="k">function</span> <span class="nf">setContent</span><span class="p">(</span><span class="nv">$content</span><span class="p">);</span>
-
-<span class="p">}</span>
-</pre></div>
-</div>
 </div>
 </div>
 </div>
