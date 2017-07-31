@@ -4,9 +4,9 @@
   "description": "Super slick prototype",
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack --progress --colors --hide-modules --display-error-details",
-    "watch": "cross-env NODE_ENV=development webpack --progress --watch --colors --hide-modules --display-error-details",
+    "watch": "cross-env NODE_ENV=development webpack --progress --watch --colors --hide-modules",
     "hot": "cross-env NODE_ENV=development webpack-dev-server --hot --colors --content-base=public/",
-    "production": "cross-env NODE_ENV=production webpack --progress --colors --hide-modules --display-error-details",
+    "production": "cross-env NODE_ENV=production webpack --progress --colors --hide-modules",
     "refresh": "php artisan migrate:refresh && php artisan db:seed",
     "unit": "mocha-webpack --webpack-config resources/assets/js/test/webpack.config-test.babel.js \"resources/assets/js/test/unit/*.js\""
   },
@@ -31,10 +31,12 @@
     "vue": "^2.1.0",
     "vue-chartjs": "^2.3.9",
     "vue-router": "^2.2.0",
+    "vue2-dragula": "^2.4.4",
+    "vuedraggable": "^2.14.1",
     "vuex": "^2.1.1"
   },
   "devDependencies": {
-    "@epegzz/sass-vars-loader": "git+ssh://git@github.com/theninja/sass-vars-loader.git#bugfix/nested-lists",
+    "@epegzz/sass-vars-loader": "^2.0.2",
     "axios-mock-adapter": "^1.8.1",
     "babel-core": "^6.24.1",
     "babel-eslint": "^7.2.1",
@@ -58,6 +60,7 @@
     "extract-text-webpack-plugin": "^2.1.0",
     "file-loader": "^0.11.1",
     "friendly-errors-webpack-plugin": "^1.6.1",
+    "kent-font": "git+ssh://git@gitlab.kent.ac.uk/webdev/kent-font.git#1.0.4",
     "mocha": "^3.4.1",
     "mocha-webpack": "next",
     "node-sass": "^4.5.3",

@@ -34,21 +34,43 @@
 
 .block-options-list	{
 	.el-form-item__label {
-		font-size: 16px;
-		display: block;
+		padding: 0 0 5px;
+		font-size: 14px;
 		font-weight: 500;
-		margin-bottom: 1em;
+		width:100%;
+		span {
+			line-height: 1.5;
+		}
+	}
+
+	.el-form--label-top .el-form-item__label {
+		padding: 0 0 5px;
+	}
+
+	.el-form-item.is-required .el-form-item__label span {
+		&::before {
+			content: "*";
+			color: #ff0000;
+		}
+	}
+
+	.el-form-item__icon-help {
+		margin-left: 5px;
+	}
+
+	.el-form-item__icon-view {
+		margin-left: auto;
+		fill: #a0a0a0;
+		float: right;
 	}
 
 	.el-form > .el-form-item + .el-form-item {
-		margin-top: 30px;
-		padding-top: 20px;
-		border-top: 1px solid rgba(191, 203, 217, 0.3);
+		margin-top: 40px;
 	}
 
 	.is-error .el-upload-dragger {
 		width: 100%;
-		border-color: #ff4949;
+		border-color: #d65757;
 	}
 
 	.el-form-item.is-required .el-form-item__label:before {
@@ -58,7 +80,7 @@
 	.el-form-item.is-error .collection-field .el-input__inner,
 	.el-form-item.is-error .collection-field .el-textarea__inner,
 	.el-form-item.is-error .collection-field .el-upload-dragger {
-		border-color: #bfcbd9;
+		border-color: #b7c2d4;
 	}
 
 	.el-form-item.is-error {
@@ -67,14 +89,14 @@
 			.el-input__inner,
 			.el-textarea__inner,
 			.el-upload-dragger {
-				border-color: #bfcbd9;
+				border-color: #b7c2d4;
 
 				&:hover {
 					border-color: #8391a5
 				}
 				&:focus {
 					outline: 0;
-					border-color: #20a0ff;
+					border-color: #03a9f4;
 				}
 			}
 
@@ -83,20 +105,20 @@
 				.el-input__inner,
 				.el-textarea__inner,
 				.el-upload-dragger {
-					border-color: #ff4949;
+					border-color: #d65757;
 				}
 			}
 		}
 
-		.redactorWrapper {
-			border: 1px solid #ff4949;
+		.richtext-wrapper {
+			border: 1px solid #d65757;
 		}
 	}
 }
 
 .el-dialog,
 .el-message-box {
-	border: 1px solid #dce3ea;
+	border: 1px solid #dadde2;
 	box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 10px;
 }
 
@@ -112,18 +134,48 @@
 }
 
 .el-table th {
-	background-color: #f0f6f9;
+	background-color: #f7f9fb;
 }
 
 .el-table__fixed-header-wrapper thead div,
 .el-table__header-wrapper thead div {
-	background-color: #f0f6f9;
+	background-color: #f7f9fb;
 }
 
 .el-table--striped .el-table__body tr:nth-child(2n) td {
-	background-color: #f7fafc;
+	background-color: #f7f9fb;
 }
 
 .el-dialog {
 	border-radius: 4px;
+}
+
+.tabbed-dialog {
+	.el-tabs--border-card > .el-tabs__header {
+		background-color: #f7f9fb;
+	}
+
+	.el-dialog__body {
+		padding: 30px 0;
+	}
+
+	.el-tabs--border-card {
+		border: 0;
+		border-top: 1px solid #dadde2;
+	}
+
+	.el-tabs--border-card {
+		box-shadow: none;
+	}
+}
+
+// allows a narrower tooltip in some cases
+.el-tooltip__popper--narrow {
+	max-width: 200px;
+}
+
+@each $status, $colour in $status-colours {
+	.el-button--#{$status} {
+		@include button-variant($colour);
+	}
 }

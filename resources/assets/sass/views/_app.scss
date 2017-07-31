@@ -1,18 +1,31 @@
 .top-bar {
-	height: get-height(top-bar);
-	border-bottom: 1px solid #dce3ea;
+	border-bottom: 1px solid #dadde2;
 	background-color: white;
 	box-shadow: 0 0px 10px rgba(0, 0, 0, 0.05);
 	width: 100%;
 	position: absolute;
 	top: 0;
 	left: 0;
-	padding: 7px 20px 7px 7px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 20px;
+	height: get-height(top-bar);
+}
+.top-bar--homepage {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+}
+.top-bar__tools {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
 }
 .top-bar-backbutton {
 	float: left;
 	line-height: 35px;
-	color: #666;
+	color: #71787f;
 	font-size: 13px;
 	cursor: pointer
 }
@@ -20,7 +33,6 @@
 	margin-right: 10px;
 }
 .user-menu-button {
-	float: right;
 }
 
 .top-bar .el-dropdown-link {

@@ -1,0 +1,31 @@
+/**
+_group-field.scss
+
+- groups of fields, for example the main block element fields for an image feature panel
+
+*/
+.group-field {
+	margin-bottom: 10px;
+}
+
+.group-field__field-list {
+	border: 1px solid #e8e8e8;
+	background-color: #fff;
+	padding: 20px 20px 40px;
+	border-radius: 4px;
+	position: relative;
+}
+
+.is-error .group-field {
+	border: 1px solid #ff4949;
+	border-radius: 4px;
+}
+
+.ci-field + .ci-field {
+	margin-top: 15px;
+}
+
+.group-field__field-list +
+.group-field__field-list {
+	margin-top: 24px;
+}

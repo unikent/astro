@@ -1,21 +1,24 @@
 <template>
 <div>
-	<template v-if="page.blocks && page.blocks[name]">
+	<template v-if="page.blocks && page.blocks[name] && page.blocks[name].length">
 		<block
 			v-for="(blockData, index) in page.blocks[name]"
 			v-if="blockData"
+			:region="name"
 			:key="`block-${blockData.id}`"
 			:type="getBlockType(blockData)"
 			:index="index"
 			:blockData="blockData"
 		/>
 	</template>
+	<empty-region v-else />
 </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
-import Block from './Block';
+import Block from 'components/Block';
+import EmptyRegion from 'components/EmptyRegion';
 
 export default {
 
@@ -24,7 +27,8 @@ export default {
 	props: ['name', 'version'],
 
 	components: {
-		Block
+		Block,
+		EmptyRegion
 	},
 
 	computed: {
@@ -34,6 +38,7 @@ export default {
 	},
 
 	methods: {
+
 		getBlockType(block) {
 			return (
 				Object.keys(block).length === 0 ?
@@ -41,6 +46,7 @@ export default {
 				`${block.definition_name}-v${block.definition_version}`
 			);
 		}
+
 	}
 
 };

@@ -9,8 +9,11 @@ import { router } from './routes';
 import httpPlugin from './plugins/http';
 import eventBusPlugin from './plugins/eventbus';
 import snackBarPlugin from './plugins/snackbar';
+
 import './directives/inline-edit';
-import App from './components/views/App';
+import './directives/field';
+
+import App from './views/App';
 
 /* global document */
 

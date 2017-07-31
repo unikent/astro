@@ -13,14 +13,9 @@
 	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/build/css/vendor.css') }}" />
 	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/build/css/main.css') }}" />
 	@if ($is_preview)
-		<link rel="stylesheet" href="https://static.kent.ac.uk/pantheon/kent-theme-assets/assets/css/main.min.css" />
-		<link rel="stylesheet" href="https://static.kent.ac.uk/pantheon/kent-theme-assets/assets/css/kentfont.css" />
 		<style>
 		html {
 			background-color: #f7f7f7;
-		}
-		.b-block {
-			max-width: calc(100vw - 17px);
 		}
 		</style>
 	@endif
