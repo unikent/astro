@@ -8,7 +8,7 @@
 		>
 			<div
 				class="block-move"
-				:class="{ 'block-move--selected': selected.indexOf(key) !== -1 }"
+				:class="[{ 'block-move--highlighted': block.version===1 }, { 'block-move--deselected': block.version!==1 }, { 'block-move--selected': selected.indexOf(key) !== -1 }]"
 				@mousedown="handleMousedown(key)"
 			>
 				{{ block.label }}

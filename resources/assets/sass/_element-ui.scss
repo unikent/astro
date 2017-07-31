@@ -34,16 +34,38 @@
 
 .block-options-list	{
 	.el-form-item__label {
-		font-size: 16px;
-		display: block;
+		padding: 0 0 5px;
+		font-size: 14px;
 		font-weight: 500;
-		margin-bottom: 1em;
+		width:100%;
+		span {
+			line-height: 1.5;
+		}
+	}
+
+	.el-form--label-top .el-form-item__label {
+		padding: 0 0 5px;
+	}
+
+	.el-form-item.is-required .el-form-item__label span {
+		&::before {
+			content: "*";
+			color: #ff0000;
+		}
+	}
+
+	.el-form-item__icon-help {
+		margin-left: 5px;
+	}
+
+	.el-form-item__icon-view {
+		margin-left: auto;
+		fill: #a0a0a0;
+		float: right;
 	}
 
 	.el-form > .el-form-item + .el-form-item {
-		margin-top: 30px;
-		padding-top: 20px;
-		border-top: 1px solid rgba(191, 203, 217, 0.3);
+		margin-top: 40px;
 	}
 
 	.is-error .el-upload-dragger {
@@ -144,5 +166,16 @@
 
 	.el-tabs--border-card {
 		box-shadow: none;
+	}
+}
+
+// allows a narrower tooltip in some cases
+.el-tooltip__popper--narrow {
+	max-width: 200px;
+}
+
+@each $status, $colour in $status-colours {
+	.el-button--#{$status} {
+		@include button-variant($colour);
 	}
 }

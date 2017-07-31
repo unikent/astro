@@ -32,6 +32,7 @@
     "vue-chartjs": "^2.3.9",
     "vue-router": "^2.2.0",
     "vue2-dragula": "^2.4.4",
+    "vuedraggable": "^2.14.1",
     "vuex": "^2.1.1"
   },
   "devDependencies": {
@@ -59,6 +60,7 @@
     "extract-text-webpack-plugin": "^2.1.0",
     "file-loader": "^0.11.1",
     "friendly-errors-webpack-plugin": "^1.6.1",
+    "kent-font": "git+ssh://git@gitlab.kent.ac.uk/webdev/kent-font.git#1.0.4",
     "mocha": "^3.4.1",
     "mocha-webpack": "next",
     "node-sass": "^4.5.3",

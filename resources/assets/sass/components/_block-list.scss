@@ -35,4 +35,13 @@
 	.block-move--selected:hover:before {
 		opacity: 1;
 	}
+
+	.block-move--highlighted {
+		border-color: #42d885;
+	}
+	.block-move--deselected {
+		opacity: 0.5;
+		color: #777;
+		background-color: #dadde2;
+	}
 }

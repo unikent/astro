@@ -25,23 +25,24 @@
 			<component
 				v-for="(item, index) in menu"
 				v-if="item.component"
-				v-show="item.active"
+				v-show="item.id===activeMenuItem"
 				:is="item.component"
 				:key="`component-${item.link}`"
 				:title="item.title"
 			/>
 		</div>
 
-		<section class="sidebar" :class="{ 'collapsed': collapsed }">
+		<section class="sidebar collapsed"">
 			<ul class="app-sidebar" role="navigation">
 				<side-menu-item
 					v-for="(item, index) in menu"
 					:link="item.link"
 					:icon="item.icon"
 					:title="item.title"
+					:id="item.id"
 					:key="item.link"
 					:index="index"
-					:active="item.active && collapsed"
+					:active="activeMenuItem"
 					:onClick="openItem"
 				/>
 			</ul>
@@ -61,12 +62,12 @@
 import { mapState, mapMutations } from 'vuex';
 
 import Icon from 'components/Icon';
-import SideMenuItem from 'components/Sidebar/SideMenuItem';
+import SideMenuItem from 'components/sidebar/SideMenuItem';
 import PageList from 'components/PageList';
-import BlockSidebar from 'components/Sidebar/BlockSidebar';
-import Navigation from 'components/Sidebar/Navigation';
-import Settings from 'components/Sidebar/Settings';
-import HelpCentre from 'components/Sidebar/HelpCentre';
+import BlockSidebar from 'components/sidebar/BlockSidebar';
+import Navigation from 'components/sidebar/Navigation';
+import Settings from 'components/sidebar/Settings';
+import HelpCentre from 'components/sidebar/HelpCentre';
 
 import { clamp } from 'classes/helpers';
 
@@ -89,36 +90,15 @@ export default {
 					link: '/pages',
 					icon: 'sites',
 					title: 'Pages',
-					component: PageList,
-					active: false
+					id: 'pages',
+					component: PageList
 				},
 				{
 					link: '/media',
 					icon: 'layers',
 					title: 'Edit blocks',
-					component: BlockSidebar,
-					active: false
-				},
-				{
-					link: '/settings',
-					icon: 'menu-alt',
-					title: 'Navigation',
-					component: Navigation,
-					active: false
-				},
-				{
-					link: '/settings',
-					icon: 'settings',
-					title: 'UI Settings',
-					component: Settings,
-					active: false
-				},
-				{
-					link: '/settings',
-					icon: 'unknown',
-					title: 'Help Centre',
-					component: HelpCentre,
-					active: false
+					id: 'blocks',
+					component: BlockSidebar
 				}
 			],
 
@@ -128,23 +108,20 @@ export default {
 	},
 
 	computed: {
-		...mapState([
-			'preview',
-			'displayIframeOverlay',
-			'undoRedo'
-		]),
 
 		...mapState({
 			collapsed: state => state.sidebarCollapsed,
 			page: state => state.page.pageData,
-			pageLoaded: state => state.page.loaded
+			pageLoaded: state => state.page.loaded,
+			activeMenuItem: state => state.menu.active
 		})
 	},
 
 	methods: {
 		...mapMutations([
 			'showIframeOverlay',
-			'collapseSidebar'
+			'collapseSidebar',
+			'updateMenuActive'
 		]),
 
 		dragStart(e) {
@@ -178,10 +155,7 @@ export default {
 
 		openItem(e, index) {
 			this.collapseSidebar();
-
-			this.menu.forEach((item, i) => {
-				item.active = i === index;
-			});
+			this.updateMenuActive(this.menu[index].id);
 		}
 	}
 };

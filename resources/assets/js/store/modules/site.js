@@ -1,24 +1,56 @@
-import api from '../../plugins/http/api';
+import _ from 'lodash';
+import api from 'plugins/http/api';
+import Vue from 'vue';
+
+const vue = new Vue();
 
 const state = {
 	pages: [],
 	site: 1,
-	layout:[]
+	layouts: [],
+	maxDepth: 3
 };
 
-const getters ={};
+const mutations = {
+
+	setSite(state, pages) {
+		state.pages = pages;
+	},
+
+	setLayouts(state, layouts) {
+		state.layouts = layouts;
+	},
+
+	addPage(state, { parent, index, page, push = false }) {
+		if(push) {
+			parent.children.push(page);
+		}
+		else {
+			parent.children.splice(index, 0, page);
+		}
+	},
+
+	removePage(state, { parent, index }) {
+		parent.children.splice(index, 1);
+	},
+
+	updatePageDepth(state, { page, depth }) {
+		page.depth = depth;
+	}
+
+};
 
 const actions = {
+
 	fetchSite({ commit, state }) {
 		api
 			.get(`site/${state.site}/tree`)
 			.then((response) => {
 				commit('setSite', response.data.data);
 			});
-
 	},
 
-	fetchLayouts({commit}) {
+	fetchLayouts({ commit }) {
 		api
 			.get('layout/definitions')
 			.then((response) => {
@@ -26,119 +58,116 @@ const actions = {
 			})
 	},
 
-	deletePage({commit, state}, page){
+	deletePage({ dispatch }, page) {
 		api
 			.delete(`page/${page.id}`)
-			.then((response) => {
-				actions.fetchSite({commit,state})
+			.then(() => {
+				dispatch('fetchSite');
 			});
 	},
 
-	createPage({commit, state}, page){
+	createPage({ dispatch }, page) {
 		api
 			.post('page', page)
-			.then((response) => {
-				actions.fetchSite({commit, state})
+			.then(() => {
+				dispatch('fetchSite');
 			})
 	},
 
-	updatePage({commit,state}, page){
+	updatePage({ dispatch }, page) {
 		api
 			.patch(`page/${page.page_id}`, page)
-			.then((response) => {
-				actions.fetchSite({commit,state})
+			.then(() => {
+				dispatch('fetchSite');
 			})
 	},
 
-	fakePage({commit, state}, page){
-		commit('addPage', page)
+	movePageCall({ dispatch }, move) {
+		// api
+		// 	.patch(`page/${page.page_id}`, page)
+		// 	.then(() => {
+		// 		dispatch('fetchSite');
+		// 	})
+		console.log(move);
 	},
 
-	removeFakePage({commit, state}){
-		commit('removePage')
+	movePage({ dispatch, commit, state }, { toPath, fromPath }) {
+		const
+			newPage = getPageInfo(toPath),
+			oldPage = getPageInfo(fromPath),
+			canDrop = newPage.parent.depth + getDepth(oldPage.data) <= state.maxDepth;
+
+		if(canDrop) {
+			const page = _.cloneDeep(oldPage.data);
+			// remove old page
+			commit('removePage', oldPage);
+			// update current and child page depths
+			updateDepths(page, newPage.parent.depth + 1);
+			// splice page in if page already exists in new position otherwise add it
+			commit('addPage', { ...newPage, page, push: !newPage.data });
+
+			dispatch('movePageCall', {
+				id: page.id,
+				parentId: newPage.parent.id,
+				nextId: newPage.parent.children[newPage.index] ? newPage.parent.children[newPage.index].id : null
+			});
+		}
+		else {
+			vue.$snackbar.open({
+				message: `
+					Unable to drop page(s) here.
+					The site structure must be less than ${state.maxDepth} levels deep.
+				`
+			});
+		}
 	}
 
 };
 
-const mutations = {
-	setSite(state, pages) {
-		state.pages = pages;
+const getters = {};
+
+const
+	getPageInfo = (path) => {
+		return {
+			data: getPage(state.pages, path),
+			parent: getPage(state.pages, path.substr(0, path.lastIndexOf('.'))),
+			index: Number.parseInt(path.substr(path.lastIndexOf('.') + 1, path.length))
+		}
 	},
 
-	setLayouts(state, layout) {
-		state.layout = layout
+	getPage = (page, fullPath) => {
+		const path = Array.isArray(fullPath) ? fullPath : fullPath.split('.');
+
+		for(var i = 0, length = path.length; page !== void 0 && i < length; i++) {
+			page = i > 0 ? page.children[path[i]] : page[path[i]];
+		}
+
+		return i && i === length ? page : false;
 	},
 
-	addPage(state, parent_page, page) {
-		loopInsert(state.pages[0], parent_page)
+	getDepth = (page, fromPage = true) => {
+		let depth = fromPage ? 1 : page.depth;
+
+		while(page !== void 0 && page.children && page.children.length) {
+			page = page.children[0];
+			depth++;
+		}
+
+		return depth;
 	},
 
-	removePage(state) {
-		loopRemove(state.pages[0])
-	}
+	updateDepths = (currPage, depth) => {
+		currPage.depth = depth;
 
-};
+		if(currPage.children && currPage.children.length) {
+			currPage.children.forEach(page => updateDepths(page, depth + 1));
+		}
+	};
 
 export default {
 	namespaced: true,
 	state,
-	getters,
+	mutations,
 	actions,
-	mutations
+	getters
 };
-
-function loopFind(target, id){
-
-	if (target.id == id){
-		return target;
-	}
-	else {
-		for (var i = 0 ; i < target.children.length; i++) {
-			var result = loopFind(target.children[i], id)
-
-			if (result != false){
-				return result
-			}
-		}
-		return false
-	}
-}
-
-function loopInsert(pages, parent_page) {
-	if(pages.id == parent_page.id){
-		pages.children.push({
-			children:[],
-			'depth':0,
-			'id':12345,
-			'is_canonical':true,
-			'page_id':1,
-			'parent_id':null,
-			'path':'/',
-			'site_id':1,
-			'slug':null,
-		})
-
-	}
-	else {
-		for (var i = 0; i < pages.children.length; i++){
-			loopInsert(pages.children[i], parent_page)
-		}
-	}
-
-}
-
-function loopRemove(pages) {
-	pages = pages.children;
-	for (var x = 0; x < pages.length; x++){
-		for (var i = 0; i < pages[x].children.length; i++) {
-			if(pages[x].children[i].id == 12345) {
-				console.log(pages[x].children[i])
-				pages[x].children.splice(i, 1);
-			}
-			else {
-				loopRemove(pages[x].children[i])
-			}
-		}
-	}
-
-}

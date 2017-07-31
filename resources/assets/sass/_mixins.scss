@@ -4,3 +4,20 @@
 	$height: map-get($heights, $key);
 	@return nth($height, 1) + nth($height, 2);
 }
+
+
+@mixin button-variant(
+	$background,
+	$border: darken($background, 10%),
+	$active-background: darken($background, 8%),
+	$active-border: darken($border, 10%)
+) {
+	background-color: $background;
+	border-color: $border;
+
+	&:focus,
+	&:hover {
+		background-color: $active-background;
+		border-color: $active-border;
+	}
+}

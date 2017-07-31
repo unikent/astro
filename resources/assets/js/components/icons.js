@@ -28,3 +28,6 @@ export { default as eye }       from 'IconPath/eye.svg';
 export { default as layers }    from 'IconPath/layers.svg';
 export { default as plus }      from 'IconPath/plus.svg';
 export { default as menualt }   from 'IconPath/menu-alt.svg';
+export { default as minus }     from 'IconPath/minus.svg';
+export { default as morealt }   from 'IconPath/more-alt.svg';
+export { default as arrow }     from 'IconPath/arrow.svg';

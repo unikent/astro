@@ -73,15 +73,20 @@
 }
 
 .block-overlay__delete {
-	bottom: 0;
-	right: 0;
+	bottom: 15px;
+	right: 30px;
 	cursor: pointer;
 	border-radius: 4px 0 0 0;
-	background-color: #e5e7ec;
+	background-color: transparent;
 	line-height: 30px;
 	height: 30px;
 	width: 30px;
 	fill: #c74d4d;
+}
+
+.block-overlay__delete--sidebar {
+	bottom: 0;
+	right: 0;
 }
 
 .block-overlay__move {

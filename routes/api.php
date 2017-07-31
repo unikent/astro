@@ -26,7 +26,4 @@ Route::group([ 'prefix' => 'v1', 'namespace' => 'v1' ], function(){
 
 	Route::resource('site', 'SiteController', [ 'only' => [ 'index', 'show', 'store', 'update', 'destroy' ]]);
 	Route::get('site/{site}/tree', 'SiteController@tree');
-
-	// Route::resource('region', '');
-	// Route::resource('block', '');
 });

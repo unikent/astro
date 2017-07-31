@@ -6,9 +6,7 @@
 
 <script>
 import baseFieldMixin from '../../mixins/baseFieldMixin';
-import RichText from 'components/RichText';
-
-/* global document */
+import RichText from 'components/richtext';
 
 export default {
 

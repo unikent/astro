@@ -22,11 +22,26 @@
 				:key="field.name"
 			>
 				<template slot="label">
-					<div style="display: flex;">
+					<div class="el-form-item__label">
 						<span>{{ field.label }}</span>
-						<el-tooltip content="View field" placement="top">
+
+						<el-tooltip
+							v-if="field.info"
+							popper-class="el-tooltip__popper--narrow"
+							:content="field.info"
+							placement="top">
 							<icon
-								style="margin-left: auto; fill: #a0a0a0; align-self: flex-end;"
+								class="el-form-item__icon-help"
+								name="help-circle"
+								width="15"
+								height="15"
+								viewBox="0 0 15 15"
+							/>
+						</el-tooltip>
+
+						<el-tooltip content="Highlight field" placement="top">
+							<icon
+								class="el-form-item__icon-view"
 								name="eye"
 								width="14"
 								height="14"
@@ -34,16 +49,10 @@
 								@click="viewField(field.name)"
 							/>
 						</el-tooltip>
+
+
 					</div>
-					<el-tooltip v-if="field.info" :content="field.info" placement="top">
-						<icon
-							class="field-info"
-							name="help"
-							width="15"
-							height="15"
-							viewBox="0 0 15 15"
-						/>
-					</el-tooltip>
+
 				</template>
 				<component
 					:is="getField(field.type)"
@@ -58,7 +67,8 @@
 
 	</div>
 
-	<div class="b-bottom-bar">
+	<!-- hide until we know what we're doing with validation -->
+	<div class="b-bottom-bar" v-show="false">
 		<el-button :plain="true" type="danger" @click="deleteThisBlock">Remove</el-button>
 		<el-button @click="submitForm('block_fields')">Validate</el-button>
 	</div>

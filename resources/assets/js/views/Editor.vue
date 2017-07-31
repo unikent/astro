@@ -1,64 +1,50 @@
 <template>
-<div class="editor-body">
+<div class="page">
 
-	<div class="editor-wrapper" ref="editor">
-		<iframe :src="getPreviewUrl" class="editor-content" :style="dimensions" frameborder="0" />
-		<div
-			class="iframe-overlay"
-			:style="{ 'position' : displayIframeOverlay ? 'absolute' : null }"
-		/>
+	<div class="editor-body">
 
-		<!-- TODO: Move this bottom bar to its own component -->
-		<footer class="b-bar">
-
-			<el-tooltip class="item" effect="dark" content="Switch preview mode" placement="top">
-				<el-select placeholder="view" v-model="currentView" class="switch-view">
-					<el-option v-for="(view, key) in views" :label="view.label" :value="key" :key="view.label">
-						<div class="view-icon">
-							<Icon :name="view.icon" aria-hidden="true" width="20" height="20" />
-						</div>
-						<span class="view-label">{{ view.label }}</span>
-					</el-option>
-				</el-select>
-			</el-tooltip>
-
-			<el-button-group class="undo-redo">
-				<el-button :disabled="!undoRedo.canUndo" @click="undo">
-					<Icon name="undo" aria-hidden="true" width="14" height="14" class="ico" />
-				</el-button>
-				<el-button :disabled="!undoRedo.canRedo" @click="redo">
-					<Icon name="redo" aria-hidden="true" width="14" height="14" class="ico" />
-				</el-button>
-			</el-button-group>
-
-			<el-button class="save-button" @click="savePage">Save</el-button>
-
+		<div class="editor-wrapper" ref="editor">
+			<iframe :src="getPreviewUrl" class="editor-content" :style="dimensions" frameborder="0" />
 			<div
-				class="page-status"
-				:class="{'page-status--is-published' : page.is_published}"
-			>{{ page.is_published ? 'published' : 'draft'}}</div>
+				class="iframe-overlay"
+				:style="{ 'position' : displayIframeOverlay ? 'absolute' : null }"
+			/>
+		</div>
 
-		</footer>
+		<sidebar />
+		<block-picker />
+
+		<el-dialog
+			title="Publish"
+			v-model="publishModalVisible"
+			:modal-append-to-body="true"
+			:before-close="handleClose"
+		>
+			<el-form :model="form">
+				<el-form-item label="Before you publish this page, give it an audit message">
+					<el-input v-model="form.message" auto-complete="off"></el-input>
+					<span class="help">This is used for an audit trail of your previously published pages</span>
+				</el-form-item>
+			</el-form>
+			<span slot="footer" class="dialog-footer">
+				<el-button @click="cancelPublish">Cancel and don't publish</el-button>
+				<el-button v-if="form.message === ''" disabled type="primary" @click="publishPage">Publish now</el-button>
+				<el-button v-else type="danger" @click="publishPage">Publish now</el-button>
+			</span>
+		</el-dialog>
+
 	</div>
-
-	<sidebar />
-	<block-picker />
 </div>
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 import { Loading } from 'element-ui';
 
 import Config from 'classes/Config';
-import Sidebar from 'components/Sidebar';
+import Sidebar from 'components/sidebar';
 import BlockPicker from 'components/BlockPicker';
 import Icon from 'components/Icon';
-
-import { undoStackInstance } from 'plugins/undo-redo';
-import { onKeyDown, onKeyUp } from 'plugins/key-commands';
-
-/* global document */
 
 export default {
 	name: 'editor',
@@ -67,6 +53,14 @@ export default {
 		Sidebar,
 		BlockPicker,
 		Icon
+	},
+
+	data() {
+		return {
+			form: {
+				message: ''
+			}
+		}
 	},
 
 	created() {
@@ -90,30 +84,55 @@ export default {
 				height: '568px'
 			}
 		};
-
-		this.onKeyDown = onKeyDown(undoStackInstance);
-		this.onKeyUp = onKeyUp(undoStackInstance);
-
-		document.addEventListener('keydown', this.onKeyDown);
-		document.addEventListener('keyup', this.onKeyUp);
 	},
 
-	destroyed() {
-		document.removeEventListener('keydown', this.onKeyDown);
-		document.removeEventListener('keyup', this.onKeyUp);
-	},
+	methods: {
+		...mapMutations([
+			'changeView',
+			'showPublishModal',
+			'hidePublishModal'
+		]),
 
-	data() {
-		return {
-			currentView: 'desktop'
-		};
+		publishPage() {
+			this.$api
+				.post(`page/${this.$route.params.site_id}/publish`, this.page)
+				.then(() => {
+					this.hidePublishModal();
+					this.$message({
+						message: 'Published page',
+						type: 'success',
+						duration: 2000
+					});
+					this.form.message = '';
+				})
+				.catch(() => {});
+		},
+
+		cancelPublish() {
+			this.hidePublishModal();
+			this.form.message = '';
+		},
+
+		handleClose() {
+			this.hidePublishModal();
+			this.form.message = '';
+		},
+
+		showLoader() {
+			this.loader = Loading.service({
+				target: this.$refs.editor,
+				text: 'Loading preview...',
+				customClass: 'loading-overlay'
+			});
+		}
 	},
 
 	computed: {
+
 		...mapState([
-			'preview',
 			'displayIframeOverlay',
-			'undoRedo'
+			'currentView',
+			'publishModal'
 		]),
 
 		...mapState({
@@ -122,7 +141,8 @@ export default {
 		}),
 
 		getPreviewUrl() {
-			return `${Config.get('base_url', '')}/preview/${this.$route.params.site_id}`;
+			// TODO: Don't reload page when page_id changes, use state instead
+			return `${Config.get('base_url', '')}/preview/${this.$route.params.page_id}`;
 		},
 
 		dimensions() {
@@ -130,42 +150,36 @@ export default {
 				width: this.views[this.currentView].width,
 				height: this.views[this.currentView].height
 			};
+		},
+
+		publishModalVisible: {
+			get() {
+				return this.publishModal.visible;
+			},
+			set(value) {
+				if(value) {
+					this.showPublishModal();
+				}
+				else {
+					this.hidePublishModal();
+				}
+			}
 		}
 	},
 
 	watch: {
-		pageLoaded() {
-			this.loader.close();
+		pageLoaded(hideLoader) {
+			if(hideLoader) {
+				this.loader.close();
+			}
+			else {
+				this.showLoader();
+			}
 		}
 	},
 
 	mounted() {
-		this.loader = Loading.service({
-			target: this.$refs.editor,
-			text: 'Loading preview...',
-			customClass: 'loading-overlay'
-		});
-	},
-
-	methods: {
-		savePage() {
-			this.$api
-				.put(`page/${this.$route.params.site_id}`, this.page)
-				.then(() => {
-					this.$snackbar.open({
-						message: 'Successfully saved page'
-					})
-				})
-				.catch(() => {});
-		},
-
-		undo() {
-			return undoStackInstance.undo();
-		},
-
-		redo() {
-			return undoStackInstance.redo();
-		}
+		this.showLoader();
 	}
 };
 </script>

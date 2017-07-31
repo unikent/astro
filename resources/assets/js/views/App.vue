@@ -24,7 +24,7 @@ export default {
 		]),
 
 		isEditor() {
-			return this.$route.name !== 'preview';
+			return ['preview', '404'].indexOf(this.$route.name) === -1;
 		}
 	}
 };

@@ -195,3 +195,14 @@ Tests are intended to run on their own database connection and will not migrate 
 connection configured as `mysql_test`, migrations can be run with `DB_CONNECTION=mysql_test php artisan migrate`.
 
 The `mysql_test` connection falls back to use the standard `DB_` config variables by default. They can be overridden using `TEST_DB_` variables. The default connection for tests is set in `phpunit.xml`.
+
+## Acknowledgements
+
+- [Laravel](https://github.com/laravel/framework) ([MIT](http://opensource.org/licenses/MIT))
+- [Vue](https://github.com/vuejs/vue) ([MIT](http://opensource.org/licenses/MIT))
+  
+Thanks for making our lives easier!
+
+## License
+
+Astro is licensed under the [MIT license](LICENSE).

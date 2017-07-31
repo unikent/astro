@@ -1,9 +1,24 @@
 <template>
-	<div class="top-bar">
+	<div class="top-bar" v-if="showBack">
 		<div v-show="showBack" @click="backToSites" class="top-bar-backbutton">
-			<i class="el-icon-arrow-left backbutton-icon"></i>Back to sites
+			<i class="el-icon-arrow-left backbutton-icon"></i>Site list
 		</div>
-		<!-- TODO: Add richtext toolbar here? -->
+
+		<div class="top-bar__tools">
+
+			<toolbar/>
+
+			<el-dropdown trigger="click" @command="handleCommand" class="user-menu-button">
+				<span class="el-dropdown-link">
+					{{ username }}<i class="el-icon-caret-bottom el-icon--right"></i>
+				</span>
+				<el-dropdown-menu slot="dropdown">
+					<el-dropdown-item command="sign-out">Sign out</el-dropdown-item>
+				</el-dropdown-menu>
+			</el-dropdown>
+		</div>
+	</div>
+	<div v-else class="top-bar top-bar--homepage">
 		<el-dropdown trigger="click" @command="handleCommand" class="user-menu-button">
 			<span class="el-dropdown-link">
 				{{ username }}<i class="el-icon-caret-bottom el-icon--right"></i>
@@ -12,21 +27,42 @@
 				<el-dropdown-item command="sign-out">Sign out</el-dropdown-item>
 			</el-dropdown-menu>
 		</el-dropdown>
-		<div class="top-title">{{ pageName }}</div>
 	</div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
+import Icon from 'components/Icon';
 import { undoStackInstance } from 'plugins/undo-redo';
+import { onKeyDown, onKeyUp } from 'plugins/key-commands';
+import Toolbar from 'components/Sidebar/Toolbar';
 
-/* global window */
+/* global window, document */
 
 export default {
 
 	name: 'top-bar',
 
+	components: {
+		Icon,
+		Toolbar
+	},
+
+	created() {
+		this.onKeyDown = onKeyDown(undoStackInstance);
+		this.onKeyUp = onKeyUp(undoStackInstance);
+
+		document.addEventListener('keydown', this.onKeyDown);
+		document.addEventListener('keyup', this.onKeyUp);
+	},
+
+	destroyed() {
+		document.removeEventListener('keydown', this.onKeyDown);
+		document.removeEventListener('keyup', this.onKeyUp);
+	},
+
 	computed: {
+
 		...mapState({
 			pageName: state => state.page.pageName,
 		}),
@@ -41,6 +77,7 @@ export default {
 	},
 
 	methods: {
+
 		handleCommand(command) {
 			if(command === 'sign-out') {
 				window.location = '/auth/logout';
