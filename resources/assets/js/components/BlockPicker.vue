@@ -2,18 +2,24 @@
 <el-dialog
 	class="tabbed-dialog"
 	title="Add block(s)"
-	size="full"
+	size="large"
+	top="0%"
 	v-model="visible"
 >
 	<el-tabs type="border-card">
 		<el-tab-pane label="General">
+			<p>Select one or more blocks from below that you'd like to add to the page.</p>
+			<div class="el-dialog__footer">
+				<el-button @click="cancel">Cancel</el-button>
+				<el-button type="primary" @click="addBlocks">Add selected blocks to the page</el-button>
+			</div>
 			<block-list :selectedBlocks="selected"/>
 		</el-tab-pane>
 	</el-tabs>
 
 	<span slot="footer" class="dialog-footer">
 		<el-button @click="cancel">Cancel</el-button>
-		<el-button type="primary" @click="addBlocks">Add</el-button>
+		<el-button type="primary" @click="addBlocks">Add selected blocks to the page</el-button>
 	</span>
 </el-dialog>
 </template>
