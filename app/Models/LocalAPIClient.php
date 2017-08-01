@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\APICommands\ListSites;
 use App\Models\APICommands\UpdateContent;
 use Astro\Renderer\API\Exception\APIErrorException;
 use Astro\Renderer\API\Data\PageData;
 use Astro\Renderer\API\Data\RouteData;
 use App\Models\Traits\ResolvesRoutes;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use App\Models\APICommands\CreateSite;
 use App\Models\APICommands\AddPage;
@@ -97,6 +99,16 @@ class LocalAPIClient implements \Astro\Renderer\Contracts\APIClient
         }else{
             return $command->execute($data,$this->user);
         }
+    }
+
+    /**
+     * Get the sites available to the current user.
+     * @return Validator|Collection
+     */
+    public function getSites()
+    {
+        return $this->execute( ListSites::class, [
+        ]);
     }
 
     /**

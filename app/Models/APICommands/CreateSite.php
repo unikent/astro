@@ -2,6 +2,7 @@
 
 namespace App\Models\APICommands;
 
+use App\Models\Revision;
 use App\Models\Site;
 use App\Models\PageContent;
 use App\Models\Page;
@@ -47,7 +48,8 @@ class CreateSite implements APICommand
                 'layout_version' => $site->options['default_layout_version']
             ]);
             $pagecontent->save();
-
+            $revision = Revision::createFromPageContent($pagecontent, $user);
+            $revision->save();
             // every site must have a root route...
             $page = Page::create(['path' => '/', 'slug' => null, 'site_id' => $site->id, 'draft_id' => $pagecontent->id]);
         });

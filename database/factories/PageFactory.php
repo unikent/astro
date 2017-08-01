@@ -32,7 +32,7 @@ $factory->state(Page::class, 'withPageContent', function ($faker) {
 
 $factory->state(Page::class, 'withPublishedContent', function ($faker) {
     return [
-        'published_revision_id' => function(array $page) {
+        'published_id' => function(array $page) {
             return factory(Revision::class)->create([
 
             ])->getKey();
@@ -43,7 +43,7 @@ $factory->state(Page::class, 'withPublishedContent', function ($faker) {
 
 $factory->state(Page::class, 'withPage', function ($faker) {
     return [
-        'published_revision_id' => function(array $page) {
+        'published_id' => function(array $page) {
             return factory(Revision::class)->create([
 
             ])->getKey();

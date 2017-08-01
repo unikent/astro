@@ -21,17 +21,17 @@ class CreatePages extends Migration
 
             $table->integer('site_id')->unsigned();
 
-			$table->integer('draft_id')->unsigned()->nullable();
-            $table->integer('published_revision_id', false, true)->nullable();
+			$table->integer('draft_id', false, true)->unsigned()->nullable();
+            $table->integer('published_id', false, true)->nullable();
 
 			$table->integer('parent_id')->nullable();
 			$table->integer('lft')->nullable();
 			$table->integer('rgt')->nullable();
 			$table->integer('depth')->nullable();
 
-            $table->foreign('published_revision_id', 'published_revision_id_fk')->references('id')->on('revisions')->onDelete('restrict');
+            $table->foreign('published_id', 'published_id_fk')->references('id')->on('revisions')->onDelete('restrict');
             $table->foreign('site_id', 'site_id_fk')->references('id')->on('sites');
-            $table->foreign('draft_id', 'draft_id_fk')->references('id')->on('page_content')->onDelete('cascade');
+            $table->foreign('draft_id', 'draft_id_fk')->references('id')->on('revisions')->onDelete('restrict');
 		});
 	}
 
@@ -45,7 +45,7 @@ class CreatePages extends Migration
         Schema::table('pages', function(Blueprint $table) {
             $table->dropForeign('site_id_fk');
             $table->dropForeign('draft_id_fk');
-            $table->dropForeign('published_revision_id_fk');
+            $table->dropForeign('published_id_fk');
         });
 
 		Schema::drop('pages');

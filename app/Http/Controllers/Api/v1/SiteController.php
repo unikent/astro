@@ -1,17 +1,15 @@
 <?php
 namespace App\Http\Controllers\Api\v1;
 
-use App\Http\Requests\Api\v1\Site\StoreRequest;
 use App\Models\LocalAPIClient;
-use App\Models\Page;
 use Auth;
-use Gate;
-use DB;
 use App\Models\Site;
 use Illuminate\Http\Request;
 use App\Http\Transformers\Api\v1\SiteTransformer;
 use App\Http\Transformers\Api\v1\PageTransformer;
 use Illuminate\Validation\ValidationException;
+use League\Fractal\Scope;
+use League\Fractal\Serializer\ArraySerializer;
 
 class SiteController extends ApiController
 {
@@ -26,15 +24,8 @@ class SiteController extends ApiController
 	 * @return Response
 	 */
 	public function index(Request $request){
-		$user = Auth::user();
-		$sites = Site::with('pages');
-
-		if(!Gate::allows('index', Site::class)){
-			$pgs = $user->publishing_groups->pluck('id');
-			$sites = $sites->whereIn('publishing_group_id', $pgs);
-		}
-
-		return fractal($sites->get(), new SiteTransformer)->respond();
+	    $api = new LocalAPIClient(Auth::user());
+		return fractal($api->getSites(), new SiteTransformer)->parseIncludes($request->get('include'))->respond();
 	}
 
     /**
@@ -46,7 +37,7 @@ class SiteController extends ApiController
      */
 	public function store(Request $request)
     {
-        $api = new LocalAPIClient();
+        $api = new LocalAPIClient(Auth::user());
         $site = $api->createSite(
             $request->get('publishing_group_id'),
             $request->get('name'),
@@ -114,10 +105,35 @@ class SiteController extends ApiController
             'pages' => function($query) {
                 return $query->orderBy('pages.lft');
             },
-            'pages.draft_page',
-            'pages.published_page.pagecontent'
+            'pages.draft',
+            'pages.published.pagecontent'
         ]);
-		return fractal($site->pages->toHierarchy(), new PageTransformer)->respond();
+		return $this->pagesToHierarchy(
+		        fractal(
+		            $site->pages()->orderBy('lft')->get(),
+                    new PageTransformer()
+                )
+                ->parseIncludes($request->get('include'))
+                ->toArray()
+        );
 	}
+
+    /**
+     * Magickery
+     * Turn a "flat" array of hierarchical data into a hierarchy.
+     * @param array $nodes Array of nodes in depth-first order, each of which MUST have a parent id key.
+     * @return hierarchical array where each node has its children keyed by 'children'
+     */
+	public function pagesToHierarchy($nodes)
+    {
+        $nodes = $nodes['data'];
+        $map = [null => ['children' => []]];
+        foreach($nodes as $node){
+            $map[$node['id']] = $node;
+            $map[$node['id']]['children'] = [];
+            $map[$node['parent_id']]['children'][] =& $map[$node['id']]; // assign by reference is required on this line ONLY
+        }
+        return $map[null]['children'];
+    }
 
 }

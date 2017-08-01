@@ -21,6 +21,16 @@ class Revision extends Model
 		return $this->belongsTo(PageContent::class, 'page_content_id');
 	}
 
+    public function draftPage()
+    {
+        return $this->hasOne(Page::class, 'draft_id');
+    }
+
+    public function publishedPage()
+    {
+        return $this->hasOne(Page::class, 'published_id');
+    }
+
     /**
      * Create a new Revision based on some existing page content.
      * @param PageContent $content The PageContent to create it from.

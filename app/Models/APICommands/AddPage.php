@@ -2,6 +2,7 @@
 
 namespace App\Models\APICommands;
 
+use App\Models\Revision;
 use DB;
 use App\Models\Page;
 use App\Models\PageContent;
@@ -50,7 +51,9 @@ class AddPage implements APICommand
             'layout_name' => $input['layout_name'],
             'layout_version' => $input['layout_version']
         ]);
-        $page->setDraft($pagecontent);
+        $revision = Revision::createFromPageContent($pagecontent, $user);
+        $revision->save();
+        $page->setDraft($revision);
         $page->save();
         DB::commit();
         return $pagecontent;

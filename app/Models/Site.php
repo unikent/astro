@@ -39,7 +39,7 @@ class Site extends Model
 
     public function publishedPages()
     {
-        return $this->hasMany(Page::class, 'site_id')->whereNotNull('published_revision_id');
+        return $this->hasMany(Page::class, 'site_id')->whereNotNull('published_id');
     }
 
 	public function pages()

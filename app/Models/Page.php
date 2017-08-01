@@ -30,6 +30,37 @@ class Page extends BaumNode implements RoutableContract
 
     protected $scoped = ['site_id'];
 
+    // The draft state of this page.
+    const STATE_NEW = 'new';  // not published
+    const STATE_DRAFT = 'modified'; // modified since last published
+    const STATE_DELETED = 'deleted'; // deleted since last published
+    const STATE_MOVED = 'moved'; // moved since last published
+    const STATE_PUBLISHED = 'published'; // not modified since last published
+    const STATE_EMPTY = 'empty'; // no draft or published state.
+
+    /**
+     * Get the draft state of this Page
+     * @return string
+     */
+    public function draftState()
+    {
+        if($this->draft_id == $this->published_id){
+            if(!$this->draft_id){
+                return self::STATE_EMPTY;
+            }else {
+                return self::STATE_PUBLISHED;
+            }
+        }elseif(!$this->published_id){
+            return self::STATE_NEW;
+        }elseif(!$this->draft_id){
+            return self::STATE_DELETED;
+        }elseif($this->draft->pagecontent_id == $this->published->pagecontent_id){
+            return self::STATE_DRAFT;
+        }else{
+            return self::STATE_MOVED;
+        }
+    }
+
     /**
      * Create a new Eloquent model instance.
      *
@@ -62,14 +93,14 @@ class Page extends BaumNode implements RoutableContract
 		return $this->belongsTo(Site::class, 'site_id');
 	}
 
-	public function draft_page()
+	public function draft()
 	{
-		return $this->belongsTo(PageContent::class, 'draft_id');
+		return $this->belongsTo(Revision::class, 'draft_id');
 	}
 
-	public function published_page()
+	public function published()
 	{
-	    return $this->belongsTo( Revision::class, 'published_revision_id' );
+	    return $this->belongsTo( Revision::class, 'published_id' );
 	}
 
     /**
@@ -96,6 +127,37 @@ class Page extends BaumNode implements RoutableContract
                     ->where('path', $path);
     }
 
+    /**
+     * Scope a query to only include pages with published content.
+     *
+     * @param Builder $query
+     * @param boolean $value
+     * @return Builder
+     */
+    public function scopePublished(Builder $query, $value = true)
+    {
+        return $query->whereNotNull('published_id');
+    }
+
+    /**
+     * Scope a query to only include active routes.
+     *
+     * @param Builder $query
+     * @param boolean $value
+     * @deprecated
+     * @return Builder
+     */
+    public function scopeActive(Builder $query, $value = true)
+    {
+        return $this->scopePublished($query, $value);
+    }
+
+    /**
+     * Find a Page by site id and path.
+     * @param $site_id
+     * @param $path
+     * @return mixed
+     */
     public function findBySiteAndPath($site_id, $path)
     {
         return $this->forSiteAndPath($site_id,$path)->first();
@@ -129,35 +191,24 @@ class Page extends BaumNode implements RoutableContract
 
 
 
-    /**
-     * Scope a query to only include active routes.
-     *
-     * @param Builder $query
-     * @param boolean $value
-     * @return Builder
-     */
-	public function scopeActive(Builder $query, $value = true)
-	{
-		return $query->whereNotNull('published_revision_id');
-	}
-
 	/**
-	 * Returns true if is_active is true, else false
+     * Has this page been published?
 	 * @return boolean
+     * @deprecated
 	 */
 	public function isActive()
 	{
-		return null != $this->published_revision_id;
+		return $this->isPublished();
 	}
 
-	/**
-	 * Returns true if site_id is set, else false
-	 * @return boolean
-	 */
-	public function isSite()
-	{
-	    return $this->isRoot();
-	}
+    /**
+     * Has this page been published?
+     * @return bool
+     */
+	public function isPublished()
+    {
+        return (null != $this->published_id);
+    }
 
 
 	/**
@@ -249,11 +300,11 @@ class Page extends BaumNode implements RoutableContract
 
     /**
      * Set the draft version of this route.
-     * @param null|PageContent $pagecontent
+     * @param null|Revision $revision
      */
-    public function setDraft($pagecontent)
+    public function setDraft($revision)
     {
-        $this->draft_id = $pagecontent ? $pagecontent->id : null;
+        $this->draft_id = $revision ? $revision->id : null;
     }
 
     /**

@@ -3,6 +3,8 @@ namespace App\Http\Transformers\Api\v1;
 
 use App\Models\Page;
 use League\Fractal\Resource\Item as FractalItem;
+use League\Fractal\Resource\Collection as FractalCollection;
+use League\Fractal\Serializer\ArraySerializer;
 use League\Fractal\TransformerAbstract as FractalTransformer;
 
 /**
@@ -12,14 +14,39 @@ use League\Fractal\TransformerAbstract as FractalTransformer;
 class PageTransformer extends FractalTransformer
 {
 
-    protected $availableIncludes = [ 'parent', 'draft', 'published', 'site' ];
+    protected $availableIncludes = [ 'parent', 'draft', 'published', 'site', 'children' ];
+
+    public $include = '';
+
+    const ALL_PAGES = 1;
+    const DRAFT_PAGES = 2;
+    const PUBLISHED_PAGES = 4;
+
+    /**
+     * Create a PageTransformer to filter specific page types.
+     * @param int $filter
+     */
+    public function __construct($filter = self::ALL_PAGES)
+    {
+        if(!in_array($filter,[self::ALL_PAGES,self::DRAFT_PAGES,self::PUBLISHED_PAGES])){
+            throw new \InvalidArgumentException("No valid filter specified.");
+        }
+        $this->filter = $filter;
+    }
 
 	public function transform(Page $page)
 	{
-		return $page->toArray();
+		$data = [
+		    'id' => $page->id,
+            'path' => $page->path,
+            'slug' => $page->slug,
+            'state' => $page->draftState(),
+            'depth' => $page->depth,
+            'parent_id' => $page->parent_id
+        ];
+        return $data;
 	}
 
-    /**
     /**
      * Include associated Parent
      * @param Page $page The Page whose parent to transform.
@@ -27,7 +54,9 @@ class PageTransformer extends FractalTransformer
      */
     public function includeParent(Page $page)
     {
-        return new FractalItem($page->parent, new PageTransformer, false);
+        if($page->parent) {
+            return new FractalItem($page->parent, new PageTransformer, false);
+        }
     }
 
     /**
@@ -35,9 +64,31 @@ class PageTransformer extends FractalTransformer
      * @param Page $page The Page to transform.
      * @return FractalItem
      */
-    public function includePage(Page $page)
+    public function includeDraft(Page $page)
     {
-        return new FractalItem($page->draft, new PageContentTransformer, false);
+        if($page->draft) {
+            return new FractalItem($page->draft, new RevisionTransformer, false);
+        }
+    }
+
+    /**
+     * Include associated PageContent
+     * @param Page $page The Page to transform.
+     * @return FractalItem
+     */
+    public function includePublished(Page $page)
+    {
+        if($page->published) {
+            return new FractalItem($page->published, new RevisionTransformer, false);
+        }
+    }
+
+    public function includeChildren(Page $page)
+    {
+        if($page->children){
+    //        $this->getCurrentScope()->getManager()->setSerializer(new ArraySerializer());
+            return new FractalCollection($page->children,$this);
+        }
     }
 
     /**

@@ -31,17 +31,26 @@ class PageContent extends Model
 
 	protected $layoutDefinition = null;
 
+    /**
+     * @deprecated
+     */
 	public function routes()
 	{
 		return $this->hasMany(Page::class, 'draft_id');
 	}
 
+    /**
+     * @deprecated
+     */
 	public function activeRoute()
 	{
 
 		return $this->belongsTo(Page::class, 'draft_id');
 	}
 
+    /**
+     * @deprecated
+     */
 	public function draftRoute()
 	{
 		return $this->hasOne(Page::class, 'draft_id');
@@ -56,7 +65,6 @@ class PageContent extends Model
 	public function published()
 	{
         throw new Exception('Not implemented');
-		//return $this->hasOne(Revision::class, 'published_revision_id')
 	}
 
 	public function history()
