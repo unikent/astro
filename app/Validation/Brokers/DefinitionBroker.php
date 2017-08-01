@@ -56,21 +56,25 @@ abstract class DefinitionBroker {
 						break;
 
 					case 'min_length':
+						$transformed[$field][] = 'nullable';
 						$transformed[$field][] = 'string';
 						$transformed[$field][] = sprintf('min:%s', $rule[1]);
 						break;
 
 					case 'max_length':
+						$transformed[$field][] = 'nullable';
 						$transformed[$field][] = 'string';
 						$transformed[$field][] = sprintf('max:%s', $rule[1]);
 						break;
 
 					case 'min_value':
+						$transformed[$field][] = 'nullable';
 						$transformed[$field][] = 'integer';
 						$transformed[$field][] = sprintf('min:%s', $rule[1]);
 						break;
 
 					case 'max_value':
+						$transformed[$field][] = 'nullable';
 						$transformed[$field][] = 'integer';
 						$transformed[$field][] = sprintf('max:%s', $rule[1]);
 						break;
