@@ -2,6 +2,7 @@
 <el-dialog
 	class="tabbed-dialog"
 	title="Add block(s)"
+	size="full"
 	v-model="visible"
 >
 	<el-tabs type="border-card">

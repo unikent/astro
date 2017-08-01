@@ -8,19 +8,14 @@
 		>
 			<div
 				class="block-move"
-				:class="[{ 'block-move--highlighted': block.version===1 }, { 'block-move--deselected': block.version!==1 }, { 'block-move--selected': selected.indexOf(key) !== -1 }]"
+				:class="[{ 'block-move--selected': selected.indexOf(key) !== -1 }]"
 				@mousedown="handleMousedown(key)"
 			>
-				{{ block.label }}
+				<h3>{{ block.label }}</h3>
+				<p>{{ block.info }}</p>
 			</div>
 		</div>
 	</div>
-	<span v-if="selected.length">
-		Selected:
-		<ul>
-			<li v-for="label in labels">{{ label }}</li>
-		</ul>
-	</span>
 </div>
 </template>
 
