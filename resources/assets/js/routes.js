@@ -47,7 +47,7 @@ const routes = [
 		name: 'page'
 	},
 	{
-		path: '/preview/:site_id',
+		path: '/preview/:page_id',
 		component: Preview,
 		name: 'preview'
 	},
