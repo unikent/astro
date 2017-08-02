@@ -177,9 +177,9 @@ export default {
 		},
 
 		edit() {
-			if(Number.parseInt(this.$route.params.page_id) !== this.page.id) {
+			if(Number.parseInt(this.$route.params.page_id) !== this.page.page_id) {
 				this.setLoaded(false);
-				this.$router.push(`/site/${this.site}/page/${this.page.id}`);
+				this.$router.push(`/site/${this.site}/page/${this.page.page_id}`);
 				this.$store.commit('changePage', this.page.path);
 			}
 			else {
