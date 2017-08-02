@@ -10,6 +10,7 @@
 					:label="f.label"
 					:prop="`${name}.${index}.${f.name}`"
 					:rules="getRules(f.name)"
+					:error="getError(index, f.name)"
 				>
 					<template slot="label">
 						<span>{{ f.label }}</span>
@@ -30,7 +31,7 @@
 					<component
 						:is="getField(f.type)"
 						:field="childField(f)"
-						:name="`${name}.${index}.${f.name}`"
+						:path="`${name}.${index}.${f.name}`"
 						:index="currentIndex"
 						:key="`${name}-${f.name}-${currentIndex}`"
 					/>
@@ -136,6 +137,15 @@ export default {
 			Vue.nextTick(() => {
 				this.$parent.validate()
 			});
+		},
+
+		getError(fieldIndex, fieldName) {
+			return (
+				this.errors &&
+				this.errors[fieldIndex] &&
+				this.errors[fieldIndex][fieldName] ?
+					this.errors[fieldIndex][fieldName] : null
+			);
 		}
 	}
 };
