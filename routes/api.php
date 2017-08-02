@@ -1,29 +1,29 @@
 <?php
 
 Route::group([ 'prefix' => 'v1', 'namespace' => 'v1' ], function(){
-	Route::get('block/definitions', 'BlockController@definitions');
-	Route::get('block/{block_definition}/definition', 'BlockController@definition');
-	Route::get('block/{block_definition}/blocks', 'BlockController@blocks');
+	Route::get('blocks/definitions', 'BlockController@definitions');
+	Route::get('blocks/{block_definition}/definition', 'BlockController@definition');
+	Route::get('blocks/{block_definition}/blocks', 'BlockController@blocks');
 
-	Route::get('layout/definitions', 'LayoutController@definitions');
-	Route::get('layout/{layout_definition}/definition', 'LayoutController@definition');
+	Route::get('layouts/definitions', 'LayoutController@definitions');
+	Route::get('layouts/{layout_definition}/definition', 'LayoutController@definition');
 
 	// Media does not use resource routing as {media} gets pluralized to {medium}, resulting in dragons.
 	Route::get('media', 'MediaController@index');
 	Route::post('media', 'MediaController@store');
 	Route::delete('media/{media}', 'MediaController@destroy');
 
-	Route::resource('page', 'PageController', [ 'except' => [ 'index', 'create', 'edit' ]]);
-	Route::post('page/{page}/publish', 'PageController@publish');
-	Route::post('page/{page}/publish-tree', 'PageController@publishTree');
-	Route::post('page/{page}/revert', 'PageController@revert');
-	Route::delete('page/{page}/force', 'PageController@forceDestroy');
+	Route::resource('pages', 'PageController', [ 'except' => [ 'index', 'create', 'edit' ]]);
+	Route::post('pages/{page}/publish', 'PageController@publish');
+	Route::post('pages/{page}/publish-tree', 'PageController@publishTree');
+	Route::post('pages/{page}/revert', 'PageController@revert');
+	Route::delete('pages/{page}/force', 'PageController@forceDestroy');
 
-	Route::get('region/definitions', 'RegionController@definitions');
-	Route::get('region/{region_definition}/definition', 'RegionController@definition');
+	Route::get('regions/definitions', 'RegionController@definitions');
+	Route::get('regions/{region_definition}/definition', 'RegionController@definition');
 
-	Route::get('route/resolve', 'RouteController@resolve');
+	Route::get('routes/resolve', 'RouteController@resolve');
 
-	Route::resource('site', 'SiteController', [ 'only' => [ 'index', 'show' ]]);
-	Route::get('site/{site}/tree', 'SiteController@tree');
+	Route::resource('sites', 'SiteController', [ 'only' => [ 'index', 'show' ]]);
+	Route::get('sites/{site}/tree', 'SiteController@tree');
 });
