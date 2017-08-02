@@ -16,6 +16,9 @@ class CreateRevisionsTable extends Migration
         Schema::create('revisions', function(Blueprint $table) {
             $table->increments('id');
             $table->integer('page_content_id')->unsigned()->index();
+            $table->string('title');
+            $table->string('layout_name');
+            $table->integer('layout_version');
 
             $table->mediumText('bake');
 

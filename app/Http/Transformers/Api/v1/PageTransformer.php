@@ -2,6 +2,7 @@
 namespace App\Http\Transformers\Api\v1;
 
 use App\Models\Page;
+use League\Fractal\ParamBag;
 use League\Fractal\Resource\Item as FractalItem;
 use League\Fractal\Resource\Collection as FractalCollection;
 use League\Fractal\Serializer\ArraySerializer;
@@ -14,9 +15,7 @@ use League\Fractal\TransformerAbstract as FractalTransformer;
 class PageTransformer extends FractalTransformer
 {
 
-    protected $availableIncludes = [ 'parent', 'draft', 'published', 'site', 'children' ];
-
-    public $include = '';
+    protected $availableIncludes = [ 'parent', 'draft', 'published', 'site' ];
 
     const ALL_PAGES = 1;
     const DRAFT_PAGES = 2;
@@ -64,10 +63,10 @@ class PageTransformer extends FractalTransformer
      * @param Page $page The Page to transform.
      * @return FractalItem
      */
-    public function includeDraft(Page $page)
+    public function includeDraft(Page $page, ParamBag $params = null)
     {
         if($page->draft) {
-            return new FractalItem($page->draft, new RevisionTransformer, false);
+            return new FractalItem($page->draft, new RevisionTransformer( $params->get('full') ), false);
         }
     }
 
@@ -76,18 +75,10 @@ class PageTransformer extends FractalTransformer
      * @param Page $page The Page to transform.
      * @return FractalItem
      */
-    public function includePublished(Page $page)
+    public function includePublished(Page $page, ParamBag $params = null)
     {
         if($page->published) {
-            return new FractalItem($page->published, new RevisionTransformer, false);
-        }
-    }
-
-    public function includeChildren(Page $page)
-    {
-        if($page->children){
-    //        $this->getCurrentScope()->getManager()->setSerializer(new ArraySerializer());
-            return new FractalCollection($page->children,$this);
+            return new FractalItem($page->published, new RevisionTransformer( $params->get('full') ), false);
         }
     }
 

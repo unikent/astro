@@ -117,19 +117,17 @@ class LocalAPIClient implements \Astro\Renderer\Contracts\APIClient
      * @param string $name Name for the new site.
      * @param string $host Hostname for the new site.
      * @param string $path Path for the new site.
-     * @param string $layout_name Default layout name to use for this site.
-     * @param int $layout_version Version of the layout to use for this site.
+     * @param string $homepage_layout layout to use for the homepage for this site.
      * @param array $options Other options.
      */
-    public function createSite($publishing_group_id, $name, $host, $path, $default_layout_name, $default_layout_version, $options = [])
+    public function createSite($publishing_group_id, $name, $host, $path, $homepage_layout, $options = [])
     {
         return $this->execute(CreateSite::class, [
             'publishing_group_id' => $publishing_group_id,
             'name' => $name,
             'host' => $host,
             'path' => $path,
-            'default_layout_name' => $default_layout_name,
-            'default_layout_version' => $default_layout_version,
+            'homepage_layout' => $homepage_layout,
             'options' => $options
         ]);
     }

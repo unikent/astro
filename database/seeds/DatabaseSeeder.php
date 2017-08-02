@@ -71,7 +71,7 @@ class DatabaseSeeder extends Seeder
 	{
 		if(App::environment() === 'production')
 		{
-			exit('Oh no you ditten\'! The seeder should only be run in dev mode.');
+			exit('The seeder should only be run in dev mode.');
 		}
 
 		$this->cleanDatabase();
@@ -92,7 +92,7 @@ class DatabaseSeeder extends Seeder
 
         $client = new LocalAPIClient($user);
         $site = $client->createSite(
-            1, 'Test Site', 'example.com', '', 'test-layout', 1
+            1, 'Test Site', 'example.com', '', ['name'=>'test-layout','version'=>1]
         );
         $client->addTree($site->id, $site->homePage->id, null, $this->testTree);
 

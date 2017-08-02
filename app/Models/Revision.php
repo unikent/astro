@@ -11,6 +11,11 @@ class Revision extends Model
 {
 	use Tracked;
 
+	const TYPE_DRAFT = 'draft';
+	const TYPE_PUBLISHED = 'published';
+	const TYPE_DELETED = 'deleted';
+	const TYPE_AUTOSAVE = 'autosave';
+
 	protected $fillable = [
 		'page_content_id',
 		'bake',
@@ -39,6 +44,9 @@ class Revision extends Model
 	public static function createFromPageContent(PageContent $content, Authenticatable $user, $type = 'draft')
     {
         $revision = new Revision();
+        $revision->title = $content->title;
+        $revision->layout_name = $content->layout_name;
+        $revision->layout_version = $content->layout_version;
         $revision->page_content_id = $content->id;
         $revision->bake = fractal(
             $content,

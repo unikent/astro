@@ -21,8 +21,8 @@ class PageContentTransformer extends FractalTransformer
 
     /**
      * Include associated active Route
-     *
-     * @return League\Fractal\ItemResource
+     * @param PageContent $pagecontent
+     * @return FractalItem
      */
     public function includeActiveRoute(PageContent $pagecontent)
     {
@@ -34,7 +34,7 @@ class PageContentTransformer extends FractalTransformer
     /**
      * Include associated draft Route
      *
-     * @return League\Fractal\ItemResource
+     * @return FractalItem
      */
     public function includeDraftRoute(PageContent $pagecontent)
     {
@@ -45,8 +45,8 @@ class PageContentTransformer extends FractalTransformer
 
     /**
      * Include all associated Routes
-     *
-     * @return League\Fractal\CollectionResource
+     * @param PageContent $pagecontent
+     * @return FractalCollection
      */
     public function includeRoutes(PageContent $pagecontent)
     {
@@ -63,7 +63,6 @@ class PageContentTransformer extends FractalTransformer
      *
      * Some nastiness resides here in order to achieve this, commented below...
      *
-     * @return League\Fractal\CollectionResource
      */
     public function includeBlocks(PageContent $pagecontent)
     {
@@ -91,7 +90,8 @@ class PageContentTransformer extends FractalTransformer
 
     /**
      * Include associated Layout/Region definitions
-     * @return League\Fractal\ItemResource
+     * @param PageContent $pagecontent
+     * @return FractalItem
      */
     public function includeLayoutDefinition(PageContent $pagecontent)
     {
@@ -101,8 +101,8 @@ class PageContentTransformer extends FractalTransformer
 
     /**
      * Include Published (latest PublishedPage)
-     *
-     * @return League\Fractal\ItemResource
+     * @param PageContent $pagecontent
+     * @return FractalItem
      */
     public function includePublished(PageContent $pagecontent)
     {
@@ -113,8 +113,8 @@ class PageContentTransformer extends FractalTransformer
 
     /**
      * Include History (all associated PublishedPages)
-     *
-     * @return League\Fractal\CollectionResource
+     * @param PageContent $pagecontent
+     * @return FractalCollection
      */
     public function includeHistory(PageContent $pagecontent)
     {

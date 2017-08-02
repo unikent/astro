@@ -3,6 +3,7 @@ namespace App\Http\Transformers\Api\v1;
 
 use App\Models\Site;
 use App\Models\Page;
+use League\Fractal\ParamBag;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item as FractalItem;
 use League\Fractal\Resource\Collection as FractalCollection;
@@ -21,9 +22,9 @@ class SiteTransformer extends FractalTransformer
             'name' => $site->name,
             'host' => $site->host,
             'path' => $site->path,
-            'created_at' => $site->created_at,
-            'updated_at' => $site->updated_at,
-            'deleted_at' => $site->deleted_at
+            'created_at' => $site->created_at ? $site->created_at->__toString() : null,
+            'updated_at' => $site->updated_at ? $site->updated_at->__toString() : null,
+            'deleted_at' => $site->deleted_at ? $site->deleted_at->__toString() : null
         ];
 		return $data;
 	}

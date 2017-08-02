@@ -4,12 +4,13 @@ namespace App\Http\Controllers\Api\v1;
 use App\Models\LocalAPIClient;
 use Auth;
 use App\Models\Site;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Transformers\Api\v1\SiteTransformer;
 use App\Http\Transformers\Api\v1\PageTransformer;
+use Respon;
 use Illuminate\Validation\ValidationException;
-use League\Fractal\Scope;
-use League\Fractal\Serializer\ArraySerializer;
+use Symfony\Component\HttpFoundation\Response;
 
 class SiteController extends ApiController
 {
@@ -25,7 +26,9 @@ class SiteController extends ApiController
 	 */
 	public function index(Request $request){
 	    $api = new LocalAPIClient(Auth::user());
-		return fractal($api->getSites(), new SiteTransformer)->parseIncludes($request->get('include'))->respond();
+	    $transformer = new SiteTransformer();
+	    $transformer->setAvailableIncludes(['publishing_group']);
+		return fractal($api->getSites(), $transformer)->parseIncludes($request->get('include'))->respond();
 	}
 
     /**
@@ -43,8 +46,7 @@ class SiteController extends ApiController
             $request->get('name'),
             $request->get('host'),
             $request->get('path'),
-            $request->get('default_layout_name'),
-            $request->get('default_layout_version'),
+            $request->get('homepage_layout',[]),
             $request->get('options')
         );
         if($site instanceof Site) {
@@ -98,9 +100,6 @@ class SiteController extends ApiController
 	 */
 	public function tree(Request $request, Site $site){
 		$this->authorize('read', $site);
-
-		$qb = $site->activeRoute->descendantsAndSelf();
-		$routes = $qb->get()->toHierarchy();
         $site->load([
             'pages' => function($query) {
                 return $query->orderBy('pages.lft');
@@ -108,14 +107,18 @@ class SiteController extends ApiController
             'pages.draft',
             'pages.published.pagecontent'
         ]);
-		return $this->pagesToHierarchy(
-		        fractal(
-		            $site->pages()->orderBy('lft')->get(),
-                    new PageTransformer()
-                )
+        $data = $this->pagesToHierarchy(
+            fractal(
+                $site->pages()->orderBy('lft')->get(),
+                new PageTransformer()
+            )
                 ->parseIncludes($request->get('include'))
                 ->toArray()
         );
+        $data = [
+           'data' => count($data) ? $data[0] : null
+        ];
+		return new JsonResponse($data);
 	}
 
     /**

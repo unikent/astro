@@ -29,14 +29,11 @@ class CreateSite implements APICommand
             'publishing_group_id' => $input->get('publishing_group_id'),
             'host' => $input->get('host'),
             'path' => $input->get('path'),
-            'options' => [
-                'default_layout_name' => $input->get('default_layout_name'),
-                'default_layout_version' => $input->get('default_layout_version'),
-            ]
+            'options' => []
         ]);
-        DB::transaction(function() use($site, $user) {
+        DB::transaction(function() use($site, $user, $input) {
             $site->save();
-
+            $layout = $input->get('homepage_layout');
             // every route must have a draft OR a published page
             $pagecontent = new PageContent([
                 'site_id' => $site->id,
@@ -44,8 +41,8 @@ class CreateSite implements APICommand
                 'created_by' => $user->getAuthIdentifier(),
                 'updated_by' => $user->getAuthIdentifier(),
                 'options' => [],
-                'layout_name' => $site->options['default_layout_name'],
-                'layout_version' => $site->options['default_layout_version']
+                'layout_name' => $layout['name'],
+                'layout_version' => $layout['version']
             ]);
             $pagecontent->save();
             $revision = Revision::createFromPageContent($pagecontent, $user);
@@ -94,13 +91,13 @@ class CreateSite implements APICommand
                 'regex:/^(\/[a-z0-9_-]+)*$/i',
                 'unique:sites,path,null,id,host,' . $data->get('host')
             ],
-            'default_layout_name' => [
+            'homepage_layout.name' => [
                 'required',
                 'string',
                 'max:100',
                 'regex:/^[a-z0-9_.-]+$/i'
             ],
-            'default_layout_version' => [
+            'homepage_layout.version' => [
                 'required',
                 'integer'
             ]
