@@ -117,8 +117,9 @@ class LocalAPIClient implements \Astro\Renderer\Contracts\APIClient
      * @param string $name Name for the new site.
      * @param string $host Hostname for the new site.
      * @param string $path Path for the new site.
-     * @param string $homepage_layout layout to use for the homepage for this site.
+     * @param array $homepage_layout layout to use for the homepage for this site. [ 'name' => '...', 'version' => '...']
      * @param array $options Other options.
+     * @return Site|Validator
      */
     public function createSite($publishing_group_id, $name, $host, $path, $homepage_layout, $options = [])
     {
@@ -138,20 +139,18 @@ class LocalAPIClient implements \Astro\Renderer\Contracts\APIClient
      * @param int $parent_id
      * @param int|null $before_id
      * @param string $slug
-     * @param string $layout_name
-     * @param int $layout_version
+     * @param array $layout [ 'name' => 'layout-name', 'version' => 'layout-version']
      * @param array $options
      * @return string json
      * @throws
      */
-    public function addPage($site_id, $parent_id, $before_id, $slug, $layout_name, $layout_version, $title)
+    public function addPage($site_id, $parent_id, $before_id, $slug, $layout, $title)
     {
         return $this->execute(AddPage::class, [
             'parent_id' => $parent_id,
             'before_id' => $before_id,
             'slug' => $slug,
-            'layout_name' => $layout_name,
-            'layout_version' => $layout_version,
+            'layout' => $layout,
             'title' => $title
         ]);
     }
@@ -165,8 +164,8 @@ class LocalAPIClient implements \Astro\Renderer\Contracts\APIClient
      * Required attributes are:
      * - slug
      * - title
-     * - layout_name
-     * - layout_version
+     * - layout['name']
+     * - layout['version']
      * @return bool True if successful.
      */
     public function addTree($site_id, $parent_id, $before_id, $tree)
@@ -177,8 +176,7 @@ class LocalAPIClient implements \Astro\Renderer\Contracts\APIClient
                 $parent_id,
                 $before_id,
                 $page['slug'],
-                $page['layout_name'],
-                $page['layout_version'],
+                $page['layout'],
                 $page['title']
             );
             if(!empty($page['children'])){

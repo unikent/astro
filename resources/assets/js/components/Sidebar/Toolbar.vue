@@ -111,7 +111,7 @@ export default {
 		]),
 		savePage() {
 			this.$api
-				.put(`page/${this.$route.params.site_id}`, this.page)
+				.put(`pages/${this.$route.params.site_id}`, this.page)
 				.then(() => {
 					this.$message({
 						message: 'Page saved',

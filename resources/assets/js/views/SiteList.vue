@@ -157,7 +157,7 @@ export default {
 
 		fetchData() {
 			this.$api
-				.get('site')
+				.get('sites')
 				.then((response) => {
 					this.sites = response.data.data;
 					this.loading = false;

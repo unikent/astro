@@ -95,7 +95,7 @@ export default {
 
 		publishPage() {
 			this.$api
-				.post(`page/${this.$route.params.site_id}/publish`, this.page)
+				.post(`pages/${this.$route.params.site_id}/publish`, this.page)
 				.then(() => {
 					this.hidePublishModal();
 					this.$message({

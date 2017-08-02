@@ -49,6 +49,7 @@ class CreateSite implements APICommand
             $revision->save();
             // every site must have a root route...
             $page = Page::create(['path' => '/', 'slug' => null, 'site_id' => $site->id, 'draft_id' => $pagecontent->id]);
+            $page->save();
         });
         $site->refresh();
         return $site;

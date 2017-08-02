@@ -21,7 +21,7 @@ class AddPage implements APICommand
     /**
      * Adding a Page
      * @param $input
-     * @return mixed
+     * @return Page The newly added page.
      */
     public function execute($input, Authenticatable $user)
     {
@@ -48,15 +48,15 @@ class AddPage implements APICommand
             'title' => $input['title'],
             'site_id' => $parent->site_id,
             'options' => [],
-            'layout_name' => $input['layout_name'],
-            'layout_version' => $input['layout_version']
+            'layout_name' => $input['layout']['name'],
+            'layout_version' => $input['layout']['version']
         ]);
         $revision = Revision::createFromPageContent($pagecontent, $user);
         $revision->save();
         $page->setDraft($revision);
         $page->save();
         DB::commit();
-        return $pagecontent;
+        return $page;
     }
 
     public function messages(Collection $data, Authenticatable $user)
@@ -86,12 +86,12 @@ class AddPage implements APICommand
                    ->where('parent_id', $data->get('parent_id'))
                    ->whereNotNull('draft_id'),
             ],
-            'layout_name' => [
+            'layout.name' => [
                 'string',
                 'max:100',
                 'required'
             ],
-            'layout_version' => [
+            'layout.version' => [
                 'integer'
             ],
             'title' => [

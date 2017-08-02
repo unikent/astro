@@ -40,6 +40,14 @@ class PageContent extends Model
 	}
 
     /**
+     * Get the PageContent which is currently a draft for a page
+     */
+	public function draft()
+    {
+        return $this->hasOne(Revision::class, 'page_content_id')->whereHas('draftPage')->limit(1);
+    }
+
+    /**
      * @deprecated
      */
 	public function activeRoute()

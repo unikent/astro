@@ -44,7 +44,7 @@ const actions = {
 
 	fetchSite({ commit, state }) {
 		api
-			.get(`site/${state.site}/tree`)
+			.get(`sites/${state.site}/tree`)
 			.then((response) => {
 				commit('setSite', response.data.data);
 			});
@@ -52,7 +52,7 @@ const actions = {
 
 	fetchLayouts({ commit }) {
 		api
-			.get('layout/definitions')
+			.get('layouts/definitions')
 			.then((response) => {
 				commit('setLayouts', response.data.data)
 			})
@@ -60,7 +60,7 @@ const actions = {
 
 	deletePage({ dispatch }, page) {
 		api
-			.delete(`page/${page.id}`)
+			.delete(`pages/${page.id}`)
 			.then(() => {
 				dispatch('fetchSite');
 			});
@@ -68,7 +68,7 @@ const actions = {
 
 	createPage({ dispatch }, page) {
 		api
-			.post('page', page)
+			.post('pages', page)
 			.then(() => {
 				dispatch('fetchSite');
 			})
@@ -76,7 +76,7 @@ const actions = {
 
 	updatePage({ dispatch }, page) {
 		api
-			.patch(`page/${page.page_id}`, page)
+			.patch(`pages/${page.page_id}`, page)
 			.then(() => {
 				dispatch('fetchSite');
 			})

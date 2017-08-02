@@ -160,12 +160,12 @@ const actions = {
 
 		// TODO: refactor into smaller methods
 		api
-			.get(`page/${id}?include=blocks.media`)
+			.get(`pages/${id}?include=blocks.media`)
 			.then(response => {
 				const page = response.data.data;
 
 				api
-					.get(`layout/${page.layout_name}/definition?include=region_definitions.block_definitions`)
+					.get(`layouts/${page.layout_name}/definition?include=region_definitions.block_definitions`)
 					.then(({ data: region }) => {
 
 						region.data.region_definitions.forEach((region) => {

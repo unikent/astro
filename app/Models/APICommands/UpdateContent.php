@@ -2,6 +2,7 @@
 
 namespace App\Models\APICommands;
 
+use App\Http\Transformers\Api\v1\PageTransformer;
 use App\Models\Contracts\APICommand;
 use App\Models\PageContent;
 use App\Models\Revision;
@@ -27,6 +28,9 @@ class UpdateContent implements APICommand
         $result = DB::transaction(function() use($input,$user){
             $draft = PageContent::findOrFail($input['draft_id']);
 
+            // get the Page that currently holds this draft...
+            $page = $draft->draft->draftPage;
+
             // Update with new content.
             $this->processBlocks($draft, $input['blocks']);
 
@@ -38,6 +42,7 @@ class UpdateContent implements APICommand
             $draft->updated_by = $user->getAuthIdentifier();
             $draft->save();
             DB::commit();
+            $draft->fresh();
             return $draft;
         });
         return $result;

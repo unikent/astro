@@ -23,8 +23,10 @@ class CreateSiteTest extends APICommandTestCase
             'publishing_group_id' => factory(\App\Models\PublishingGroup::class)->create()->getKey(),
             'host' => 'example.com',
             'path' => '',
-            'default_layout_name' => 'test-layout',
-            'default_layout_version' => 1
+            'homepage_layout' => [
+                'name' => 'test-layout',
+                'version' => 1
+            ]
         ];
     }
 
@@ -144,13 +146,13 @@ class CreateSiteTest extends APICommandTestCase
      */
     public function validation_whenDefaultLayoutNameIsMissingOrInvalid_fails()
     {
-        $data = $this->input(['default_layout_name' => '']);
+        $data = $this->input(['homepage_layout' => ['name' => '', 'layout' => 1]]);
         $this->assertTrue($this->validator($data)->fails());
-        $data = $this->input(['default_layout_name' => '//£*']);
+        $data = $this->input(['homepage_layout' => ['name' => '//£*', 'layout' => 1]]);
         $this->assertTrue($this->validator($data)->fails());
-        $data = $this->input(['default_layout_name' => null]);
+        $data = $this->input(['homepage_layout' => null ]);
         $this->assertTrue($this->validator($data)->fails());
-        $data = $this->input(null,['default_layout_name']);
+        $data = $this->input(null,['homepage_layout']);
         $this->assertTrue($this->validator($data)->fails());
     }
 
