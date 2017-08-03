@@ -27,7 +27,7 @@ class SiteController extends ApiController
 	public function index(Request $request){
 	    $api = new LocalAPIClient(Auth::user());
 	    $transformer = new SiteTransformer();
-	    $transformer->setAvailableIncludes(['publishing_group']);
+	    $transformer->setAvailableIncludes(['publishing_group','homepage']);
 		return fractal($api->getSites(), $transformer)->parseIncludes($request->get('include'))->respond();
 	}
 

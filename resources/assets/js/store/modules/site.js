@@ -44,9 +44,9 @@ const actions = {
 
 	fetchSite({ commit, state }) {
 		api
-			.get(`sites/${state.site}/tree`)
+			.get(`sites/${state.site}/tree?include=draft`)
 			.then((response) => {
-				commit('setSite', response.data.data);
+				commit('setSite', [response.data.data]);
 			});
 	},
 

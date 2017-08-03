@@ -13,7 +13,7 @@ class SiteTransformer extends FractalTransformer
 {
 
     protected $defaultIncludes = [ ];
-    protected $availableIncludes = [ 'drafts','pages','published','publishing_group' ];
+    protected $availableIncludes = [ 'drafts','pages','published','publishing_group','homepage' ];
 
 	public function transform(Site $site)
 	{
@@ -28,6 +28,13 @@ class SiteTransformer extends FractalTransformer
         ];
 		return $data;
 	}
+
+	public function includeHomepage(Site $site)
+    {
+        if($site->homePage){
+            return new FractalItem($site->homePage, new PageTransformer(), false);
+        }
+    }
 
 	public function includePublishingGroup(Site $site)
     {
