@@ -1,11 +1,11 @@
 <template>
 	<div>
-		<div class="media-upload__type">
+		<div v-if="allowTypes" class="media-upload__type">
 			Upload type
 			<el-select
 				class="media-upload__select"
 				v-model="uploadType"
-				@change="handleChange"
+				@change="changeAccept"
 				placeholder="Filter files"
 			>
 				<el-option label="All" value="media" />
@@ -15,7 +15,11 @@
 				<el-option label="Audio" value="audio" />
 			</el-select>
 		</div>
-		<upload-form :accept="accept" :multiple="multiple" />
+		<upload-form
+			:accept="accept"
+			:multiple="multiple"
+			:on-success="onSuccess"
+		/>
 	</div>
 </template>
 
@@ -27,11 +31,27 @@ export default {
 	props: {
 		multiple: {
 			default: true
+		},
+		allowTypes: {
+			default: true
+		},
+		type: {
+			default: 'media'
+		},
+		onSuccess: {
+			type: Function,
+			default: () => {}
 		}
 	},
 
 	components: {
 		UploadForm
+	},
+
+	created() {
+		if(!this.allowTypes) {
+			this.changeAccept(this.type);
+		}
 	},
 
 	data() {
@@ -43,7 +63,7 @@ export default {
 
 	methods: {
 
-		handleChange(val) {
+		changeAccept(val) {
 			switch(val) {
 				case 'image':
 					this.accept = '.jpg,.jpeg,.png,.gif,.bmp,.svg';
