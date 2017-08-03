@@ -5,32 +5,32 @@
 
 		<div class="u-mla u-flex">
 
-			<el-button
-				class="upload-button"
-				@click="showUploadForm = true"
-			>Upload</el-button>
+			<el-button @click="showUploadForm = true">Upload</el-button> <!-- class="upload-button" -->
 
-			<el-input
+			<!-- <el-input
 				placeholder="Search for media"
 				class="manage-table__search"
 				v-model="searchTerm"
 				icon="search"
 				:on-icon-click="search"
-			/>
+			/> -->
 
 		</div>
 	</div>
 
-	<el-row>
+	<div class="columns">
 
-		<el-col :span="18">
-
-			<el-select class="media__filter-by" placeholder="Filter by" value="">
-				<el-option label="All media" value="media" />
+		<div class="column is-three-quarters">
+			<!-- <el-select class="media__filter-by" placeholder="Show" value="media">
+				<el-option label="Show all" value="media" />
 				<el-option label="Image" value="image" />
 				<el-option label="Document" value="document" />
 				<el-option label="Video" value="video" />
 				<el-option label="Audio" value="audio" />
+			</el-select>
+			<el-select class="media__filter-by" placeholder="Filter by" value="">
+				<el-option label="All media" value="media" />
+				<el-option label="Unused" value="media" />
 			</el-select>
 
 			<el-select class="media__order-by" placeholder="Order by" value="">
@@ -41,67 +41,40 @@
 				<el-option label="Name" value="name" />
 				<el-option label="Resolution" value="resolution" />
 				<el-option label="Duration" value="duration" />
-			</el-select>
-
-		</el-col>
-
-		<el-col :span="6">
-			<el-row>
-				<el-col :span="12">
-					<el-slider
-						v-model="imageSize"
-						:step="25"
-						:show-tooltip="false"
-						style="margin: 0 5px;"
-					/>
-				</el-col>
-				<el-col :span="12">
-					<el-pagination
-						@size-change="handleMediaCountChange"
-						:page-sizes="[20, 50, 100, 200]"
-						:page-size="mediaCount"
-						layout="slot, sizes"
-						style="margin: 0"
-					>
-						<slot>
-							<span class="show-text">Show</span>
-						</slot>
-					</el-pagination>
-				</el-col>
-			</el-row>
-		</el-col>
-
-	</el-row>
-
-	<el-row style="margin-top: 30px">
-		<div v-for="rowIndex in Math.ceil(filteredImages.length / colCount)" class="columns">
-			<div v-for="colIndex in colCount" class="column">
-				<div
-					v-if="getThumbnail(rowIndex, colIndex)"
-					class="image-grid__item"
-					:title="getThumbnail(rowIndex, colIndex).title"
-				>
-					<lazy-img
-						class="img-grid"
-						:bg="true"
-						:src="getThumbnail(rowIndex, colIndex).url"
-						:smallSrc="getThumbnail(rowIndex, colIndex).url"
-					/>
-					<div class="image-grid__item-overlay" />
-					<div class="item-grid__edit">
-						<i class="el-icon-edit it-butt" @click="showMediaDetails = true; media = getThumbnailIndex(rowIndex, colIndex)"></i>
-						<el-dropdown trigger="click" menu-align="start">
-							<i class="el-icon-more"></i>
-							<el-dropdown-menu slot="dropdown">
-								<el-dropdown-item>Refresh Thumbnails</el-dropdown-item>
-								<el-dropdown-item>Download</el-dropdown-item>
-								<el-dropdown-item>Delete</el-dropdown-item>
-							</el-dropdown-menu>
-						</el-dropdown>
-					</div>
-				</div>
-			</div>
+			</el-select> -->
+			<span style="line-height: 36px">{{ total }} results</span>
 		</div>
+
+		<div class="column">
+			<el-slider
+				v-show="view === 'Grid'"
+				v-model="imageSize"
+				:step="25"
+				:show-tooltip="false"
+			/>
+		</div>
+
+		<div class="column o-media__switch">
+			<el-radio-group v-model="view" size="small">
+				<el-radio-button label="Grid"></el-radio-button>
+				<el-radio-button label="Details"></el-radio-button>
+			</el-radio-group>
+		</div>
+
+	</div>
+
+<!-- 	<el-row>
+		<span>Showing all media filtered by "" in descending order of duration</span>
+		<span class="results-text">{{ total }} results</span>
+	</el-row> -->
+
+	<el-row>
+		<results
+			:results="filteredImages"
+			:view="view"
+			:columnCount="colCount"
+			:editAction="showMediaOverlay"
+		/>
 	</el-row>
 
 	<el-row>
@@ -111,7 +84,7 @@
 			:current-page="currentPage"
 			:page-sizes="[20, 50, 100, 200]"
 			:page-size="mediaCount"
-			layout="total, slot, sizes, ->, prev, pager, next"
+			layout="slot, sizes, ->, prev, pager, next"
 			:total="total"
 		>
 			<slot>
@@ -124,102 +97,44 @@
 		<media-upload />
 	</el-dialog>
 
-	<el-dialog title="Details" v-model="showMediaDetails" size="large">
-		<div v-if="filteredImages[media]" class="columns">
-			<div class="column">
-				<div class="preview-dialog__image-outer">
-					<div class="preview-dialog__image-wrapper">
-						<div class="preview-dialog__image-img" :style="`
-							background: url('${filteredImages[media].url}') center center / contain no-repeat;
-						`" />
-					</div>
-				</div>
-			</div>
-			<div class="column is-one-third">
-				<div class="preview-dialog__details-wrapper">
-					<div v-for="(value, key) in getAttributes(filteredImages[media])" v-if="value">
-						<h3>{{ prettyName(key) }}</h3>
-						<p>{{ transformAttr(key, value) }}</p>
-					</div>
-					<div v-if="filteredImages[media].colours">
-						<h3>Colour palette</h3>
-						<div class="preview-dialog__details-colour-wrapper">
-							<div v-for="rgb in filteredImages[media].colours" class="preview-dialog__details-colours" :style="`background-color: rgb(${rgb.join(',')})`" />
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</el-dialog>
+	<media-overlay />
 </el-card>
 </template>
 
 <script>
-import _ from 'lodash';
-import ColorThief from 'color-thief-standalone';
-import MediaUpload from 'components/MediaUpload';
-import LazyImg from 'components/LazyImage';
+import { mapActions } from 'vuex';
 
-/* global Image */
+import Results from 'components/media/Results';
+import MediaUpload from 'components/MediaUpload';
+import MediaOverlay from 'components/media/MediaOverlay';
 
 export default {
 
 	components: {
 		MediaUpload,
-		LazyImg
+		Results,
+		MediaOverlay
 	},
 
 	data() {
 		return {
 			searchTerm: '',
 			showUploadForm: false,
-			showMediaDetails: false,
 			imageSize: 25,
 
 			currentPage: 1,
 			mediaCount: 20,
 
 			images: [],
-
-			media: 0
+			view: 'Grid'
 		};
-	},
-
-	watch: {
-		showMediaDetails(show) {
-			if(show) {
-				const img = new Image();
-
-				img.addEventListener('load', () => {
-					const colorThief = new ColorThief();
-					this.filteredImages.splice(this.media, 1, {
-						...this.filteredImages[this.media],
-						colours: colorThief.getPalette(img, 6)
-					});
-				});
-
-				img.src = this.filteredImages[this.media].url;
-			}
-		}
 	},
 
 	created() {
-		this.prettyNames = {
-			'filename'    : 'Filename',
-			'filesize'    : 'File size',
-			'type'        : 'File type',
-			'height'      : 'Height',
-			'width'       : 'Width',
-			'aspect_ratio': 'Aspect ratio'
-		};
-	},
-
-	mounted() {
 		this.fetchMedia();
 	},
 
 	computed: {
-
 		colCount() {
 			switch(this.imageSize) {
 				case 0:
@@ -239,9 +154,8 @@ export default {
 			const
 				from = (this.currentPage - 1) * this.mediaCount,
 				to = from + this.mediaCount;
-
 			return (
-				this.total < to ? this.images : this.images.slice(from, to)
+				this.total < (to - from) ? this.images : this.images.slice(from, to)
 			);
 		},
 
@@ -251,16 +165,12 @@ export default {
 	},
 
 	methods: {
+		...mapActions([
+			'showMediaOverlay'
+		]),
+
 		search() {
 			// TODO: filter media by "this.searchTerm"
-		},
-
-		getThumbnail(row, col) {
-			return this.filteredImages[this.getThumbnailIndex(row, col)];
-		},
-
-		getThumbnailIndex(rowIndex, colIndex) {
-			return (rowIndex - 1) * this.colCount + colIndex - 1;
 		},
 
 		handleMediaCountChange(newSize) {
@@ -269,36 +179,6 @@ export default {
 
 		handlePagination(pageNumber) {
 			this.currentPage = pageNumber;
-		},
-
-		getAttributes(media) {
-			return _.pick(media, [
-				'type', 'filename', 'filesize',
-				'height', 'width', 'aspect_ratio'
-			]);
-		},
-
-		prettyName(attr) {
-			return this.prettyNames[attr] ? this.prettyNames[attr] : attr;
-		},
-
-		formatBytes(size, precision = 2) {
-			const
-				base = Math.log(size) / Math.log(1024),
-				floored = Math.floor(base),
-				unit = ['bytes', 'KB', 'MB', 'GB', 'TB'][floored],
-				formattedBytes = Math.pow(1024, base - floored).toFixed(precision);
-
-			return `${formattedBytes} ${unit}`;
-		},
-
-		transformAttr(name, attr) {
-			switch(name) {
-				case 'filesize':
-					return this.formatBytes(attr);
-			}
-
-			return attr;
 		},
 
 		fetchMedia() {
