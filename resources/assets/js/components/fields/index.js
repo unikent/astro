@@ -8,7 +8,6 @@ import Select        from './Select';
 import MultiSelect   from './MultiSelect';
 import Radio         from './Radio';
 import ButtonGroup   from './ButtonGroup';
-import Link          from './Link';
 import Image         from './Image';
 import File          from './File';
 import Slider        from './Slider';
@@ -27,7 +26,6 @@ export default {
 	multiselect: MultiSelect,
 	radio:       Radio,
 	buttongroup: ButtonGroup,
-	link:        Link,
 	image:       Image,
 	file:        File,
 	number:      Number,

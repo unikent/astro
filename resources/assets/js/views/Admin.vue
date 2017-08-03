@@ -65,7 +65,7 @@ export default {
 				{
 					link: '/settings',
 					icon: 'settings',
-					title: 'General Settings'
+					title: 'Settings'
 				}
 			]
 		};
