@@ -8,6 +8,7 @@
 					:label="f.label"
 					:prop="`${name}.${f.name}`"
 					:rules="rules[name].fields[f.name]"
+					:error="getError(f.name)"
 				>
 					<template slot="label">
 						<span>{{ f.label }}</span>
@@ -26,10 +27,11 @@
 							/>
 						</el-tooltip>
 					</template>
+
 					<component
 						:is="getField(f.type)"
 						:field="childField(f)"
-						:name="`${name}.${f.name}`"
+						:path="`${name}.${f.name}`"
 						:index="currentIndex"
 						:key="`${name}-${f.name}-${currentIndex}`"
 					/>
@@ -80,6 +82,13 @@ export default {
 				this.rules[this.name];
 
 			return rules.fields[fieldName];
+		},
+
+		getError(fieldName) {
+			return (
+				this.errors && this.errors[fieldName] ?
+					this.errors[fieldName] : null
+			);
 		}
 	}
 };

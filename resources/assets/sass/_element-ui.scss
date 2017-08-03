@@ -34,28 +34,18 @@
 
 .block-options-list	{
 	.el-form-item__label {
-		padding: 0 0 5px;
+		padding: 0 0 10px;
 		font-size: 14px;
 		font-weight: 500;
-		width:100%;
+		width: 100%;
+
 		span {
 			line-height: 1.5;
 		}
 	}
 
-	.el-form--label-top .el-form-item__label {
-		padding: 0 0 5px;
-	}
-
-	.el-form-item.is-required .el-form-item__label span {
-		&::before {
-			content: "*";
-			color: #ff0000;
-		}
-	}
-
 	.el-form-item__icon-help {
-		margin-left: 5px;
+		margin-right: 5px;
 	}
 
 	.el-form-item__icon-view {
@@ -75,6 +65,11 @@
 
 	.el-form-item.is-required .el-form-item__label:before {
 		content: none;
+	}
+
+	.el-form-item.is-required .el-form-item__label:after {
+		content: '*';
+		color: #ff4949;
 	}
 
 	.el-form-item.is-error .collection-field .el-input__inner,

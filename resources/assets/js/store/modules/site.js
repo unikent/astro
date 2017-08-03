@@ -82,9 +82,12 @@ const actions = {
 			})
 	},
 
-	movePageCall({ dispatch }, move) {
+	movePageApi({ dispatch }, move) {
+		// If-Unmodified-Since
 		// api
-		// 	.patch(`page/${page.page_id}`, page)
+		// 	.patch(`site/${site_id}/stucture`, page, {
+		// 		headers: {'If-Unmodified-Since': 'foobar'}
+		// 	})
 		// 	.then(() => {
 		// 		dispatch('fetchSite');
 		// 	})
@@ -106,10 +109,10 @@ const actions = {
 			// splice page in if page already exists in new position otherwise add it
 			commit('addPage', { ...newPage, page, push: !newPage.data });
 
-			dispatch('movePageCall', {
-				id: page.id,
-				parentId: newPage.parent.id,
-				nextId: newPage.parent.children[newPage.index] ? newPage.parent.children[newPage.index].id : null
+			dispatch('movePageApi', {
+				page_id: page.id,
+				parent_id: newPage.parent.id,
+				next_id: newPage.parent.children[newPage.index] ? newPage.parent.children[newPage.index].id : null
 			});
 		}
 		else {

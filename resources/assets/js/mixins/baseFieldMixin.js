@@ -1,22 +1,26 @@
-import { mapMutations } from 'vuex';
+import { mapGetters, mapMutations } from 'vuex';
 
 export default {
 
-	props: ['field', 'name'],
+	props: ['field', 'path', 'errors'],
 
 	data() {
 		return this.field;
 	},
 
 	computed: {
+		...mapGetters([
+			'getCurrentFieldValue'
+		]),
+
 		value: {
 			get() {
-				const value = this.$store.getters.getCurrentFieldValue(this.name);
+				const value = this.getCurrentFieldValue(this.path);
 				return value !== void 0 ? value : this.default;
 			},
 			set(value) {
 				this.updateFieldValue({
-					name: this.name,
+					name: this.path,
 					value: this.transformValue(value)
 				});
 			}
