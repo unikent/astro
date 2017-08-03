@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use Baum\Node;
 use DB;
 use Exception;
 use Baum\Node as BaumNode;
@@ -37,6 +38,20 @@ class Page extends BaumNode implements RoutableContract
     const STATE_MOVED = 'moved'; // moved since last published
     const STATE_PUBLISHED = 'published'; // not modified since last published
     const STATE_EMPTY = 'empty'; // no draft or published state.
+
+    /**
+     * Prunes this Page and its descendants removing any pages with no draft or published revision.
+     */
+    public function removeEmptyPages()
+    {
+        if(!$this->draft_id && !$this->published_id){
+            $this->delete();
+        }else {
+            foreach ($this->children as $child) {
+                $child->removeEmptyPages();
+            }
+        }
+    }
 
     /**
      * Get the draft state of this Page
@@ -305,6 +320,7 @@ class Page extends BaumNode implements RoutableContract
     public function setDraft($revision)
     {
         $this->draft_id = $revision ? $revision->id : null;
+        $this->save();
     }
 
     /**

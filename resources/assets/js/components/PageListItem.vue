@@ -1,5 +1,5 @@
 <template>
-<div
+<div v-if="page.draft"
 	:class="{
 		'page-list__item': !root,
 		'page-list__root': root && hasChildren && flatten,

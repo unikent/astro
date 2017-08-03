@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\APICommands\ListSites;
 use App\Models\APICommands\UpdateContent;
+use App\Models\APICommands\DeletePage;
 use Astro\Renderer\API\Exception\APIErrorException;
 use Astro\Renderer\API\Data\PageData;
 use Astro\Renderer\API\Data\RouteData;

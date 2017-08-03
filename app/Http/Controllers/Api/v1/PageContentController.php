@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Api\v1;
 
+use App\Http\Transformers\Api\v1\PageTransformer;
 use App\Models\APICommands\AddPage;
 use App\Models\LocalAPIClient;
 use Auth;
@@ -15,6 +16,7 @@ use App\Models\Revision;
 use App\Exceptions\UnpublishedParentException;
 use App\Http\Requests\Api\v1\Page\PersistRequest;
 use App\Http\Transformers\Api\v1\PageContentTransformer;
+use League\Flysystem\Adapter\Local;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 
@@ -45,7 +47,7 @@ class PageContentController extends ApiController
 	    $api = new LocalAPIClient(Auth::user());
 	    $pagecontent = $api->execute(AddPage::class, $request->all());
 
-		return fractal($pagecontent, new PageContentTransformer)->respond(201);
+		return fractal($pagecontent, new PageTransformer)->respond(201);
 	}
 
 	/**
@@ -139,8 +141,8 @@ class PageContentController extends ApiController
 	 */
 	public function destroy(Request $request, PageContent $pagecontent){
 		$this->authorize('delete', $pagecontent);
-
-        $pagecontent->delete();
+		$api = new LocalAPIClient(Auth::user());
+		$api->deletePage($pagecontent->id);
 		return (new SymfonyResponse())->setStatusCode(200);
 	}
 

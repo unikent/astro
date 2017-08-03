@@ -23,40 +23,34 @@ class DatabaseSeeder extends Seeder
         [
             'slug' => 'undergraduate',
             'title' => 'Undergraduates',
-            'layout_name' => 'test-layout',
-            'layout_version' => 1,
+            'layout' => [ 'name' => 'kent-homepage', 'version' => 1],
             'children' => [
                 [
                     'slug' => '2017',
                     'title' => '2017 Entry',
-                    'layout_name' => 'test-layout',
-                    'layout_version' => 1
+                    'layout' => [ 'name' => 'kent-homepage', 'version' => 1],
                 ],
                 [
                     'slug' => '2018',
                     'title' => '2018 Entry',
-                    'layout_name' => 'test-layout',
-                    'layout_version' => 1
+                    'layout' => [ 'name' => 'kent-homepage', 'version' => 1],
                 ],
             ]
         ],
         [
             'slug' => 'postgraduate',
             'title' => 'Postgraduates',
-            'layout_name' => 'test-layout',
-            'layout_version' => 1,
+            'layout' => [ 'name' => 'kent-homepage', 'version' => 1],
             'children' => [
                 [
                     'slug' => '2017',
                     'title' => '2017 Entry',
-                    'layout_name' => 'test-layout',
-                    'layout_version' => 1
+                    'layout' => [ 'name' => 'kent-homepage', 'version' => 1],
                 ],
                 [
                     'slug' => '2018',
                     'title' => '2018 Entry',
-                    'layout_name' => 'test-layout',
-                    'layout_version' => 1
+                    'layout' => [ 'name' => 'kent-homepage', 'version' => 1],
                 ],
             ]
         ]
@@ -92,7 +86,7 @@ class DatabaseSeeder extends Seeder
 
         $client = new LocalAPIClient($user);
         $site = $client->createSite(
-            1, 'Test Site', 'example.com', '', ['name'=>'test-layout','version'=>1]
+            1, 'Test Site', 'example.com', '', ['name'=>'kent-homepage','version'=>1]
         );
         $client->addTree($site->id, $site->homePage->id, null, $this->testTree);
 

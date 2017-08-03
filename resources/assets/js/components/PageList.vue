@@ -20,7 +20,7 @@
 				<el-form-item label="Page title">
 					<el-input name="title" v-model="createForm.title" auto-complete="off"></el-input>
 				</el-form-item>
-				<el-select name="layout_name" v-model="createForm.layout_name" placeholder="Select">
+				<el-select name="layout_name" v-model="createForm.layout.name" placeholder="Select">
 					<el-option
 							v-for="item in layouts"
 							:key="item"
@@ -29,10 +29,10 @@
 					</el-option>
 				</el-select>
 				<el-form-item label="Layout Version">
-					<el-input name="layout_version" v-model="createForm.layout_version" auto-complete="off"></el-input>
+					<el-input name="layout_version" v-model="createForm.layout.version" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="slug">
-					<el-input name="slug" v-model="createForm.route.slug" auto-complete="off"></el-input>
+					<el-input name="slug" v-model="createForm.slug" auto-complete="off"></el-input>
 				</el-form-item>
 			</el-form>
 			<span slot="footer" class="dialog-footer">
@@ -75,12 +75,12 @@ export default {
 			layouts: [],
 			createForm: {
 				title: 'Unnamed Page',
-				layout_name: 'kent-homepage',
-				layout_version: 1,
-				route: {
-					slug: 'testing',
-					parent_id: 1
-				},
+				layout: {
+                    name: 'kent-homepage',
+                    version: 1,
+                },
+				slug: 'testing',
+				parent_id: 1,
 				options: {}
 			}
 		};
@@ -101,7 +101,7 @@ export default {
 		openModal(pageItem) {
 			this.currentPage = pageItem;
 			this.createFormVisible = true;
-			this.createForm.route.parent_id = pageItem.page.id;
+			this.createForm.parent_id = pageItem.page.draft.page_content_id;
 		},
 
 		addChild() {
