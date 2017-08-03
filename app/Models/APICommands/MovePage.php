@@ -25,6 +25,7 @@ class MovePage implements APICommand
     public function execute($input, Authenticatable $user)
     {
         $page = null;
+        return false;
         DB::beginTransaction();
         $parent = Page::find($input['parent_id']);
         $before = !empty($input['before_id']) ? Page::find($input['before_id']) : null;
@@ -64,42 +65,24 @@ class MovePage implements APICommand
     public function rules(Collection $data, Authenticatable $user)
     {
         return [
-            'draft_id' => [
+            'page_id' => [
                 'required',
-                'exists:page_content'
+                'exists:page_content,id'
             ],
+            // parent must exist and be in the same site as this page
             'parent_id' => [
                 'required',
-                'exists:pages,id'
+                'exists:pages,id',
+                'same_site:' . $data->get('page_id'),
+                'descendant_or_self:'.$data->get('page_id').',false'
              ],
             // if before_id exists it must have the parent_id specified for the new route / page.
-            'before_id' => [
+            'next_id' => [
                 'nullable',
                 Rule::exists('pages','id')
                     ->where('parent_id', $data->get('parent_id'))
             ],
-            'slug' => [
-                // slug is required and can only contain lowercase letters, numbers, hyphen or underscore.
-                'required',
-                'regex:/^[a-z0-9_-]+$/',
-                // there must not be an existing draft route with the same slug under the parent page
-                Rule::unique('pages', 'slug')
-                   ->where('parent_id', $data->get('parent_id'))
-                   ->whereNotNull('draft_id'),
-            ],
-            'layout_name' => [
-                'string',
-                'max:100',
-                'required'
-            ],
-            'layout_version' => [
-                'integer'
-            ],
-            'title' => [
-                'string',
-                'max:150',
-                'required'
-            ]
+
         ];
     }
 }

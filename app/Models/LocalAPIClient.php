@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\APICommands\ListSites;
 use App\Models\APICommands\UpdateContent;
 use App\Models\APICommands\DeletePage;
+use App\Models\APICommands\MovePage;
 use Astro\Renderer\API\Exception\APIErrorException;
 use Astro\Renderer\API\Data\PageData;
 use Astro\Renderer\API\Data\RouteData;
@@ -214,9 +215,9 @@ class LocalAPIClient implements \Astro\Renderer\Contracts\APIClient
         ]);
     }
 
-    public function movePage()
+    public function movePage($data)
     {
-
+        return $this->execute(MovePage::class, $data);
     }
 
     public function publishPage()

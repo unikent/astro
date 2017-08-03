@@ -84,15 +84,14 @@ const actions = {
 
 	movePageApi({ dispatch }, move) {
 		// If-Unmodified-Since
-		// api
-		// 	.patch(`site/${site_id}/stucture`, page, {
-		// 		headers: {'If-Unmodified-Since': 'foobar'}
-		// 	})
-		// 	.then(() => {
-		// 		dispatch('fetchSite');
-		// 	})
+		api
+		 	.patch(`sites/${state.site}/tree`, move)
+		 	.then(() => {
+		 		dispatch('fetchSite');
+		 	});
 		console.log(move);
 	},
+
 
 	movePage({ dispatch, commit, state }, { toPath, fromPath }) {
 		const
@@ -110,7 +109,7 @@ const actions = {
 			commit('addPage', { ...newPage, page, push: !newPage.data });
 
 			dispatch('movePageApi', {
-				page_id: page.id,
+				page_id: page.draft.page_content_id,
 				parent_id: newPage.parent.id,
 				next_id: newPage.parent.children[newPage.index] ? newPage.parent.children[newPage.index].id : null
 			});

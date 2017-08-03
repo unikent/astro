@@ -121,6 +121,13 @@ class SiteController extends ApiController
 		return new JsonResponse($data);
 	}
 
+	public function move(Request $request)
+    {
+        $api = new LocalAPIClient(Auth::user());
+        $result = $api->movePage($request->all());
+        return $result;
+    }
+
     /**
      * Magickery
      * Turn a "flat" array of hierarchical data into a hierarchy.
