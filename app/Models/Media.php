@@ -326,7 +326,7 @@ class Media extends Model
 			}
 		}
 
-		return isset($extMap[$extension]) ? $extMap[$extension] : 'image';
+		return isset($extMap[$extension]) ? $extMap[$extension] : 'document';
 	}
 
 	/**
