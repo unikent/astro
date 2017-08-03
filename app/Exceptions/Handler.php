@@ -50,44 +50,52 @@ class Handler extends ExceptionHandler
 	{
 		$classname = get_class($exception);
 
-		if($exception instanceof AuthorizationException)
-		{
-			return $this->formatErrors(
-				'Not Authorized', $classname, 403, $exception
-			);
+		if($request->route()){
+			$action = $request->route()->getAction();
+			$prefix = $action['prefix'];
 		}
-		else if($exception instanceof AuthenticationException)
+
+		if(isset($prefix) && starts_with($prefix, 'api'))
 		{
-			return $this->formatErrors(
-				'Not Authenticated', $classname, 401, $exception
-			);
-		}
-		else if($exception instanceof ValidationException)
-		{
-			return $this->formatErrors(
-				'Invalid input given',
-				$exception->validator->errors()->getMessages(),
-				422,
-				$exception
-			);
-		}
-		else if(
-			$exception instanceof DefinitionNotFoundException ||
-			$exception instanceof ModelNotFoundException
-		)
-		{
-			return $this->formatErrors(
-				'Not Found', $classname, 404, $exception
-			);
-		}
-		else if($exception instanceof PostTooLargeException)
-		{
-			return $this->formatErrors(
-				'This content is too large to upload',
-				$classname,
-				422,
-				$exception
-			);
+			if($exception instanceof AuthorizationException)
+			{
+				return $this->formatErrors(
+					'Not Authorized', $classname, 403, $exception
+				);
+			}
+			else if($exception instanceof AuthenticationException)
+			{
+				return $this->formatErrors(
+					'Not Authenticated', $classname, 401, $exception
+				);
+			}
+			else if($exception instanceof ValidationException)
+			{
+				return $this->formatErrors(
+					'Invalid input given',
+					$exception->validator->errors()->getMessages(),
+					422,
+					$exception
+				);
+			}
+			else if(
+				$exception instanceof DefinitionNotFoundException ||
+				$exception instanceof ModelNotFoundException
+			)
+			{
+				return $this->formatErrors(
+					'Not Found', $classname, 404, $exception
+				);
+			}
+			else if($exception instanceof PostTooLargeException)
+			{
+				return $this->formatErrors(
+					'This content is too large to upload',
+					$classname,
+					422,
+					$exception
+				);
+			}
 		}
 
 		return parent::render($request, $exception);
