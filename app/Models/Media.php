@@ -37,7 +37,11 @@ class Media extends Model
 
 	protected $appends = [
 		'url',
-		'file',
+		'file'
+	];
+
+	protected $casts = [
+		'variants' => 'json'
 	];
 
 	protected $file;
@@ -202,6 +206,30 @@ class Media extends Model
 	}
 
 	/**
+	 * Get variants attribute.
+	 *
+	 * @return array
+	 */
+	public function getVariantsAttribute($value)
+	{
+		$variants = json_decode($value, true);
+
+		if(is_array($variants))
+		{
+			array_walk(
+				$variants,
+				function(&$variant, $key) {
+					if($key !== 'base64') {
+						$variant = $this->fileUrl . '/' . $this->id . '/' . $variant;
+					}
+				}
+			);
+		}
+
+		return $variants;
+	}
+
+	/**
 	 * Save the model to the database.
 	 *
 	 * We wrap the save operation in a transaction, to ensure that we have an ID assigned
@@ -218,6 +246,10 @@ class Media extends Model
 			if(is_a($this->file, File::class)){
 				$this->hash = static::hash($this->file);
 				$this->filename = $this->file->getFilename();
+
+				$this->type = static::getMediaType(
+					$this->file->getClientOriginalName()
+				);
 
 				$this->fill(static::extractMeta($this->file));
 			}
@@ -274,6 +306,27 @@ class Media extends Model
 			DB::rollBack();
 			throw $e;
 		}
+	}
+
+	// TODO: refactor this into something less yucky?
+	public static function getMediaType($filename) {
+		$extension = pathinfo($filename, PATHINFO_EXTENSION);
+
+		$types = [
+			'image' => 'jpg,jpeg,png,gif,bmp,svg' ,
+			'document' => 'pdf,doc,docx,key,ppt,pptx,pps,ppsx,odt,xls,xlsx,zip,csv'
+		];
+
+		$extMap = [];
+
+		foreach($types as $type => $list) {
+			$exts = explode(',', $list);
+			foreach($exts as $ext) {
+				$extMap[$ext] = $type;
+			}
+		}
+
+		return isset($extMap[$extension]) ? $extMap[$extension] : 'image';
 	}
 
 	/**
