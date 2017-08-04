@@ -15,19 +15,14 @@ class CreateRevisionsTable extends Migration
     {
         Schema::create('revisions', function(Blueprint $table) {
             $table->increments('id');
-            $table->integer('page_content_id')->unsigned()->index();
+            $table->integer('page_id')->unsigned();
             $table->string('title');
             $table->string('layout_name');
             $table->integer('layout_version');
-
             $table->mediumText('bake');
-
-            $table->string('type')->default('published');
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
             $table->timestamps();
-
-            $table->foreign('page_content_id', 'page_content_id_fk')->references('id')->on('page_content');
         });
     }
 
@@ -39,7 +34,7 @@ class CreateRevisionsTable extends Migration
     public function down()
     {
         Schema::table('revisions', function(Blueprint $table) {
-            $table->dropForeign('page_content_id_fk');
+            $table->dropForeign('fk_page_id');
         });
         Schema::drop('revisions');
     }

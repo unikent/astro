@@ -20,7 +20,7 @@
 		</span>
 
 		<span ref="name" style=" flex: 1 0 auto; cursor: pointer;" @click="edit">
-			{{ page.path === '/' ? 'Home page' : (page.draft.title || page.slug) }}
+			{{ page.path === '/' ? 'Home page' : page.id + ' ' + (page.draft.title || page.slug) }}
 		</span>
 
 		<!-- Page options dropdown -->

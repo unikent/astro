@@ -17,10 +17,10 @@ class CreateRedirects extends Migration
             $table->increments('id');
 
             $table->string('path')->unique();
-            $table->integer('page_content_id')->unsigned();
+            $table->integer('page_id')->unsigned();
 
             $table->timestamps();
-            $table->foreign('page_content_id', 'redirects_page_content_id_fk')->references('id')->on('page_content')->onDelete('cascade');
+            $table->foreign('page_id', 'redirects_page_id_fk')->references('id')->on('pages')->onDelete('cascade');
         });
     }
 
@@ -32,7 +32,7 @@ class CreateRedirects extends Migration
     public function down()
     {
         Schema::table('redirects', function(Blueprint $table) {
-            $table->dropForeign('redirects_page_content_id_fk');
+            $table->dropForeign('redirects_page_id_fk');
         });
 
         Schema::drop('redirects');

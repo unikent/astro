@@ -28,7 +28,6 @@ class AddPage implements APICommand
         $page = null;
         DB::beginTransaction();
         $parent = Page::find($input['parent_id']);
-        $before = !empty($input['before_id']) ? Page::find($input['before_id']) : null;
         $page = $parent->getChildWithSlug($input['slug']);
         if ($page) {
             if ($page->hasDraft()) {
@@ -40,9 +39,6 @@ class AddPage implements APICommand
                 'slug' => $input['slug'],
                 'parent_id' => $parent->id
             ]);
-            if ($before) {
-                $page->makePreviousSiblingOf($before);
-            }
         }
         $pagecontent = PageContent::create([
             'title' => $input['title'],

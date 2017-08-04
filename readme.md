@@ -93,18 +93,16 @@ Includes will resolve deep relations, i.e. 'block,block.definitions' but please 
 
 #### Pages, Revisions, Sites & Permissions
 
-A **Site** has a host (domain) name, an optional path prefix, a hierarchical structure and at least one **Page**.
+A **Site** has a host (domain) name, an optional path prefix, and one or more hierarchical structures (versions - 
+e.g. "draft", "published"), each of which has at least one **Page** (homepage). 
 
-The **Site** structure is comprised of **Pages**, stored as a nested set (using Baum, a nested-set implementation for Laravel)
-, scoped to that **Site**.
+A **Site** structure is comprised of **Pages**, stored as a nested set (using Baum, a nested-set implementation for Laravel)
+, scoped to that **Site** and **Version**.
 
-A **Page** has zero or one draft **Revision** and zero or one published **Revision**. A **Page** with no **Revisions** 
-should not exist.
+A **Page** has a **Revision** which represents its current content (blocks), title and configuration.
 
-A **Revision** includes the content (blocks) that make up a **Page** as well as the title, meta data, layout name and version.
- 
-A new **Revision** is created every time page content or definition is updated. **Revisions** have a type, which can be
-one of "draft", "published", "archived" or "deleted".
+A new **Revision** is created every time page content or definition is updated. **Revisions** have a created date,
+modified date, published date and deleted date and are associated with a single Page.
  
 The URL to a **Page** is represented by concatenating its **Site's** hostname and path and the **Page's** path. 
 The **Page's** path is generated automatically when saved by appending its slug to the end of its parent's path.
@@ -114,8 +112,8 @@ A single **Page** may be associated with multiple **Revisions** (providing a pub
 When a **Page** is moved, a **Redirect** is created to point the old path to the new. If a new **Page** is created at
 the old location, the redirection is removed.
 
-All changes to **Pages** including edits, moves, deletions and additions are made in draft mode, and must be published
-in order for them to take effect on the live version of the site.
+All changes to **Pages** including edits, moves, deletions and additions are made in the **draft** site structure, 
+and must be published to the **live** site structure in order for them to take effect on the live version of the site.
 
 ##### Authorization 
 

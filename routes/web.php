@@ -17,15 +17,14 @@ use Astro\Renderer\Base\SingleDefinitionsFolderLocator;
 use Astro\Renderer\Engines\TwigEngine;
 use Astro\Renderer\AstroRenderer;
 use App\Models\LocalAPIClient;
+use Illuminate\Http\Request;
 
 $this->get('auth/login', 'Auth\AuthController@login')->name('auth.login');
 $this->post('auth/login', 'Auth\AuthController@loginLocal');
 $this->get('auth/sso/respond', 'Auth\AuthController@loginSSO')->name('auth.sso.respond');
 $this->post('auth/logout', 'Auth\AuthController@logout')->name('auth.logout');
 
-
-
-Route::get('/draft/{route?}', function($route = '') {
+Route::get('/draft', function(Request $request) {
 
     // Template, definitions, etc locator
     $locator = new SingleDefinitionsFolderLocator(
@@ -40,7 +39,7 @@ Route::get('/draft/{route?}', function($route = '') {
     // controller
     $astro = new AstroRenderer();
 
-    return $astro->renderRoute($route . "/", $api, $engine, $locator);
+    return $astro->renderRoute($request->input('host'), $request->input('path'), $api, $engine, $locator);
 })
 ->where('route', '(.*?)/?')
 ->middleware('auth');

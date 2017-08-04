@@ -34,22 +34,7 @@ class CreateSite implements APICommand
         DB::transaction(function() use($site, $user, $input) {
             $site->save();
             $layout = $input->get('homepage_layout');
-            // every route must have a draft OR a published page
-            $pagecontent = new PageContent([
-                'site_id' => $site->id,
-                'title' => 'Home Page',
-                'created_by' => $user->getAuthIdentifier(),
-                'updated_by' => $user->getAuthIdentifier(),
-                'options' => [],
-                'layout_name' => $layout['name'],
-                'layout_version' => $layout['version']
-            ]);
-            $pagecontent->save();
-            $revision = Revision::createFromPageContent($pagecontent, $user);
-            $revision->save();
-            // every site must have a root route...
-            $page = Page::create(['path' => '/', 'slug' => null, 'site_id' => $site->id, 'draft_id' => $pagecontent->id]);
-            $page->save();
+            $site->createHomePage('Home Page', $layout, $user);
         });
         $site->refresh();
         return $site;

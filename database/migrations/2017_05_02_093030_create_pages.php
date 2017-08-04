@@ -15,24 +15,35 @@ class CreatePages extends Migration
 	{
 		Schema::create('pages', function (Blueprint $table) {
 			$table->increments('id');
+            $table->integer('site_id')->unsigned();
+            $table->string('version',30);
 
 			$table->string('path', 255)->index();
 			$table->string('slug', 60)->nullable();
 
-            $table->integer('site_id')->unsigned();
+			$table->integer('revision_id', false, true)->unsigned()->nullable();
 
-			$table->integer('draft_id', false, true)->unsigned()->nullable();
-            $table->integer('published_id', false, true)->nullable();
-
+            // baum/nestedset fields
 			$table->integer('parent_id')->nullable();
 			$table->integer('lft')->nullable();
 			$table->integer('rgt')->nullable();
 			$table->integer('depth')->nullable();
 
-            $table->foreign('published_id', 'published_id_fk')->references('id')->on('revisions')->onDelete('restrict');
-            $table->foreign('site_id', 'site_id_fk')->references('id')->on('sites');
-            $table->foreign('draft_id', 'draft_id_fk')->references('id')->on('revisions')->onDelete('restrict');
+            // Keep track
+            $table->integer('created_by')->nullable();
+            $table->integer('updated_by')->nullable();
+            $table->timestamps();
+            $table->timestamp('deleted_at')->nullable();
+
+			$table->index(['site_id','version','lft'], 'idx_site_id_version_path');
+            $table->foreign('revision_id', 'fk_revision_id')->references('id')->on('revisions')->onDelete('restrict');
+            $table->foreign('site_id', 'fk_site_id')->references('id')->on('sites')->onDelete('restrict');
+            $table->index('updated_at', 'idx_updated_at');
 		});
+
+		Schema::table('revisions', function(Blueprint $table) {
+            $table->foreign('page_id', 'fk_page_id')->references('id')->on('pages');
+        });
 	}
 
 	/**
@@ -42,10 +53,14 @@ class CreatePages extends Migration
 	 */
 	public function down()
 	{
+	    Schema::table('revisions', function(Blueprint $table){
+	       $table->dropForeign('fk_page_id');
+        });
         Schema::table('pages', function(Blueprint $table) {
-            $table->dropForeign('site_id_fk');
-            $table->dropForeign('draft_id_fk');
-            $table->dropForeign('published_id_fk');
+            $table->dropIndex('idx_updated_at');
+            $table->dropForeign('fk_site_id');
+            $table->dropForeign('fk_revision_id');
+            $table->dropIndex('idx_site_id_version_path');
         });
 
 		Schema::drop('pages');

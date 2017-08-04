@@ -45,9 +45,9 @@ class LocalAPIClient implements \Astro\Renderer\Contracts\APIClient
         $this->user = $user;
     }
 
-    public function getRouteDefinition($path)
+    public function getRouteDefinition($host, $path)
     {
-        $json = $this->resolveRoute($path);
+        $json = $this->resolveRoute($host, $path);
         $data = json_decode($json->content(),true);
         if(null === $data){
             throw new APIErrorException('Non json data returned from API for path "' . $path . '"',APIErrorException::ERR_INVALID_JSON);

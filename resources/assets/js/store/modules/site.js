@@ -109,8 +109,8 @@ const actions = {
 			commit('addPage', { ...newPage, page, push: !newPage.data });
 
 			dispatch('movePageApi', {
-				page_id: page.draft.page_content_id,
-				parent_id: newPage.parent.id,
+				page_id: page.id,
+				parent_id: newPage.data.parent_id,
 				next_id: newPage.parent.children[newPage.index] ? newPage.parent.children[newPage.index].id : null
 			});
 		}

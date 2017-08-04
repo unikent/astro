@@ -41,13 +41,13 @@ class AppServiceProvider extends ServiceProvider
 
         /**
          */
-		Validator::extend('descendant_or_self', function($attribute, $value, $parameters, $validator){
+		Validator::extend('not_descendant_or_self', function($attribute, $value, $parameters, $validator){
 		     $page = Page::find($parameters[0]);
 		     if(!$page){
 		         return false;
              }
-             $is = $page->descendantsAndSelf()->where('id', $value)->exists();
-		     return (empty($parameters[1]) || $parameters[1] != 'false') ? $is : ! $is;
+             $is = !$page->descendantsAndSelf()->where('id', $value)->exists();
+		     return $is;
         });
 	}
 

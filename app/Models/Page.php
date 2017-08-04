@@ -4,6 +4,8 @@ namespace App\Models;
 use Baum\Node;
 use DB;
 use Exception;
+use App\Exceptions\PageExistsException;
+
 use Baum\Node as BaumNode;
 use App\Models\Traits\Routable;
 use Illuminate\Database\Eloquent\Builder;
@@ -21,6 +23,7 @@ class Page extends BaumNode implements RoutableContract
 		'draft_id',
 		'parent_id',
         'site_id',
+        'version',
         'path'
 	];
 
@@ -29,7 +32,7 @@ class Page extends BaumNode implements RoutableContract
 		'rgt'
 	];
 
-    protected $scoped = ['site_id'];
+    protected $scoped = ['site_id','version'];
 
     // The draft state of this page.
     const STATE_NEW = 'new';  // not published
@@ -136,7 +139,7 @@ class Page extends BaumNode implements RoutableContract
      * @param $path
      * @return mixed
      */
-    public function scopeForSiteAndPath($query, $site_id, $path)
+    public static function scopeForSiteAndPath($query, $site_id, $path)
     {
         return $query->where('site_id', $site_id)
                     ->where('path', $path);
@@ -173,11 +176,14 @@ class Page extends BaumNode implements RoutableContract
      * @param $path
      * @return mixed
      */
-    public function findBySiteAndPath($site_id, $path)
+    public static function findBySiteAndPath($site_id, $path)
     {
-        return $this->forSiteAndPath($site_id,$path)->first();
+        return Page::forSiteAndPath($site_id,$path)->first();
     }
 
+    public static function findByHostAndPath($host, $path)
+    {
+    }
 
     /**
      * Delete the model from the database.
@@ -248,9 +254,46 @@ class Page extends BaumNode implements RoutableContract
 		return $path . $this->slug;
 	}
 
+    /**
+     * Move logic:
+     * If parent does not have a node with this path, create it.
+     * Check that the node we are copying to does not already have a draft
+     * Set the destination Page's draft to our draft
+     * Set the source Page's draft to null.
+     * Repeat for all children.
+     * Prune any now-empty Pages.
+     * @param $parent
+     */
+	public function move($parent)
+    {
+        // No reordering within a parent
+        if( $this->parent_id == $parent->id ) {
+            return $this;
+        }
+        $dest = $parent->children->where('slug', $this->slug)->first();
+        if(!$dest){
+            $dest = $parent->children()->create([
+                'site_id' => $parent->site_id,
+                'slug' => $this->slug,
+                'parent_id' => $parent->id
+            ]);
+        }
+        // can't move if it already exists
+        if($dest->draft_id){
+            throw new PageExistsException($dest);
+        }
+        $dest->setDraft($this->draft);
+        $dest->save();
+        $this->setDraft(null);
+        foreach($this->children as $child){
+            $child->move($dest);
+        }
+        $this->removeEmptyPages();
+        return $dest;
+    }
+
 	/**
-	 * Clones the desendants of the given Route to the current Route instance.
-	 *
+	 * Clones the desendants of the given Page to the current Page instance.
 	 * @param Page $node
 	 * @return \Illuminate\Database\Eloquent\Collection $descendants
 	 */

@@ -24,42 +24,26 @@ class MovePage implements APICommand
      */
     public function execute($input, Authenticatable $user)
     {
-        $page = null;
-        return false;
-        DB::beginTransaction();
-        $parent = Page::find($input['parent_id']);
-        $before = !empty($input['before_id']) ? Page::find($input['before_id']) : null;
-        $page = $parent->getChildWithSlug($input['slug']);
-        if ($page) {
-            if ($page->hasDraft()) {
-                throw new DraftExistsException($page);
+        return DB::transaction(function() use($input,$user){
+            $page = Page::find($input['page_id']);
+            $parent = Page::find($input['parent_id']);
+            // we only move Pages which have drafts
+            if (!$page->hasDraft()) {
+                throw new DraftRequiredException($page);
             }
-        } else {
-            $page = $parent->children()->create([
-                'site_id' => $parent->site_id,
-                'slug' => $input['slug'],
-                'parent_id' => $parent->id
-            ]);
-            if ($before) {
-                $page->makePreviousSiblingOf($before);
-            }
-        }
-        $pagecontent = PageContent::create([
-            'title' => $input['title'],
-            'site_id' => $parent->site_id,
-            'options' => [],
-            'layout_name' => $input['layout_name'],
-            'layout_version' => $input['layout_version']
-        ]);
-        $page->setDraft($pagecontent);
-        $page->save();
-        DB::commit();
-        return $pagecontent;
+            $result = $page->move($parent);
+            return $result;
+        });
     }
 
     public function messages(Collection $data, Authenticatable $user)
     {
-        return [];
+        return [
+            'parent_id.same_site' => 'The parent must be in the same site.',
+            'parent_id.exists' => 'Parent not foundy',
+            'parent_id.required' => 'Where my parent?',
+            'parent_id.descendant_or_self' => 'huh?'
+        ];
     }
 
     public function rules(Collection $data, Authenticatable $user)
@@ -67,21 +51,22 @@ class MovePage implements APICommand
         return [
             'page_id' => [
                 'required',
-                'exists:page_content,id'
+                'exists:pages,id'
             ],
             // parent must exist and be in the same site as this page
             'parent_id' => [
                 'required',
                 'exists:pages,id',
                 'same_site:' . $data->get('page_id'),
-                'descendant_or_self:'.$data->get('page_id').',false'
+                'not_descendant_or_self:'.$data->get('page_id')
              ],
             // if before_id exists it must have the parent_id specified for the new route / page.
-            'next_id' => [
-                'nullable',
-                Rule::exists('pages','id')
-                    ->where('parent_id', $data->get('parent_id'))
-            ],
+//            'next_id' => [
+//                'nullable',
+//                Rule::exists('pages','id')->where(function($query) use($data) {
+//                    $query->where('parent_id', $data->get('parent_id'));
+//                })
+//            ],
 
         ];
     }

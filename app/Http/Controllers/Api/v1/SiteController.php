@@ -101,15 +101,13 @@ class SiteController extends ApiController
 	public function tree(Request $request, Site $site){
 		$this->authorize('read', $site);
         $site->load([
-            'pages' => function($query) {
-                return $query->orderBy('pages.lft');
-            },
+            'pages',
             'pages.draft',
             'pages.published.pagecontent'
         ]);
         $data = $this->pagesToHierarchy(
             fractal(
-                $site->pages()->orderBy('lft')->get(),
+                $site->pages()->orderBy('path')->with(['draft','published'])->get(),
                 new PageTransformer()
             )
                 ->parseIncludes($request->get('include'))

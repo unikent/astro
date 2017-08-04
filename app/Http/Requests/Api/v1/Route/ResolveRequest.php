@@ -27,6 +27,7 @@ class ResolveRequest extends FormRequest
     {
         return [
             'path' => 'required',
+            'host' => 'required'
         ];
     }
 
