@@ -2,10 +2,13 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Exceptions\PostTooLargeException;
 
 class Handler extends ExceptionHandler
 {
@@ -45,70 +48,75 @@ class Handler extends ExceptionHandler
 	 */
 	public function render($request, Exception $exception)
 	{
-		if($request->route()){
+		$classname = get_class($exception);
+
+		if($request->route())
+		{
 			$action = $request->route()->getAction();
 			$prefix = $action['prefix'];
-		} else {
-			$prefix = null;
 		}
 
-		switch($prefix){
-			case 'api/v1':
-				$classname = substr(strrchr(get_class($exception), '\\'), 1);
+		if(isset($prefix) && starts_with($prefix, 'api'))
+		{
+			if($exception instanceof AuthorizationException)
+			{
+				return $this->formatErrors(
+					'Not Authorized', $classname, 403, $exception
+				);
+			}
+			else if($exception instanceof AuthenticationException)
+			{
+				return $this->formatErrors(
+					'Not Authenticated', $classname, 401, $exception
+				);
+			}
+			else if($exception instanceof ValidationException)
+			{
+				return $this->formatErrors(
+					'Invalid input given',
+					$exception->validator->errors()->getMessages(),
+					422,
+					$exception
+				);
+			}
+			else if(
+				$exception instanceof DefinitionNotFoundException ||
+				$exception instanceof ModelNotFoundException
+			)
+			{
+				return $this->formatErrors(
+					'Not Found', $classname, 404, $exception
+				);
+			}
+			else if($exception instanceof PostTooLargeException)
+			{
+				return $this->formatErrors(
+					'This content is too large to upload',
+					$classname,
+					422,
+					$exception
+				);
+			}
 
-				switch(get_class($exception)){
-					case 'App\Exceptions\DefinitionNotFoundException':
-					case 'Illuminate\Database\Eloquent\ModelNotFoundException':
-						return $this->formatErrors(
-							'Not Found', $classname, 404, $exception
-						);
-						break;
-
-					case 'Illuminate\Auth\AuthenticationException':
-						return $this->formatErrors(
-							'Not Authenticated', $classname, 401, $exception
-						);
-						break;
-
-					case 'Illuminate\Auth\Access\AuthorizationException':
-						return $this->formatErrors(
-							'Not Authorized', $classname, 403, $exception
-						);
-						break;
-
-					case 'Illuminate\Validation\ValidationException':
-						return $this->formatErrors(
-							'Invalid input given',
-							$exception->validator->errors()->getMessages(),
-							422,
-							$exception
-						);
-						break;
-
-					default:
-						return $this->formatErrors(
-							$classname, $classname, 500, $exception
-						);
-						break;
-				}
-
-				break;
-
-			default:
-				return parent::render($request, $exception);
-				break;
+			return $this->formatErrors(
+				$exception->getMessage(),
+				$classname,
+				500,
+				$exception
+			);
 		}
 
+		return parent::render($request, $exception);
 	}
 
 	// TODO: replace with fractal?
-	protected function formatErrors($message = '', $reason = 'Unknown', $code = 500, $e = null)
+	protected function formatErrors($message = '', $details = 'Unknown', $code = 500, $e = null)
 	{
 		$errors = [
 			'errors' => [
 				[
 					'message' => $message,
-					'reason'  => $reason
+					'details'  => $details
 				]
 			]
 		];
@@ -116,7 +124,7 @@ class Handler extends ExceptionHandler
 		// Only include stack trace in debug mode (as could reveal secrets)
 		if($code === 500 && config('app.debug') && isset($e))
 		{
-			$errors['errors'][0]['trace'] = $e;
+			$errors['errors'][0]['trace'] = $e->getTrace();
 		}
 
 		return response()->json($errors, $code);

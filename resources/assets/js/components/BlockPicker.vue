@@ -7,7 +7,7 @@
 	v-model="visible"
 >
 	<el-tabs type="border-card">
-		<el-tab-pane label="General">
+		<el-tab-pane label="All blocks">
 			<p>Select one or more blocks from below that you'd like to add to the page.</p>
 			<div class="el-dialog__footer">
 				<el-button @click="cancel">Cancel</el-button>

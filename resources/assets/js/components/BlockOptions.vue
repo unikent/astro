@@ -18,53 +18,60 @@
 				v-for="field in currentDefinition.fields"
 				:label="field.label"
 				:prop="field.name"
-				:error="localErrors[field.name] || null"
+				:error="
+					typeof localErrors[field.name] === 'string' ?
+						localErrors[field.name] :
+						null
+				"
 				:key="field.name"
 			>
 				<template slot="label">
-					<div class="el-form-item__label">
-						<span>{{ field.label }}</span>
+					<span>{{ field.label }}</span>
 
-						<el-tooltip
-							v-if="field.info"
-							popper-class="el-tooltip__popper--narrow"
-							:content="field.info"
-							placement="top">
-							<icon
-								class="el-form-item__icon-help"
-								name="help-circle"
-								width="15"
-								height="15"
-								viewBox="0 0 15 15"
-							/>
-						</el-tooltip>
+					<el-tooltip
+						v-if="field.info"
+						popper-class="el-tooltip__popper--narrow"
+						:content="field.info"
+						placement="top"
+					>
+						<icon
+							class="el-form-item__icon-help"
+							name="help-circle"
+							width="15"
+							height="15"
+							viewBox="0 0 15 15"
+						/>
+					</el-tooltip>
 
-						<el-tooltip content="Highlight field" placement="top">
-							<icon
-								class="el-form-item__icon-view"
-								name="eye"
-								width="14"
-								height="14"
-								viewBox="0 0 14 14"
-								@click="viewField(field.name)"
-							/>
-						</el-tooltip>
-
-
-					</div>
-
+					<el-tooltip content="Highlight field" placement="top">
+						<icon
+							class="el-form-item__icon-view"
+							name="eye"
+							width="14"
+							height="14"
+							viewBox="0 0 14 14"
+							@click="viewField(field.name)"
+						/>
+					</el-tooltip>
 				</template>
 				<component
 					:is="getField(field.type)"
 					:field="field"
-					:name="field.name"
+					:path="field.name"
 					:index="currentIndex"
 					:key="`${currentDefinition.name}-${currentIndex}`"
 					:scrollTo="scrollTo"
+					:errors="
+						typeof localErrors[field.name] !== 'string' ?
+							localErrors[field.name] :
+							null
+					"
 				/>
 			</el-form-item>
 		</el-form>
 
+		<!-- TODO: make this look nice -->
+		<div v-else>Click a block to display its options in this sidebar.</div>
 	</div>
 
 	<!-- hide until we know what we're doing with validation -->

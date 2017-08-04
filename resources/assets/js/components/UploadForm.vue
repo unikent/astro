@@ -6,10 +6,10 @@
 		name="upload"
 		:on-error="handleError"
 		:on-progress="handleProgress"
+		:on-success="onSuccess"
 		:http-request="upload"
 		:multiple="multiple"
 		:accept="accept"
-		style="margin: 0 5px;"
 	>
 		<i class="el-icon-upload"></i>
 		<div class="el-upload__text">Drop {{ multiple ? 'file(s)' : 'single file' }} here or <em>click to upload</em></div>
@@ -30,10 +30,14 @@ import UploadFailList from './UploadFailList';
 // TODO: while uploading show global upload progress.
 
 export default {
-	props: [
-		'accept',
-		'multiple'
-	],
+	props: {
+		accept: String,
+		multiple: Boolean,
+		onSuccess: {
+			type: Function,
+			default: () => {}
+		}
+	},
 
 	components: {
 		UploadFailList

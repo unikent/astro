@@ -103,7 +103,7 @@ class MediaController extends ApiController
 		}
 
 		// TODO: implement job for processing media based on content type
-		// dispatch(new ProcessMedia($media));
+		dispatch(new ProcessMedia($media));
 
 		return fractal($media, new MediaTransformer)->respond(201);
 	}

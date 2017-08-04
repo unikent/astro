@@ -1,4 +1,6 @@
 import inlineFieldMixin from 'mixins/inlineFieldMixin';
+import imagesLoaded from 'imagesloaded';
+import { eventBus } from 'plugins/eventbus';
 
 export default {
 
@@ -39,6 +41,11 @@ export default {
 						}
 
 						this[name] = newVal;
+
+						// TODO: use state for this?
+						imagesLoaded(this.$el, () => {
+							eventBus.$emit('block:updateOverlay');
+						});
 					}, {
 						deep: true
 					});

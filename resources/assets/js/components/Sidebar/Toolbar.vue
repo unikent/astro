@@ -25,9 +25,6 @@
 
 	<el-button class="toolbar__button-publish" type="danger" @click="showPublishModal">Publish ...</el-button>
 
-
-
-
 </div>
 
 
@@ -49,7 +46,6 @@ export default {
 
 	computed: {
 		...mapState([
-			'preview',
 			'displayIframeOverlay',
 			'undoRedo',
 			'currentView'
@@ -59,17 +55,6 @@ export default {
 			page: state => state.page.pageData,
 			pageLoaded: state => state.page.loaded
 		}),
-
-		getPreviewUrl() {
-			return `${Config.get('base_url', '')}/preview/${this.$route.params.site_id}`;
-		},
-
-		dimensions() {
-			return {
-				width: this.views[this.currentView].width,
-				height: this.views[this.currentView].height
-			};
-		},
 
 		view: {
 			get() {
@@ -111,7 +96,7 @@ export default {
 		]),
 		savePage() {
 			this.$api
-				.put(`page/${this.$route.params.site_id}`, this.page)
+				.put(`page/${this.$route.params.page_id}`, this.page)
 				.then(() => {
 					this.$message({
 						message: 'Page saved',

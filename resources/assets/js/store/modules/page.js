@@ -86,9 +86,6 @@ const mutations = {
 			_.set(clone, name, value);
 			fields = clone;
 		}
-
-		// TODO: use state for this
-		Vue.nextTick(() => eventBus.$emit('block:updateOverlay'));
 	},
 
 	updateBlockMedia(state, { index, value }) {
