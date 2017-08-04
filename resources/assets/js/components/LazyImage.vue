@@ -15,7 +15,6 @@ export default {
 			required: true
 		},
 		smallSrc: {
-			type: String,
 			required: true
 		},
 		template: {
@@ -26,6 +25,14 @@ export default {
 		},
 		bg: {
 			type: Boolean
+		},
+		'on-start': {
+			type: Function,
+			default: () => {}
+		},
+		'on-load': {
+			type: Function,
+			default: () => {}
 		}
 	},
 
@@ -48,6 +55,7 @@ export default {
 
 	watch: {
 		src() {
+			this.imageSrc = this.smallSrc;
 			this.loadImage();
 		}
 	},
@@ -58,14 +66,17 @@ export default {
 
 	methods: {
 		loadImage() {
+			this.onStart();
+
 			let img = new Image();
 
 			img.addEventListener('load', () => {
 				this.imageSrc = this.src;
+				this.onLoad();
 			});
 
 			img.addEventListener('error', () => {
-				console.warn(`Oops! We couldnt load the "${img.src}" image.`);
+				console.warn(`Oops! We couldnt load "${img.src}".`);
 			});
 
 			img.src = this.src;

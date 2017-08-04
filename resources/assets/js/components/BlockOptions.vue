@@ -71,7 +71,7 @@
 		</el-form>
 
 		<!-- TODO: make this look nice -->
-		<div v-else>Click a block to display edition options in this sidebar.</div>
+		<div v-else>Click a block to display its options in this sidebar.</div>
 	</div>
 
 	<!-- hide until we know what we're doing with validation -->

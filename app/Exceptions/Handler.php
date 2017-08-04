@@ -50,7 +50,8 @@ class Handler extends ExceptionHandler
 	{
 		$classname = get_class($exception);
 
-		if($request->route()){
+		if($request->route())
+		{
 			$action = $request->route()->getAction();
 			$prefix = $action['prefix'];
 		}
@@ -96,19 +97,26 @@ class Handler extends ExceptionHandler
 					$exception
 				);
 			}
+
+			return $this->formatErrors(
+				$exception->getMessage(),
+				$classname,
+				500,
+				$exception
+			);
 		}
 
 		return parent::render($request, $exception);
 	}
 
 	// TODO: replace with fractal?
-	protected function formatErrors($message = '', $reason = 'Unknown', $code = 500, $e = null)
+	protected function formatErrors($message = '', $details = 'Unknown', $code = 500, $e = null)
 	{
 		$errors = [
 			'errors' => [
 				[
 					'message' => $message,
-					'reason'  => $reason
+					'details'  => $details
 				]
 			]
 		];
@@ -116,7 +124,7 @@ class Handler extends ExceptionHandler
 		// Only include stack trace in debug mode (as could reveal secrets)
 		if($code === 500 && config('app.debug') && isset($e))
 		{
-			$errors['errors'][0]['trace'] = $e;
+			$errors['errors'][0]['trace'] = $e->getTrace();
 		}
 
 		return response()->json($errors, $code);

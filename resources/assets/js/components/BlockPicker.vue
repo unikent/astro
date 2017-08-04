@@ -5,7 +5,7 @@
 	v-model="visible"
 >
 	<el-tabs type="border-card">
-		<el-tab-pane label="General">
+		<el-tab-pane label="All blocks">
 			<block-list :selectedBlocks="selected"/>
 		</el-tab-pane>
 	</el-tabs>
