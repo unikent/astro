@@ -16,20 +16,20 @@ class CreateRoutes extends Migration
 		Schema::create('routes', function (Blueprint $table) {
 			$table->increments('id');
 
-			$table->string('path', 255)->index();
+			$table->string('path')->index();
 			$table->string('slug', 60)->nullable();
-            $table->boolean('is_canonical')->boolean()->default(false);
+			$table->boolean('is_canonical')->boolean()->default(false);
 
 			$table->integer('page_id')->unsigned();
-            $table->integer('site_id')->unsigned()->nullable();
+			$table->integer('site_id')->unsigned()->nullable();
 
 			$table->integer('parent_id')->nullable();
 			$table->integer('lft')->nullable();
 			$table->integer('rgt')->nullable();
 			$table->integer('depth')->nullable();
 
-            $table->foreign('site_id', 'site_id_fk')->references('id')->on('sites');
-            $table->foreign('page_id', 'page_id_fk')->references('id')->on('pages')->onDelete('cascade');
+			$table->foreign('site_id', 'site_id_fk')->references('id')->on('sites');
+			$table->foreign('page_id', 'page_id_fk')->references('id')->on('pages')->onDelete('cascade');
 		});
 	}
 
@@ -40,10 +40,10 @@ class CreateRoutes extends Migration
 	 */
 	public function down()
 	{
-        Schema::table('routes', function(Blueprint $table) {
-            $table->dropForeign('site_id_fk');
-            $table->dropForeign('page_id_fk');
-        });
+		Schema::table('routes', function(Blueprint $table) {
+			$table->dropForeign('site_id_fk');
+			$table->dropForeign('page_id_fk');
+		});
 
 		Schema::drop('routes');
 	}
