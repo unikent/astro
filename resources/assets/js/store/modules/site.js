@@ -8,7 +8,11 @@ const state = {
 	pages: [],
 	site: 1,
 	layouts: [],
-	maxDepth: 3
+	maxDepth: 3,
+	pageModal: {
+		visible: false,
+		parentId: null
+	}
 };
 
 const mutations = {
@@ -36,8 +40,15 @@ const mutations = {
 
 	updatePageDepth(state, { page, depth }) {
 		page.depth = depth;
-	}
+	},
 
+	setPageModalVisibility(state, visible) {
+		state.pageModal.visible = visible;
+	},
+
+	setPageModalParent(state, pageId) {
+		state.pageModal.parentId = pageId;
+	}
 };
 
 const actions = {
@@ -123,6 +134,15 @@ const actions = {
 				`
 			});
 		}
+	},
+
+	showPageModal({ commit }, { id }) {
+		commit('setPageModalParent', id);
+		commit('setPageModalVisibility', true);
+	},
+
+	hidePageModal({ commit }) {
+		commit('setPageModalVisibility', false);
 	}
 
 };
