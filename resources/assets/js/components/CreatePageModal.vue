@@ -42,20 +42,32 @@ export default {
 		return {
 			layouts: [
 				{
-					label: 'Kent homepage',
+					label: 'University homepage',
 					name: 'kent-homepage'
 				},
 				{
-					label: 'Astro 2017',
-					name: 'astro17'
+					label: 'School homepage',
+					name: 'school-homepage'
+				},
+				{
+					label: 'School research page',
+					name: 'school-research'
+				},
+				{
+					label: 'School facilities page',
+					name: 'school-facilities'
+				},
+				{
+					label: 'School about page',
+					name: 'school-about'
 				}
 			],
 			createForm: {
-				title: 'Unnamed Page',
-				layout_name: 'kent-homepage',
+				title: 'New page',
+				layout_name: 'school-homepage',
 				layout_version: 1,
 				route: {
-					slug: 'testing',
+					slug: 'new-page',
 					parent_id: 1
 				},
 				blocks: {},
