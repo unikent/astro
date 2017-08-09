@@ -4,6 +4,7 @@
 	<publish-modal />
 	<media-picker />
 	<media-overlay size="small" />
+	<create-page-modal />
 </div>
 </template>
 
@@ -12,6 +13,7 @@ import BlockPicker from 'components/BlockPicker';
 import PublishModal from 'components/PublishModal';
 import MediaPicker from 'components/MediaPicker';
 import MediaOverlay from 'components/media/MediaOverlay';
+import CreatePageModal from 'components/CreatePageModal';
 
 export default {
 
@@ -21,7 +23,8 @@ export default {
 		BlockPicker,
 		PublishModal,
 		MediaPicker,
-		MediaOverlay
+		MediaOverlay,
+		CreatePageModal
 	}
 
 };
