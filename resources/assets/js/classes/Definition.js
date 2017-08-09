@@ -97,15 +97,15 @@ export default class Definition {
 		return null;
 	}
 
-	static fillBlockFields(block) {
+	static fillBlockFields(block, definition = null) {
 		const type = Definition.getType({
 			name   : block.definition_name,
 			version: block.definition_version
 		});
 
-		if(type && Definition.get(type)) {
+		if(type && (Definition.get(type) || definition)) {
 
-			Definition.get(type).fields.forEach(field => {
+			(Definition.get(type) || definition).fields.forEach(field => {
 
 				if(block.fields[field.name] === void 0) {
 					let value;
