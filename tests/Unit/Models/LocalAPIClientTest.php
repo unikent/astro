@@ -3,6 +3,7 @@
 namespace Tests\Unit\Models;
 
 use App\Models\LocalAPIClient;
+use Astro\Renderer\Contracts\APIClient;
 use App\Models\PublishingGroup;
 use App\Models\Revision;
 use Illuminate\Contracts\Validation\ValidationException;

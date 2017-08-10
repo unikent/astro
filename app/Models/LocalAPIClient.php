@@ -9,6 +9,7 @@ use App\Models\APICommands\MovePage;
 use Astro\Renderer\API\Exception\APIErrorException;
 use Astro\Renderer\API\Data\PageData;
 use Astro\Renderer\API\Data\RouteData;
+use Astro\Renderer\Contracts\APIClient;
 use App\Models\Traits\ResolvesRoutes;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
@@ -26,7 +27,7 @@ use Illuminate\Validation\ValidationException;
  * @package App\Models
  */
 
-class LocalAPIClient implements \Astro\Renderer\Contracts\APIClient
+class LocalAPIClient implements APIClient
 {
     use ResolvesRoutes;
 
