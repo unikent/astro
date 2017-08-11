@@ -73,9 +73,8 @@ class LocalAPIClientTest extends TestCase
             $publishing_group_id, 'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
         );
         $this->assertInstanceOf(Site::class, $site);
-        $this->assertInstanceOf(Page::class, $site->pages()->first());
-        $this->assertInstanceOf(Revision::class, $site->pages()->first()->draft);
-        $this->assertInstanceOf(Page::class, $site->homePage);
+        $this->assertInstanceOf(Page::class, $site->homepage);
+        $this->assertInstanceOf(Revision::class, $site->homepage->revision);
     }
 
     /**
@@ -101,10 +100,8 @@ class LocalAPIClientTest extends TestCase
             $new_page_title
         );
         $this->assertInstanceOf(Page::class, $newpage);
-        $draft = $newpage->draft;
-        $this->assertInstanceOf(Revision::class, $draft);
-        $this->assertInstanceOf(PageContent::class, $draft->pagecontent);
-        $this->assertEquals($new_page_title, $draft->title);
+        $this->assertInstanceOf(Revision::class, $newpage->revision);
+        $this->assertEquals($new_page_title, $newpage->revision->title);
     }
 
     /**

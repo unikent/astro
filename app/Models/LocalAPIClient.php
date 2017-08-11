@@ -212,7 +212,7 @@ class LocalAPIClient implements APIClient
     public function deletePage($id)
     {
         return $this->execute( DeletePage::class, [
-            'page_id' => $id
+            'id' => $id
         ]);
     }
 

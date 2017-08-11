@@ -4,7 +4,7 @@ namespace App\Models\APICommands;
 
 use App\Models\Revision;
 use App\Models\Site;
-use App\Models\PageContent;
+use App\Models\RevisionSet;
 use App\Models\Page;
 use DB;
 use App\Models\Contracts\APICommand;
@@ -24,20 +24,48 @@ class CreateSite implements APICommand
      */
     public function execute($input,Authenticatable $user)
     {
-        $site = new Site([
-            'name' => $input->get('name'),
-            'publishing_group_id' => $input->get('publishing_group_id'),
-            'host' => $input->get('host'),
-            'path' => $input->get('path'),
-            'options' => []
-        ]);
-        DB::transaction(function() use($site, $user, $input) {
-            $site->save();
+        return DB::transaction(function() use($user, $input) {
+            $site = Site::create([
+                'name' => $input->get('name'),
+                'publishing_group_id' => $input->get('publishing_group_id'),
+                'host' => $input->get('host'),
+                'path' => $input->get('path'),
+                'options' => []
+            ]);
             $layout = $input->get('homepage_layout');
-            $site->createHomePage('Home Page', $layout, $user);
+            $this->createHomePage($site, 'Home Page', $layout, $user);
+            $site->refresh();
+            return $site;
         });
-        $site->refresh();
-        return $site;
+    }
+
+    /**
+     * Create the home page for a site.
+     * @param string $title The title for the homepage for this site.
+     * @param array $layout The layout for the homepage for this site [name => '', version => '']
+     * @param Authenticatable $user The creator of this site.
+     */
+    public function createHomePage($site, $title, $layout, $user)
+    {
+        $page = Page::create([
+            'site_id' => $site->id,
+            'parent_id' => null,
+            'version' => Page::STATE_DRAFT,
+            'slug' => null,
+            'created_by' => $user->id,
+            'updated_by' => $user->id
+        ]);
+        $revision_set = RevisionSet::create(['site_id' => $site->id]);
+        $revision = Revision::create([
+            'revision_set_id' => $revision_set->id,
+            'title' => $title,
+            'created_by' => $user->id,
+            'updated_by' => $user->id,
+            'layout_name' => $layout['name'],
+            'layout_version' => $layout['version']
+        ]);
+        $page->setRevision($revision);
+        return $page;
     }
 
     /**

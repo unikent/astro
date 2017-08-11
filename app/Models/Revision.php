@@ -6,6 +6,13 @@ use App\Http\Transformers\Api\v1\PageContentTransformer;
 use App\Models\Traits\Tracked;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
+
+/**
+ * Revisions track the state of a Page, including its content, options, title, etc at a point in
+ * time.
+ * @package App\Models
+ */
 
 class Revision extends Model
 {
@@ -17,23 +24,42 @@ class Revision extends Model
 	const TYPE_AUTOSAVE = 'autosave';
 
 	protected $fillable = [
-		'page_content_id',
-		'bake',
+        'site_id',
+        'title',
+        'created_by',
+        'updated_by',
+        'layout_name',
+        'layout_version',
+		'bake'
 	];
 
-	public function pagecontent()
-	{
-		return $this->belongsTo(PageContent::class, 'page_content_id');
-	}
+
+    /**
+     * The "booting" method of the model.
+     *
+     * @return void
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function($revision){
+            // bake cannot be null
+            $revision->bake = !empty($revision->bake) ? $revision->bake : '[]';
+            if(!$revision->revision_set_id){
+                throw new ValidationException("Revision must be part of a RevisionSet");
+            }
+        });
+    }
 
     public function draftPage()
     {
-        return $this->hasOne(Page::class, 'draft_id');
+        return $this->hasOne(Page::class, 'revision_id')->where('version', Page::STATE_DRAFT);
     }
 
     public function publishedPage()
     {
-        return $this->hasOne(Page::class, 'published_id');
+        return $this->hasOne(Page::class, 'revision_id')->where('version', Page::STATE_PUBLISHED);
     }
 
     /**
@@ -53,7 +79,7 @@ class Revision extends Model
             new PageContentTransformer()
         )->parseIncludes([ 'blocks', 'activeRoute' ])->toJson();
         $revision->type = $type;
-        $revision->updated_by = $user->getAuthIdentifier();
+        $revision->updated_by = $user->id;
         $revision->created_at = $content->created_at;
         $revision->created_by = $content->created_by;
         return $revision;

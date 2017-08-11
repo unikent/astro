@@ -11,7 +11,8 @@ class DatabaseSeeder extends Seeder
 	 */
 	private $tables = [
 	    'revisions',
-	    'page_content',
+	    'deleted_pages',
+        'revision_sets',
 	    'pages',
         'sites',
         'publishing_groups',

@@ -7,14 +7,11 @@ use Exception;
 use App\Exceptions\PageExistsException;
 
 use Baum\Node as BaumNode;
-use App\Models\Traits\Routable;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use App\Models\Contracts\Routable as RoutableContract;
 
-class Page extends BaumNode implements RoutableContract
+class Page extends BaumNode
 {
-	use Routable;
+	public $table = 'pages';
 
 	public $timestamps = false;
 
@@ -24,7 +21,8 @@ class Page extends BaumNode implements RoutableContract
 		'parent_id',
         'site_id',
         'version',
-        'path'
+        'path',
+        'revision_id'
 	];
 
 	protected $hidden = [
@@ -36,48 +34,12 @@ class Page extends BaumNode implements RoutableContract
 
     // The draft state of this page.
     const STATE_NEW = 'new';  // not published
-    const STATE_DRAFT = 'modified'; // modified since last published
+    const STATE_DRAFT = 'draft'; // modified since last published
     const STATE_DELETED = 'deleted'; // deleted since last published
     const STATE_MOVED = 'moved'; // moved since last published
     const STATE_PUBLISHED = 'published'; // not modified since last published
     const STATE_EMPTY = 'empty'; // no draft or published state.
 
-    /**
-     * Prunes this Page and its descendants removing any pages with no draft or published revision.
-     */
-    public function removeEmptyPages()
-    {
-        if(!$this->draft_id && !$this->published_id){
-            $this->delete();
-        }else {
-            foreach ($this->children as $child) {
-                $child->removeEmptyPages();
-            }
-        }
-    }
-
-    /**
-     * Get the draft state of this Page
-     * @return string
-     */
-    public function draftState()
-    {
-        if($this->draft_id == $this->published_id){
-            if(!$this->draft_id){
-                return self::STATE_EMPTY;
-            }else {
-                return self::STATE_PUBLISHED;
-            }
-        }elseif(!$this->published_id){
-            return self::STATE_NEW;
-        }elseif(!$this->draft_id){
-            return self::STATE_DELETED;
-        }elseif($this->draft->pagecontent_id == $this->published->pagecontent_id){
-            return self::STATE_DRAFT;
-        }else{
-            return self::STATE_MOVED;
-        }
-    }
 
     /**
      * Create a new Eloquent model instance.
@@ -106,20 +68,70 @@ class Page extends BaumNode implements RoutableContract
 		});
 	}
 
+    /************************************************************************
+     * Relations
+     ************************************************************************/
+
+    /**
+     * The Site that this Page belongs to.
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
 	public function site()
 	{
 		return $this->belongsTo(Site::class, 'site_id');
 	}
 
-	public function draft()
-	{
-		return $this->belongsTo(Revision::class, 'draft_id');
-	}
+    /**
+     * All the revisions attached to this Page.
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+	public function history()
+    {
+        return $this->hasMany(Revision::class);
+    }
 
-	public function published()
-	{
-	    return $this->belongsTo( Revision::class, 'published_id' );
-	}
+    /**
+     * The current Revision attached to this Page.
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function revision()
+    {
+        return $this->belongsTo(Revision::class, 'revision_id');
+    }
+
+    /************************************************************************
+     * Query Scopes
+     ************************************************************************/
+
+    /**
+     * Restrict query to draft version of the site.
+     * @param $query
+     * @return mixed
+     */
+	public function scopeDraft($query)
+    {
+        return $this->scopeVersion($query, self::STATE_DRAFT);
+    }
+
+    /**
+     * Restrict query to published version of the site.
+     * @param $query
+     * @return mixed
+     */
+    public function scopePublished($query)
+    {
+        return $this->scopeVersion($query, self::STATE_PUBLISHED);
+    }
+
+    /**
+     * Restrict query to specific version of the site.
+     * @param $query
+     * @return mixed
+     */
+    public function scopeVersion($query, $version)
+    {
+        return $query->where('version', $version);
+    }
 
     /**
      * Restrict query to specific site.
@@ -144,32 +156,6 @@ class Page extends BaumNode implements RoutableContract
         return $query->where('site_id', $site_id)
                     ->where('path', $path);
     }
-
-    /**
-     * Scope a query to only include pages with published content.
-     *
-     * @param Builder $query
-     * @param boolean $value
-     * @return Builder
-     */
-    public function scopePublished(Builder $query, $value = true)
-    {
-        return $query->whereNotNull('published_id');
-    }
-
-    /**
-     * Scope a query to only include active routes.
-     *
-     * @param Builder $query
-     * @param boolean $value
-     * @deprecated
-     * @return Builder
-     */
-    public function scopeActive(Builder $query, $value = true)
-    {
-        return $this->scopePublished($query, $value);
-    }
-
     /**
      * Find a Page by site id and path.
      * @param $site_id
@@ -179,56 +165,6 @@ class Page extends BaumNode implements RoutableContract
     public static function findBySiteAndPath($site_id, $path)
     {
         return Page::forSiteAndPath($site_id,$path)->first();
-    }
-
-    public static function findByHostAndPath($host, $path)
-    {
-    }
-
-    /**
-     * Delete the model from the database.
-     * Creates a new Redirect model to ensure that the path is not lost forever.
-     *
-     * @return bool|null
-     * @throws \Exception
-     */
-    public function delete()
-    {
-    	DB::beginTransaction();
-
-    	try {
-    		if($this->isActive()){
-    			Redirect::createFromRoute($this);
-    		}
-
-	    	parent::delete();
-
-	    	DB::commit();
-    	} catch(Exception $e){
-    		DB::rollback();
-    		throw $e;
-    	}
-    }
-
-
-
-	/**
-     * Has this page been published?
-	 * @return boolean
-     * @deprecated
-	 */
-	public function isActive()
-	{
-		return $this->isPublished();
-	}
-
-    /**
-     * Has this page been published?
-     * @return bool
-     */
-	public function isPublished()
-    {
-        return (null != $this->published_id);
     }
 
 
@@ -258,8 +194,6 @@ class Page extends BaumNode implements RoutableContract
      * Move logic:
      * If parent does not have a node with this path, create it.
      * Check that the node we are copying to does not already have a draft
-     * Set the destination Page's draft to our draft
-     * Set the source Page's draft to null.
      * Repeat for all children.
      * Prune any now-empty Pages.
      * @param $parent
@@ -348,22 +282,14 @@ class Page extends BaumNode implements RoutableContract
 	}
 
     /**
-     * Does this route have a draft?
-     * @return bool
-     */
-	public function hasDraft()
-    {
-        return $this->draft_id ? true : false;
-    }
-
-    /**
-     * Set the draft version of this route.
+     * Set the revision for this page.
      * @param null|Revision $revision
      */
-    public function setDraft($revision)
+    public function setRevision($revision)
     {
-        $this->draft_id = $revision ? $revision->id : null;
+        $this->revision_id = $revision ? $revision->id : null;
         $this->save();
+        return $this;
     }
 
     /**

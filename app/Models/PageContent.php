@@ -13,7 +13,7 @@ use League\Fractal\TransformerAbstract as FractalTransformer;
 
 class PageContent extends Model
 {
-	use Tracked, SoftDeletes;
+	use Tracked;
 
 	protected $table = 'page_content';
 

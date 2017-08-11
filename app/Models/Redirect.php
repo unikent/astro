@@ -1,16 +1,18 @@
 <?php
 namespace App\Models;
 
+use App\Models\Traits\Tracked;
 use DB;
 use Exception;
-use App\Models\Page;
-use App\Models\Traits\Routable;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Contracts\Routable as RoutableContract;
 
-class Redirect extends Model implements RoutableContract
+/**
+ * A Redirect records the paths of pages which have been moved elsewhere.
+ * @package App\Models
+ */
+class Redirect extends Model
 {
-	use Routable;
+	use Tracked;
 
 	protected $fillable = [
 		'path',

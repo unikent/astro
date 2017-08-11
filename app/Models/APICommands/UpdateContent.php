@@ -2,9 +2,9 @@
 
 namespace App\Models\APICommands;
 
-use App\Http\Transformers\Api\v1\PageTransformer;
 use App\Models\Contracts\APICommand;
 use App\Models\PageContent;
+use App\Models\RevisionSet;
 use App\Models\Revision;
 use App\Models\Block;
 use App\Validation\Brokers\BlockBroker;
@@ -14,6 +14,7 @@ use Illuminate\Support\Collection;
 
 use App\Models\Definitions\Block as BlockDefinition;
 use App\Models\Definitions\Region as RegionDefinition;
+use App\Models\Page;
 
 class UpdateContent implements APICommand
 {
@@ -26,20 +27,17 @@ class UpdateContent implements APICommand
     public function execute($input, Authenticatable $user)
     {
         $result = DB::transaction(function() use($input,$user){
-            $draft = PageContent::findOrFail($input['draft_id']);
-
-            // get the Page that currently holds this draft...
-            $page = $draft->draft->draftPage;
+            $page = Page::find($input['id']);
 
             // Update with new content.
-            $this->processBlocks($draft, $input['blocks']);
+            $this->processBlocks($page, $input['blocks']);
 
             // Save our previous state to the revisions table.
             $revision = Revision::createFromPageContent($draft, $user);
             $revision->save();
 
             // update this draft
-            $draft->updated_by = $user->getAuthIdentifier();
+            $draft->updated_by = $user->id;
             $draft->save();
             DB::commit();
             $draft->fresh();
@@ -108,8 +106,8 @@ class UpdateContent implements APICommand
     public function rules(Collection $data, Authenticatable $user)
     {
         $rules = [
-            'draft_id' => [
-                'exists:page_content,id'
+            'id' => [
+                'exists:pages,id'
             ],
             'blocks' => [
                 'present',

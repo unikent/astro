@@ -15,7 +15,7 @@ class CreateRevisionsTable extends Migration
     {
         Schema::create('revisions', function(Blueprint $table) {
             $table->increments('id');
-            $table->integer('page_id')->unsigned();
+            $table->integer('revision_set_id')->unsigned();
             $table->string('title');
             $table->string('layout_name');
             $table->integer('layout_version');
@@ -23,6 +23,7 @@ class CreateRevisionsTable extends Migration
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
             $table->timestamps();
+            $table->foreign('revision_set_id', 'revision_sets_id_fk')->references('id')->on('revision_sets');
         });
     }
 
@@ -34,7 +35,7 @@ class CreateRevisionsTable extends Migration
     public function down()
     {
         Schema::table('revisions', function(Blueprint $table) {
-            $table->dropForeign('fk_page_id');
+            $table->dropForeign('revision_sets_id_fk');
         });
         Schema::drop('revisions');
     }

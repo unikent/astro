@@ -19,7 +19,11 @@ class CreateRedirects extends Migration
             $table->string('path')->unique();
             $table->integer('page_id')->unsigned();
 
+            // Keep track
+            $table->integer('created_by')->nullable();
+            $table->integer('updated_by')->nullable();
             $table->timestamps();
+
             $table->foreign('page_id', 'redirects_page_id_fk')->references('id')->on('pages')->onDelete('cascade');
         });
     }

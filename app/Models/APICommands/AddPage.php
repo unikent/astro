@@ -5,7 +5,7 @@ namespace App\Models\APICommands;
 use App\Models\Revision;
 use DB;
 use App\Models\Page;
-use App\Models\PageContent;
+use App\Models\RevisionSet;
 use App\Models\Contracts\APICommand;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Collection;
@@ -25,33 +25,55 @@ class AddPage implements APICommand
      */
     public function execute($input, Authenticatable $user)
     {
-        $page = null;
-        DB::beginTransaction();
-        $parent = Page::find($input['parent_id']);
-        $page = $parent->getChildWithSlug($input['slug']);
-        if ($page) {
-            if ($page->hasDraft()) {
-                throw new DraftExistsException($page);
+        return DB::transaction(function() use($input, $user){
+            $parent = Page::find($input['parent_id']);
+            $page = $this->addChild($parent,
+                $input['slug'],
+                $input['title'],
+                $user,
+                $input['layout']['name'],
+                $input['layout']['version']
+            );
+            if(!empty($input['next_id'])){
+                $page->makePreviousSiblingOf(Page::find($input['next_id']));
             }
-        } else {
-            $page = $parent->children()->create([
+            return $page;
+        });
+    }
+
+
+    /**
+     * Adds a new page (creating a revision) at the end of this page's children.
+     * @param string $slug The slug for the new page, must not already exist under this parent.
+     * @param string $title The title for the new page.
+     * @param Authenticatable $user The user account to set as the creator.
+     * @param string $layout_name The name of the layout for this page.
+     * @param int $layout_version The version of the layout for this page.
+     * @return Page
+     */
+    public function addChild($parent, $slug, $title, $user, $layout_name, $layout_version)
+    {
+        $page = $parent->children()->create(
+            [
                 'site_id' => $parent->site_id,
-                'slug' => $input['slug'],
-                'parent_id' => $parent->id
-            ]);
-        }
-        $pagecontent = PageContent::create([
-            'title' => $input['title'],
-            'site_id' => $parent->site_id,
-            'options' => [],
-            'layout_name' => $input['layout']['name'],
-            'layout_version' => $input['layout']['version']
+                'version' => Page::STATE_DRAFT,
+                'slug' => $slug,
+                'parent_id' => $parent->id,
+                'created_by' => $user->id,
+                'updated_by' => $user->id
+            ]
+        );
+        $revision_set = RevisionSet::create(['site_id' => $parent->site_id]);
+        $revision = Revision::create([
+            'revision_set_id' => $revision_set->id,
+            'title' => $title,
+            'created_by' => $user->id,
+            'updated_by' => $user->id,
+            'layout_name' => $layout_name,
+            'layout_version' => $layout_version,
+            'bake' => '[]'
         ]);
-        $revision = Revision::createFromPageContent($pagecontent, $user);
-        $revision->save();
-        $page->setDraft($revision);
-        $page->save();
-        DB::commit();
+        $page->setRevision($revision);
         return $page;
     }
 
@@ -68,7 +90,7 @@ class AddPage implements APICommand
                 'exists:pages,id'
              ],
             // if before_id exists it must have the parent_id specified for the new route / page.
-            'before_id' => [
+            'next_id' => [
                 'nullable',
                 Rule::exists('pages','id')
                     ->where('parent_id', $data->get('parent_id'))
@@ -77,10 +99,10 @@ class AddPage implements APICommand
                 // slug is required and can only contain lowercase letters, numbers, hyphen or underscore.
                 'required',
                 'regex:/^[a-z0-9_-]+$/',
-                // there must not be an existing draft route with the same slug under the parent page
+                // there must not be an existing draft page with the same slug under the parent page
                 Rule::unique('pages', 'slug')
                    ->where('parent_id', $data->get('parent_id'))
-                   ->whereNotNull('draft_id'),
+                   ->where('version', Page::STATE_DRAFT),
             ],
             'layout.name' => [
                 'string',

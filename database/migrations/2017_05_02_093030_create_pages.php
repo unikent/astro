@@ -41,9 +41,6 @@ class CreatePages extends Migration
             $table->index('updated_at', 'idx_updated_at');
 		});
 
-		Schema::table('revisions', function(Blueprint $table) {
-            $table->foreign('page_id', 'fk_page_id')->references('id')->on('pages');
-        });
 	}
 
 	/**
@@ -53,9 +50,6 @@ class CreatePages extends Migration
 	 */
 	public function down()
 	{
-	    Schema::table('revisions', function(Blueprint $table){
-	       $table->dropForeign('fk_page_id');
-        });
         Schema::table('pages', function(Blueprint $table) {
             $table->dropIndex('idx_updated_at');
             $table->dropForeign('fk_site_id');

@@ -4,16 +4,13 @@ namespace App\Models\APICommands;
 
 use App\Models\Contracts\APICommand;
 use App\Models\Page;
-use App\Models\PageContent;
 use DB;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Collection;
+use App\Models\DeletedPage;
 
 /**
- * Delete a page means:
- * - Find the current draft
- * - Set it to null
- * - Set all its children to null.
+ * Delete a page and all its descendants, recording this as DeletedPages.
  * @package App\Models\APICommands
  */
 class DeletePage implements APICommand
@@ -27,31 +24,19 @@ class DeletePage implements APICommand
     public function execute($input, Authenticatable $user)
     {
         return DB::transaction(function() use($input) {
-            $id = $input['page_id'];
-            $pagecontent = PageContent::find($id);
-            $revision = $pagecontent->draft;
-            if($revision) {
-                $page = $revision->draftPage;
-                if($page){
-                    $this->markPagesDeleted([$page]);
-                    $page->removeEmptyPages();
-                    return true;
-                }
+            $id = $input['id'];
+            $page = Page::find($id);
+            $deletes = [];
+            foreach( $page->getDescendantsAndSelf() as $item){
+                $deletes[] = [
+                    'revision_id' => $item->revision->id,
+                    'path' => $item->path
+                ];
             }
-            return false;
+            DeletedPage::insert($deletes);
+            $page->delete();
+            return true;
         });
-    }
-
-    /**
-     * Recursively mark all drafts of a Page as deleted.
-     * @param Collection $page Collection of Pages
-     */
-    public function markPagesDeleted($pages)
-    {
-        foreach($pages as $page){
-            $page->setDraft(null);
-            $this->markPagesDeleted($page->children);
-        }
     }
 
     /**
@@ -62,7 +47,7 @@ class DeletePage implements APICommand
     public function messages(Collection $data, Authenticatable $user)
     {
         return [
-            'page_id' => 'The page does not exist.'
+            'id' => 'The page does not exist.'
         ];
     }
 
@@ -74,8 +59,8 @@ class DeletePage implements APICommand
     public function rules(Collection $data, Authenticatable $user)
     {
         return [
-          'page_id' => [
-              'exists:page_content,id'
+          'id' => [
+              'exists:pages,id'
           ]
         ];
     }
