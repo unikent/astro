@@ -24,7 +24,7 @@ class PublishingGroup extends Model
 
 	public function sites()
 	{
-		return $this->hasMany('sites');
+		return $this->hasMany(Site::class);
 	}
 
 }

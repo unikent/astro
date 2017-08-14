@@ -66,14 +66,14 @@ class Block extends Model
 	/**
 	 * Deletes all blocks for a given Page and Region.
 	 *
-	 * @param  PageContent|int $pagecontent_or_id
+	 * @param  PageC|int $page_or_id
 	 * @param  string $region
 	 * @return void
 	 */
-	public static function deleteForPageRegion($pagecontent_or_id, $region)
+	public static function deleteForPageRegion($page_or_id, $region)
 	{
-		$pagecontent_id = is_numeric($pagecontent_or_id) ? $pagecontent_or_id : $pagecontent_or_id->getKey();
-		static::where('page_content_id', '=', $pagecontent_id)
+		$page_id = is_numeric($page_or_id) ? $page_or_id : $page_or_id->getKey();
+		static::where('page_id', '=', $page_id)
 			->where('region_name', '=', $region)
 			->delete();
 	}

@@ -30,6 +30,7 @@ class Revision extends Model
         'updated_by',
         'layout_name',
         'layout_version',
+        'revision_set_id',
 		'bake'
 	];
 
@@ -52,6 +53,11 @@ class Revision extends Model
         });
     }
 
+    public function set()
+    {
+        return $this->belongsTo(RevisionSet::class, 'revision_set_id');
+    }
+
     public function draftPage()
     {
         return $this->hasOne(Page::class, 'revision_id')->where('version', Page::STATE_DRAFT);
@@ -60,6 +66,19 @@ class Revision extends Model
     public function publishedPage()
     {
         return $this->hasOne(Page::class, 'revision_id')->where('version', Page::STATE_PUBLISHED);
+    }
+
+    /**
+     * Get all previous revisions of this revision.
+     * @return mixed
+     */
+    public function history()
+    {
+        return $this->hasManyThrough(Revision::class, RevisionSet::class, 'id', 'revision_set_id', 'revision_set_id')
+                    ->where(
+                        function($query){
+                            return $query->where('created_at', '<', $this->created_at);
+                        });
     }
 
     /**

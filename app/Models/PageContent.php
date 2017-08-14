@@ -31,55 +31,6 @@ class PageContent extends Model
 
 	protected $layoutDefinition = null;
 
-    /**
-     * @deprecated
-     */
-	public function routes()
-	{
-		return $this->hasMany(Page::class, 'draft_id');
-	}
-
-    /**
-     * Get the PageContent which is currently a draft for a page
-     */
-	public function draft()
-    {
-        return $this->hasOne(Revision::class, 'page_content_id')->whereHas('draftPage')->limit(1);
-    }
-
-    /**
-     * @deprecated
-     */
-	public function activeRoute()
-	{
-
-		return $this->belongsTo(Page::class, 'draft_id');
-	}
-
-    /**
-     * @deprecated
-     */
-	public function draftRoute()
-	{
-		return $this->hasOne(Page::class, 'draft_id');
-	}
-
-
-	public function blocks()
-	{
-		return $this->hasMany(Block::class, 'page_content_id');
-	}
-
-	public function published()
-	{
-        throw new Exception('Not implemented');
-	}
-
-	public function history()
-	{
-		return $this->hasMany(Revision::class, 'page_content_id');
-	}
-
 
 	/**
 	 * Creates a PublishedPage by baking the Page to JSON with Fractal.

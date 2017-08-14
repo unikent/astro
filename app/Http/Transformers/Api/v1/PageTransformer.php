@@ -5,8 +5,8 @@ use App\Models\Page;
 use League\Fractal\ParamBag;
 use League\Fractal\Resource\Item as FractalItem;
 use League\Fractal\Resource\Collection as FractalCollection;
-use League\Fractal\Serializer\ArraySerializer;
 use League\Fractal\TransformerAbstract as FractalTransformer;
+use App\Http\Transformers\Api\v1\Definitions\LayoutTransformer as LayoutDefinitionTransformer;
 
 /**
  * Transforms Page from the database to the correct format for the API to output.
@@ -15,23 +15,7 @@ use League\Fractal\TransformerAbstract as FractalTransformer;
 class PageTransformer extends FractalTransformer
 {
 
-    protected $availableIncludes = [ 'parent', 'draft', 'published', 'site' ];
-
-    const ALL_PAGES = 1;
-    const DRAFT_PAGES = 2;
-    const PUBLISHED_PAGES = 4;
-
-    /**
-     * Create a PageTransformer to filter specific page types.
-     * @param int $filter
-     */
-    public function __construct($filter = self::ALL_PAGES)
-    {
-        if(!in_array($filter,[self::ALL_PAGES,self::DRAFT_PAGES,self::PUBLISHED_PAGES])){
-            throw new \InvalidArgumentException("No valid filter specified.");
-        }
-        $this->filter = $filter;
-    }
+    protected $availableIncludes = [ 'parent', 'revision', 'history', 'site' ];
 
 	public function transform(Page $page)
 	{
@@ -39,7 +23,7 @@ class PageTransformer extends FractalTransformer
 		    'id' => $page->id,
             'path' => $page->path,
             'slug' => $page->slug,
-            'state' => $page->draftState(),
+            'version' => $page->version,
             'depth' => $page->depth,
             'parent_id' => $page->parent_id
         ];
@@ -59,26 +43,14 @@ class PageTransformer extends FractalTransformer
     }
 
     /**
-     * Include associated PageContent
+     * Include associated Revision
      * @param Page $page The Page to transform.
      * @return FractalItem
      */
-    public function includeDraft(Page $page, ParamBag $params = null)
+    public function includeRevision(Page $page, ParamBag $params = null)
     {
-        if($page->draft) {
-            return new FractalItem($page->draft, new RevisionTransformer( $params->get('full') ), false);
-        }
-    }
-
-    /**
-     * Include associated PageContent
-     * @param Page $page The Page to transform.
-     * @return FractalItem
-     */
-    public function includePublished(Page $page, ParamBag $params = null)
-    {
-        if($page->published) {
-            return new FractalItem($page->published, new RevisionTransformer( $params->get('full') ), false);
+        if($page->revision) {
+            return new FractalItem($page->revision, new RevisionTransformer( $params->get('full') ), false);
         }
     }
 
@@ -92,5 +64,62 @@ class PageTransformer extends FractalTransformer
             return new FractalItem($page->site, new SiteTransformer, false);
         }
     }
+
+    /**
+     * Include associated Blocks
+     *
+     * It was decided that API clients would rather consume ordered blocks sorted
+     * into regions, rather than duplicating ordering and grouping logic in every client.
+     *
+     * Some nastiness resides here in order to achieve this, commented below...
+     *
+     */
+    public function includeBlocks(Page $page)
+    {
+        if(!$page->blocks->isEmpty()){
+            // Using sortBy instead of orderBy as the collection might have been eager-loaded
+            // Use of groupBy results in a Collection with nested Collections, keyed by 'region_name'.
+            $blocksByRegion = $page->blocks->sortBy('order')->groupBy('region_name');
+
+            // Unfortunately Fractal cannot serialize a Collection with nested Collections. We use an
+            // inline Transformer to create a FractalItem, serializing nested FractalCollections as we go.
+            // We use the current scope to access the manager and also pass it to createData to ensure
+            // includes continue to function.
+            $scope = $this->getCurrentScope();
+
+            return new FractalItem($blocksByRegion, function(Collection $blocksByRegion) use ($scope){
+                foreach($blocksByRegion as $region => $blocks){
+                    $collection = new FractalCollection($blocks, new BlockTransformer, false);
+                    $blocksByRegion[$region] = $scope->getManager()->createData($collection, 'blocks', $scope)->toArray();
+                }
+
+                return $blocksByRegion->toArray();
+            }, false);
+        }
+    }
+
+    /**
+     * Include associated Layout/Region definitions
+     * @param Page $pagecontent
+     * @return FractalItem
+     */
+    public function includeLayoutDefinition(Page $page)
+    {
+        $layoutDefinition = $page->getLayoutDefinition();
+        return new FractalItem($layoutDefinition, new LayoutDefinitionTransformer, false);
+    }
+
+    /**
+     * Include History (all Revisions up to and including the current one)
+     * @param Page $page The page.
+     * @return FractalCollection
+     */
+    public function includeHistory(Page $page)
+    {
+        if(!$page->history->isEmpty()){
+            return new FractalCollection($page->revision->history, new RevisionTransformer, false);
+        }
+    }
+
 
 }

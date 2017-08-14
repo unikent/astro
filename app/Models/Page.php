@@ -1,11 +1,12 @@
 <?php
 namespace App\Models;
 
-use Baum\Node;
+use App\Models\Scopes\VersionScope;
 use DB;
+use Doctrine\DBAL\Version;
 use Exception;
-use App\Exceptions\PageExistsException;
-
+use App\Models\Definitions\Layout as LayoutDefinition;
+use App\Http\Transformers\Api\v1\PageTransformer;
 use Baum\Node as BaumNode;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -63,10 +64,22 @@ class Page extends BaumNode
 	{
 		parent::boot();
 
+		// restrict requests to the draft pages.
+		static::addGlobalScope(new VersionScope());
+
 		static::saving(function($node){
 			$node->path = $node->generatePath();
 		});
 	}
+
+    /**
+     * Generate the json version of the current revision of this Page.
+     * @return string
+     */
+	public function bake()
+    {
+        return fractal($this, new PageTransformer)->parseIncludes(['blocks', 'revision'])->toJson();
+    }
 
     /************************************************************************
      * Relations
@@ -82,15 +95,6 @@ class Page extends BaumNode
 	}
 
     /**
-     * All the revisions attached to this Page.
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-	public function history()
-    {
-        return $this->hasMany(Revision::class);
-    }
-
-    /**
      * The current Revision attached to this Page.
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -98,6 +102,17 @@ class Page extends BaumNode
     {
         return $this->belongsTo(Revision::class, 'revision_id');
     }
+
+    /**
+     * The Blocks linked to this Page.
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function blocks()
+    {
+        return $this->hasMany(Block::class, 'page_id');
+    }
+
+
 
     /************************************************************************
      * Query Scopes
@@ -130,7 +145,18 @@ class Page extends BaumNode
      */
     public function scopeVersion($query, $version)
     {
-        return $query->where('version', $version);
+        return $query->withoutGlobalScope(VersionScope::class)
+                    ->where('version', $version);
+    }
+
+    /**
+     * Removes the default drafts-only global scope for the query.
+     * @param $query
+     * @return mixed
+     */
+    public function scopeAnyVersion($query)
+    {
+        return $query->withoutGlobalScope(Version::class);
     }
 
     /**
@@ -156,6 +182,14 @@ class Page extends BaumNode
         return $query->where('site_id', $site_id)
                     ->where('path', $path);
     }
+
+
+    /**************************************************************************
+     * Utility Methods
+     */
+
+
+
     /**
      * Find a Page by site id and path.
      * @param $site_id
@@ -190,41 +224,6 @@ class Page extends BaumNode
 		return $path . $this->slug;
 	}
 
-    /**
-     * Move logic:
-     * If parent does not have a node with this path, create it.
-     * Check that the node we are copying to does not already have a draft
-     * Repeat for all children.
-     * Prune any now-empty Pages.
-     * @param $parent
-     */
-	public function move($parent)
-    {
-        // No reordering within a parent
-        if( $this->parent_id == $parent->id ) {
-            return $this;
-        }
-        $dest = $parent->children->where('slug', $this->slug)->first();
-        if(!$dest){
-            $dest = $parent->children()->create([
-                'site_id' => $parent->site_id,
-                'slug' => $this->slug,
-                'parent_id' => $parent->id
-            ]);
-        }
-        // can't move if it already exists
-        if($dest->draft_id){
-            throw new PageExistsException($dest);
-        }
-        $dest->setDraft($this->draft);
-        $dest->save();
-        $this->setDraft(null);
-        foreach($this->children as $child){
-            $child->move($dest);
-        }
-        $this->removeEmptyPages();
-        return $dest;
-    }
 
 	/**
 	 * Clones the desendants of the given Page to the current Page instance.
@@ -300,5 +299,54 @@ class Page extends BaumNode
     public function getChildWithSlug($slug)
     {
         return $this->immediateDescendants()->where('slug', $slug)->first();
+    }
+
+    /**
+     * Loads the Layout definition, optionally including Regions
+     *
+     * @param boolean $includeRegions
+     * @return void
+     */
+    public function loadLayoutDefinition($includeRegions = false)
+    {
+        $file = LayoutDefinition::locateDefinition($this->revision->layout_name, $this->revision->layout_version);
+        $definition = LayoutDefinition::fromDefinitionFile($file);
+
+        if($includeRegions) $definition->loadRegionDefinitions();
+
+        $this->layoutDefinition = $definition;
+    }
+
+    /**
+     * Returns the layoutDefinitions Collection, loading from disk if necessary,
+     * optionally including Regions.
+     *
+     * @param boolean $includeRegions
+     * @return LayoutDefinition
+     */
+    public function getLayoutDefinition($includeRegions = false){
+        if(!$this->layoutDefinition){
+            $this->loadLayoutDefinition($includeRegions);
+
+        } elseif($includeRegions) {
+            // If using a previously-loaded $layoutDefinition, region definitions may not be present.
+            // By calling getRegionDefinitions rather than loadRegionDefinitions, RegionDefinitions get loaded,
+            // but only if they are not already present. A call to laodRegionDefinitions would force a new load
+            // operation regardless.
+            $this->layoutDefinition->getRegionDefinitions();
+        }
+
+        return $this->layoutDefinition;
+    }
+
+
+    /**
+     * Deletes all blocks in the given Region
+     *
+     * @param  string $region
+     * @return void
+     */
+    public function clearRegion($region){
+        Block::deleteForPageRegion($this, $region);
     }
 }

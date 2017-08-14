@@ -31,8 +31,8 @@ class SiteTransformer extends FractalTransformer
 
 	public function includeHomepage(Site $site)
     {
-        if($site->homePage){
-            return new FractalItem($site->homePage, new PageTransformer(), false);
+        if($site->homepage){
+            return new FractalItem($site->homepage, new PageTransformer(), false);
         }
     }
 

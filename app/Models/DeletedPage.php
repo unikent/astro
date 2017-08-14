@@ -25,4 +25,8 @@ class DeletedPage extends Model
         'updated_at'
 	];
 
+	public function revision()
+    {
+        return $this->belongsTo(Revision::class);
+    }
 }

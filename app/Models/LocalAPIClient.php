@@ -138,20 +138,19 @@ class LocalAPIClient implements APIClient
 
     /**
      * Adds a subpage to a site.
-     * @param int $site_id
      * @param int $parent_id
-     * @param int|null $before_id
+     * @param int|null $next_id
      * @param string $slug
      * @param array $layout [ 'name' => 'layout-name', 'version' => 'layout-version']
      * @param array $options
      * @return string json
      * @throws
      */
-    public function addPage($site_id, $parent_id, $before_id, $slug, $layout, $title)
+    public function addPage( $parent_id, $next_id, $slug, $layout, $title)
     {
         return $this->execute(AddPage::class, [
             'parent_id' => $parent_id,
-            'before_id' => $before_id,
+            'next_id' => $next_id,
             'slug' => $slug,
             'layout' => $layout,
             'title' => $title
@@ -160,9 +159,8 @@ class LocalAPIClient implements APIClient
 
     /**
      * Add a hierarchy of pages to a site.
-     * @param int $site_id
      * @param int $parent_id
-     * @param int $before_id
+     * @param int $next_id
      * @param array $tree array of pages attributes, each of which may have a children array containing subpage definitions.
      * Required attributes are:
      * - slug
@@ -171,19 +169,18 @@ class LocalAPIClient implements APIClient
      * - layout['version']
      * @return bool True if successful.
      */
-    public function addTree($site_id, $parent_id, $before_id, $tree)
+    public function addTree($parent_id, $next_id, $tree)
     {
         foreach( $tree as $page ) {
             $added = $this->addPage(
-                $site_id,
                 $parent_id,
-                $before_id,
+                $next_id,
                 $page['slug'],
                 $page['layout'],
                 $page['title']
             );
             if(!empty($page['children'])){
-                $this->addTree($site_id, $added->id, null, $page['children']);
+                $this->addTree( $added->id, null, $page['children']);
             }
         }
         return true;
@@ -196,7 +193,7 @@ class LocalAPIClient implements APIClient
     public function updatePageContent($draft_id,$regions)
     {
         return $this->execute(UpdateContent::class, [
-           'draft_id' => $draft_id,
+           'id' => $draft_id,
             'blocks' => $regions
         ]);
     }
@@ -216,9 +213,13 @@ class LocalAPIClient implements APIClient
         ]);
     }
 
-    public function movePage($data)
+    public function movePage($id, $new_parent_id, $next_id = null)
     {
-        return $this->execute(MovePage::class, $data);
+        return $this->execute(MovePage::class, [
+            'id' => $id,
+            'parent_id' => $new_parent_id,
+            'next_id' => $next_id
+        ]);
     }
 
     public function publishPage()

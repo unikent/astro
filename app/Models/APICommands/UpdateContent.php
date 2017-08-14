@@ -33,28 +33,32 @@ class UpdateContent implements APICommand
             $this->processBlocks($page, $input['blocks']);
 
             // Save our previous state to the revisions table.
-            $revision = Revision::createFromPageContent($draft, $user);
-            $revision->save();
-
-            // update this draft
-            $draft->updated_by = $user->id;
-            $draft->save();
-            DB::commit();
-            $draft->fresh();
-            return $draft;
+            $previous_revision = $page->revision;
+            $revision = Revision::create([
+                'revision_set_id' => $previous_revision->revision_set_id,
+                'title' => $previous_revision->title,
+                'layout_name' => $previous_revision->layout_name,
+                'layout_version' => $previous_revision->layout_version,
+                'created_by' => $user->id,
+                'updated_by' => $user->id,
+                'bake' => $page->bake()
+            ]);
+            $page->setRevision($revision);
+            $page->fresh();
+            return $page;
         });
         return $result;
     }
 
     /**
-     * @param PageContent $pagecontent
+     * @param Page $page
      * @param $regions
      */
-    protected function processBlocks($pagecontent, $regions) {
+    protected function processBlocks($page, $regions) {
         foreach($regions as $region => $blocks) {
             // Remove any existing Blocks in the region (to avoid re-ordering existing)
             // TODO: explore updating block order rather than deleting each time
-            $pagecontent->clearRegion($region);
+            $page->clearRegion($region);
 
             // Re/create all the blocks
             if(!empty($blocks)) {
@@ -63,7 +67,7 @@ class UpdateContent implements APICommand
 
                     $block->fill($data);
 
-                    $block->page_content_id = $pagecontent->getKey();
+                    $block->page_content_id = $page->getKey();
 
                     $block->order = $delta;
                     $block->region_name = $region;

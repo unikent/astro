@@ -11,6 +11,7 @@ class DatabaseSeeder extends Seeder
 	 */
 	private $tables = [
 	    'revisions',
+        'redirects',
 	    'deleted_pages',
         'revision_sets',
 	    'pages',
@@ -89,7 +90,7 @@ class DatabaseSeeder extends Seeder
         $site = $client->createSite(
             1, 'Test Site', 'example.com', '', ['name'=>'kent-homepage','version'=>1]
         );
-        $client->addTree($site->id, $site->homePage->id, null, $this->testTree);
+        $client->addTree( $site->homepage->id, null, $this->testTree);
 
     }
 

@@ -23,7 +23,7 @@ class RevisionSet extends Model
      */
 	public function revisions()
     {
-        return $this->hasMany('Revision', 'revision_set_id');
+        return $this->hasMany(Revision::class, 'revision_set_id');
     }
 
 }

@@ -25,7 +25,7 @@ class MovePage implements APICommand
     public function execute($input, Authenticatable $user)
     {
         return DB::transaction(function() use($input,$user){
-            $page = Page::find($input['page_id']);
+            $page = Page::find($input['id']);
             $parent = Page::find($input['parent_id']);
             $next = Page::find(!empty($input['next_id']) ? $input['next_id'] : null);
             if($parent->id != $page->parent_id){
@@ -65,8 +65,8 @@ class MovePage implements APICommand
         $remove_length = strlen($page->parent->path);
         foreach($page->getDescendantsAndSelf() as $item){
             $redirects[] = [
-                'from' => $item->path,
-                'to' => $this->replacePath($item->path, $parent->path , $remove_length)
+                'path' => $item->path,
+                'page_id' => $page->id //$this->replacePath($item->path, $parent->path , $remove_length)
             ];
         }
         Redirect::insert($redirects);
@@ -79,11 +79,30 @@ class MovePage implements APICommand
      */
     public function updatePaths($page,$parent)
     {
-        $prefix_length = strlen($page->parent->path);
-        $sql = "CONCAT(:path, SUBSTRING(path, $prefix_length))";
-        Page::where('lft', '>=', $page->lft)
-            ->where('lft', '<', $page->rgt)
-            ->update(['path' => DB::raw($sql)], [$parent->path]);
+        $len = strlen($page->parent->path);
+        $prefix_length = $len == 1 ? 1 : $len+1;
+        $binds = [
+            // handle root parent with path of '/' as a special case
+            'prefix' => strlen($parent->path) == 1 ? '' : $parent->path,
+            'prefix_length' => $prefix_length,
+            'lft' => $page->lft,
+            'rgt' => $page->rgt,
+            'site_id' => $page->site_id,
+            'version' => $page->version
+        ];
+        print_r($binds);
+
+        DB::update("
+          UPDATE pages 
+          SET 
+            path = CONCAT(:prefix, SUBSTRING(path, :prefix_length) )
+          WHERE lft >= :lft
+          AND lft < :rgt
+          AND site_id = :site_id
+          AND version = :version
+        ",
+            $binds
+        );
     }
 
     public function messages(Collection $data, Authenticatable $user)
@@ -99,7 +118,7 @@ class MovePage implements APICommand
     public function rules(Collection $data, Authenticatable $user)
     {
         return [
-            'page_id' => [
+            'id' => [
                 'required',
                 'exists:pages,id'
             ],
@@ -107,10 +126,10 @@ class MovePage implements APICommand
             'parent_id' => [
                 'required',
                 'exists:pages,id',
-                'same_site:' . $data->get('page_id'),
-                'not_descendant_or_self:'.$data->get('page_id')
+                'same_site:' . $data->get('id'),
+                'not_descendant_or_self:'.$data->get('id')
              ],
-            // if before_id exists it must have the parent_id specified for the new route / page.
+            // if next_id exists it must have the parent_id specified for the new route / page.
             'next_id' => [
                 'nullable',
                 Rule::exists('pages','id')->where(function($query) use($data) {

@@ -89,7 +89,7 @@ class AddPage implements APICommand
                 'required',
                 'exists:pages,id'
              ],
-            // if before_id exists it must have the parent_id specified for the new route / page.
+            // if next_id exists it must have the parent_id specified for the new route / page.
             'next_id' => [
                 'nullable',
                 Rule::exists('pages','id')

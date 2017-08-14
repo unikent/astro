@@ -16,7 +16,7 @@ class CreateRedirects extends Migration
         Schema::create('redirects', function(Blueprint $table) {
             $table->increments('id');
 
-            $table->string('path')->unique();
+            $table->string('path');
             $table->integer('page_id')->unsigned();
 
             // Keep track

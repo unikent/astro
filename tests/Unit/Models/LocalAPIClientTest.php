@@ -3,16 +3,13 @@
 namespace Tests\Unit\Models;
 
 use App\Models\LocalAPIClient;
-use Astro\Renderer\Contracts\APIClient;
 use App\Models\PublishingGroup;
 use App\Models\Revision;
 use Illuminate\Contracts\Validation\ValidationException;
 use Illuminate\Contracts\Validation\Validator;
-use Mockery;
 use App\Models\User;
 use App\Models\Site;
 use App\Models\Page;
-use App\Models\PageContent;
 use Tests\TestCase;
 
 class LocalAPIClientTest extends TestCase
@@ -89,8 +86,7 @@ class LocalAPIClientTest extends TestCase
         );
         $new_page_title = 'This is a page :)';
         $newpage = $client->addPage(
-            $site->id,
-            $site->homePage->id,
+            $site->homepage->id,
             null,
             'foo',
             [
@@ -114,7 +110,7 @@ class LocalAPIClientTest extends TestCase
         $site = $client->createSite(
             $publishing_group_id, 'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
         );
-        $client->addTree($site->id, $site->homePage->id, null, $this->testTree);
+        $client->addTree($site->homepage->id, null, $this->testTree);
         $expected = [
             "/",
             "/undergraduate",
@@ -137,11 +133,10 @@ class LocalAPIClientTest extends TestCase
         $site = $client->createSite(
             $publishing_group_id, 'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
         );
-        $client->addTree($site->id, $site->homePage->id, null, $this->testTree);
-        $parent = Page::findByPath('/undergraduate');
+        $client->addTree($site->homepage->id, null, $this->testTree);
+        $parent = Page::findBySiteAndPath($site->id,'/undergraduate');
         $new_page_title = 'test';
         $newpage = $client->addPage(
-            $site->id,
             $parent->id,
             null,
             'test',
@@ -174,7 +169,6 @@ class LocalAPIClientTest extends TestCase
         );
         $new_page_title = 'This is a page :)';
         $newpage = $client->addPage(
-            $site->id,
             null,
             null,
             'foo',
@@ -197,8 +191,7 @@ class LocalAPIClientTest extends TestCase
         );
         $new_page_title = 'This is a page :)';
         $newpage = $client->addPage(
-            $site->id,
-            $site->homePage->id,
+            $site->homepage->id,
             null,
             'foo',
             ['name' => 'test-layout', 'version' => 1],
@@ -206,9 +199,8 @@ class LocalAPIClientTest extends TestCase
         );
         $this->assertInstanceOf(Page::class, $newpage);
         $newpage = $client->addPage(
-            $site->id,
-            $site->homePage->children()->first()->id,
-            $site->homePage->id,
+            $site->homepage->children()->first()->id,
+            $site->homepage->id,
             'bar',
             ['name' => 'test-layout', 'version' => 1],
             $new_page_title
@@ -226,11 +218,10 @@ class LocalAPIClientTest extends TestCase
         $site = $client->createSite(
             $publishing_group_id, 'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
         );
-        $client->addTree($site->id, $site->homePage->id, null, $this->testTree);
-        $parent1 = Page::findByPath('/undergraduate/2018');
-        $parent2 = Page::findByPath('/postgraduate/2017');
+        $client->addTree( $site->homepage->id, null, $this->testTree);
+        $parent1 = Page::findBySiteAndPath($site->id, '/undergraduate/2018');
+        $parent2 = Page::findBySiteAndPath($site->id, '/postgraduate/2017');
         $client->addPage(
-            $site->id,
             $parent1->parent_id,
             $parent1->id,
             'test',
@@ -238,7 +229,6 @@ class LocalAPIClientTest extends TestCase
             'test1'
         );
         $client->addPage(
-            $site->id,
             $parent2->parent_id,
             $parent2->id,
             'test',
@@ -285,7 +275,7 @@ class LocalAPIClientTest extends TestCase
         $site = $client->createSite(
             $publishing_group_id, 'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
         );
-        $client->updatePageContent($site->homePage->id, null);
+        $client->updatePageContent($site->homepage->id, null);
     }
 
     /**
@@ -298,13 +288,13 @@ class LocalAPIClientTest extends TestCase
         $site = $client->createSite(
             $publishing_group_id, 'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
         );
-        $draft = $site->homePage->draft;
-        $result = $client->updatePageContent($site->homePage->id, ['main' => []]);
-        $this->assertInstanceOf(Revision::class, $result);
-        $this->assertInstanceOf(Revision::class, $site->homePage->draft);
-        $new_draft = $site->homePage->draft;
-        $site->fresh(['homePage']);
-        $this->assertNotEquals($draft->id, $new_draft->id);
+        $homepage = $site->homepage;
+        $old_revision = $homepage->revision;
+        $homepage = $client->updatePageContent($homepage->id, ['main' => []]);
+        $this->assertInstanceOf(Page::class, $homepage);
+        $this->assertInstanceOf(Revision::class, $site->homepage->revision);
+        $new_revision = $homepage->revision;
+        $this->assertNotEquals($new_revision->id, $old_revision->id);
     }
 
 }
