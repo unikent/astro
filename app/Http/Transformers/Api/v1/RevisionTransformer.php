@@ -8,7 +8,7 @@ use League\Fractal\Resource\Item as FractalItem;
 class RevisionTransformer extends FractalTransformer
 {
 
-    protected $availableIncludes = ['pagecontent'];
+    protected $availableIncludes = [];
 
     protected $full = false;
 
@@ -26,7 +26,7 @@ class RevisionTransformer extends FractalTransformer
 	    $data = [
 	        'id' => $revision->id,
             'title' => $revision->title,
-            'page_content_id' => $revision->page_content_id,
+            'revision_set_id' => $revision->revision_set_id,
             'type' => $revision->type,
             'created_at' => $revision->created_at,
             'updated_at' => $revision->updated_at,
@@ -41,15 +41,4 @@ class RevisionTransformer extends FractalTransformer
         return $data;
 	}
 
-
-    /**
-     * Include associated Site
-     * @return FractalItem
-     */
-    public function includePagecontent(Revision $revision)
-    {
-//        if($revision->site){
-            return new FractalItem($revision->pagecontent, new PageContentTransformer, false);
- //       }
-    }
 }

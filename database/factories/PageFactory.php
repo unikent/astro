@@ -20,15 +20,6 @@ $factory->state(Page::class, 'isRoot', function ($faker) {
     ];
 });
 
-$factory->state(Page::class, 'withPageContent', function ($faker) {
-    return [
-        'draft_id' => function(array $page) {
-            return factory(PageContent::class)->create([
-
-            ])->getKey();
-        },
-    ];
-});
 
 $factory->state(Page::class, 'withPublishedContent', function ($faker) {
     return [
