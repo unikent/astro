@@ -13,11 +13,11 @@ Route::group([ 'prefix' => 'v1', 'namespace' => 'v1' ], function(){
 	Route::post('media', 'MediaController@store');
 	Route::delete('media/{media}', 'MediaController@destroy');
 
-	Route::resource('pages', 'PageContentController', [ 'except' => [ 'index', 'create', 'edit' ]]);
-	Route::post('pages/{page}/publish', 'PageContentController@publish');
-	Route::post('pages/{page}/publish-tree', 'PageContentController@publishTree');
-	Route::post('pages/{page}/revert', 'PageContentController@revert');
-	Route::delete('pages/{page}/force', 'PageContentController@forceDestroy');
+	Route::resource('pages', 'PageController', [ 'except' => [ 'index', 'create', 'edit' ]]);
+	Route::post('pages/{page}/publish', 'PageController@publish');
+	Route::post('pages/{page}/publish-tree', 'PageController@publishTree');
+	Route::post('pages/{page}/revert', 'PageController@revert');
+	Route::delete('pages/{page}/force', 'PageController@forceDestroy');
 
 	Route::get('regions/definitions', 'RegionController@definitions');
 	Route::get('regions/{region_definition}/definition', 'RegionController@definition');

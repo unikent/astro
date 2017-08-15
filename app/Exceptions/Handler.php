@@ -123,7 +123,7 @@ class Handler extends ExceptionHandler
 		];
 
         // Only include stack trace in debug mode (as could reveal secrets)
-        if($code === 500 && config('app.debug') && isset($e))
+        if(in_array($code, [500,404]) && config('app.debug') && isset($e))
         {
             $errors['errors'][0]['trace'] = $e->getTrace();
         }

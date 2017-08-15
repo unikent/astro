@@ -162,7 +162,7 @@ const actions = {
 				const page = response.data.data;
 
 				api
-					.get(`layouts/${page.layout_name}/definition?include=region_definitions.block_definitions`)
+					.get(`layouts/${page.revision.layout_name}/definition?include=region_definitions.block_definitions`)
 					.then(({ data: region }) => {
 
 						region.data.region_definitions.forEach((region) => {

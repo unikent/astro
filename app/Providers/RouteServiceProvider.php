@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Models\PageContent;
+use App\Models\Page;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\Definitions\Block as BlockDefinition;
@@ -31,7 +31,7 @@ class RouteServiceProvider extends ServiceProvider
 		parent::boot();
 
 	    Route::bind('page', function($value){
-	        return PageContent::withTrashed()->where('id', '=', $value)->firstOrFail();
+	        return Page::where('id', '=', $value)->firstOrFail();
 	    });
 
 	    Route::bind('block_definition', function($value){

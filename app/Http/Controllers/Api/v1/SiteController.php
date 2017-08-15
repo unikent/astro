@@ -102,12 +102,11 @@ class SiteController extends ApiController
 		$this->authorize('read', $site);
         $site->load([
             'pages',
-            'pages.draft',
-            'pages.published.pagecontent'
+            'pages.revision',
         ]);
         $data = $this->pagesToHierarchy(
             fractal(
-                $site->pages()->orderBy('path')->with(['draft','published'])->get(),
+                $site->pages()->orderBy('path')->with(['revision'])->get(),
                 new PageTransformer()
             )
                 ->parseIncludes($request->get('include'))

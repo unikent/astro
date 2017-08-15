@@ -118,7 +118,7 @@ export default {
 		getLayout(layoutName) {
 			this.createForm.blocks = {};
 			this.$api
-				.get(`layout/${layoutName}/definition?include=region_definitions.block_definitions`)
+				.get(`layouts/${layoutName}/definition?include=region_definitions.block_definitions`)
 				.then(({ data: json }) => {
 					// go through our region definitions
 					json.data.region_definitions.forEach((region) => {

@@ -17,6 +17,8 @@ class PageTransformer extends FractalTransformer
 
     protected $availableIncludes = [ 'parent', 'revision', 'history', 'site' ];
 
+    protected $defaultIncludes = [ 'revision' ];
+
 	public function transform(Page $page)
 	{
 		$data = [

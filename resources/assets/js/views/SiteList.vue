@@ -28,7 +28,7 @@
 					<el-table-column prop="canonical.path" label="Path"></el-table-column>
 					<el-table-column inline-template label="Actions" width="110">
 						<div>
-							<router-link :to="`/site/${sites[$index].id}/page/${sites[$index].homepage.draft.page_content_id}`">
+							<router-link :to="`/site/${sites[$index].id}/page/${sites[$index].homepage.id}`">
 								<el-button type="default" size="small">
 									<icon name="edit" width="14" height="14" />
 								</el-button>

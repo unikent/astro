@@ -28,8 +28,8 @@ class RevisionTransformer extends FractalTransformer
             'title' => $revision->title,
             'revision_set_id' => $revision->revision_set_id,
             'type' => $revision->type,
-            'created_at' => $revision->created_at,
-            'updated_at' => $revision->updated_at,
+            'created_at' => $revision->created_at ? $revision->created_at->toDateTimeString() : null,
+            'updated_at' => $revision->updated_at ? $revision->updated_at->toDateTimeString() : null,
             'layout_name' => $revision->layout_name,
             'layout_version' => $revision->layout_version
         ];

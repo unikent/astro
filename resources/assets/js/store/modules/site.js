@@ -79,7 +79,15 @@ const actions = {
 
 	createPage({ dispatch }, page) {
 		api
-			.post('pages', page)
+			.post('pages', {
+				parent_id: page.route.parent_id,
+				slug: page.route.slug,
+				layout: {
+					name: page.layout_name,
+					version: page.layout_version,
+				},
+				title: page.title
+			})
 			.then(() => {
 				dispatch('fetchSite');
 			})
