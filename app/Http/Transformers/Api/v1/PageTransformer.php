@@ -27,7 +27,9 @@ class PageTransformer extends FractalTransformer
             'slug' => $page->slug,
             'version' => $page->version,
             'depth' => $page->depth,
-            'parent_id' => $page->parent_id
+            'parent_id' => $page->parent_id,
+            'layout_name' => $page->revision->layout_name,
+            'layout_version' => $page->revision->layout_version
         ];
         return $data;
 	}

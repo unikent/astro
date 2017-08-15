@@ -232,6 +232,10 @@ class Page extends BaumNode
     public function setRevision($revision)
     {
         $this->revision_id = $revision ? $revision->id : null;
+        if($revision && !$revision->bake){
+            $revision = $this->bake();
+            $revision->save();
+        }
         $this->save();
         return $this;
     }

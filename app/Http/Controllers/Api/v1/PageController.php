@@ -76,7 +76,7 @@ class PageController extends ApiController
         $this->authorize('update', $page);
         $api = new LocalAPIClient(Auth::user());
         $page = $api->updatePageContent($page->id, $request->input('blocks'));
-        return fractal($page, new PageContentTransformer)->respond();
+        return fractal($page, new PageTransformer)->respond();
     }
 
     /**
@@ -270,7 +270,7 @@ class PageController extends ApiController
 
                     $block->fill($data);
 
-                    $block->page_content_id = $page->getKey();
+                    $block->page_id = $page->getKey();
 
                     $block->order = $delta;
                     $block->region_name = $region;

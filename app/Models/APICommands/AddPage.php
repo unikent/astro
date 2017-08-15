@@ -71,7 +71,7 @@ class AddPage implements APICommand
             'updated_by' => $user->id,
             'layout_name' => $layout_name,
             'layout_version' => $layout_version,
-            'bake' => $page->bake()
+            'bake' => ''
         ]);
         $page->setRevision($revision);
         return $page;

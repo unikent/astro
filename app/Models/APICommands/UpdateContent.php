@@ -67,7 +67,7 @@ class UpdateContent implements APICommand
 
                     $block->fill($data);
 
-                    $block->page_content_id = $page->getKey();
+                    $block->page_id = $page->getKey();
 
                     $block->order = $delta;
                     $block->region_name = $region;
