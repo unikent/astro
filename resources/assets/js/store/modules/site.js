@@ -55,7 +55,7 @@ const actions = {
 
 	fetchSite({ commit, state }) {
 		api
-			.get(`sites/${state.site}/tree?include=draft`)
+			.get(`sites/${state.site}/tree?include=revision`)
 			.then((response) => {
 				commit('setSite', [response.data.data]);
 			});

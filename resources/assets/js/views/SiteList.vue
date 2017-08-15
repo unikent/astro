@@ -157,7 +157,7 @@ export default {
 
 		fetchData() {
 			this.$api
-				.get('sites?include=homepage.draft')
+				.get('sites?include=homepage.revision')
 				.then((response) => {
 					this.sites = response.data.data;
 					this.loading = false;

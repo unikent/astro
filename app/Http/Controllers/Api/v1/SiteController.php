@@ -106,7 +106,7 @@ class SiteController extends ApiController
         ]);
         $data = $this->pagesToHierarchy(
             fractal(
-                $site->pages()->orderBy('path')->with(['revision'])->get(),
+                $site->pages()->orderBy('lft')->with(['revision'])->get(),
                 new PageTransformer()
             )
                 ->parseIncludes($request->get('include'))
