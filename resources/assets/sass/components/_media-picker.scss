@@ -1,0 +1,33 @@
+.media-picker {
+	&__form-caution {
+		display: inline-block;
+		margin-top: 8px;
+		color: #98aac6;
+		font-size: .8rem;
+	}
+
+	&__overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		padding: 5px;
+
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-end;
+		align-items: flex-end;
+		cursor: pointer;
+	}
+
+	&__overlay:before {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		right: 0;
+		border-width: 50px 50px 0 0;
+		border-style: solid;
+		border-color: transparent #20a0ff;
+	}
+}

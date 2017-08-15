@@ -206,7 +206,7 @@ export default {
 
 		handleCommand(command) {
 			if(this[command]) {
-				this[command](this);
+				this[command](this.page);
 			}
 		}
 

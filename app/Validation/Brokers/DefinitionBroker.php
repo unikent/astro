@@ -45,11 +45,14 @@ abstract class DefinitionBroker {
 	{
 		$transformed = [];
 
-		foreach($rules as $field => $ruleset){
-			foreach($ruleset as &$rule){
+		foreach($rules as $field => $ruleset)
+		{
+			foreach($ruleset as &$rule)
+			{
 				$rule = explode(':', $rule);
 
-				switch($rule[0]){
+				switch($rule[0])
+				{
 					case 'required':
 						$transformed[$field][] = 'present';
 						$transformed[$field][] = 'required';
@@ -77,6 +80,10 @@ abstract class DefinitionBroker {
 						$transformed[$field][] = 'nullable';
 						$transformed[$field][] = 'integer';
 						$transformed[$field][] = sprintf('max:%s', $rule[1]);
+						break;
+
+					case 'regex':
+						$transformed[$field][] = sprintf('regex:/%s/', $rule[1]);
 						break;
 
 					default:
@@ -108,16 +115,17 @@ abstract class DefinitionBroker {
 	/**
 	 * Runs 'passes()' on the Validator instance.
 	 *
-     * @return void
-     *
+	 * @return void
+	 *
 	 * @throws \Illuminate\Validation\ValidationException;
 	 */
 	public function validate()
 	{
 		$validator = $this->getValidator();
 
-		if(!$validator->passes()){
-        	throw new ValidationException($validator);
+		if(!$validator->passes())
+		{
+			throw new ValidationException($validator);
 		}
 	}
 

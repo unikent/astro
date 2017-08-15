@@ -5,6 +5,7 @@ import shareMutations from '../plugins/share-mutations';
 import shareTimeTravel from '../plugins/share-time-travel';
 import page from './modules/page';
 import site from './modules/site';
+import media from './modules/media';
 import definition from './modules/definition';
 import Config from 'classes/Config';
 
@@ -18,10 +19,6 @@ let store = new Vuex.Store({
 		over: {
 			x: 0,
 			y: 0
-		},
-		preview: {
-			visible: false,
-			url: ''
 		},
 		wrapperStyles: {},
 		displayIframeOverlay: false,
@@ -41,7 +38,7 @@ let store = new Vuex.Store({
 			visible: false
 		},
 		menu: {
-			active: "pages"
+			active: 'pages'
 		}
 	},
 
@@ -55,10 +52,6 @@ let store = new Vuex.Store({
 
 		updateOver(state, position) {
 			state.over = position;
-		},
-
-		changePreview(state, value) {
-			state.preview = value;
 		},
 
 		updateWrapperStyle(state, { prop, value }) {
@@ -119,7 +112,8 @@ let store = new Vuex.Store({
 	modules: {
 		page,
 		definition,
-		site
+		site,
+		media
 	},
 
 	plugins: [

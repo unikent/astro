@@ -50,76 +50,77 @@ class Handler extends ExceptionHandler
     {
         $classname = get_class($exception);
 
-        if($request->route())
-        {
-            $action = $request->route()->getAction();
-            $prefix = $action['prefix'];
-        }
 
-        if(isset($prefix) && starts_with($prefix, 'api'))
-        {
-            if($exception instanceof AuthorizationException)
-            {
-                return $this->formatErrors(
-                    'Not Authorized', $classname, 403, $exception
-                );
-            }
-            else if($exception instanceof AuthenticationException)
-            {
-                return $this->formatErrors(
-                    'Not Authenticated', $classname, 401, $exception
-                );
-            }
-            else if($exception instanceof ValidationException)
-            {
-                return $this->formatErrors(
-                    'Invalid input given',
-                    $exception->validator->errors()->getMessages(),
-                    422,
-                    $exception
-                );
-            }
-            else if(
-                $exception instanceof DefinitionNotFoundException ||
-                $exception instanceof ModelNotFoundException
-            )
-            {
-                return $this->formatErrors(
-                    'Not Found', $classname, 404, $exception
-                );
-            }
-            else if($exception instanceof PostTooLargeException)
-            {
-                return $this->formatErrors(
-                    'This content is too large to upload',
-                    $classname,
-                    422,
-                    $exception
-                );
-            }
+		if($request->route())
+		{
+			$action = $request->route()->getAction();
+			$prefix = $action['prefix'];
+		}
 
-            return $this->formatErrors(
-                $exception->getMessage(),
-                $classname,
-                500,
-                $exception
-            );
-        }
+		if(isset($prefix) && starts_with($prefix, 'api'))
+		{
+			if($exception instanceof AuthorizationException)
+			{
+				return $this->formatErrors(
+					'Not Authorized', $classname, 403, $exception
+				);
+			}
+			else if($exception instanceof AuthenticationException)
+			{
+				return $this->formatErrors(
+					'Not Authenticated', $classname, 401, $exception
+				);
+			}
+			else if($exception instanceof ValidationException)
+			{
+				return $this->formatErrors(
+					'Invalid input given',
+					$exception->validator->errors()->getMessages(),
+					422,
+					$exception
+				);
+			}
+			else if(
+				$exception instanceof DefinitionNotFoundException ||
+				$exception instanceof ModelNotFoundException
+			)
+			{
+				return $this->formatErrors(
+					'Not Found', $classname, 404, $exception
+				);
+			}
+			else if($exception instanceof PostTooLargeException)
+			{
+				return $this->formatErrors(
+					'This content is too large to upload',
+					$classname,
+					422,
+					$exception
+				);
+			}
+
+			return $this->formatErrors(
+				$exception->getMessage(),
+				$classname,
+				500,
+				$exception
+			);
+		}
 
         return parent::render($request, $exception);
     }
 
-    // TODO: replace with fractal?
-    protected function formatErrors($message = '', $details = 'Unknown', $code = 500, $e = null)
-    {
-        $errors = [
-            'errors' => [
-                [
-                    'message' => $message,
-                    'details'  => $details
-                ]
-            ]
-        ];
+	// TODO: replace with fractal?
+	protected function formatErrors($message = '', $details = 'Unknown', $code = 500, $e = null)
+	{
+		$errors = [
+			'errors' => [
+				[
+					'message' => $message,
+					'details'  => $details
+				]
+			]
+		];
 
         // Only include stack trace in debug mode (as could reveal secrets)
         if($code === 500 && config('app.debug') && isset($e))

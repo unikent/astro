@@ -37,13 +37,13 @@ export default (http, store, router) => {
 									`
 								});
 
-								if(error.reason && typeof error.reason === 'object') {
+								if(error.details && typeof error.details === 'object') {
 
-									Object.keys(error.reason).forEach(field => {
-										error.reason[field] = error.reason[field].join(' | ');
+									Object.keys(error.details).forEach(field => {
+										error.details[field] = error.details[field].join(' | ');
 									});
 
-									const errors = unflatten(error.reason, { safe: true });
+									const errors = unflatten(error.details, { safe: true });
 
 									store.commit('updateErrors', errors);
 								}

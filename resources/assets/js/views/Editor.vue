@@ -2,7 +2,6 @@
 <div class="page">
 
 	<div class="editor-body">
-
 		<div class="editor-wrapper" ref="editor">
 			<iframe :src="getPreviewUrl" class="editor-content" :style="dimensions" frameborder="0" />
 			<div
@@ -10,40 +9,20 @@
 				:style="{ 'position' : displayIframeOverlay ? 'absolute' : null }"
 			/>
 		</div>
-
 		<sidebar />
-		<block-picker />
-
-		<el-dialog
-			title="Publish"
-			v-model="publishModalVisible"
-			:modal-append-to-body="true"
-			:before-close="handleClose"
-		>
-			<el-form :model="form">
-				<el-form-item label="Before you publish this page, give it an audit message">
-					<el-input v-model="form.message" auto-complete="off"></el-input>
-					<span class="help">This is used for an audit trail of your previously published pages</span>
-				</el-form-item>
-			</el-form>
-			<span slot="footer" class="dialog-footer">
-				<el-button @click="cancelPublish">Cancel and don't publish</el-button>
-				<el-button v-if="form.message === ''" disabled type="primary" @click="publishPage">Publish now</el-button>
-				<el-button v-else type="danger" @click="publishPage">Publish now</el-button>
-			</span>
-		</el-dialog>
-
 	</div>
+
+	<modal-container />
 </div>
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex';
+import { mapState } from 'vuex';
 import { Loading } from 'element-ui';
 
 import Config from 'classes/Config';
 import Sidebar from 'components/sidebar';
-import BlockPicker from 'components/BlockPicker';
+import ModalContainer from 'components/ModalContainer';
 import Icon from 'components/Icon';
 
 export default {
@@ -51,16 +30,8 @@ export default {
 
 	components: {
 		Sidebar,
-		BlockPicker,
+		ModalContainer,
 		Icon
-	},
-
-	data() {
-		return {
-			form: {
-				message: ''
-			}
-		}
 	},
 
 	created() {
@@ -87,36 +58,6 @@ export default {
 	},
 
 	methods: {
-		...mapMutations([
-			'changeView',
-			'showPublishModal',
-			'hidePublishModal'
-		]),
-
-		publishPage() {
-			this.$api
-				.post(`pages/${this.$route.params.site_id}/publish`, this.page)
-				.then(() => {
-					this.hidePublishModal();
-					this.$message({
-						message: 'Published page',
-						type: 'success',
-						duration: 2000
-					});
-					this.form.message = '';
-				})
-				.catch(() => {});
-		},
-
-		cancelPublish() {
-			this.hidePublishModal();
-			this.form.message = '';
-		},
-
-		handleClose() {
-			this.hidePublishModal();
-			this.form.message = '';
-		},
 
 		showLoader() {
 			this.loader = Loading.service({
@@ -126,13 +67,11 @@ export default {
 			});
 		}
 	},
-
 	computed: {
 
 		...mapState([
 			'displayIframeOverlay',
-			'currentView',
-			'publishModal'
+			'currentView'
 		]),
 
 		...mapState({
@@ -150,21 +89,8 @@ export default {
 				width: this.views[this.currentView].width,
 				height: this.views[this.currentView].height
 			};
-		},
-
-		publishModalVisible: {
-			get() {
-				return this.publishModal.visible;
-			},
-			set(value) {
-				if(value) {
-					this.showPublishModal();
-				}
-				else {
-					this.hidePublishModal();
-				}
-			}
 		}
+
 	},
 
 	watch: {

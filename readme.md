@@ -32,7 +32,7 @@ Astro has three separate components:
 5. Set your `APP_KEY` variable within `.env`. Running `php artisan key:generate` makes this simple.
 6. Pull in your definitions, i.e. for UoK: `git clone git@github.com:unikent/cms-prototype-blocks.git`.
 7. Update `DEFINITIONS_PATH` in your .env to point to the newly-cloned definitions directory.
-8. Create a symlink so that `storage/app/pubic` can be accessed from `public/storage`
+8. Create a symlink in the `public` folder to link `uploads` to `storage/app/public/uploads`. Depending on your system this would be with something like `ln -s ../storage/app/public/uploads/ uploads`.
 9. Run `php artisan migrate --seed` and `DB_CONNECTION=mysql_test php artisan migrate`
 10. Ensure that everything is working properly, by running the test suite: `phpunit`
 

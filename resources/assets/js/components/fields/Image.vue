@@ -1,124 +1,89 @@
 <template>
-<el-upload
-	class="upload-form"
-	drag
-	action="media"
-	name="upload"
-	:on-error="handleError"
-	:on-success="handleSuccess"
-	:on-remove="handleRemove"
-	:on-preview="handlePreview"
-	:http-request="upload"
-	:accept="accept"
-	:file-list="fileList"
-	style="margin: 0 5px;"
->
-	<i class="el-icon-upload"></i>
-	<div class="el-upload__text">Drop a file here or <em>click to upload</em></div>
-	<div class="el-upload__tip" slot="tip">
-		Files must be less than 20MB.
-		<upload-fail-list
-			listType="text"
-			:files="failedUploads"
-		/>
-	</div>
-</el-upload>
+<div v-if="value" class="image-field">
+	<item-thumbnail
+		:item="item"
+		:enable-options="value.filename !== 'placeholder.jpg'"
+		:on-edit="showMediaOverlay"
+	>
+		<div class="image-field__overlay">
+			<el-button @click="showPicker">Change image</el-button>
+		</div>
+	</item-thumbnail>
+</div>
+<div v-else class="image-field__add-button">
+	<el-button @click="showPicker">Add image</el-button>
+</div>
 </template>
 
 <script>
-import upload from 'plugins/http/upload';
-import UploadFailList from '../UploadFailList';
+import { mapMutations, mapGetters, mapActions } from 'vuex';
 
-import { mapMutations, mapState } from 'vuex';
+import MediaPicker from 'components/MediaPicker';
+import ItemThumbnail from 'components/media/ItemThumbnail';
 
 export default {
 
 	name: 'image-field',
 
 	components: {
-		UploadFailList
+		MediaPicker,
+		ItemThumbnail
 	},
 
 	props: [
-		'name',
+		'path',
 		'accept',
-		'multiple'
+		'multiple',
+		'field'
 	],
 
-	data() {
-		return {
-			showPreview: false,
-			failedUploads: []
-		};
-	},
-
 	computed: {
-		fileList: {
+		...mapGetters([
+			'getCurrentFieldValue'
+		]),
+
+		value: {
 			get() {
-				const val = this.$store.getters.getCurrentFieldValue(this.name);
-				return val ? [{...val, name: val.filename }] : [];
+				return this.getCurrentFieldValue(this.path);
 			},
 			set(value) {
 				this.updateFieldValue({
-					name: this.name,
-					value
+					name: this.path,
+					value: { ...value, type: 'image' }
 				});
 
 				this.updateBlockMedia({
 					value: {
 						...value,
-						associated_field: this.name
+						associated_field: this.path
 					}
 				});
 			}
 		},
 
-		...mapState([
-			'preview'
-		])
+		item() {
+			return { ...this.value, type: 'image' };
+		}
 	},
 
 	methods: {
-
 		...mapMutations([
 			'updateFieldValue',
-			'updateBlockMedia'
+			'updateBlockMedia',
+			'setMediaType',
+			'updateMediafieldPath',
+			'showMediaPicker',
 		]),
 
-		handleError(err, file) {
-			if(err.response && err.response.status === 422) {
-				file.error = err.response.data.errors[0].message;
-			}
+		...mapActions([
+			'showMediaOverlay'
+		]),
 
-			this.failedUploads.push(file);
-		},
-
-		handleSuccess({ data: json }) {
-			this.fileList = json.data;
-		},
-
-		upload(options) {
-			if(!options.data) {
-				options.data = {};
-			}
-
-			// TODO: update with real site or publishing group id
-			options.data['publishing_group_ids[]'] = 1;
-
-			return upload(options);
-		},
-
-		handleRemove() {
-			this.fileList = null;
-		},
-
-		handlePreview() {
-			this.$store.commit('changePreview', {
-				visible: true,
-				url: this.fileList[0].url
-			});
+		showPicker() {
+			this.setMediaType('image');
+			this.updateMediafieldPath(this.path);
+			this.showMediaPicker();
 		}
-
 	}
 };
 </script>
