@@ -14,6 +14,7 @@ Route::group([ 'prefix' => 'v1', 'namespace' => 'v1' ], function(){
 	Route::delete('media/{media}', 'MediaController@destroy');
 
 	Route::resource('pages', 'PageController', [ 'except' => [ 'index', 'create', 'edit' ]]);
+	Route::put('pages/{page}/content', 'PageController@updateContent');
 	Route::post('pages/{page}/publish', 'PageController@publish');
 	Route::post('pages/{page}/publish-tree', 'PageController@publishTree');
 	Route::post('pages/{page}/revert', 'PageController@revert');

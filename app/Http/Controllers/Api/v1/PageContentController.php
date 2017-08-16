@@ -77,7 +77,7 @@ class PageContentController extends ApiController
 
 		try {
             $pagecontent->publish(new PageContentTransformer);
-			return response($pagecontent->published->bake, 200);
+			return response($pagecontent->revision->blocks, 200);
 		} catch(UnpublishedParentException $e){
 			return response([ 'errors' => [ $e->getMessage() ] ], 406);
 		}

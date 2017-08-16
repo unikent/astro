@@ -23,6 +23,11 @@ class Revision extends Model
 	const TYPE_DELETED = 'deleted';
 	const TYPE_AUTOSAVE = 'autosave';
 
+    protected $casts = [
+        'blocks' => 'json',
+        'options' => 'json'
+    ];
+
 	protected $fillable = [
         'site_id',
         'title',
@@ -46,7 +51,8 @@ class Revision extends Model
 
         static::saving(function($revision){
             // bake cannot be null
-            $revision->bake = !empty($revision->bake) ? $revision->bake : '[]';
+            $revision->blocks = !empty($revision->blocks) ? $revision->blocks: '';
+            $revision->options = !empty($revision->options)? $revision->options : '';
             if(!$revision->revision_set_id){
                 throw new ValidationException("Revision must be part of a RevisionSet");
             }
@@ -79,29 +85,6 @@ class Revision extends Model
                         function($query){
                             return $query->where('created_at', '<', $this->created_at);
                         });
-    }
-
-    /**
-     * Create a new Revision based on some existing page content.
-     * @param PageContent $content The PageContent to create it from.
-     * @param string $type The type of this revision (draft, published, etc)
-     */
-	public static function createFromPageContent(PageContent $content, Authenticatable $user, $type = 'draft')
-    {
-        $revision = new Revision();
-        $revision->title = $content->title;
-        $revision->layout_name = $content->layout_name;
-        $revision->layout_version = $content->layout_version;
-        $revision->page_content_id = $content->id;
-        $revision->bake = fractal(
-            $content,
-            new PageContentTransformer()
-        )->parseIncludes([ 'blocks', 'activeRoute' ])->toJson();
-        $revision->type = $type;
-        $revision->updated_by = $user->id;
-        $revision->created_at = $content->created_at;
-        $revision->created_by = $content->created_by;
-        return $revision;
     }
 
 }

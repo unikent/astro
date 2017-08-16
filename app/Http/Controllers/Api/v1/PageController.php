@@ -67,12 +67,26 @@ class PageController extends ApiController
     /**
      * PUT /api/v1/page/{page}
      * PATCH /api/v1/page/{page}
-     *
+     * Update page options (title, settings, etc)
      * @param Request $request
      * @param Page $page
      * @return Response
      */
     public function update(Request $request, Page $page){
+        $this->authorize('update', $page);
+        $api = new LocalAPIClient(Auth::user());
+        $page = $api->updatePage($page->id, $request->input('title'), $request->input('settings', null));
+        return fractal($page, new PageTransformer)->respond();
+    }
+
+    /**
+     * POST /api/v1/page/{page}/content
+     * Update page content (blocks)
+     * @param Request $request
+     * @param Page $page
+     * @return Response
+     */
+    public function updateContent(Request $request, Page $page){
         $this->authorize('update', $page);
         $api = new LocalAPIClient(Auth::user());
         $page = $api->updatePageContent($page->id, $request->input('blocks'));
@@ -91,7 +105,7 @@ class PageController extends ApiController
 
         try {
             $page->publish(new PageContentTransformer);
-            return response($page->published->bake, 200);
+            return response($page->revision->blocks, 200);
         } catch(UnpublishedParentException $e){
             return response([ 'errors' => [ $e->getMessage() ] ], 406);
         }
@@ -116,7 +130,7 @@ class PageController extends ApiController
             }
 
             DB::commit();
-            return response($page->published->bake, 200);
+            return response($page->revision->blocks, 200);
 
         } catch(UnpublishedParentException $e){
             DB::rollBack();

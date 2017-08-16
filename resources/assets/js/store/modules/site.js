@@ -95,7 +95,9 @@ const actions = {
 
 	updatePage({ dispatch }, page) {
 		api
-			.patch(`pages/${page.page_id}`, page)
+			.patch(`pages/${page.id}/content`, {
+				blocks: page.blocks
+			})
 			.then(() => {
 				dispatch('fetchSite');
 			})

@@ -35,8 +35,8 @@ const mutations = {
 			};
 		}
 
-		state.currentLayout = page.layout_name;
-		state.currentLayoutVersion = page.layout_version;
+		state.currentLayout = page.layout.name;
+		state.currentLayoutVersion = page.layout.version;
 
 		state.pageData = page;
 	},
@@ -162,7 +162,7 @@ const actions = {
 				const page = response.data.data;
 
 				api
-					.get(`layouts/${page.revision.layout_name}/definition?include=region_definitions.block_definitions`)
+					.get(`layouts/${page.layout.name}/definition?include=region_definitions.block_definitions`)
 					.then(({ data: region }) => {
 
 						region.data.region_definitions.forEach((region) => {

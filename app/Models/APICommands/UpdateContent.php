@@ -41,7 +41,8 @@ class UpdateContent implements APICommand
                 'layout_version' => $previous_revision->layout_version,
                 'created_by' => $user->id,
                 'updated_by' => $user->id,
-                'bake' => $page->bake()
+                'blocks' => $page->bake(),
+                'options' => ''
             ]);
             $page->setRevision($revision);
             $page->fresh();

@@ -6,6 +6,7 @@ use App\Models\APICommands\ListSites;
 use App\Models\APICommands\UpdateContent;
 use App\Models\APICommands\DeletePage;
 use App\Models\APICommands\MovePage;
+use App\Models\APICommands\UpdatePage;
 use Astro\Renderer\API\Exception\APIErrorException;
 use Astro\Renderer\API\Data\PageData;
 use Astro\Renderer\API\Data\RouteData;
@@ -190,28 +191,52 @@ class LocalAPIClient implements APIClient
      * @param $draft_id int The id of the draft page content to update.
      * @param array $regions Array of [region-name] => [block1, block2, etc]
      */
-    public function updatePageContent($draft_id,$regions)
+    public function updatePageContent($page_id,$regions)
     {
         return $this->execute(UpdateContent::class, [
-           'id' => $draft_id,
+           'id' => $page_id,
             'blocks' => $regions
         ]);
     }
 
-    public function renamePage($page_id, $new_slug)
+    /**
+     * Update a page's options
+     * If $new_title is null, then the page title will not be updated.
+     * Any page settings / options will only be modified if they exist in the options array.
+     * Any option set to null may be removed / unset.
+     * @param int $page_id The Page ID
+     * @param null|string $new_title Updated page title or null to not update.
+     * @param null|array $options Optional page settings / options to update if present.
+     */
+    public function updatePage($page_id, $new_title = null, $options = null)
     {
-        return $this->execute(RenamePage::class, [
-            'page_id' => $page_id,
-            'slug' => $new_slug,
+        return $this->execute(UpdatePage::class, [
+            'id' => $page_id,
+            'title' => $new_title,
+            'options' => $options
         ]);
     }
 
+    /**
+     * Deletes the specified Page.
+     * @param int $id The ID of the page to delete.
+     * @return Validator
+     */
     public function deletePage($id)
     {
         return $this->execute( DeletePage::class, [
             'id' => $id
         ]);
     }
+
+    public function renamePage($page_id, $new_slug)
+    {
+        return $this->execute(RenamePage::class, [
+            'id' => $page_id,
+            'slug' => $new_slug,
+        ]);
+    }
+
 
     public function movePage($id, $new_parent_id, $next_id = null)
     {
@@ -224,31 +249,27 @@ class LocalAPIClient implements APIClient
 
     public function publishPage()
     {
-
+        throw new \LogicException('Publish Page not yet implemented.');
     }
 
     public function unpublishPage()
     {
-
+        throw new \LogicException('Unpublish Page not yet implemented.');
     }
 
     public function copyPage()
     {
-
+        throw new \LogicException('Copy Page not yet implemented.');
     }
 
     public function updateSite()
     {
-
+        throw new \LogicException('Update Site not yet implemented.');
     }
 
     public function deleteSite()
     {
-
+        throw new \LogicException('Delete site not yet implemented.');
     }
 
-    public function updatePage()
-    {
-
-    }
 }

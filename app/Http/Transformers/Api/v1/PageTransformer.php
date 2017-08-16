@@ -17,19 +17,22 @@ class PageTransformer extends FractalTransformer
 
     protected $availableIncludes = [ 'parent', 'revision', 'history', 'site' ];
 
-    protected $defaultIncludes = [ 'revision' ];
-
 	public function transform(Page $page)
 	{
 		$data = [
 		    'id' => $page->id,
             'path' => $page->path,
             'slug' => $page->slug,
+            'title' => $page->revision->title,
             'version' => $page->version,
             'depth' => $page->depth,
             'parent_id' => $page->parent_id,
-            'layout_name' => $page->revision->layout_name,
-            'layout_version' => $page->revision->layout_version
+            'layout' => [
+                'name' => $page->revision->layout_name,
+                'version' => $page->revision->layout_version
+            ],
+            'blocks' => $page->revision->blocks,
+            'options' => $page->revision->options
         ];
         return $data;
 	}

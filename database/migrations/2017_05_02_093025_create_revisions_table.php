@@ -19,7 +19,8 @@ class CreateRevisionsTable extends Migration
             $table->string('title');
             $table->string('layout_name');
             $table->integer('layout_version');
-            $table->mediumText('bake');
+            $table->mediumText('blocks');
+            $table->mediumText('options');
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
             $table->timestamps();

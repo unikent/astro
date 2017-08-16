@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use App\Http\Transformers\Api\v1\BlockTransformer;
 use App\Models\Scopes\VersionScope;
 use DB;
 use Doctrine\DBAL\Version;
@@ -10,6 +11,15 @@ use App\Http\Transformers\Api\v1\PageTransformer;
 use Baum\Node as BaumNode;
 use Illuminate\Database\Eloquent\Collection;
 
+/**
+ * A Page represents a path in a hierarchical site structure.
+ * Each page has a current revision, and each "tree" of pages is scoped by its site_id and version (draft, published, etc).
+ *
+ * By default, a global Eloquent scope is applied to Pages which restricts all queries to "draft" versions.
+ *
+ * Add the scope "anyVersion" to a query to remove this restriction.
+ * @package App\Models
+ */
 class Page extends BaumNode
 {
 	public $table = 'pages';
@@ -31,6 +41,7 @@ class Page extends BaumNode
 		'rgt'
 	];
 
+	// nested set implementation has a tree for each site_id+version combination.
     protected $scoped = ['site_id','version'];
 
     // The draft state of this page.
@@ -73,12 +84,31 @@ class Page extends BaumNode
 	}
 
     /**
-     * Generate the json version of the current revision of this Page.
-     * @return string
+     * Generate the blocks array for this page.
+     * @return array
      */
 	public function bake()
     {
-        return fractal($this, new PageTransformer)->parseIncludes(['blocks', 'revision'])->toJson();
+        $data = [];
+        $blocksByRegion = $this->blocks()
+                                ->with('media')
+                                ->orderBy('order')
+                                ->get()
+                                ->groupBy('region_name');
+        $this->load('blocks.media');
+        foreach($blocksByRegion as $region => $blocks){
+            $data[$region] = [];
+            foreach($blocks as $block){
+                $block->embedMedia();
+                $data[$region][] = [
+                    'definition_name' => $block->definition_name,
+                    'definition_version' => $block->definition_version,
+                    'region_name' => $block->region_name,
+                    'fields' => $block->fields
+                ];
+            }
+        }
+        return $data;
     }
 
     /************************************************************************
@@ -232,8 +262,8 @@ class Page extends BaumNode
     public function setRevision($revision)
     {
         $this->revision_id = $revision ? $revision->id : null;
-        if($revision && !$revision->bake){
-            $revision = $this->bake();
+        if($revision && !$revision->blocks){
+            $revision->blocks = $this->bake();
             $revision->save();
         }
         $this->save();
@@ -329,7 +359,7 @@ class Page extends BaumNode
             // Create our Revision, bake it with Fractal
             $published = new Revision;
             $published->page_content_id = $this->getKey();
-            $published->bake = fractal($this, $transformer)->parseIncludes([ 'blocks', 'activeRoute' ])->toJson();
+            $published->blocks = fractal($this, $transformer)->parseIncludes([ 'blocks', 'activeRoute' ])->toJson();
             $published->save();
 
             DB::commit();
