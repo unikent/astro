@@ -118,21 +118,29 @@ const actions = {
 		const
 			newPage = getPageInfo(toPath),
 			oldPage = getPageInfo(fromPath),
-			canDrop = newPage.parent.depth + getDepth(oldPage.data) <= state.maxDepth;
+			canDrop = newPage.parent.depth + getDepth(oldPage.data) <= state.maxDepth,
+			newPos = Number.parseInt(toPath.substr(toPath.lastIndexOf('.') + 1, toPath.length));
 
 		if(canDrop) {
+
+			// Reordering logic is a bit different as we are not adding a new item into the parent collection,
+			if(newPage.parent.id == oldPage.parent.id){
+
+			}
+
 			const page = _.cloneDeep(oldPage.data);
-			// remove old page
+
+            // remove old page
 			commit('removePage', oldPage);
 			// update current and child page depths
 			updateDepths(page, newPage.parent.depth + 1);
 			// splice page in if page already exists in new position otherwise add it
 			commit('addPage', { ...newPage, page, push: !newPage.data });
-
+			const next_id = newPos+1 < newPage.parent.children.length ? newPage.parent.children[newPos+1].id : null;
 			dispatch('movePageApi', {
 				page_id: page.id,
-				parent_id: newPage.data.parent_id,
-				next_id: newPage.parent.children[newPage.index] ? newPage.parent.children[newPage.index].id : null
+				parent_id: newPage.parent.id,
+				next_id: next_id //newPage.data && newPage.parent.children[newPos+1] ? newPage.parent.children[newPos+1].id : null
 			});
 		}
 		else {

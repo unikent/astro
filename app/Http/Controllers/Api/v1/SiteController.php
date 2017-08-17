@@ -121,7 +121,11 @@ class SiteController extends ApiController
 	public function move(Request $request)
     {
         $api = new LocalAPIClient(Auth::user());
-        $result = $api->movePage($request->all());
+        $result = $api->movePage(
+            $request->get('page_id'),
+            $request->get('parent_id'),
+            $request->get('next_id')
+        );
         return $result;
     }
 

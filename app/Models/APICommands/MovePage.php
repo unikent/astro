@@ -27,7 +27,7 @@ class MovePage implements APICommand
         return DB::transaction(function() use($input,$user){
             $page = Page::find($input['id']);
             $parent = Page::find($input['parent_id']);
-            $next = Page::find(!empty($input['next_id']) ? $input['next_id'] : null);
+            $next = Page::find(!empty($input['next_id'] ) ? $input['next_id'] : null);
             if($parent->id != $page->parent_id){
                 $this->createRedirects($page,$parent);
                 $this->updatePaths($page,$parent);
