@@ -51,8 +51,8 @@ class Revision extends Model
 
         static::saving(function($revision){
             // bake cannot be null
-            $revision->blocks = !empty($revision->blocks) ? $revision->blocks: '';
-            $revision->options = !empty($revision->options)? $revision->options : '';
+            $revision->blocks = !empty($revision->blocks) ? $revision->blocks: [];
+            $revision->options = !empty($revision->options)? $revision->options : [];
             if(!$revision->revision_set_id){
                 throw new ValidationException("Revision must be part of a RevisionSet");
             }

@@ -18,7 +18,7 @@ class LayoutTransformer extends FractalTransformer
     /**
      * Include associated Region definitions
      *
-     * @return League\Fractal\ItemResource
+
      */
     public function includeRegionDefinitions(Layout $layout)
     {

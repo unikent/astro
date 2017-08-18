@@ -35,9 +35,10 @@ const mutations = {
 			};
 		}
 
-		state.currentLayout = page.layout.name;
-		state.currentLayoutVersion = page.layout.version;
-
+		if(page.layout) {
+            state.currentLayout = page.layout.name;
+            state.currentLayoutVersion = page.layout.version;
+        }
 		state.pageData = page;
 	},
 

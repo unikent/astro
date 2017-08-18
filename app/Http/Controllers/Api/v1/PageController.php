@@ -47,7 +47,7 @@ class PageController extends ApiController
      */
     public function show(Request $request, Page $page){
         $this->authorize('read', $page);
-        return fractal($page, new PageTransformer)->parseIncludes($request->get('include'))->respond();
+        return fractal($page, new PageTransformer(true))->parseIncludes($request->get('include'))->respond();
     }
 
     /**
@@ -61,7 +61,7 @@ class PageController extends ApiController
         $api = new LocalAPIClient(Auth::user());
         $page = $api->execute(AddPage::class, $request->all());
 
-        return fractal($page, new PageTransformer)->respond(201);
+        return fractal($page, new PageTransformer(true))->respond(201);
     }
 
     /**
@@ -76,7 +76,7 @@ class PageController extends ApiController
         $this->authorize('update', $page);
         $api = new LocalAPIClient(Auth::user());
         $page = $api->updatePage($page->id, $request->input('title'), $request->input('settings', null));
-        return fractal($page, new PageTransformer)->respond();
+        return fractal($page, new PageTransformer(true))->respond();
     }
 
     /**
@@ -90,7 +90,7 @@ class PageController extends ApiController
         $this->authorize('update', $page);
         $api = new LocalAPIClient(Auth::user());
         $page = $api->updatePageContent($page->id, $request->input('blocks'));
-        return fractal($page, new PageTransformer)->respond();
+        return fractal($page, new PageTransformer(true))->respond();
     }
 
     /**

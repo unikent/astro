@@ -13,7 +13,7 @@ class SiteTransformer extends FractalTransformer
 {
 
     protected $defaultIncludes = [ ];
-    protected $availableIncludes = [ 'drafts','pages','published','publishing_group','homepage' ];
+    protected $availableIncludes = [ 'pages','publishing_group','homepage' ];
 
 	public function transform(Site $site)
 	{
@@ -29,10 +29,10 @@ class SiteTransformer extends FractalTransformer
 		return $data;
 	}
 
-	public function includeHomepage(Site $site)
+	public function includeHomepage(Site $site, ParamBag $params = null)
     {
         if($site->homepage){
-            return new FractalItem($site->homepage, new PageTransformer(), false);
+            return new FractalItem($site->homepage, new PageTransformer($params->get('full')), false);
         }
     }
 
@@ -43,32 +43,10 @@ class SiteTransformer extends FractalTransformer
         }
     }
 
-    public function includeDrafts(Site $site)
-    {
-        $drafts = $site->draftPages;
-        if($drafts){
-            $drafts->load('draft');
-            return new FractalCollection($drafts, new PageTransformer(PageTransformer::DRAFT_PAGES), false);
-        }
-    }
-
     public function includePages(Site $site)
     {
         if(!$site->pages->isEmpty()){
-            return new FractalCollection($site->pages, new PageTransformer(PageTransformer::ALL_PAGES), false);
+            return new FractalCollection($site->pages, new PageTransformer(), false);
         }
     }
-
-    /**
-     * Include all associated Routes
-     *
-     * @return Collection
-     */
-    public function includePublished(Site $site)
-    {
-        if(!$site->publishedPages->isEmpty()){
-            return new FractalCollection($site->publishedPages, new PageTransformer(PageTransformer::PUBLISHED_PAGES), false);
-        }
-    }
-
 }

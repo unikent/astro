@@ -15,25 +15,40 @@ use App\Http\Transformers\Api\v1\Definitions\LayoutTransformer as LayoutDefiniti
 class PageTransformer extends FractalTransformer
 {
 
-    protected $availableIncludes = [ 'parent', 'revision', 'history', 'site' ];
+    protected $availableIncludes = [ 'parent', 'revision', 'revisions', 'site', 'layout_definition' ];
 
-	public function transform(Page $page)
+    protected $full = true; // whether to include blocks with output
+
+    /**
+     * Create a PageTransformer.
+     * @param bool $full Whether or not to include blocks with the output.
+     */
+    public function __construct($full = false)
+    {
+        $this->full = $full;
+    }
+
+    public function transform(Page $page)
 	{
 		$data = [
 		    'id' => $page->id,
-            'path' => $page->path,
             'slug' => $page->slug,
-            'title' => $page->revision->title,
+            'path' => $page->path,
             'version' => $page->version,
-            'depth' => $page->depth,
-            'parent_id' => $page->parent_id,
+            'title' => $page->revision->title,
             'layout' => [
                 'name' => $page->revision->layout_name,
                 'version' => $page->revision->layout_version
             ],
-            'blocks' => $page->revision->blocks,
-            'options' => $page->revision->options
+            'options' => $page->revision->options,
+            'depth' => $page->depth,
+            'parent_id' => $page->parent_id,
+            'site_id' => $page->site_id,
+            'revision_id' => $page->revision_id
         ];
+		if($this->full){
+            $data['blocks'] = $page->revision->blocks;
+        }
         return $data;
 	}
 
@@ -42,10 +57,10 @@ class PageTransformer extends FractalTransformer
      * @param Page $page The Page whose parent to transform.
      * @return FractalItem
      */
-    public function includeParent(Page $page)
+    public function includeParent(Page $page, ParamBag $params = null)
     {
         if($page->parent) {
-            return new FractalItem($page->parent, new PageTransformer, false);
+            return new FractalItem($page->parent, new PageTransformer($params->get('full')), false);
         }
     }
 
@@ -123,7 +138,7 @@ class PageTransformer extends FractalTransformer
      * @param Page $page The page.
      * @return FractalCollection
      */
-    public function includeHistory(Page $page)
+    public function includeRevisions(Page $page)
     {
         if(!$page->history->isEmpty()){
             return new FractalCollection($page->revision->history, new RevisionTransformer, false);
