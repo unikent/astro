@@ -14,8 +14,8 @@ trait FileUploadTrait
 
         $tmp = tempnam(sys_get_temp_dir(), 'astro_test_');
         copy($filepath, $tmp);
-
-        return new LaravelFile($tmp);
+//        return new LaravelFile($tmp); replaced with below so that tests stop exploding...
+        return new UploadedFile($tmp, $name);
     }
 
     public static function setupFileUpload($path, $name){

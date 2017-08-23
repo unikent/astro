@@ -14,7 +14,6 @@ use App\Models\Block;
 use Illuminate\Http\Request;
 use App\Models\Revision;
 use App\Exceptions\UnpublishedParentException;
-use App\Http\Transformers\Api\v1\PageContentTransformer;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use App\Http\Requests\Api\v1\Route\ResolveRequest;
 use App\Models\Traits\ResolvesRoutes;
@@ -104,7 +103,7 @@ class PageController extends ApiController
         $this->authorize('publish', $page);
 
         try {
-            $page->publish(new PageContentTransformer);
+            $page->publish(new PageTransformer);
             return response($page->revision->blocks, 200);
         } catch(UnpublishedParentException $e){
             return response([ 'errors' => [ $e->getMessage() ] ], 406);
@@ -126,7 +125,7 @@ class PageController extends ApiController
         try {
             foreach($routes as $route){
                 $this->authorize('publish', $route->page);
-                $route->page->publish(new PageContentTransformer);
+                $route->page->publish(new PageTransformer);
             }
 
             DB::commit();
@@ -155,7 +154,7 @@ class PageController extends ApiController
         $published = Revision::findOrFail($request->get('published_page_id'));
         $page->revert($published);
 
-        return fractal($page, new PageContentTransformer)->respond();
+        return fractal($page, new PageTransformer)->respond();
     }
 
     /**

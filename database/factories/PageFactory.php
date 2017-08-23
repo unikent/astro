@@ -1,7 +1,5 @@
 <?php
-use App\Http\Transformers\Api\v1\PageContentTransformer;
 use App\Models\Site;
-use App\Models\PageContent;
 use App\Models\Page;
 use App\Models\Revision;
 
@@ -43,14 +41,14 @@ $factory->state(Page::class, 'withPage', function ($faker) {
 });
 
 $factory->state(Page::class, 'withParent', function ($faker) {
-    $parent = factory(Page::class)->states('withPageContent', 'isRoot')->create();
+    $parent = factory(Page::class)->states('withRevision', 'isRoot')->create();
     return [
         'parent_id' => $parent->getKey(),
     ];
 });
 
 $factory->state(Page::class, 'withPublishedParent', function ($faker) {
-    $parent = factory(Page::class)->states('withPageContent', 'isRoot', 'withPublishedContent')->create();
+    $parent = factory(Page::class)->states('withRevision', 'isRoot', 'withPublishedContent')->create();
     return [
         'parent_id' => $parent->getKey(),
     ];

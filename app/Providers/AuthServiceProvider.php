@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Models\PageContent;
 use App\Models\Site;
 use App\Models\Page;
 use App\Models\Media;
@@ -10,7 +9,6 @@ use App\Policies\PagePolicy;
 use App\Policies\SitePolicy;
 use App\Policies\RoutePolicy;
 use App\Policies\MediaPolicy;
-use Illuminate\Support\Facades\Gate;
 use App\Models\Definitions\Block as BlockDefinition;
 use App\Models\Definitions\Layout as LayoutDefinition;
 use App\Models\Definitions\Region as RegionDefinition;
@@ -27,7 +25,7 @@ class AuthServiceProvider extends ServiceProvider
 	 * @var array
 	 */
 	protected $policies = [
-		PageContent::class => PagePolicy::class,
+        Page::class => PagePolicy::class,
 		Page::class => RoutePolicy::class,
 		Site::class => SitePolicy::class,
 		Media::class => MediaPolicy::class,

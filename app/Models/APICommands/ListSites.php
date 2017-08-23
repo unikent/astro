@@ -3,11 +3,7 @@
 namespace App\Models\APICommands;
 
 use App\Models\Site;
-use DB;
-use App\Models\Page;
-use App\Models\PageContent;
 use App\Models\Contracts\APICommand;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Gate;

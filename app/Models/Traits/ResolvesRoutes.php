@@ -3,11 +3,7 @@
 namespace App\Models\Traits;
 
 use App\Models\Page;
-use App\Models\Redirect;
-use App\Http\Transformers\Api\v1\PageContentTransformer;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-use Gate;
 
 /**
  * Trait ResolvesRoutes

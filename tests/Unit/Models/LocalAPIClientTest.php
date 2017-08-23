@@ -59,7 +59,7 @@ class LocalAPIClientTest extends TestCase
     }
 
     /**
-     * A new site will have a Page with some draft PageContent.
+     * A new site will have a Page with an empty revision.
      * @test
      */
     public function createSite_createsASite()

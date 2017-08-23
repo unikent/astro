@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use App\Exceptions\UnpublishedParentException;
 use App\Http\Transformers\Api\v1\BlockTransformer;
 use App\Models\Scopes\VersionScope;
 use DB;
@@ -338,10 +339,6 @@ class Page extends BaumNode
      */
     public function publish(FractalTransformer $transformer)
     {
-        if($this->isDirty()){
-            throw new Exception('You cannot publish a pagecontent with unsaved changes.');
-        }
-
         // Ensure that the draft does not have unpublished ancestors
         if($this->hasUnpublishedAncestors() ) {
             throw new UnpublishedParentException('Page cannot be published: it has unpublished ancestors.');
@@ -377,7 +374,7 @@ class Page extends BaumNode
     }
 
     /**
-     * Restores a PageContent from a Revision instance. All Block instances are
+     * Restores a Page from a Revision instance. All Block instances are
      * replaced with those defined by the bake. Routes remain unaltered.
      *
      * @return void
@@ -385,11 +382,11 @@ class Page extends BaumNode
      */
     public function revert(Revision $published){
         if($this->getKey() !== $published->page_content_id){
-            throw new Exception('Revision must be related to this PageContent');
+            throw new Exception('Revision must be related to this Page');
         }
 
         if($this->isDirty()){
-            throw new Exception('A PageContent must be in a clean state in order to revert.');
+            throw new Exception('A Page must be in a clean state in order to revert.');
         }
 
         DB::beginTransaction();

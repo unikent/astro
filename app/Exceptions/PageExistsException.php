@@ -5,7 +5,7 @@ namespace App\Exceptions;
 use App\Models\Page;
 
 /**
- * Thrown when an attempt is made to set the draft PageContent of a Page when it already has a draft.
+ * Thrown when an attempt is made to set the draft Page of a Page when it already has a draft.
  * @package App\Exceptions
  */
 class PageExistsException extends \Exception

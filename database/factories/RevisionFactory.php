@@ -1,13 +1,12 @@
 <?php
 
 use App\Models\Revision;
-use App\Models\PageContent;
-use Faker\Generator;
+use App\Models\RevisionSet;
 
 $factory->define(Revision::class, function($faker){
     return [
-        'page_content_id' => function($revision) {
-            return factory(PageContent::class)->create()->getKey();
+        'revision_set_id' => function($revision) {
+            return factory(RevisionSet::class)->create()->getKey();
         },
         'bake' => '{}'
     ];

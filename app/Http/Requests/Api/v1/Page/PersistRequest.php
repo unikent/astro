@@ -1,8 +1,6 @@
 <?php
 namespace App\Http\Requests\Api\v1\Page;
 
-use Gate;
-use App\Models\PageContent;
 use Illuminate\Validation\Rule;
 use App\Http\Requests\FormRequest;
 use App\Validation\Brokers\BlockBroker;

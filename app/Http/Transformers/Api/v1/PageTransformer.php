@@ -124,7 +124,7 @@ class PageTransformer extends FractalTransformer
 
     /**
      * Include associated Layout/Region definitions
-     * @param Page $pagecontent
+     * @param Page $page
      * @return FractalItem
      */
     public function includeLayoutDefinition(Page $page)
