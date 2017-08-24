@@ -11,7 +11,7 @@ $factory->define(Site::class, function ($faker) {
         'host' => $faker->domainName(),
         'path' => '',
         'publishing_group_id' => $group->id,
-        '' => json_encode(['layout_name' => 'kent-homepage', 'layout_version' => 1])
+        'options' => []
 	];
 });
 

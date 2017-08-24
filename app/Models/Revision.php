@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Traits\Tracked;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\ValidationException;
+use Carbon\Carbon;
 
 /**
  * Revisions track the state of a Page, including its content, options, title, etc at a point in
@@ -37,6 +38,11 @@ class Revision extends Model
 		'bake'
 	];
 
+	protected $dates = [
+	    'created_at',
+        'updated_at',
+	   'published_at'
+    ];
 
     /**
      * The "booting" method of the model.
@@ -55,6 +61,14 @@ class Revision extends Model
                 throw new ValidationException("Revision must be part of a RevisionSet");
             }
         });
+    }
+
+    /**
+     * Mark this revision as published.
+     */
+    public function setPublished()
+    {
+        $this->published_at = $this->published_at ? $this->published_at : Carbon::now();
     }
 
     public function set()

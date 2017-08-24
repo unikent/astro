@@ -18,6 +18,7 @@ class MediaPolicyTest extends PolicyTestCase
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function index_WhenUserIsUnprivilegedAndAcoIsMediaClass_IsDenied(){
@@ -27,6 +28,7 @@ class MediaPolicyTest extends PolicyTestCase
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function index_WhenUserIsAdminAndAcoIsMediaClass_IsAllowed(){
@@ -36,6 +38,7 @@ class MediaPolicyTest extends PolicyTestCase
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function index_WhenUserIsAdminAndAcoIsArrayWithPublishingGroup_IsAllowed(){
@@ -47,6 +50,7 @@ class MediaPolicyTest extends PolicyTestCase
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function index_WhenUserIsAdminAndAcoIsArrayWithSite_IsAllowed(){
@@ -58,6 +62,7 @@ class MediaPolicyTest extends PolicyTestCase
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function index_WithPublishingGroupAndUserIsNotMember_IsDenied(){
@@ -69,6 +74,7 @@ class MediaPolicyTest extends PolicyTestCase
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function index_WithPublishingGroupAndUserIsMember_IsAllowed(){
@@ -82,6 +88,7 @@ class MediaPolicyTest extends PolicyTestCase
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function index_WithSiteAndUserIsNotMemberOfPublishingGroup_IsDenied(){
@@ -93,6 +100,7 @@ class MediaPolicyTest extends PolicyTestCase
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function index_WithSiteAndUserIsMemberOfPublishingGroup_IsAllowed(){
@@ -108,6 +116,7 @@ class MediaPolicyTest extends PolicyTestCase
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function read_IsAllowed(){
@@ -118,6 +127,7 @@ class MediaPolicyTest extends PolicyTestCase
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function create_WhenUserIsAdminAndAcoIsOnlyMedia_IsAllowed(){
@@ -129,6 +139,7 @@ class MediaPolicyTest extends PolicyTestCase
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function create_WhenUserIsAdminAndAcoIsMediaAndPublishingGroup_IsAllowed(){
@@ -142,6 +153,7 @@ class MediaPolicyTest extends PolicyTestCase
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function create_WhenUserIsAdminAndAcoIsMediaAndSite_IsAllowed(){
@@ -155,6 +167,7 @@ class MediaPolicyTest extends PolicyTestCase
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function create_WhenAcoDoesNotIncludeSiteOrPublishingGroup_IsDenied(){
@@ -166,6 +179,7 @@ class MediaPolicyTest extends PolicyTestCase
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function create_WhenAcoIncludesPublishingGroupAndUserIsNotInPublishingGroup_IsDenied(){
@@ -181,6 +195,7 @@ class MediaPolicyTest extends PolicyTestCase
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function create_WhenAcoIncludesPublishingGroupAndUserIsInPublishingGroup_IsAllowed(){
@@ -197,6 +212,7 @@ class MediaPolicyTest extends PolicyTestCase
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function create_WhenAcoIncludesSiteAndUserIsNotInPublishingGroup_IsDenied(){
@@ -214,6 +230,7 @@ class MediaPolicyTest extends PolicyTestCase
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function create_WhenAcoIncludesSiteAndUserIsInPublishingGroup_IsAllowed(){
@@ -234,6 +251,7 @@ class MediaPolicyTest extends PolicyTestCase
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function update_IsAllowed(){
@@ -244,6 +262,7 @@ class MediaPolicyTest extends PolicyTestCase
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function delete_WhenUserIsAdminAndAcoIsOnlyMedia_IsAllowed(){
@@ -255,6 +274,7 @@ class MediaPolicyTest extends PolicyTestCase
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function delete_WhenUserIsAdminAndAcoIsMediaAndPublishingGroup_IsAllowed(){
@@ -268,6 +288,7 @@ class MediaPolicyTest extends PolicyTestCase
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function delete_WhenUserIsAdminAndAcoIsMediaAndSite_IsAllowed(){
@@ -281,6 +302,7 @@ class MediaPolicyTest extends PolicyTestCase
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function delete_WhenAcoDoesNotIncludeSiteOrPublishingGroup_IsDenied(){
@@ -292,6 +314,7 @@ class MediaPolicyTest extends PolicyTestCase
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function delete_WhenAcoIncludesPublishingGroupAndUserIsNotInPublishingGroup_IsDenied(){
@@ -307,6 +330,7 @@ class MediaPolicyTest extends PolicyTestCase
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function delete_WhenAcoIncludesPublishingGroupAndUserIsInPublishingGroup_IsAllowed(){
@@ -323,6 +347,7 @@ class MediaPolicyTest extends PolicyTestCase
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function delete_WhenAcoIncludesSiteAndUserIsNotInPublishingGroup_IsDenied(){
@@ -340,6 +365,7 @@ class MediaPolicyTest extends PolicyTestCase
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function delete_WhenAcoIncludesSiteAndUserIsInPublishingGroup_IsAllowed(){

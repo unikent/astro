@@ -6,51 +6,35 @@ use App\Models\Revision;
 $factory->define(Page::class, function (Faker\Generator $faker) {
     $site = factory(Site::class)->create();
 	return [
-		'slug' => $faker->word,
-        'site_id' => $site->id
+		'slug' => null,
+        'site_id' => $site->id,
+        'parent_id' => null,
+        'version' => Page::STATE_DRAFT
 	];
 });
 
-$factory->state(Page::class, 'isRoot', function ($faker) {
+$factory->state(Page::class, 'withRevision', function($faker){
     return [
-    	'slug' => null,
-        'parent_id' => null
-    ];
-});
-
-
-$factory->state(Page::class, 'withPublishedContent', function ($faker) {
-    return [
-        'published_id' => function(array $page) {
-            return factory(Revision::class)->create([
-
-            ])->getKey();
-        },
-    ];
-});
-
-
-$factory->state(Page::class, 'withPage', function ($faker) {
-    return [
-        'published_id' => function(array $page) {
-            return factory(Revision::class)->create([
-
-            ])->getKey();
-        },
+        'revision_id' => function(){
+            return factory(Revision::class)->create()->getKey();
+        }
     ];
 });
 
 $factory->state(Page::class, 'withParent', function ($faker) {
-    $parent = factory(Page::class)->states('withRevision', 'isRoot')->create();
+    $parent = factory(Page::class)->states('withRevision')->create();
     return [
         'parent_id' => $parent->getKey(),
     ];
 });
 
-$factory->state(Page::class, 'withPublishedParent', function ($faker) {
-    $parent = factory(Page::class)->states('withRevision', 'isRoot', 'withPublishedContent')->create();
+
+$factory->state(Page::class, 'withSite', function ($faker) {
+    $site = factory(Site::class)->create();
+    $parent = factory(Page::class)->states('withRevision')->create();
     return [
-        'parent_id' => $parent->getKey(),
+        'site_id' => $site->id
     ];
 });
+
 

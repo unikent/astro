@@ -101,13 +101,9 @@ class PageController extends ApiController
      */
     public function publish(Request $request, Page $page){
         $this->authorize('publish', $page);
-
-        try {
-            $page->publish(new PageTransformer);
-            return response($page->revision->blocks, 200);
-        } catch(UnpublishedParentException $e){
-            return response([ 'errors' => [ $e->getMessage() ] ], 406);
-        }
+        $api = new LocalAPIClient(Auth::user());
+        $published = $api->publishPage($page->id);
+        return fractal($published, new PageTransformer(true))->respond();
     }
 
     /**
@@ -151,8 +147,8 @@ class PageController extends ApiController
     public function revert(Request $request, Page $page){
         $this->authorize('revert', $page);
 
-        $published = Revision::findOrFail($request->get('published_page_id'));
-        $page->revert($published);
+        $revision = Revision::findOrFail($request->get('published_page_id'));
+        $page->revert($revision);
 
         return fractal($page, new PageTransformer)->respond();
     }
@@ -160,10 +156,10 @@ class PageController extends ApiController
     /**
      * DELETE /api/v1/page/{page}
      *
-     * Soft-deletes a page, leaving Routes intact.
+     * Deletes a page, creates DeletedPages.
      *
      * @param  Request    $request
-     * @param  Definition $definition
+     * @param  Page $page
      * @return SymfonyResponse
      */
     public function destroy(Request $request, Page $page){
@@ -171,142 +167,6 @@ class PageController extends ApiController
         $api = new LocalAPIClient(Auth::user());
         $api->deletePage($page->id);
         return (new SymfonyResponse())->setStatusCode(200);
-    }
-
-    /**
-     * DELETE /api/v1/page/{page}/force
-     *
-     * Hard-deletes a page, allowing the database to cascade and delete Routes too.
-     *
-     * @param  Request    $request
-     * @param  Definition $definition
-     * @return SymfonyResponse
-     */
-    public function forceDestroy(Request $request, Page $page){
-        $this->authorize('forceDelete', $page);
-
-        $page->forceDelete();
-        return (new SymfonyResponse())->setStatusCode(200);
-    }
-
-    /**
-     * Persists Page and Blocks
-     * associations for the given Page.
-     *
-     * @param  Request $request
-     * @param  Page    $page
-     * @return void
-     */
-    protected function process(Request $request, Page $page){
-        DB::beginTransaction();
-
-        try {
-            throw new Exception('Not Implemented');
-            // Set the Page attributes and save the Page (we need an ID for the Route)
-            $page->fill($request->all());
-            $page->save();
-
-            $draftRoute = new Route([
-                'slug' => $request->input('route.slug'),
-                'page_id' => $page->getKey(),
-                'parent_id' => $request->input('route.parent_id', null),
-            ]);
-
-            // Runs on Update...
-            if($page->activeRoute){
-                $activeRoute = $page->activeRoute;
-
-                // If the Route has been moved in the tree, we need to create a new Route
-                if($request->has('route.parent_id') && $request->get('route.parent_id') !== $activeRoute->parent_id){
-                    $draftRoute->parent_id = $request->input('route.parent_id');
-
-                    $draftRoute->save();
-                    $draftRoute->cloneDescendants($activeRoute);
-
-                    // If the Route has not changed position, inherit the active position in the tree
-                } else {
-                    $draftRoute->parent_id = $activeRoute->parent_id;
-                }
-            }
-
-            // If $draftRoute has not already been saved, save it.
-            if($draftRoute->isDirty()) $draftRoute->save();
-
-            // If a Site ID is present, attempt to retrieve the existing Site model.
-            if($request->has('site_id')){
-                $site = Site::findOrFail($request->get('site_id'));
-            }
-
-            // If site attributes are present, update the Site (or create a new one)
-            // Then ensure that the Route is associated with the given Site.
-            if($request->has('site')){
-                $site = isset($site) ? $site : new Site;
-                $site->fill($request->get('site'));
-                $site->save();
-
-                $this->authorize($site->wasRecentlyCreated ? 'create' : 'update', $site);
-
-                // Note: makeSite takes effect immediately, and affects all published and unpublished Routes
-                $draftRoute->makeSite($site);
-            }
-
-            // Now we have a Page in a state that we can authorize, so lets do that
-            // Note: as we are within a Transaction, ALL changes will be rolled-back should authz fail
-            $this->authorize($page->wasRecentlyCreated ? 'create' : 'update', $page);
-
-            // Populate the regions with Blocks
-            if($request->has('blocks')){
-                $this->processBlocks($page, $request->input('blocks'));
-            }
-
-            DB::commit();
-        } catch(Exception $e){
-            DB::rollBack();
-            throw $e;
-        }
-    }
-
-    /**
-     * @param Page $page
-     * @param $regions
-     */
-    protected function processBlocks($page, $regions) {
-        foreach($regions as $region => $blocks) {
-            // Remove any existing Blocks in the region (to avoid re-ordering existing)
-            // TODO: explore updating block order rather than deleting each time
-            $page->clearRegion($region);
-
-            // Re/create all the blocks
-            if(!empty($blocks)) {
-                foreach($blocks as $delta => $data) {
-                    $block = new Block;
-
-                    $block->fill($data);
-
-                    $block->page_id = $page->getKey();
-
-                    $block->order = $delta;
-                    $block->region_name = $region;
-
-                    $block->save();
-
-                    // associate media items with this block
-                    if(isset($data['media']) && is_array($data['media'])) {
-                        $media_block_ids = [];
-
-                        foreach($data['media'] as $media) {
-                            if(isset($media['id'], $media['associated_field'])) {
-                                $media_block_ids[$media['id']] = [
-                                    'block_associated_field' => $media['associated_field']
-                                ];
-                            }
-                        }
-
-                        $block->media()->sync($media_block_ids);
-                    }
-                }
-            }
-        }
     }
 
 }

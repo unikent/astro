@@ -16,6 +16,18 @@ class VersionScope implements Scope
     // The version we are applying
     public $version = Page::STATE_DRAFT;
 
+    private static $_ignore = false;
+
+    public static function disable()
+    {
+        static::$_ignore = true;
+    }
+
+    public static function enable()
+    {
+        static::$_ignore = false;
+    }
+
     /**
      * Create the Scope with the version to apply.
      * @param string $version
@@ -36,6 +48,8 @@ class VersionScope implements Scope
      */
     public function apply(Builder $builder, Model $model)
     {
-        $builder->where('version',  $this->version);
+        if(!static::$_ignore) {
+            $builder->where('version', $this->version);
+        }
     }
 }

@@ -30,6 +30,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function scopePublishingGroups_ReturnsOnlyItemsAssociatedWithTheGivenPublishingGroups()
 	{
@@ -56,6 +57,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function scopeSites_ReturnsOnlyItemsAssociatedWithTheGivenSites()
 	{
@@ -82,6 +84,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function scopeTypes_ReturnsOnlyItemsMatchingGivenTypes()
 	{
@@ -103,6 +106,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function scopeMimeTypes_ReturnsOnlyItemsMatchingGivenMimeTypes()
 	{
@@ -126,6 +130,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function setFilenameAttribute_StripsUnsafeCharactersButLeavesExtensionIntact()
 	{
@@ -138,6 +143,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function getFileAttribute_WhenNotPersistedAndNotPopulated_ReturnsNull()
 	{
@@ -147,6 +153,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function getFileAttribute_WhenNotPersistedAndPopulated_ReturnsFileObject()
 	{
@@ -158,6 +165,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function getFileAttribute_WhenPersisted_ReturnsFileObject()
 	{
@@ -172,6 +180,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function getSrcAttribute_WithoutIdAndFilename_ReturnsEmptyString()
 	{
@@ -181,6 +190,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function getSrcAttribute_WithIdButWithoutFilename_ReturnsEmptyString()
 	{
@@ -192,6 +202,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function getSrcAttribute_WithFilenameButWithoutId_ReturnsEmptyString()
 	{
@@ -203,6 +214,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function getSrcAttribute_WithIdAndFilename_ReturnsPath()
 	{
@@ -217,6 +229,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function extractMeta_WithFile_ReturnsArray()
 	{
@@ -228,6 +241,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function extractMeta_WithImage_ReturnsSize()
 	{
@@ -240,6 +254,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function extractMeta_WithImage_ReturnsFormat()
 	{
@@ -252,6 +267,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function extractMeta_WithImage_ReturnsMimeType()
 	{
@@ -264,6 +280,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function extractMeta_WithImage_ReturnsWidth()
 	{
@@ -276,6 +293,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function extractMeta_WithImage_ReturnsHeight()
 	{
@@ -288,6 +306,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function extractMeta_WithImage_ReturnsAspectRatio()
 	{
@@ -302,6 +321,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function hash_WithFile_ReturnsHash()
 	{
@@ -313,6 +333,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function findByHash_WhenHashExists_ReturnsItem()
 	{
@@ -327,6 +348,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function findByHash_WhenHashDoesNotExist_ReturnsNull()
 	{
@@ -340,6 +362,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function findByHashOrFail_WhenHashExists_ReturnsItem()
 	{
@@ -354,6 +377,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function findByHashOrFail_WhenHashDoesNotExist_ReturnsNull()
 	{
@@ -369,6 +393,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function save_WhenSuccessful_PersistsModel()
 	{
@@ -382,6 +407,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function save_WhenSuccessful_ReturnsTrue()
 	{
@@ -393,6 +419,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function save_WithUploadedFile_MovesFileToDestinationDirectory()
 	{
@@ -405,6 +432,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function save_WithFileAndPathIsNotDestination_CopiesFileToDestinationDirectory()
 	{
@@ -417,6 +445,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function save_WithFileAndPathIsDestination_DoesNotCopyFile()
 	{
@@ -432,6 +461,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function save_WithFile_SetsFilename()
 	{
@@ -443,6 +473,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function save_WithUploadedFile_SetsFilenameToClientOriginal()
 	{
@@ -454,6 +485,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function save_WithFile_HashesFile()
 	{
@@ -466,6 +498,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function save_WithUploadedFile_HashesFile()
 	{
@@ -478,6 +511,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function save_WithFile_ExtractsAndPersistsMetadata()
 	{
@@ -494,6 +528,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function save_WithUploadedFile_ExtractsAndPersistsMetadata()
 	{
@@ -512,6 +547,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function delete_DoesNotRemoveDirectoryFromDisk()
 	{
@@ -526,6 +562,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function forceDelete_RemovesModelFromDatabase()
 	{
@@ -538,6 +575,7 @@ class MediaTest extends TestCase
 
 	/**
 	 * @test
+	 * @group media
 	 */
 	public function forceDelete_RemovesDirectoryFromDisk()
 	{

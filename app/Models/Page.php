@@ -11,6 +11,7 @@ use App\Models\Definitions\Layout as LayoutDefinition;
 use App\Http\Transformers\Api\v1\PageTransformer;
 use Baum\Node as BaumNode;
 use Illuminate\Database\Eloquent\Collection;
+use League\Fractal\TransformerAbstract;
 
 /**
  * A Page represents a path in a hierarchical site structure.
@@ -143,8 +144,6 @@ class Page extends BaumNode
         return $this->hasMany(Block::class, 'page_id');
     }
 
-
-
     /************************************************************************
      * Query Scopes
      ************************************************************************/
@@ -218,8 +217,15 @@ class Page extends BaumNode
     /**************************************************************************
      * Utility Methods
      */
-
-
+    public function publishedVersion()
+    {
+        if(Page::STATE_PUBLISHED == $this->version){
+            return $this;
+        }
+        return Page::published()
+                    ->forSiteAndPath($this->site_id, $this->path)
+                    ->first();
+    }
 
     /**
      * Find a Page by site id and path.
@@ -267,8 +273,20 @@ class Page extends BaumNode
             $revision->blocks = $this->bake();
             $revision->save();
         }
+        if($this->isPublishedVersion()){
+            $revision->setPublished();
+        }
         $this->save();
         return $this;
+    }
+
+    /**
+     * Is this a published version of a page?
+     * @return bool
+     */
+    public function isPublishedVersion()
+    {
+        return Page::STATE_PUBLISHED == $this->version;
     }
 
     /**
@@ -333,11 +351,11 @@ class Page extends BaumNode
      * Creates a PublishedPage by baking the Page to JSON with Fractal.
      * If the Page is dirty, an exception will be thrown.
      *
-     * @param \League\Fractal\TransformerAbstract $transformer
+     * @param TransformerAbstract $transformer
      * @return void
      * @throws Exception
      */
-    public function publish(FractalTransformer $transformer)
+    public function publish(TransformerAbstract $transformer)
     {
         // Ensure that the draft does not have unpublished ancestors
         if($this->hasUnpublishedAncestors() ) {
@@ -370,7 +388,7 @@ class Page extends BaumNode
 
     public function hasUnpublishedAncestors()
     {
-        return true;
+        return false;
     }
 
     /**

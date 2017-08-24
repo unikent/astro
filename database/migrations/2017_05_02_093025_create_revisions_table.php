@@ -23,6 +23,7 @@ class CreateRevisionsTable extends Migration
             $table->mediumText('options');
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
+            $table->timestamp('published_at')->nullable();
             $table->timestamps();
             $table->foreign('revision_set_id', 'revision_sets_id_fk')->references('id')->on('revision_sets');
         });

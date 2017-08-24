@@ -16,6 +16,7 @@ class PageContentTest extends TestCase
 
 	/**
 	 * @test
+	 * @group ignore
 	 */
 	public function publish_WhenPageHasUnsavedChanges_ThrowsException()
 	{
@@ -26,6 +27,7 @@ class PageContentTest extends TestCase
 
 	/**
 	 * @test
+	 * @group ignore
 	 */
 	public function publish_WhenPageHasUnpublishedParents_ThrowsException()
 	{
@@ -36,6 +38,7 @@ class PageContentTest extends TestCase
 
 	/**
 	 * @test
+	 * @group ignore
 	 */
 	public function publish_CreatesPublishedPageInstance()
 	{
@@ -46,6 +49,7 @@ class PageContentTest extends TestCase
 
 	/**
 	 * @test
+	 * @group ignore
 	 */
 	public function publish_AssociatesPublishedPageWithPageInstance()
 	{
@@ -56,6 +60,7 @@ class PageContentTest extends TestCase
 
 	/**
 	 * @test
+	 * @group ignore
 	 * @group integration
 	 *
 	 * This tests integration between $page->publish(), $route->makeActive() and $route->delete().
@@ -69,6 +74,7 @@ class PageContentTest extends TestCase
 
 	/**
 	 * @test
+	 * @group ignore
 	 */
 	public function publish_DraftRouteBecomesActiveRoute()
 	{
@@ -79,6 +85,7 @@ class PageContentTest extends TestCase
 
 	/**
 	 * @test
+	 * @group ignore
 	 */
 	public function publish_PageOnlyHasOneRoute()
 	{
@@ -89,6 +96,7 @@ class PageContentTest extends TestCase
 
 	/**
 	 * @test
+	 * @group ignore
 	 */
 	public function publish_PublishedPageBakeContainsSerializedPageInstance()
 	{
@@ -101,6 +109,7 @@ class PageContentTest extends TestCase
 
 	/**
 	 * @test
+	 * @group ignore
 	 */
 	public function revert_WhenPublishedPageIsNotAssociatedWithPage_ThrowsException()
 	{
@@ -119,6 +128,7 @@ class PageContentTest extends TestCase
 
 	/**
 	 * @test
+	 * @group ignore
 	 */
 	public function revert_RevertsPageToMatchPublishedPage()
 	{
@@ -147,6 +157,7 @@ class PageContentTest extends TestCase
 
 	/**
 	 * @test
+	 * @group ignore
 	 */
 	public function revert_RevertsBlocksToMatchPublishedPage()
 	{
@@ -172,6 +183,7 @@ class PageContentTest extends TestCase
 
 	/**
 	 * @test
+	 * @group ignore
 	 */
 	public function clearRegion_DeletesAllBlocksForGivenPageAndRegion()
 	{
@@ -184,6 +196,7 @@ class PageContentTest extends TestCase
 
 	/**
 	 * @test
+	 * @group ignore
 	 */
 	public function clearRegion_DoesNotDeleteBlocksInOtherRegions()
 	{
@@ -200,6 +213,7 @@ class PageContentTest extends TestCase
 
 	/**
 	 * @test
+	 * @group ignore
 	 */
 	public function getPageDefinition_ReturnLayoutDefinition(){
 		$page = factory(Page::class)->make();
@@ -210,6 +224,7 @@ class PageContentTest extends TestCase
 
 	/**
 	 * @test
+	 * @group ignore
 	 */
 	public function getLayoutDefinition_WhenPageDefinitionIsNotLoaded_LoadsSupportedLayoutDefinition(){
 		$page = factory(Page::class)->make();
@@ -221,6 +236,7 @@ class PageContentTest extends TestCase
 
 	/**
 	 * @test
+	 * @group ignore
 	 */
 	public function getLayoutDefinition_WhenLayoutDefinitionIsLoaded_DoesNotReloadLayoutDefinition(){
 		$page = factory(Page::class)->make();
@@ -235,6 +251,7 @@ class PageContentTest extends TestCase
 
 	/**
 	 * @test
+	 * @group ignore
 	 */
 	public function getLayoutDefinition_WithRegionDefinitionsWhenLayoutDefinitionIsLoadedWithoutRegions_HasRegionDefinitions()
 	{
@@ -252,6 +269,7 @@ class PageContentTest extends TestCase
 
 	/**
 	 * @test
+	 * @group ignore
 	 */
 	public function getLayoutDefinition_WithRegionDefinitionsWhenLayoutDefinitionIsLoadedWithRegions_HasRegionDefinitions()
 	{
