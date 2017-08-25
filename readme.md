@@ -101,8 +101,8 @@ A **Site** structure is comprised of **Pages**, stored as a nested set (using Ba
 
 A **Page** has a **Revision** which represents its current content (blocks), title and configuration.
 
-A new **Revision** is created every time page content or definition is updated. **Revisions** have a created date,
-modified date, published date and deleted date and are associated with a single Page.
+A new **Revision** is created every time page content or definition is updated (but not for a Page move).
+**Revisions** have a created date, modified date, published date and deleted date and are associated with a single Page.
  
 The URL to a **Page** is represented by concatenating its **Site's** hostname and path and the **Page's** path. 
 The **Page's** path is generated automatically when saved by appending its slug to the end of its parent's path.
@@ -114,6 +114,14 @@ the old location, the redirection is removed.
 
 All changes to **Pages** including edits, moves, deletions and additions are made in the **draft** site structure, 
 and must be published to the **live** site structure in order for them to take effect on the live version of the site.
+
+When a **Page** is published a new **Page** is created with the same site_id, path, slug, revision_id and a version of "published",
+putting it in a completely separate nested set **scope** (tree) to the draft version.
+
+A **Global Scope** is applied by default to all **Page** queries which restricts the queries to pages with a version of "draft".
+This can be removed on a per-query basis, or disabled completely using the static method ``VersionScope::disable()``. This
+must be done **before any operations (creates, updates, deletes, etc)** which might need to query for non-draft pages.
+
 
 ##### Authorization 
 

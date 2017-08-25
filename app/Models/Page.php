@@ -78,6 +78,7 @@ class Page extends BaumNode
 		parent::boot();
 
 		// restrict requests to the draft pages.
+        // or not as it appears to mess things up elsewhere...
 		static::addGlobalScope(new VersionScope());
 
 		static::saving(function($node){
