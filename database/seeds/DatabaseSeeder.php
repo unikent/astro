@@ -94,6 +94,16 @@ class DatabaseSeeder extends Seeder
         $client->addTree( $site->homepage->id, null, $this->testTree);
         $client->publishPage(Page::forSiteAndPath($site->id, '/')->first()->id);
         $client->publishPage(Page::forSiteAndPath($site->id, '/postgraduate')->first()->id);
+        $client->publishPage(Page::forSiteAndPath($site->id, '/postgraduate/2018')->first()->id);
+        $client->publishPage(Page::forSiteAndPath($site->id, '/postgraduate/2017')->first()->id);
+        $client->publishPage(Page::forSiteAndPath($site->id, '/undergraduate')->first()->id);
+        $client->publishPage(Page::forSiteAndPath($site->id, '/undergraduate/2017')->first()->id);
+        $client->publishPage(Page::forSiteAndPath($site->id, '/undergraduate/2018')->first()->id);
+        $client->deletePage(Page::forSiteAndPath($site->id, '/undergraduate/2017')->first()->id);
+        $client->movePage(Page::forSiteAndPath($site->id, '/postgraduate/2017')->first()->id,
+                            Page::forSiteAndPath($site->id, '/undergraduate')->first()->id,
+                            Page::forSiteAndPath($site->id, '/undergraduate/2018')->first()->id);
+        $client->publishPage(Page::forSiteAndpath($site->id, '/undergraduate/2017')->first()->id);
     }
 
 	/**
