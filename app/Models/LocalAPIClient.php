@@ -56,7 +56,7 @@ class LocalAPIClient implements APIClient
             throw new APIErrorException('Non json data returned from API for path "' . $path . '"',APIErrorException::ERR_INVALID_JSON);
         }
         try {
-            $data['data']['canonical'] = $data['data']['active_route']['path'];
+ //           $data['data']['canonical'] = $data['data']['active_route']['path'];
             $page = PageData::fromArray( isset($data['data']) ? $data['data'] : []);
             $slug = $this->slugFromPath($path);
             $route = new RouteData(
