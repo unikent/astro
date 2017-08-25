@@ -33,6 +33,9 @@ class PublishPage implements APICommand
             // set as this page.
             // @TODO - may be simpler to do this as a housekeeping function at the end of publishing...
 
+            // need to do this whenever dealing with modifying
+            VersionScope::disable();
+
             // is there already a published page at this path? If so remove it (and its descendants)
             $published = $page->publishedVersion();
             if($published) {
@@ -64,20 +67,16 @@ class PublishPage implements APICommand
             //
             $fields = [
                 'site_id' => $page->site_id,
-                'version' => Page::STATE_DRAFT,
+                'version' => Page::STATE_PUBLISHED,
                 'parent_id' => $published_parent ? $published_parent->id : null,
                 'slug' => $page->slug,
                 'created_by' => $page->created_by,
                 'updated_by' => $page->updated_by
             ];
             if($published_parent){
-                VersionScope::disable();
                 $published_page = $published_parent->children()->create($fields);
-                VersionScope::enable();
             }else{
-                VersionScope::disable();
                 $published_page = Page::create($fields);
-                VersionScope::enable();
             }
             $published_page->setRevision($page->revision);
 
@@ -103,10 +102,12 @@ class PublishPage implements APICommand
             // (2)
             if(!$positioned){
                 $next = $page->siblings()->where('lft', $page->lft+1)->first();
-                $published_next = Page::forSiteAndPath($page->site_id, $next->path)->published()->first();
-                if($published_next){
-                    $published_page->makePreviousSiblingOf($published_next);
-                    $positioned = true;
+                if($next) {
+                    $published_next = Page::forSiteAndPath($page->site_id, $next->path)->published()->first();
+                    if ($published_next) {
+                        $published_page->makePreviousSiblingOf($published_next);
+                        $positioned = true;
+                    }
                 }
             }
             // (3) is the default when adding a new page... so nothing to do here...
@@ -126,6 +127,7 @@ class PublishPage implements APICommand
                             ->update(['published_at' => Carbon::now()]);
                 }
             }
+            VersionScope::enable();
 
             return $published_page;
         });

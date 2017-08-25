@@ -2,6 +2,7 @@
 
 namespace App\Models\Traits;
 
+use App\Http\Transformers\Api\v1\PageTransformer;
 use App\Models\Page;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
@@ -24,22 +25,9 @@ trait ResolvesRoutes
         // Attempt to resolve the Route
         $page = Page::findByHostAndPath($host, $path);
 
-        // If the Route is not found, attempt to find a Redirect
-//        if(!$page){
-//            $redirect = Redirect::findByPathOrFail($path);
-//        }
-        if($page && $page->draft){
-            return fractal($page, new PageTransformer())->parseIncludes(['draft'])->respond();
+        if($page){
+            return fractal($page, new PageTransformer(true))->parseIncludes(['site'])->respond();
         }
-
-/*        if(Gate::allows('read', $resolve)){
-            if($resolve->published_page){
-                return response($resolve->published_page->bake);
-            } else {
-                return fractal($resolve->page, new PageContentTransformer)->parseIncludes([ 'blocks', 'active_route' ])->respond();
-            }
-        }
-*/
         return (new SymfonyResponse())->setStatusCode(404);
 
     }
