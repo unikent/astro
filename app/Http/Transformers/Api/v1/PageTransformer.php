@@ -2,56 +2,88 @@
 namespace App\Http\Transformers\Api\v1;
 
 use App\Models\Page;
-use Illuminate\Database\Eloquent\Collection;
+use League\Fractal\ParamBag;
 use League\Fractal\Resource\Item as FractalItem;
 use League\Fractal\Resource\Collection as FractalCollection;
 use League\Fractal\TransformerAbstract as FractalTransformer;
 use App\Http\Transformers\Api\v1\Definitions\LayoutTransformer as LayoutDefinitionTransformer;
 
+/**
+ * Transforms Page from the database to the correct format for the API to output.
+ * @package App\Http\Transformers\Api\v1
+ */
 class PageTransformer extends FractalTransformer
 {
 
-	protected $defaultIncludes = [ 'active_route' ];
-    protected $availableIncludes = [ 'routes', 'draft_route', 'blocks', 'layout_definition', 'published', 'history' ];
+    protected $availableIncludes = [ 'parent', 'revision', 'revisions', 'site', 'layout_definition' ];
 
-	public function transform(Page $page)
+    protected $full = true; // whether to include blocks with output
+
+    /**
+     * Create a PageTransformer.
+     * @param bool $full Whether or not to include blocks with the output.
+     */
+    public function __construct($full = false)
+    {
+        $this->full = $full;
+    }
+
+    public function transform(Page $page)
 	{
-		return $page->toArray();
+		$data = [
+		    'id' => $page->id,
+            'slug' => $page->slug,
+            'path' => $page->path,
+            'version' => $page->version,
+            'title' => $page->revision->title,
+            'layout' => [
+                'name' => $page->revision->layout_name,
+                'version' => $page->revision->layout_version
+            ],
+            'options' => $page->revision->options,
+            'depth' => $page->depth,
+            'parent_id' => $page->parent_id,
+            'site_id' => $page->site_id,
+            'revision_id' => $page->revision_id
+        ];
+		if($this->full){
+            $data['blocks'] = $page->revision->blocks;
+        }
+        return $data;
 	}
 
     /**
-     * Include associated active Route
-     *
-     * @return League\Fractal\ItemResource
+     * Include associated Parent
+     * @param Page $page The Page whose parent to transform.
+     * @return FractalItem
      */
-    public function includeActiveRoute(Page $page)
+    public function includeParent(Page $page, ParamBag $params = null)
     {
-    	if($page->activeRoute){
-	    	return new FractalItem($page->activeRoute, new RouteTransformer, false);
-    	}
-    }
-
-    /**
-     * Include associated draft Route
-     *
-     * @return League\Fractal\ItemResource
-     */
-    public function includeDraftRoute(Page $page)
-    {
-        if($page->draftRoute){
-            return new FractalItem($page->draftRoute, new RouteTransformer, false);
+        if($page->parent) {
+            return new FractalItem($page->parent, new PageTransformer($params->get('full')), false);
         }
     }
 
     /**
-     * Include all associated Routes
-     *
-     * @return League\Fractal\CollectionResource
+     * Include associated Revision
+     * @param Page $page The Page to transform.
+     * @return FractalItem
      */
-    public function includeRoutes(Page $page)
+    public function includeRevision(Page $page, ParamBag $params = null)
     {
-        if(!$page->routes->isEmpty()){
-            return new FractalCollection($page->routes, new RouteTransformer, false);
+        if($page->revision) {
+            return new FractalItem($page->revision, new RevisionTransformer( $params->get('full') ), false);
+        }
+    }
+
+    /**
+     * Include associated Site
+     * @return FractalItem
+     */
+    public function includeSite(Page $page)
+    {
+        if($page->site){
+            return new FractalItem($page->site, new SiteTransformer, false);
         }
     }
 
@@ -63,11 +95,10 @@ class PageTransformer extends FractalTransformer
      *
      * Some nastiness resides here in order to achieve this, commented below...
      *
-     * @return League\Fractal\CollectionResource
      */
     public function includeBlocks(Page $page)
     {
-    	if(!$page->blocks->isEmpty()){
+        if(!$page->blocks->isEmpty()){
             // Using sortBy instead of orderBy as the collection might have been eager-loaded
             // Use of groupBy results in a Collection with nested Collections, keyed by 'region_name'.
             $blocksByRegion = $page->blocks->sortBy('order')->groupBy('region_name');
@@ -86,41 +117,33 @@ class PageTransformer extends FractalTransformer
 
                 return $blocksByRegion->toArray();
             }, false);
-    	}
+        }else{
+            return ['main' => []];
+        }
     }
 
     /**
      * Include associated Layout/Region definitions
-     * @return League\Fractal\ItemResource
+     * @param Page $page
+     * @return FractalItem
      */
     public function includeLayoutDefinition(Page $page)
     {
-    	$layoutDefinition = $page->getLayoutDefinition();
-    	return new FractalItem($layoutDefinition, new LayoutDefinitionTransformer, false);
+        $layoutDefinition = $page->getLayoutDefinition();
+        return new FractalItem($layoutDefinition, new LayoutDefinitionTransformer, false);
     }
 
     /**
-     * Include Published (latest PublishedPage)
-     *
-     * @return League\Fractal\ItemResource
+     * Include History (all Revisions up to and including the current one)
+     * @param Page $page The page.
+     * @return FractalCollection
      */
-    public function includePublished(Page $page)
-    {
-        if($page->published){
-            return new FractalItem($page->published, new PublishedPageTransformer, false);
-        }
-    }
-
-    /**
-     * Include History (all associated PublishedPages)
-     *
-     * @return League\Fractal\CollectionResource
-     */
-    public function includeHistory(Page $page)
+    public function includeRevisions(Page $page)
     {
         if(!$page->history->isEmpty()){
-            return new FractalCollection($page->history, new PublishedPageTransformer, false);
+            return new FractalCollection($page->revision->history, new RevisionTransformer, false);
         }
     }
+
 
 }

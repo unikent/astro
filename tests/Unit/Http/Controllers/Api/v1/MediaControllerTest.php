@@ -34,6 +34,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      * @group authentication
      */
     public function index_WhenUnauthenticated_Returns401(){
@@ -43,6 +44,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      * @group authentication
      */
     public function index_WhenAuthenticatedAndRequestIsWithoutSiteIdsAndPublishingGroupIds_ChecksAuthorization(){
@@ -54,6 +56,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      * @group authentication
      */
     public function index_WhenAuthenticatedAndRequestHasSiteIds_ChecksAuthorization(){
@@ -84,6 +87,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      * @group authentication
      */
     public function index_WhenAuthenticatedAndRequestHasPublishingGroupIds_ChecksAuthorization(){
@@ -114,6 +118,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      * @group authentication
      */
     public function index_WhenAuthenticatedAndRequestIsWithoutSiteIdsAndPublishingGroupIdsAndUnauthorized_Returns403(){
@@ -127,6 +132,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      * @group authentication
      */
     public function index_WhenAuthenticatedAndRequestHasSiteIdsAndUnauthorized_Returns403(){
@@ -157,6 +163,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      * @group authentication
      */
     public function index_WhenAuthenticatedAndRequestHasPublishingGroupIdsAndUnauthorized_Returns403(){
@@ -187,6 +194,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      */
     public function index_WhenAuthorizedAndRequestHasSiteIds_ReturnsJsonOfMediaAssociatedWithSiteIds(){
         $sites = factory(Site::class, 3)->states('withPublishingGroup')->create();
@@ -217,6 +225,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      */
     public function index_WhenAuthorizedRequestHasPublishingGroupIds_ReturnsJsonOfMediaAssociatedWithPublishingGroups(){
         $pgs = factory(PublishingGroup::class, 3)->create();
@@ -247,6 +256,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      */
     public function index_WhenAuthorizedAndRequestHasTypes_ReturnsJsonOfMedia(){
         $media = new Collection([
@@ -266,6 +276,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      */
     public function index_WhenAuthorizedAndRequestHasTypes_ReturnsJsonOfMediaFilteredByTypes(){
         $media = new Collection([
@@ -290,6 +301,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      */
     public function index_WhenAuthorizedAndRequestHasMimeTypes_ReturnsJsonOfMediaFilteredByMimeTypes(){
         $media = new Collection([
@@ -314,6 +326,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      */
     public function index_WhenAuthorized_Returns200(){
         $media = new Collection([
@@ -332,6 +345,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      * @group authentication
      */
     public function store_WhenUnauthenticated_Returns401(){
@@ -341,6 +355,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function store_WhenAuthenticated_ChecksAuthorizationForSite(){
@@ -356,6 +371,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function store_WhenAuthenticated_ChecksAuthorizationForPublishingGroup(){
@@ -371,6 +387,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function store_WhenAuthenticatedAndUnauthorized_Returns403(){
@@ -382,6 +399,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      */
     public function store_WhenAuthorizedAndValidAndMediaDoesNotExist_CreatesMedia(){
         $count = Media::count();
@@ -394,6 +412,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      */
     public function store_WhenAuthorizedAndValidAndMediaDoesNotExist_AssociatesMediaWithSiteAndPublishingGroup(){
         $this->authenticatedAndAuthorized();
@@ -410,6 +429,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      */
     public function store_WhenAuthorizedAndValidAndMediaAlreadyExists_DoesNotCreateNewMedia(){
         // Set up the existing Media item
@@ -445,6 +465,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      */
     public function store_WhenAuthorizedAndValidAndMediaAlreadyExists_AssociatesExisitngMediaWithSiteAndPublishingGroup(){
         // Set up the existing Media item
@@ -480,6 +501,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      */
     public function store_WhenAuthorizedAndValid_ReturnsJson(){
         $this->authenticatedAndAuthorized();
@@ -493,6 +515,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      */
     public function store_WhenAuthorizedAndValid_Returns201(){
         $this->authenticatedAndAuthorized();
@@ -505,6 +528,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      * @group authentication
      */
     public function destroy_WhenUnauthenticated_Returns401(){
@@ -516,6 +540,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      */
     public function delete_WhenAuthorizedAndMediaNotFound_Returns404(){
         $this->authenticatedAndAuthorized();
@@ -526,6 +551,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function destroy_WhenAuthenticatedAndDeletingBySites_ChecksAuthorizationForSites(){
@@ -549,6 +575,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function destroy_WhenAuthenticatedAndDeletingByPublishingGroup_ChecksAuthorizationForPublishingGroup(){
@@ -572,6 +599,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      * @group authorization
      */
     public function destroy_WhenAuthenticatedAndUnauthorized_Returns403(){
@@ -589,6 +617,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      */
     public function destroy_WhenAuthenticatedAndDeletingBySites_UnassociatesSpecifiedSitesOnly(){
         $sites = factory(Site::class, 3)->states('withPublishingGroup')->create();
@@ -608,6 +637,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      */
     public function destroy_WhenAuthenticatedAndDeletingByPublishingGroups_UnassociatesPublishingGroupsOnly(){
         $pgs = factory(PublishingGroup::class, 3)->create();
@@ -627,6 +657,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 
     /**
      * @test
+	 * @group media
      */
     public function destroy_WhenAuthorizedAndValid_Returns200(){
         $pg = factory(PublishingGroup::class)->create();

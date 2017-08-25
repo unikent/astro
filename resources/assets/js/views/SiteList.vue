@@ -28,7 +28,7 @@
 					<el-table-column prop="canonical.path" label="Path"></el-table-column>
 					<el-table-column inline-template label="Actions" width="110">
 						<div>
-							<router-link :to="`/site/${sites[$index].id}`">
+							<router-link :to="`/site/${sites[$index].id}/page/${sites[$index].homepage.id}`">
 								<el-button type="default" size="small">
 									<icon name="edit" width="14" height="14" />
 								</el-button>
@@ -157,7 +157,7 @@ export default {
 
 		fetchData() {
 			this.$api
-				.get('site')
+				.get('sites?include=homepage.revision')
 				.then((response) => {
 					this.sites = response.data.data;
 					this.loading = false;

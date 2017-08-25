@@ -40,7 +40,9 @@ export default {
 
 	data() {
 		return {
+
 			loading: true
+
 		};
 	},
 
@@ -52,8 +54,10 @@ export default {
 
 	methods: {
 		...mapActions({
+
 			showPageModal: 'site/showPageModal'
 		})
+
 	}
 };
 </script>

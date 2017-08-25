@@ -25,7 +25,7 @@ class PagePolicy
      * Determine whether the user can view the page.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Page  $page
+     * @param  Page  $page
      * @return boolean
      */
     public function read(User $user, Page $page)
@@ -38,7 +38,7 @@ class PagePolicy
      * Determine whether the user can create pages.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Page  $page
+     * @param  Page  $page
      * @return boolean
      */
     public function create(User $user, Page $page)
@@ -51,7 +51,7 @@ class PagePolicy
      * Determine whether the user can update the page.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Page  $page
+     * @param  Page  $page
      * @return boolean
      */
     public function update(User $user, Page $page)
@@ -64,7 +64,7 @@ class PagePolicy
      * Determine whether the user can publish the page.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Page  $page
+     * @param  Page  $page
      * @return boolean
      */
     public function publish(User $user, Page $page)
@@ -76,7 +76,7 @@ class PagePolicy
      * Determine whether the user can revert the page.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Page  $page
+     * @param  Page  $page
      * @return boolean
      */
     public function revert(User $user, Page $page)
@@ -88,7 +88,7 @@ class PagePolicy
      * Determine whether the user can delete the page.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Page  $page
+     * @param  Page  $page
      * @return boolean
      */
     public function delete(User $user, Page $page)
@@ -101,7 +101,7 @@ class PagePolicy
      * Determine whether the user can force-delete the page.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Page  $page
+     * @param  Page  $page
      * @return boolean
      */
     public function forceDelete(User $user, Page $page)

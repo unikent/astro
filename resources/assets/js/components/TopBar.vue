@@ -35,7 +35,7 @@ import { mapState } from 'vuex';
 import Icon from 'components/Icon';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
-import Toolbar from 'components/Sidebar/Toolbar';
+import Toolbar from 'components/sidebar/Toolbar';
 
 /* global window, document */
 

@@ -31,7 +31,7 @@ class RouteServiceProvider extends ServiceProvider
 		parent::boot();
 
 	    Route::bind('page', function($value){
-	        return Page::withTrashed()->where('id', '=', $value)->firstOrFail();
+	        return Page::where('id', '=', $value)->firstOrFail();
 	    });
 
 	    Route::bind('block_definition', function($value){

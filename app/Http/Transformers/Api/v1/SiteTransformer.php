@@ -2,7 +2,9 @@
 namespace App\Http\Transformers\Api\v1;
 
 use App\Models\Site;
-use App\Models\Route;
+use App\Models\Page;
+use League\Fractal\ParamBag;
+use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item as FractalItem;
 use League\Fractal\Resource\Collection as FractalCollection;
 use League\Fractal\TransformerAbstract as FractalTransformer;
@@ -10,36 +12,41 @@ use League\Fractal\TransformerAbstract as FractalTransformer;
 class SiteTransformer extends FractalTransformer
 {
 
-    protected $defaultIncludes = [ 'active_route' ];
-    protected $availableIncludes = [ 'routes' ];
+    protected $defaultIncludes = [ ];
+    protected $availableIncludes = [ 'pages','publishing_group','homepage' ];
 
 	public function transform(Site $site)
 	{
-		return $site->toArray();
+		$data = [
+		  'id' => $site->id,
+            'name' => $site->name,
+            'host' => $site->host,
+            'path' => $site->path,
+            'created_at' => $site->created_at ? $site->created_at->__toString() : null,
+            'updated_at' => $site->updated_at ? $site->updated_at->__toString() : null,
+            'deleted_at' => $site->deleted_at ? $site->deleted_at->__toString() : null
+        ];
+		return $data;
 	}
 
-    /**
-     * Include associated 'Canonical' Route
-     *
-     * @return League\Fractal\ItemResource
-     */
-    public function includeActiveRoute(Site $site)
+	public function includeHomepage(Site $site, ParamBag $params = null)
     {
-        if($site->activeRoute){
-            return new FractalItem($site->activeRoute, new RouteTransformer, false);
+        if($site->homepage){
+            return new FractalItem($site->homepage, new PageTransformer($params->get('full')), false);
         }
     }
 
-    /**
-     * Include all associated Routes
-     *
-     * @return League\Fractal\ItemResource
-     */
-    public function includeRoutes(Site $site)
+	public function includePublishingGroup(Site $site)
     {
-        if(!$site->routes->isEmpty()){
-            return new FractalCollection($site->routes, new RouteTransformer, false);
+        if($site->publishing_group){
+            return new FractalItem($site->publishing_group, new PublishingGroupTransformer, false);
         }
     }
 
+    public function includePages(Site $site)
+    {
+        if(!$site->pages->isEmpty()){
+            return new FractalCollection($site->pages, new PageTransformer(), false);
+        }
+    }
 }

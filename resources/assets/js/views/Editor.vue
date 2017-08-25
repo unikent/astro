@@ -58,6 +58,7 @@ export default {
 	},
 
 	methods: {
+
 		showLoader() {
 			this.loader = Loading.service({
 				target: this.$refs.editor,

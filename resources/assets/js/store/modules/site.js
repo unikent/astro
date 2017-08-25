@@ -55,15 +55,15 @@ const actions = {
 
 	fetchSite({ commit, state }) {
 		api
-			.get(`site/${state.site}/tree`)
+			.get(`sites/${state.site}/tree?include=revision`)
 			.then((response) => {
-				commit('setSite', response.data.data);
+				commit('setSite', [response.data.data]);
 			});
 	},
 
 	fetchLayouts({ commit }) {
 		api
-			.get('layout/definitions')
+			.get('layouts/definitions')
 			.then((response) => {
 				commit('setLayouts', response.data.data)
 			})
@@ -71,7 +71,7 @@ const actions = {
 
 	deletePage({ dispatch }, page) {
 		api
-			.delete(`page/${page.id}`)
+			.delete(`pages/${page.id}`)
 			.then(() => {
 				dispatch('fetchSite');
 			});
@@ -79,7 +79,15 @@ const actions = {
 
 	createPage({ dispatch }, page) {
 		api
-			.post('page', page)
+			.post('pages', {
+				parent_id: page.route.parent_id,
+				slug: page.route.slug,
+				layout: {
+					name: page.layout_name,
+					version: page.layout_version,
+				},
+				title: page.title
+			})
 			.then(() => {
 				dispatch('fetchSite');
 			})
@@ -87,7 +95,9 @@ const actions = {
 
 	updatePage({ dispatch }, page) {
 		api
-			.patch(`page/${page.page_id}`, page)
+			.patch(`pages/${page.id}/content`, {
+				blocks: page.blocks
+			})
 			.then(() => {
 				dispatch('fetchSite');
 			})
@@ -95,35 +105,42 @@ const actions = {
 
 	movePageApi({ dispatch }, move) {
 		// If-Unmodified-Since
-		// api
-		// 	.patch(`site/${site_id}/stucture`, page, {
-		// 		headers: {'If-Unmodified-Since': 'foobar'}
-		// 	})
-		// 	.then(() => {
-		// 		dispatch('fetchSite');
-		// 	})
+		api
+		 	.patch(`sites/${state.site}/tree`, move)
+		 	.then(() => {
+		 		dispatch('fetchSite');
+		 	});
 		console.log(move);
 	},
+
 
 	movePage({ dispatch, commit, state }, { toPath, fromPath }) {
 		const
 			newPage = getPageInfo(toPath),
 			oldPage = getPageInfo(fromPath),
-			canDrop = newPage.parent.depth + getDepth(oldPage.data) <= state.maxDepth;
+			canDrop = newPage.parent.depth + getDepth(oldPage.data) <= state.maxDepth,
+			newPos = Number.parseInt(toPath.substr(toPath.lastIndexOf('.') + 1, toPath.length));
 
 		if(canDrop) {
+
+			// Reordering logic is a bit different as we are not adding a new item into the parent collection,
+			if(newPage.parent.id == oldPage.parent.id){
+
+			}
+
 			const page = _.cloneDeep(oldPage.data);
-			// remove old page
+
+            // remove old page
 			commit('removePage', oldPage);
 			// update current and child page depths
 			updateDepths(page, newPage.parent.depth + 1);
 			// splice page in if page already exists in new position otherwise add it
 			commit('addPage', { ...newPage, page, push: !newPage.data });
-
+			const next_id = newPos+1 < newPage.parent.children.length ? newPage.parent.children[newPos+1].id : null;
 			dispatch('movePageApi', {
 				page_id: page.id,
 				parent_id: newPage.parent.id,
-				next_id: newPage.parent.children[newPage.index] ? newPage.parent.children[newPage.index].id : null
+				next_id: next_id //newPage.data && newPage.parent.children[newPos+1] ? newPage.parent.children[newPos+1].id : null
 			});
 		}
 		else {

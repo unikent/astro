@@ -17,10 +17,14 @@ class CreateSites extends Migration
             $table->increments('id');
             $table->string('name');
             $table->integer('publishing_group_id')->unsigned()->index();
+            $table->mediumText('options');
+            $table->string('host');
+            $table->string('path')->default('');
 
             $table->timestamps();
             $table->softDeletes();
 
+            $table->unique(['host', 'path'], 'uk_host_path');
             $table->foreign('publishing_group_id', 'sites_publishing_group_id_fk')->references('id')->on('publishing_groups');
         });
     }

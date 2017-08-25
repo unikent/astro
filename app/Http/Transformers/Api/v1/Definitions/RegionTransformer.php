@@ -17,7 +17,7 @@ class RegionTransformer extends FractalTransformer
     /**
      * Include associated Block definitions
      *
-     * @return League\Fractal\ItemResource
+
      */
     public function includeBlockDefinitions(Region $region)
     {

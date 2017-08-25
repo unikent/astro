@@ -1,5 +1,5 @@
 <template>
-<div
+<div v-if="page.revision"
 	:class="{
 		'page-list__item': !root,
 		'page-list__root': root && hasChildren && flatten,
@@ -20,7 +20,7 @@
 		</span>
 
 		<span ref="name" style=" flex: 1 0 auto; cursor: pointer;" @click="edit">
-			{{ page.path === '/' ? 'Home page' : (page.title || page.slug) }}
+			{{ page.path === '/' ? 'Home page' : (page.revision.title || page.slug) }}
 		</span>
 
 		<!-- Page options dropdown -->
@@ -177,9 +177,10 @@ export default {
 		},
 
 		edit() {
-			if(Number.parseInt(this.$route.params.page_id) !== this.page.page_id) {
+		    const page_id = this.page.id;
+			if(Number.parseInt(this.$route.params.page_id) !== page_id) {
 				this.setLoaded(false);
-				this.$router.push(`/site/${this.site}/page/${this.page.page_id}`);
+				this.$router.push(`/site/${this.site}/page/${page_id}`);
 				this.$store.commit('changePage', this.page.path);
 			}
 			else {
@@ -192,13 +193,13 @@ export default {
 		},
 
 		remove() {
-			this.$confirm(`Are you sure you want to delete "${this.page.title}"?`, 'Warning', {
+			this.$confirm(`Are you sure you want to delete "${this.page.revision.title}"?`, 'Warning', {
 				confirmButtonText: 'OK',
 				cancelButtonText: 'Cancel',
 				type: 'warning'
 			}).then(() => {
 				this.deletePage({
-					id:this.page.page_id
+					id:this.page.id
 				})
 			});
 		},

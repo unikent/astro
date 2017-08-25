@@ -2,10 +2,10 @@
 namespace App\Models\Traits;
 
 use App\Models\Page;
-use App\Models\PublishedPage;
+use App\Models\Revision;
 
 /**
- *
+ * @deprecated
  */
 trait Routable  {
 
@@ -16,7 +16,7 @@ trait Routable  {
 
 	public function published_page()
 	{
-		return $this->hasOne(PublishedPage::class, 'page_id', 'page_id')->latest()->limit(1);
+		return $this->hasOne(Revision::class, 'page_id', 'page_id')->latest()->limit(1);
 	}
 
 

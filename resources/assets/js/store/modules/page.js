@@ -35,9 +35,10 @@ const mutations = {
 			};
 		}
 
-		state.currentLayout = page.layout_name;
-		state.currentLayoutVersion = page.layout_version;
-
+		if(page.layout) {
+            state.currentLayout = page.layout.name;
+            state.currentLayoutVersion = page.layout.version;
+        }
 		state.pageData = page;
 	},
 
@@ -157,12 +158,12 @@ const actions = {
 
 		// TODO: refactor into smaller methods
 		api
-			.get(`page/${id}?include=blocks.media`)
+			.get(`pages/${id}?include=blocks.media`)
 			.then(response => {
 				const page = response.data.data;
 
 				api
-					.get(`layout/${page.layout_name}/definition?include=region_definitions.block_definitions`)
+					.get(`layouts/${page.layout.name}/definition?include=region_definitions.block_definitions`)
 					.then(({ data: region }) => {
 
 						region.data.region_definitions.forEach((region) => {

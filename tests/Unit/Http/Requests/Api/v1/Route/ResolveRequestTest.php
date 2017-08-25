@@ -4,7 +4,7 @@ namespace Tests\Unit\Http\Requests\Api\v1\Route;
 use Faker;
 use Mockery;
 use Validator;
-use App\Models\Route;
+use App\Models\Page;
 use Tests\Unit\Http\Requests\RequestTestCase;
 use App\Http\Requests\Api\v1\Route\ResolveRequest;
 

@@ -66,7 +66,7 @@ class Block extends Model
 	/**
 	 * Deletes all blocks for a given Page and Region.
 	 *
-	 * @param  Page|int $page_or_id
+	 * @param  PageC|int $page_or_id
 	 * @param  string $region
 	 * @return void
 	 */

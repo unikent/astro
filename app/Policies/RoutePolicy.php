@@ -3,7 +3,7 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\Route;
+use App\Models\Page;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class RoutePolicy
@@ -33,10 +33,10 @@ class RoutePolicy
      * Determine whether the user can view the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Route  $route
+     * @param  \App\Models\Page  $route
      * @return boolean
      */
-    public function read(User $user, Route $route)
+    public function read(User $user, Page $route)
     {
         if($route->isActive()){
             return true;
@@ -51,10 +51,10 @@ class RoutePolicy
      * Determine whether the user can create definitions.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Route  $route
+     * @param  \App\Models\Page  $route
      * @return boolean
      */
-    public function create(User $user, Route $route)
+    public function create(User $user, Page $route)
     {
         return true;
     }
@@ -63,10 +63,10 @@ class RoutePolicy
      * Determine whether the user can update the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Route  $route
+     * @param  \App\Models\Page  $route
      * @return boolean
      */
-    public function update(User $user, Route $route)
+    public function update(User $user, Page $route)
     {
         return true;
     }
@@ -75,10 +75,10 @@ class RoutePolicy
      * Determine whether the user can delete the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Route  $route
+     * @param  \App\Models\Page  $route
      * @return boolean
      */
-    public function delete(User $user, Route $route)
+    public function delete(User $user, Page $route)
     {
         return true;
     }

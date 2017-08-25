@@ -24,7 +24,6 @@ class BlockTransformer extends FractalTransformer
 
     /**
      * Include associated Layout/Region definitions
-     * @return League\Fractal\ItemResource
      */
     public function includeDefinition(Block $block)
     {

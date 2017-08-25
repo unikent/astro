@@ -21,11 +21,11 @@ return [
 	'delete_unused_tags'=>true,
 
 	// Model to use to store the tags in the database
-	'tag_model'=>'\Conner\Tagging\Model\Tag',
+	'tag_model'=>\Conner\Tagging\Model\Tag::class,
 
 	// Delimiter used within tags
 	'delimiter' => '-',
 	
 	// Model to use for the relation between tags and tagged records
-	'tagged_model' => '\Conner\Tagging\Model\Tagged',
+	'tagged_model' => \Conner\Tagging\Model\Tagged::class,
 ];
