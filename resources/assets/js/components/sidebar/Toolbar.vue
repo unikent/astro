@@ -23,6 +23,8 @@
 
 	<el-button class="toolbar__button-save" type="success" @click="savePage">Save</el-button>
 
+	<a class="el-button el-button--info toolbar__button-preview" type="info" :href="draftLink" target="_blank">Preview <icon name="newwindow" aria-hidden="true" width="14" height="14" class="ico" /></a>
+
 	<el-button class="toolbar__button-publish" type="danger" @click="showPublishModal">Publish ...</el-button>
 
 </div>
@@ -63,6 +65,11 @@ export default {
 			set(value) {
 				this.changeView(value);
 			}
+		},
+
+		draftLink() {
+			//return ;
+			return '/draft/' + `${this.$route.params.page_id}`;
 		}
 	},
 
