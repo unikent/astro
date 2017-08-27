@@ -23,7 +23,8 @@ const state = {
 	pageName: '',
 	scale: .4,
 	loaded: false,
-	dragging: false
+	dragging: false,
+	currentSavedState: ''
 };
 
 const mutations = {
@@ -149,6 +150,10 @@ const mutations = {
 
 		// TODO: use state for this
 		Vue.nextTick(() => eventBus.$emit('block:updateOverlay', index));
+	},
+
+	updateCurrentSavedState(state) {
+		state.currentSavedState = JSON.stringify(state.pageData.blocks);
 	}
 };
 
@@ -198,7 +203,7 @@ const actions = {
 					});
 
 			});
-	}
+	},
 };
 
 const getters = {
@@ -233,6 +238,10 @@ const getters = {
 	scaleUp: (state) => () => {
 		// return scale with three digits after decimal point
 		return state.scale !== 0 ? Math.round(1 / state.scale * 1000) / 1000 : 1;
+	},
+
+	unsavedChangesExist: (state) => () => {
+		return state.currentSavedState != JSON.stringify(state.pageData.blocks);
 	}
 };
 

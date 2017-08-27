@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import Icon from 'components/Icon';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
@@ -67,6 +67,10 @@ export default {
 			pageName: state => state.page.pageName,
 		}),
 
+		...mapGetters([
+			'unsavedChangesExist'
+		]),
+
 		showBack() {
 			return ['site', 'page'].indexOf(this.$route.name) !== -1;
 		},
@@ -85,6 +89,14 @@ export default {
 		},
 
 		backToSites() {
+			console.log('switching back to site');
+			const unsavedChangesExist = this.unsavedChangesExist();
+			if (unsavedChangesExist) {
+				alert('unsaved changes exist - save prompt goes here');
+			} else {
+				console.log('unsaved changes do not exist');
+			}
+
 			this.$store.commit('changePage', '');
 			this.$store.commit('setPage', {});
 			this.$store.commit('setLoaded', false);

@@ -101,6 +101,11 @@ export default {
 			'changeView',
 			'showPublishModal'
 		]),
+
+		updateCurrentSavedState() {
+			this.$store.commit('updateCurrentSavedState');
+		},
+
 		savePage() {
 			this.$api
 				.put(`pages/${this.$route.params.page_id}/content`, {
@@ -112,6 +117,8 @@ export default {
 						type: 'success',
 						duration: 2000
 					});
+					// update saved state here
+					this.updateCurrentSavedState();
 				})
 				.catch(() => {});
 		},

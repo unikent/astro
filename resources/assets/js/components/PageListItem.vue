@@ -67,7 +67,7 @@
 </template>
 
 <script>
-import { mapState, mapActions, mapMutations } from 'vuex';
+import { mapState, mapActions, mapMutations, mapGetters } from 'vuex';
 import Draggable from 'vuedraggable';
 import Icon from 'components/Icon';
 
@@ -92,6 +92,10 @@ export default {
 		...mapState('site', {
 			site: state => state.site
 		}),
+
+		...mapGetters([
+			'unsavedChangesExist'
+		]),
 
 		root() {
 			return this.depth === 0;
@@ -181,6 +185,13 @@ export default {
 			if(Number.parseInt(this.$route.params.page_id) !== page_id) {
 				this.setLoaded(false);
 				this.$router.push(`/site/${this.site}/page/${page_id}`);
+				console.log('switching pages in editor');
+				const unsavedChangesExist = this.unsavedChangesExist();
+				if (unsavedChangesExist) {
+					alert('unsaved changes exist - save prompt goes here');
+				} else {
+					console.log('unsaved changes do not exist');
+				}
 				this.$store.commit('changePage', this.page.path);
 			}
 			else {
