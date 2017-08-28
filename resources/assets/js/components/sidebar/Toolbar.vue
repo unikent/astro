@@ -34,7 +34,7 @@
 
 
 <script>
-import { mapState, mapMutations } from 'vuex';
+import { mapState, mapMutations, mapActions } from 'vuex';
 
 import Icon from 'components/Icon';
 import { undoStackInstance } from 'plugins/undo-redo';
@@ -99,7 +99,11 @@ export default {
 	methods: {
 		...mapMutations([
 			'changeView',
-			'showPublishModal'
+			'showPublishModal',
+		]),
+
+		...mapActions([
+			'handleSavePage'
 		]),
 
 		updateCurrentSavedState() {
@@ -107,20 +111,7 @@ export default {
 		},
 
 		savePage() {
-			this.$api
-				.put(`pages/${this.$route.params.page_id}/content`, {
-                    blocks: this.page.blocks
-                })
-				.then(() => {
-					this.$message({
-						message: 'Page saved',
-						type: 'success',
-						duration: 2000
-					});
-					// update saved state here
-					this.updateCurrentSavedState();
-				})
-				.catch(() => {});
+			this.handleSavePage(this.$route.params.page_id);
 		},
 
 		// TODO - add preview the page functionality

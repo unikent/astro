@@ -204,6 +204,24 @@ const actions = {
 
 			});
 	},
+
+	handleSavePage({ state }, id) {
+			const blocks = state.pageData.blocks;
+			api
+				.put(`pages/${id}/content`, {
+                    blocks: blocks
+                })
+				.then(() => {
+					this.$message({
+						message: 'Page saved',
+						type: 'success',
+						duration: 2000
+					});
+					// update saved state here
+					this.updateCurrentSavedState();
+				})
+				.catch(() => {});
+		},
 };
 
 const getters = {
