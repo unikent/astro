@@ -129,7 +129,8 @@ export default {
 		...mapActions({
 			movePage: 'site/movePage',
 			deletePage: 'site/deletePage',
-			updatePage: 'site/updatePage'
+			updatePage: 'site/updatePage',
+		    handleSavePage: 'handleSavePage'
 		}),
 
 		handleDragEnd() {
@@ -180,18 +181,20 @@ export default {
 			}
 		},
 
+		savePage() {
+			this.handleSavePage({id: this.$route.params.page_id, message: this.$message});
+		},
+
 		edit() {
 		    const page_id = this.page.id;
 			if(Number.parseInt(this.$route.params.page_id) !== page_id) {
-				this.setLoaded(false);
-				this.$router.push(`/site/${this.site}/page/${page_id}`);
-				console.log('switching pages in editor');
+				/* autosave and unsaved changes before we switch to the new page */
 				const unsavedChangesExist = this.unsavedChangesExist();
 				if (unsavedChangesExist) {
-					alert('unsaved changes exist - save prompt goes here');
-				} else {
-					console.log('unsaved changes do not exist');
+					this.savePage();
 				}
+				this.setLoaded(false);
+				this.$router.push(`/site/${this.site}/page/${page_id}`);
 				this.$store.commit('changePage', this.page.path);
 			}
 			else {
