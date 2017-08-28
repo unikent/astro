@@ -205,19 +205,25 @@ const actions = {
 			});
 	},
 
-	handleSavePage({ state }, id) {
+	/**
+	 * Saves a page
+	 * @param {Object} state - the context of the action - added by VueX
+	 * @param {Object} payload - parameter object
+	 * @param {string} payload.id - the id of the page
+	 * @param {callback} payload.message - function to display a message
+	 */
+	handleSavePage({ state }, payload) {
 			const blocks = state.pageData.blocks;
 			api
-				.put(`pages/${id}/content`, {
+				.put(`pages/${payload.id}/content`, {
                     blocks: blocks
                 })
 				.then(() => {
-					this.$message({
-						message: 'Page saved',
-						type: 'success',
-						duration: 2000
-					});
-					// update saved state here
+					payload.message({
+							message: 'Page saved',
+							type: 'success',
+							duration: 2000
+						});
 					this.updateCurrentSavedState();
 				})
 				.catch(() => {});

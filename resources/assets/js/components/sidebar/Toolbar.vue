@@ -111,7 +111,7 @@ export default {
 		},
 
 		savePage() {
-			this.handleSavePage(this.$route.params.page_id);
+			this.handleSavePage({id: this.$route.params.page_id, message: this.$message});
 		},
 
 		// TODO - add preview the page functionality
