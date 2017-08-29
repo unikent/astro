@@ -209,13 +209,13 @@ const actions = {
 	 * Saves a page
 	 * @param {Object} state - the context of the action - added by VueX
 	 * @param {Object} payload - parameter object
-	 * @param {string} payload.id - the id of the page
 	 * @param {callback} payload.message - function to display a message
 	 */
 	handleSavePage({ state }, payload) {
 			const blocks = state.pageData.blocks;
+			const id = state.pageData.id;
 			api
-				.put(`pages/${payload.id}/content`, {
+				.put(`pages/${id}/content`, {
                     blocks: blocks
                 })
 				.then(() => {

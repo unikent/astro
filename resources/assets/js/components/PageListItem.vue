@@ -182,7 +182,7 @@ export default {
 		},
 
 		savePage() {
-			this.handleSavePage({id: this.$route.params.page_id, message: this.$message});
+			this.handleSavePage({message: this.$message});
 		},
 
 		edit() {
