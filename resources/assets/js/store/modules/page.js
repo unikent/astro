@@ -23,7 +23,8 @@ const state = {
 	pageName: '',
 	scale: .4,
 	loaded: false,
-	dragging: false
+	dragging: false,
+	currentSavedState: ''
 };
 
 const mutations = {
@@ -149,6 +150,10 @@ const mutations = {
 
 		// TODO: use state for this
 		Vue.nextTick(() => eventBus.$emit('block:updateOverlay', index));
+	},
+
+	updateCurrentSavedState(state) {
+		state.currentSavedState = JSON.stringify(state.pageData.blocks);
 	}
 };
 
@@ -198,7 +203,34 @@ const actions = {
 					});
 
 			});
-	}
+	},
+
+	/**
+	 * Saves a page
+	 * @param {Object} state - the context of the action - added by VueX
+	 * @param {Object} commit - added by VueX
+	 * @param {Object} payload - parameter object
+	 * @param {callback} payload.message - function to display a message
+	 * @return {promise} - api - to allow other methods to wait for the save 
+	 * to complete
+	 */
+	handleSavePage({ state, commit }, payload) {
+			const blocks = state.pageData.blocks;
+			const id = state.pageData.id;
+			return api
+				.put(`pages/${id}/content`, {
+                    blocks: blocks
+                })
+				.then(() => {
+					payload.message({
+							message: 'Page saved',
+							type: 'success',
+							duration: 2000
+						});
+					commit('updateCurrentSavedState');
+				})
+				.catch(() => {});
+	},
 };
 
 const getters = {
@@ -233,6 +265,10 @@ const getters = {
 	scaleUp: (state) => () => {
 		// return scale with three digits after decimal point
 		return state.scale !== 0 ? Math.round(1 / state.scale * 1000) / 1000 : 1;
+	},
+
+	unsavedChangesExist: (state) => () => {
+		return state.currentSavedState != JSON.stringify(state.pageData.blocks);
 	}
 };
 

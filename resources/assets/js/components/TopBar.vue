@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters, mapActions } from 'vuex';
 import Icon from 'components/Icon';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
@@ -67,6 +67,10 @@ export default {
 			pageName: state => state.page.pageName,
 		}),
 
+		...mapGetters([
+			'unsavedChangesExist'
+		]),
+
 		showBack() {
 			return ['site', 'page'].indexOf(this.$route.name) !== -1;
 		},
@@ -78,13 +82,27 @@ export default {
 
 	methods: {
 
+		...mapActions([
+			'handleSavePage'
+		]),
+
+		/* if user has unsaved changes then save the changes */
+		autoSave() {
+			const unsavedChangesExist = this.unsavedChangesExist();
+			if (unsavedChangesExist) {
+				this.handleSavePage({message: this.$message});
+			}
+		},
+
 		handleCommand(command) {
 			if(command === 'sign-out') {
+				this.autoSave();
 				window.location = '/auth/logout';
 			}
 		},
 
 		backToSites() {
+			this.autoSave();
 			this.$store.commit('changePage', '');
 			this.$store.commit('setPage', {});
 			this.$store.commit('setLoaded', false);
