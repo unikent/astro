@@ -86,22 +86,23 @@ export default {
 			'handleSavePage'
 		]),
 
-		savePage() {
-			this.handleSavePage({message: this.$message});
+		/* if user has unsaved changes then save the changes */
+		autoSave() {
+			const unsavedChangesExist = this.unsavedChangesExist();
+			if (unsavedChangesExist) {
+				this.handleSavePage({message: this.$message});
+			}
 		},
 
 		handleCommand(command) {
 			if(command === 'sign-out') {
+				this.autoSave();
 				window.location = '/auth/logout';
 			}
 		},
 
 		backToSites() {
-			/* autosave any unsaved changes before we switch to the new page */
-			const unsavedChangesExist = this.unsavedChangesExist();
-			if (unsavedChangesExist) {
-				this.savePage();
-			}
+			this.autoSave();
 			this.$store.commit('changePage', '');
 			this.$store.commit('setPage', {});
 			this.$store.commit('setLoaded', false);
