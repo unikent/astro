@@ -208,13 +208,16 @@ const actions = {
 	/**
 	 * Saves a page
 	 * @param {Object} state - the context of the action - added by VueX
+	 * @param {Object} commit - added by VueX
 	 * @param {Object} payload - parameter object
 	 * @param {callback} payload.message - function to display a message
+	 * @return {promise} - api - to allow other methods to wait for the save 
+	 * to complete
 	 */
-	handleSavePage({ state }, payload) {
+	handleSavePage({ state, commit }, payload) {
 			const blocks = state.pageData.blocks;
 			const id = state.pageData.id;
-			api
+			return api
 				.put(`pages/${id}/content`, {
                     blocks: blocks
                 })
@@ -224,10 +227,10 @@ const actions = {
 							type: 'success',
 							duration: 2000
 						});
-					this.updateCurrentSavedState();
+					commit('updateCurrentSavedState');
 				})
 				.catch(() => {});
-		},
+	},
 };
 
 const getters = {

@@ -23,7 +23,7 @@
 
 	<el-button class="toolbar__button-save" type="success" @click="savePage">Save</el-button>
 
-	<a class="el-button el-button--info toolbar__button-preview" type="info" :href="draftLink" target="_blank">Preview <icon name="newwindow" aria-hidden="true" width="14" height="14" class="ico" /></a>
+	<el-button class="toolbar__button-preview" type="info" @click="previewPage">Preview <icon name="newwindow" aria-hidden="true" width="14" height="14" class="ico" /></el-button>
 
 	<el-button class="toolbar__button-publish" type="danger" @click="showPublishModal">Publish ...</el-button>
 
@@ -114,13 +114,14 @@ export default {
 			this.handleSavePage({id: this.$route.params.page_id, message: this.$message});
 		},
 
-		// TODO - add preview the page functionality
+		/* autosave the page and open a preview window */
 		previewPage() {
-			this.$message({
-				message: 'TODO: previewing page...',
-				type: 'success',
-				duration: 2000
-			});
+			/* handleSavePage returns a promise so we here we wait for it to complete before
+			opening the preview window */
+			this.handleSavePage({id: this.$route.params.page_id, message: this.$message})
+				.then(() => {
+					window.open(this.draftLink,'_blank');
+				});
 		},
 
 		undo() {
