@@ -65,6 +65,10 @@ export default {
 				text: 'Loading preview...',
 				customClass: 'loading-overlay'
 			});
+		},
+
+		updateCurrentSavedState() {
+			this.$store.commit('updateCurrentSavedState');
 		}
 	},
 	computed: {
@@ -95,6 +99,7 @@ export default {
 
 	watch: {
 		pageLoaded(hideLoader) {
+			this.updateCurrentSavedState();
 			if(hideLoader) {
 				this.loader.close();
 			}
