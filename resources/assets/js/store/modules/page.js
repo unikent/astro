@@ -20,9 +20,9 @@ const state = {
 			main: []
 		}
 	},
+	pageTitle: 'Home page',
 	pagePath: '/',
 	pageSlug: 'home',
-	pageTitle: 'Home page',
 	scale: .4,
 	loaded: false,
 	dragging: false

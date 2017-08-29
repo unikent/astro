@@ -89,7 +89,7 @@ export default {
 		},
 
 		backToSites() {
-			this.$store.commit('changePage', {});
+			this.$store.commit('changePage', {title: "Home page", path: '/', slug:'home'});
 			this.$store.commit('setPage', {});
 			this.$store.commit('setLoaded', false);
 			undoStackInstance.clear();
