@@ -4,6 +4,8 @@
 			<i class="el-icon-arrow-left backbutton-icon"></i>Site list
 		</div>
 
+		<div class="top-bar__page-title">{{ pageTitle }} <el-tag type="primary">{{ pagePath }}</el-tag></div>
+
 		<div class="top-bar__tools">
 
 			<toolbar/>
@@ -64,7 +66,9 @@ export default {
 	computed: {
 
 		...mapState({
-			pageName: state => state.page.pageName,
+			pageTitle: state => state.page.pageTitle,
+			pagePath: state => state.page.pagePath,
+			pageSlug: state => state.page.pageSlug
 		}),
 
 		showBack() {
@@ -85,7 +89,7 @@ export default {
 		},
 
 		backToSites() {
-			this.$store.commit('changePage', '');
+			this.$store.commit('changePage', {});
 			this.$store.commit('setPage', {});
 			this.$store.commit('setLoaded', false);
 			undoStackInstance.clear();

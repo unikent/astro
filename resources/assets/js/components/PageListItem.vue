@@ -181,7 +181,7 @@ export default {
 			if(Number.parseInt(this.$route.params.page_id) !== page_id) {
 				this.setLoaded(false);
 				this.$router.push(`/site/${this.site}/page/${page_id}`);
-				this.$store.commit('changePage', this.page.path);
+				this.$store.commit('changePage', { title: this.page.revision.title, path: this.page.path, slug: this.page.slug } );
 			}
 			else {
 				this.$snackbar.open({
