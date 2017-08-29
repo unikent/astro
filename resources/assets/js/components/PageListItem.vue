@@ -188,7 +188,7 @@ export default {
 		edit() {
 		    const page_id = this.page.id;
 			if(Number.parseInt(this.$route.params.page_id) !== page_id) {
-				/* autosave and unsaved changes before we switch to the new page */
+				/* autosave any unsaved changes before we switch to the new page */
 				const unsavedChangesExist = this.unsavedChangesExist();
 				if (unsavedChangesExist) {
 					this.savePage();

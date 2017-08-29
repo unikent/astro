@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapState, mapGetters, mapActions } from 'vuex';
 import Icon from 'components/Icon';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
@@ -82,6 +82,14 @@ export default {
 
 	methods: {
 
+		...mapActions([
+			'handleSavePage'
+		]),
+
+		savePage() {
+			this.handleSavePage({message: this.$message});
+		},
+
 		handleCommand(command) {
 			if(command === 'sign-out') {
 				window.location = '/auth/logout';
@@ -89,14 +97,11 @@ export default {
 		},
 
 		backToSites() {
-			console.log('switching back to site');
+			/* autosave any unsaved changes before we switch to the new page */
 			const unsavedChangesExist = this.unsavedChangesExist();
 			if (unsavedChangesExist) {
-				alert('unsaved changes exist - save prompt goes here');
-			} else {
-				console.log('unsaved changes do not exist');
+				this.savePage();
 			}
-
 			this.$store.commit('changePage', '');
 			this.$store.commit('setPage', {});
 			this.$store.commit('setLoaded', false);
