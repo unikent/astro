@@ -59,8 +59,7 @@ export default {
 		},
 
 		draftLink() {
-			//return ;
-			return '/draft/' + `${this.$route.params.page_id}`;
+			return window.astro.base_url + '/draft/' + `${this.$route.params.page_id}`;
 		}
 	},
 
