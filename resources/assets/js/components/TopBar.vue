@@ -106,6 +106,7 @@ export default {
 		},
 
 		backToSites() {
+			this.autoSave();
 			this.$store.commit('changePage', {title: "Home page", path: '/', slug:'home'});
 			this.$store.commit('setPage', {});
 			this.$store.commit('setLoaded', false);
