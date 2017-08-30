@@ -20,7 +20,9 @@ const state = {
 			main: []
 		}
 	},
-	pageName: '',
+	pageTitle: 'Home page',
+	pagePath: '/',
+	pageSlug: 'home',
 	scale: .4,
 	loaded: false,
 	dragging: false,
@@ -37,9 +39,9 @@ const mutations = {
 		}
 
 		if(page.layout) {
-            state.currentLayout = page.layout.name;
-            state.currentLayoutVersion = page.layout.version;
-        }
+			state.currentLayout = page.layout.name;
+			state.currentLayoutVersion = page.layout.version;
+		}
 		state.pageData = page;
 	},
 
@@ -105,9 +107,14 @@ const mutations = {
 		blockData.splice(idx, 1, { ...blockData[idx] })
 	},
 
-	changePage(state, name) {
+	changePage(state, { title, path, slug }) {
 		// TODO: replace this with actual domain when that info is available
-		state.pageName = `kent.ac.uk/site-name${name}`;
+		if(slug === null) {
+			slug = '/';
+		}
+		state.pageTitle = `${title}`;
+		state.pagePath = `kent.ac.uk/site-name${path}`;
+		state.pageSlug = `${slug}`;
 	},
 
 	addBlock(state, { region, index, block }) {

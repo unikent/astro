@@ -14,7 +14,11 @@
 		vertical-align: top;
 		position:relative;
 		top:-1px;
-		fill: #fff;
+	}
+	&:hover {
+		svg {
+			fill: #50bfff;
+		}
 	}
 }
 

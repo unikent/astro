@@ -12,18 +12,9 @@
 		</el-select>
 	</el-tooltip>
 
-	<el-button-group class="undo-redo">
-		<el-button :disabled="!undoRedo.canUndo" @click="undo">
-			<icon name="undo" aria-hidden="true" width="14" height="14" class="ico" />
-		</el-button>
-		<el-button :disabled="!undoRedo.canRedo" @click="redo">
-			<icon name="redo" aria-hidden="true" width="14" height="14" class="ico" />
-		</el-button>
-	</el-button-group>
-
 	<el-button class="toolbar__button-save" type="success" @click="savePage">Save</el-button>
 
-	<el-button class="toolbar__button-preview" type="info" @click="previewPage">Preview <icon name="newwindow" aria-hidden="true" width="14" height="14" class="ico" /></el-button>
+	<el-button class="toolbar__button-preview" :plain="true" type="info" @click="previewPage">Preview <icon name="newwindow" aria-hidden="true" width="14" height="14" class="ico" /></el-button>
 
 	<el-button class="toolbar__button-publish" type="danger" @click="showPublishModal">Publish ...</el-button>
 

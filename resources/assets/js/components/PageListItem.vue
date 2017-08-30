@@ -14,7 +14,10 @@
 	</div>
 	<!-- End expand tree icon -->
 
-	<div class="page-list__title">
+	<div
+		class="page-list__title"
+		:class="{ 'page-list__title--selected': pageData.id===this.page.id }"
+	>
 		<span class="page-list__item__drag-handle">
 			<icon v-if="!root" name="arrow" width="14" height="14" />
 		</span>
@@ -91,6 +94,10 @@ export default {
 
 		...mapState('site', {
 			site: state => state.site
+		}),
+
+		...mapState({
+			pageData: state => state.page.pageData
 		}),
 
 		...mapGetters([
@@ -195,7 +202,7 @@ export default {
 				}
 				this.setLoaded(false);
 				this.$router.push(`/site/${this.site}/page/${page_id}`);
-				this.$store.commit('changePage', this.page.path);
+				this.$store.commit('changePage', { title: this.page.revision.title, path: this.page.path, slug: this.page.slug } );
 			}
 			else {
 				this.$snackbar.open({

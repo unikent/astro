@@ -6,11 +6,12 @@
 	position: absolute;
 	top: 0;
 	left: 0;
-	display: flex;
+	display: inline;
 	align-items: center;
 	justify-content: space-between;
 	padding: 0 20px;
 	height: get-height(top-bar);
+	line-height: get-height(top-bar);
 }
 .top-bar--homepage {
 	display: flex;
@@ -18,16 +19,26 @@
 	justify-content: flex-end;
 }
 .top-bar__tools {
-	display: flex;
+	display: inline-flex;
 	align-items: center;
 	justify-content: flex-end;
+	line-height: 10px;
+	float: right;
+}
+.top-bar__page-title {
+	float: left;
+	display: inline-block;
+	vertical-align: middle;
+	padding-left: 50px;
 }
 .top-bar-backbutton {
 	float: left;
-	line-height: 35px;
+	display: inline-block;
+	vertical-align: middle;
+	line-height: get-height(top-bar);
 	color: #71787f;
 	font-size: 13px;
-	cursor: pointer
+	cursor: pointer;
 }
 .backbutton-icon {
 	margin-right: 10px;
