@@ -43,58 +43,64 @@ class PublishPage implements APICommand
     public function execute($input, Authenticatable $user)
     {
         return DB::transaction(function() use($input) {
+            $published_page = null;
             $page = Page::find($input['id']);
-            // Check if this Page has been previously published then moved, prior to this publishing.
-            // If so, we should delete it from its previous location.
-            // Logic: Does a published page exist with a revision belonging to the same revision
-            // set as this page.
-            // @TODO - may be simpler to do this as a housekeeping function at the end of publishing...
 
             // need to do this whenever dealing with modifying
             VersionScope::disable();
 
-            // is there already a published page at this path? If so remove it (and its descendants)
-            $published = $page->publishedVersion();
-            if($published) {
-                // deleting the previously published page and all of its descendants deals with the edge case that
-                // the user deleted or moved a page, then created a new page in its place which is now being published
-                // without publishing the "move" or "deletion". ie. we start with a clean slate.
-                $published->delete();
-            }else{
+            // is there already a published page at this path?
+            $published_page = $page->publishedVersion();
+            if($published_page) {
+                // Is it a previous version of the page we are now publishing?
+                if($published_page->revision->revision_set_id != $page->revision->revision_set_id){
+                    // deleting the previously published page and all of its descendants deals with the edge case that
+                    // the user deleted or moved a page, then created a new page in its place which is now being published
+                    // without publishing the "move" or "deletion". ie. we start with a clean slate.
+                    $published_page->delete();
+                    $published_page = null;
+                }
+            }
+            if(!$published_page){
                 // has a version of this page been published elsewhere? If so delete it...
                 $published_and_moved = Page::published()
-                                            ->forSite($page->site_id)
-                                            ->whereHas('revision', function($query) use($page){
-                                               $query->where('revision_set_id', $page->revision->revision_set_id );
-                                            })->first();
-                if($published_and_moved){
+                    ->forSite($page->site_id)
+                    ->whereHas('revision', function ($query) use ($page) {
+                        $query->where('revision_set_id', $page->revision->revision_set_id);
+                    })->first();
+                if ($published_and_moved) {
                     $published_and_moved->delete();
                 }
             }
-            // does this page have a parent, and if so, has it been published?
-            $parent = $page->parent;
-            $published_parent = null;
-            if ($parent) {
-                $published_parent = $parent->publishedVersion();
-                if (!$published_parent) {
-                    throw new UnpublishedParentException('Parent pages must be published first.');
+
+            if(!$published_page) {
+
+                // does this page have a parent, and if so, has it been published?
+                $parent = $page->parent;
+                $published_parent = null;
+                if ($parent) {
+                    $published_parent = $parent->publishedVersion();
+                    if (!$published_parent) {
+                        throw new UnpublishedParentException('Parent pages must be published first.');
+                    }
+                }
+
+                //
+                $fields = [
+                    'site_id' => $page->site_id,
+                    'version' => Page::STATE_PUBLISHED,
+                    'parent_id' => $published_parent ? $published_parent->id : null,
+                    'slug' => $page->slug,
+                    'created_by' => $page->created_by,
+                    'updated_by' => $page->updated_by
+                ];
+                if ($published_parent) {
+                    $published_page = $published_parent->children()->create($fields);
+                } else {
+                    $published_page = Page::create($fields);
                 }
             }
 
-            //
-            $fields = [
-                'site_id' => $page->site_id,
-                'version' => Page::STATE_PUBLISHED,
-                'parent_id' => $published_parent ? $published_parent->id : null,
-                'slug' => $page->slug,
-                'created_by' => $page->created_by,
-                'updated_by' => $page->updated_by
-            ];
-            if($published_parent){
-                $published_page = $published_parent->children()->create($fields);
-            }else{
-                $published_page = Page::create($fields);
-            }
             $published_page->setRevision($page->revision);
 
             // need to check if page is in a different position relative to its siblings than before.
@@ -108,7 +114,7 @@ class PublishPage implements APICommand
             // 3) Otherwise, add it as the last child under its parent.
             $positioned = false;
             // (1)
-            $previous = $page->siblings()->where('lft', $page->lft-1)->first();
+            $previous = $page->siblings()->where('rgt', $page->lft-1)->first();
             if($previous){
                 $published_previous = Page::forSiteAndPath($page->site_id, $previous->path)->published()->first();
                 if($published_previous) {
@@ -118,7 +124,7 @@ class PublishPage implements APICommand
             }
             // (2)
             if(!$positioned){
-                $next = $page->siblings()->where('lft', $page->lft+1)->first();
+                $next = $page->siblings()->where('lft', $page->rgt+1)->first();
                 if($next) {
                     $published_next = Page::forSiteAndPath($page->site_id, $next->path)->published()->first();
                     if ($published_next) {
@@ -130,7 +136,7 @@ class PublishPage implements APICommand
             // (3) is the default when adding a new page... so nothing to do here...
 
             // are we also publishing the descendants of this page?
-            if(!empty($input['tree'])){
+/*            if(!empty($input['tree'])){
                 $pages = $this->copyPages($page->children);
                 if($pages) {
                     $published_page->makeTree($pages);
@@ -144,6 +150,7 @@ class PublishPage implements APICommand
                             ->update(['published_at' => Carbon::now()]);
                 }
             }
+*/
             VersionScope::enable();
 
             return $published_page;
