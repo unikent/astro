@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\APICommands\PublishPage;
 use App\Models\Page;
 use DB;
 use Laravel\Dusk\DuskServiceProvider;
@@ -20,6 +21,8 @@ class AppServiceProvider extends ServiceProvider
 	public function boot()
 	{
 		Schema::defaultStringLength(191); // Fix for the webfarm running older MySQL
+
+        Validator::extend('parent_is_published', function( $attr, $value ) { return PublishPage::parentIsPublished($value); });
 
 		Validator::extend('definition_exists', function ($attribute, $value, $parameters, $validator){
 			$data = $validator->getData();
