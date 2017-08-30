@@ -133,7 +133,8 @@ export default {
 	methods: {
 
 		...mapMutations([
-			'setLoaded'
+			'setLoaded',
+			'updateMenuActive'
 		]),
 
 		...mapActions({
@@ -194,7 +195,7 @@ export default {
 		edit() {
 		    const page_id = this.page.id;
 			if(Number.parseInt(this.$route.params.page_id) !== page_id) {
-				/* autosave any unsaved changes before we switch to the new page */
+				/* prompt to save any unsaved changes before we switch to the new page */
 				this.promptToSave(() => {
 					this.setLoaded(false);
 					this.$router.push(`/site/${this.site}/page/${page_id}`);

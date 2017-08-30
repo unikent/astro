@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters, mapActions } from 'vuex';
+import { mapState, mapGetters, mapActions, mapMutations } from 'vuex';
 import Icon from 'components/Icon';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
@@ -91,6 +91,10 @@ export default {
 
 		...mapActions([
 			'handleSavePage'
+		]),
+
+		...mapMutations([
+			'updateMenuActive'
 		]),
 
 		handleCommand(command) {

@@ -20,6 +20,9 @@ export default {
 					intendedActions();
 				}).catch(() => {
 					// decided to remain in the editor
+					if (this.activeMenuItem!=='blocks') {
+						this.updateMenuActive('blocks');
+					}
 				});
 			} else {
 				// user had no unsaved changes so proceed with intended actions
