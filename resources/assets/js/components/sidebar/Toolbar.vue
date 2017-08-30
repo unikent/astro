@@ -102,14 +102,14 @@ export default {
 		},
 
 		savePage() {
-			this.handleSavePage({id: this.$route.params.page_id, message: this.$message});
+			this.handleSavePage({message: this.$message});
 		},
 
 		/* autosave the page and open a preview window */
 		previewPage() {
 			/* handleSavePage returns a promise so we here we wait for it to complete before
 			opening the preview window */
-			this.handleSavePage({id: this.$route.params.page_id, message: this.$message})
+			this.handleSavePage({message: this.$message})
 				.then(() => {
 					window.open(this.draftLink,'_blank');
 				});
