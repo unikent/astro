@@ -19,6 +19,7 @@ use App\Models\APICommands\CreateSite;
 use App\Models\APICommands\AddPage;
 use Auth;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
  * Prototyping
@@ -48,12 +49,12 @@ class LocalAPIClient implements APIClient
         $this->user = $user;
     }
 
-    public function getRouteDefinition($host, $path)
+    public function getRouteDefinition($host, $path, $version = 'published')
     {
-        $json = $this->resolveRoute($host, $path);
-        $data = json_decode($json->content(),true);
+        $json = $this->resolveRoute($host, $path, $version);
+        $data = $json ? json_decode($json->content(),true) : null;
         if(null === $data){
-            throw new APIErrorException('Non json data returned from API for path "' . $path . '"',APIErrorException::ERR_INVALID_JSON);
+            throw new RouteNotFoundException();//APIErrorException('Non json data returned from API for path "' . $path . '"',APIErrorException::ERR_INVALID_JSON);
         }
         try {
  //           $data['data']['canonical'] = $data['data']['active_route']['path'];

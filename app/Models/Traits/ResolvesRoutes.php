@@ -20,15 +20,15 @@ trait ResolvesRoutes
      * @param $path
      * @return $this|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\JsonResponse|SymfonyResponse
      */
-    public function resolveRoute($host, $path)
+    public function resolveRoute($host, $path, $version = 'published')
     {
         // Attempt to resolve the Route
-        $page = Page::findByHostAndPath($host, $path);
+        $page = Page::findByHostAndPath($host, $path, $version);
 
         if($page){
             return fractal($page, new PageTransformer(true))->parseIncludes(['site'])->respond();
         }
-        return (new SymfonyResponse())->setStatusCode(404);
+        return null;// (new SymfonyResponse())->setStatusCode(404);
 
     }
 }
