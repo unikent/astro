@@ -73,6 +73,7 @@
 import { mapState, mapActions, mapMutations, mapGetters } from 'vuex';
 import Draggable from 'vuedraggable';
 import Icon from 'components/Icon';
+import promptToSave from '../mixins/promptToSave';
 
 export default {
 	name: 'page-list-item',
@@ -83,6 +84,8 @@ export default {
 		Icon,
 		Draggable
 	},
+
+	mixins:[ promptToSave ],
 
 	data() {
 		return {
@@ -130,7 +133,8 @@ export default {
 	methods: {
 
 		...mapMutations([
-			'setLoaded'
+			'setLoaded',
+			'updateMenuActive'
 		]),
 
 		...mapActions({
@@ -188,21 +192,15 @@ export default {
 			}
 		},
 
-		savePage() {
-			this.handleSavePage({message: this.$message});
-		},
-
 		edit() {
 		    const page_id = this.page.id;
 			if(Number.parseInt(this.$route.params.page_id) !== page_id) {
-				/* autosave any unsaved changes before we switch to the new page */
-				const unsavedChangesExist = this.unsavedChangesExist();
-				if (unsavedChangesExist) {
-					this.savePage();
-				}
-				this.setLoaded(false);
-				this.$router.push(`/site/${this.site}/page/${page_id}`);
-				this.$store.commit('changePage', { title: this.page.revision.title, path: this.page.path, slug: this.page.slug } );
+				/* prompt to save any unsaved changes before we switch to the new page */
+				this.promptToSave(() => {
+					this.setLoaded(false);
+					this.$router.push(`/site/${this.site}/page/${page_id}`);
+					this.$store.commit('changePage', { title: this.page.revision.title, path: this.page.path, slug: this.page.slug } );
+				});
 			}
 			else {
 				this.$snackbar.open({
