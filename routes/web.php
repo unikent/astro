@@ -40,10 +40,30 @@ Route::get('/draft/{page}', function(Request $request, Page $page) {
     // controller
     $astro = new AstroRenderer();
     $site = $page->site;
-    return $astro->renderRoute($page->site->host, $page->site->path . $page->path, $api, $engine, $locator);
+    return $astro->renderRoute($page->site->host, $page->site->path . $page->path, $api, $engine, $locator, Page::STATE_DRAFT);
 })
 ->where('route', '(.*?)/?')
 ->middleware('auth');
+
+Route::get('/published/{host}/{path?}', function(Request $request, $host, $path = '') {
+    // Template, definitions, etc locator
+    $path = '/' . $path;
+
+    $locator = new SingleDefinitionsFolderLocator(
+        Config::get('app.definitions_path') ,
+        'Astro\Renderer\Base\Block',
+        'Astro\Renderer\Base\Layout'
+    );
+    $app_url = Config::get('app.url') . '/draft';
+    $api = new LocalAPIClient();
+    $engine = new TwigEngine(Config::get('app.definitions_path'));
+
+    // controller
+    $astro = new AstroRenderer();
+    return $astro->renderRoute($host, $path, $api, $engine, $locator, Page::STATE_PUBLISHED);
+})
+->where('host', '([^/]+)')
+->where('path', '(.*?)/?');
 
 Route::get('/{catchall?}', function($route = '') {
 	$user = Auth::user();
