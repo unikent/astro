@@ -38,6 +38,7 @@ import Icon from 'components/Icon';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
 import Toolbar from 'components/sidebar/Toolbar';
+import promptToSave from '../mixins/promptToSave';
 
 /* global window, document */
 
@@ -49,6 +50,8 @@ export default {
 		Icon,
 		Toolbar
 	},
+
+	mixins:[ promptToSave ],
 
 	created() {
 		this.onKeyDown = onKeyDown(undoStackInstance);
@@ -90,28 +93,22 @@ export default {
 			'handleSavePage'
 		]),
 
-		/* if user has unsaved changes then save the changes */
-		autoSave() {
-			const unsavedChangesExist = this.unsavedChangesExist();
-			if (unsavedChangesExist) {
-				this.handleSavePage({message: this.$message});
-			}
-		},
-
 		handleCommand(command) {
 			if(command === 'sign-out') {
-				this.autoSave();
-				window.location = '/auth/logout';
+				this.promptToSave(() => {
+					window.location = '/auth/logout';
+				});
 			}
 		},
 
 		backToSites() {
-			this.autoSave();
-			this.$store.commit('changePage', {title: "Home page", path: '/', slug:'home'});
-			this.$store.commit('setPage', {});
-			this.$store.commit('setLoaded', false);
-			undoStackInstance.clear();
-			this.$router.push('/sites');
+			this.promptToSave(() => {
+				this.$store.commit('changePage', {title: "Home page", path: '/', slug:'home'});
+				this.$store.commit('setPage', {});
+				this.$store.commit('setLoaded', false);
+				undoStackInstance.clear();
+				this.$router.push('/sites');
+			})
 		}
 	}
 };
