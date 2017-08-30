@@ -4,6 +4,8 @@
 			<i class="el-icon-arrow-left backbutton-icon"></i>Site list
 		</div>
 
+		<div class="top-bar__page-title">{{ pageTitle }} <el-tag type="primary">{{ pagePath }}</el-tag></div>
+
 		<div class="top-bar__tools">
 
 			<toolbar/>
@@ -31,7 +33,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters, mapActions } from 'vuex';
 import Icon from 'components/Icon';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
@@ -64,8 +66,14 @@ export default {
 	computed: {
 
 		...mapState({
-			pageName: state => state.page.pageName,
+			pageTitle: state => state.page.pageTitle,
+			pagePath: state => state.page.pagePath,
+			pageSlug: state => state.page.pageSlug
 		}),
+
+		...mapGetters([
+			'unsavedChangesExist'
+		]),
 
 		showBack() {
 			return ['site', 'page'].indexOf(this.$route.name) !== -1;
@@ -78,14 +86,28 @@ export default {
 
 	methods: {
 
+		...mapActions([
+			'handleSavePage'
+		]),
+
+		/* if user has unsaved changes then save the changes */
+		autoSave() {
+			const unsavedChangesExist = this.unsavedChangesExist();
+			if (unsavedChangesExist) {
+				this.handleSavePage({message: this.$message});
+			}
+		},
+
 		handleCommand(command) {
 			if(command === 'sign-out') {
+				this.autoSave();
 				window.location = '/auth/logout';
 			}
 		},
 
 		backToSites() {
-			this.$store.commit('changePage', '');
+			this.autoSave();
+			this.$store.commit('changePage', {title: "Home page", path: '/', slug:'home'});
 			this.$store.commit('setPage', {});
 			this.$store.commit('setLoaded', false);
 			undoStackInstance.clear();

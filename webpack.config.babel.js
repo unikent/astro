@@ -23,7 +23,7 @@ export default {
 	output: {
 		path: path.resolve(__dirname, 'public/build'),
 		filename: 'js/[name].js',
-		publicPath: '/build/'
+		publicPath: isProduction ? '/site-editor/build/' : '/build/'
 	},
 
 	module: {

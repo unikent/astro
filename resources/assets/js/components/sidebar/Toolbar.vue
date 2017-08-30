@@ -12,16 +12,9 @@
 		</el-select>
 	</el-tooltip>
 
-	<el-button-group class="undo-redo">
-		<el-button :disabled="!undoRedo.canUndo" @click="undo">
-			<icon name="undo" aria-hidden="true" width="14" height="14" class="ico" />
-		</el-button>
-		<el-button :disabled="!undoRedo.canRedo" @click="redo">
-			<icon name="redo" aria-hidden="true" width="14" height="14" class="ico" />
-		</el-button>
-	</el-button-group>
-
 	<el-button class="toolbar__button-save" type="success" @click="savePage">Save</el-button>
+
+	<el-button class="toolbar__button-preview" :plain="true" type="info" @click="previewPage">Preview <icon name="newwindow" aria-hidden="true" width="14" height="14" class="ico" /></el-button>
 
 	<el-button class="toolbar__button-publish" type="danger" @click="showPublishModal">Publish ...</el-button>
 
@@ -32,7 +25,7 @@
 
 
 <script>
-import { mapState, mapMutations } from 'vuex';
+import { mapState, mapMutations, mapActions } from 'vuex';
 
 import Icon from 'components/Icon';
 import { undoStackInstance } from 'plugins/undo-redo';
@@ -63,6 +56,10 @@ export default {
 			set(value) {
 				this.changeView(value);
 			}
+		},
+
+		draftLink() {
+			return window.astro.base_url + '/draft/' + `${this.$route.params.page_id}`;
 		}
 	},
 
@@ -92,30 +89,29 @@ export default {
 	methods: {
 		...mapMutations([
 			'changeView',
-			'showPublishModal'
+			'showPublishModal',
 		]),
-		savePage() {
-			this.$api
-				.put(`pages/${this.$route.params.page_id}/content`, {
-                    blocks: this.page.blocks
-                })
-				.then(() => {
-					this.$message({
-						message: 'Page saved',
-						type: 'success',
-						duration: 2000
-					});
-				})
-				.catch(() => {});
+
+		...mapActions([
+			'handleSavePage'
+		]),
+
+		updateCurrentSavedState() {
+			this.$store.commit('updateCurrentSavedState');
 		},
 
-		// TODO - add preview the page functionality
+		savePage() {
+			this.handleSavePage({message: this.$message});
+		},
+
+		/* autosave the page and open a preview window */
 		previewPage() {
-			this.$message({
-				message: 'TODO: previewing page...',
-				type: 'success',
-				duration: 2000
-			});
+			/* handleSavePage returns a promise so we here we wait for it to complete before
+			opening the preview window */
+			this.handleSavePage({message: this.$message})
+				.then(() => {
+					window.open(this.draftLink,'_blank');
+				});
 		},
 
 		undo() {

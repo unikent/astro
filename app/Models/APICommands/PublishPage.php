@@ -19,6 +19,23 @@ use Illuminate\Support\Collection;
 class PublishPage implements APICommand
 {
     /**
+     * Determines if this page is root or if not, if a page with its parent url is published
+     * @param int $page_id The id of an unpublished page to test.
+     */
+    public static function parentIsPublished($page_id)
+    {
+        $page = Page::find($page_id);
+        if(!$page){
+            return false;
+        }
+        if(!$page->parent){
+            return true;
+        }else{
+            return $page->parent->publishedVersion();
+        }
+    }
+
+    /**
      * Carry out the command, based on the provided $input.
      * @param array $input The input options as key=>value pairs.
      * @return mixed
@@ -170,7 +187,8 @@ class PublishPage implements APICommand
     public function messages(Collection $data, Authenticatable $user)
     {
         return [
-            'id' => 'The page does not exist.'
+            'id.exists' => 'The page does not exist.',
+            'id.parent_is_published' => 'The parents of this page must be published first.'
         ];
     }
 
@@ -183,8 +201,9 @@ class PublishPage implements APICommand
     {
         return [
           'id' => [
-              'exists:pages,id'
-          ]
+              'exists:pages,id',
+              'parent_is_published:'.$data->get('id')
+          ],
         ];
     }
 }

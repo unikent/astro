@@ -43,6 +43,7 @@
 						/>
 					</el-tooltip>
 
+					<!--
 					<el-tooltip content="Highlight field" placement="top">
 						<icon
 							class="el-form-item__icon-view"
@@ -53,6 +54,7 @@
 							@click="viewField(field.name)"
 						/>
 					</el-tooltip>
+					-->
 				</template>
 				<component
 					:is="getField(field.type)"

@@ -14,7 +14,10 @@
 	</div>
 	<!-- End expand tree icon -->
 
-	<div class="page-list__title">
+	<div
+		class="page-list__title"
+		:class="{ 'page-list__title--selected': pageData.id===this.page.id }"
+	>
 		<span class="page-list__item__drag-handle">
 			<icon v-if="!root" name="arrow" width="14" height="14" />
 		</span>
@@ -67,7 +70,7 @@
 </template>
 
 <script>
-import { mapState, mapActions, mapMutations } from 'vuex';
+import { mapState, mapActions, mapMutations, mapGetters } from 'vuex';
 import Draggable from 'vuedraggable';
 import Icon from 'components/Icon';
 
@@ -92,6 +95,14 @@ export default {
 		...mapState('site', {
 			site: state => state.site
 		}),
+
+		...mapState({
+			pageData: state => state.page.pageData
+		}),
+
+		...mapGetters([
+			'unsavedChangesExist'
+		]),
 
 		root() {
 			return this.depth === 0;
@@ -125,7 +136,8 @@ export default {
 		...mapActions({
 			movePage: 'site/movePage',
 			deletePage: 'site/deletePage',
-			updatePage: 'site/updatePage'
+			updatePage: 'site/updatePage',
+		    handleSavePage: 'handleSavePage'
 		}),
 
 		handleDragEnd() {
@@ -176,12 +188,21 @@ export default {
 			}
 		},
 
+		savePage() {
+			this.handleSavePage({message: this.$message});
+		},
+
 		edit() {
 		    const page_id = this.page.id;
 			if(Number.parseInt(this.$route.params.page_id) !== page_id) {
+				/* autosave any unsaved changes before we switch to the new page */
+				const unsavedChangesExist = this.unsavedChangesExist();
+				if (unsavedChangesExist) {
+					this.savePage();
+				}
 				this.setLoaded(false);
 				this.$router.push(`/site/${this.site}/page/${page_id}`);
-				this.$store.commit('changePage', this.page.path);
+				this.$store.commit('changePage', { title: this.page.revision.title, path: this.page.path, slug: this.page.slug } );
 			}
 			else {
 				this.$snackbar.open({

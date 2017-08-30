@@ -8,6 +8,20 @@
 	}
 }
 
+.toolbar__button-preview {
+	text-decoration: none;
+	svg {
+		vertical-align: top;
+		position:relative;
+		top:-1px;
+	}
+	&:hover {
+		svg {
+			fill: #50bfff;
+		}
+	}
+}
+
 .el-select-dropdown__item {
 	.view-icon {
 		width: 22px;

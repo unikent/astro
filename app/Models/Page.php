@@ -239,6 +239,21 @@ class Page extends BaumNode
         return Page::forSiteAndPath($site_id,$path)->first();
     }
 
+    /**
+     * Find a Page based on host (domain name) and path.
+     * @param $host
+     * @param $path
+     * @return $this
+     */
+    public static function findByHostAndPath($host, $path)
+    {
+        return Page::whereHas('site', function($query) use($host) {
+                $query->where('host', $host);
+            })
+            ->join('sites', 'site_id', '=', 'sites.id')
+            ->whereRaw("concat(sites.path, pages.path) = ?", [$path])
+            ->first();
+    }
 
 	/**
 	 * Assembles a path using the ancestor slugs within the Route tree
