@@ -104,6 +104,7 @@ class Page extends BaumNode
             foreach($blocks as $block){
                 $block->embedMedia();
                 $data[$region][] = [
+                    'id' => $block->id,
                     'definition_name' => $block->definition_name,
                     'definition_version' => $block->definition_version,
                     'region_name' => $block->region_name,
