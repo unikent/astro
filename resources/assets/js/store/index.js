@@ -37,9 +37,6 @@ let store = new Vuex.Store({
 		publishModal: {
 			visible: false
 		},
-		unsavedChangesModal: {
-			visible: false
-		},
 		menu: {
 			active: 'pages'
 		}
@@ -104,15 +101,6 @@ let store = new Vuex.Store({
 		hidePublishModal(state) {
 			state.publishModal.visible = false;
 		},
-
-		showUnsavedChangesModal(state) {
-			state.unsavedChangesModal.visible = true;
-		},
-
-		hideUnsavedChangesModal(state) {
-			state.unsavedChangesModal.visible = false;
-		},
-
 		updateMenuActive(state, id) {
 			state.menu.active = id;
 		}
