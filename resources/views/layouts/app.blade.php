@@ -10,7 +10,7 @@
 
 	<title>Kent CMS</title>
 
-	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/build/css/vendor.css') }}" />
+
 	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/build/css/main.css') }}" />
 
 	<script>

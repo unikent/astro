@@ -30,6 +30,7 @@ import { mapState, mapMutations, mapActions } from 'vuex';
 import Icon from 'components/Icon';
 import { undoStackInstance } from 'plugins/undo-redo';
 
+
 export default {
 	name: 'toolbar',
 

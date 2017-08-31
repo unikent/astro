@@ -44,4 +44,10 @@ class User extends KentUser
         return ($this->role == 'admin');
     }
 
+    public function setRememberToken($value)
+    {
+        return false;
+    }
+
+
 }
