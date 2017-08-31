@@ -75,10 +75,6 @@ export default {
 			pageSlug: state => state.page.pageSlug
 		}),
 
-		...mapGetters([
-			'unsavedChangesExist'
-		]),
-
 		showBack() {
 			return ['site', 'page'].indexOf(this.$route.name) !== -1;
 		},

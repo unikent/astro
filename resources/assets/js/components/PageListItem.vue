@@ -103,10 +103,6 @@ export default {
 			pageData: state => state.page.pageData
 		}),
 
-		...mapGetters([
-			'unsavedChangesExist'
-		]),
-
 		root() {
 			return this.depth === 0;
 		},

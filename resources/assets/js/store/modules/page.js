@@ -161,6 +161,10 @@ const mutations = {
 
 	updateCurrentSavedState(state) {
 		state.currentSavedState = JSON.stringify(state.pageData.blocks);
+	},
+
+	resetCurrentSavedState(state) {
+		state.currentSavedState = '';	
 	}
 };
 
