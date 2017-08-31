@@ -39,6 +39,7 @@ import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
 import Toolbar from 'components/sidebar/Toolbar';
 import promptToSave from '../mixins/promptToSave';
+import Config from '../classes/Config.js';
 
 /* global window, document */
 
@@ -100,7 +101,19 @@ export default {
 		handleCommand(command) {
 			if(command === 'sign-out') {
 				this.promptToSave(() => {
-					window.location = '/auth/logout';
+
+                    var form = document.createElement("form");
+                    form.setAttribute("method", 'post');
+                    form.setAttribute("action", Config.get('base_url', '') + '/auth/logout');
+                    var csrf = document.createElement("input");
+                    csrf.setAttribute("type", "hidden");
+                    csrf.setAttribute("name", "_token");
+                    csrf.setAttribute("value", window.astro.csrf_token);
+                    form.appendChild(csrf);
+                    document.body.appendChild(form);
+                    form.submit();
+
+//					window.location = Config.get('base_url', '') + '/auth/logout';
 				});
 			}
 		},

@@ -10,7 +10,6 @@
 
 	<title>Astro</title>
 
-	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/build/css/vendor.css') }}" />
 	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/build/css/main.css') }}" />
 	@if ($is_preview)
 		<style>
