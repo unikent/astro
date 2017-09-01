@@ -30,6 +30,7 @@
 		"barryvdh/laravel-ide-helper": "^2.3",
 		"baum/baum": "~1.0",
 		"doctrine/dbal": "^2.5",
+		"fideloper/proxy": "^3.3",
 		"intervention/image": "^2.3",
 		"intervention/imagecache": "^2.3",
 		"james-heinrich/getid3": "^1.9",
@@ -39,8 +40,8 @@
 		"rtconner/laravel-tagging": "^2.2",
 		"spatie/laravel-fractal": "^3.5",
 		"spatie/laravel-permission": "^1.12",
-		"unikent/kentauth": "dev-laravel/5.3",
-		"unikent/astro-renderer": "dev-develop"
+		"unikent/astro-renderer": "dev-develop",
+		"unikent/kentauth": "dev-laravel/5.3"
 	},
 	"require-dev": {
 		"fzaninotto/faker": "~1.4",
