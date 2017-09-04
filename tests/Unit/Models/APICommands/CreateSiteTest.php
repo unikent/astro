@@ -8,7 +8,10 @@
 
 namespace Tests\Unit\Models\APICommands;
 
+use App\Models\APICommands\AddPage;
 use App\Models\APICommands\CreateSite;
+
+use Illuminate\Support\Facades\Config;
 
 class CreateSiteTest extends APICommandTestCase
 {
@@ -16,6 +19,13 @@ class CreateSiteTest extends APICommandTestCase
     {
         return new CreateSite();
     }
+
+    public function setup()
+    {
+        parent::setup();
+        Config::set('app.definitions_path', realpath(dirname(__FILE__ ). '/../../../Support/Fixtures/definitions'));
+    }
+
     public function getValidData()
     {
         return [
@@ -137,7 +147,67 @@ class CreateSiteTest extends APICommandTestCase
      */
     public function validation_whenHostAndPathAreNotUnique_fails()
     {
-        $this->markTestIncomplete();
+        // create a site
+        $existing = $this->execute(CreateSite::class, $this->getValidData());
+        // attempt to create another site with the same input
+        $this->assertTrue($this->validator($this->input([]))->fails());
+
+        // add subpages to the created site
+        $pageone = $this->execute(AddPage::class, [
+            'site_id' => $existing->id,
+            'parent_id' => $existing->homepage->id,
+            'slug' => 'one',
+            'title' => 'Page One',
+            'layout' => [
+                'name' => 'test-layout',
+                'version' => 1
+            ]
+        ]);
+        $pagetwo = $this->execute(AddPage::class, [
+            'site_id' => $existing->id,
+            'parent_id' => $pageone->id,
+            'slug' => 'two',
+            'title' => 'Page Two',
+            'layout' => [
+                'name' => 'test-layout',
+                'version' => 1
+            ]
+        ]);
+        $this->assertTrue($this->validator($this->input(['path' => '/one']))->fails());
+        $this->assertTrue($this->validator($this->input(['path' => '/one/two']))->fails());
+    }
+
+    /**
+     * @test
+     * @group validation
+     */
+    public function validation_whenHostExistsButPathDoesNotClash_passes()
+    {
+        // create a site
+        $existing = $this->execute(CreateSite::class, $this->getValidData());
+
+        // add subpages to the created site
+        $pageone = $this->execute(AddPage::class, [
+            'site_id' => $existing->id,
+            'parent_id' => $existing->homepage->id,
+            'slug' => 'one',
+            'title' => 'Page One',
+            'layout' => [
+                'name' => 'test-layout',
+                'version' => 1
+            ]
+        ]);
+        $pagetwo = $this->execute(AddPage::class, [
+            'site_id' => $existing->id,
+            'parent_id' => $pageone->id,
+            'slug' => 'two',
+            'title' => 'Page Two',
+            'layout' => [
+                'name' => 'test-layout',
+                'version' => 1
+            ]
+        ]);
+        $this->assertTrue($this->validator($this->input(['path' => '/food']))->passes());
     }
 
     /**
@@ -162,12 +232,27 @@ class CreateSiteTest extends APICommandTestCase
      */
     public function validation_whenDefaultLayoutVersionIsMissingOrInvalid_fails()
     {
-        $this->markTestIncomplete();
+        $data = $this->input([]);
+        unset($data['homepage_layout']['version']);
+        $this->assertTrue($this->validator($data)->fails());
+        $data['homepage_layout']['version'] = 'v1';
+        $this->assertTrue($this->validator($data)->fails());
+        $data['homepage_layout']['version'] = '';
+        $this->assertTrue($this->validator($data)->fails());
     }
 
+    /**
+     * @test
+     * @group validation
+     */
     public function validation_whenDefaultLayoutDefinitionNotFound_fails()
     {
-        $this->markTestIncomplete();
+        $data = $this->input([]);
+        $data['homepage_layout']['name'] = 'missing-layout-name';
+        $this->assertTrue($this->validator($data)->fails());
+        $data['homepage_layout']['name'] = 'test-layout';
+        $data['homepage_layout']['version'] = 22;
+        $this->assertTrue($this->validator($data)->fails());
     }
 
 }

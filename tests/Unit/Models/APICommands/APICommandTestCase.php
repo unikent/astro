@@ -2,9 +2,10 @@
 
 namespace Tests\Unit\Models\APICommands;
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Validator;
-use \App\Models\User;
+use App\Models\User;
 
 abstract class APICommandTestCase extends TestCase
 {
@@ -60,5 +61,21 @@ abstract class APICommandTestCase extends TestCase
         return $validator;
     }
 
+    /**
+     * Creates and executes an API command without any data validation
+     * @param string $command Name of the command class
+     * @param array $data The parameters to the command
+     * @param null|Authenticatable $user
+     * @return mixed The result of the command.
+     */
+    public function execute($command, $data, $user = null)
+    {
+        if(null == $user){
+            $user = factory(User::class)->states('admin')->create();
+        }
+        $command = new $command;
+        $data = collect($data);
+        return $command->execute($data, $user);
+    }
 
 }

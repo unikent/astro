@@ -91,6 +91,8 @@ class CreateSite implements APICommand
         if(is_null($data->get('path'))){
             $data->put('path','');
         }
+        $layout = $data->get('homepage_layout', []);
+        $version = !empty($layout['version']) ? $layout['version'] : null;
         $rules = [
             'name' => ['required', 'max:190' ],
             'publishing_group_id' => [ 'required' ],
@@ -103,13 +105,15 @@ class CreateSite implements APICommand
             'path' =>[
                 'nullable',
                 'regex:/^(\/[a-z0-9_-]+)*$/i',
-                'unique:sites,path,null,id,host,' . $data->get('host')
+                'unique:sites,path,null,id,host,' . $data->get('host'),
+                'unique_site_path:' . $data->get('host')
             ],
             'homepage_layout.name' => [
                 'required',
                 'string',
                 'max:100',
-                'regex:/^[a-z0-9_.-]+$/i'
+                'regex:/^[a-z0-9_.-]+$/i',
+                'layout_exists:' . $version
             ],
             'homepage_layout.version' => [
                 'required',
