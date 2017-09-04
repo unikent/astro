@@ -20,7 +20,7 @@ class PageContentTest extends TestCase
 	 */
 	public function publish_WhenPageHasUnsavedChanges_ThrowsException()
 	{
-        $this->markTestIncomplete(
+        return $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );
 	}
@@ -31,7 +31,7 @@ class PageContentTest extends TestCase
 	 */
 	public function publish_WhenPageHasUnpublishedParents_ThrowsException()
 	{
-        $this->markTestIncomplete(
+        return $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );
 	}
@@ -42,7 +42,7 @@ class PageContentTest extends TestCase
 	 */
 	public function publish_CreatesPublishedPageInstance()
 	{
-        $this->markTestIncomplete(
+        return $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );
 	}
@@ -53,7 +53,7 @@ class PageContentTest extends TestCase
 	 */
 	public function publish_AssociatesPublishedPageWithPageInstance()
 	{
-        $this->markTestIncomplete(
+        return $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );
 	}
@@ -67,7 +67,7 @@ class PageContentTest extends TestCase
 	 */
 	public function publish_WhenThereIsAnActiveRoute_ActiveRouteGetsRedirected()
 	{
-        $this->markTestIncomplete(
+        return $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );
 	}
@@ -78,7 +78,7 @@ class PageContentTest extends TestCase
 	 */
 	public function publish_DraftRouteBecomesActiveRoute()
 	{
-        $this->markTestIncomplete(
+        return $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );
 	}
@@ -89,7 +89,7 @@ class PageContentTest extends TestCase
 	 */
 	public function publish_PageOnlyHasOneRoute()
 	{
-        $this->markTestIncomplete(
+        return $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );
 	}
@@ -100,7 +100,7 @@ class PageContentTest extends TestCase
 	 */
 	public function publish_PublishedPageBakeContainsSerializedPageInstance()
 	{
-        $this->markTestIncomplete(
+        return $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );
 	}
@@ -113,7 +113,7 @@ class PageContentTest extends TestCase
 	 */
 	public function revert_WhenPublishedPageIsNotAssociatedWithPage_ThrowsException()
 	{
-        $this->markTestIncomplete(
+        return $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );
         $r1 = factory(Page::class)->states([ 'withPage', 'isRoot' ])->create();
@@ -132,7 +132,7 @@ class PageContentTest extends TestCase
 	 */
 	public function revert_RevertsPageToMatchPublishedPage()
 	{
-        $this->markTestIncomplete(
+        return $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );
 		$route = factory(Page::class)->states([ 'withPage', 'isRoot' ])->create();
@@ -161,7 +161,7 @@ class PageContentTest extends TestCase
 	 */
 	public function revert_RevertsBlocksToMatchPublishedPage()
 	{
-        $this->markTestIncomplete(
+        return $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );
 		$route = factory(Page::class)->states([ 'withPage', 'isRoot' ])->create();
@@ -216,6 +216,7 @@ class PageContentTest extends TestCase
 	 * @group ignore
 	 */
 	public function getPageDefinition_ReturnLayoutDefinition(){
+        return $this->markTestIncomplete();
 		$page = factory(Page::class)->make();
 		$this->assertInstanceOf(LayoutDefinition::class, $page->getLayoutDefinition());
 	}
@@ -227,6 +228,7 @@ class PageContentTest extends TestCase
 	 * @group ignore
 	 */
 	public function getLayoutDefinition_WhenPageDefinitionIsNotLoaded_LoadsSupportedLayoutDefinition(){
+        return $this->markTestIncomplete();
 		$page = factory(Page::class)->make();
 		$definition = $page->getLayoutDefinition();
 
@@ -239,6 +241,7 @@ class PageContentTest extends TestCase
 	 * @group ignore
 	 */
 	public function getLayoutDefinition_WhenLayoutDefinitionIsLoaded_DoesNotReloadLayoutDefinition(){
+        return $this->markTestIncomplete();
 		$page = factory(Page::class)->make();
 		$page->getLayoutDefinition(); 					// This should populate $pageDefinition
 
@@ -255,6 +258,7 @@ class PageContentTest extends TestCase
 	 */
 	public function getLayoutDefinition_WithRegionDefinitionsWhenLayoutDefinitionIsLoadedWithoutRegions_HasRegionDefinitions()
 	{
+        return $this->markTestIncomplete();
 		$page = factory(Page::class)->make();
 		$page->loadLayoutDefinition();
 
@@ -273,6 +277,7 @@ class PageContentTest extends TestCase
 	 */
 	public function getLayoutDefinition_WithRegionDefinitionsWhenLayoutDefinitionIsLoadedWithRegions_HasRegionDefinitions()
 	{
+        return $this->markTestIncomplete();
 		$page = factory(Page::class)->make();
 		$definition = $page->getLayoutDefinition(true);
 

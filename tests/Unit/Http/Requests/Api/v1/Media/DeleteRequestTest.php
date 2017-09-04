@@ -35,6 +35,7 @@ class DeleteRequestTest extends RequestTestCase
 
     /**
      * @test
+     * @group media
      */
     public function validation_WithValidAttributes_IsValid()
     {
