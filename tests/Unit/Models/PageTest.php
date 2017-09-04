@@ -1,6 +1,11 @@
 <?php
 namespace Tests\Unit\Models;
 
+use App\Models\Block;
+use App\Models\LocalAPIClient;
+use App\Models\PublishingGroup;
+use App\Models\Scopes\VersionScope;
+use App\Models\User;
 use Exception;
 use Tests\TestCase;
 use App\Models\Page;
@@ -10,37 +15,289 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PageTest extends TestCase
 {
+    function getTestSite()
+    {
 
+    }
 
+    /**
+     * @test
+     */
+    function draftVersionScope_isSetByDefaultWhenPageIsBooted()
+    {
+        $page = new Page();
+        $scope = Page::getGlobalScope(VersionScope::class);
+        $this->assertInstanceOf(VersionScope::class, $scope);
+        $this->assertEquals(Page::STATE_DRAFT, $scope->version);
+    }
+
+    /**
+     * @test
+     */
+    function pageHierarchyIsScoped_bySiteAndVersion()
+    {
+        $page = new Page();
+        $cols = $page->getScopedColumns();
+        sort($cols);
+        $this->assertEquals(['site_id', 'version'], $cols);
+    }
 
 	/**
 	 * @test
 	 */
-	function scopeActive_ReturnsActiveRoutesOnly()
+	function scopePublished_ReturnsPublishedPagesOnly()
 	{
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
+	    $user = factory(User::class)->create();
+	    $pubgroup = factory(PublishingGroup::class)->create();
+	    $pubgroup->users()->attach($user);
+        $api = new LocalAPIClient($user);
+        $site = $api->createSite(
+            $pubgroup->id,
+            'test',
+            'example.com',
+            '',
+            ['name' => 'test-layout', 'version' => 1]
         );
+        $api->publishPage($site->homepage->id);
+	    $pages = Page::published()->get();
+	    $this->assertCount(1, $pages);
+	    foreach($pages as $page){
+	        $this->assertEquals(Page::STATE_PUBLISHED, $page->version);
+        }
 	}
 
 	/**
 	 * @test
 	 */
-	function scopeDraft_WithFalseArgument_ReturnsInactiveRoutesOnly()
+	function scopeDrafts_ReturnsDraftPagesOnly()
 	{
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
+        $user = factory(User::class)->create();
+        $pubgroup = factory(PublishingGroup::class)->create();
+        $pubgroup->users()->attach($user);
+        $api = new LocalAPIClient($user);
+        $site = $api->createSite(
+            $pubgroup->id,
+            'test',
+            'example.com',
+            '',
+            ['name' => 'test-layout', 'version' => 1]
         );
+        $api->publishPage($site->homepage->id);
+        $pages = Page::draft()->get();
+        $this->assertCount(1, $pages);
+        foreach($pages as $page){
+            $this->assertEquals(Page::STATE_DRAFT, $page->version);
+        }
 	}
 
-	/**
+    /**
+     * @test
+     */
+    function scopeVersion_restrictsToSpecifiedVersion()
+    {
+        $user = factory(User::class)->create();
+        $pubgroup = factory(PublishingGroup::class)->create();
+        $pubgroup->users()->attach($user);
+        $api = new LocalAPIClient($user);
+        $site = $api->createSite(
+            $pubgroup->id,
+            'test',
+            'example.com',
+            '',
+            ['name' => 'test-layout', 'version' => 1]
+        );
+        $api->publishPage($site->homepage->id);
+        $pages = Page::version(Page::STATE_DRAFT)->get();
+        $this->assertCount(1, $pages);
+        $this->assertEquals(Page::STATE_DRAFT, $pages[0]->version);
+        $pages = Page::version(Page::STATE_PUBLISHED)->get();
+        $this->assertCount(1, $pages);
+        $this->assertEquals(Page::STATE_PUBLISHED, $pages[0]->version);
+    }
+
+    /**
+     * @test
+     */
+    public function scopeAny_removesVersionScope()
+    {
+        $user = factory(User::class)->create();
+        $pubgroup = factory(PublishingGroup::class)->create();
+        $pubgroup->users()->attach($user);
+        $api = new LocalAPIClient($user);
+        $site = $api->createSite(
+            $pubgroup->id,
+            'test',
+            'example.com',
+            '',
+            ['name' => 'test-layout', 'version' => 1]
+        );
+        $api->publishPage($site->homepage->id);
+        $pages = Page::anyVersion()->orderBy('version')->get();
+
+        $this->assertCount(2, $pages);
+        $this->assertEquals(Page::STATE_DRAFT, $pages[0]->version);
+        $this->assertEquals(Page::STATE_PUBLISHED, $pages[1]->version);
+    }
+
+    /**
+     * @test
+     */
+    public function scopeForSite_restrictsToSpecifiedSite()
+    {
+        return $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function scopeForSiteAndPath_restrictsToSpecificSiteAndPath()
+    {
+        return $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function publishedVersion_retrievesPublishedPageMatchingPagesPath()
+    {
+        return $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function publishedVersion_returnsFalseIfNoPublishedVersion()
+    {
+        return $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function findBySiteAndPath_returnsPageIfExists()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function findBySiteAndPath_returnsNullIfSiteOrPageDoesNotExist()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function findByHostAndPath_returnsPageIfExists()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function findByHostAndPath_returnsNullIfSiteOrPageDoesNotExist()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function findByHostAndPath_takesVersionIntoAccount()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function isPublishedVersion_returnsTrueIfPageIsPublishedVersion()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function isPublishedVersion_returnsFalseIfPageIsNotPublishedVersion()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    function bake_includesCorrectData()
+    {
+        return $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    function bake_returnsEmptyArrayIfNoRegionsExist()
+    {
+        return $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    function bake_includesMediaWherePresent()
+    {
+        return $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function setRevision_setsRevisionAsPublished_ifPageIsPublished()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function setRevision_doesNotSetRevisionAsPublished_ifPageIsNotPublished()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function isPublishedVersion_returnsTrue_ifPageIsPublishedVersion()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function isPublishedVersion_returnsFalse_ifPageIsNotPublishedVersion()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     */
+    public function setRevision_setsRevision()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
 	 * @test
 	 */
 	function generatePath_WhenNoParentOrSlugIsSet_SetsPathToRoot()
 	{
 		$route = factory(Page::class)->states('withRevision')->make([ 'slug' => null ]);
 		$path = $route->generatePath();
-
 		$this->assertEquals('/', $path);
 	}
 
@@ -50,7 +307,6 @@ class PageTest extends TestCase
 	function generatePath_WhenNoParentButSlugIsSet_ThrowsException()
 	{
 		$route = factory(Page::class)->states('withRevision')->make(['slug' => 'foo']);
-
 		$this->expectException(Exception::class);
 		$route->generatePath();
 	}
@@ -63,7 +319,6 @@ class PageTest extends TestCase
 		$r1 = factory(Page::class)->states('withRevision')->create();
 		$r2 = factory(Page::class)->states('withRevision')->create([ 'slug' => 'foo', 'parent_id' => $r1->getKey() , 'site_id' => $r1->site_id]);
 		$r3 = factory(Page::class)->states('withRevision')->make([ 'slug' => 'bar', 'parent_id' => $r2->getKey() , 'site_id' => $r1->site_id]);
-
 		$path = $r3->generatePath();
 		$this->assertEquals('/' . $r2->slug . '/' . $r3->slug, $path); // $r1 is a root node, so has no slug
 	}
@@ -78,7 +333,6 @@ class PageTest extends TestCase
 		$r1 = factory(Page::class)->states( 'withRevision')->create();
 		$r2 = factory(Page::class)->states('withRevision')->create([ 'slug' => 'foo', 'parent_id' => $r1->getKey(), 'site_id' => $r1->site_id ]);
 		$r3 = factory(Page::class)->states('withRevision')->make([ 'slug' => 'bar', 'parent_id' => $r2->getKey(), 'site_id' => $r1->site_id ]);
-
 		$r3->save();
 		$this->assertEquals('/' . $r2->slug . '/' . $r3->slug, $r3->path); // $r1 is a root node, so has no slug
 	}
@@ -129,152 +383,113 @@ class PageTest extends TestCase
 		Page::findByPathOrFail('/foobar');
 	}
 
-
-
-
-	/**
-	 * @test
+    /**
+     * @test
      * @group ignore
-	 */
-	public function cloneDescendants_WhenAllDescendantsArePublished_ClonesAllDescendantsAsInactive()
-	{
-	    return $this->markTestIncomplete();
-		$a1 = factory(Page::class)->states('withPublishedParent', 'withRevision')->create();
-		$a1->page->publish(new PageTransformer);
-
-		$a2 = factory(Page::class)->states('withRevision')->create([ 'parent_id' => $a1->getKey() ]);
-		$a2->page->publish(new PageTransformer);
-
-		$a3 = factory(Page::class)->states('withRevision')->create([ 'parent_id' => $a2->getKey() ]);
-		$a3->page->publish(new PageTransformer);
-
-		$a4 = factory(Page::class)->states('withRevision')->create([ 'parent_id' => $a2->getKey() ]);
-		$a4->page->publish(new PageTransformer);
-
-		$b1 = factory(Page::class)->states('withPublishedParent', 'withRevision')->create();
-
-		$a1 = $a1->fresh();
-		$count = $a1->descendants()->count();
-
-		$descendants = $b1->cloneDescendants($a1);
-
-		$this->assertEquals($count, $descendants->count());
-
-		$descendant_page_ids = $descendants->pluck('page_id');
-		$this->assertContains($a2->page_id, $descendant_page_ids);
-		$this->assertContains($a3->page_id, $descendant_page_ids);
-		$this->assertContains($a4->page_id, $descendant_page_ids);
-
-		$this->assertNotContains(true, $descendants->pluck('is_active'));
-	}
-
-	/**
-	 * @test
-	 * @group integration
-     * @group ignore
-	 *
-	 * This test depends upon the $route->save() function working properly. Its worth
-	 * keeping as an integration tests to prevent against regressions in this behaviour.
-	 */
-	public function cloneDescendants_WhenSomeDescendantsAreDraft_ClonesAllDescendantsAndRemovesOriginalDrafts()
-	{
-        return $this->markTestIncomplete();
-		$a1 = factory(Page::class)->states('withPublishedParent', 'withRevision')->create();
-		$a1->page->publish(new PageTransformer);
-
-		$a2 = factory(Page::class)->states('withRevision')->create([ 'parent_id' => $a1->getKey() ]);
-		$a2->page->publish(new PageTransformer);
-
-		$a3 = factory(Page::class)->states('withRevision')->create([ 'parent_id' => $a2->getKey() ]);
-		$a4 = factory(Page::class)->states('withRevision')->create([ 'parent_id' => $a2->getKey() ]);
-
-		$b1 = factory(Page::class)->states('withPublishedParent', 'withRevision')->create();
-
-		$a1 = $a1->fresh();
-		$count = $a1->descendants()->count();
-
-		$descendants = $b1->cloneDescendants($a1);
-		$this->assertEquals($count, $descendants->count());
-
-		$a1 = $a1->fresh();
-		$this->assertEquals($count-2, $a1->descendants()->count());
-
-		$this->assertInstanceOf(Page::class, Page::find($a2->getKey()));
-		$this->assertNull(Page::find($a3->getKey()));
-		$this->assertNull(Page::find($a4->getKey()));
-	}
-
-	/**
-	 * @test
-     * @group ignore
-     *
      */
-	public function cloneDescendants_WhenDestinationHasOwnDescendants_RetainsOriginalDescendants()
-	{
+    public function clearRegion_DeletesAllBlocksForGivenPageAndRegion()
+    {
+        $page = factory(Page::class)->create();
+        factory(Block::class, 3)->create([ 'page_id' => $page->getKey() ]);
+
+        $page->clearRegion('test-region');
+        $this->assertEquals(0, $page->blocks()->count());
+    }
+
+    /**
+     * @test
+     * @group ignore
+     */
+    public function clearRegion_DoesNotDeleteBlocksInOtherRegions()
+    {
+        $page = factory(Page::class)->create();
+
+        factory(Block::class, 3)->create([ 'page_id' => $page->getKey() ]);
+        factory(Block::class, 2)->create([ 'page_id' => $page->getKey(), 'region_name' => 'foobar' ]);
+
+        $page->clearRegion('foobar');
+        $this->assertEquals(3, $page->blocks()->count());
+    }
+
+
+
+    /**
+     * @test
+     * @group ignore
+     */
+    public function getPageDefinition_ReturnLayoutDefinition(){
         return $this->markTestIncomplete();
-		// Original Route, with descendants
-		$a1 = factory(Page::class)->states('withPublishedParent', 'withRevision')->create();
-		$a1->page->publish(new PageTransformer);
-
-		$a2 = factory(Page::class)->states('withRevision')->create([ 'parent_id' => $a1->getKey() ]);
-		$a2->page->publish(new PageTransformer);
-
-		$a3 = factory(Page::class)->states('withRevision')->create([ 'parent_id' => $a2->getKey() ]);
-		$a4 = factory(Page::class)->states('withRevision')->create([ 'parent_id' => $a2->getKey() ]);
-
-		// New Route, with own descendants
-		$b1 = factory(Page::class)->states('withPublishedParent', 'withRevision')->create();
-		$b1->page->publish(new PageTransformer);
-
-		$b2 = factory(Page::class)->states('withRevision')->create([ 'parent_id' => $b1->getKey() ]);
-		$b2->page->publish(new PageTransformer);
-
-		$b3 = factory(Page::class)->states('withRevision')->create([ 'parent_id' => $b1->getKey() ]);
-
-		// Perform test
-		$a1 = $a1->fresh();
-		$count = $a1->descendants()->count();
-
-		$descendants = $b1->cloneDescendants($a1);
-
-		$this->assertEquals($count + 2, $descendants->count()); // Own descendants, plus cloned descendants.
-
-		$descendant_page_ids = $descendants->pluck('page_id');
-		$this->assertContains($a2->page_id, $descendant_page_ids);
-		$this->assertContains($b2->page_id, $descendant_page_ids);
-		$this->assertContains($a3->page_id, $descendant_page_ids);
-		$this->assertContains($b3->page_id, $descendant_page_ids);
-		$this->assertContains($a4->page_id, $descendant_page_ids);
-	}
+        $page = factory(Page::class)->make();
+        $this->assertInstanceOf(LayoutDefinition::class, $page->getLayoutDefinition());
+    }
 
 
-	/**
-	 * @test
-	 */
-	public function delete_WhenRouteIsNotActive_DoesNotCreateRedirect()
-	{
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );	}
 
-	/**
-	 * @test
-	 */
-	public function delete_WhenRouteIsActive_DeletesRoute()
-	{
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-	}
+    /**
+     * @test
+     * @group ignore
+     */
+    public function getLayoutDefinition_WhenPageDefinitionIsNotLoaded_LoadsSupportedLayoutDefinition(){
+        return $this->markTestIncomplete();
+        $page = factory(Page::class)->make();
+        $definition = $page->getLayoutDefinition();
 
-	/**
-	 * @test
-	 */
-	public function delete_WhenRouteIsActive_CreatesNewRedirect()
-	{
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-	}
+        $this->assertNotEmpty($definition);
+        $this->assertEquals('test-layout', $definition->name);
+    }
+
+    /**
+     * @test
+     * @group ignore
+     */
+    public function getLayoutDefinition_WhenLayoutDefinitionIsLoaded_DoesNotReloadLayoutDefinition(){
+        return $this->markTestIncomplete();
+        $page = factory(Page::class)->make();
+        $page->getLayoutDefinition(); 					// This should populate $pageDefinition
+
+        $page = Mockery::mock($page)->makePartial()->shouldAllowMockingProtectedMethods();
+        $page->shouldNotReceive('loadLayoutDefinition');
+
+        $definition = $page->getLayoutDefinition(); 	// This should not re-populate $pageDefinition
+        $this->assertNotEmpty($definition);				// Is populated, but not empty.
+    }
+
+    /**
+     * @test
+     * @group ignore
+     */
+    public function getLayoutDefinition_WithRegionDefinitionsWhenLayoutDefinitionIsLoadedWithoutRegions_HasRegionDefinitions()
+    {
+        return $this->markTestIncomplete();
+        $page = factory(Page::class)->make();
+        $page->loadLayoutDefinition();
+
+        $definition = $page->getLayoutDefinition(true);
+
+        // Ensure that our assertion does not trigger loading of Region definitions
+        $definition = Mockery::mock($definition)->makePartial()->shouldAllowMockingProtectedMethods();
+        $definition->shouldNotReceive('loadRegionDefinitions');
+
+        $this->assertCount(1, $definition->getRegionDefinitions());
+    }
+
+    /**
+     * @test
+     * @group ignore
+     */
+    public function getLayoutDefinition_WithRegionDefinitionsWhenLayoutDefinitionIsLoadedWithRegions_HasRegionDefinitions()
+    {
+        return $this->markTestIncomplete();
+        $page = factory(Page::class)->make();
+        $definition = $page->getLayoutDefinition(true);
+
+        // Ensure that our assertion does not trigger loading of Region definitions
+        $definition = Mockery::mock($definition)->makePartial()->shouldAllowMockingProtectedMethods();
+        $definition->shouldNotReceive('loadRegionDefinitions');
+
+        $this->assertCount(1, $definition->getRegionDefinitions());
+    }
+
+
 
 }
