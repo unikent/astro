@@ -2,6 +2,9 @@
 
 namespace Tests\Unit\Models\APICommands;
 
+use App\Models\Contracts\APICommand;
+use App\Models\LocalAPIClient;
+use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Validator;
@@ -16,9 +19,21 @@ abstract class APICommandTestCase extends TestCase
     abstract public function getValidData();
 
     /**
-     * @return A new instance of the class to test.
+     * @return APICommand A new instance of the class to test.
      */
     abstract public function fixture();
+
+    /**
+     * Get an API Client to use.
+     * @param Authenticatable|null $user Optional Authenticatable. If null, will be auto-provided.
+     * @return LocalAPIClient
+     */
+    public function api($user = null)
+    {
+        $user = $user ? $user : factory(User::class)->create();
+        $api = new LocalAPIClient($user);
+        return $api;
+    }
 
     /**
      * Provide default valid input that can be overridden with invalid values.
@@ -77,5 +92,29 @@ abstract class APICommandTestCase extends TestCase
         $data = collect($data);
         return $command->execute($data, $user);
     }
+
+    /**
+     * The execute method of every APICommand should thrown an exception in case of DB error.
+     * @test
+     * @group APICommands
+     */
+    public function execute_throwsException_onDBError()
+    {
+        $this->expectException(Exception::class);
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * The execute method of every APICommand should do all DB modifications within a transactions, so if an
+     * error occurs the database state should remain unchanged.
+     * @test
+     * @group APICommands
+     */
+    public function execute_rollsback_onDBError()
+    {
+        $this->expectException(Exception::class);
+        $this->markTestIncomplete();
+    }
+
 
 }

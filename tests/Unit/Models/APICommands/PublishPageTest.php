@@ -11,7 +11,7 @@ use App\Models\Redirect;
 use App\Models\Revision;
 use App\Models\Definitions\Layout as LayoutDefinition;
 
-class PageContentTest extends TestCase
+class PublishPageTest extends TestCase
 {
 
 	/**

@@ -42,7 +42,7 @@ class CreateSiteTest extends APICommandTestCase
 
     /**
      * @test
-     * @group validation
+     * @group APICommands
      */
     public function validation_whenInputIsValid_passes()
     {
@@ -53,7 +53,7 @@ class CreateSiteTest extends APICommandTestCase
 
     /**
      * @test
-     * @group validation
+     * @group APICommands
      */
     public function validation_whenNameIsMissingOrTooLong_fails()
     {
@@ -67,7 +67,7 @@ class CreateSiteTest extends APICommandTestCase
 
     /**
      * @test
-     * @group validation
+     * @group APICommands
      */
     public function validation_whenPublishingGroupIsMissing_fails()
     {
@@ -77,7 +77,7 @@ class CreateSiteTest extends APICommandTestCase
 
     /**
      * @test
-     * @group validation
+     * @group APICommands
      */
     public function validation_whenPublishingGroupDoesNotExist_fails()
     {
@@ -87,7 +87,7 @@ class CreateSiteTest extends APICommandTestCase
 
     /**
      * @test
-     * @group validation
+     * @group APICommands
      */
     public function validation_whenHostIsMissingOrInvalid_fails()
     {
@@ -101,7 +101,7 @@ class CreateSiteTest extends APICommandTestCase
 
     /**
      * @test
-     * @group validation
+     * @group APICommands
      */
     public function validation_whenPathIsEmpty_succeeds()
     {
@@ -132,7 +132,7 @@ class CreateSiteTest extends APICommandTestCase
 
     /**
      * @test
-     * @group validation
+     * @group APICommands
      * @dataProvider invalidPathProvider
      */
     public function validation_whenPathIsNotValid_fails($path)
@@ -143,7 +143,7 @@ class CreateSiteTest extends APICommandTestCase
 
     /**
      * @test
-     * @group validation
+     * @group APICommands
      */
     public function validation_whenHostAndPathAreNotUnique_fails()
     {
@@ -179,7 +179,7 @@ class CreateSiteTest extends APICommandTestCase
 
     /**
      * @test
-     * @group validation
+     * @group APICommands
      */
     public function validation_whenHostExistsButPathDoesNotClash_passes()
     {
@@ -212,7 +212,7 @@ class CreateSiteTest extends APICommandTestCase
 
     /**
      * @test
-     * @group validation
+     * @group APICommands
      */
     public function validation_whenDefaultLayoutNameIsMissingOrInvalid_fails()
     {
@@ -228,7 +228,7 @@ class CreateSiteTest extends APICommandTestCase
 
     /**
      * @test
-     * @group validation
+     * @group APICommands
      */
     public function validation_whenDefaultLayoutVersionIsMissingOrInvalid_fails()
     {
@@ -243,7 +243,7 @@ class CreateSiteTest extends APICommandTestCase
 
     /**
      * @test
-     * @group validation
+     * @group APICommands
      */
     public function validation_whenDefaultLayoutDefinitionNotFound_fails()
     {
@@ -255,4 +255,39 @@ class CreateSiteTest extends APICommandTestCase
         $this->assertTrue($this->validator($data)->fails());
     }
 
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function createHomePage_creates_APageARevisionAndARevisionSet_withCorrectFields()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function createHomePage_returns_newlyCreatedHomepage()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function execute_createsASiteWithAHomePage()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function execute_returns_newlyCreatedSite()
+    {
+        $this->markTestIncomplete();
+    }
 }
