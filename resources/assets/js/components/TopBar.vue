@@ -60,6 +60,7 @@ export default {
 
 		document.addEventListener('keydown', this.onKeyDown);
 		document.addEventListener('keyup', this.onKeyUp);
+		window.addEventListener("beforeunload", this.leaveAstro); 
 	},
 
 	destroyed() {
@@ -75,10 +76,6 @@ export default {
 			pageSlug: state => state.page.pageSlug
 		}),
 
-		...mapGetters([
-			'unsavedChangesExist'
-		]),
-
 		showBack() {
 			return ['site', 'page'].indexOf(this.$route.name) !== -1;
 		},
@@ -89,6 +86,15 @@ export default {
 	},
 
 	methods: {
+
+		leaveAstro(e) {
+			/* we are very limited as to what we can do when a tries to leave 
+			https://developer.mozilla.org/en/docs/Web/Events/beforeunload
+			*/
+			var confirmationMessage = "\o/";
+			e.returnValue = confirmationMessage;     // Gecko, Trident, Chrome 34+
+			return confirmationMessage;              // Gecko, WebKit, Chrome <34
+		},
 
 		...mapActions([
 			'handleSavePage'

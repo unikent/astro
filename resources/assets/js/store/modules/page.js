@@ -161,6 +161,10 @@ const mutations = {
 
 	updateCurrentSavedState(state) {
 		state.currentSavedState = JSON.stringify(state.pageData.blocks);
+	},
+
+	resetCurrentSavedState(state) {
+		state.currentSavedState = '';	
 	}
 };
 
@@ -275,7 +279,12 @@ const getters = {
 	},
 
 	unsavedChangesExist: (state) => () => {
-		return state.currentSavedState != JSON.stringify(state.pageData.blocks);
+		if (state.currentSavedState.length === 0) {
+	 		// if user has not edited a page yet so we do not have any unsaved changes
+			return false;
+		} else {
+			return state.currentSavedState != JSON.stringify(state.pageData.blocks);
+		}
 	}
 };
 

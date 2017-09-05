@@ -46,16 +46,20 @@ export default {
 					name: 'kent-homepage'
 				},
 				{
-					label: 'Astro 2017',
-					name: 'astro17'
+					label: 'Site homepage',
+					name: 'site-homepage'
+				},
+				{
+					label: 'Content page',
+					name: 'content'
 				}
 			],
 			createForm: {
-				title: 'Unnamed Page',
-				layout_name: 'kent-homepage',
+				title: 'New page',
+				layout_name: 'site-homepage',
 				layout_version: 1,
 				route: {
-					slug: 'testing',
+					slug: 'newpage',
 					parent_id: 1
 				},
 				blocks: {},
