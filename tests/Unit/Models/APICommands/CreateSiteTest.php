@@ -20,12 +20,6 @@ class CreateSiteTest extends APICommandTestCase
         return new CreateSite();
     }
 
-    public function setup()
-    {
-        parent::setup();
-        Config::set('app.definitions_path', realpath(dirname(__FILE__ ). '/../../../Support/Fixtures/definitions'));
-    }
-
     public function getValidData()
     {
         return [
@@ -277,7 +271,7 @@ class CreateSiteTest extends APICommandTestCase
      * @test
      * @group APICommands
      */
-    public function execute_createsASiteWithAHomePage()
+    public function execute_createsASite_WithADraftHomePage()
     {
         $this->markTestIncomplete();
     }

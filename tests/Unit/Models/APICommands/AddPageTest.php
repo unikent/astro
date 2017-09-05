@@ -35,12 +35,6 @@ class AddPageTest extends APICommandTestCase
         ]);
     }
 
-    public function setup()
-    {
-        parent::setup();
-        Config::set('app.definitions_path', realpath(dirname(__FILE__ ). '/../../../Support/Fixtures/definitions'));
-    }
-
     public function getValidData()
     {
         $this->pubgroup = $this->pubgroup ? $this->pubgroup : factory(PublishingGroup::class)->create();
@@ -235,7 +229,7 @@ class AddPageTest extends APICommandTestCase
      * @test
      * @group APICommands
      */
-    public function addChild_returns_newlyCreatedPage()
+    public function addChild_returns_newlyCreatedDraftPage()
     {
         $this->markTestIncomplete();
     }

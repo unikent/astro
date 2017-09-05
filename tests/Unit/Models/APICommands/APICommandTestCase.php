@@ -6,12 +6,20 @@ use App\Models\Contracts\APICommand;
 use App\Models\LocalAPIClient;
 use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 
 abstract class APICommandTestCase extends TestCase
 {
+    /**
+     * @var array A valid (existing) layout name and version
+     */
+    protected $test_layout = [
+        'name' => 'test-layout',
+        'version' => 1
+    ];
 
     /**
      * @return array Valid input data.
@@ -91,6 +99,12 @@ abstract class APICommandTestCase extends TestCase
         $command = new $command;
         $data = collect($data);
         return $command->execute($data, $user);
+    }
+
+    public function setup()
+    {
+        parent::setup();
+        Config::set('app.definitions_path', realpath(dirname(__FILE__ ). '/../../../Support/Fixtures/definitions'));
     }
 
     /**

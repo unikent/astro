@@ -29,7 +29,10 @@ class MovePage implements APICommand
             $parent = Page::find($input['parent_id']);
             $next = Page::find(!empty($input['next_id'] ) ? $input['next_id'] : null);
             if($parent->id != $page->parent_id){
-                $this->createRedirects($page,$parent);
+                $redirects = $this->getRedirects($page);
+                if($redirects){
+                    Redirect::insert($redirects);
+                }
                 $this->updatePaths($page,$parent);
             }
             if($next){
@@ -55,11 +58,11 @@ class MovePage implements APICommand
     }
 
     /**
-     * Create Redirects for the moved page and all its descendants.
+     * Get Redirects to create for the moved page and all its descendants.
      * @param Page $page The Page that will be moved.
-     * @param Page $parent The new parent Page (where the Page is moving to).
+     * @return array of arrays with old path and page ids
      */
-    public function createRedirects($page, $parent)
+    public function getRedirects($page)
     {
         $redirects = [];
         $remove_length = strlen($page->parent->path);
@@ -69,7 +72,7 @@ class MovePage implements APICommand
                 'page_id' => $page->id //$this->replacePath($item->path, $parent->path , $remove_length)
             ];
         }
-        Redirect::insert($redirects);
+        return $redirects;
     }
 
     /**
@@ -90,7 +93,6 @@ class MovePage implements APICommand
             'site_id' => $page->site_id,
             'version' => $page->version
         ];
-        print_r($binds);
 
         DB::update("
           UPDATE pages 
