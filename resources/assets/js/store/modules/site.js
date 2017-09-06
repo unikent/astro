@@ -17,6 +17,10 @@ const state = {
 
 const mutations = {
 
+    updateCurrentSiteID(state, id) {
+    	state.site = id;
+	},
+
 	setSite(state, pages) {
 		state.pages = pages;
 	},
