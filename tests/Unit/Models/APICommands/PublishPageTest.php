@@ -28,7 +28,7 @@ class PublishPageTest extends APICommandTestCase
      * @test
      * @group APICommands
      */
-    public function execute_returns_publishedVersionOfpage()
+    public function execute_returns_publishedVersionOfPage()
     {
         $this->markTestIncomplete();
     }
