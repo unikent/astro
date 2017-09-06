@@ -24,7 +24,117 @@ class PublishPageTest extends APICommandTestCase
         ];
     }
 
-	/**
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function execute_returns_publishedVersionOfpage()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function validation_whenPageIsNotDraft_fails()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function validation_whenPageDoesNotExist_fails()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function validation_whenPageIsMissingOrNull_fails()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function validation_whenPageParent_isUnpublished_fails()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function validation_whenPageIsDraftRoot_passes()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function validation_whenPageIsDraftWithPublishedParent_passes()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function execute_restoresDraftVersionScope()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function execute_whenThisPageIsAlreadyPublishedHere_leavesPublishedDescendantsUnchanged()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function execute_whenAnotherPageIsPublishedHere_replacesItAndItsDescendants()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function execute_whenThisPageWasPreviouslyPublishedElsewhere_deletesOldLocationPageAndDescendants()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     * @todo break this up into multiple tests to handle different logic
+     */
+    public function execute_positionsPublishedPageCorrectly_withRegardToItsSiblings()
+    {
+        $this->markTestIncomplete();
+    }
+
+
+    /**
 	 * @test
      * @group APICommands
 	 */
