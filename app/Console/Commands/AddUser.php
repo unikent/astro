@@ -2,8 +2,11 @@
 
 namespace App\Console\Commands;
 
+use App\Models\PublishingGroup;
+use ArrayObject;
 use Illuminate\Console\Command;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class AddUser extends Command
 {
@@ -13,8 +16,10 @@ class AddUser extends Command
      * @var string
      */
     protected $signature = 'astro:adduser 
-                                {username} 
+                                {username}
                                 {publishinggroup : The Publishing Group Name} 
+                                {name? : The users name (only required if the user account does not already exist).}
+                                {email? : The users email (only required if the user account does not already exist).}
                             ';
 
     /**
@@ -22,7 +27,7 @@ class AddUser extends Command
      *
      * @var string
      */
-    protected $description = 'Add a user to a publishing group.';
+    protected $description = 'Add a user to a publishing group, creating the user if the account does not exist.';
 
     /**
      * Create a new command instance.
@@ -43,11 +48,21 @@ class AddUser extends Command
     {
         $name = $this->argument('name');
         $username = $this->argument('username');
+        $pubgroup_name = $this->argument('publishinggroup');
+        $pubgroup = PublishingGroup::where('name', $pubgroup_name)->first();
+        $email = $this->argument('email');
+        if(!$pubgroup){
+            $this->error('Publishing group "' . $pubgroup_name . '" does not exist.');
+            return;
+        }
         if(preg_match('/^[a-z0-9_-]{1,30}$/i', $username)){
             $user = User::where('username', $username)->first();
             if(!$user){
                 if(!preg_match('/^[a-z0-9\' ]$/i', $name)){
                     $name = $username;
+                }
+                while(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+                    $email = $this->ask('Please enter the email address for this user account: ');
                 }
                 $password = '';
                 while(!$password) {
@@ -58,16 +73,18 @@ class AddUser extends Command
                         $this->error('Passwords do not match. Please try again.');
                     }
                 }
-                $user = User::create([
-                    'username' => $username,
-                    'password' => Hash::make($password),
-                    'role' => 'user',
-                    'name' => $name
-                ]);
+                $user = new User();
+                $user->username = $username;
+                $user->password = Hash::make($password);
+                $user->role = 'user';
+                $user->name = $name;
+                $user->email = $email;
+                $user->settings =new ArrayObject();
+                $user->save();
                 $this->info('User created.');
-            }else {
-                $this->error('User "' . $username . '" already exists.');
             }
+            $pubgroup->users()->syncWithoutDetaching([$user->id]);
+            $this->info('User "'.$username.'" added to publishing group "' . $pubgroup_name . '"');
         }else{
             $this->error('Username must be between 1 and 30 alphanumeric characters.');
         }

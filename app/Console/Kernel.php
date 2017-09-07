@@ -13,7 +13,9 @@ class Kernel extends ConsoleKernel
 	 * @var array
 	 */
 	protected $commands = [
-		Commands\CheckDefns::class
+		Commands\CheckDefns::class,
+        Commands\AddSite::class,
+        Commands\AddUser::class,
 	];
 
 	/**
