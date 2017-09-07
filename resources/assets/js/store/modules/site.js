@@ -88,16 +88,17 @@ const actions = {
 				},
 				title: page.title
 			})
-			.then(() => {
-				dispatch('fetchSite');
+			.then((response) => {
+				page.id = response.data.data.id;
+				dispatch('updatePage', page);
 			})
 	},
 
 	updatePage({ dispatch }, page) {
 		api
-			.patch(`pages/${page.id}/content`, {
-				blocks: page.blocks
-			})
+            .put(`pages/${page.id}/content`, {
+                blocks: page.blocks
+            })
 			.then(() => {
 				dispatch('fetchSite');
 			})
