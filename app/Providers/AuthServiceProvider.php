@@ -7,7 +7,6 @@ use App\Models\Page;
 use App\Models\Media;
 use App\Policies\PagePolicy;
 use App\Policies\SitePolicy;
-use App\Policies\RoutePolicy;
 use App\Policies\MediaPolicy;
 use App\Models\Definitions\Block as BlockDefinition;
 use App\Models\Definitions\Layout as LayoutDefinition;
@@ -26,7 +25,6 @@ class AuthServiceProvider extends ServiceProvider
 	 */
 	protected $policies = [
         Page::class => PagePolicy::class,
-		Page::class => RoutePolicy::class,
 		Site::class => SitePolicy::class,
 		Media::class => MediaPolicy::class,
 		BlockDefinition::class => BlockDefinitionPolicy::class,
