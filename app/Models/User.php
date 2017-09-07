@@ -35,6 +35,16 @@ class User extends KentUser
     }
 
     /**
+     * Can this user edit the site with this id?
+     * @param Site $site The ID of the site to check for.
+     * @return mixed
+     */
+    public function canEditSite(Site $site)
+    {
+      return $this->isAdmin() || $site->publishing_group->users()->contains($this->id);
+    }
+
+    /**
      * Returns true if users' role is set to 'admin'
      *
      * @return boolean
