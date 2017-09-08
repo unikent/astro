@@ -61,6 +61,7 @@ class LocalAPIClientTest extends TestCase
     /**
      * A new site will have a Page with an empty revision.
      * @test
+     * @group APICommands
      */
     public function createSite_createsASite()
     {
@@ -76,6 +77,7 @@ class LocalAPIClientTest extends TestCase
 
     /**
      * @test
+     * @group APICommands
      */
     public function addPage_addsAPage()
     {
@@ -102,6 +104,7 @@ class LocalAPIClientTest extends TestCase
 
     /**
      * @test
+     * @group APICommands
      */
     public function addTree_addsMultiplePages()
     {
@@ -125,6 +128,7 @@ class LocalAPIClientTest extends TestCase
 
     /**
      * @test
+     * @group APICommands
      */
     public function addPage_addsAPageAtTheEnd_ifNoBeforeID()
     {
@@ -158,6 +162,7 @@ class LocalAPIClientTest extends TestCase
 
     /**
      * @test
+     * @group APICommands
      */
     function addPage_withNoParent_fails()
     {
@@ -180,6 +185,7 @@ class LocalAPIClientTest extends TestCase
 
     /**
      * @test
+     * @group APICommands
      */
     function addPage_whenBeforeIsARoot_fails()
     {
@@ -209,6 +215,7 @@ class LocalAPIClientTest extends TestCase
 
     /**
      * @test
+     * @group APICommands
      */
     public function addPage_addsAPageBeforeAnotherPage_ifBeforeID()
     {
@@ -252,6 +259,7 @@ class LocalAPIClientTest extends TestCase
 
     /**
      * @test
+     * @group APICommands
      */
     function updateContent_withNoDraftId_fails()
     {
@@ -266,6 +274,7 @@ class LocalAPIClientTest extends TestCase
 
     /**
      * @test
+     * @group APICommands
      */
     public function updateContent_withNoBlocks_fails()
     {
@@ -280,6 +289,7 @@ class LocalAPIClientTest extends TestCase
 
     /**
      * @test
+     * @group APICommands
      */
     public function updateContent_withValidData_works()
     {

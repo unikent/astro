@@ -8,7 +8,10 @@
 
 namespace Tests\Unit\Models\APICommands;
 
+use App\Models\APICommands\AddPage;
 use App\Models\APICommands\CreateSite;
+
+use Illuminate\Support\Facades\Config;
 
 class CreateSiteTest extends APICommandTestCase
 {
@@ -16,6 +19,7 @@ class CreateSiteTest extends APICommandTestCase
     {
         return new CreateSite();
     }
+
     public function getValidData()
     {
         return [
@@ -32,7 +36,7 @@ class CreateSiteTest extends APICommandTestCase
 
     /**
      * @test
-     * @group validation
+     * @group APICommands
      */
     public function validation_whenInputIsValid_passes()
     {
@@ -43,7 +47,7 @@ class CreateSiteTest extends APICommandTestCase
 
     /**
      * @test
-     * @group validation
+     * @group APICommands
      */
     public function validation_whenNameIsMissingOrTooLong_fails()
     {
@@ -57,7 +61,7 @@ class CreateSiteTest extends APICommandTestCase
 
     /**
      * @test
-     * @group validation
+     * @group APICommands
      */
     public function validation_whenPublishingGroupIsMissing_fails()
     {
@@ -67,7 +71,7 @@ class CreateSiteTest extends APICommandTestCase
 
     /**
      * @test
-     * @group validation
+     * @group APICommands
      */
     public function validation_whenPublishingGroupDoesNotExist_fails()
     {
@@ -77,7 +81,7 @@ class CreateSiteTest extends APICommandTestCase
 
     /**
      * @test
-     * @group validation
+     * @group APICommands
      */
     public function validation_whenHostIsMissingOrInvalid_fails()
     {
@@ -91,7 +95,7 @@ class CreateSiteTest extends APICommandTestCase
 
     /**
      * @test
-     * @group validation
+     * @group APICommands
      */
     public function validation_whenPathIsEmpty_succeeds()
     {
@@ -122,7 +126,7 @@ class CreateSiteTest extends APICommandTestCase
 
     /**
      * @test
-     * @group validation
+     * @group APICommands
      * @dataProvider invalidPathProvider
      */
     public function validation_whenPathIsNotValid_fails($path)
@@ -133,16 +137,76 @@ class CreateSiteTest extends APICommandTestCase
 
     /**
      * @test
-     * @group validation
+     * @group APICommands
      */
     public function validation_whenHostAndPathAreNotUnique_fails()
     {
+        // create a site
+        $existing = $this->execute(CreateSite::class, $this->getValidData());
+        // attempt to create another site with the same input
+        $this->assertTrue($this->validator($this->input([]))->fails());
 
+        // add subpages to the created site
+        $pageone = $this->execute(AddPage::class, [
+            'site_id' => $existing->id,
+            'parent_id' => $existing->homepage->id,
+            'slug' => 'one',
+            'title' => 'Page One',
+            'layout' => [
+                'name' => 'test-layout',
+                'version' => 1
+            ]
+        ]);
+        $pagetwo = $this->execute(AddPage::class, [
+            'site_id' => $existing->id,
+            'parent_id' => $pageone->id,
+            'slug' => 'two',
+            'title' => 'Page Two',
+            'layout' => [
+                'name' => 'test-layout',
+                'version' => 1
+            ]
+        ]);
+        $this->assertTrue($this->validator($this->input(['path' => '/one']))->fails());
+        $this->assertTrue($this->validator($this->input(['path' => '/one/two']))->fails());
     }
 
     /**
      * @test
-     * @group validation
+     * @group APICommands
+     */
+    public function validation_whenHostExistsButPathDoesNotClash_passes()
+    {
+        // create a site
+        $existing = $this->execute(CreateSite::class, $this->getValidData());
+
+        // add subpages to the created site
+        $pageone = $this->execute(AddPage::class, [
+            'site_id' => $existing->id,
+            'parent_id' => $existing->homepage->id,
+            'slug' => 'one',
+            'title' => 'Page One',
+            'layout' => [
+                'name' => 'test-layout',
+                'version' => 1
+            ]
+        ]);
+        $pagetwo = $this->execute(AddPage::class, [
+            'site_id' => $existing->id,
+            'parent_id' => $pageone->id,
+            'slug' => 'two',
+            'title' => 'Page Two',
+            'layout' => [
+                'name' => 'test-layout',
+                'version' => 1
+            ]
+        ]);
+        $this->assertTrue($this->validator($this->input(['path' => '/food']))->passes());
+    }
+
+    /**
+     * @test
+     * @group APICommands
      */
     public function validation_whenDefaultLayoutNameIsMissingOrInvalid_fails()
     {
@@ -158,16 +222,66 @@ class CreateSiteTest extends APICommandTestCase
 
     /**
      * @test
-     * @group validation
+     * @group APICommands
      */
     public function validation_whenDefaultLayoutVersionIsMissingOrInvalid_fails()
     {
-
+        $data = $this->input([]);
+        unset($data['homepage_layout']['version']);
+        $this->assertTrue($this->validator($data)->fails());
+        $data['homepage_layout']['version'] = 'v1';
+        $this->assertTrue($this->validator($data)->fails());
+        $data['homepage_layout']['version'] = '';
+        $this->assertTrue($this->validator($data)->fails());
     }
 
+    /**
+     * @test
+     * @group APICommands
+     */
     public function validation_whenDefaultLayoutDefinitionNotFound_fails()
     {
-        
+        $data = $this->input([]);
+        $data['homepage_layout']['name'] = 'missing-layout-name';
+        $this->assertTrue($this->validator($data)->fails());
+        $data['homepage_layout']['name'] = 'test-layout';
+        $data['homepage_layout']['version'] = 22;
+        $this->assertTrue($this->validator($data)->fails());
     }
 
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function createHomePage_creates_APageARevisionAndARevisionSet_withCorrectFields()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function createHomePage_returns_newlyCreatedHomepage()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function execute_createsASite_WithADraftHomePage()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function execute_returns_newlyCreatedSite()
+    {
+        $this->markTestIncomplete();
+    }
 }

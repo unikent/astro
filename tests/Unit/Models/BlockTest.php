@@ -15,9 +15,7 @@ class BlockTest extends TestCase
 	 */
 	public function deleteForPageRegion_WhenPageIsGiven_DeletesAllBlocksForGivenPageAndRegion()
 	{
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+
 		$page = factory(Page::class)->create();
 		factory(Block::class, 3)->create([ 'page_id' => $page->getKey() ]);
 
@@ -32,9 +30,7 @@ class BlockTest extends TestCase
 	 */
 	public function deleteForPageRegion_WhenPageIdInstanceIsGiven_DeletesAllBlocksForGivenPageAndRegion()
 	{
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+
 		$page = factory(Page::class)->create();
 		factory(Block::class, 3)->create([ 'page_id' => $page->getKey() ]);
 
@@ -49,9 +45,7 @@ class BlockTest extends TestCase
 	 */
 	public function deleteForPageRegion_DoesNotDeleteBlocksInOtherRegions()
 	{
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+
 		$page = factory(Page::class)->create();
 
 		factory(Block::class, 3)->create([ 'page_id' => $page->getKey() ]);

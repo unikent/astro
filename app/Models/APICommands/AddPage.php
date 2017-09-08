@@ -85,6 +85,9 @@ class AddPage implements APICommand
 
     public function rules(Collection $data, Authenticatable $user)
     {
+        $layout = $data->get('layout', []);
+        $version = !empty($layout['version']) ? $layout['version'] : null;
+
         return [
             'parent_id' => [
                 'required',
@@ -108,9 +111,11 @@ class AddPage implements APICommand
             'layout.name' => [
                 'string',
                 'max:100',
-                'required'
-            ],
+                'required',
+                'regex:/^[a-z0-9_.-]+$/i',
+                'layout_exists:' . $version            ],
             'layout.version' => [
+                'required',
                 'integer'
             ],
             'title' => [

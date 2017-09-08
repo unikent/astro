@@ -10,11 +10,11 @@ use Illuminate\Support\Collection;
 use App\Models\Page;
 
 /**
- * Updates meta for a page including its title and any other options.
- * Does not update blocks or layout.
+ * Updates the slug for a page.
+ * Updates the path for the page and all of its descendants.
  * @package App\Models\APICommands
  */
-class UpdatePage implements APICommand
+class UpdatePageSlug implements APICommand
 {
 
     /**
@@ -27,29 +27,7 @@ class UpdatePage implements APICommand
         $result = DB::transaction(function() use($input,$user){
             $page = Page::find($input['id']);
 
-            $previous_revision = $page->revision;
-            $options = $previous_revision->options;
-            if(isset($input['options']) && is_array($input['options'])){
-                foreach($input['options'] as $name => $value){
-                    if(null !== $value){
-                        unset($options[$name]);
-                    }else{
-                        $options[$name] = $value;
-                    }
-                }
-            }
 
-            $revision = Revision::create([
-                'revision_set_id' => $previous_revision->revision_set_id,
-                'title' => !empty($input['title']) ? $input['title'] : $previous_revision->title,
-                'layout_name' => $previous_revision->layout_name,
-                'layout_version' => $previous_revision->layout_version,
-                'created_by' => $user->id,
-                'updated_by' => $user->id,
-                'options' => $options,
-                'blocks' => $previous_revision->bake
-            ]);
-            $page->setRevision($revision);
             $page->fresh();
             return $page;
         });
@@ -77,10 +55,7 @@ class UpdatePage implements APICommand
             'id' => [
                 'exists:pages,id'
             ],
-            'options' => [
-                'array'
-            ],
-            'title' => [
+            'slug' => [
                 'string'
             ]
         ];

@@ -20,7 +20,7 @@ class CreateSite implements APICommand
      * Carry out the command, based on the provided $input.
      * @param Collection $input The input options as key=>value pairs.
      * @param Authenticatable $user
-     * @return mixed
+     * @return Site The newly created Site.
      */
     public function execute($input,Authenticatable $user)
     {
@@ -44,6 +44,7 @@ class CreateSite implements APICommand
      * @param string $title The title for the homepage for this site.
      * @param array $layout The layout for the homepage for this site [name => '', version => '']
      * @param Authenticatable $user The creator of this site.
+     * @return Page Newly created Homepage
      */
     public function createHomePage($site, $title, $layout, $user)
     {
@@ -91,6 +92,8 @@ class CreateSite implements APICommand
         if(is_null($data->get('path'))){
             $data->put('path','');
         }
+        $layout = $data->get('homepage_layout', []);
+        $version = !empty($layout['version']) ? $layout['version'] : null;
         $rules = [
             'name' => ['required', 'max:190' ],
             'publishing_group_id' => [ 'required' ],
@@ -103,13 +106,15 @@ class CreateSite implements APICommand
             'path' =>[
                 'nullable',
                 'regex:/^(\/[a-z0-9_-]+)*$/i',
-                'unique:sites,path,null,id,host,' . $data->get('host')
+                'unique:sites,path,null,id,host,' . $data->get('host'),
+                'unique_site_path:' . $data->get('host')
             ],
             'homepage_layout.name' => [
                 'required',
                 'string',
                 'max:100',
-                'regex:/^[a-z0-9_.-]+$/i'
+                'regex:/^[a-z0-9_.-]+$/i',
+                'layout_exists:' . $version
             ],
             'homepage_layout.version' => [
                 'required',

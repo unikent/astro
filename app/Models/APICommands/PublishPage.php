@@ -19,10 +19,10 @@ use Illuminate\Support\Collection;
 class PublishPage implements APICommand
 {
     /**
-     * Determines if this page is root or if not, if a page with its parent url is published
+     * Determines if this page can be published or not. If page has a parent, then that must be published first.
      * @param int $page_id The id of an unpublished page to test.
      */
-    public static function parentIsPublished($page_id)
+    public static function canBePublished($page_id)
     {
         $page = Page::find($page_id);
         if(!$page){
