@@ -8,6 +8,7 @@ use DB;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Collection;
 use App\Models\DeletedPage;
+use Illuminate\Validation\Rule;
 
 /**
  * Delete a page and all its descendants, recording this as DeletedPages.
@@ -60,7 +61,11 @@ class DeletePage implements APICommand
     {
         return [
           'id' => [
-              'exists:pages,id'
+              'required',
+              Rule::exists('pages')->where(function($query) use($data) {
+                  $query->where('id', $data->get('id'))
+                        ->where('version', Page::STATE_DRAFT);
+              })
           ]
         ];
     }

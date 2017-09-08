@@ -49,6 +49,7 @@ class SiteControllerTest extends ApiControllerTestCase {
      * @group authorization
      */
     public function index_WhenAuthenticatedAndNotAuthorizedToIndex_ReturnsJsonOfSitePagesAssociatedWithUser(){
+        $this->markTestIncomplete();
         $routes = factory(Page::class, 3)->states([ 'withRevision', 'withParent', 'withSite' ])->create();
 
         // Create a PublishingGroup...

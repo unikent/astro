@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Models\APICommands\PublishPage;
 use App\Models\Page;
+use App\Validation\Rules\LayoutExistsRule;
+use App\Validation\Rules\UniqueSitePathRule;
 use DB;
 use Laravel\Dusk\DuskServiceProvider;
 use Illuminate\Support\Facades\Schema;
@@ -22,7 +24,14 @@ class AppServiceProvider extends ServiceProvider
 	{
 		Schema::defaultStringLength(191); // Fix for the webfarm running older MySQL
 
-        Validator::extend('parent_is_published', function( $attr, $value ) { return PublishPage::parentIsPublished($value); });
+        Validator::extend('parent_is_published', function( $attr, $value ) { return PublishPage::canBePublished($value); });
+        Validator::extend('unique_site_path', function($attr, $value, $parameters, $validator) {
+            $host = isset($parameters[0]) ? $parameters[0] : null;
+            return (new UniqueSitePathRule($host))->passes($attr, $value);
+        });
+        Validator::extend('layout_exists', function($attribute, $value, $parameters, $validator){
+           return (new LayoutExistsRule(empty($parameters[0]) ? 0 : $parameters[0]))->passes($attribute,$value);
+        });
 
 		Validator::extend('definition_exists', function ($attribute, $value, $parameters, $validator){
 			$data = $validator->getData();
