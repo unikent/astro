@@ -27,7 +27,8 @@ class MovePageTest extends APICommandTestCase
         ]);
         $page = $this->api()->addPage($this->site->homepage->id, null, 'foo', $this->test_layout, 'Foo');
         return [
-            'id' => $page->id
+            'id' => $page->id,
+            'parent_id' => $this->site->homepage->id
         ];
     }
 
