@@ -88,12 +88,15 @@ export default {
 	methods: {
 
 		leaveAstro(e) {
-			/* we are very limited as to what we can do when a tries to leave 
+			/* we are very limited as to what we can do when someone tries to leave 
 			https://developer.mozilla.org/en/docs/Web/Events/beforeunload
 			*/
-			var confirmationMessage = "\o/";
-			e.returnValue = confirmationMessage;     // Gecko, Trident, Chrome 34+
-			return confirmationMessage;              // Gecko, WebKit, Chrome <34
+			const unsavedChangesExist = this.unsavedChangesExist();
+			if (unsavedChangesExist == true) {
+				var confirmationMessage = "You may lose changes if you leave without saving";
+				e.returnValue = confirmationMessage;     // Gecko, Trident, Chrome 34+
+				return confirmationMessage;              // Gecko, WebKit, Chrome <34
+			}
 		},
 
 		...mapActions([
