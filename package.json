@@ -29,6 +29,7 @@
     "scribe-plugin-link-prompt-command": "^1.0.0",
     "scribe-plugin-sanitizer": "^0.1.10",
     "sinon": "^2.2.0",
+    "underscore.string": "^3.3.4",
     "vue": "^2.1.0",
     "vue-chartjs": "^2.3.9",
     "vue-router": "^2.2.0",
