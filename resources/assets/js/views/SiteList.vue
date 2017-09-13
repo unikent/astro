@@ -52,12 +52,13 @@
 						<el-form-item label="URL">
 							<el-input v-model="form.url" auto-complete="off"></el-input>
 						</el-form-item>
-						<el-form-item label="Parent site">
+						<p>Suggested URL {{ suggestedSlug }}</p>
+<!-- 						<el-form-item label="Parent site">
 							<el-select v-model="form.parent" class="w100">
 								<el-option label="Root (none)" :value="0" />
 								<el-option v-for="site in sites" :label="site.title" :value="site.id" :key="site.id" />
 							</el-select>
-						</el-form-item>
+						</el-form-item> -->
 					</el-col>
 					<el-col :span="11" :offset="2">
 						<el-form-item label="Home page layout">
@@ -65,12 +66,12 @@
 								<el-option label="Default" value="" />
 							</el-select>
 						</el-form-item>
-						<el-form-item label="Max page depth">
+	<!-- 					<el-form-item label="Max page depth">
 							<el-input-number v-model="form.maxDepth"></el-input-number>
-						</el-form-item>
-						<el-form-item label="Description">
+						</el-form-item> -->
+<!-- 						<el-form-item label="Description">
 							<el-input v-model="form.options.description" type="textarea" />
-						</el-form-item>
+						</el-form-item> -->
 					</el-col>
 				</el-row>
 			</el-form>
@@ -86,6 +87,7 @@
 
 <script>
 import Icon from 'components/Icon';
+import slugify from 'underscore.string/slugify';
 
 export default {
 
@@ -96,12 +98,14 @@ export default {
 	data() {
 		return {
 			sites: [],
+			layouts: [],
 			dialogFormVisible: false,
 			loading: true,
 
 			form: {
 				title: '',
 				url: '',
+				slug: '',
 				parent: 0,
 				layout: '',
 				options: {
@@ -114,6 +118,12 @@ export default {
 
 	created() {
 		this.fetchData();
+	},
+
+	computed: {
+		suggestedSlug() {
+			return slugify(this.form.url);
+		}
 	},
 
 	methods: {
@@ -162,6 +172,13 @@ export default {
 					this.sites = response.data.data;
 					this.loading = false;
 				});
+
+			this.$api
+				.get('layouts/definitions')
+				.then((response) => {
+					this.layouts = response.data.data;
+				});
+
 		}
 
 	}
