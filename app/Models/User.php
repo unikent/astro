@@ -14,11 +14,12 @@ class User extends KentUser
         'settings' => 'json'
     ];
 
+
+	  protected $hidden = [ 'api_token', 'created_at', 'updated_at' ];
+
     protected $attributes = [
         'settings' => '{}'
     ];
-
-	protected $hidden = [ 'api_token', 'created_at', 'updated_at', 'created_by', 'updated_by' ];
 
     /**
      * Create a new Eloquent model instance.
@@ -31,7 +32,7 @@ class User extends KentUser
    		parent::__construct($attributes);
 
    		$this->api_token = $this->api_token ?: str_random(191); // Max string length without MySQL 5.7, see commit 7c90098
-	}
+	  }
 
     public function publishing_groups()
     {
