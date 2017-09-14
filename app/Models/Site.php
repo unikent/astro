@@ -14,6 +14,9 @@ class Site extends Model
         'publishing_group_id',
         'host',
         'path',
+        'created_by',
+        'updated_by',
+
         'options'
     ];
 

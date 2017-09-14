@@ -33,7 +33,9 @@ class Page extends BaumNode
         'site_id',
         'version',
         'path',
-        'revision_id'
+        'revision_id',
+        'created_by',
+        'updated_by',
 	];
 
 	protected $hidden = [
