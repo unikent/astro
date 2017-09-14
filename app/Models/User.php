@@ -20,10 +20,6 @@ class User extends KentUser
 
 	protected $hidden = [ 'api_token', 'created_at', 'updated_at', 'created_by', 'updated_by' ];
 
-    protected $attributes = [
-        'settings' => '{}'
-    ];
-
     /**
      * Create a new Eloquent model instance.
      *
