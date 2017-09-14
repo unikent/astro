@@ -14,8 +14,7 @@ class User extends KentUser
         'settings' => 'json'
     ];
 
-
-	  protected $hidden = [ 'api_token', 'created_at', 'updated_at' ];
+	  protected $hidden = [ 'api_token', 'created_at', 'updated_at'];
 
     protected $attributes = [
         'settings' => '{}'
@@ -33,6 +32,22 @@ class User extends KentUser
 
    		$this->api_token = $this->api_token ?: str_random(191); // Max string length without MySQL 5.7, see commit 7c90098
 	  }
+
+    /**
+     * Register callback to ensure user has a publishing group with their username.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+        static::created(function($user){
+            // We want every user to automatically have a publishing group with their username.
+            $group = PublishingGroup::where('name', '=', $user->username)->first();
+            if(!$group){
+                $group = PublishingGroup::create(['name' => $user->username]);
+            }
+            $group->users()->sync($user, false);
+        });
+    }
 
     public function publishing_groups()
     {
