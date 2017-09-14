@@ -68,6 +68,7 @@ import BlockSidebar from 'components/sidebar/BlockSidebar';
 import Navigation from 'components/sidebar/Navigation';
 import Settings from 'components/sidebar/Settings';
 import HelpCentre from 'components/sidebar/HelpCentre';
+import ErrorSidebar from 'components/sidebar/Errors';
 
 import { clamp } from 'classes/helpers';
 
@@ -99,6 +100,13 @@ export default {
 					title: 'Edit blocks',
 					id: 'blocks',
 					component: BlockSidebar
+				},
+				{
+					link: '/errors',
+					icon: 'alert',
+					title: 'Page errors',
+					id: 'errors',
+					component: ErrorSidebar
 				}
 			],
 

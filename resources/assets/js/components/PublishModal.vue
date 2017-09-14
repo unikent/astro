@@ -1,4 +1,6 @@
 <template>
+
+<div>
 <el-dialog
 	title="Publish"
 	v-model="publishModalVisible"
@@ -17,6 +19,23 @@
 		<el-button v-else type="danger" @click="publishPage">Publish now</el-button>
 	</span>
 </el-dialog>
+
+
+<el-dialog
+	title="Published"
+	v-model="publishedModalVisible"
+	:modal-append-to-body="true"
+	:before-close="handleClose"
+>
+	<el-form :model="form">
+		Published!
+		<a href="">My published page</a>
+	</el-form>
+	<span slot="footer" class="dialog-footer">
+		<el-button @click="cancelPublish">Close</el-button>
+	</span>
+</el-dialog>
+</div>
 </template>
 
 <script>
@@ -35,7 +54,8 @@ export default {
 
 	computed: {
 		...mapState([
-			'publishModal'
+			'publishModal',
+			'publishedModal'
 		]),
 
 		publishModalVisible: {
@@ -50,13 +70,24 @@ export default {
 					this.hidePublishModal();
 				}
 			}
+		},
+
+		publishedModalVisible: {
+			get() {
+				return this.publishedModal.visible;
+			},
+			set(value) {
+				this.showPublishedModal();
+			}
 		}
 	},
 
 	methods: {
 		...mapMutations([
 			'showPublishModal',
-			'hidePublishModal'
+			'hidePublishModal',
+			'showPublishedModal',
+			'hidePublishedModal'
 		]),
 
 		publishPage() {
@@ -64,11 +95,11 @@ export default {
 				.post('pages/' + this.$route.params.page_id + '/publish', this.page)
 				.then(() => {
 					this.hidePublishModal();
-					this.$message({
-						message: 'Published page',
-						type: 'success',
-						duration: 2000
-					});
+
+					this.$alert('This is a message', 'Published', {
+          confirmButtonText: 'OK',
+		  message: `You have published your page to http://www.kent.ac.uk/my-site/my-page`
+        });
 					this.form.message = '';
 				})
 				.catch(() => {});
@@ -76,11 +107,13 @@ export default {
 
 		cancelPublish() {
 			this.hidePublishModal();
+			this.hidePublishedModal();
 			this.form.message = '';
 		},
 
 		handleClose() {
 			this.hidePublishModal();
+			this.hidePublishedModal();
 			this.form.message = '';
 		}
 	}

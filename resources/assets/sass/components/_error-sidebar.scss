@@ -1,0 +1,16 @@
+.validation-errors {
+	list-style-type: none;
+}
+
+.validation-errors__item {
+	margin: 1rem 0;
+}
+
+.validation-errors__link {
+	color: inherit;
+	margin-left: 0.5rem;
+}
+
+.el-tag--success {
+	color: #076330;
+}
