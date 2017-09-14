@@ -14,7 +14,7 @@ class User extends KentUser
         'settings' => 'json'
     ];
 
-	protected $hidden = [ 'api_token', 'created_at', 'updated_at', 'created_by', 'updated_by' ];
+	protected $hidden = [ 'api_token', 'created_at', 'updated_at'];
 
     protected $attributes = [
         'settings' => '{}'
@@ -44,8 +44,8 @@ class User extends KentUser
             $group = PublishingGroup::where('name', '=', $user->username)->first();
             if(!$group){
                 $group = PublishingGroup::create(['name' => $user->username]);
-                $group->users()->sync($user, false);
             }
+            $group->users()->sync($user, false);
         });
     }
 
