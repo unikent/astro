@@ -5,6 +5,7 @@
 	<media-picker />
 	<media-overlay size="small" />
 	<create-page-modal />
+	<edit-page-modal />
 </div>
 </template>
 
@@ -14,6 +15,7 @@ import PublishModal from 'components/PublishModal';
 import MediaPicker from 'components/MediaPicker';
 import MediaOverlay from 'components/media/MediaOverlay';
 import CreatePageModal from 'components/CreatePageModal';
+import EditPageModal from 'components/EditPageModal';
 
 export default {
 
@@ -24,7 +26,8 @@ export default {
 		PublishModal,
 		MediaPicker,
 		MediaOverlay,
-		CreatePageModal
+		CreatePageModal,
+		EditPageModal
 	}
 
 };
