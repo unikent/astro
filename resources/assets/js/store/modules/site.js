@@ -12,13 +12,17 @@ const state = {
 	pageModal: {
 		visible: false,
 		parentId: null
+	},
+	editPageModal: {
+		visible: false,
+		parentId: null
 	}
 };
 
 const mutations = {
 
-    updateCurrentSiteID(state, id) {
-    	state.site = id;
+	updateCurrentSiteID(state, id) {
+		state.site = id;
 	},
 
 	setSite(state, pages) {
@@ -52,6 +56,14 @@ const mutations = {
 
 	setPageModalParent(state, pageId) {
 		state.pageModal.parentId = pageId;
+	},
+
+	setEditPageModalVisibility(state, visible) {
+		state.editPageModal.visible = visible;
+	},
+
+	setEditPageModalParent(state, pageId) {
+		state.editPageModal.parentId = pageId;
 	}
 };
 
@@ -165,6 +177,15 @@ const actions = {
 
 	hidePageModal({ commit }) {
 		commit('setPageModalVisibility', false);
+	},
+
+	showEditPageModal({ commit }, { id }) {
+		commit('setEditPageModalParent', id);
+		commit('setEditPageModalVisibility', true);
+	},
+
+	hideEditPageModal({ commit }) {
+		commit('setEditPageModalVisibility', false);
 	}
 
 };
