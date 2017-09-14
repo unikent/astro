@@ -21,7 +21,10 @@
 
 		-->
 
-		<el-row type="flex" justify="center">
+
+		<!--
+
+			<el-row type="flex" justify="center">
 			<el-col :span="24">
 				 <el-table :data="sites" stripe border class="w100" v-loading.body="loading">
 					<el-table-column prop="name" label="Name" width="300"></el-table-column>
@@ -42,37 +45,50 @@
 			</el-col>
 		</el-row>
 
+	-->
+
+	<h2>Temp Site List</h2>
+	<ul v-loading.body="loading">
+		<li v-for="site in sites">
+			<router-link :to="`/site/${site.id}/page/${site.homepage.id}`">{{site.name}}</router-link>
+							<el-button @click="askRemove(site.id)" type="default" size="small">
+								<icon name="delete" width="14" height="14" />
+							</el-button>
+		</li>
+	</ul>
+		
+
 		<el-dialog title="Site Options" v-model="dialogFormVisible">
 			<el-form :model="form" label-position="top">
 				<el-row type="flex" :gutter="20">
 					<el-col :span="11">
+
 						<el-form-item label="Title">
-							<el-input v-model="form.title" auto-complete="off"></el-input>
+							<el-input v-model="form.name" auto-complete="off"></el-input>
 						</el-form-item>
-						<el-form-item label="URL">
-							<el-input v-model="form.url" auto-complete="off"></el-input>
+
+						<el-form-item label="Domain">
+							<el-input v-model="form.host" auto-complete="off" placeholder="www.kent.ac.uk"></el-input>
 						</el-form-item>
-						<p>Suggested URL {{ suggestedSlug }}</p>
-<!-- 						<el-form-item label="Parent site">
-							<el-select v-model="form.parent" class="w100">
-								<el-option label="Root (none)" :value="0" />
-								<el-option v-for="site in sites" :label="site.title" :value="site.id" :key="site.id" />
-							</el-select>
-						</el-form-item> -->
+
+						<el-form-item label="Path">
+							<el-input v-model="form.path" auto-complete="off" placeholder="/"></el-input>
+						</el-form-item>
+
 					</el-col>
+
 					<el-col :span="11" :offset="2">
 						<el-form-item label="Home page layout">
-							<el-select v-model="form.layout" class="w100">
-								<el-option label="Default" value="" />
+
+							<el-select v-model="form.homepage_layout" class="w100" placeholder="Select">
+								<el-option v-for="layout in layouts" :label="layout.name" :value="layout" :key="layout.name" />
+								<!-- <el-option label="Default" value="" /> -->
 							</el-select>
 						</el-form-item>
-	<!-- 					<el-form-item label="Max page depth">
-							<el-input-number v-model="form.maxDepth"></el-input-number>
-						</el-form-item> -->
-<!-- 						<el-form-item label="Description">
-							<el-input v-model="form.options.description" type="textarea" />
-						</el-form-item> -->
+
 					</el-col>
+
+					<p>{{errors}}</p>
 				</el-row>
 			</el-form>
 			<span slot="footer" class="dialog-footer">
@@ -82,12 +98,14 @@
 		</el-dialog>
 
 	</div>
+
+
 </el-card>
+
 </template>
 
 <script>
 import Icon from 'components/Icon';
-import slugify from 'underscore.string/slugify';
 
 export default {
 
@@ -103,15 +121,12 @@ export default {
 			loading: true,
 
 			form: {
-				title: '',
-				url: '',
-				slug: '',
-				parent: 0,
-				layout: '',
-				options: {
-					description: '',
-					maxDepth: 3
-				}
+				name: '',
+				path: '',
+				host: '',
+				homepage_layout: [],
+				publishing_group_id: '',
+				errors: '',
 			}
 		};
 	},
@@ -120,11 +135,6 @@ export default {
 		this.fetchData();
 	},
 
-	computed: {
-		suggestedSlug() {
-			return slugify(this.form.url);
-		}
-	},
 
 	methods: {
 
@@ -146,37 +156,76 @@ export default {
 		},
 
 		addSite() {
-			this.sites.push({
-				title: this.form.title,
-				url: this.form.url,
-				id: this.sites.length
+
+			this.loading = true;
+
+			let site = {};
+			site = ({
+			  name: this.form.name,
+			  host: this.form.host,
+			  path: this.form.path,
+			  publishing_group_id: "1",
+			  homepage_layout: {
+			  	name: this.form.homepage_layout.name,
+			  	version: this.form.homepage_layout.version
+			  }
 			});
 
-			this.dialogFormVisible = false;
+			console.log(site);
+			this.$api
+				.post('sites', site)
+				.then((response) => {
+					// success, so let's refresh what data as have from the api
+					this.fetchData();
 
-			this.form = {
-				title: '',
-				url: '',
-				parent: 0,
-				layout: '',
-				options: {
-					description: '',
-				}
-			};
+					// reset the form
+					this.form = {
+						name: '',
+						host: '',
+						path: '',
+						errors: '',
+						publishing_group_id: '',
+						homepage_layout: []
+					};
+					this.loading = false;
+					this.dialogFormVisible = false;
+				})
+				.catch((response) => {
+					console.log('API error trying to POST ', site);
+					this.form.errors = response;
+					// alert('fix this issues dude');
+					this.loading = false;
+				});
+
+
+
+				
 		},
 
+
+
 		fetchData() {
+			let layouts = {};
 			this.$api
 				.get('sites?include=homepage.revision')
 				.then((response) => {
 					this.sites = response.data.data;
-					this.loading = false;
 				});
 
 			this.$api
 				.get('layouts/definitions')
 				.then((response) => {
-					this.layouts = response.data.data;
+					this.layouts = [];
+					layouts = response.data.data;
+					for (var i = layouts.length - 1; i >= 0; i--) {
+						// @TODO - this should return an array of layout definations 
+						// so for now we are faking this and setting the version numbers to 1
+						let currentLayout = [];
+						currentLayout.name = layouts[i];
+						currentLayout.version = "1";
+						this.layouts.push(currentLayout);
+					}
+					this.loading = false;
 				});
 
 		}
