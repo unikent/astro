@@ -11,6 +11,12 @@ namespace Tests\Unit\Models\APICommands;
 use App\Models\APICommands\AddPage;
 use App\Models\APICommands\CreateSite;
 
+use App\Models\Page;
+use App\Models\Revision;
+use App\Models\RevisionSet;
+use App\Models\Site;
+use App\Models\User;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 
 class CreateSiteTest extends APICommandTestCase
@@ -255,16 +261,23 @@ class CreateSiteTest extends APICommandTestCase
      */
     public function createHomePage_creates_APageARevisionAndARevisionSet_withCorrectFields()
     {
-        $this->markTestIncomplete();
-    }
+        $site = factory(Site::class)->create();
+        $user = factory(User::class)->create();
+        $title = 'Test Title';
+        $layout = ['name' => 'test-layout', 'version' => 1];
+        $homepage = $this->fixture()->createHomePage($site, $title, $layout, $user);
 
-    /**
-     * @test
-     * @group APICommands
-     */
-    public function createHomePage_returns_newlyCreatedHomepage()
-    {
-        $this->markTestIncomplete();
+        $this->assertInstanceOf(Page::class, $homepage);
+        $this->assertEquals($homepage->id, $site->homepage->id);
+        $this->assertEquals(null, $site->homepage->parent_id);
+        $this->assertEquals($site->id, $site->homepage->site_id);
+        $this->assertInstanceOf(Revision::class, $homepage->revision);
+        $this->assertEquals($title, $homepage->revision->title);
+        $this->assertEquals($layout['name'], $homepage->revision->layout_name);
+        $this->assertEquals($layout['version'], $homepage->revision->layout_version);
+        $this->assertEquals($user->id, $homepage->created_by);
+        $this->assertEquals($user->id, $homepage->updated_by);
+        $this->assertInstanceOf(RevisionSet::class, $homepage->revision->set);
     }
 
     /**
@@ -273,15 +286,8 @@ class CreateSiteTest extends APICommandTestCase
      */
     public function execute_createsASite_WithADraftHomePage()
     {
-        $this->markTestIncomplete();
+        $site = $this->fixture()->execute(new Collection($this->input(null)), factory(User::class)->create());
+        $this->assertEquals(Page::STATE_DRAFT, $site->homepage->version);
     }
 
-    /**
-     * @test
-     * @group APICommands
-     */
-    public function execute_returns_newlyCreatedSite()
-    {
-        $this->markTestIncomplete();
-    }
 }

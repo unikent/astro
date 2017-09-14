@@ -66,6 +66,7 @@ class CreateSite implements APICommand
             'layout_version' => $layout['version']
         ]);
         $page->setRevision($revision);
+        $page->refresh();
         return $page;
     }
 

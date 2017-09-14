@@ -28,4 +28,6 @@ Route::group([ 'prefix' => 'v1', 'namespace' => 'v1' ], function(){
 	Route::resource('sites', 'SiteController', [ 'only' => [ 'index', 'show', 'store', 'update', 'destroy' ]]);
     Route::get('sites/{site}/tree', 'SiteController@tree');
     Route::patch('sites/{site}/tree', 'SiteController@move');
+
+    Route::resource('pubgroups', 'PublishingGroupController', [ 'only' => ['index']]);
 });
