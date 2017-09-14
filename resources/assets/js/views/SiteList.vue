@@ -7,20 +7,7 @@
 		</el-button>
 	</div>
 	<div>
-		<!--
-
-		<div class="site-list-pagination">
-			<el-pagination
-				@current-change="navigate"
-				:current-page="pagination.current_page"
-				:page-size="pagination.per_page"
-				layout="total, prev, pager, next, jumper"
-				:total="pagination.total">
-			</el-pagination>
-		</div>  v-loading.body="fetching"
-
-		-->
-
+	
 
 		<!--
 
@@ -48,17 +35,47 @@
 	-->
 
 	<h2>Temp Site List</h2>
-	<ul v-loading.body="loading">
-		<li v-for="site in sites">
-			<router-link :to="`/site/${site.id}/page/${site.homepage.id}`">{{site.name}}</router-link>
-							<el-button @click="askRemove(site.id)" type="default" size="small">
-								<icon name="delete" width="14" height="14" />
-							</el-button>
-		</li>
-	</ul>
-		
+	
+	<el-row :span="24" :gutter="10">
+		<el-col :xs="10" :sm="10" :md="10" :lg="10">
+			<div class="grid-content bg-purple">Name</div>
+		</el-col>
 
-		<el-dialog title="Site Options" v-model="dialogFormVisible">
+		<el-col :xs="10" :sm="10" :md="10" :lg="10">
+			<div class="grid-content bg-purple">Path</div>
+		</el-col>
+		
+		<el-col :xs="4" :sm="4" :md="4" :lg="4">
+			<div class="grid-content bg-purple-light">Actions</div>
+		</el-col>
+	</el-row>
+
+	<el-row :span="24" :gutter="10" v-for="site in sites" :key="site.id">
+
+		<el-row :span="24" :gutter="10">
+			<el-col :xs="10" :sm="10" :md="10" :lg="10">
+				<div class="grid-content bg-purple">
+					<router-link :to="`/site/${site.id}/page/${site.homepage.id}`">{{site.name}}</router-link>
+				</div>
+			</el-col>
+
+			<el-col :xs="10" :sm="10" :md="10" :lg="10">
+				<div class="grid-content bg-purple">Path</div>
+			</el-col>
+
+			<el-col :xs="4" :sm="4" :md="4" :lg="4">
+				<div class="grid-content bg-purple-light">
+					<el-button @click="askRemove(site.id)" type="default" size="small">
+						<icon name="delete" width="14" height="14" />
+					</el-button>
+				</div>
+			</el-col>
+		</el-row>
+
+	</el-row>
+
+		
+		<el-dialog title="Add Site" v-model="dialogFormVisible">
 			<el-form :model="form" label-position="top">
 				<el-row type="flex" :gutter="20">
 					<el-col :span="11">
@@ -87,8 +104,12 @@
 						</el-form-item>
 
 					</el-col>
+				</el-row>
 
-					<p>{{errors}}</p>
+				<el-row>
+					<el-row :span="24" :gutter="10" v-for="error in form.errors" :key="error.id">
+						1 - {{error}}
+					</el-row>
 				</el-row>
 			</el-form>
 			<span slot="footer" class="dialog-footer">
@@ -156,7 +177,6 @@ export default {
 		},
 
 		addSite() {
-
 			this.loading = true;
 
 			let site = {};
@@ -172,6 +192,7 @@ export default {
 			});
 
 			console.log(site);
+			this.form.errors = [];
 			this.$api
 				.post('sites', site)
 				.then((response) => {
@@ -190,19 +211,13 @@ export default {
 					this.loading = false;
 					this.dialogFormVisible = false;
 				})
-				.catch((response) => {
+				.catch((errors) => {
 					console.log('API error trying to POST ', site);
-					this.form.errors = response;
-					// alert('fix this issues dude');
+					console.log(errors.response.data.errors);
+					this.form.errors = errors.response.data.errors;
 					this.loading = false;
-				});
-
-
-
-				
+				});				
 		},
-
-
 
 		fetchData() {
 			let layouts = {};
