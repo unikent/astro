@@ -34,45 +34,66 @@
 
 	-->
 
-	<h2>Temp Site List</h2>
-	
-	<el-row :span="24" :gutter="10">
-		<el-col :xs="10" :sm="10" :md="10" :lg="10">
-			<div class="grid-content bg-purple">Name</div>
-		</el-col>
+	<!-- <div class="el-table el-table--fit el-table--enable-row-hover el-table--enable-row-transition el-table--astro"> -->
+	<div class="el-table w100 el-table--fit el-table--striped el-table--border el-table--enable-row-hover">
+		<table cellspacing="0" cellpadding="0" border="0" class="w100">
+				<tr>
+					<th>
+						<div class="cell">
+							Name
+						</div>
+					</th>
 
-		<el-col :xs="10" :sm="10" :md="10" :lg="10">
-			<div class="grid-content bg-purple">Path</div>
-		</el-col>
-		
-		<el-col :xs="4" :sm="4" :md="4" :lg="4">
-			<div class="grid-content bg-purple-light">Actions</div>
-		</el-col>
-	</el-row>
+					<th>
+						<div class="cell">
+							Location
+						</div>
+					</th>
 
-	<el-row :span="24" :gutter="10" v-for="site in sites" :key="site.id">
+					<th>
+						<div class="cell">
+							Actions
+						</div>
+					</th>
 
-		<el-row :span="24" :gutter="10">
-			<el-col :xs="10" :sm="10" :md="10" :lg="10">
-				<div class="grid-content bg-purple">
-					<router-link :to="`/site/${site.id}/page/${site.homepage.id}`">{{site.name}}</router-link>
-				</div>
-			</el-col>
+				</tr>
+			</thead>
+			<tbody>
+				<tr
+				v-for="site in sites" 
+				:key="site.id"
+				class="el-table__row"
+				:class="{ 'el-table__row--selected': selected && selected.indexOf(row.id) !== -1 }"
+				>
+				<td>
+					<div class="cell">
+						<router-link :to="`/site/${site.id}/page/${site.homepage.id}`">{{site.name}}</router-link>
+					</div>
+				</td>
 
-			<el-col :xs="10" :sm="10" :md="10" :lg="10">
-				<div class="grid-content bg-purple">Path</div>
-			</el-col>
+				<td>
+					<div class="cell">
+						<span class="el-tag el-tag--primary">{{site.host}}{{site.path}}</span>
+					</div>
+				</td>
 
-			<el-col :xs="4" :sm="4" :md="4" :lg="4">
-				<div class="grid-content bg-purple-light">
-					<el-button @click="askRemove(site.id)" type="default" size="small">
-						<icon name="delete" width="14" height="14" />
-					</el-button>
-				</div>
-			</el-col>
-		</el-row>
+				<td>
+					<div class="cell">
+						<el-button @click="askRemove(site.id)" type="default" size="small">
+							<icon name="delete" width="14" height="14" />
+						</el-button>
+					</div>
+				</td>
 
-	</el-row>
+
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+
+
+
 
 		
 		<el-dialog title="Add Site" v-model="dialogFormVisible">
