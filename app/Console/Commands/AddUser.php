@@ -17,7 +17,7 @@ class AddUser extends Command
      */
     protected $signature = 'astro:adduser 
                                 {username}
-                                {publishinggroup : The Publishing Group Name} 
+                                {publishinggroup? : The Publishing Group Name (if blank user will be added to a publishing group with their own username).} 
                                 {name? : The users name (only required if the user account does not already exist).}
                                 {email? : The users email (only required if the user account does not already exist).}
                             ';
@@ -47,14 +47,17 @@ class AddUser extends Command
     public function handle()
     {
         $name = $this->argument('name');
+        $pubgroup = null;
         $username = $this->argument('username');
         $pubgroup_name = $this->argument('publishinggroup');
-        $pubgroup = PublishingGroup::where('name', $pubgroup_name)->first();
-        $email = $this->argument('email');
-        if(!$pubgroup){
-            $this->error('Publishing group "' . $pubgroup_name . '" does not exist.');
-            return;
+        if($pubgroup_name && $pubgroup_name != $username){
+            $pubgroup = PublishingGroup::where('name', $pubgroup_name)->first();
+            if(!$pubgroup){
+                $this->error('Publishing group "' . $pubgroup_name . '" does not exist.');
+                return;
+            }
         }
+        $email = $this->argument('email');
         if(preg_match('/^[a-z0-9_-]{1,30}$/i', $username)){
             $user = User::where('username', $username)->first();
             if(!$user){
@@ -83,8 +86,14 @@ class AddUser extends Command
                 $user->save();
                 $this->info('User created.');
             }
+            if(!$pubgroup) {
+                // if we didn't find a pub group above, but got to here, we just want to make sure the
+                // user is a member of a publishing group named after their username.
+                // New users will have this group, but legacy ones will need it created.
+                $pubgroup = PublishingGroup::firstOrCreate(['name' => $username]);
+            }
             $pubgroup->users()->syncWithoutDetaching([$user->id]);
-            $this->info('User "'.$username.'" added to publishing group "' . $pubgroup_name . '"');
+            $this->info('User "'.$username.'" added to publishing group "' . ($pubgroup_name ? $pubgroup_name : $username) . '"');
         }else{
             $this->error('Username must be between 1 and 30 alphanumeric characters.');
         }

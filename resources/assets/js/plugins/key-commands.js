@@ -27,16 +27,6 @@ export const onKeyDown = (ctx) => {
 		if(key) {
 			keys[key] = true;
 		}
-
-		if((e.ctrlKey || e.metaKey) && keys.z) {
-			e.preventDefault();
-			ctx.undo();
-		}
-
-		if((e.ctrlKey || e.metaKey) && keys.y) {
-			e.preventDefault();
-			ctx.redo();
-		}
 	};
 };
 
