@@ -271,7 +271,7 @@ export default {
 				.catch((errors) => {
 					// @TODO - what do we do when the API is unavaliable
 				});
-		},
+		}
 	}
 };
 </script>
