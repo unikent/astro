@@ -15,6 +15,8 @@ const state = {
 	},
 	editPageModal: {
 		visible: false,
+		title: '',
+		slug: '',
 		parentId: null
 	}
 };
@@ -64,6 +66,11 @@ const mutations = {
 
 	setEditPageModalParent(state, pageId) {
 		state.editPageModal.parentId = pageId;
+	},
+
+	setPageMeta(state, page) {
+		state.editPageModal.title = page.title;
+		state.editPageModal.slug = page.slug;
 	}
 };
 
@@ -112,22 +119,39 @@ const actions = {
 
 	updatePage({ dispatch }, page) {
 		api
-            .put(`pages/${page.id}/content`, {
-                blocks: page.blocks
-            })
+			.put(`pages/${page.id}/content`, {
+				blocks: page.blocks
+			})
 			.then(() => {
 				dispatch('fetchSite');
 			})
 	},
 
+	updatePageMeta({ dispatch }, page) {
+		api
+			.put(`pages/${page.id}`, {
+				title: page.title,
+				options: {}
+			})
+			.then(() => {
+				api
+					.put(`pages/${page.id}/slug`, {
+						slug: page.slug
+					})
+					.then(() => {
+						dispatch('fetchSite');
+					});
+			})
+			.catch(() => {});
+	},
+
 	movePageApi({ dispatch }, move) {
 		// If-Unmodified-Since
 		api
-		 	.patch(`sites/${state.site}/tree`, move)
-		 	.then(() => {
-		 		dispatch('fetchSite');
-		 	});
-		console.log(move);
+			.patch(`sites/${state.site}/tree`, move)
+			.then(() => {
+				dispatch('fetchSite');
+			});
 	},
 
 
@@ -139,11 +163,6 @@ const actions = {
 			newPos = Number.parseInt(toPath.substr(toPath.lastIndexOf('.') + 1, toPath.length));
 
 		if(canDrop) {
-
-			// Reordering logic is a bit different as we are not adding a new item into the parent collection,
-			if(newPage.parent.id == oldPage.parent.id){
-
-			}
 
 			const page = _.cloneDeep(oldPage.data);
 
@@ -180,8 +199,13 @@ const actions = {
 	},
 
 	showEditPageModal({ commit }, { id }) {
-		commit('setEditPageModalParent', id);
-		commit('setEditPageModalVisibility', true);
+		api
+			.get(`pages/${id}`)
+			.then((response) => {
+				commit('setPageMeta', response.data.data);
+				commit('setEditPageModalParent', id);
+				commit('setEditPageModalVisibility', true);
+			});
 	},
 
 	hideEditPageModal({ commit }) {

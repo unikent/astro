@@ -5,7 +5,7 @@
 			<el-input name="title" v-model="editForm.title" auto-complete="off"></el-input>
 		</el-form-item>
 		<el-form-item label="URL">
-			<el-input name="slug" v-model="editForm.route.slug" auto-complete="off"><template slot="prepend">https://www.kent.ac.uk/my-site/</template></el-input>
+			<el-input name="slug" v-model="editForm.slug" auto-complete="off"><template slot="prepend">https://www.kent.ac.uk/my-site/</template></el-input>
 		</el-form-item>
 	</el-form>
 	<span slot="footer" class="dialog-footer">
@@ -45,7 +45,8 @@ export default {
 
 		visible: {
 			get() {
-				this.editForm.title = this.editPageModal.parentId;
+				this.editForm.title = this.editPageModal.title;
+				this.editForm.slug = this.editPageModal.slug;
 				return this.editPageModal.visible;
 			},
 			set(show) {
@@ -53,34 +54,27 @@ export default {
 					this.hideEditPageModal();
 				}
 			}
-		},
+		}
 	},
 
 	created() {
-		//this.fetchSite();
+
 	},
 
 	methods: {
 		...mapActions({
-			//fetchSite: 'site/fetchSite',
-			//createPage: 'site/createPage',
-			hideEditPageModal: 'site/hideEditPageModal'
+			fetchPageMeta: 'site/fetchPageMeta',
+			hideEditPageModal: 'site/hideEditPageModal',
+			updatePageMeta: 'site/updatePageMeta'
 		}),
 
 		saveEdit() {
-			// TODO: when endpoint is ready, update this
-			// this.updatePage({
-			// 	title: this.currentPage.title,
-			// 	id: this.currentPage.id,
-			// 	page_id: this.currentPage.page_id,
-			// 	layout_name: this.layout_name,
-			// 	layout_version: this.layout_version,
-			// 	route: {
-			// 		slug: this.currentPage.slug,
-			// 		parent_id: this.currentPage.parent_id
-			// 	}
-			// });
-		}
+			this.updatePageMeta(this.editForm);
+			/*this.updatePageMeta({
+				title: this.currentPage.title,
+				slug: this.currentPage.slug
+			});*/
+		},
 	}
 };
 </script>
