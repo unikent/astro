@@ -1,9 +1,23 @@
-.validation-errors {
+ul.validation-errors {
 	list-style-type: none;
+	padding: 0 1rem;
 }
 
-.validation-errors__item {
+li.validation-errors__item {
 	margin: 1rem 0;
+	background-color: #fff;
+	padding: 5px;
+	border: 1px solid #9a0000;;
+	border-radius: 4px;
+	line-height: 26px;
+	height: 38px;
+	transition: background-color .3s ease-out;
+	display: flex;
+	background-color: rgba(255, 0, 0, 0.16);
+	color: #9a0000;
+	i {
+		line-height: 2;
+	}
 }
 
 .validation-errors__link {
