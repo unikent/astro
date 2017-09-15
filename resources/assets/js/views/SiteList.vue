@@ -8,33 +8,6 @@
 	</div>
 	<div>
 	
-
-		<!--
-
-			<el-row type="flex" justify="center">
-			<el-col :span="24">
-				 <el-table :data="sites" stripe border class="w100" v-loading.body="loading">
-					<el-table-column prop="name" label="Name" width="300"></el-table-column>
-					<el-table-column prop="canonical.path" label="Path"></el-table-column>
-					<el-table-column inline-template label="Actions" width="110">
-						<div>
-							<router-link :to="`/site/${sites[$index].id}/page/${sites[$index].homepage.id}`">
-								<el-button type="default" size="small">
-									<icon name="edit" width="14" height="14" />
-								</el-button>
-							</router-link>
-							<el-button @click="askRemove($index)" type="default" size="small">
-								<icon name="delete" width="14" height="14" />
-							</el-button>
-						</div>
-					</el-table-column>
-				</el-table>
-			</el-col>
-		</el-row>
-
-	-->
-
-
 	<div class="el-table w100 el-table--fit el-table--striped el-table--border el-table--enable-row-hover">
 		<table cellspacing="0" cellpadding="0" border="0" class="w100">
 				<tr>
@@ -225,23 +198,21 @@ export default {
 
 			// paths needs to be blank or a srting starting with a /
 			if (this.form.path.length != 0) {
-				console.log('have path');
 				if (this.form.path[0] != '/') {
-					console.log('have path not staring with slash');
 					this.form.path = '/' + this.form.path;
 				}
 			}
 			let site = {};
 
 			site = ({
-			  name: this.form.name,
-			  host: this.form.host,
-			  path: this.form.path,
-			  publishing_group_id: this.form.publishing_group_id,
-			  homepage_layout: {
-			  	name: this.form.homepage_layout.name,
-			  	version: this.form.homepage_layout.version
-			  }
+				name: this.form.name,
+				host: this.form.host,
+				path: this.form.path,
+				publishing_group_id: this.form.publishing_group_id,
+				homepage_layout: {
+					name: this.form.homepage_layout.name,
+					version: this.form.homepage_layout.version
+				}
 			});
 
 			this.form.errors = [];
@@ -272,7 +243,6 @@ export default {
 		},
 
 		fetchData() {
-
 			const fetchSites = this.$api.get('sites?include=homepage.revision'); 
 			const fetchGroups = this.$api.get('pubgroups');
 			const fetchLayouts = this.$api.get('layouts/definitions');
@@ -291,7 +261,7 @@ export default {
 						// so for now we are faking this and setting the version numbers to 1
 						let currentLayout = [];
 						currentLayout.name = layouts[i];
-						currentLayout.version = "1";
+						currentLayout.version = '1';
 						this.layouts.push(currentLayout);
 					}
 					
@@ -299,7 +269,7 @@ export default {
 					this.loading = false;
 				})
 				.catch((errors) => {
-					console.log(errors);
+					// @TODO - what do we do when the API is unavaliable
 				});
 		},
 	}
