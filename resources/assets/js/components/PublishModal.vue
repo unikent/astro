@@ -1,6 +1,4 @@
 <template>
-
-<div>
 <el-dialog
 	title="Publish"
 	v-model="publishModalVisible"
@@ -19,23 +17,6 @@
 		<el-button v-else type="danger" @click="publishPage">Publish now</el-button>
 	</span>
 </el-dialog>
-
-
-<el-dialog
-	title="Published"
-	v-model="publishedModalVisible"
-	:modal-append-to-body="true"
-	:before-close="handleClose"
->
-	<el-form :model="form">
-		Published!
-		<a href="">My published page</a>
-	</el-form>
-	<span slot="footer" class="dialog-footer">
-		<el-button @click="cancelPublish">Close</el-button>
-	</span>
-</el-dialog>
-</div>
 </template>
 
 <script>

@@ -6,11 +6,12 @@
 	position: absolute;
 	top: 0;
 	left: 0;
-	display: flex;
+	display: inline;
 	align-items: center;
 	justify-content: space-between;
 	padding: 0 20px;
 	height: get-height(top-bar);
+	line-height: get-height(top-bar);
 }
 .top-bar--homepage {
 	display: flex;

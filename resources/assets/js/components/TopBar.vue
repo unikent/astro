@@ -4,11 +4,7 @@
 			<div v-show="showBack" @click="backToSites" class="top-bar-backbutton">
 				<i class="el-icon-arrow-left backbutton-icon"></i>Site list
 			</div>
-			<div class="top-bar__page-title">
-				<div class="top-bar__title">{{ pageTitle }}</div>
-				<el-tag type="success">Published</el-tag>
-				<span class="top-bar__url">{{ pagePath }}</span>
-			</div>
+			<div class="top-bar__page-title">{{ pageTitle }} <el-tag type="primary">{{ pagePath }}</el-tag></div>
 		</div>
 
 		<div class="top-bar__tools">
