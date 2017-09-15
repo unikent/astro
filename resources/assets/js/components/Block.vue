@@ -147,6 +147,7 @@ export default {
 		]),
 
 		editBlock() {
+		this.showSelectedOverlay();
 			// set the block in the sidebar if the user clicks on a different block (including one with the same index but in a different region)
 			if(this.currentBlockIndex !== this.index || this.currentRegion !== this.region) {
 				this.collapseSidebar();
@@ -173,6 +174,24 @@ export default {
 				)
 			) {
 				this.$bus.$emit('block:hideOverlay', this);
+			}
+		},
+
+		showSelectedOverlay() {
+			this.$bus.$emit('block:showSelectedOverlay', this);
+		},
+
+		hideSelectedOverlay(e) {
+			if(
+				e.relatedTarget !== null ||
+				(
+					e.relatedTarget && (
+						!e.relatedTarget.hasAttribute('class') ||
+						e.relatedTarget.getAttribute('class').indexOf('b-block') === -1
+					)
+				)
+			) {
+				this.$bus.$emit('block:hideSelectedOverlay', this);
 			}
 		},
 

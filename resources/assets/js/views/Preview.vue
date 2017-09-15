@@ -37,12 +37,22 @@
 				<icon name="plus" width="15" height="15" viewBox="0 0 15 15" />
 			</div>
 		</div>
+
+		<div
+			class="block-selected-overlay" :class="{
+				'block-selected-overlay--hidden': overlaySelectedHidden
+			}"
+			:style="blockSelectedOverlayStyles"
+		>
+		</div>
+
 	</div>
 	<div class="b-handle" :style="handleStyles">
 		<icon name="move" width="20" height="20" />
 	</div>
 	<div id="b-overlay" :style="overlayStyles"></div>
 	<resize-shim :onResize="onResize" />
+
 </div>
 </template>
 
@@ -77,10 +87,12 @@ export default {
 				fill: '#fff'
 			},
 			blockOverlayStyles: {},
+			blockSelectedOverlayStyles: {},
 			hideBlockOverlayControls: false,
 			overlayStyles: {},
 			wrapperStyles: {},
 			overlayHidden: true,
+			overlaySelectedHidden: true,
 			current: null
 		};
 	},
@@ -158,6 +170,7 @@ export default {
 		this.onResize = _.throttle(() => {
 			if(this.current) {
 				this.positionOverlay(this.current);
+				this.positionSelectedOverlay(this.current);
 			}
 		}, 16, { trailing: true });
 	},
@@ -206,6 +219,10 @@ export default {
 			this.$bus.$on('block:hideOverlay', this.hideOverlay);
 			this.$bus.$on('block:updateOverlay', this.updateOverlay);
 			this.$bus.$on('block:move', this.repositionOverlay);
+
+			this.$bus.$on('block:showSelectedOverlay', this.showSelectedOverlay);
+			this.$bus.$on('block:hideSelectedOverlay', this.hideSelectedOverlay);
+
 		},
 
 		removeDialog(done) {
@@ -252,17 +269,36 @@ export default {
 			}
 		},
 
+		showSelectedOverlay(block) {
+			if(block === this.current) {
+				// wait for images to load before displaying overlay
+				imagesLoaded(block.$el, () => {
+					this.positionSelectedOverlay(block, true);
+				});
+			}
+		},
+
+		hideSelectedOverlay(block) {
+			if(block !== this.current) {
+				this.overlaySelectedHidden = true;
+				this.updateStyles('blockSelectedOverlay', 'transform', 'translateY(0)');
+			}
+		},
+
 		updateOverlay(index = null) {
 			// block is hovered and wasn't just deleted
 			if(this.current && this.current.index !== index) {
 				this.positionOverlay(this.current);
+				this.positionSelectedOverlay(this.current);
 			}
 			else if(this.current && this.current.index === index) {
 				this.hideOverlay();
+				this.hideSelectedOverlay();
 				this.current = null;
 			}
 			else {
 				this.hideOverlay();
+				this.hideSelectedOverlay();
 			}
 		},
 
@@ -330,7 +366,9 @@ export default {
 			}
 
 			this.overlayHidden = false;
+			this.overlaySelectedHidden = false;
 			this.updateStyles('blockOverlay', 'transform', `translateY(${offset}px)`);
+			this.updateStyles('blockSelectedOverlay', 'transform', `translateY(${offset}px)`);
 		},
 
 		positionOverlay(block, setCurrent) {
@@ -360,6 +398,45 @@ export default {
 			this.overlayHidden = false;
 
 			this.updateStyles('blockOverlay', {
+				transform: `translateY(${(pos.top + window.scrollY - minusTop)}px)`,
+				left     : `${(pos.left + window.scrollX - minusLeft)}px`,
+				width    : `${(pos.width + addWidth)}px`,
+				height   : `${(pos.height + addHeight)}px`
+			});
+
+			if(setCurrent) {
+				this.current = block;
+			}
+		},
+
+
+		positionSelectedOverlay(block, setCurrent) {
+			if(this.dragging) {
+				return;
+			}
+
+			var
+				pos = block.$el.getBoundingClientRect(),
+				heightDiff = Math.round(pos.height - 30),
+				widthDiff = Math.round(pos.width - 30),
+				minusTop = 0,
+				minusLeft = 0,
+				addHeight = 0,
+				addWidth = 0;
+
+			if(heightDiff < 0) {
+				addHeight = -heightDiff;
+				minusTop = addHeight / 2;
+			}
+
+			if(widthDiff < 0) {
+				addWidth = -widthDiff;
+				minusLeft = addWidth / 2;
+			}
+
+			this.overlaySelectedHidden = false;
+
+			this.updateStyles('blockSelectedOverlay', {
 				transform: `translateY(${(pos.top + window.scrollY - minusTop)}px)`,
 				left     : `${(pos.left + window.scrollX - minusLeft)}px`,
 				width    : `${(pos.width + addWidth)}px`,
