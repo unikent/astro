@@ -34,7 +34,7 @@
 
 	-->
 
-	<!-- <div class="el-table el-table--fit el-table--enable-row-hover el-table--enable-row-transition el-table--astro"> -->
+
 	<div class="el-table w100 el-table--fit el-table--striped el-table--border el-table--enable-row-hover">
 		<table cellspacing="0" cellpadding="0" border="0" class="w100">
 				<tr>
@@ -58,7 +58,7 @@
 
 				</tr>
 			</thead>
-			<tbody>
+			<tbody v-loading.body="loading">
 				<tr
 				v-for="site in sites" 
 				:key="site.id"
