@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\PublishingGroup;
 use App\Models\Site;
 use App\Models\Page;
 use App\Models\Media;
 use App\Policies\PagePolicy;
+use App\Policies\PublishingGroupPolicy;
 use App\Policies\SitePolicy;
 use App\Policies\MediaPolicy;
 use App\Models\Definitions\Block as BlockDefinition;
@@ -30,6 +32,7 @@ class AuthServiceProvider extends ServiceProvider
 		BlockDefinition::class => BlockDefinitionPolicy::class,
 		LayoutDefinition::class => LayoutDefinitionPolicy::class,
 		RegionDefinition::class => RegionDefinitionPolicy::class,
+        PublishingGroup::class => PublishingGroupPolicy::class
 	];
 
 	/**

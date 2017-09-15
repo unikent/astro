@@ -7,81 +7,121 @@
 		</el-button>
 	</div>
 	<div>
-		<!--
-
-		<div class="site-list-pagination">
-			<el-pagination
-				@current-change="navigate"
-				:current-page="pagination.current_page"
-				:page-size="pagination.per_page"
-				layout="total, prev, pager, next, jumper"
-				:total="pagination.total">
-			</el-pagination>
-		</div>  v-loading.body="fetching"
-
-		-->
-
-		<el-row type="flex" justify="center">
-			<el-col :span="24">
-				 <el-table :data="sites" stripe border class="w100" v-loading.body="loading">
-					<el-table-column prop="name" label="Name" width="300"></el-table-column>
-					<el-table-column prop="canonical.path" label="Path"></el-table-column>
-					<el-table-column inline-template label="Actions" width="110">
-						<div>
-							<router-link :to="`/site/${sites[$index].id}/page/${sites[$index].homepage.id}`">
-								<el-button type="default" size="small">
-									<icon name="edit" width="14" height="14" />
-								</el-button>
-							</router-link>
-							<el-button @click="askRemove($index)" type="default" size="small">
-								<icon name="delete" width="14" height="14" />
-							</el-button>
+	
+	<div class="el-table w100 el-table--fit el-table--striped el-table--border el-table--enable-row-hover">
+		<table cellspacing="0" cellpadding="0" border="0" class="w100">
+				<tr>
+					<th>
+						<div class="cell">
+							Name
 						</div>
-					</el-table-column>
-				</el-table>
-			</el-col>
-		</el-row>
+					</th>
 
-		<el-dialog title="Site Options" v-model="dialogFormVisible">
+					<th>
+						<div class="cell">
+							Location
+						</div>
+					</th>
+
+					<th>
+						<div class="cell">
+							Actions
+						</div>
+					</th>
+
+				</tr>
+			</thead>
+			<tbody v-loading.body="loading">
+				<tr
+				v-for="site in sites" 
+				:key="site.id"
+				class="el-table__row"
+				>
+				<td>
+					<div class="cell">
+						<router-link :to="`/site/${site.id}/page/${site.homepage.id}`">{{site.name}}</router-link>
+					</div>
+				</td>
+
+				<td>
+					<div class="cell">
+						<span class="el-tag el-tag--primary">{{site.host}}{{site.path}}</span>
+					</div>
+				</td>
+
+				<td>
+					<div class="cell">
+						<el-button @click="askRemove(site.id)" type="default" size="small">
+							<icon name="delete" width="14" height="14" />
+						</el-button>
+					</div>
+				</td>
+
+
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+		
+		<el-dialog title="Add Site" v-model="dialogFormVisible">
 			<el-form :model="form" label-position="top">
 				<el-row type="flex" :gutter="20">
 					<el-col :span="11">
-						<el-form-item label="Title">
-							<el-input v-model="form.title" auto-complete="off"></el-input>
+
+						<el-form-item label="Name">
+							<el-input v-model="form.name" auto-complete="off"></el-input>
 						</el-form-item>
-						<el-form-item label="URL">
-							<el-input v-model="form.url" auto-complete="off"></el-input>
+
+						<el-form-item label="Host">
+							<el-input v-model="form.host" auto-complete="off" placeholder="www.kent.ac.uk"></el-input>
 						</el-form-item>
-						<el-form-item label="Parent site">
-							<el-select v-model="form.parent" class="w100">
-								<el-option label="Root (none)" :value="0" />
-								<el-option v-for="site in sites" :label="site.title" :value="site.id" :key="site.id" />
-							</el-select>
+
+						<el-form-item label="Path">
+							<el-input v-model="form.path" auto-complete="off" placeholder=""></el-input>
 						</el-form-item>
+
 					</el-col>
+
 					<el-col :span="11" :offset="2">
 						<el-form-item label="Home page layout">
-							<el-select v-model="form.layout" class="w100">
-								<el-option label="Default" value="" />
+							<el-select v-model="form.homepage_layout" class="w100" placeholder="Select">
+								<el-option v-for="layout in layouts" :label="layout.name" :value="layout" :key="layout.name" />
 							</el-select>
 						</el-form-item>
-						<el-form-item label="Max page depth">
-							<el-input-number v-model="form.maxDepth"></el-input-number>
-						</el-form-item>
-						<el-form-item label="Description">
-							<el-input v-model="form.options.description" type="textarea" />
+
+						<el-form-item label="Publishing Group">
+							<el-select v-model="form.publishing_group_id" class="w100" placeholder="Select">
+								<el-option v-for="group in publishingGroups" :label="group.name" :value="group.id" :key="group.id" />
+							</el-select>
 						</el-form-item>
 					</el-col>
 				</el-row>
+
+				<div class="el-alert el-alert--error" v-if="form.errorMsgs">
+					<i class="el-alert__icon el-icon-circle-cross is-big"></i>
+					<div class="el-alert__content">
+						<span class="el-alert__title is-bold">{{form.errorMsgs}}</span>
+						<ul v-for="error in form.errorsDetails" :key="error.id">
+							<li class="el-alert__description">{{error}}</li>
+						</ul>
+					</div>
+				</div>
+
+
+	
 			</el-form>
 			<span slot="footer" class="dialog-footer">
-				<el-button @click="dialogFormVisible = false">Cancel</el-button>
+				<el-button @click="cancelForm">Cancel</el-button>
 				<el-button type="primary" @click="addSite">Add Site</el-button>
 			</span>
 		</el-dialog>
 
 	</div>
+
+
 </el-card>
+
 </template>
 
 <script>
@@ -96,18 +136,19 @@ export default {
 	data() {
 		return {
 			sites: [],
+			layouts: [],
 			dialogFormVisible: false,
 			loading: true,
 
+			publishingGroups: [],
+
 			form: {
-				title: '',
-				url: '',
-				parent: 0,
-				layout: '',
-				options: {
-					description: '',
-					maxDepth: 3
-				}
+				name: '',
+				path: '',
+				host: '',
+				homepage_layout: [],
+				publishing_group_id: '',
+				errors: '',
 			}
 		};
 	},
@@ -116,8 +157,10 @@ export default {
 		this.fetchData();
 	},
 
+
 	methods: {
 
+		// @TODO - delete site is not yet implemented!
 		askRemove(index) {
 			this.$confirm(
 				`Site ${index} will be permanently removed.\nAre you sure?`,
@@ -135,35 +178,100 @@ export default {
 			}).catch(() => {});
 		},
 
-		addSite() {
-			this.sites.push({
-				title: this.form.title,
-				url: this.form.url,
-				id: this.sites.length
-			});
+		cancelForm() {
+			this.dialogFormVisible = false;
+			// reset the form
+			this.form = {
+				name: '',
+				host: '',
+				path: '',
+				errors: '',
+				publishing_group_id: '',
+				homepage_layout: []
+			};
+			this.loading = false;
+		},
 
+		addSite() {
+			this.loading = true;
 			this.dialogFormVisible = false;
 
-			this.form = {
-				title: '',
-				url: '',
-				parent: 0,
-				layout: '',
-				options: {
-					description: '',
+			// paths needs to be blank or a srting starting with a /
+			if (this.form.path.length != 0) {
+				if (this.form.path[0] != '/') {
+					this.form.path = '/' + this.form.path;
 				}
-			};
+			}
+			let site = {};
+
+			site = ({
+				name: this.form.name,
+				host: this.form.host,
+				path: this.form.path,
+				publishing_group_id: this.form.publishing_group_id,
+				homepage_layout: {
+					name: this.form.homepage_layout.name,
+					version: this.form.homepage_layout.version
+				}
+			});
+
+			this.form.errors = [];
+			this.$api
+				.post('sites', site)
+				.then((response) => {
+					// success, so let's refresh what data as have from the api
+					this.fetchData();
+
+					// reset the form
+					this.form = {
+						name: '',
+						host: '',
+						path: '',
+						errors: '',
+						publishing_group_id: '',
+						homepage_layout: []
+					};
+					this.loading = false;
+					
+				})
+				.catch((errors) => {
+					this.dialogFormVisible = true;
+					this.form.errorMsgs = errors.response.data.errors[0].message;
+					this.form.errorsDetails = errors.response.data.errors[0].details;
+					this.loading = false;
+				});				
 		},
 
 		fetchData() {
-			this.$api
-				.get('sites?include=homepage.revision')
-				.then((response) => {
-					this.sites = response.data.data;
+			const fetchSites = this.$api.get('sites?include=homepage.revision'); 
+			const fetchGroups = this.$api.get('pubgroups');
+			const fetchLayouts = this.$api.get('layouts/definitions');
+			
+			// make sure we all all the data back before continuing
+			Promise.all([fetchSites, fetchGroups, fetchLayouts])
+				.then((responses) => {
+					this.sites = responses[0].data.data;
+					this.publishingGroups = responses[1].data.data;
+
+					this.layouts = [];
+					let layouts = {};
+					layouts = responses[2].data.data;
+					for (var i = layouts.length - 1; i >= 0; i--) {
+						// @TODO - this should return an array of layout definations 
+						// so for now we are faking this and setting the version numbers to 1
+						let currentLayout = [];
+						currentLayout.name = layouts[i];
+						currentLayout.version = '1';
+						this.layouts.push(currentLayout);
+					}
+					
+					// now we have all the data unhide the list
 					this.loading = false;
+				})
+				.catch((errors) => {
+					// @TODO - what do we do when the API is unavaliable
 				});
 		}
-
 	}
 };
 </script>
