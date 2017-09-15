@@ -3,10 +3,10 @@
 	<back-bar :title="title" />
 	<ul class="validation-errors">
 		<li class="validation-errors__item">
-			<el-tag type="danger"><i class="el-icon-warning"></i><a href="#" class="validation-errors__link">Call-to-action</a></el-tag>
+			<i class="el-icon-warning"></i><a href="#" class="validation-errors__link">Call-to-action</a>
 		</li>
 		<li class="validation-errors__item">
-			<el-tag type="success"><i class="el-icon-circle-check"></i><a href="#" class="validation-errors__link">Key links</a></el-tag>
+			<i class="el-icon-warning"></i><a href="#" class="validation-errors__link">Key links</a>
 		</li>
 	</ul>
 </div>
