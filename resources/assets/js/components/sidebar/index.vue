@@ -112,14 +112,14 @@ export default {
 				{
 					link: '/media',
 					icon: 'layers',
-					title: 'Blocks',
+					title: 'Blocks on current page',
 					id: 'blocks',
 					component: BlockSidebar
 				},
 				{
 					link: '/errors',
 					icon: 'alert',
-					title: 'Errors',
+					title: 'Errors on current page',
 					id: 'errors',
 					component: ErrorSidebar
 				}

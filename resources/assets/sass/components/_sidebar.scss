@@ -102,17 +102,22 @@ to the right of the sidebar is another sidebar (sidebar__switcher) which contain
 		}
 	}
 
-	.sidebar--deactivated {
-		opacity: 0.6;
-	}
-
 	// sidebar in-page options (blocks, errors, etc)
 	.sidebar--in-page {
+		padding-top: 10px;
 		height: 100%;
 		box-shadow: inset 0 0px 10px 1px rgba(0, 0, 0, 0.05);
-		li a {
-			height: 45px;
+		li {
+			margin: 10px 0;
+			a {
+				height: 45px;
+			}
 		}
+	}
+
+	// used when a sidebar element is deactivated
+	.sidebar--deactivated {
+		opacity: 0.6;
 	}
 
 	.editor-component-list--is-collapsed {
