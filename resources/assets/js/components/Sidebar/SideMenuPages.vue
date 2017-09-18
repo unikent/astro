@@ -1,5 +1,5 @@
 <template>
-<li v-if="id!=='pages'" :class="id === active ? 'active' : ''">
+<li v-if="id==='pages'" :class="id === active ? 'active' : ''">
 	<el-tooltip :content="title" placement="left" :disabled="!showTooltip">
 		<a v-if="id==='errors'" href="#" @click.prevent="handleClick">
 			<el-badge is-dot class="item">
@@ -20,7 +20,7 @@ import Icon from 'components/Icon';
 /* global setTimeout, clearTimeout */
 
 export default {
-	name: 'side-menu-item',
+	name: 'side-menu-pages',
 
 	props: [
 		'index',

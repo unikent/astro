@@ -33,7 +33,20 @@
 		</div>
 
 		<section class="sidebar">
-			<ul class="sidebar__switcher" role="navigation">
+			<ul class="sidebar__switcher sidebar--pages" role="navigation">
+				<side-menu-pages
+					v-for="(item, index) in menu"
+					:link="item.link"
+					:icon="item.icon"
+					:title="item.title"
+					:id="item.id"
+					:key="item.link"
+					:index="index"
+					:active="activeMenuItem"
+					:onClick="openItem"
+				/>
+			</ul>
+			<ul :class="activeMenuItem==='pages'?'sidebar--deactivated':''" class="sidebar__switcher sidebar--in-page" role="navigation">
 				<side-menu-item
 					v-for="(item, index) in menu"
 					:link="item.link"
@@ -63,6 +76,7 @@ import { mapState, mapMutations } from 'vuex';
 
 import Icon from 'components/Icon';
 import SideMenuItem from 'components/sidebar/SideMenuItem';
+import SideMenuPages from 'components/sidebar/SideMenuPages';
 import PageList from 'components/PageList';
 import BlockSidebar from 'components/sidebar/BlockSidebar';
 import Navigation from 'components/sidebar/Navigation';
@@ -79,7 +93,8 @@ export default {
 
 	components: {
 		Icon,
-		SideMenuItem
+		SideMenuItem,
+		SideMenuPages
 	},
 
 	data() {
