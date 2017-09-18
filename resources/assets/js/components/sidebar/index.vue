@@ -32,8 +32,8 @@
 			/>
 		</div>
 
-		<section class="sidebar collapsed"">
-			<ul class="app-sidebar" role="navigation">
+		<section class="sidebar">
+			<ul class="sidebar__switcher" role="navigation">
 				<side-menu-item
 					v-for="(item, index) in menu"
 					:link="item.link"
@@ -97,14 +97,14 @@ export default {
 				{
 					link: '/media',
 					icon: 'layers',
-					title: 'Edit blocks',
+					title: 'Blocks',
 					id: 'blocks',
 					component: BlockSidebar
 				},
 				{
 					link: '/errors',
 					icon: 'alert',
-					title: 'Page errors',
+					title: 'Errors',
 					id: 'errors',
 					component: ErrorSidebar
 				}

@@ -1,23 +1,13 @@
 <template>
-<li v-if="id===active" class="active">
+<li :class="id === active ? 'active' : ''">
 	<el-tooltip :content="title" placement="left" :disabled="!showTooltip">
 		<a v-if="id==='errors'" href="#" @click.prevent="handleClick">
 			<el-badge is-dot class="item">
-			<icon :name="icon" className="menu-icon" />
-			<span>{{ title }}</span>
+				<icon :name="icon" className="menu-icon" />
 			</el-badge>
 		</a>
 		<a v-else href="#" @click.prevent="handleClick">
 			<icon :name="icon" className="menu-icon" />
-			<span>{{ title }}</span>
-		</a>
-	</el-tooltip>
-</li>
-<li v-else>
-	<el-tooltip :content="title" placement="left" :disabled="!showTooltip">
-		<a href="#" @click.prevent="handleClick">
-			<icon :name="icon" className="menu-icon" />
-			<span>{{ title }}</span>
 		</a>
 	</el-tooltip>
 </li>
