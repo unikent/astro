@@ -12,7 +12,9 @@ const state = {
 	pageModal: {
 		visible: false,
 		parentId: null
-	}
+	},
+	sitePath: 'site',
+	siteDomain: 'https://webtools-test.kent.ac.uk/'
 };
 
 const mutations = {

@@ -29,12 +29,19 @@
 	display: inline-block;
 	vertical-align: middle;
 	padding-left: 50px;
+	.el-tag {
+		font-size: 10px;
+	}
 }
 .top-bar__url {
 	font-size: 11px;
+	.el-tag {
+		height: 18px;
+		line-height: 16px;
+	}
 }
 .top-bar__title {
-	padding: 1rem 0;
+	padding: 1rem 0 0.5rem 0;
 }
 .top-bar-backbutton {
 	float: left;

@@ -6,8 +6,8 @@
 			</div>
 			<div class="top-bar__page-title">
 				<div class="top-bar__title">{{ pageTitle }}</div>
-				<el-tag type="success">Published</el-tag>
-				<span class="top-bar__url">{{ pagePath }}</span>
+				<span v-if="isPublished===true" class="top-bar__url"><el-tag type="success">Published</el-tag> <a :href="renderedURL" target="_blank">{{ renderedURL }}</a> <icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" /></span>
+				<span v-else class="top-bar__url"><el-tag type="warning">Draft</el-tag> {{ renderedURL }}</span>
 			</div>
 		</div>
 
@@ -78,7 +78,10 @@ export default {
 		...mapState({
 			pageTitle: state => state.page.pageTitle,
 			pagePath: state => state.page.pagePath,
-			pageSlug: state => state.page.pageSlug
+			pageSlug: state => state.page.pageSlug,
+			isPublished: state => state.page.isPublished,
+			sitePath: state => state.site.sitePath,
+			siteDomain: state => state.site.siteDomain
 		}),
 
 		showBack() {
@@ -87,6 +90,10 @@ export default {
 
 		username() {
 			return window.astro.username;
+		},
+
+		renderedURL() {
+			return this.siteDomain + this.sitePath + this.pagePath;
 		}
 	},
 

@@ -25,3 +25,11 @@ $status-colours: (
 	warning: #e5ce66,
 	danger: #d65757
 ) !default;
+
+// darker font colours to make them more readable against background colours
+$status-font-colours: (
+	success: #0a5f30,
+	primary: #0b63a5,
+	warning: #946902,
+	danger: #b10000
+) !default;
