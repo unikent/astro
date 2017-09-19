@@ -7,7 +7,7 @@
 		"
 	 />
 	<div ref="options-list" class="block-options-list custom-scrollbar">
-		<el-form
+		<el-block-form
 			v-if="currentDefinition"
 			label-position="top"
 			:model="blockFields"
@@ -70,7 +70,7 @@
 					"
 				/>
 			</el-form-item>
-		</el-form>
+		</el-block-form>
 
 		<!-- TODO: make this look nice -->
 		<div v-else>Click a block to display its options in this sidebar.</div>
@@ -92,8 +92,8 @@ import BackBar from './BackBar';
 import fields from 'components/fields';
 import containers from 'components/fields/containers';
 import { heights } from 'classes/sass';
-
 import Icon from './Icon';
+import BlockForm from './BlockForm';
 
 /* global document */
 
@@ -149,6 +149,14 @@ export default {
 			return this.errors.blocks ?
 				this.errors.blocks[this.currentRegion][this.currentIndex].fields : {};
 		},
+
+		// calculate the current client-side validation state of the form
+		// @TODO need to get this from el-form
+		currentValidation() {
+
+
+		},
+
 
 		rules() {
 			return Definition.getRules(this.currentDefinition, false);
