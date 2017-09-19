@@ -23,6 +23,7 @@ An element loading spinner is shown after the user hits 'Publish'.
 	v-loading="loading"
 	element-loading-text="Publishing your page..."
 	class="publish-modal"
+	:before-close="handleClose"
 	:close-on-press-escape="false"
 	:close-on-click-modal="false"
 >
@@ -143,6 +144,13 @@ export default {
 					this.published = false;
 					this.error = error.config.method + ' ' + error.config.url + ' ' + error.response.status + ' (' + error.response.statusText + ')';
 				});
+		},
+
+		/**
+		called when the user clicks the X icon, clicks away from the modal, or presses ESC
+		*/
+		handleClose() {
+			this.cancelPublish();
 		},
 
 		/**
