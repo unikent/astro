@@ -18,7 +18,7 @@ const state = {
 	pageData: {
 		blocks: {
 			main: []
-		}
+		},
 	},
 	pageTitle: 'Home page',
 	pagePath: '/',
@@ -26,7 +26,8 @@ const state = {
 	scale: .4,
 	loaded: false,
 	dragging: false,
-	currentSavedState: ''
+	currentSavedState: '',
+	validationIssues: []
 };
 
 const mutations = {
@@ -165,6 +166,26 @@ const mutations = {
 
 	resetCurrentSavedState(state) {
 		state.currentSavedState = '';	
+	},
+
+	addValidationIssue(state) {
+		var issue = {};
+		issue.index = state.currentBlockIndex;
+		issue.value = true
+		state.validationIssues[issue.index] = issue.value;
+	},
+
+
+	removeValidationIssue(state) {
+		// get current block and block id
+		// remove from set
+		state.validationIssues.splice(state.currentBlockIndex, 1);
+	}, 
+
+	// remove all validations issues in the current page
+	// for when we load a new page
+	clearValidationIssues(state) {
+		state.validationIssues = [];
 	}
 };
 
@@ -209,6 +230,7 @@ const actions = {
 						});
 
 						commit('setLoaded');
+						commit('clearValidationIssues');
 
 						undoStackInstance.init(state.pageData);
 					});
