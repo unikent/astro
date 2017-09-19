@@ -60,7 +60,7 @@ export default {
 
 		document.addEventListener('keydown', this.onKeyDown);
 		document.addEventListener('keyup', this.onKeyUp);
-		window.addEventListener("beforeunload", this.leaveAstro); 
+		window.addEventListener("beforeunload", this.leaveAstro);
 	},
 
 	destroyed() {
@@ -88,7 +88,7 @@ export default {
 	methods: {
 
 		leaveAstro(e) {
-			/* we are very limited as to what we can do when someone tries to leave 
+			/* we are very limited as to what we can do when someone tries to leave
 			https://developer.mozilla.org/en/docs/Web/Events/beforeunload
 			*/
 			const unsavedChangesExist = this.unsavedChangesExist();
