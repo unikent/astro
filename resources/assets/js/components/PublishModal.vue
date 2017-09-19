@@ -29,7 +29,7 @@ An element loading spinner is shown after the user hits 'Publish'.
 >
 	<div :style="published===true || error!=='' ? 'display:none;': 'display:block;'">
 		<p>You're about to publish the page <strong>{{ pageTitle }}</strong></p>
-		<p>It will be published to the URL <el-tag type="gray">{{ pagePath }}</el-tag></p>
+		<p>It will be published to the URL <el-tag type="gray">{{ renderedURL }}</el-tag></p>
 		<div class="publish-modal__buttons">
 			<span slot="footer" class="dialog-footer">
 				<el-button @click="cancelPublish">Cancel</el-button>
@@ -45,7 +45,7 @@ An element loading spinner is shown after the user hits 'Publish'.
 			:closable=false
 			>
 		</el-alert>
-		<div class="publish-modal__message">View your new page now at <a :href="pagePath" target="_blank">{{ pagePath }}</a> (opens in a new tab)</div>
+		<div class="publish-modal__message">View your new page now at <a :href="renderedURL" target="_blank">{{ renderedURL }}</a> (opens in a new tab)</div>
 		<div class="publish-modal__buttons">
 			<span slot="footer" class="dialog-footer">
 				<el-button type="primary" @click="cancelPublish">Close</el-button>
@@ -99,7 +99,9 @@ export default {
 		...mapState({
 			pageTitle: state => state.page.pageTitle,
 			pagePath: state => state.page.pagePath,
-			pageSlug: state => state.page.pageSlug
+			pageSlug: state => state.page.pageSlug,
+			siteDomain: state => state.site.siteDomain,
+			sitePath: state => state.site.sitePath
 		}),
 
 		// basically controls show/hide of the modal
@@ -115,6 +117,11 @@ export default {
 					this.hidePublishModal();
 				}
 			}
+		},
+
+		// frontend URL - so the user can view their newly-published page
+		renderedURL() {
+			return this.siteDomain + this.sitePath + this.pagePath;
 		}
 	},
 

@@ -12,13 +12,15 @@ const state = {
 	pageModal: {
 		visible: false,
 		parentId: null
-	}
+	},
+	sitePath: 'site',
+	siteDomain: 'https://webtools-test.kent.ac.uk/'
 };
 
 const mutations = {
 
-    updateCurrentSiteID(state, id) {
-    	state.site = id;
+	updateCurrentSiteID(state, id) {
+		state.site = id;
 	},
 
 	setSite(state, pages) {

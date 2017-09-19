@@ -164,7 +164,7 @@ const mutations = {
 	},
 
 	resetCurrentSavedState(state) {
-		state.currentSavedState = '';	
+		state.currentSavedState = '';
 	}
 };
 
@@ -222,7 +222,7 @@ const actions = {
 	 * @param {Object} commit - added by VueX
 	 * @param {Object} payload - parameter object
 	 * @param {callback} payload.message - function to display a message
-	 * @return {promise} - api - to allow other methods to wait for the save 
+	 * @return {promise} - api - to allow other methods to wait for the save
 	 * to complete
 	 */
 	handleSavePage({ state, commit }, payload) {
