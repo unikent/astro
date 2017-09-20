@@ -19,6 +19,7 @@ class Block extends Model
 
 	protected $casts = [
 		'fields' => 'json',
+		'errors' => 'json'
 	];
 
 	protected $definition = null;
