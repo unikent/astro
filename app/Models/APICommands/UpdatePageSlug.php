@@ -26,13 +26,50 @@ class UpdatePageSlug implements APICommand
     {
         $result = DB::transaction(function() use($input,$user){
             $page = Page::find($input['id']);
-
-
-            $page->fresh();
+            if($input['slug'] == $page->slug){
+            	return $page;
+			}
+			$this->updateSlugAndPaths($page, $input['slug']);
+			$page->refresh();
             return $page;
         });
         return $result;
     }
+
+
+	/**
+	 * Update the paths in the database for a Page and its descendants when it moves to a new parent.
+	 * @param Page $page The Page which is moving
+	 * @param Page $parent The Page which will be the new parent.
+	 */
+	public function updateSlugAndPaths($page,$slug)
+	{
+		$replace_length = strlen($page->path); // get length to replace
+		$replace_with = (strlen($page->parent->path) == 1 ? '' : $page->parent->path) . '/' . $slug;
+		$binds = [
+			// handle root parent with path of '/' as a special case
+			'prefix' => $replace_with,
+			'replace_length' => $replace_length,
+			'lft' => $page->lft,
+			'rgt' => $page->rgt,
+			'site_id' => $page->site_id,
+			'version' => $page->version
+		];
+
+		DB::update("
+          UPDATE pages 
+          SET 
+            path = CONCAT(:prefix, SUBSTRING(path, :replace_length) )
+          WHERE lft >= :lft
+          AND lft < :rgt
+          AND site_id = :site_id
+          AND version = :version
+        ",
+			$binds
+		);
+		$page->slug = $slug;
+		$page->save();
+	}
 
     /**
      * Get the error messages for this command.
@@ -41,7 +78,10 @@ class UpdatePageSlug implements APICommand
      */
     public function messages(Collection $data, Authenticatable $user)
     {
-        return [];
+        return [
+        	'slug.regex' => 'Slug can only contain lowercase letters, numbers and hyphens.',
+			'slug_unchanged_or_unique' => 'A page with the slug "' . $data->get('slug') . '" already exists at this level.'
+		];
     }
 
     /**
@@ -51,13 +91,19 @@ class UpdatePageSlug implements APICommand
      */
     public function rules(Collection $data, Authenticatable $user)
     {
+        $page = Page::find($data->get('id'));
+        $parent_id = $page ? $page->parent_id : null;
         $rules = [
             'id' => [
                 'exists:pages,id'
             ],
             'slug' => [
-                'string'
-            ]
+                // slug is required and can only contain lowercase letters, numbers, hyphen or underscore.
+                'required',
+                'regex:/^[a-z0-9_-]+$/',
+                // there must not be an existing draft page with the same slug under the parent page
+				'slug_unchanged_or_unique:'.$data->get('id')
+            ],
         ];
         return $rules;
     }
