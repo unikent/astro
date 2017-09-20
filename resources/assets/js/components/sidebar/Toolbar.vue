@@ -101,15 +101,19 @@ export default {
 			this.$store.commit('updateCurrentSavedState');
 		},
 
+		/**
+		save the page
+		also send a notification object so we can output a success message
+		*/
 		savePage() {
-			this.handleSavePage({message: this.$message});
+			this.handleSavePage({notify: this.$notify});
 		},
 
 		/* autosave the page and open a preview window */
 		previewPage() {
 			/* handleSavePage returns a promise so we here we wait for it to complete before
 			opening the preview window */
-			this.handleSavePage({message: this.$message})
+			this.handleSavePage()
 				.then(() => {
 					window.open(this.draftLink,'_blank');
 				});

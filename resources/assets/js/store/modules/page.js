@@ -164,7 +164,7 @@ const mutations = {
 	},
 
 	resetCurrentSavedState(state) {
-		state.currentSavedState = '';	
+		state.currentSavedState = '';
 	}
 };
 
@@ -222,26 +222,44 @@ const actions = {
 	 * @param {Object} commit - added by VueX
 	 * @param {Object} payload - parameter object
 	 * @param {callback} payload.message - function to display a message
-	 * @return {promise} - api - to allow other methods to wait for the save 
+	 * @return {promise} - api - to allow other methods to wait for the save
 	 * to complete
 	 */
 	handleSavePage({ state, commit }, payload) {
-			const blocks = state.pageData.blocks;
-			const id = state.pageData.id;
-			return api
-				.put(`pages/${id}/content`, {
-                    blocks: blocks
-                })
-				.then(() => {
-					payload.message({
-							message: 'Page saved',
-							type: 'success',
-							duration: 2000
-						});
-					commit('updateCurrentSavedState');
-				})
-				.catch(() => {});
-	},
+		const blocks = state.pageData.blocks;
+		const id = state.pageData.id;
+		return api
+			.put(`pages/${id}/content`, {
+				blocks: blocks
+			})
+			/**
+			successful save
+			- only display the notification message if that's what we want (there's a defined payload)
+			- eg on preview we don't want to show a save message
+			*/
+			.then(() => {
+				if (payload) {
+					payload.notify({
+						title: 'Saved',
+						message: 'You\'ve saved this page successfully.',
+						type: 'success',
+						duration: 4000
+					});
+				}
+				commit('updateCurrentSavedState');
+			})
+			/**
+			unsuccessful save, such as a network problem
+			*/
+			.catch(() => {
+				payload.notify({
+					title: 'Not saved',
+					message: 'There was a problem and this page has not been saved. Please try again later.',
+					type: 'error',
+					duration: 0
+				});
+			});
+	}
 };
 
 const getters = {

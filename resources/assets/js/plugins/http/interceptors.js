@@ -31,11 +31,11 @@ export default (http, store, router) => {
 						if(response.data.errors) {
 							response.data.errors.forEach(error => {
 
-								vue.$alert('We saved your page, but we also highlighted a few problems on the page. You\'ll need to check these before you can publish.', 'Almost there...', {
-									confirmButtonText: 'OK',
-									type: 'warning',
-									closeOnClickModal: true,
-									closeOnPressEscape: true
+								const h = vue.$createElement;
+								vue.$notify({
+									title: 'Page saved',
+									message: h('i', { style: 'color: #bb9132' }, 'We saved your page, but there are some fixes to make before you can publish.'),
+									type: 'warning'
 								});
 
 								if(error.details && typeof error.details === 'object') {
