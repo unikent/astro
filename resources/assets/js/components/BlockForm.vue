@@ -1,7 +1,11 @@
 <script>
 /**
-custom form component for use with the block editor which reports its current validation 
-sends a passValidation or failValidation event to its parent 
+Custom form component for use with the block editor which reports its current validation 
+Sends a passValidation or failValidation event to its parent 
+
+Used within the editor sidebar to allow users to update blocks 
+
+inherited from the Form compoent from ElementUI
 */
 import Vue from 'vue';
 import { Form } from 'element-ui';
