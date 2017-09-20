@@ -1,14 +1,46 @@
+/**
+TopBar.vue
+
+The top bar is the container for the main actions across the site and within pages.
+
+The top bar is split into two flavours:
+
+1. homepage. A very minimal top bar shown only on the homepage. It's made up of just a logout dropdown and other key site information.
+
+2. page editing. The page editing top bar is made up of three sections:
+	a. back button to the site list/homepage
+	b. page title, publish status, and url
+	c. toolbar with device view, save, preview, publish actions, as well as the logout dropdown.
+
+Note that the page editing toolbar is a separate component found in `components/Toolbar.vue`
+
+*/
 <template>
 	<div class="top-bar" v-if="showBack">
 		<div>
 			<div v-show="showBack" @click="backToSites" class="top-bar-backbutton">
-				<i class="el-icon-arrow-left backbutton-icon"></i>Site list
+				<i class="el-icon-arrow-left backbutton-icon"></i>Sites
 			</div>
-			<div class="top-bar__page-title">
+			<div v-if="publishStatus==='published'" class="top-bar__page-title">
+				<div class="top-bar__title">{{ pageTitle }}<el-tag type="success">Published</el-tag></div>
+				<span class="top-bar__url"><a :href="renderedURL" target="_blank">{{ renderedURL }}</a> <icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" /></span>
+			</div>
+
+			<div v-else-if="publishStatus==='draft'" class="top-bar__page-title">
+				<div class="top-bar__title">{{ pageTitle }}<el-tag type="warning">Draft</el-tag></div>
+				<span class="top-bar__url"><a :href="renderedURL" target="_blank">{{ renderedURL }}</a> <icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" /></span>
+			</div>
+
+			<div v-if="publishStatus==='new'" class="top-bar__page-title">
+				<div class="top-bar__title">{{ pageTitle }}<el-tag type="primary">Unpublished draft</el-tag></div>
+				<span class="top-bar__url">{{ renderedURL }}</span>
+			</div>
+
+			<div v-else class="top-bar__page-title">
 				<div class="top-bar__title">{{ pageTitle }}</div>
-				<span v-if="isPublished===true" class="top-bar__url"><el-tag type="success">Published</el-tag> <a :href="renderedURL" target="_blank">{{ renderedURL }}</a> <icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" /></span>
-				<span v-else class="top-bar__url"><el-tag type="warning">Draft</el-tag> {{ renderedURL }}</span>
+				<span class="top-bar__url">{{ renderedURL }}</span>
 			</div>
+
 		</div>
 
 		<div class="top-bar__tools">
@@ -40,9 +72,7 @@
 <script>
 import { mapState, mapGetters, mapActions, mapMutations } from 'vuex';
 import Icon from 'components/Icon';
-import { undoStackInstance } from 'plugins/undo-redo';
-import { onKeyDown, onKeyUp } from 'plugins/key-commands';
-import Toolbar from 'components/sidebar/Toolbar';
+import Toolbar from 'components/Toolbar';
 import promptToSave from '../mixins/promptToSave';
 import Config from '../classes/Config.js';
 
@@ -79,7 +109,7 @@ export default {
 			pageTitle: state => state.page.pageTitle,
 			pagePath: state => state.page.pagePath,
 			pageSlug: state => state.page.pageSlug,
-			isPublished: state => state.page.isPublished,
+			publishStatus: state => state.page.publishStatus,
 			sitePath: state => state.site.sitePath,
 			siteDomain: state => state.site.siteDomain
 		}),
@@ -122,23 +152,24 @@ export default {
 		handleCommand(command) {
 			if(command === 'sign-out') {
 				this.promptToSave(() => {
-
-                    var form = document.createElement("form");
-                    form.setAttribute("method", 'post');
-                    form.setAttribute("action", Config.get('base_url', '') + '/auth/logout');
-                    var csrf = document.createElement("input");
-                    csrf.setAttribute("type", "hidden");
-                    csrf.setAttribute("name", "_token");
-                    csrf.setAttribute("value", window.astro.csrf_token);
-                    form.appendChild(csrf);
-                    document.body.appendChild(form);
-                    form.submit();
-
-//					window.location = Config.get('base_url', '') + '/auth/logout';
+					var form = document.createElement("form");
+					form.setAttribute("method", 'post');
+					form.setAttribute("action", Config.get('base_url', '') + '/auth/logout');
+					var csrf = document.createElement("input");
+					csrf.setAttribute("type", "hidden");
+					csrf.setAttribute("name", "_token");
+					csrf.setAttribute("value", window.astro.csrf_token);
+					form.appendChild(csrf);
+					document.body.appendChild(form);
+					form.submit();
+					//window.location = Config.get('base_url', '') + '/auth/logout';
 				});
 			}
 		},
 
+		/**
+			gets the user back to the main site listing
+		*/
 		backToSites() {
 			this.promptToSave(() => {
 				this.$store.commit('changePage', {title: "Home page", path: '/', slug:'home'});

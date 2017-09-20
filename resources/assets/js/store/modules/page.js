@@ -27,7 +27,7 @@ const state = {
 	loaded: false,
 	dragging: false,
 	currentSavedState: '',
-	isPublished: true
+	publishStatus: ''
 };
 
 const mutations = {
