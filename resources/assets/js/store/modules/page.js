@@ -1,7 +1,8 @@
 /**
  * Page State Module
- * @module state
- * @namespace State
+ * @module store/page
+ * @see module:store
+ * @memberof module:store
  */
 
 import _ from 'lodash';
@@ -10,6 +11,16 @@ import { Definition } from 'classes/helpers';
 import api from 'plugins/http/api';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { eventBus } from 'plugins/eventbus';
+
+/**
+ * The Page State
+
+ * @typedef {Object} PageState
+ * @property {string} currentLayout - The name of the layout in use for the current page.
+ * @property {int} currentLayoutVersion - The version number of the layout in use for the current page.
+ * @property {number|null} currentBlockIndex - The index of the currently selected block in the currently selected region.
+ * @property {string} currentRegion - The name of the region containing the currently selected block.
+ */
 
 const state = {
 	currentLayout: null,
@@ -234,6 +245,7 @@ const actions = {
 	 * @param {callback} payload.message - function to display a message
 	 * @return {promise} - api - to allow other methods to wait for the save 
 	 * to complete
+	 * @memberof module:store/page
 	 */
 	handleSavePage({ state, commit }, payload) {
 			const blocks = state.pageData.blocks;
@@ -298,9 +310,10 @@ const getters = {
 	}
 };
 
+
 /**
- * The Page State
- * @property {object} state The state
+ * Imaginary Namespace
+ * @exports Page
  */
 export default {
 	state,

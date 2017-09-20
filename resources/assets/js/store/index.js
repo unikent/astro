@@ -9,10 +9,14 @@ import media from './modules/media';
 import definition from './modules/definition';
 import Config from 'classes/Config';
 
-/* global process */
 
 Vue.use(Vuex);
 
+/**
+ * Store Module
+ * @module store
+ * @see module:store/page
+ */
 let store = new Vuex.Store({
 
 	state: {
@@ -124,5 +128,6 @@ let store = new Vuex.Store({
 	strict: process.env.NODE_ENV !== 'production'
 
 });
+
 
 export default store;

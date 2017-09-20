@@ -17,13 +17,13 @@ const state = {
 
 const mutations = {
 
-    /**
+	/**
 	 * Set the current site id stored in the store.
-     * @param {object} state
-     * @param {int} id The id of the site to set as current site.
-     */
-    updateCurrentSiteID(state, id) {
-    	state.site = id;
+	 * @param {object} state
+	 * @param {int} id The id of the site to set as current site.
+	 */
+	updateCurrentSiteID(state, id) {
+		state.site = id;
 	},
 
 	setSite(state, pages) {
@@ -105,9 +105,9 @@ const actions = {
 
 	updatePage({ dispatch }, page) {
 		api
-            .put(`pages/${page.id}/content`, {
-                blocks: page.blocks
-            })
+			.put(`pages/${page.id}/content`, {
+				blocks: page.blocks
+			})
 			.then(() => {
 				dispatch('fetchSite');
 			})
@@ -116,10 +116,10 @@ const actions = {
 	movePageApi({ dispatch }, move) {
 		// If-Unmodified-Since
 		api
-		 	.patch(`sites/${state.site}/tree`, move)
-		 	.then(() => {
-		 		dispatch('fetchSite');
-		 	});
+			.patch(`sites/${state.site}/tree`, move)
+			.then(() => {
+				dispatch('fetchSite');
+			});
 		console.log(move);
 	},
 
@@ -140,7 +140,7 @@ const actions = {
 
 			const page = _.cloneDeep(oldPage.data);
 
-            // remove old page
+			// remove old page
 			commit('removePage', oldPage);
 			// update current and child page depths
 			updateDepths(page, newPage.parent.depth + 1);
