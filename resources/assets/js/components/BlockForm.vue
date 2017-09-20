@@ -1,29 +1,14 @@
 <script>
 /**
 custom form component for use with the block editor which reports its current validation 
-state to the vuex store
-
-inherits from the standard Element Form
-**/
-import { mapMutations } from 'vuex';
+sends a passValidation or failValidation event to its parent 
+*/
 import Vue from 'vue';
 import { Form } from 'element-ui';
 
-export default Vue.component('el-block-form', {
+export default Vue.component('block-form', {
 	extends: Form,
 
-	data: function () {
-	  return {
-	    currentValidationState: true
-	  }
-	},
-
-	methods: {
-		...mapMutations([
-			'removeValidationIssue', 
-			'addValidationIssue'
-			]),
-	},
 	computed: {
 		valid: function() {
 			if (this.fields) {
@@ -37,14 +22,24 @@ export default Vue.component('el-block-form', {
 		}
 	},
 	watch:{
-		valid: function(value) {
-			if (value) {
-				this.removeValidationIssue();
+		valid: function(isValid) {
+			if (isValid) {
+				this.$emit('passValidation');
 			} else {
-				this.addValidationIssue();
+				this.$emit('failValidation');
 			}
 		}	
-	}	
+	},
+	updated: function() {
+		// invoked when the form is loaded with a new block of data
+		this.validate((isValid) => {
+			if (isValid) {
+				this.$emit('passValidation');
+			} else {
+				this.$emit('failValidation');
+			}
+		});
 
+	}
 })
 </script>

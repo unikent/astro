@@ -7,8 +7,10 @@
 		"
 	 />
 	<div ref="options-list" class="block-options-list custom-scrollbar">
-		<el-block-form
+		<block-form
 			v-if="currentDefinition"
+			v-on:failValidation="setValidation(false)"
+			v-on:passValidation="setValidation(true)"
 			label-position="top"
 			:model="blockFields"
 			:rules="rules"
@@ -70,7 +72,7 @@
 					"
 				/>
 			</el-form-item>
-		</el-block-form>
+		</block-form>
 
 		<!-- TODO: make this look nice -->
 		<div v-else>Click a block to display its options in this sidebar.</div>
@@ -98,6 +100,11 @@ import BlockForm from './BlockForm';
 /* global document */
 
 export default {
+	data: function () {
+			return {
+				valid: true
+			}
+		},
 
 	name: 'block-options',
 
@@ -109,6 +116,7 @@ export default {
 	},
 
 	computed: {
+
 
 		...mapGetters([
 			'getCurrentBlock'
@@ -149,14 +157,6 @@ export default {
 			return this.errors.blocks ?
 				this.errors.blocks[this.currentRegion][this.currentIndex].fields : {};
 		},
-
-		// calculate the current client-side validation state of the form
-		// @TODO need to get this from el-form
-		currentValidation() {
-
-
-		},
-
 
 		rules() {
 			return Definition.getRules(this.currentDefinition, false);
@@ -237,6 +237,10 @@ export default {
 			if(this.currentBlock.fieldElements[fieldName]) {
 				console.log(this.currentBlock.fieldElements[fieldName]);
 			}
+		},
+
+		setValidation(status) {
+			this.valid = status;
 		}
 
 	}
