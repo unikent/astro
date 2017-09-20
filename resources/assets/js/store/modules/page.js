@@ -1,3 +1,9 @@
+/**
+ * Page State Module
+ * @module state
+ * @namespace State
+ */
+
 import _ from 'lodash';
 import Vue from 'vue';
 import { Definition } from 'classes/helpers';
@@ -30,7 +36,10 @@ const state = {
 };
 
 const mutations = {
-
+    /**
+	 * Mutation to set the current page.
+     * @param {object} page Page object representing the current page.
+     */
 	setPage(state, page) {
 		if(!page.blocks) {
 			page.blocks = {
@@ -218,8 +227,9 @@ const actions = {
 
 	/**
 	 * Saves a page
-	 * @param {Object} state - the context of the action - added by VueX
-	 * @param {Object} commit - added by VueX
+	 * @param {Object} input
+	 * @param {Object} input.state - the context of the action - added by VueX
+	 * @param {Object} input.commit - added by VueX
 	 * @param {Object} payload - parameter object
 	 * @param {callback} payload.message - function to display a message
 	 * @return {promise} - api - to allow other methods to wait for the save 
@@ -288,6 +298,10 @@ const getters = {
 	}
 };
 
+/**
+ * The Page State
+ * @property {object} state The state
+ */
 export default {
 	state,
 	mutations,

@@ -17,6 +17,11 @@ const state = {
 
 const mutations = {
 
+    /**
+	 * Set the current site id stored in the store.
+     * @param {object} state
+     * @param {int} id The id of the site to set as current site.
+     */
     updateCurrentSiteID(state, id) {
     	state.site = id;
 	},
