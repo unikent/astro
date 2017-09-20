@@ -19,14 +19,14 @@ const state = {
 			main: []
 		}
 	},
-	pageTitle: '',
-	pagePath: '',
-	pageSlug: '',
+	pageTitle: '', // current page title, shown in the TopBar and used to link users to the published version of a page
+	pagePath: '', // current page path, shown in the TopBar and used to link users to the published version of a page
+	pageSlug: '', // current page slug, shown in the TopBar and used to link users to the published version of a page
 	scale: .4,
 	loaded: false,
 	dragging: false,
 	currentSavedState: '',
-	publishStatus: ''
+	publishStatus: '' // publish status of the page, shown in the TopBar. TODO This doesn't have any values yet but once the api tells us publish status we'll be able to test for appropriate values
 };
 
 const mutations = {
