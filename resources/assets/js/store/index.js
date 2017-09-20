@@ -12,13 +12,16 @@ import Config from 'classes/Config';
 
 Vue.use(Vuex);
 
-/**
- * Store Module
- * @module store
- * @see module:store/page
- */
 let store = new Vuex.Store({
 
+	/**
+	 * The global editor state
+	 * @namespace state
+	 * @property {Object} over - What coordinates the mouse is over???
+	 * @property {number} over.x - X Coordinate
+	 * @property {number} over.y - Y Coordinate
+	 * @property {Object} WrapperStyles - The styles for the wrapper.
+	 */
 	state: {
 		over: {
 			x: 0,

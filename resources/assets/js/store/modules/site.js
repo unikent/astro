@@ -4,6 +4,11 @@ import Vue from 'vue';
 
 const vue = new Vue();
 
+/**
+ * @namespace state/site
+ * @property {Array} pages - Array of Pages in the current Site.
+ * @property {number} site - ID of the current Site.
+ */
 const state = {
 	pages: [],
 	site: 1,
@@ -19,6 +24,8 @@ const mutations = {
 
 	/**
 	 * Set the current site id stored in the store.
+	 * @function
+	 * @memberof state/site#
 	 * @param {object} state
 	 * @param {int} id The id of the site to set as current site.
 	 */
