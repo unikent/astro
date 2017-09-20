@@ -42,6 +42,12 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Validator::extend('parent_is_published', function( $attr, $value ) { return PublishPage::canBePublished($value); });
+
+        Validator::extend('page_is_valid', function($attr, $id) {
+        	$page = Page::find($id);
+        	return $page && $page->revision->valid;
+		});
+
         Validator::extend('unique_site_path', function($attr, $value, $parameters, $validator) {
             $host = isset($parameters[0]) ? $parameters[0] : null;
             return (new UniqueSitePathRule($host))->passes($attr, $value);

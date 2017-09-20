@@ -47,7 +47,8 @@ class UpdatePage implements APICommand
                 'created_by' => $user->id,
                 'updated_by' => $user->id,
                 'options' => $options,
-                'blocks' => $previous_revision->bake
+                'blocks' => $previous_revision->bake,
+				'valid' => $previous_revision->valid
             ]);
             $page->setRevision($revision);
             $page->fresh();
