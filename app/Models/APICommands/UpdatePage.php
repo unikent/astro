@@ -78,10 +78,13 @@ class UpdatePage implements APICommand
                 'exists:pages,id'
             ],
             'options' => [
-                'array'
+                'array',
+                'nullable'
             ],
             'title' => [
-                'string'
+                'string',
+                'max:150',
+                'nullable'
             ]
         ];
         return $rules;

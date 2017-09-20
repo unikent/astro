@@ -32,7 +32,8 @@
 			/>
 		</div>
 
-		<section class="sidebar collapsed"">
+
+		<section class="sidebar collapsed">
 			<ul class="app-sidebar" role="navigation">
 				<side-menu-item
 					v-for="(item, index) in menu"

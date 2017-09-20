@@ -9,8 +9,6 @@ use Auth;
 use DB;
 use Exception;
 use App\Models\Page;
-use App\Models\Site;
-use App\Models\Block;
 use Illuminate\Http\Request;
 use App\Models\Revision;
 use App\Exceptions\UnpublishedParentException;
@@ -74,7 +72,26 @@ class PageController extends ApiController
     public function update(Request $request, Page $page){
         $this->authorize('update', $page);
         $api = new LocalAPIClient(Auth::user());
-        $page = $api->updatePage($page->id, $request->input('title'), $request->input('settings', null));
+        $page = $api->updatePage(
+            $page->id,
+            $request->input('title'),
+            $request->input('settings', null)
+        );
+        return fractal($page, new PageTransformer(true))->respond();
+    }
+
+    /**
+     * PUT /api/v1/page/{page}/slug
+     * Update page slug
+     * @param Request $request
+     * @param Page $page
+     * @return Response
+     */
+    public function changeSlug(Request $request, Page $page)
+    {
+        $this->authorize('update', $page);
+        $api = new LocalAPIClient(Auth::user());
+        $page = $api->renamePage($page->id, $request->input('slug'));
         return fractal($page, new PageTransformer(true))->respond();
     }
 

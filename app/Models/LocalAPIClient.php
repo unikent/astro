@@ -8,6 +8,7 @@ use App\Models\APICommands\UpdateContent;
 use App\Models\APICommands\DeletePage;
 use App\Models\APICommands\MovePage;
 use App\Models\APICommands\UpdatePage;
+use App\Models\APICommands\UpdatePageSlug;
 use Astro\Renderer\API\Exception\APIErrorException;
 use Astro\Renderer\API\Data\PageData;
 use Astro\Renderer\API\Data\RouteData;
@@ -233,7 +234,7 @@ class LocalAPIClient implements APIClient
 
     public function renamePage($page_id, $new_slug)
     {
-        return $this->execute(RenamePage::class, [
+        return $this->execute(UpdatePageSlug::class, [
             'id' => $page_id,
             'slug' => $new_slug,
         ]);
