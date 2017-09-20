@@ -76,8 +76,6 @@ import Toolbar from 'components/Toolbar';
 import promptToSave from '../mixins/promptToSave';
 import Config from '../classes/Config.js';
 
-/* global window, document */
-
 export default {
 
 	name: 'top-bar',
@@ -90,28 +88,19 @@ export default {
 	mixins:[ promptToSave ],
 
 	created() {
-		this.onKeyDown = onKeyDown(undoStackInstance);
-		this.onKeyUp = onKeyUp(undoStackInstance);
-
-		document.addEventListener('keydown', this.onKeyDown);
-		document.addEventListener('keyup', this.onKeyUp);
 		window.addEventListener("beforeunload", this.leaveAstro);
-	},
-
-	destroyed() {
-		document.removeEventListener('keydown', this.onKeyDown);
-		document.removeEventListener('keyup', this.onKeyUp);
 	},
 
 	computed: {
 
 		...mapState({
-			pageTitle: state => state.page.pageTitle, // the title of the current page so we can output the title of the current page in the topbar
-			pagePath: state => state.page.pagePath, // the path of the current page so we can output the path of the current page in the topbar
-			pageSlug: state => state.page.pageSlug, // the slug of the current page so we can output the slug of the current page in the topbar
-			publishStatus: state => state.page.publishStatus, // the publish status of the page so we can output the publish status of the current page in the topbar
-			sitePath: state => state.site.sitePath, // the path of the site that the page belongs to so we can output the path of the current page in the topbar
-			siteDomain: state => state.site.siteDomain // the domain of the site that the page belongs to so we can output the domain of the current page in the topbar
+			pageData: state => state.page.pageData, // complete set of page data. We need this so we can get the right info as the site is first loaded (things like title and slug won't already be in the store)
+			pageTitle: state => state.page.pageTitle, // the title of the current page for the topbar
+			pagePath: state => state.page.pagePath, // the path of the current page for the topbar
+			pageSlug: state => state.page.pageSlug, // the slug of the current page for the topbar
+			publishStatus: state => state.page.publishStatus, // the publish status of the page for the publish status of the current page in the topbar
+			sitePath: state => state.site.sitePath, // the path of the site that the page belongs to the current page path in the topbar
+			siteDomain: state => state.site.siteDomain // the domain of the site that the page belongs to for the current page path in the topbar
 		}),
 
 		// works out if we should show a back button or not (ie whether we're editing a page or on the homepage)
@@ -177,10 +166,9 @@ export default {
 		backToSites() {
 			// another prompt to save the page when going back to the site listing
 			this.promptToSave(() => {
-				this.$store.commit('changePage', {title:'Home page', path:'/', slug:'home'});
+				this.$store.commit('changePage', {title:'', path:'', slug:''});
 				this.$store.commit('setPage', {});
 				this.$store.commit('setLoaded', false);
-				undoStackInstance.clear();
 				this.$router.push('/sites');
 			})
 		}

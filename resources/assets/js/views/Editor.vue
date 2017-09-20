@@ -70,6 +70,11 @@ export default {
 
 		updateCurrentSavedState() {
 			this.$store.commit('updateCurrentSavedState');
+			// update page title, path, slug in the store, so the top-bar can display the correct info even when the user has typed the url directly into the browser
+			// only do this however if the page has already loaded
+			if (this.pageLoaded) {
+				this.$store.commit('changePage', {title:this.$store.state.page.pageData.title, path:this.$store.state.page.pageData.path, slug:this.$store.state.page.pageData.slug});
+			}
 		}
 	},
 	computed: {

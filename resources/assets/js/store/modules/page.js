@@ -2,7 +2,6 @@ import _ from 'lodash';
 import Vue from 'vue';
 import { Definition } from 'classes/helpers';
 import api from 'plugins/http/api';
-import { undoStackInstance } from 'plugins/undo-redo';
 import { eventBus } from 'plugins/eventbus';
 
 const state = {
@@ -20,9 +19,9 @@ const state = {
 			main: []
 		}
 	},
-	pageTitle: 'Home page',
-	pagePath: '/',
-	pageSlug: 'home',
+	pageTitle: '',
+	pagePath: '',
+	pageSlug: '',
 	scale: .4,
 	loaded: false,
 	dragging: false,
@@ -109,7 +108,6 @@ const mutations = {
 	},
 
 	changePage(state, { title, path, slug }) {
-		// TODO: replace this with actual domain when that info is available
 		if(slug === null) {
 			slug = '/';
 		}
@@ -210,8 +208,6 @@ const actions = {
 						});
 
 						commit('setLoaded');
-
-						undoStackInstance.init(state.pageData);
 					});
 
 			});
