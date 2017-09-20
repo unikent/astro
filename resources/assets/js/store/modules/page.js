@@ -227,21 +227,21 @@ const actions = {
 	 * to complete
 	 */
 	handleSavePage({ state, commit }, payload) {
-			const blocks = state.pageData.blocks;
-			const id = state.pageData.id;
-			return api
-				.put(`pages/${id}/content`, {
-                    blocks: blocks
-                })
-				.then(() => {
-					payload.message({
-							message: 'Page saved',
-							type: 'success',
-							duration: 2000
-						});
-					commit('updateCurrentSavedState');
-				})
-				.catch(() => {});
+		const blocks = state.pageData.blocks;
+		const id = state.pageData.id;
+		return api
+			.put(`pages/${id}/content`, {
+				blocks: blocks
+			})
+			.then(() => {
+				payload.message({
+					message: 'Page saved',
+					type: 'success',
+					duration: 2000
+				});
+				commit('updateCurrentSavedState');
+			})
+			.catch(() => {});
 	},
 };
 
@@ -281,9 +281,10 @@ const getters = {
 
 	unsavedChangesExist: (state) => () => {
 		if (state.currentSavedState.length === 0) {
-	 		// if user has not edited a page yet so we do not have any unsaved changes
+			// if user has not edited a page yet so we do not have any unsaved changes
 			return false;
-		} else {
+		}
+		else {
 			return state.currentSavedState != JSON.stringify(state.pageData.blocks);
 		}
 	}

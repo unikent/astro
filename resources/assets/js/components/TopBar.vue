@@ -106,22 +106,25 @@ export default {
 	computed: {
 
 		...mapState({
-			pageTitle: state => state.page.pageTitle,
-			pagePath: state => state.page.pagePath,
-			pageSlug: state => state.page.pageSlug,
-			publishStatus: state => state.page.publishStatus,
-			sitePath: state => state.site.sitePath,
-			siteDomain: state => state.site.siteDomain
+			pageTitle: state => state.page.pageTitle, // the title of the current page so we can output the title of the current page in the topbar
+			pagePath: state => state.page.pagePath, // the path of the current page so we can output the path of the current page in the topbar
+			pageSlug: state => state.page.pageSlug, // the slug of the current page so we can output the slug of the current page in the topbar
+			publishStatus: state => state.page.publishStatus, // the publish status of the page so we can output the publish status of the current page in the topbar
+			sitePath: state => state.site.sitePath, // the path of the site that the page belongs to so we can output the path of the current page in the topbar
+			siteDomain: state => state.site.siteDomain // the domain of the site that the page belongs to so we can output the domain of the current page in the topbar
 		}),
 
+		// works out if we should show a back button or not (ie whether we're editing a page or on the homepage)
 		showBack() {
 			return ['site', 'page'].indexOf(this.$route.name) !== -1;
 		},
 
+		// lets us output the current user's username in the top bar
 		username() {
 			return window.astro.username;
 		},
 
+		// lets us output a calculated url for the current page in the top bar
 		renderedURL() {
 			return this.siteDomain + this.sitePath + this.pagePath;
 		}
@@ -151,6 +154,7 @@ export default {
 
 		handleCommand(command) {
 			if(command === 'sign-out') {
+				// prompts the user to save the page when they try to log out
 				this.promptToSave(() => {
 					var form = document.createElement("form");
 					form.setAttribute("method", 'post');
@@ -171,8 +175,9 @@ export default {
 			gets the user back to the main site listing
 		*/
 		backToSites() {
+			// another prompt to save the page when going back to the site listing
 			this.promptToSave(() => {
-				this.$store.commit('changePage', {title: "Home page", path: '/', slug:'home'});
+				this.$store.commit('changePage', {title:'Home page', path:'/', slug:'home'});
 				this.$store.commit('setPage', {});
 				this.$store.commit('setLoaded', false);
 				undoStackInstance.clear();
