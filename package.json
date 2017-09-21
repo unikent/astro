@@ -16,6 +16,8 @@
     "chart.js": "^2.5.0",
     "cms-prototype-blocks": "git+ssh://git@github.com/unikent/cms-prototype-blocks.git#master",
     "color-thief-standalone": "^1.0.3",
+    "documentation": "^5.3.2",
+    "documentation-loader": "^0.1.1-beta",
     "element-ui": "^1.2.8",
     "flat": "^2.0.1",
     "imagesloaded": "^4.1.2",

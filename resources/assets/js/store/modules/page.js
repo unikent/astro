@@ -5,6 +5,16 @@ import api from 'plugins/http/api';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { eventBus } from 'plugins/eventbus';
 
+/**
+ * Page State Module
+ * @namespace state/page
+ * @property {string} currentLayout - The name of the layout in use for the current page.
+ * @property {int} currentLayoutVersion - The version number of the layout in use for the current page.
+ * @property {number|null} currentBlockIndex - The index of the currently selected block in the currently selected region.
+ * @property {string} currentRegion - The name of the region containing the currently selected block.
+ * @property {Object} blockMeta - Some meta about blocks???
+ * @property {Object} blockMeta.blocks - Object with keys as region names and values as Arrays of blocks.
+ */
 const state = {
 	currentLayout: null,
 	currentLayoutVersion: 1,
@@ -30,8 +40,13 @@ const state = {
 };
 
 const mutations = {
-
-	setPage(state, page) {
+    /**
+	 * Mutation to set the current page.
+	 * @method
+     * @param {object} page Page object representing the current page.
+	 * @memberof state/page#
+     */
+	setPage: function(state, page) {
 		if(!page.blocks) {
 			page.blocks = {
 				main: []
@@ -218,12 +233,14 @@ const actions = {
 
 	/**
 	 * Saves a page
-	 * @param {Object} state - the context of the action - added by VueX
-	 * @param {Object} commit - added by VueX
+	 * @param {Object} input
+	 * @param {Object} input.state - the context of the action - added by VueX
+	 * @param {Object} input.commit - added by VueX
 	 * @param {Object} payload - parameter object
 	 * @param {callback} payload.message - function to display a message
 	 * @return {promise} - api - to allow other methods to wait for the save 
 	 * to complete
+	 * @memberof state/page#
 	 */
 	handleSavePage({ state, commit }, payload) {
 			const blocks = state.pageData.blocks;
@@ -280,13 +297,14 @@ const getters = {
 
 	unsavedChangesExist: (state) => () => {
 		if (state.currentSavedState.length === 0) {
-	 		// if user has not edited a page yet so we do not have any unsaved changes
+			// if user has not edited a page yet so we do not have any unsaved changes
 			return false;
 		} else {
 			return state.currentSavedState != JSON.stringify(state.pageData.blocks);
 		}
 	}
 };
+
 
 export default {
 	state,

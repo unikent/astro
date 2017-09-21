@@ -9,12 +9,19 @@ import media from './modules/media';
 import definition from './modules/definition';
 import Config from 'classes/Config';
 
-/* global process */
 
 Vue.use(Vuex);
 
 let store = new Vuex.Store({
 
+	/**
+	 * The global editor state
+	 * @namespace state
+	 * @property {Object} over - What coordinates the mouse is over???
+	 * @property {number} over.x - X Coordinate
+	 * @property {number} over.y - Y Coordinate
+	 * @property {Object} WrapperStyles - The styles for the wrapper.
+	 */
 	state: {
 		over: {
 			x: 0,
@@ -124,5 +131,6 @@ let store = new Vuex.Store({
 	strict: process.env.NODE_ENV !== 'production'
 
 });
+
 
 export default store;
