@@ -6,6 +6,7 @@ import shareTimeTravel from '../plugins/share-time-travel';
 import page from './modules/page';
 import site from './modules/site';
 import media from './modules/media';
+import validation from './modules/validation'; 
 import definition from './modules/definition';
 import Config from 'classes/Config';
 
@@ -112,7 +113,8 @@ let store = new Vuex.Store({
 		page,
 		definition,
 		site,
-		media
+		media,
+		validation
 	},
 
 	plugins: [
