@@ -22,6 +22,8 @@ const state = {
 	pageTitle: '', // current page title, shown in the TopBar and used to link users to the published version of a page
 	pagePath: '', // current page path, shown in the TopBar and used to link users to the published version of a page
 	pageSlug: '', // current page slug, shown in the TopBar and used to link users to the published version of a page
+	sitePath: '', // current site path, shown in the TopBar and used to link users to the published version of a page
+	siteDomain: '', // current site domain, shown in the TopBar and used to link users to the published version of a page
 	scale: .4,
 	loaded: false,
 	dragging: false,
@@ -59,6 +61,14 @@ const mutations = {
 
 	setBlock(state, { index } = { index: null }) {
 		state.currentBlockIndex = index;
+	},
+
+	setSiteDomain(state, siteDomain) {
+		state.siteDomain = siteDomain;
+	},
+
+	setSitePath(state, sitePath) {
+		state.sitePath = sitePath;
 	},
 
 	reorderBlocks(state, { from, to, value }) {
@@ -173,9 +183,13 @@ const actions = {
 
 		// TODO: refactor into smaller methods
 		api
-			.get(`pages/${id}?include=blocks.media`)
+			.get(`pages/${id}?include=blocks.media,site`)
 			.then(response => {
 				const page = response.data.data;
+
+				// store site domain and path
+				commit('setSiteDomain', page.site.host);
+				commit('setSitePath', page.site.path);
 
 				api
 					.get(`layouts/${page.layout.name}/definition?include=region_definitions.block_definitions`)

@@ -99,8 +99,8 @@ export default {
 			pagePath: state => state.page.pagePath, // the path of the current page for the topbar
 			pageSlug: state => state.page.pageSlug, // the slug of the current page for the topbar
 			publishStatus: state => state.page.publishStatus, // the publish status of the page for the publish status of the current page in the topbar
-			sitePath: state => state.site.sitePath, // the path of the site that the page belongs to the current page path in the topbar
-			siteDomain: state => state.site.siteDomain // the domain of the site that the page belongs to for the current page path in the topbar
+			sitePath: state => state.page.sitePath, // the path of the site that the page belongs to, for the current page path in the topbar
+			siteDomain: state => state.page.siteDomain // the domain of the site that the page belongs to, for the current page path in the topbar
 		}),
 
 		// works out if we should show a back button or not (ie whether we're editing a page or on the homepage)

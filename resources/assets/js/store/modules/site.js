@@ -12,9 +12,7 @@ const state = {
 	pageModal: {
 		visible: false,
 		parentId: null
-	},
-	sitePath: '', // current site path, shown in the TopBar and used to link users to the published version of a page
-	siteDomain: '' // current site domain, shown in the TopBar and used to link users to the published version of a page
+	}
 };
 
 const mutations = {
