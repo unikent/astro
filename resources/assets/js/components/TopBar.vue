@@ -1,10 +1,11 @@
 <template>
 	<div class="top-bar" v-if="showBack">
-		<div v-show="showBack" @click="backToSites" class="top-bar-backbutton">
-			<i class="el-icon-arrow-left backbutton-icon"></i>Site list
+		<div>
+			<div v-show="showBack" @click="backToSites" class="top-bar-backbutton">
+				<i class="el-icon-arrow-left backbutton-icon"></i>Site list
+			</div>
+			<div class="top-bar__page-title">{{ pageTitle }} <el-tag type="primary">{{ pagePath }}</el-tag></div>
 		</div>
-
-		<div class="top-bar__page-title">{{ pageTitle }} <el-tag type="primary">{{ pagePath }}</el-tag></div>
 
 		<div class="top-bar__tools">
 
@@ -60,7 +61,7 @@ export default {
 
 		document.addEventListener('keydown', this.onKeyDown);
 		document.addEventListener('keyup', this.onKeyUp);
-		window.addEventListener("beforeunload", this.leaveAstro); 
+		window.addEventListener("beforeunload", this.leaveAstro);
 	},
 
 	destroyed() {
@@ -88,7 +89,7 @@ export default {
 	methods: {
 
 		leaveAstro(e) {
-			/* we are very limited as to what we can do when someone tries to leave 
+			/* we are very limited as to what we can do when someone tries to leave
 			https://developer.mozilla.org/en/docs/Web/Events/beforeunload
 			*/
 			const unsavedChangesExist = this.unsavedChangesExist();
