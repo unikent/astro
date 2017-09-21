@@ -12,9 +12,7 @@ const state = {
 	pageModal: {
 		visible: false,
 		parentId: null
-	},
-	sitePath: '',
-	siteDomain: ''
+	}
 };
 
 const mutations = {

@@ -23,6 +23,8 @@ const state = {
 	pageTitle: 'Home page',
 	pagePath: '/',
 	pageSlug: 'home',
+	siteDomain: '',
+	sitePath: '',
 	scale: .4,
 	loaded: false,
 	dragging: false,

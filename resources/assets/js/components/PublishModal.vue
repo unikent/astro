@@ -100,8 +100,8 @@ export default {
 			pageTitle: state => state.page.pageTitle,
 			pagePath: state => state.page.pagePath,
 			pageSlug: state => state.page.pageSlug,
-			siteDomain: state => state.site.siteDomain,
-			sitePath: state => state.site.sitePath
+			siteDomain: state => state.page.siteDomain,
+			sitePath: state => state.page.sitePath
 		}),
 
 		// basically controls show/hide of the modal
