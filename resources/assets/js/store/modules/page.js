@@ -28,7 +28,7 @@ const state = {
 	loaded: false,
 	dragging: false,
 	currentSavedState: '',
-	invalidBlocks: new Set(),
+	invalidBlocks: [],
 };
 
 const mutations = {
@@ -170,15 +170,21 @@ const mutations = {
 	},
 
 	addBlockValidationIssue(state, block_id) {
-		state.invalidBlocks.add(block_id);
+		if (state.invalidBlocks.indexOf(block_id) === -1) {
+			state.invalidBlocks.push(block_id);
+		}
 	},
 
 	deleteBlockValidationIssue(state, block_id) {
-		state.invalidBlocks.delete(block_id);
+		const location = state.invalidBlocks.indexOf(block_id);
+		if (location !== -1) {
+			reducedItems = state.invalidBlocks.splice(location, 1);
+			state.invalidBlocks = reducedItems;
+		}
 	},
 
 	clearBlockValidationIssues() {
-		state.invalidBlocks.clear();
+		state.invalidBlocks = [];
 	}
 
 };
@@ -302,7 +308,7 @@ const getters = {
 		} else {
 			return state.currentSavedState != JSON.stringify(state.pageData.blocks);
 		}
-	}
+	},
 };
 
 export default {
