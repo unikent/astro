@@ -158,6 +158,7 @@ export default {
 				this.errors.blocks[this.currentRegion][this.currentIndex].fields : {};
 		},
 
+		// @TODO - this lags when switching blocks with different rule sets- investigate
 		rules() {
 			return Definition.getRules(this.currentDefinition, false);
 		}
@@ -173,6 +174,14 @@ export default {
 			if(val && oldVal && val.id !== oldVal.id) {
 				this.$refs['options-list'].scrollTop = 0;
 			}
+		},
+
+		valid(isValid) {
+			if (isValid) {
+				this.deleteBlockValidationIssue(this.currentBlock.id);
+			} else {
+				this.addBlockValidationIssue(this.currentBlock.id);
+			}
 		}
 	},
 
@@ -180,7 +189,9 @@ export default {
 		...mapMutations([
 			'setBlock',
 			'deleteBlock',
-			'updateErrors'
+			'updateErrors',
+			'addBlockValidationIssue',
+			'deleteBlockValidationIssue'
 		]),
 
 		goBack() {
