@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import Vue from 'vue';
+import { mapMutations } from 'vuex';
 import { Definition } from 'classes/helpers';
 import api from 'plugins/http/api';
 import { undoStackInstance } from 'plugins/undo-redo';
@@ -18,7 +19,7 @@ const state = {
 	pageData: {
 		blocks: {
 			main: []
-		},
+		}
 	},
 	pageTitle: 'Home page',
 	pagePath: '/',
@@ -27,7 +28,7 @@ const state = {
 	loaded: false,
 	dragging: false,
 	currentSavedState: '',
-	validationIssues: []
+	invalidBlocks: new Set(),
 };
 
 const mutations = {
@@ -168,25 +169,23 @@ const mutations = {
 		state.currentSavedState = '';	
 	},
 
-	addValidationIssue(state) {
-		var issue = {};
-		issue.index = state.currentBlockIndex;
-		issue.value = true
-		state.validationIssues[issue.index] = issue.value;
+	addBlockValidationIssue(state, block_id) {
+		console.log('adding issue for ' + block_id);
+		state.invalidBlocks.add(block_id);
+		console.log(state.invalidBlocks.size);
 	},
 
+	deleteBlockValidationIssue(state, block_id) {
+		console.log('removing validation issue ' + block_id);
+		state.invalidBlocks.delete(block_id);
+		console.log(state.invalidBlocks.size);
+	},
 
-	removeValidationIssue(state) {
-		// get current block and block id
-		// remove from set
-		state.validationIssues.splice(state.currentBlockIndex, 1);
-	}, 
-
-	// remove all validations issues in the current page
-	// for when we load a new page
-	clearValidationIssues(state) {
-		state.validationIssues = [];
+	clearBlockValidationIssues() {
+		console.log('clearing validation issues');
+		state.invalidBlocks.clear();
 	}
+
 };
 
 const actions = {
@@ -230,7 +229,8 @@ const actions = {
 						});
 
 						commit('setLoaded');
-						commit('clearValidationIssues');
+						commit('clearBlockValidationIssues');
+						// @TODO - populate validations issues with those received from the api
 
 						undoStackInstance.init(state.pageData);
 					});
