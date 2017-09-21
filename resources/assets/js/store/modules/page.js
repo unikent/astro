@@ -170,19 +170,14 @@ const mutations = {
 	},
 
 	addBlockValidationIssue(state, block_id) {
-		console.log('adding issue for ' + block_id);
 		state.invalidBlocks.add(block_id);
-		console.log(state.invalidBlocks.size);
 	},
 
 	deleteBlockValidationIssue(state, block_id) {
-		console.log('removing validation issue ' + block_id);
 		state.invalidBlocks.delete(block_id);
-		console.log(state.invalidBlocks.size);
 	},
 
 	clearBlockValidationIssues() {
-		console.log('clearing validation issues');
 		state.invalidBlocks.clear();
 	}
 
