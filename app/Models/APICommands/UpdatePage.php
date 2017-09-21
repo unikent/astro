@@ -19,6 +19,7 @@ class UpdatePage implements APICommand
 
     /**
      * Carry out the command, based on the provided $input.
+	 * If nothing has been changed, does nothing.
      * @param array $input The input options as key=>value pairs.
      * @return mixed
      */
@@ -29,29 +30,39 @@ class UpdatePage implements APICommand
 
             $previous_revision = $page->revision;
             $options = $previous_revision->options;
+            $changed = false;
             if(isset($input['options']) && is_array($input['options'])){
                 foreach($input['options'] as $name => $value){
                     if(null !== $value){
-                        unset($options[$name]);
+                    	if(isset($options[$name])) {
+							unset($options[$name]);
+							$changed = true;
+						}
                     }else{
-                        $options[$name] = $value;
+                    	if($options[$name] != $value) {
+							$options[$name] = $value;
+							$changed = true;
+						}
                     }
                 }
             }
 
-            $revision = Revision::create([
-                'revision_set_id' => $previous_revision->revision_set_id,
-                'title' => !empty($input['title']) ? $input['title'] : $previous_revision->title,
-                'layout_name' => $previous_revision->layout_name,
-                'layout_version' => $previous_revision->layout_version,
-                'created_by' => $user->id,
-                'updated_by' => $user->id,
-                'options' => $options,
-                'blocks' => $previous_revision->bake,
-				'valid' => $previous_revision->valid
-            ]);
-            $page->setRevision($revision);
-            $page->fresh();
+
+            if($changed || (!empty($input['title']) && $input['title'] != $previous_revision->title)) {
+
+				$revision = Revision::create([
+					'revision_set_id' => $previous_revision->revision_set_id,
+					'title' => !empty($input['title']) ? $input['title'] : $previous_revision->title,
+					'layout_name' => $previous_revision->layout_name,
+					'layout_version' => $previous_revision->layout_version,
+					'created_by' => $user->id,
+					'updated_by' => $user->id,
+					'options' => $options,
+					'blocks' => $previous_revision->bake
+				]);
+				$page->setRevision($revision);
+			}
+
             return $page;
         });
         return $result;
@@ -80,13 +91,14 @@ class UpdatePage implements APICommand
             ],
             'options' => [
                 'array',
-                'nullable'
+				'nullable'
             ],
             'title' => [
                 'string',
-                'max:150',
-                'nullable'
-            ]
+				'nullable',
+				'max:150'
+			]
+
         ];
         return $rules;
     }
