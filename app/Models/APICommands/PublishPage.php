@@ -202,7 +202,8 @@ class PublishPage implements APICommand
         return [
           'id' => [
               'exists:pages,id',
-              'parent_is_published:'.$data->get('id')
+              'parent_is_published:'.$data->get('id'),
+			  'page_is_valid'
           ],
         ];
     }

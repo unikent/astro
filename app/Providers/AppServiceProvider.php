@@ -24,7 +24,30 @@ class AppServiceProvider extends ServiceProvider
 	{
 		Schema::defaultStringLength(191); // Fix for the webfarm running older MySQL
 
+        Validator::extend('slug_unchanged_or_unique', function($attr, $value, $parameters, $validator) {
+			$id = isset($parameters[0]) ? $parameters[0] : null;
+			$page = Page::find($id);
+			if($page ){
+				if($page->slug == $value){ // can keep slug the same...
+					return true;
+				}
+				if($page->parent_id){ // can change slug on home page
+					$ok = Page::where('parent_id', '=', $page->parent_id)
+								->where('slug', $value)
+								->count() == 0;
+					return $ok;
+				}
+			}
+			return false;
+        });
+
         Validator::extend('parent_is_published', function( $attr, $value ) { return PublishPage::canBePublished($value); });
+
+        Validator::extend('page_is_valid', function($attr, $id) {
+        	$page = Page::find($id);
+        	return $page && $page->revision->valid;
+		});
+
         Validator::extend('unique_site_path', function($attr, $value, $parameters, $validator) {
             $host = isset($parameters[0]) ? $parameters[0] : null;
             return (new UniqueSitePathRule($host))->passes($attr, $value);

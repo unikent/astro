@@ -35,7 +35,8 @@ class Revision extends Model
         'layout_name',
         'layout_version',
         'revision_set_id',
-		'bake'
+		'bake',
+		'valid'
 	];
 
 	protected $dates = [

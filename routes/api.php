@@ -15,6 +15,7 @@ Route::group([ 'prefix' => 'v1', 'namespace' => 'v1' ], function(){
 
 	Route::resource('pages', 'PageController', [ 'except' => [ 'index', 'create', 'edit' ]]);
 	Route::put('pages/{page}/content', 'PageController@updateContent');
+	Route::put('pages/{page}/slug', 'PageController@changeSlug');
 	Route::post('pages/{page}/publish', 'PageController@publish');
 	Route::post('pages/{page}/publish-tree', 'PageController@publishTree');
 	Route::post('pages/{page}/revert', 'PageController@revert');
