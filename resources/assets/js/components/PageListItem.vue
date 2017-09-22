@@ -33,7 +33,7 @@
 			</el-button>
 
 			<el-dropdown-menu slot="dropdown">
-				<el-dropdown-item command="openModal">Settings</el-dropdown-item>
+				<el-dropdown-item command="openEditModal">Edit page settings</el-dropdown-item>
 				<el-dropdown-item v-show="!root" :disabled="depth > 2" command="openModal">Add subpage</el-dropdown-item>
 				<el-dropdown-item v-show="!root" command="remove" divided>Delete</el-dropdown-item>
 			</el-dropdown-menu>
@@ -61,6 +61,7 @@
 				:site="site"
 				:key="child.id"
 				:open-modal="openModal"
+				:open-edit-modal="openEditModal"
 				:path="`${path}.${index}`"
 				:depth="depth + 1"
 			/>
@@ -78,7 +79,7 @@ import promptToSave from '../mixins/promptToSave';
 export default {
 	name: 'page-list-item',
 
-	props: ['page', 'on-add', 'flatten', 'open-modal', 'path', 'depth'],
+	props: ['page', 'on-add', 'flatten', 'open-modal', 'open-edit-modal', 'path', 'depth'],
 
 	components: {
 		Icon,

@@ -79,6 +79,7 @@ class UpdatePageSlug implements APICommand
     public function messages(Collection $data, Authenticatable $user)
     {
         return [
+        	'id.page_is_a_subpage' => 'You cannot change the slug of the homepage.',
         	'slug.regex' => 'Slug can only contain lowercase letters, numbers and hyphens.',
 			'slug_unchanged_or_unique' => 'A page with the slug "' . $data->get('slug') . '" already exists at this level.'
 		];
@@ -95,7 +96,7 @@ class UpdatePageSlug implements APICommand
         $parent_id = $page ? $page->parent_id : null;
         $rules = [
             'id' => [
-                'exists:pages,id'
+                'page_is_a_subpage'
             ],
             'slug' => [
                 // slug is required and can only contain lowercase letters, numbers, hyphen or underscore.
