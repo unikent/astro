@@ -32,9 +32,6 @@ const state = {
 			main: []
 		}
 	},
-	pageTitle: 'Home page',
-	pagePath: '/',
-	pageSlug: 'home',
 	scale: .4,
 	loaded: false,
 	dragging: false,
@@ -130,9 +127,9 @@ const mutations = {
 		if(slug === null) {
 			slug = '/';
 		}
-		state.pageTitle = `${title}`;
-		state.pagePath = `kent.ac.uk/site-name${path}`;
-		state.pageSlug = `${slug}`;
+		// state.pageTitle = `${title}`;
+		// state.pagePath = `kent.ac.uk/site-name${path}`;
+		// state.pageSlug = `${slug}`;
 	},
 
 	addBlock(state, { region, index, block }) {
