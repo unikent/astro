@@ -4,6 +4,7 @@
 		<el-form-item label="Page title">
 			<el-input name="title" v-model="editForm.title" auto-complete="off"></el-input>
 		</el-form-item>
+		<input type="hidden" name="id" :value="editForm.id">
 	</el-form>
 	<span slot="footer" class="dialog-footer">
 	<el-button @click="visible = false">Cancel</el-button>
@@ -25,7 +26,6 @@ export default {
 			editForm: {
 				title: '',
 				id: 1,
-				page_id: 1,
 				route: {
 					slug: '',
 					parent_id: 1
@@ -52,6 +52,8 @@ export default {
 			get() {
 				this.editForm.title = this.editPageModal.title;
 				this.editForm.slug = this.editPageModal.slug;
+				this.editForm.id = this.editPageModal.id;
+				this.editForm.page_id = this.editPageModal.page_id;
 				return this.editPageModal.visible;
 			},
 			set(show) {

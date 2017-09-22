@@ -17,6 +17,8 @@ const state = {
 		visible: false,
 		title: '',
 		slug: '',
+		id: 0,
+		page_id: 0,
 		parentId: null
 	}
 };
@@ -71,6 +73,7 @@ const mutations = {
 	setPageMeta(state, page) {
 		state.editPageModal.title = page.title;
 		state.editPageModal.slug = page.slug;
+		state.editPageModal.id = page.id;
 	}
 };
 
