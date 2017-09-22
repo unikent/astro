@@ -1,0 +1,38 @@
+ul.validation-errors {
+	list-style-type: none;
+	padding: 0 1rem;
+}
+
+li.validation-errors__item {
+	margin: 1rem 0;
+	background-color: #fff;
+	padding: 5px;
+	border: 1px solid;
+	border-radius: 4px;
+	line-height: 26px;
+	height: 38px;
+	transition: background-color .3s ease-out;
+	display: flex;
+	i {
+		line-height: 2;
+	}
+	&.warning {
+		background-color: rgba(255, 0, 0, 0.16);
+		border-color: #9a0000;
+		color: #9a0000;
+	}
+	&.success {
+		background-color: rgba(0, 255, 0, 0.16);
+		border-color: #076330;
+		color: #076330;
+	}
+}
+
+.validation-errors__link {
+	color: inherit;
+	margin-left: 0.5rem;
+}
+
+.el-tag--success {
+	color: #076330;
+}
