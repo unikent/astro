@@ -32,9 +32,21 @@
 			/>
 		</div>
 
-
-		<section class="sidebar collapsed">
-			<ul class="app-sidebar" role="navigation">
+		<section class="sidebar">
+			<ul class="sidebar__switcher sidebar--pages" role="navigation">
+				<side-menu-pages
+					v-for="(item, index) in menu"
+					:link="item.link"
+					:icon="item.icon"
+					:title="item.title"
+					:id="item.id"
+					:key="item.link"
+					:index="index"
+					:active="activeMenuItem"
+					:onClick="openItem"
+				/>
+			</ul>
+			<ul :class="activeMenuItem==='pages'?'sidebar--deactivated':''" class="sidebar__switcher sidebar--in-page" role="navigation">
 				<side-menu-item
 					v-for="(item, index) in menu"
 					:link="item.link"
@@ -64,11 +76,13 @@ import { mapState, mapMutations } from 'vuex';
 
 import Icon from 'components/Icon';
 import SideMenuItem from 'components/sidebar/SideMenuItem';
+import SideMenuPages from 'components/sidebar/SideMenuPages';
 import PageList from 'components/PageList';
 import BlockSidebar from 'components/sidebar/BlockSidebar';
 import Navigation from 'components/sidebar/Navigation';
 import Settings from 'components/sidebar/Settings';
 import HelpCentre from 'components/sidebar/HelpCentre';
+import ErrorSidebar from 'components/sidebar/Errors';
 
 import { clamp } from 'classes/helpers';
 
@@ -79,7 +93,8 @@ export default {
 
 	components: {
 		Icon,
-		SideMenuItem
+		SideMenuItem,
+		SideMenuPages
 	},
 
 	data() {
@@ -97,9 +112,16 @@ export default {
 				{
 					link: '/media',
 					icon: 'layers',
-					title: 'Edit blocks',
+					title: 'Blocks on current page',
 					id: 'blocks',
 					component: BlockSidebar
+				},
+				{
+					link: '/errors',
+					icon: 'alert',
+					title: 'Errors on current page',
+					id: 'errors',
+					component: ErrorSidebar
 				}
 			],
 

@@ -4,6 +4,11 @@ import Vue from 'vue';
 
 const vue = new Vue();
 
+/**
+ * @namespace state/site
+ * @property {Array} pages - Array of Pages in the current Site.
+ * @property {number} site - ID of the current Site.
+ */
 const state = {
 	pages: [],
 	site: 1,
@@ -25,6 +30,13 @@ const state = {
 
 const mutations = {
 
+	/**
+	 * Set the current site id stored in the store.
+	 * @function
+	 * @memberof state/site#
+	 * @param {object} state
+	 * @param {int} id The id of the site to set as current site.
+	 */
 	updateCurrentSiteID(state, id) {
 		state.site = id;
 	},
@@ -172,7 +184,7 @@ const actions = {
 
 			const page = _.cloneDeep(oldPage.data);
 
-            // remove old page
+			// remove old page
 			commit('removePage', oldPage);
 			// update current and child page depths
 			updateDepths(page, newPage.parent.depth + 1);
