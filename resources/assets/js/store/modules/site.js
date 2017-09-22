@@ -134,14 +134,17 @@ const actions = {
 				options: {}
 			})
 			.then(() => {
-				api
-					.put(`pages/${page.id}/slug`, {
-						slug: page.slug
-					})
-					.then(() => {
-						dispatch('fetchSite');
-					});
+				dispatch('fetchSite');
 			})
+			// .then(() => {
+			// 	api
+			// 		.put(`pages/${page.id}/slug`, {
+			// 			slug: page.slug
+			// 		})
+			// 		.then(() => {
+			// 			dispatch('fetchSite');
+			// 		});
+			// })
 			.catch(() => {});
 	},
 

@@ -165,6 +165,10 @@ const mutations = {
 
 	resetCurrentSavedState(state) {
 		state.currentSavedState = '';
+	},
+
+	savePageMeta(state, page) {
+		state.pageData.title = page.title;
 	}
 };
 

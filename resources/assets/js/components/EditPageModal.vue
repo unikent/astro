@@ -4,9 +4,6 @@
 		<el-form-item label="Page title">
 			<el-input name="title" v-model="editForm.title" auto-complete="off"></el-input>
 		</el-form-item>
-		<el-form-item label="URL">
-			<el-input name="slug" v-model="editForm.slug" auto-complete="off"><template slot="prepend">https://www.kent.ac.uk/my-site/</template></el-input>
-		</el-form-item>
 	</el-form>
 	<span slot="footer" class="dialog-footer">
 	<el-button @click="visible = false">Cancel</el-button>
@@ -16,7 +13,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapMutations, mapState, mapActions } from 'vuex';
 import { Definition } from 'classes/helpers';
 
 export default {
@@ -43,6 +40,14 @@ export default {
 			editPageModal: state => state.editPageModal
 		}),
 
+		...mapState({
+			pageData: state => state.page.pageData
+		}),
+
+		...mapMutations([
+			'savePageMeta'
+		]),
+
 		visible: {
 			get() {
 				this.editForm.title = this.editPageModal.title;
@@ -68,13 +73,16 @@ export default {
 			updatePageMeta: 'site/updatePageMeta'
 		}),
 
+		/**
+		updates the data in the db
+		hides the modal
+		and updates the store to the new page meta
+		*/
 		saveEdit() {
 			this.updatePageMeta(this.editForm);
-			/*this.updatePageMeta({
-				title: this.currentPage.title,
-				slug: this.currentPage.slug
-			});*/
-		},
+			this.hideEditPageModal();
+			this.$store.commit('savePageMeta', this.editForm);
+		}
 	}
 };
 </script>
