@@ -15,6 +15,7 @@ import { eventBus } from 'plugins/eventbus';
  * @property {string} currentRegion - The name of the region containing the currently selected block.
  * @property {Object} blockMeta - Some meta about blocks???
  * @property {Object} blockMeta.blocks - Object with keys as region names and values as Arrays of blocks.
+ * @property {Array} invalidBlocks - array of block ids of invalid blocks within the page
  */
 const state = {
 	currentLayout: null,
@@ -237,6 +238,7 @@ const actions = {
 						}
 
 						commit('setPage', _.cloneDeep(page));
+						commit('clearBlockValidationIssues');
 
 						Object.keys(blocks).forEach(region => {
 							blocks[region].forEach((block, index) => {
@@ -244,8 +246,15 @@ const actions = {
 							});
 						});
 
+						Object.keys(blocks).forEach(region => {
+							blocks[region].forEach((block, index) => {
+								if (block.errors !== null) {
+									commit('addBlockValidationIssue', block.id);
+								}
+							});
+						});
+						
 						commit('setLoaded');
-						commit('clearBlockValidationIssues');
 						// @TODO - populate validations issues with those received from the api
 
 						undoStackInstance.init(state.pageData);
@@ -266,21 +275,21 @@ const actions = {
 	 * @memberof state/page#
 	 */
 	handleSavePage({ state, commit }, payload) {
-			const blocks = state.pageData.blocks;
-			const id = state.pageData.id;
-			return api
-				.put(`pages/${id}/content`, {
-                    blocks: blocks
-                })
-				.then(() => {
-					payload.message({
-							message: 'Page saved',
-							type: 'success',
-							duration: 2000
-						});
-					commit('updateCurrentSavedState');
-				})
-				.catch(() => {});
+		const blocks = state.pageData.blocks;
+		const id = state.pageData.id;
+		return api
+			.put(`pages/${id}/content`, {
+				blocks: blocks
+			})
+			.then(() => {
+				payload.message({
+					message: 'Page saved',
+					type: 'success',
+					duration: 2000
+				});
+				commit('updateCurrentSavedState');
+			})
+			.catch(() => {});
 	},
 };
 
@@ -322,7 +331,8 @@ const getters = {
 		if (state.currentSavedState.length === 0) {
 			// if user has not edited a page yet so we do not have any unsaved changes
 			return false;
-		} else {
+		}
+		else {
 			return state.currentSavedState != JSON.stringify(state.pageData.blocks);
 		}
 	},
