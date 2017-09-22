@@ -3,7 +3,7 @@
 
 	<div class="editor-body">
 		<div class="editor-wrapper" ref="editor">
-			<iframe :src="getPreviewUrl" class="editor-content" :style="dimensions" frameborder="0" />
+			<iframe :src="getPreviewUrl" id="editor-content" class="editor-content" :style="dimensions" frameborder="0" />
 			<div
 				class="iframe-overlay"
 				:style="{ 'position' : displayIframeOverlay ? 'absolute' : null }"

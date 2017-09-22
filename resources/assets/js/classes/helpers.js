@@ -129,4 +129,3 @@ export const smoothScrollTo = (options) => {
 
 	el.addEventListener('transitionend', onEnd, false);
 };
-

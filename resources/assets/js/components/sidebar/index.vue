@@ -58,6 +58,7 @@
 					:active="activeMenuItem"
 					:onClick="openItem"
 				/>
+				<li><a href="#" @click="scrollTo" id="1">Block</a></li>
 			</ul>
 		</section>
 
@@ -84,7 +85,7 @@ import Settings from 'components/sidebar/Settings';
 import HelpCentre from 'components/sidebar/HelpCentre';
 import ErrorSidebar from 'components/sidebar/Errors';
 
-import { clamp } from 'classes/helpers';
+import { smoothScrollTo, clamp } from 'classes/helpers';
 
 /* global document */
 
@@ -179,6 +180,12 @@ export default {
 		openItem(e, index) {
 			this.collapseSidebar();
 			this.updateMenuActive(this.menu[index].id);
+		},
+
+		scrollTo() {
+			var el = document.getElementById('editor-content');
+			var pos = el.contentWindow.document.getElementById('block_1').getBoundingClientRect();
+			el.contentWindow.scrollTo(0, pos.top);
 		}
 	}
 };
