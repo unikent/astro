@@ -10,21 +10,23 @@
 			@change="getLayout"
 		>
 			<el-option
-				v-for="item in layouts"
-				:key="item.name"
-				:label="item.label"
-				:value="item.name">
+					v-for="item in layouts"
+					:key="item.name"
+					:label="item.label"
+					:value="item.name">
 			</el-option>
 		</el-select>
-		<input type="hidden" name="layout_version" :value="createForm.layout_version">
-		<el-form-item label="URL">
-			<el-input name="slug" v-model="createForm.route.slug" auto-complete="off"><template slot="prepend">https://www.kent.ac.uk/my-site/</template></el-input>
+		<el-form-item label="Layout Version">
+			<el-input name="layout_version" v-model="createForm.layout_version" auto-complete="off"></el-input>
+		</el-form-item>
+		<el-form-item label="slug">
+			<el-input name="slug" v-model="createForm.route.slug" auto-complete="off"></el-input>
 		</el-form-item>
 	</el-form>
-	<div slot="footer" class="dialog-footer">
-		<el-button @click="visible = false">Cancel</el-button>
-		<el-button type="primary" @click="addChild">Confirm</el-button>
-	</div>
+	<span slot="footer" class="dialog-footer">
+	<el-button @click="visible = false">Cancel</el-button>
+	<el-button type="primary" @click="addChild">Confirm</el-button>
+</span>
 </el-dialog>
 </template>
 
@@ -100,6 +102,21 @@ export default {
 		addChild() {
 			this.createPage(this.createForm);
 			this.visible = false;
+		},
+
+		saveEdit() {
+			// TODO: when endpoint is ready, update this
+			// this.updatePage({
+			// 	title: this.currentPage.title,
+			// 	id: this.currentPage.id,
+			// 	page_id: this.currentPage.page_id,
+			// 	layout_name: this.layout_name,
+			// 	layout_version: this.layout_version,
+			// 	route: {
+			// 		slug: this.currentPage.slug,
+			// 		parent_id: this.currentPage.parent_id
+			// 	}
+			// });
 		},
 
 		getLayout(layoutName) {

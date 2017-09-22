@@ -72,9 +72,9 @@ export default {
 	computed: {
 
 		...mapState({
-			pageTitle: state => state.page.pageData.title,
-			pagePath: state => state.page.pageData.path,
-			pageSlug: state => state.page.pageData.slug
+			pageTitle: state => state.page.pageTitle,
+			pagePath: state => state.page.pagePath,
+			pageSlug: state => state.page.pageSlug
 		}),
 
 		showBack() {

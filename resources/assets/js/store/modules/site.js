@@ -17,14 +17,6 @@ const state = {
 	pageModal: {
 		visible: false,
 		parentId: null
-	},
-	editPageModal: {
-		visible: false,
-		title: '',
-		slug: '',
-		id: 0,
-		page_id: 0,
-		parentId: null
 	}
 };
 
@@ -72,20 +64,6 @@ const mutations = {
 
 	setPageModalParent(state, pageId) {
 		state.pageModal.parentId = pageId;
-	},
-
-	setEditPageModalVisibility(state, visible) {
-		state.editPageModal.visible = visible;
-	},
-
-	setEditPageModalParent(state, pageId) {
-		state.editPageModal.parentId = pageId;
-	},
-
-	setPageMeta(state, page) {
-		state.editPageModal.title = page.title;
-		state.editPageModal.slug = page.slug;
-		state.editPageModal.id = page.id;
 	}
 };
 
@@ -142,27 +120,6 @@ const actions = {
 			})
 	},
 
-	updatePageMeta({ dispatch }, page) {
-		api
-			.put(`pages/${page.id}`, {
-				title: page.title,
-				options: {}
-			})
-			.then(() => {
-				dispatch('fetchSite');
-			})
-			// .then(() => {
-			// 	api
-			// 		.put(`pages/${page.id}/slug`, {
-			// 			slug: page.slug
-			// 		})
-			// 		.then(() => {
-			// 			dispatch('fetchSite');
-			// 		});
-			// })
-			.catch(() => {});
-	},
-
 	movePageApi({ dispatch }, move) {
 		// If-Unmodified-Since
 		api
@@ -170,6 +127,7 @@ const actions = {
 			.then(() => {
 				dispatch('fetchSite');
 			});
+		console.log(move);
 	},
 
 
@@ -181,6 +139,11 @@ const actions = {
 			newPos = Number.parseInt(toPath.substr(toPath.lastIndexOf('.') + 1, toPath.length));
 
 		if(canDrop) {
+
+			// Reordering logic is a bit different as we are not adding a new item into the parent collection,
+			if(newPage.parent.id == oldPage.parent.id){
+
+			}
 
 			const page = _.cloneDeep(oldPage.data);
 
@@ -214,20 +177,6 @@ const actions = {
 
 	hidePageModal({ commit }) {
 		commit('setPageModalVisibility', false);
-	},
-
-	showEditPageModal({ commit }, { id }) {
-		api
-			.get(`pages/${id}`)
-			.then((response) => {
-				commit('setPageMeta', response.data.data);
-				commit('setEditPageModalParent', id);
-				commit('setEditPageModalVisibility', true);
-			});
-	},
-
-	hideEditPageModal({ commit }) {
-		commit('setEditPageModalVisibility', false);
 	}
 
 };
