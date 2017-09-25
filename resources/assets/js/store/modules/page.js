@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import Vue from 'vue';
-import { mapMutations } from 'vuex';
 import { Definition } from 'classes/helpers';
 import api from 'plugins/http/api';
 import { undoStackInstance } from 'plugins/undo-redo';
@@ -247,8 +246,8 @@ const actions = {
 						});
 
 						Object.keys(blocks).forEach(region => {
-							blocks[region].forEach((block, index) => {
-								if (block.errors !== null) {
+							blocks[region].forEach((block) => {
+								if (typeof block.errors !== 'undefined' && block.errors !== null) {
 									commit('addBlockValidationIssue', block.id);
 								}
 							});
