@@ -5,6 +5,7 @@
 		@mouseenter="showOverlay"
 		@mouseleave="hideOverlay"
 		@click="editBlock"
+		:id="blockId"
 	>
 		<div
 			class="block"
@@ -111,6 +112,10 @@ export default {
 
 		offset() {
 			return this.blockMeta.offset;
+		},
+
+		blockId() {
+			return 'block_' + this.index;
 		}
 	},
 
