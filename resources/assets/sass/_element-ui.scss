@@ -174,3 +174,11 @@
 		@include button-variant($colour);
 	}
 }
+
+// modify the font and border colours of tags, to make them more readable
+@each $status, $colour in $status-font-colours {
+	.el-tag--#{$status} {
+		color: $colour;
+		border: 1px solid $colour;
+	}
+}
