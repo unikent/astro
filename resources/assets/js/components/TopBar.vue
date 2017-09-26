@@ -166,7 +166,6 @@ Note that the page editing toolbar is a separate component found in `components/
 			backToSites() {
 				// another prompt to save the page when going back to the site listing
 				this.promptToSave(() => {
-					this.$store.commit('changePage', {title:'', path:'', slug:''});
 					this.$store.commit('setPage', {});
 					this.$store.commit('setLoaded', false);
 					this.$router.push('/sites');
