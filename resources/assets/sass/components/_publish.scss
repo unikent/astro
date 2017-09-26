@@ -1,0 +1,27 @@
+/**
+_publish.scss
+
+styles specifically for the publish modal
+
+*/
+
+// error block
+.publish-modal__errors {
+	margin: 2rem 0;
+}
+
+// for messages, such as the link to the newly published page
+.publish-modal__message {
+	padding: 2rem 0;
+}
+
+// needed for the buttons, because each set of buttons for success/failure is not longer in the modal footer
+.publish-modal__buttons {
+	text-align: right;
+	padding: 1rem 1rem 0;
+}
+
+// a bit more padding for the publish modal alert message. Just makes it look nicer.
+.publish-modal .el-alert {
+	padding: 1rem;
+}

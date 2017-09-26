@@ -35,6 +35,8 @@ const state = {
 	pageTitle: 'Home page',
 	pagePath: '/',
 	pageSlug: 'home',
+	siteDomain: '',
+	sitePath: '',
 	scale: .4,
 	loaded: false,
 	dragging: false,
@@ -270,7 +272,7 @@ const actions = {
 	 * @param {Object} input.commit - added by VueX
 	 * @param {Object} payload - parameter object
 	 * @param {callback} payload.message - function to display a message
-	 * @return {promise} - api - to allow other methods to wait for the save 
+	 * @return {promise} - api - to allow other methods to wait for the save
 	 * to complete
 	 * @memberof state/page#
 	 */

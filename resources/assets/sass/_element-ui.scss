@@ -173,4 +173,7 @@
 	.el-button--#{$status} {
 		@include button-variant($colour);
 	}
+	.el-alert--#{$status} {
+		background-color: $colour;
+	}
 }
