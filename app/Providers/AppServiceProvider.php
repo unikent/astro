@@ -41,6 +41,11 @@ class AppServiceProvider extends ServiceProvider
 			return false;
         });
 
+		Validator::extend('page_is_a_subpage', function($attr, $id) {
+			return Page::where('id', '=', $id)
+				->whereNotNull('parent_id')->exists();
+		});
+
         Validator::extend('parent_is_published', function( $attr, $value ) { return PublishPage::canBePublished($value); });
 
         Validator::extend('page_is_valid', function($attr, $id) {
