@@ -309,7 +309,7 @@ const actions = {
 						});
 					}
 					// we're all good
-					else {
+					else if (response.data.data.valid===1) {
 						vue.$notify({
 							title: 'Saved',
 							message: 'You saved this page successfully.',
@@ -326,7 +326,7 @@ const actions = {
 			.catch(() => {
 				vue.$notify({
 					title: 'Not saved',
-					message: 'There was a network problem and this page has not been saved. Please try again later.',
+					message: 'There was a problem and this page has not been saved. Please try again later.',
 					type: 'error',
 					duration: 0
 				});
