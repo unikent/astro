@@ -22,7 +22,7 @@
 			<icon v-if="!root" name="arrow" width="14" height="14" />
 		</span>
 
-		<span ref="name" style=" flex: 1 0 auto; cursor: pointer;" @click="edit">
+		<span ref="name" class="page-list__text" @click="edit">
 			{{ page.path === '/' ? 'Home page' : (page.revision.title || page.slug) }}
 		</span>
 

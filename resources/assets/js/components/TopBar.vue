@@ -1,10 +1,46 @@
+/**
+TopBar.vue
+
+The top bar is the container for the main actions across the site and within pages.
+
+The top bar is split into two flavours:
+
+1. homepage. A very minimal top bar shown only on the homepage. It's made up of just a logout dropdown and other key site information.
+
+2. page editing. The page editing top bar is made up of three sections:
+	a. back button to the site list/homepage
+	b. page title, publish status, and url
+	c. toolbar with device view, save, preview, publish actions, as well as the logout dropdown.
+
+Note that the page editing toolbar is a separate component found in `components/Toolbar.vue`
+
+*/
 <template>
 	<div class="top-bar" v-if="showBack">
 		<div>
 			<div v-show="showBack" @click="backToSites" class="top-bar-backbutton">
-				<i class="el-icon-arrow-left backbutton-icon"></i>Site list
+				<i class="el-icon-arrow-left backbutton-icon"></i>Sites
 			</div>
-			<div class="top-bar__page-title">{{ pageTitle }} <el-tag type="primary">{{ pagePath }}</el-tag></div>
+			<div v-if="publishStatus==='published'" class="top-bar__page-title">
+				<div class="top-bar__title">{{ pageTitle }}<el-tag type="success">Published</el-tag></div>
+				<span class="top-bar__url"><a :href="renderedURL" target="_blank">{{ renderedURL }}</a> <icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" /></span>
+			</div>
+
+			<div v-else-if="publishStatus==='draft'" class="top-bar__page-title">
+				<div class="top-bar__title">{{ pageTitle }}<el-tag type="warning">Draft</el-tag></div>
+				<span class="top-bar__url"><a :href="renderedURL" target="_blank">{{ renderedURL }}</a> <icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" /></span>
+			</div>
+
+			<div v-if="publishStatus==='new'" class="top-bar__page-title">
+				<div class="top-bar__title">{{ pageTitle }}<el-tag type="primary">Unpublished draft</el-tag></div>
+				<span class="top-bar__url">{{ renderedURL }}</span>
+			</div>
+
+			<div v-else class="top-bar__page-title">
+				<div class="top-bar__title">{{ pageTitle }}</div>
+				<span class="top-bar__url">{{ renderedURL }}</span>
+			</div>
+
 		</div>
 
 		<div class="top-bar__tools">
@@ -21,7 +57,8 @@
 			</el-dropdown>
 		</div>
 	</div>
-	<div v-else class="top-bar top-bar--homepage">
+	<div v-else class="top-bar
+	 				   top-bar--homepage">
 		<el-dropdown trigger="click" @command="handleCommand" class="user-menu-button">
 			<span class="el-dropdown-link">
 				{{ username }}<i class="el-icon-caret-bottom el-icon--right"></i>
@@ -36,13 +73,9 @@
 <script>
 import { mapState, mapGetters, mapActions, mapMutations } from 'vuex';
 import Icon from 'components/Icon';
-import { undoStackInstance } from 'plugins/undo-redo';
-import { onKeyDown, onKeyUp } from 'plugins/key-commands';
-import Toolbar from 'components/sidebar/Toolbar';
+import Toolbar from 'components/Toolbar';
 import promptToSave from '../mixins/promptToSave';
 import Config from '../classes/Config.js';
-
-/* global window, document */
 
 export default {
 
@@ -53,36 +86,40 @@ export default {
 		Toolbar
 	},
 
-	mixins:[ promptToSave ],
+	mixins:[promptToSave],
 
 	created() {
-		this.onKeyDown = onKeyDown(undoStackInstance);
-		this.onKeyUp = onKeyUp(undoStackInstance);
-
-		document.addEventListener('keydown', this.onKeyDown);
-		document.addEventListener('keyup', this.onKeyUp);
-		window.addEventListener("beforeunload", this.leaveAstro);
-	},
-
-	destroyed() {
-		document.removeEventListener('keydown', this.onKeyDown);
-		document.removeEventListener('keyup', this.onKeyUp);
+		window.addEventListener('beforeunload', this.leaveAstro);
 	},
 
 	computed: {
 
 		...mapState({
-			pageTitle: state => state.page.pageTitle,
-			pagePath: state => state.page.pagePath,
-			pageSlug: state => state.page.pageSlug
+			pageData: state => state.page.pageData, // complete set of page data. We need this so we can get the right info as the site is first loaded (things like title and slug won't already be in the store)
 		}),
 
+		...mapGetters([
+			'publishStatus',
+			'pageTitle',
+			'pageSlug',
+			'pagePath',
+			'sitePath',
+			'siteDomain'
+		]),
+
+		// works out if we should show a back button or not (ie whether we're editing a page or on the homepage)
 		showBack() {
 			return ['site', 'page'].indexOf(this.$route.name) !== -1;
 		},
 
+		// lets us output the current user's username in the top bar
 		username() {
 			return window.astro.username;
+		},
+
+		// lets us output a calculated url for the current page in the top bar
+		renderedURL() {
+			return this.siteDomain + this.sitePath + this.pagePath;
 		}
 	},
 
@@ -110,30 +147,32 @@ export default {
 
 		handleCommand(command) {
 			if(command === 'sign-out') {
+				// prompts the user to save the page when they try to log out
 				this.promptToSave(() => {
-
-                    var form = document.createElement("form");
-                    form.setAttribute("method", 'post');
-                    form.setAttribute("action", Config.get('base_url', '') + '/auth/logout');
-                    var csrf = document.createElement("input");
-                    csrf.setAttribute("type", "hidden");
-                    csrf.setAttribute("name", "_token");
-                    csrf.setAttribute("value", window.astro.csrf_token);
-                    form.appendChild(csrf);
-                    document.body.appendChild(form);
-                    form.submit();
-
-//					window.location = Config.get('base_url', '') + '/auth/logout';
+					const form = document.createElement('form');
+					form.setAttribute('method', 'post');
+					form.setAttribute('action', Config.get('base_url', '') + '/auth/logout');
+					const csrf = document.createElement('input');
+					csrf.setAttribute('type', 'hidden');
+					csrf.setAttribute('name', '_token');
+					csrf.setAttribute('value', window.astro.csrf_token);
+					form.appendChild(csrf);
+					document.body.appendChild(form);
+					form.submit();
+					//window.location = Config.get('base_url', '') + '/auth/logout';
 				});
 			}
 		},
 
+		/**
+			gets the user back to the main site listing
+		*/
 		backToSites() {
+			// another prompt to save the page when going back to the site listing
 			this.promptToSave(() => {
-				this.$store.commit('changePage', {title: "Home page", path: '/', slug:'home'});
+				this.$store.commit('changePage', {title:'', path:'', slug:''});
 				this.$store.commit('setPage', {});
 				this.$store.commit('setLoaded', false);
-				undoStackInstance.clear();
 				this.$router.push('/sites');
 			})
 		}

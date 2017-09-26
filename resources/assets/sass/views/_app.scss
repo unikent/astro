@@ -6,12 +6,11 @@
 	position: absolute;
 	top: 0;
 	left: 0;
-	display: inline;
+	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 0 20px;
+	padding: 0 10px;
 	height: get-height(top-bar);
-	line-height: get-height(top-bar);
 }
 .top-bar--homepage {
 	display: flex;
@@ -29,7 +28,21 @@
 	float: left;
 	display: inline-block;
 	vertical-align: middle;
-	padding-left: 50px;
+	padding-left: 20px;
+	.el-tag {
+		height: 18px;
+		line-height: 16px;
+		font-size: 10px;
+		margin-left: 5px;
+	}
+}
+.top-bar__url {
+	font-size: 11px;
+	color: #71787f;
+}
+.top-bar__title {
+	font-size: 14px;
+	padding: 1rem 0 0 0;
 }
 .top-bar__url {
 	font-size: 11px;

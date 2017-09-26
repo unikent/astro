@@ -95,6 +95,16 @@ $page-height: 38px;
 	cursor: default;
 }
 
+// the page title text shown inside each page item in the list
+// add an ellipsis and hide overflow if the text is too long
+.page-list__text {
+	flex: 1 1 auto;
+	cursor: pointer;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 .page-list__item::before,
 .page-list__item::after,
 .page-list__root > .page-list__title:before,
