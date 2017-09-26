@@ -270,13 +270,12 @@ const actions = {
 	 * @param {Object} input
 	 * @param {Object} input.state - the context of the action - added by VueX
 	 * @param {Object} input.commit - added by VueX
-	 * @param {Object} payload - parameter object
-	 * @param {callback} payload.message - function to display a message
+	 * @param {boolean} notify - show a notification?
 	 * @return {promise} - api - to allow other methods to wait for the save
 	 * to complete
 	 * @memberof state/page#
 	 */
-	handleSavePage({ state, commit }, payload) {
+	handleSavePage({ state, commit }, notify) {
 		const blocks = state.pageData.blocks;
 		const id = state.pageData.id;
 		return api
@@ -289,8 +288,7 @@ const actions = {
 			- eg on preview we don't want to show a save message
 			*/
 			.then(response => {
-
-				if (payload) {
+				if (notify) {
 					// there are validation errors
 					if (response.data.data.valid===0) {
 						// create the message markup
@@ -303,7 +301,7 @@ const actions = {
 								vue.$createElement('p', 'Check the error sidebar for details.')
 							]
 						);
-						payload.notify({
+						vue.$notify({
 							title: 'Saved',
 							message: message,
 							type: 'warning',
@@ -312,7 +310,7 @@ const actions = {
 					}
 					// we're all good
 					else {
-						payload.notify({
+						vue.$notify({
 							title: 'Saved',
 							message: 'You saved this page successfully.',
 							type: 'success',
@@ -326,7 +324,7 @@ const actions = {
 			unsuccessful save, such as a network problem
 			*/
 			.catch(() => {
-				payload.notify({
+				vue.$notify({
 					title: 'Not saved',
 					message: 'There was a network problem and this page has not been saved. Please try again later.',
 					type: 'error',
