@@ -93,8 +93,7 @@ export default {
 
 	computed: {
 		...mapState([
-			'publishModal',
-			'publishedModal'
+			'publishModal'
 		]),
 
 		...mapState({
@@ -128,9 +127,7 @@ export default {
 	methods: {
 		...mapMutations([
 			'showPublishModal',
-			'hidePublishModal',
-			'showPublishedModal',
-			'hidePublishedModal'
+			'hidePublishModal'
 		]),
 
 		/**

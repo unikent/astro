@@ -16,7 +16,8 @@
 
 	<el-button class="toolbar__button-preview" :plain="true" type="info" @click="previewPage">Preview <icon name="newwindow" aria-hidden="true" width="14" height="14" class="ico" /></el-button>
 
-	<el-button class="toolbar__button-publish" type="danger" @click="showPublishModal">Publish ...</el-button>
+	<el-button v-if="invalidBlocks===true" class="toolbar__button-publish" type="danger" @click="showPublishModal">Publish ...</el-button>
+	<el-button v-if="invalidBlocks===false" class="toolbar__button-publish" type="danger" @click="showPublishValidationWarningModal">Publish ...</el-button>
 
 </div>
 
@@ -25,7 +26,7 @@
 
 
 <script>
-import { mapState, mapMutations, mapActions } from 'vuex';
+import { mapState, mapMutations, mapActions, mapGetters } from 'vuex';
 
 import Icon from 'components/Icon';
 import { undoStackInstance } from 'plugins/undo-redo';
@@ -50,6 +51,10 @@ export default {
 			pageLoaded: state => state.page.loaded
 		}),
 
+		...mapGetters([
+			'getInvalidBlocks'
+		]),
+
 		view: {
 			get() {
 				return this.currentView;
@@ -61,6 +66,14 @@ export default {
 
 		draftLink() {
 			return window.astro.base_url + '/draft/' + `${this.$route.params.page_id}`;
+		},
+
+		invalidBlocks() {
+			var invalidBlocks = false;
+			if (this.getInvalidBlocks().length === 0) {
+				invalidBlocks = true;
+			}
+			return invalidBlocks;
 		}
 	},
 
@@ -91,6 +104,7 @@ export default {
 		...mapMutations([
 			'changeView',
 			'showPublishModal',
+			'showPublishValidationWarningModal'
 		]),
 
 		...mapActions([
