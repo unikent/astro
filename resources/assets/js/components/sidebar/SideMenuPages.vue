@@ -13,6 +13,7 @@
 </li>
 </template>
 
+
 <script>
 import { mapState, mapMutations } from 'vuex';
 import Icon from 'components/Icon';
