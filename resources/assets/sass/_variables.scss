@@ -1,28 +1,35 @@
 $grid-breakpoints: (
-	xs: 0,
-	sm: 576px,
-	md: 768px,
-	lg: 992px,
-	xl: 1200px
+				xs: 0,
+				sm: 576px,
+				md: 768px,
+				lg: 992px,
+				xl: 1200px
 ) !default;
 
 // TODO: decide on colour names
 $theme-colours: (
-	c1: #48576a,
-	c2: #71787f,
-	c3: #8391a5,
-	c4: #b7c2d4,
-	c5: #dadde2,
-	c6: #e5e7ec,
-	c7: #f7f9fb,
-	lightest: #fff,
-	selected: #03a9f4
+				c1: #48576a,
+				c2: #71787f,
+				c3: #8391a5,
+				c4: #b7c2d4,
+				c5: #dadde2,
+				c6: #e5e7ec,
+				c7: #f7f9fb,
+				lightest: #fff,
+				selected: #03a9f4
 ) !default;
 
 $status-colours: (
-	success: #5ab181,
-	info: #4eadda,
-	warning: #e5ce66,
-	danger: #d65757,
-	error: #d65757
+				success: #5ab181,
+				info: #4eadda,
+				warning: #e5ce66,
+				danger: #d65757
+) !default;
+
+// darker font colours to make them more readable against background colours
+$status-font-colours: (
+				success: #0a5f30,
+				primary: #0b63a5,
+				warning: #946902,
+				danger: #b10000
 ) !default;
