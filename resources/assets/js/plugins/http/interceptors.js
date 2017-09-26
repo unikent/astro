@@ -18,11 +18,11 @@ export default (http, store, router) => {
 						if(response.data.errors) {
 							response.data.errors.forEach(error => {
 
-								const h = vue.$createElement;
+								// notification to the user
 								vue.$notify({
-									title: 'Page saved',
-									message: h('i', { style: 'color: #bb9132' }, 'We saved your page, but there are some fixes to make before you can publish.'),
-									type: 'warning'
+									title: 'Error',
+									message: 'There are some problems on your page.' + error,
+									type: 'error'
 								});
 
 								if(error.details && typeof error.details === 'object') {

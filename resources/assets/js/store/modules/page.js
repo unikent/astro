@@ -6,6 +6,8 @@ import api from 'plugins/http/api';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { eventBus } from 'plugins/eventbus';
 
+const vue = new Vue();
+
 /**
  * Page State Module
  * @namespace state/page
@@ -286,14 +288,37 @@ const actions = {
 			- only display the notification message if that's what we want (there's a defined payload)
 			- eg on preview we don't want to show a save message
 			*/
-			.then(() => {
+			.then(response => {
+
 				if (payload) {
-					payload.notify({
-						title: 'Saved',
-						message: 'You saved this page successfully.',
-						type: 'success',
-						duration: 4000
-					});
+					// there are validation errors
+					if (response.data.data.valid===0) {
+						// create the message markup
+						const message = vue.$createElement(
+							'div',
+							{ style: 'color: #bb9132' },
+							[
+								vue.$createElement('p', 'The page saved ok, but there are some validation errors.'),
+								vue.$createElement('p', 'You won\'t be able to publish till these are fixed.'),
+								vue.$createElement('p', 'Check the error sidebar for details.')
+							]
+						);
+						payload.notify({
+							title: 'Saved',
+							message: message,
+							type: 'warning',
+							duration: 10000
+						});
+					}
+					// we're all good
+					else {
+						payload.notify({
+							title: 'Saved',
+							message: 'You saved this page successfully.',
+							type: 'success',
+							duration: 4000
+						});
+					}
 				}
 				commit('updateCurrentSavedState');
 			})
@@ -303,7 +328,7 @@ const actions = {
 			.catch(() => {
 				payload.notify({
 					title: 'Not saved',
-					message: 'There was a problem and this page has not been saved. Please try again later.',
+					message: 'There was a network problem and this page has not been saved. Please try again later.',
 					type: 'error',
 					duration: 0
 				});
