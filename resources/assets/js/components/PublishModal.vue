@@ -93,7 +93,8 @@ export default {
 
 	computed: {
 		...mapState([
-			'publishModal'
+			'publishModal',
+			'publishedModal'
 		]),
 
 		...mapState({
@@ -118,7 +119,6 @@ export default {
 				}
 			}
 		},
-
 		// frontend URL - so the user can view their newly-published page
 		renderedURL() {
 			return this.siteDomain + this.sitePath + this.pagePath;
@@ -128,7 +128,9 @@ export default {
 	methods: {
 		...mapMutations([
 			'showPublishModal',
-			'hidePublishModal'
+			'hidePublishModal',
+			'showPublishedModal',
+			'hidePublishedModal'
 		]),
 
 		/**

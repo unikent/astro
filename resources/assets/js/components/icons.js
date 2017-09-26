@@ -32,3 +32,5 @@ export { default as minus }     from 'IconPath/minus.svg';
 export { default as morealt }   from 'IconPath/more-alt.svg';
 export { default as arrow }     from 'IconPath/arrow.svg';
 export { default as newwindow } from 'IconPath/new-window.svg';
+export { default as alert } from 'IconPath/alert.svg';
+export { default as info } from 'IconPath/info-alt.svg';

@@ -1,10 +1,11 @@
 <template>
 	<div class="top-bar" v-if="showBack">
-		<div v-show="showBack" @click="backToSites" class="top-bar-backbutton">
-			<i class="el-icon-arrow-left backbutton-icon"></i>Site list
+		<div>
+			<div v-show="showBack" @click="backToSites" class="top-bar-backbutton">
+				<i class="el-icon-arrow-left backbutton-icon"></i>Site list
+			</div>
+			<div class="top-bar__page-title">{{ pageTitle }} <el-tag type="primary">{{ pagePath }}</el-tag></div>
 		</div>
-
-		<div class="top-bar__page-title">{{ pageTitle }} <el-tag type="primary">{{ pagePath }}</el-tag></div>
 
 		<div class="top-bar__tools">
 

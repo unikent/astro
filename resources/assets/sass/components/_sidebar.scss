@@ -1,4 +1,13 @@
+/**
+editor-sidebar is the side-panel of the editor
+it contains a panel (sidebar) for things like page listings, block details, error listings
+to the right of the sidebar is another sidebar (sidebar__switcher) which contains the buttons to switch between panels
+*/
 .editor-sidebar {
+
+	background-color: #f7f9fb;
+	z-index: 0;
+	font-size: 14px;
 	max-width: 50vw;
 	min-width: 398px;
 
@@ -17,42 +26,98 @@
 		background-color: #f5f7fa;
 	}
 
+	/**
+	sidebar is the right-hand component of the editor-sidebar
+	it is mainly a wrapper for the sidebar__switcher list
+	*/
 	.sidebar {
 		position: absolute;
 		top: 0;
-		left: 0;
-		width: 100%;
+		right: 0;
 		height: 100%;
 		background-color: #fff;
 		transition: transform .5s cubic-bezier(.19, 1, .22, 1);
-		border-left: 1px solid transparent;
+		border-left: 1px solid #d7deea;
+	}
 
-		.app-sidebar {
-			li {
-				border-left: 3px solid transparent;
-			}
+	/**
+	sidebar__switcher is the region specifically for the list of sidebar screen options, such as blocks, errors, pages, etc.
+	*/
+	.sidebar__switcher {
+		padding: 0;
+		margin: 0;
+		list-style: none;
 
-			a {
-				padding: 14px 18px 14px 15px;
+		li {
+			line-height: 0;
+		}
+
+		.menu-icon {
+			fill: #444;
+		}
+
+		a {
+			color: #71787f;
+			position: relative;
+			transition: color .2s ease-out;
+			font-size: 14px;
+			display : flex;
+			align-items : center;
+			text-decoration: none;
+			line-height: 1.8em;
+			padding: 14px;
+
+			&:hover {
+				text-decoration: none;
+				color: #03a9f4;
 			}
 		}
 
-		&.collapsed {
-			border-left: 1px solid #d7deea;
-			transform: translateX(100%) translateX(-53px);
-			span {
-				opacity: 0;
-				transition: opacity .3s ease-out;
-			}
+		.router-link-active,
+		.active {
+			border-left: 3px solid #03a9f4;
 
-			.active {
-				border-left: 3px solid #03a9f4;
+			color: #03a9f4;
+			a {
+				padding-left: 11px;
 			}
 		}
 	}
 
-	.app-sidebar {
-		list-style: none;
+	// the sidebar list for the pages
+	.sidebar--pages {
+		background-color: #e5eef7;
+		border-bottom: 1px solid #e4e4e4;
+		box-shadow: 0 0px 10px 1px rgba(0, 0, 0, 0.05);
+		.active {
+			border-left: none;
+			background-color: #cfeaff;
+			a {
+				padding-left: 14px;
+
+			}
+		}
+		li a {
+			height: 50px;
+		}
+	}
+
+	// sidebar in-page options (blocks, errors, etc)
+	.sidebar--in-page {
+		padding-top: 10px;
+		height: 100%;
+		box-shadow: inset 0 0px 10px 1px rgba(0, 0, 0, 0.05);
+		li {
+			margin: 10px 0;
+			a {
+				height: 45px;
+			}
+		}
+	}
+
+	// used when a sidebar element is deactivated
+	.sidebar--deactivated {
+		opacity: 0.6;
 	}
 
 	.editor-component-list--is-collapsed {
@@ -66,7 +131,7 @@
 	}
 
 	.sidebar-component-wrapper {
-		width: calc(100% - 53px);
+		width: calc(100% - 45px);
 		height: 100%;
 		overflow: hidden;
 		position: relative;

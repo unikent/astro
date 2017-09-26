@@ -63,7 +63,8 @@ class CreateSite implements APICommand
             'created_by' => $user->id,
             'updated_by' => $user->id,
             'layout_name' => $layout['name'],
-            'layout_version' => $layout['version']
+            'layout_version' => $layout['version'],
+			'valid' => true
         ]);
         $page->setRevision($revision);
         $page->refresh();
