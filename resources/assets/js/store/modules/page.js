@@ -1,10 +1,22 @@
 import _ from 'lodash';
 import Vue from 'vue';
+import { mapMutations } from 'vuex';
 import { Definition } from 'classes/helpers';
 import api from 'plugins/http/api';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { eventBus } from 'plugins/eventbus';
 
+/**
+ * Page State Module
+ * @namespace state/page
+ * @property {string} currentLayout - The name of the layout in use for the current page.
+ * @property {int} currentLayoutVersion - The version number of the layout in use for the current page.
+ * @property {number|null} currentBlockIndex - The index of the currently selected block in the currently selected region.
+ * @property {string} currentRegion - The name of the region containing the currently selected block.
+ * @property {Object} blockMeta - Some meta about blocks???
+ * @property {Object} blockMeta.blocks - Object with keys as region names and values as Arrays of blocks.
+ * @property {Array} invalidBlocks - array of block ids of invalid blocks within the page
+ */
 const state = {
 	currentLayout: null,
 	currentLayoutVersion: 1,
@@ -26,12 +38,18 @@ const state = {
 	scale: .4,
 	loaded: false,
 	dragging: false,
-	currentSavedState: ''
+	currentSavedState: '',
+	invalidBlocks: [],
 };
 
 const mutations = {
-
-	setPage(state, page) {
+    /**
+	 * Mutation to set the current page.
+	 * @method
+     * @param {object} page Page object representing the current page.
+	 * @memberof state/page#
+     */
+	setPage: function(state, page) {
 		if(!page.blocks) {
 			page.blocks = {
 				main: []
@@ -165,7 +183,26 @@ const mutations = {
 
 	resetCurrentSavedState(state) {
 		state.currentSavedState = '';	
+	},
+
+	addBlockValidationIssue(state, block_id) {
+		if (state.invalidBlocks.indexOf(block_id) === -1) {
+			state.invalidBlocks.push(block_id);
+		}
+	},
+
+	deleteBlockValidationIssue(state, block_id) {
+		const location = state.invalidBlocks.indexOf(block_id);
+		if (location !== -1) {
+			reducedItems = state.invalidBlocks.splice(location, 1);
+			state.invalidBlocks = reducedItems;
+		}
+	},
+
+	clearBlockValidationIssues() {
+		state.invalidBlocks = [];
 	}
+
 };
 
 const actions = {
@@ -201,6 +238,7 @@ const actions = {
 						}
 
 						commit('setPage', _.cloneDeep(page));
+						commit('clearBlockValidationIssues');
 
 						Object.keys(blocks).forEach(region => {
 							blocks[region].forEach((block, index) => {
@@ -208,7 +246,16 @@ const actions = {
 							});
 						});
 
+						Object.keys(blocks).forEach(region => {
+							blocks[region].forEach((block, index) => {
+								if (block.errors !== null) {
+									commit('addBlockValidationIssue', block.id);
+								}
+							});
+						});
+						
 						commit('setLoaded');
+						// @TODO - populate validations issues with those received from the api
 
 						undoStackInstance.init(state.pageData);
 					});
@@ -218,29 +265,31 @@ const actions = {
 
 	/**
 	 * Saves a page
-	 * @param {Object} state - the context of the action - added by VueX
-	 * @param {Object} commit - added by VueX
+	 * @param {Object} input
+	 * @param {Object} input.state - the context of the action - added by VueX
+	 * @param {Object} input.commit - added by VueX
 	 * @param {Object} payload - parameter object
 	 * @param {callback} payload.message - function to display a message
 	 * @return {promise} - api - to allow other methods to wait for the save 
 	 * to complete
+	 * @memberof state/page#
 	 */
 	handleSavePage({ state, commit }, payload) {
-			const blocks = state.pageData.blocks;
-			const id = state.pageData.id;
-			return api
-				.put(`pages/${id}/content`, {
-                    blocks: blocks
-                })
-				.then(() => {
-					payload.message({
-							message: 'Page saved',
-							type: 'success',
-							duration: 2000
-						});
-					commit('updateCurrentSavedState');
-				})
-				.catch(() => {});
+		const blocks = state.pageData.blocks;
+		const id = state.pageData.id;
+		return api
+			.put(`pages/${id}/content`, {
+				blocks: blocks
+			})
+			.then(() => {
+				payload.message({
+					message: 'Page saved',
+					type: 'success',
+					duration: 2000
+				});
+				commit('updateCurrentSavedState');
+			})
+			.catch(() => {});
 	},
 };
 
@@ -280,13 +329,15 @@ const getters = {
 
 	unsavedChangesExist: (state) => () => {
 		if (state.currentSavedState.length === 0) {
-	 		// if user has not edited a page yet so we do not have any unsaved changes
+			// if user has not edited a page yet so we do not have any unsaved changes
 			return false;
-		} else {
+		}
+		else {
 			return state.currentSavedState != JSON.stringify(state.pageData.blocks);
 		}
-	}
+	},
 };
+
 
 export default {
 	state,
