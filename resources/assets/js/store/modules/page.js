@@ -184,8 +184,7 @@ const mutations = {
 	deleteBlockValidationIssue(state, block_id) {
 		const location = state.invalidBlocks.indexOf(block_id);
 		if (location !== -1) {
-			reducedItems = state.invalidBlocks.splice(location, 1);
-			state.invalidBlocks = reducedItems;
+			state.invalidBlocks.splice(location, 1);
 		}
 	},
 
@@ -237,7 +236,7 @@ const actions = {
 						});
 
 						Object.keys(blocks).forEach(region => {
-							blocks[region].forEach((block, index) => {
+							blocks[region].forEach((block) => {
 								if (block.errors !== null) {
 									commit('addBlockValidationIssue', block.id);
 								}
@@ -245,8 +244,6 @@ const actions = {
 						});
 
 						commit('setLoaded');
-						// @TODO - populate validations issues with those received from the api
-
 					});
 
 			});
@@ -372,6 +369,10 @@ const getters = {
 	getBlockMeta: (state) => (index, region, prop = false) => {
 		const blockMeta = state.blockMeta.blocks[region][index];
 		return prop ? blockMeta[prop] : blockMeta;
+	},
+
+	getBlocks: (state) => () => {
+		return state.pageData.blocks;
 	},
 
 	scaleDown: (state) => () => {
