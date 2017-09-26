@@ -26,7 +26,7 @@
 <script>
 import { mapState } from 'vuex';
 import BackBar from 'components/BackBar';
-
+ 
 export default {
 	name: 'errors',
 
