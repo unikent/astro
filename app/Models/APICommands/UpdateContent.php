@@ -13,6 +13,7 @@ use Illuminate\Support\Collection;
 use App\Models\Definitions\Block as BlockDefinition;
 use App\Models\Definitions\Region as RegionDefinition;
 use App\Models\Page;
+use Illuminate\Support\Facades\Validator;
 
 class UpdateContent implements APICommand
 {
@@ -28,7 +29,7 @@ class UpdateContent implements APICommand
             $page = Page::find($input['id']);
 
             // Update with new content.
-            $this->processBlocks($page, $input['blocks']);
+            $errors = $this->processBlocks($page, $input['blocks']);
 
             // Save our previous state to the revisions table.
             $previous_revision = $page->revision;
@@ -40,7 +41,8 @@ class UpdateContent implements APICommand
                 'created_by' => $user->id,
                 'updated_by' => $user->id,
                 'blocks' => $page->bake(),
-                'options' => ''
+                'options' => '',
+				'valid' => !$errors
             ]);
             $page->setRevision($revision);
             $page->fresh();
@@ -54,6 +56,7 @@ class UpdateContent implements APICommand
      * @param $regions
      */
     protected function processBlocks($page, $regions) {
+    	$errors = false;
         foreach($regions as $region => $blocks) {
             // Remove any existing Blocks in the region (to avoid re-ordering existing)
             // TODO: explore updating block order rather than deleting each time
@@ -61,6 +64,7 @@ class UpdateContent implements APICommand
 
             // Re/create all the blocks
             if(!empty($blocks)) {
+
                 foreach($blocks as $delta => $data) {
                     $block = new Block;
 
@@ -71,6 +75,8 @@ class UpdateContent implements APICommand
                     $block->order = $delta;
                     $block->region_name = $region;
 
+                    $block->errors = $this->validateBlock($block);
+					$errors = $errors || !empty($block->errors);
                     $block->save();
 
                     // associate media items with this block
@@ -89,7 +95,31 @@ class UpdateContent implements APICommand
                 }
             }
         }
+        return $errors;
     }
+
+    public function validateBlock($block)
+	{
+		$rules = [];
+		// ...load the Block definition...
+		$version = isset($block['definition_version']) ? $block['definition_version'] : null;
+		$file = BlockDefinition::locateDefinition($block['definition_name'], $version);
+		$blockDefinition = BlockDefinition::fromDefinitionFile($file);
+
+		// ...load the validation rules from the definition...
+		$bb = new BlockBroker($blockDefinition);
+
+		// ...and then merge the block field validation rules.
+		foreach ($bb->getRules() as $field => $ruleset) {
+			$rules[$field] = $ruleset;
+		}
+		$validator = Validator::make($block->fields, $rules);
+		if($validator->fails()){
+			$errors = $validator->errors();
+			return $errors;
+		}
+		return null;
+	}
 
     /**
      * Get the error messages for this command.
@@ -136,12 +166,6 @@ class UpdateContent implements APICommand
                     // ...merge any region constraint validation rules...
                     foreach($bb->getRegionConstraintRules($regionDefinition) as $field => $ruleset){
                         $key = sprintf('blocks.%s.%d.%s', $region, $delta, $field);
-                        $rules[$key] = $ruleset;
-                    }
-
-                    // ...and then merge the block field validation rules.
-                    foreach($bb->getRules() as $field => $ruleset){
-                        $key = sprintf('blocks.%s.%d.fields.%s', $region, $delta, $field);
                         $rules[$key] = $ruleset;
                     }
 

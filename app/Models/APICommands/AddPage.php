@@ -72,7 +72,8 @@ class AddPage implements APICommand
             'layout_name' => $layout_name,
             'layout_version' => $layout_version,
             'blocks' => null,
-            'options' => null
+            'options' => null,
+			'valid' => true
         ]);
         $page->setRevision($revision);
         return $page;

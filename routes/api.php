@@ -15,6 +15,7 @@ Route::group([ 'prefix' => 'v1', 'namespace' => 'v1' ], function(){
 
 	Route::resource('pages', 'PageController', [ 'except' => [ 'index', 'create', 'edit' ]]);
 	Route::put('pages/{page}/content', 'PageController@updateContent');
+	Route::put('pages/{page}/slug', 'PageController@changeSlug');
 	Route::post('pages/{page}/publish', 'PageController@publish');
 	Route::post('pages/{page}/publish-tree', 'PageController@publishTree');
 	Route::post('pages/{page}/revert', 'PageController@revert');
@@ -28,4 +29,6 @@ Route::group([ 'prefix' => 'v1', 'namespace' => 'v1' ], function(){
 	Route::resource('sites', 'SiteController', [ 'only' => [ 'index', 'show', 'store', 'update', 'destroy' ]]);
     Route::get('sites/{site}/tree', 'SiteController@tree');
     Route::patch('sites/{site}/tree', 'SiteController@move');
+
+    Route::resource('pubgroups', 'PublishingGroupController', [ 'only' => ['index']]);
 });

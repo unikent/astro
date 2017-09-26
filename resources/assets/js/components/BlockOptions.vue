@@ -7,8 +7,10 @@
 		"
 	 />
 	<div ref="options-list" class="block-options-list custom-scrollbar">
-		<el-form
+		<block-form
 			v-if="currentDefinition"
+			v-on:failValidation="setValidation(false)"
+			v-on:passValidation="setValidation(true)"
 			label-position="top"
 			:model="blockFields"
 			:rules="rules"
@@ -70,7 +72,7 @@
 					"
 				/>
 			</el-form-item>
-		</el-form>
+		</block-form>
 
 		<!-- TODO: make this look nice -->
 		<div v-else>Click a block to display its options in this sidebar.</div>
@@ -92,12 +94,17 @@ import BackBar from './BackBar';
 import fields from 'components/fields';
 import containers from 'components/fields/containers';
 import { heights } from 'classes/sass';
-
 import Icon from './Icon';
+import BlockForm from './BlockForm';
 
 /* global document */
 
 export default {
+	data: function () {
+			return {
+				valid: true
+			}
+		},
 
 	name: 'block-options',
 
@@ -109,6 +116,7 @@ export default {
 	},
 
 	computed: {
+
 
 		...mapGetters([
 			'getCurrentBlock'
@@ -150,6 +158,7 @@ export default {
 				this.errors.blocks[this.currentRegion][this.currentIndex].fields : {};
 		},
 
+		// @TODO - this lags when switching blocks with different rule sets- investigate
 		rules() {
 			return Definition.getRules(this.currentDefinition, false);
 		}
@@ -165,6 +174,14 @@ export default {
 			if(val && oldVal && val.id !== oldVal.id) {
 				this.$refs['options-list'].scrollTop = 0;
 			}
+		},
+
+		valid(isValid) {
+			if (isValid) {
+				this.deleteBlockValidationIssue(this.currentBlock.id);
+			} else {
+				this.addBlockValidationIssue(this.currentBlock.id);
+			}
 		}
 	},
 
@@ -172,7 +189,9 @@ export default {
 		...mapMutations([
 			'setBlock',
 			'deleteBlock',
-			'updateErrors'
+			'updateErrors',
+			'addBlockValidationIssue',
+			'deleteBlockValidationIssue'
 		]),
 
 		goBack() {
@@ -229,6 +248,10 @@ export default {
 			if(this.currentBlock.fieldElements[fieldName]) {
 				console.log(this.currentBlock.fieldElements[fieldName]);
 			}
+		},
+
+		setValidation(status) {
+			this.valid = status;
 		}
 
 	}

@@ -33,7 +33,9 @@ class Page extends BaumNode
         'site_id',
         'version',
         'path',
-        'revision_id'
+        'revision_id',
+        'created_by',
+        'updated_by',
 	];
 
 	protected $hidden = [
@@ -106,7 +108,8 @@ class Page extends BaumNode
                     'definition_name' => $block->definition_name,
                     'definition_version' => $block->definition_version,
                     'region_name' => $block->region_name,
-                    'fields' => $block->fields
+                    'fields' => $block->fields,
+					'errors' => $block->errors
                 ];
             }
         }
