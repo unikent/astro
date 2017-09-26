@@ -7,6 +7,15 @@
 	font-weight: bold;
 	line-height: 1;
 	padding: 0.5rem 0.5rem 0.5rem 2rem;
+	position:fixed;
+	width: 100%;
+	text-align:center;
+	z-index: 9999;
+	height: 40px;
+	text-wrap: none;
+}
+.preview-spacer {
+	height: 40px;
 }
 .preview span {
 	font-size: 0.9rem;
@@ -20,6 +29,6 @@
 }
 </style>
 <div class="preview">
-	<svg width="25" height="25" aria-hidden="true"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/build/img/sprite.svg#icon-info-alt-49c80"></use></svg>
 	<span>This is a preview version of the page.</span>
 </div>
+<div class="preview-spacer"></div>

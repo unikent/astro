@@ -43,9 +43,8 @@ Route::get('/draft/{page}', function(Request $request, Page $page) {
 
     // add in preview bar
     $original_html = $astro->renderRoute($page->site->host, $page->site->path . $page->path, $api, $engine, $locator, Page::STATE_DRAFT);
-    $preview_bar = ''; // TODO read file in from preview-bar.html
-	
-    return str_replace('<body>', '<body>' . $preview_bar, $original_html);
+    $preview_bar = file_get_contents(resource_path('views/components/preview-bar.html'));
+    return preg_replace('/(<body[^>]*>)/is', '$1' . $preview_bar, $original_html);
 })
 ->where('route', '(.*?)/?')
 ->middleware('auth');
