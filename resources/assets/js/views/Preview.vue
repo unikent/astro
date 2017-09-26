@@ -101,7 +101,8 @@ export default {
 
 		...mapGetters([
 			'scaleDown',
-			'scaleUp'
+			'scaleUp',
+			'getBlocks'
 		]),
 
 		layout() {
@@ -191,7 +192,8 @@ export default {
 			'addBlock',
 			'showBlockPicker',
 			'updateInsertIndex',
-			'updateInsertRegion'
+			'updateInsertRegion',
+			'deleteBlockValidationIssue'
 		]),
 
 		initEvents() {
@@ -218,7 +220,11 @@ export default {
 		},
 
 		removeBlock(command) {
+			// remove block but before we do so remove any validation issues it owns 
 			const { index, region } = this.current;
+			const blocks = this.getBlocks();
+			const blockToBeDeleted = blocks[region][index];
+			this.deleteBlockValidationIssue(blockToBeDeleted.id);
 			this.deleteBlock({ index, region });
 			this.hideOverlay();
 			this.current = null;
