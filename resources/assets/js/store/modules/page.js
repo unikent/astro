@@ -290,7 +290,7 @@ const actions = {
 				if (payload) {
 					payload.notify({
 						title: 'Saved',
-						message: 'You\'ve saved this page successfully.',
+						message: 'You saved this page successfully.',
 						type: 'success',
 						duration: 4000
 					});
