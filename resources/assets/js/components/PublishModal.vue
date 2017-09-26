@@ -77,7 +77,7 @@ An element loading spinner is shown after the user hits 'Publish'.
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex';
+import { mapState, mapMutations, mapGetters } from 'vuex';
 
 
 export default {
@@ -105,6 +105,14 @@ export default {
 			sitePath: state => state.page.sitePath
 		}),
 
+		...mapGetters([
+			'pageTitle',
+			'pagePath',
+			'pageSlug',
+			'siteDomain',
+			'sitePath'
+		]),
+
 		// basically controls show/hide of the modal
 		publishModalVisible: {
 			get() {
@@ -121,7 +129,7 @@ export default {
 		},
 		// frontend URL - so the user can view their newly-published page
 		renderedURL() {
-			return this.siteDomain + this.sitePath + this.pagePath;
+			return 'http://' + this.siteDomain + this.sitePath + this.pagePath;
 		}
 	},
 

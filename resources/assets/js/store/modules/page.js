@@ -1,13 +1,11 @@
 import _ from 'lodash';
 import Vue from 'vue';
-import { mapMutations } from 'vuex';
 import { Definition } from 'classes/helpers';
 import api from 'plugins/http/api';
-import { undoStackInstance } from 'plugins/undo-redo';
 import { eventBus } from 'plugins/eventbus';
 
 /**
- * Page State Module
+ * Store module containing current page related data.
  * @namespace state/page
  * @property {string} currentLayout - The name of the layout in use for the current page.
  * @property {int} currentLayoutVersion - The version number of the layout in use for the current page.
@@ -16,6 +14,7 @@ import { eventBus } from 'plugins/eventbus';
  * @property {Object} blockMeta - Some meta about blocks???
  * @property {Object} blockMeta.blocks - Object with keys as region names and values as Arrays of blocks.
  * @property {Array} invalidBlocks - array of block ids of invalid blocks within the page
+ * @property {boolean} loaded - has the page data been successfully loaded or not?
  */
 const state = {
 	currentLayout: null,
@@ -32,26 +31,24 @@ const state = {
 			main: []
 		}
 	},
-	pageTitle: 'Home page',
-	pagePath: '/',
-	pageSlug: 'home',
-	siteDomain: '',
-	sitePath: '',
 	scale: .4,
 	loaded: false,
 	dragging: false,
 	currentSavedState: '',
-	invalidBlocks: [],
+	invalidBlocks: []
 };
 
 const mutations = {
-    /**
+	/**
 	 * Mutation to set the current page.
 	 * @method
-     * @param {object} page Page object representing the current page.
+	 * @param {object} page Page object representing the current page.
 	 * @memberof state/page#
-     */
+	 */
 	setPage: function(state, page) {
+		if(!page){
+			page = {};
+		}
 		if(!page.blocks) {
 			page.blocks = {
 				main: []
@@ -127,16 +124,6 @@ const mutations = {
 		blockData.splice(idx, 1, { ...blockData[idx] })
 	},
 
-	changePage(state, { title, path, slug }) {
-		// TODO: replace this with actual domain when that info is available
-		if(slug === null) {
-			slug = '/';
-		}
-		state.pageTitle = `${title}`;
-		state.pagePath = `kent.ac.uk/site-name${path}`;
-		state.pageSlug = `${slug}`;
-	},
-
 	addBlock(state, { region, index, block }) {
 		if(region === void 0) {
 			region = state.currentRegion;
@@ -184,7 +171,8 @@ const mutations = {
 	},
 
 	resetCurrentSavedState(state) {
-		state.currentSavedState = '';	
+
+		state.currentSavedState = '';
 	},
 
 	addBlockValidationIssue(state, block_id) {
@@ -210,10 +198,10 @@ const mutations = {
 const actions = {
 
 	fetchPage({ state, commit }, id) {
-
+		commit('setPage', null);
 		// TODO: refactor into smaller methods
 		api
-			.get(`pages/${id}?include=blocks.media`)
+			.get(`pages/${id}?include=blocks.media,site`)
 			.then(response => {
 				const page = response.data.data;
 
@@ -255,11 +243,10 @@ const actions = {
 								}
 							});
 						});
-						
+
 						commit('setLoaded');
 						// @TODO - populate validations issues with those received from the api
 
-						undoStackInstance.init(state.pageData);
 					});
 
 			});
@@ -296,6 +283,73 @@ const actions = {
 };
 
 const getters = {
+
+	/**
+	 * Getter to determine published state of the current page.
+	 * A Page can be either:
+	 * - new - Never been published.
+	 * - draft - Changed since last published.
+	 * - published - Not modified since last published.
+	 * @param state
+	 * @returns {string} - The state as a string.
+	 * @memberof state/page#
+	 * @todo - implement once supported by the API.
+	 */
+	publishStatus: (state) =>  {
+		return (state.loaded ? 'new' : '');
+	},
+
+	/**
+	 * Getter to retrieve the title of the current page, or null if no page is set.
+	 * @param state
+	 * @returns {string|null} The current page title, or null if there is no current page.
+	 * @memberof state/page#
+	 */
+	pageTitle: (state) => {
+		return state.loaded ? state.pageData.title : '';
+	},
+
+	/**
+	 * Getter to retrieve the slug of the current page, or null if no page is set.
+	 * @param state
+	 * @returns {string|null} The current page slug, or null if there is no current page.
+	 * @memberof state/page#
+	 */
+	pageSlug: (state) => {
+		return state.loaded ? state.pageData.slug : '';
+	},
+
+	/**
+	 * Getter to retrieve the path of the current page, or null if no page is set.
+	 * @param state
+	 * @returns {string|null} The current page's path, or null if there is no current page.
+	 * @memberof state/page#
+	 */
+	pagePath: (state) => {
+		return (state.loaded ? state.pageData.path : '');
+	},
+
+	/**
+	 * Getter to retrieve the root path of the current page's site, or null if no page is set.
+	 * @param state
+	 * @returns {string|null} The current page's site's path or null if there is no current page.
+	 * @memberof state/page#
+	 * @todo Site should be a separate object in store state.
+	 */
+	sitePath: (state) => {
+		return (state.loaded ? state.pageData.site.path : '');
+	},
+
+	/**
+	 * Getter to retrieve the domain name for the current page's site, or null if no page is set.
+	 * @param state
+	 * @returns {string|null} The current domain name, or null if there is no current page.
+	 * @memberof state/page#
+	 * @todo Site should be a separate object in store state.
+	 */
+	siteDomain: (state) => {
+		return (state.loaded ? state.pageData.site.host : '');
+	},
 
 	getFieldValue: (state) => (index, name) => {
 		const block = state.pageData.blocks[state.currentRegion][index];
