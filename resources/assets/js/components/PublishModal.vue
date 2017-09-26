@@ -97,14 +97,6 @@ export default {
 			'publishedModal'
 		]),
 
-		...mapState({
-			pageTitle: state => state.page.pageTitle,
-			pagePath: state => state.page.pagePath,
-			pageSlug: state => state.page.pageSlug,
-			siteDomain: state => state.page.siteDomain,
-			sitePath: state => state.page.sitePath
-		}),
-
 		...mapGetters([
 			'pageTitle',
 			'pagePath',
