@@ -6,23 +6,10 @@ const vue = new Vue();
 /* global Promise */
 
 export default (http, store, router) => {
-	// http.interceptors.request.use(
-	// 	config => {
-	// 		console.log(config);
-	// 		return config;
-	// 	},
-	// 	error => {
-	// 		return Promise.reject(error);
-	// 	}
-	// );
 	http.interceptors.response.use(
 		response => response,
 		error => {
 			const { response } = error
-
-			// if([401, 400].indexOf(response.status) > -1) {
-			// 	window.location = '/auth/login';
-			// }
 
 			if(Array.isArray(response.data.errors)) {
 
@@ -31,10 +18,11 @@ export default (http, store, router) => {
 						if(response.data.errors) {
 							response.data.errors.forEach(error => {
 
-								vue.$snackbar.open({
-									message: `
-										${error.message}.\nCheck validation errors for more details.
-									`
+								// notification to the user
+								vue.$notify({
+									title: 'Error',
+									message: 'There are some problems on your page.' + error,
+									type: 'error'
 								});
 
 								if(error.details && typeof error.details === 'object') {

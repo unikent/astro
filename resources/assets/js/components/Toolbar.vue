@@ -12,7 +12,7 @@
 		</el-select>
 	</el-tooltip>
 
-	<el-button class="toolbar__button-save" type="success" @click="savePage">Save</el-button>
+	<el-button class="toolbar__button-save" type="success" @click="savePage" v-loading.fullscreen.lock="fullscreenLoading">Save</el-button>
 
 	<el-button class="toolbar__button-preview" :plain="true" type="info" @click="previewPage">Preview <icon name="newwindow" aria-hidden="true" width="14" height="14" class="ico" /></el-button>
 
@@ -36,6 +36,12 @@ export default {
 
 	components: {
 		Icon
+	},
+
+	data() {
+		return {
+			fullscreenLoading: false
+		}
 	},
 
 	computed: {
@@ -101,15 +107,26 @@ export default {
 			this.$store.commit('updateCurrentSavedState');
 		},
 
+		/**
+		save the page
+		*/
 		savePage() {
-			this.handleSavePage({message: this.$message});
+			// show the loading spinner
+			this.fullscreenLoading = true;
+			
+			// we want a user notification
+			// also wait till handleSavePage has finished to hide the loading spinner
+			this.handleSavePage({ notify: true })
+			.then(() => {
+				this.fullscreenLoading = false;
+			});
 		},
 
 		/* autosave the page and open a preview window */
 		previewPage() {
 			/* handleSavePage returns a promise so we here we wait for it to complete before
 			opening the preview window */
-			this.handleSavePage({message: this.$message})
+			this.handleSavePage()
 				.then(() => {
 					window.open(this.draftLink,'_blank');
 				});

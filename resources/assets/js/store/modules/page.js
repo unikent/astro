@@ -4,6 +4,8 @@ import { Definition } from 'classes/helpers';
 import api from 'plugins/http/api';
 import { eventBus } from 'plugins/eventbus';
 
+const vue = new Vue();
+
 /**
  * Store module containing current page related data.
  * @namespace state/page
@@ -171,7 +173,6 @@ const mutations = {
 	},
 
 	resetCurrentSavedState(state) {
-
 		state.currentSavedState = '';
 	},
 
@@ -242,7 +243,7 @@ const actions = {
 								}
 							});
 						});
-
+						// @TODO - populate validations issues with those received from the api
 						commit('setLoaded');
 					});
 
@@ -254,29 +255,68 @@ const actions = {
 	 * @param {Object} input
 	 * @param {Object} input.state - the context of the action - added by VueX
 	 * @param {Object} input.commit - added by VueX
-	 * @param {Object} payload - parameter object
-	 * @param {callback} payload.message - function to display a message
+	 * @param {boolean} notify - show a notification?
 	 * @return {promise} - api - to allow other methods to wait for the save
 	 * to complete
 	 * @memberof state/page#
 	 */
-	handleSavePage({ state, commit }, payload) {
+	handleSavePage({ state, commit }, notify) {
 		const blocks = state.pageData.blocks;
 		const id = state.pageData.id;
 		return api
 			.put(`pages/${id}/content`, {
 				blocks: blocks
 			})
-			.then(() => {
-				payload.message({
-					message: 'Page saved',
-					type: 'success',
-					duration: 2000
-				});
+			/**
+			successful save
+			- only display the notification message if that's what we want (there's a defined payload)
+			- eg on preview we don't want to show a save message
+			*/
+			.then(response => {
+				if (notify) {
+					// there are validation errors
+					if (response.data.data.valid===0) {
+						// create the message markup
+						const message = vue.$createElement(
+							'div',
+							{ style: 'color: #bb9132' },
+							[
+								vue.$createElement('p', 'The page saved ok, but there are some validation errors.'),
+								vue.$createElement('p', 'You won\'t be able to publish till these are fixed.'),
+								vue.$createElement('p', 'Check the error sidebar for details.')
+							]
+						);
+						vue.$notify({
+							title: 'Saved',
+							message: message,
+							type: 'warning',
+							duration: 10000
+						});
+					}
+					// we're all good
+					else if (response.data.data.valid===1) {
+						vue.$notify({
+							title: 'Saved',
+							message: 'You saved this page successfully.',
+							type: 'success',
+							duration: 4000
+						});
+					}
+				}
 				commit('updateCurrentSavedState');
 			})
-			.catch(() => {});
-	},
+			/**
+			unsuccessful save, such as a network problem
+			*/
+			.catch(() => {
+				vue.$notify({
+					title: 'Not saved',
+					message: 'There was a problem and this page has not been saved. Please try again later.',
+					type: 'error',
+					duration: 0
+				});
+			});
+	}
 };
 
 const getters = {
