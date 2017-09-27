@@ -39,17 +39,16 @@
 .top-bar__url {
 	font-size: 11px;
 	color: #71787f;
+	.el-tag {
+		height: 18px;
+		line-height: 16px;
+	}
 }
 .top-bar__title {
 	font-size: 14px;
 	padding: 1rem 0 0 0;
 }
-.top-bar__url {
-	font-size: 11px;
-}
-.top-bar__title {
-	padding: 1rem 0;
-}
+
 .top-bar-backbutton {
 	float: left;
 	display: inline-block;
@@ -60,7 +59,7 @@
 	cursor: pointer;
 }
 .backbutton-icon {
-	margin-right: 10px;
+	margin-right: 6px;
 }
 .user-menu-button {
 }
