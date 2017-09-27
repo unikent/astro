@@ -14,6 +14,7 @@ class PublishingGroupPolicy
         if($user->isAdmin()){
             return true;
         }
+        return true;
     }
 
     /**
