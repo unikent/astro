@@ -175,14 +175,6 @@ export default {
 				this.$refs['options-list'].scrollTop = 0;
 			}
 		},
-
-		valid(isValid) {
-			if (isValid) {
-				this.deleteBlockValidationIssue(this.currentBlock.id);
-			} else {
-				this.addBlockValidationIssue(this.currentBlock.id);
-			}
-		}
 	},
 
 	methods: {
@@ -251,7 +243,11 @@ export default {
 		},
 
 		setValidation(status) {
-			this.valid = status;
+			if (status) {
+				this.deleteBlockValidationIssue(this.currentBlock.id);
+			} else {
+				this.addBlockValidationIssue(this.currentBlock.id);
+			}
 		}
 
 	}
