@@ -183,8 +183,7 @@ const mutations = {
 	deleteBlockValidationIssue(state, block_id) {
 		const location = state.invalidBlocks.indexOf(block_id);
 		if (location !== -1) {
-			reducedItems = state.invalidBlocks.splice(location, 1);
-			state.invalidBlocks = reducedItems;
+			state.invalidBlocks.splice(location, 1);
 		}
 	},
 
@@ -244,8 +243,6 @@ const actions = {
 						});
 
 						commit('setLoaded');
-						// @TODO - populate validations issues with those received from the api
-
 					});
 
 			});
