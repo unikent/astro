@@ -1,6 +1,6 @@
 {
 	"heights": {
-		"top-bar": [80, "px"],
+		"top-bar": [65, "px"],
 		"block-back-bar": [42, "px"],
 		"block-bottom-bar": [56, "px"]
 	}

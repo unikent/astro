@@ -5,9 +5,28 @@ import Vue from 'vue';
 const vue = new Vue();
 
 /**
+ * Representation of a Site as returned by the API
+ * @typedef {Object} Site
+ * @property {number} id - Unique ID for this Site.
+ * @property {string} name - The human-readable name for this Site.
+ * @property {string} host - The domain name for this Site, eg. www.example.com/
+ * @property {string} path - The path from the domain name for this site. Can be empty, or e.g. /sub/folder/names.
+ * @property {string} created_at - The YYYY-MM-DD HH:MM:SS timestamp for when this site was created.
+ * @property {string} updated_at - The YYYY-MM-DD HH:MM:SS timestamp for when this site was updated.
+ * @property {string} created_by - The username of the user who created this Site.
+ * @property {string} updated_by - The username of the user who last updated this Site.
+ * @property {PublishingGroup} publishing_group - The Publishing Group this site is a member of. May be null if data not loaded.
+ * @property {Page} homepage - Representation of the Page which is the home page for this site. May be null if data not loaded.
+ */
+
+/**
+ * Store module containing site-level data.
+ * @example <caption>Access site data from within a component.</caption>
+ * this.$store.site.layouts; // get the layouts
  * @namespace state/site
  * @property {Array} pages - Array of Pages in the current Site.
  * @property {number} site - ID of the current Site.
+ * @property {Site} currentSite - Representation of the currently selected Site in the editor, as returned by the API.
  */
 const state = {
 	pages: [],
@@ -140,10 +159,6 @@ const actions = {
 
 		if(canDrop) {
 
-			// Reordering logic is a bit different as we are not adding a new item into the parent collection,
-			if(newPage.parent.id == oldPage.parent.id){
-
-			}
 
 			const page = _.cloneDeep(oldPage.data);
 
