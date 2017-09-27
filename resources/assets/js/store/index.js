@@ -44,11 +44,12 @@ let store = new Vuex.Store({
 		publishModal: {
 			visible: false
 		},
-		publishedModal: {
+		publishValidationWarningModal: {
 			visible: false
 		},
 		menu: {
-			active: 'pages'
+			active: 'pages',
+			flash: ''
 		}
 	},
 
@@ -112,16 +113,20 @@ let store = new Vuex.Store({
 			state.publishModal.visible = false;
 		},
 
-		showPublishedModal(state) {
-			state.publishedModal.visible = true;
+		showPublishValidationWarningModal(state) {
+			state.publishValidationWarningModal.visible = true;
 		},
 
-		hidePublishedModal(state) {
-			state.publishedModal.visible = false;
+		hidePublishValidationWarningModal(state) {
+			state.publishValidationWarningModal.visible = false;
 		},
 
 		updateMenuActive(state, id) {
 			state.menu.active = id;
+		},
+
+		updateMenuFlash(state, id) {
+			state.menu.flash = id;
 		}
 	},
 
