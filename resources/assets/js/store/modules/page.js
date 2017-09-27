@@ -243,13 +243,7 @@ const actions = {
 								}
 							});
 						});
-<<<<<<< HEAD
-
-						commit('setLoaded');
 						// @TODO - populate validations issues with those received from the api
-=======
->>>>>>> 5709608b640ad87be7cede81fc461d7b46f880c7
-
 						commit('setLoaded');
 					});
 
@@ -261,12 +255,7 @@ const actions = {
 	 * @param {Object} input
 	 * @param {Object} input.state - the context of the action - added by VueX
 	 * @param {Object} input.commit - added by VueX
-<<<<<<< HEAD
 	 * @param {boolean} notify - show a notification?
-=======
-	 * @param {Object} payload - parameter object
-	 * @param {callback} payload.message - function to display a message
->>>>>>> 5709608b640ad87be7cede81fc461d7b46f880c7
 	 * @return {promise} - api - to allow other methods to wait for the save
 	 * to complete
 	 * @memberof state/page#
