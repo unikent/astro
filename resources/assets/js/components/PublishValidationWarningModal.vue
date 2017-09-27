@@ -23,23 +23,6 @@ Shows a warning message when there are validation errors, and the user tries to 
 			:closable=false
 			>
 		</el-alert>
-
-		<el-collapse class="publish-modal__errors">
-			<el-collapse-item title="Issue list" name="1">
-				<p>Here are the blocks on the page that have wrong or missing fields:</p>
-				<template v-if="blocks" v-for="region in blocks">
-					<ul class="validation-errors" v-if="region">
-						<template v-for="block in region">
-							<template v-if="errors.indexOf(block.id) !== -1">
-								<li>
-									<el-tag type="danger">{{ block.definition_name }}</el-tag>
-								</li>
-							</template>
-						</template>
-					</ul>
-				</template>
-			</el-collapse-item>
-		</el-collapse>
 		<div class="publish-modal__buttons">
 			<span slot="footer" class="dialog-footer">
 				<el-button type="primary" @click="openErrors">Close this message and open the error sidebar</el-button>
