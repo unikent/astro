@@ -88,6 +88,11 @@ html {
 	user-select: none;
 	display: flex;
 	align-items: center;
+
+	// makes text in the the device selector dropdown appear ok
+	.el-input__icon + .el-input__inner {
+		padding-right: 25px;
+	}
 }
 
 .page-status {

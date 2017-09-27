@@ -21,7 +21,13 @@ Note that the page editing toolbar is a separate component found in `components/
 			<div v-show="showBack" @click="backToSites" class="top-bar-backbutton">
 				<i class="el-icon-arrow-left backbutton-icon"></i>Sites
 			</div>
-			<div v-if="publishStatus==='published'" class="top-bar__page-title">
+
+			<div v-if="publishStatus==='new'" class="top-bar__page-title">
+				<div class="top-bar__title">{{ pageTitle }}<el-tag type="primary">Unpublished draft</el-tag></div>
+				<span class="top-bar__url">{{ renderedURL }}</span>
+			</div>
+
+			<div v-else-if="publishStatus==='published'" class="top-bar__page-title">
 				<div class="top-bar__title">{{ pageTitle }}<el-tag type="success">Published</el-tag></div>
 				<span class="top-bar__url"><a :href="renderedURL" target="_blank">{{ renderedURL }}</a> <icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" /></span>
 			</div>
@@ -29,11 +35,6 @@ Note that the page editing toolbar is a separate component found in `components/
 			<div v-else-if="publishStatus==='draft'" class="top-bar__page-title">
 				<div class="top-bar__title">{{ pageTitle }}<el-tag type="warning">Draft</el-tag></div>
 				<span class="top-bar__url"><a :href="renderedURL" target="_blank">{{ renderedURL }}</a> <icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" /></span>
-			</div>
-
-			<div v-if="publishStatus==='new'" class="top-bar__page-title">
-				<div class="top-bar__title">{{ pageTitle }}<el-tag type="primary">Unpublished draft</el-tag></div>
-				<span class="top-bar__url">{{ renderedURL }}</span>
 			</div>
 
 			<div v-else class="top-bar__page-title">
@@ -166,7 +167,6 @@ Note that the page editing toolbar is a separate component found in `components/
 			backToSites() {
 				// another prompt to save the page when going back to the site listing
 				this.promptToSave(() => {
-					this.$store.commit('changePage', {title:'', path:'', slug:''});
 					this.$store.commit('setPage', {});
 					this.$store.commit('setLoaded', false);
 					this.$router.push('/sites');

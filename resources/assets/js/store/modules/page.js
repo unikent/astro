@@ -236,8 +236,8 @@ const actions = {
 						});
 
 						Object.keys(blocks).forEach(region => {
-							blocks[region].forEach((block, index) => {
-								if (block.errors !== null) {
+							blocks[region].forEach((block) => {
+								if (typeof block.errors !== 'undefined' && block.errors !== null) {
 									commit('addBlockValidationIssue', block.id);
 								}
 							});
