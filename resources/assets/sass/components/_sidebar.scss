@@ -146,4 +146,32 @@ to the right of the sidebar is another sidebar (sidebar__switcher) which contain
 		}
 
 	}
+
+	// used for the list of errors
+	.sidebar__errors {
+		height: 100%;
+	}
+
+	// gives a flash highlight to sidebar menus if needed (eg if we select the errors sidebar from a modal)
+	.sidebar--flash {
+		animation-name: flash;
+		animation-duration: 900ms;
+		animation-timing-function: ease-in-out;
+	}
+}
+
+
+@keyframes flash {
+	0% {
+		background-color: rgba(255, 0, 0, 0.16);
+	}
+	22% {
+		background-color: rgba(255, 0, 0, 0.8);
+	}
+	77% {
+		background-color: rgba(255, 0, 0, 0.16);
+	}
+	100% {
+		background-color: transparent;
+	}
 }

@@ -48,7 +48,8 @@ let store = new Vuex.Store({
 			visible: false
 		},
 		menu: {
-			active: 'pages'
+			active: 'pages',
+			flash: ''
 		}
 	},
 
@@ -122,6 +123,10 @@ let store = new Vuex.Store({
 
 		updateMenuActive(state, id) {
 			state.menu.active = id;
+		},
+
+		updateMenuFlash(state, id) {
+			state.menu.flash = id;
 		}
 	},
 

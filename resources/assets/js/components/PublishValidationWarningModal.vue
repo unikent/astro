@@ -12,6 +12,7 @@ Shows a warning message when there are validation errors, and the user tries to 
 	:before-close="handleClose"
 	:close-on-press-escape="false"
 	:close-on-click-modal="false"
+	class="publish-modal"
 >
 	<div>
 		<el-alert
@@ -22,6 +23,7 @@ Shows a warning message when there are validation errors, and the user tries to 
 			:closable=false
 			>
 		</el-alert>
+
 		<el-collapse class="publish-modal__errors">
 			<el-collapse-item title="Issue list" name="1">
 				<p>Here are the blocks on the page that have wrong or missing fields:</p>
@@ -36,12 +38,11 @@ Shows a warning message when there are validation errors, and the user tries to 
 						</template>
 					</ul>
 				</template>
-
 			</el-collapse-item>
 		</el-collapse>
 		<div class="publish-modal__buttons">
 			<span slot="footer" class="dialog-footer">
-				<el-button type="primary" @click="cancel">Close</el-button>
+				<el-button type="primary" @click="openErrors">Close this message and open the error sidebar</el-button>
 			</span>
 		</div>
 	</div>
@@ -97,7 +98,9 @@ export default {
 	methods: {
 		...mapMutations([
 			'showPublishValidationWarningModal',
-			'hidePublishValidationWarningModal'
+			'hidePublishValidationWarningModal',
+			'updateMenuActive',
+			'updateMenuFlash'
 		]),
 
 		/**
@@ -112,6 +115,18 @@ export default {
 		*/
 		cancel() {
 			this.hidePublishValidationWarningModal();
+		},
+
+		/**
+		open the error listing in the sidebar and close the warning modal
+		*/
+		openErrors() {
+			this.cancel();
+			this.updateMenuActive('errors');
+			this.updateMenuFlash('errors');
+			setTimeout(() => {
+				this.updateMenuFlash('');
+			}, 1000);
 		}
 	}
 };
