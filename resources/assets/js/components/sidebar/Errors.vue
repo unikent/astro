@@ -72,6 +72,26 @@ export default {
 
 			// set the block menu item as active
 			this.updateMenuActive('blocks');
+
+			// scroll to the right bit of the block options side panel
+			// we need a tiny timeout to make sure the error fields have had time to populate
+			setTimeout( () => {
+			
+				// find all the error fields...
+				var error_fields = document.getElementsByClassName('is-error');
+
+				// ...and get the block options list containing div
+				var options_list = document.getElementById('block-options-list');
+
+				// Now get the top/bottom of the first error
+				// we need to add on the top position of the scroll to make sure the next time we're not going to go back to the top of the div
+				var error_pos_top = error_fields[0].getBoundingClientRect().top + options_list.scrollTop;
+				var error_pos_bottom = error_fields[0].getBoundingClientRect().bottom + options_list.scrollTop;
+
+				// and finally scroll to the position of the error, adding on a bit to make sure it's properly visible
+				options_list.scrollTop = error_pos_top - (error_pos_bottom - error_pos_top) - 50;
+			}, 1);
+
 		},
 
 		// return the correct human-readable label for the specified block definition
