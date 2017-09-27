@@ -8,7 +8,7 @@
 					<template v-if="errors.indexOf(block.id) !== -1">
 						<li class="validation-errors__item warning">
 							<i class="el-icon-warning"></i>
-							<a href="#" @click="scrollTo(key)" class="validation-errors__link">{{ label(block.definition_name + "-v" + block.definition_version) }}</a>
+							<a href="#" @click="scrollTo(key, block.definition_name, block.definition_version)" class="validation-errors__link">{{ label(block.definition_name + "-v" + block.definition_version) }}</a>
 						</li>
 					</template>
 				</template>
@@ -58,7 +58,7 @@ export default {
 		- note that blocks are identified by their block position and not unique api id.
 		- this means as blocks are reordered on the page, the error markers automatically reposition accordingly
 		*/
-		scrollTo(block_id) {
+		scrollTo(block_id, definition_name, definition_version) {
 			var el = document.getElementById('editor-content');
 			var block = el.contentWindow.document.getElementById('block_' + block_id);
 			// position of the block in the iframe
@@ -66,8 +66,9 @@ export default {
 			// add on Y scroll position to pos.top to make sure the position for the next jump is relative to the current scroll position
 			el.contentWindow.scrollTo(0, pos.top + el.contentWindow.scrollY);
 
-			// set the current block
-			this.setBlock({ index: block_id, type: 'type' });
+			// set the current block, given its position (index) and name (definition_name + definition_version)
+			var type = definition_name + "-v" + definition_version;
+			this.setBlock({ index: block_id, type: type });
 
 			// set the block menu item as active
 			this.updateMenuActive('blocks');
