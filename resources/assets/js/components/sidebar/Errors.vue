@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 import BackBar from 'components/BackBar';
 
 export default {
@@ -47,6 +47,11 @@ export default {
 
 	methods: {
 
+		...mapMutations([
+			'setBlock',
+			'updateMenuActive'
+		]),
+
 		/**
 		@TODO - implement smooth scrolling?
 		scrollTo() - simple jump to the specified block in the iframe 'editor-content'
@@ -60,6 +65,12 @@ export default {
 			var pos = block.getBoundingClientRect();
 			// add on Y scroll position to pos.top to make sure the position for the next jump is relative to the current scroll position
 			el.contentWindow.scrollTo(0, pos.top + el.contentWindow.scrollY);
+
+			// set the current block
+			this.setBlock({ index: block_id, type: 'type' });
+
+			// set the block menu item as active
+			this.updateMenuActive('blocks');
 		},
 
 		// return the correct human-readable label for the specified block definition
