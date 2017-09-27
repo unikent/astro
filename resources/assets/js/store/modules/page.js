@@ -411,6 +411,14 @@ const getters = {
 		return prop ? blockMeta[prop] : blockMeta;
 	},
 
+	getInvalidBlocks: (state) => () => {
+		return state.invalidBlocks;
+	},
+
+	getCurrentRegion: (state) => () => {
+		return state.currentRegion;
+	},
+
 	getBlocks: (state) => () => {
 		return state.pageData.blocks;
 	},
@@ -432,7 +440,7 @@ const getters = {
 		else {
 			return state.currentSavedState != JSON.stringify(state.pageData.blocks);
 		}
-	},
+	}
 };
 
 

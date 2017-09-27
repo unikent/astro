@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="sidebar__errors" :class="flash === 'errors' ? 'sidebar--flash' : ''">
 		<back-bar :title="title" />
 		<template v-if="blocks" v-for="region in blocks">
 			<!-- we could put the region title here when we use more than one region -->
@@ -37,6 +37,10 @@ export default {
 
 		region() {
 			return this.$store.state.page.currentRegion;
+		},
+
+		flash() {
+			return this.$store.state.menu.flash;
 		}
 	},
 

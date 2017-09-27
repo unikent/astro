@@ -56,7 +56,7 @@ An element loading spinner is shown after the user hits 'Publish'.
 		<el-alert
 			title="Page not published"
 			type="error"
-			description="Sorry we had a problem publishing this page. It might be a connection problem, so try again in a bit."
+			description="Sorry we had a problem publishing this page. Try saving your page and republishing. Alternatively it might be a connection problem, so try again later."
 			show-icon
 			:closable=false
 			>
@@ -93,8 +93,7 @@ export default {
 
 	computed: {
 		...mapState([
-			'publishModal',
-			'publishedModal'
+			'publishModal'
 		]),
 
 		...mapGetters([
@@ -128,9 +127,7 @@ export default {
 	methods: {
 		...mapMutations([
 			'showPublishModal',
-			'hidePublishModal',
-			'showPublishedModal',
-			'hidePublishedModal'
+			'hidePublishModal'
 		]),
 
 		/**
