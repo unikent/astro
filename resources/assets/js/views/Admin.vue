@@ -2,7 +2,7 @@
 <div class="admin-wrapper">
 	<aside class="left-side">
 		<section class="sidebar">
-			<ul class="sidebar__switcher" role="navigation">
+			<ul class="admin-sidebar" role="navigation">
 				<side-menu-item
 					v-for="item in menu"
 					:link="item.link"
