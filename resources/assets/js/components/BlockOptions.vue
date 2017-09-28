@@ -6,7 +6,7 @@
 				currentDefinition.label : title
 		"
 	 />
-	<div ref="options-list" class="block-options-list custom-scrollbar">
+	<div ref="options-list" id="block-options-list" class="block-options-list custom-scrollbar">
 		<block-form
 			v-if="currentDefinition"
 			v-on:failValidation="setValidation(false)"
