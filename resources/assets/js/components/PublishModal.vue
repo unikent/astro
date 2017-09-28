@@ -20,7 +20,7 @@ An element loading spinner is shown after the user hits 'Publish'.
 	title="Publish"
 	v-model="publishModalVisible"
 	:modal-append-to-body="true"
-	v-loading="loading"
+	v-loading.fullscreen.lock="loading"
 	element-loading-text="Publishing your page..."
 	class="publish-modal"
 	:before-close="handleClose"
@@ -56,13 +56,13 @@ An element loading spinner is shown after the user hits 'Publish'.
 		<el-alert
 			title="Page not published"
 			type="error"
-			description="Sorry we had a problem publishing this page. Try saving your page and republishing. Alternatively it might be a connection problem, so try again later."
+			description="Sorry we had a problem publishing this page. Did you save your page before publishing? Alternatively it might be a connection problem, so try again later."
 			show-icon
 			:closable=false
 			>
 		</el-alert>
 		<el-collapse class="publish-modal__errors">
-			<el-collapse-item title="Report errors" name="1">
+			<el-collapse-item title="Still having problems?" name="1">
 				<p>If you're having persistent problems publishing your page, contact us and let us know the following error message:</p>
 				<el-tag type="gray">{{ error }}</el-tag>
 			</el-collapse-item>
@@ -146,9 +146,14 @@ export default {
 					this.error = '';
 				})
 				.catch((error) => {
+					if (error.config && error.response) {
+						this.error = error.config.method + ' ' + error.config.url + ' ' + error.response.status + ' (' + error.response.statusText + ')';
+					}
+					else {
+						this.error = 'Network connection problem - you may not have a reliable connection to the internet.';
+					}
 					this.loading = false;
 					this.published = false;
-					this.error = error.config.method + ' ' + error.config.url + ' ' + error.response.status + ' (' + error.response.statusText + ')';
 				});
 		},
 

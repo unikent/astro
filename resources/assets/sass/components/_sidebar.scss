@@ -27,8 +27,8 @@ to the right of the sidebar is another sidebar (sidebar__switcher) which contain
 	}
 
 	/**
-	sidebar is the right-hand component of the editor-sidebar
-	it is mainly a wrapper for the sidebar__switcher list
+	sidebar is a generic side-menu
+	it is mainly a wrapper for the sidebar__switcher list and the admin-sidebar menu
 	*/
 	.sidebar {
 		position: absolute;

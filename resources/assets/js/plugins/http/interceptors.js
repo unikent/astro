@@ -19,11 +19,11 @@ export default (http, store, router) => {
 							response.data.errors.forEach(error => {
 
 								// notification to the user
-								vue.$notify({
-									title: 'Error',
-									message: 'There are some problems on your page.' + error,
-									type: 'error'
-								});
+								// vue.$notify({
+								// 	title: 'Error',
+								// 	message: 'There are some problems on your page.' + error,
+								// 	type: 'error'
+								// });
 
 								if(error.details && typeof error.details === 'object') {
 
