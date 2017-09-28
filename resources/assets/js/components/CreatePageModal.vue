@@ -20,7 +20,11 @@
 			<el-input name="layout_version" v-model="createForm.layout_version" auto-complete="off"></el-input>
 		</el-form-item>
 		<el-form-item label="slug">
-			<el-input name="slug" v-model="createForm.route.slug" auto-complete="off"></el-input>
+			<el-input 
+				name="slug"
+				v-model="createForm.route.slug"
+				v-bind:placeholder="suggestedSlug" 
+				auto-complete="off" @focus="setUserEditingSlug"></el-input>
 		</el-form-item>
 	</el-form>
 	<span slot="footer" class="dialog-footer">
@@ -33,6 +37,7 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 import { Definition } from 'classes/helpers';
+import { slugify } from 'underscore.string';
 
 export default {
 
@@ -59,12 +64,13 @@ export default {
 				layout_name: 'site-homepage',
 				layout_version: 1,
 				route: {
-					slug: 'newpage',
+					slug: '',
 					parent_id: 1
 				},
 				blocks: {},
 				options: {}
-			}
+			},
+			userEditingSlug: false
 		};
 	},
 
@@ -85,6 +91,10 @@ export default {
 				}
 			}
 		},
+
+		suggestedSlug() {
+			return slugify(this.createForm.title);
+		}
 	},
 
 	created() {
@@ -100,8 +110,34 @@ export default {
 		}),
 
 		addChild() {
+			// if the user has not edited the slug then use the suggested slug
+			if (this.userEditingSlug ==  false) {
+				this.createForm.route.slug = this.suggestedSlug;
+			}
 			this.createPage(this.createForm);
+			this.resetForm();
 			this.visible = false;
+		},
+
+		setUserEditingSlug() {
+			if (this.userEditingSlug ==  false) {
+				this.userEditingSlug = true;
+				this.createForm.route.slug = this.suggestedSlug;
+			}
+		},
+
+		resetForm() {
+			this.createForm = {
+				title: 'New page',
+				layout_name: 'site-homepage',
+				layout_version: 1,
+				route: {
+					slug: '',
+					parent_id: 1
+				},
+				blocks: {},
+				options: {}
+			}
 		},
 
 		saveEdit() {

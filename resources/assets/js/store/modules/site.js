@@ -127,6 +127,14 @@ const actions = {
 				page.id = response.data.data.id;
 				dispatch('updatePage', page);
 			})
+			.catch((error) => {
+				vue.$notify({
+					title: 'Page not added',
+					message: 'Please ensure that there is not already a page with the same slug',
+					type: 'error',
+					duration: 0
+				});
+			})
 	},
 
 	updatePage({ dispatch }, page) {
