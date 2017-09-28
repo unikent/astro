@@ -36,6 +36,12 @@ const state = {
 	pageModal: {
 		visible: false,
 		parentId: null
+	},
+	editPageModal: {
+		visible: false,
+		title: '',
+		slug: '',
+		id: 0
 	}
 };
 
@@ -83,6 +89,25 @@ const mutations = {
 
 	setPageModalParent(state, pageId) {
 		state.pageModal.parentId = pageId;
+	},
+
+	setEditPageModalVisibility(state, visible) {
+		state.editPageModal.visible = visible;
+	},
+
+	setEditPageModalParent(state, pageId) {
+		state.editPageModal.parentId = pageId;
+	},
+
+	/**
+	 * Sets the title, slug and id for the edit page settings modal.
+	 * @param state
+	 * @param {Object} page The Page to use data from.
+	 */
+	setPageMeta(state, page) {
+		state.editPageModal.title = page.title;
+		state.editPageModal.slug = page.slug;
+		state.editPageModal.id = page.id;
 	}
 };
 
@@ -139,6 +164,28 @@ const actions = {
 			})
 	},
 
+	updatePageMeta({ dispatch }, page) {
+		api
+			.put(`pages/${page.id}`, {
+				title: page.title,
+				options: {}
+			})
+			.then(() => {
+				alert(title);
+				dispatch('fetchSite');
+			})
+			// .then(() => {
+			// 	api
+			// 		.put(`pages/${page.id}/slug`, {
+			// 			slug: page.slug
+			// 		})
+			// 		.then(() => {
+			// 			dispatch('fetchSite');
+			// 		});
+			// })
+			.catch(() => {});
+	},
+
 	movePageApi({ dispatch }, move) {
 		// If-Unmodified-Since
 		api
@@ -146,7 +193,6 @@ const actions = {
 			.then(() => {
 				dispatch('fetchSite');
 			});
-		console.log(move);
 	},
 
 
@@ -158,7 +204,6 @@ const actions = {
 			newPos = Number.parseInt(toPath.substr(toPath.lastIndexOf('.') + 1, toPath.length));
 
 		if(canDrop) {
-
 
 			const page = _.cloneDeep(oldPage.data);
 
@@ -192,6 +237,20 @@ const actions = {
 
 	hidePageModal({ commit }) {
 		commit('setPageModalVisibility', false);
+	},
+
+	/**
+	 * Display the edit page settings modal.
+	 * @param commit
+	 * @param {object} page - The Page object.
+	 */
+	showEditPageModal({ commit }, page) {
+		commit('setPageMeta', page);
+		commit('setEditPageModalVisibility', true);
+	},
+
+	hideEditPageModal({ commit }) {
+		commit('setEditPageModalVisibility', false);
 	}
 
 };

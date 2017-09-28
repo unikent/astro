@@ -104,21 +104,6 @@ export default {
 			this.visible = false;
 		},
 
-		saveEdit() {
-			// TODO: when endpoint is ready, update this
-			// this.updatePage({
-			// 	title: this.currentPage.title,
-			// 	id: this.currentPage.id,
-			// 	page_id: this.currentPage.page_id,
-			// 	layout_name: this.layout_name,
-			// 	layout_version: this.layout_version,
-			// 	route: {
-			// 		slug: this.currentPage.slug,
-			// 		parent_id: this.currentPage.parent_id
-			// 	}
-			// });
-		},
-
 		getLayout(layoutName) {
 			this.createForm.blocks = {};
 			this.$api
