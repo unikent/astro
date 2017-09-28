@@ -86,9 +86,13 @@
 			 and updates the store to the new page meta
 			 */
 			saveEdit() {
-				this.updatePageMeta(this.editForm);
-				this.hideEditPageModal();
-				this.$store.commit('savePageMeta', this.editForm);
+				this.updatePageMeta(this.editForm)
+					.then( (response) => {
+						this.hideEditPageModal();
+				})
+					.catch( (response) => {
+						console.dir(response);
+					});
 			}
 		}
 	};

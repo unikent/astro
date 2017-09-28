@@ -64,6 +64,7 @@ const mutations = {
 		state.pageData = page;
 	},
 
+
 	setLoaded(state, loaded = true) {
 		state.loaded = loaded;
 	},
@@ -386,6 +387,15 @@ const getters = {
 	 */
 	siteDomain: (state) => {
 		return (state.loaded ? state.pageData.site.host : '');
+	},
+
+	/**
+	 * Get the data representing the current page.
+	 * @param state
+	 * @returns {state/page.pageData|{blocks}|pageData|Object|*}
+	 */
+	currentPage: (state) => {
+		return state.pageData;
 	},
 
 	getFieldValue: (state) => (index, name) => {

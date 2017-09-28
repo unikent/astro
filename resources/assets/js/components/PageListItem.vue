@@ -23,7 +23,7 @@
 		</span>
 
 		<span ref="name" class="page-list__text" @click="edit">
-			{{ page.path === '/' ? 'Home page' : (page.revision.title || page.slug) }}
+			{{ page.path === '/' ? 'Home page' : (page.title || page.slug) }}
 		</span>
 
 		<!-- Page options dropdown -->

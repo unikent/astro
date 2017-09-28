@@ -57,6 +57,21 @@ let store = new Vuex.Store({
 
 	mutations: {
 
+		/**
+		 * Mutates a page title, both in the pages list and in the editor if it is the page being edited.
+		 * @param state
+		 * @param {string} title - The new title.
+		 */
+		setPageTitle: function(state, { id, title} ) {
+			if(state.page.pageData && state.page.pageData.id === id){
+				state.page.pageData.title = title;
+			}
+			const pg = state.site.findPageById(state.site.pages, id);
+			if(pg){
+				pg.title = title;
+			}
+		},
+
 		changeView(state, currentView) {
 			state.currentView = currentView;
 		},

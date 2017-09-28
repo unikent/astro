@@ -42,10 +42,32 @@ const state = {
 		title: '',
 		slug: '',
 		id: 0
+	},
+	/**
+	 * Finds and returns the page with the specified id if it is present in the pages tree.
+	 * @param {Array} pages - Array of Pages to search.
+	 * @param {number} id - The page id to search for.
+	 * @returns {Object|null}
+	 */
+	findPageById: (pages, id) => {
+		for( var i in pages){
+			let page = pages[i];
+			if(page.id === id){
+				return page;
+			}
+			if(page.children && page.children.length){
+				let result = state.findPageById(page.children, id);
+				if(result){
+					return result;
+				}
+			}
+		}
+		return null;
 	}
 };
 
 const mutations = {
+
 
 	/**
 	 * Set the current site id stored in the store.
@@ -172,15 +194,20 @@ const actions = {
 			})
 	},
 
-	updatePageMeta({ dispatch }, page) {
-		api
+	/**
+	 * Updates the Page meta details for the specified Page.
+	 * @param dispatch
+	 * @param page
+	 * @returns {Promise<R>|Promise.<TResult>|Promise<R2|R1>}
+	 */
+	updatePageMeta({ dispatch, commit }, page) {
+		return api
 			.put(`pages/${page.id}`, {
 				title: page.title,
 				options: {}
 			})
-			.then(() => {
-				alert(title);
-				dispatch('fetchSite');
+			.then( (response) => {
+				commit('setPageTitle', response.data.data, { root: true});
 			})
 			// .then(() => {
 			// 	api
@@ -191,7 +218,7 @@ const actions = {
 			// 			dispatch('fetchSite');
 			// 		});
 			// })
-			.catch(() => {});
+			//.catch((response) => { console.log(response);});
 	},
 
 	movePageApi({ dispatch }, move) {
@@ -263,7 +290,19 @@ const actions = {
 
 };
 
-const getters = {};
+const getters = {
+
+	findPage: (state, getters) => (id, input = null) => {
+		if(null === input){
+			input = state.pages;
+			return input.forEach( (item) => {
+				return item.id == id ? item : getters.findPage(item.children);
+			} );
+		}
+		return null;
+	}
+
+};
 
 const
 	getPageInfo = (path) => {
