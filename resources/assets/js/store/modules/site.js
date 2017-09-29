@@ -71,6 +71,18 @@ const state = {
 		}
 		return null;
 	},
+
+	/**
+	 * Updates the slug for a page and also updates its path.
+	 * @param {string} new_slug - The new slug.
+	 * @param {Object} page - Page data object.
+	 */
+	setSlugAndPath: (new_slug, page) => {
+		let path = page.path;
+		path = path.substr(0, path.lastIndexOf(page.slug)) + new_slug;
+		page.path = path;
+		page.slug = new_slug;
+	},
 };
 
 const mutations = {

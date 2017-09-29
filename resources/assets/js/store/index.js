@@ -80,15 +80,12 @@ let store = new Vuex.Store({
 		 * @param {string} slug - The new slug.
 		 */
 		setPageSlug: function(state, { id, slug} ) {
-			if(state.page.pageData && state.page.pageData.id === id){
-				let path = state.page.pageData.path;
-				path = path.substr(0, path.lastIndexOf(state.page.pageData.slug)) + slug;
-				state.page.pageData.path = path;
-				state.page.pageData.slug = slug;
-			}
 			const pg = state.site.findPageById(state.site.pages, id);
 			if(pg){
-				pg.slug = slug;
+				state.site.setSlugAndPath(slug, pg);
+			}
+			if(state.page.pageData && state.page.pageData.id === id){
+				state.site.setSlugAndPath(slug, state.page.pageData);
 			}
 		},
 
