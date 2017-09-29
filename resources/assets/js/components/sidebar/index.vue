@@ -185,7 +185,7 @@ export default {
 	mounted() {
 		// to enable other components to open the errors sidebar when needed
 		eventBus.$on('sidebar:openErrors', (e) => {
-			this.openItem(e, 2);
+			this.updateMenuActive('errors');
 		});
 	}
 };
