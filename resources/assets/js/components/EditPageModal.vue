@@ -7,6 +7,16 @@
 			<el-form-item label="Page Slug" v-if="editForm.editSlug">
 				<el-input name="slug" v-model="editForm.slug" auto-complete="off"></el-input>
 			</el-form-item>
+			<div class="el-alert el-alert--error" v-if="editForm.errorMessage">
+				<i class="el-alert__icon el-icon-circle-cross is-big"></i>
+				<div class="el-alert__content">
+					<span class="el-alert__title is-bold">{{editForm.errorMessage}}</span>
+					<ul v-for="error in editForm.errorDetails" :key="error.id">
+						<li class="el-alert__description">{{error}}</li>
+					</ul>
+				</div>
+			</div>
+
 		</el-form>
 		<span slot="footer" class="dialog-footer">
 	<el-button @click="visible = false">Cancel</el-button>
@@ -28,7 +38,9 @@
 					title: '',
 					id: 0,
 					slug: '',
-					editSlug: false
+					editSlug: false,
+					errorMessage: '',
+					errorDetails: []
 				}
 			};
 		},
@@ -83,8 +95,9 @@
 					.then( (response) => {
 						this.hideEditPageModal();
 					})
-					.catch( (error) => {
-						console.dir(error);
+					.catch((error) => {
+						this.editForm.errorMessage = error.data.errors[0].message;
+						this.editForm.errorDetails = error.data.errors[0].details;
 					});
 			}
 		}
