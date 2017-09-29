@@ -83,7 +83,7 @@ import Navigation from 'components/sidebar/Navigation';
 import Settings from 'components/sidebar/Settings';
 import HelpCentre from 'components/sidebar/HelpCentre';
 import ErrorSidebar from 'components/sidebar/Errors';
-
+import { eventBus } from 'plugins/eventbus';
 import { clamp } from 'classes/helpers';
 
 /* global document */
@@ -180,6 +180,13 @@ export default {
 			this.collapseSidebar();
 			this.updateMenuActive(this.menu[index].id);
 		}
+	},
+
+	mounted() {
+		// to enable other components to open the errors sidebar when needed
+		eventBus.$on('sidebar:openErrors', (e) => {
+			this.updateMenuActive('errors');
+		});
 	}
 };
 </script>
