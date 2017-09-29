@@ -13,9 +13,16 @@ use Tests\TestCase;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 
+/**
+ * Utility methods for testing the API Commands.
+ * Includes methods for setting up test fixtures.
+ * @package Tests\Unit\Models\APICommands
+ */
 abstract class APICommandTestCase extends TestCase
 {
+	// wraps all database calls within a test in a transaction.
 	use DatabaseTransactions;
+
     /**
      * @var array A valid (existing) layout name and version
      */
@@ -25,11 +32,15 @@ abstract class APICommandTestCase extends TestCase
     ];
 
     /**
+	 * Should be implemented to return an array of input data which would be valid for the command
+	 * being tested.
+	 * Used by @see APICommandTestCase::input() to get some valid default data to use in a test.
      * @return array Valid input data.
      */
     abstract public function getValidData();
 
     /**
+	 * Should return an instance of the command class under test.
      * @return APICommand A new instance of the class to test.
      */
     abstract public function fixture();
