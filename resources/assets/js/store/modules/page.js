@@ -40,6 +40,13 @@ const state = {
 	invalidBlocks: []
 };
 
+
+methods : {
+	closeNotification: () => {
+		vue.$notify.close();
+	}
+}
+
 const mutations = {
 	/**
 	 * Mutation to set the current page.
@@ -277,20 +284,38 @@ const actions = {
 					// there are validation errors
 					if (response.data.data.valid===0) {
 						// create the message markup
+
 						const message = vue.$createElement(
 							'div',
-							{ style: 'color: #bb9132' },
+							{ 
+								'style': { 
+									color: '#bb9132'
+								},
+							},
 							[
 								vue.$createElement('p', 'The page saved ok, but there are some validation errors.'),
 								vue.$createElement('p', 'You won\'t be able to publish till these are fixed.'),
-								vue.$createElement('p', 'Check the error sidebar for details.')
-							]
+								vue.$createElement('a', {
+									attrs: {
+										href: '#'
+									},
+									on: {
+										click(e) {
+											eventBus.$emit('sidebar:openErrors', e);
+										}
+									}
+								}, 'Check the error sidebar for details.')
+							],
+							
 						);
 						vue.$notify({
 							title: 'Saved',
 							message: message,
 							type: 'warning',
-							duration: 10000
+							duration: 10000,
+							onClick: function() {
+								this.close();
+							}
 						});
 					}
 					// we're all good
