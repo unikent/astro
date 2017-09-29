@@ -40,13 +40,6 @@ const state = {
 	invalidBlocks: []
 };
 
-
-methods : {
-	closeNotification: () => {
-		vue.$notify.close();
-	}
-}
-
 const mutations = {
 	/**
 	 * Mutation to set the current page.
