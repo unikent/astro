@@ -121,17 +121,6 @@ export default {
 					name: '[name].[ext]?[hash]'
 				}
 			},
-            {
-                test: [/\.js$/],
-                exclude: /(node_modules|bower_components)/,
-                loader: 'documentation-loader',
-				options: {
-                    entry: './assets/js/*.js .assets/js/**/*.js',
-                    github: true,
-                    format: 'html',
-                    output: './documentation/js'
-				}
-            }
 
 		]
 

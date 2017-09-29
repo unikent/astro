@@ -20,13 +20,19 @@ const vue = new Vue();
  */
 
 /**
- * Store module containing site-level data.
+ * Maintains the state of the Site being edited, including available Layouts and site page hierarchy.
  * @example <caption>Access site data from within a component.</caption>
  * this.$store.site.layouts; // get the layouts
  * @namespace state/site
  * @property {Array} pages - Array of Pages in the current Site.
  * @property {number} site - ID of the current Site.
  * @property {Site} currentSite - Representation of the currently selected Site in the editor, as returned by the API.
+ * @property {Object} editPageModal - Configuration for the edit page modal dialog.
+ * @property {boolean} editPageModal.visible - Whether the modal is visible or not.
+ * @property {string} editPageModal.title - The page title field value for the modal.
+ * @property {string} editPageModal.slug - The page slug field value for the modal.
+ * @propoerty {number} editPageModal.id - The id of the page who's settings are being edited.
+ * @property {boolean} editPageModal.editSlug - Whether or not to allow editing of the page slug in the modal (root pages cannot have their slug changed).
  */
 const state = {
 	pages: [],
@@ -36,10 +42,51 @@ const state = {
 	pageModal: {
 		visible: false,
 		parentId: null
-	}
+	},
+	editPageModal: {
+		visible: false,
+		title: '',
+		slug: '',
+		id: 0,
+		editSlug: false
+	},
+	/**
+	 * Finds and returns the page with the specified id if it is present in the pages tree.
+	 * @param {Array} pages - Array of Pages to search.
+	 * @param {number} id - The page id to search for.
+	 * @returns {Object|null}
+	 */
+	findPageById: (pages, id) => {
+		for( var i in pages){
+			let page = pages[i];
+			if(page.id === id){
+				return page;
+			}
+			if(page.children && page.children.length){
+				let result = state.findPageById(page.children, id);
+				if(result){
+					return result;
+				}
+			}
+		}
+		return null;
+	},
+
+	/**
+	 * Updates the slug for a page and also updates its path.
+	 * @param {string} new_slug - The new slug.
+	 * @param {Object} page - Page data object.
+	 */
+	setSlugAndPath: (new_slug, page) => {
+		let path = page.path;
+		path = path.substr(0, path.lastIndexOf(page.slug)) + new_slug;
+		page.path = path;
+		page.slug = new_slug;
+	},
 };
 
 const mutations = {
+
 
 	/**
 	 * Set the current site id stored in the store.
@@ -83,6 +130,26 @@ const mutations = {
 
 	setPageModalParent(state, pageId) {
 		state.pageModal.parentId = pageId;
+	},
+
+	setEditPageModalVisibility(state, visible) {
+		state.editPageModal.visible = visible;
+	},
+
+	setEditPageModalParent(state, pageId) {
+		state.editPageModal.parentId = pageId;
+	},
+
+	/**
+	 * Sets the title, slug and id for the edit page settings modal.
+	 * @param state
+	 * @param {Object} page The Page to use data from.
+	 */
+	setPageMeta(state, page) {
+		state.editPageModal.title = page.title;
+		state.editPageModal.slug = page.slug;
+		state.editPageModal.id = page.id;
+		state.editPageModal.editSlug = !!page.parent_id;
 	}
 };
 
@@ -147,6 +214,35 @@ const actions = {
 			})
 	},
 
+	/**
+	 * Updates the Page meta details for the specified Page.
+	 * @param dispatch
+	 * @param page
+	 * @returns {Promise<R>|Promise.<TResult>|Promise<R2|R1>}
+	 */
+	updatePageMeta({ dispatch, commit }, page) {
+		return api
+			.put(`pages/${page.id}`, {
+				title: page.title,
+				options: {}
+			})
+			.then( (response) => {
+				commit('setPageTitle', response.data.data, {root: true});
+			})
+			.then( () => {
+				if(state.editPageModal.editSlug) {
+					return api.put(`pages/${page.id}/slug`, {
+						slug: page.slug
+					})
+					.then((response) => {
+						commit('setPageSlug', response.data.data, {root: true});
+					})
+				}
+			}).catch((err) => {
+				throw(err.response);
+			});
+	},
+
 	movePageApi({ dispatch }, move) {
 		// If-Unmodified-Since
 		api
@@ -154,7 +250,6 @@ const actions = {
 			.then(() => {
 				dispatch('fetchSite');
 			});
-		console.log(move);
 	},
 
 
@@ -166,7 +261,6 @@ const actions = {
 			newPos = Number.parseInt(toPath.substr(toPath.lastIndexOf('.') + 1, toPath.length));
 
 		if(canDrop) {
-
 
 			const page = _.cloneDeep(oldPage.data);
 
@@ -200,11 +294,26 @@ const actions = {
 
 	hidePageModal({ commit }) {
 		commit('setPageModalVisibility', false);
+	},
+
+	/**
+	 * Display the edit page settings modal.
+	 * @param commit
+	 * @param {object} page - The Page object.
+	 */
+	showEditPageModal({ commit }, page) {
+		commit('setPageMeta', page);
+		commit('setEditPageModalVisibility', true);
+	},
+
+	hideEditPageModal({ commit }) {
+		commit('setEditPageModalVisibility', false);
 	}
 
 };
 
-const getters = {};
+const getters = {
+};
 
 const
 	getPageInfo = (path) => {

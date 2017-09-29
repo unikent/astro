@@ -57,6 +57,38 @@ let store = new Vuex.Store({
 
 	mutations: {
 
+		/**
+		 * Mutates a page title, both in the pages list and in the editor if it is the page being edited.
+		 * @param state
+		 * @param {string} title - The new title.
+		 */
+		setPageTitle: function(state, { id, title} ) {
+			if(state.page.pageData && state.page.pageData.id === id){
+				state.page.pageData.title = title;
+			}
+			const pg = state.site.findPageById(state.site.pages, id);
+			if(pg){
+				pg.title = title;
+			}
+		},
+
+		/**
+		 * Mutates a page slug, both in the pages list and in the editor if it is the page being edited.
+		 * As a side-effect of this, path must also be updated.
+		 * @todo Cascade the updated path to all the subpages (this is done in the API, but we haven't reloaded the data).
+		 * @param state
+		 * @param {string} slug - The new slug.
+		 */
+		setPageSlug: function(state, { id, slug} ) {
+			const pg = state.site.findPageById(state.site.pages, id);
+			if(pg){
+				state.site.setSlugAndPath(slug, pg);
+			}
+			if(state.page.pageData && state.page.pageData.id === id){
+				state.site.setSlugAndPath(slug, state.page.pageData);
+			}
+		},
+
 		changeView(state, currentView) {
 			state.currentView = currentView;
 		},

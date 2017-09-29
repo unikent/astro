@@ -8,6 +8,7 @@
 			:page="page"
 			:flatten="true"
 			:open-modal="showPageModal"
+			:open-edit-modal="showEditPageModal"
 			path="0"
 			:depth="0"
 		/>
@@ -55,7 +56,8 @@ export default {
 	methods: {
 		...mapActions({
 
-			showPageModal: 'site/showPageModal'
+			showPageModal: 'site/showPageModal',
+			showEditPageModal: 'site/showEditPageModal'
 		})
 
 	}
