@@ -73,6 +73,8 @@
 						this.editForm.slug = this.editPageModal.slug;
 						this.editForm.id = this.editPageModal.id;
 						this.editForm.editSlug = this.editPageModal.editSlug;
+						this.editForm.errorMessage = '';
+						this.editForm.editDetails = [];
 					}
 				}
 			}
@@ -92,7 +94,7 @@
 			 */
 			saveEdit() {
 				this.updatePageMeta(this.editForm)
-					.then( (response) => {
+					.then((response) => {
 						this.hideEditPageModal();
 					})
 					.catch((error) => {
