@@ -20,13 +20,19 @@ const vue = new Vue();
  */
 
 /**
- * Store module containing site-level data.
+ * Maintains the state of the Site being edited, including available Layouts and site page hierarchy.
  * @example <caption>Access site data from within a component.</caption>
  * this.$store.site.layouts; // get the layouts
  * @namespace state/site
  * @property {Array} pages - Array of Pages in the current Site.
  * @property {number} site - ID of the current Site.
  * @property {Site} currentSite - Representation of the currently selected Site in the editor, as returned by the API.
+ * @property {Object} editPageModal - Configuration for the edit page modal dialog.
+ * @property {boolean} editPageModal.visible - Whether the modal is visible or not.
+ * @property {string} editPageModal.title - The page title field value for the modal.
+ * @property {string} editPageModal.slug - The page slug field value for the modal.
+ * @propoerty {number} editPageModal.id - The id of the page who's settings are being edited.
+ * @property {boolean} editPageModal.editSlug - Whether or not to allow editing of the page slug in the modal (root pages cannot have their slug changed).
  */
 const state = {
 	pages: [],
@@ -41,7 +47,8 @@ const state = {
 		visible: false,
 		title: '',
 		slug: '',
-		id: 0
+		id: 0,
+		editSlug: false
 	},
 	/**
 	 * Finds and returns the page with the specified id if it is present in the pages tree.
@@ -63,7 +70,7 @@ const state = {
 			}
 		}
 		return null;
-	}
+	},
 };
 
 const mutations = {
@@ -130,6 +137,7 @@ const mutations = {
 		state.editPageModal.title = page.title;
 		state.editPageModal.slug = page.slug;
 		state.editPageModal.id = page.id;
+		state.editPageModal.editSlug = !!page.parent_id;
 	}
 };
 
@@ -207,18 +215,20 @@ const actions = {
 				options: {}
 			})
 			.then( (response) => {
-				commit('setPageTitle', response.data.data, { root: true});
+				commit('setPageTitle', response.data.data, {root: true});
 			})
-			// .then(() => {
-			// 	api
-			// 		.put(`pages/${page.id}/slug`, {
-			// 			slug: page.slug
-			// 		})
-			// 		.then(() => {
-			// 			dispatch('fetchSite');
-			// 		});
-			// })
-			//.catch((response) => { console.log(response);});
+			.then( () => {
+				if(state.editPageModal.editSlug) {
+					return api.put(`pages/${page.id}/slug`, {
+						slug: page.slug
+					})
+					.then((response) => {
+						commit('setPageSlug', response.data.data, {root: true});
+					})
+				}
+			}).catch((err) => {
+				throw(err.response);
+			});
 	},
 
 	movePageApi({ dispatch }, move) {
@@ -291,17 +301,6 @@ const actions = {
 };
 
 const getters = {
-
-	findPage: (state, getters) => (id, input = null) => {
-		if(null === input){
-			input = state.pages;
-			return input.forEach( (item) => {
-				return item.id == id ? item : getters.findPage(item.children);
-			} );
-		}
-		return null;
-	}
-
 };
 
 const

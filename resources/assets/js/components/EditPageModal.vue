@@ -4,7 +4,7 @@
 			<el-form-item label="Page title">
 				<el-input name="title" v-model="editForm.title" auto-complete="off"></el-input>
 			</el-form-item>
-			<el-form-item label="Page Slug" v-if="editForm.parent_id">
+			<el-form-item label="Page Slug" v-if="editForm.editSlug">
 				<el-input name="slug" v-model="editForm.slug" auto-complete="off"></el-input>
 			</el-form-item>
 		</el-form>
@@ -28,7 +28,7 @@
 					title: '',
 					id: 0,
 					slug: '',
-					parent_id: null
+					editSlug: false
 				}
 			};
 		},
@@ -37,10 +37,6 @@
 			...mapState('site', {
 				pages: state => state.pages,
 				editPageModal: state => state.editPageModal
-			}),
-
-			...mapState({
-				pageData: state => state.page.pageData
 			}),
 
 			...mapGetters([
@@ -64,13 +60,10 @@
 						this.editForm.title = this.editPageModal.title;
 						this.editForm.slug = this.editPageModal.slug;
 						this.editForm.id = this.editPageModal.id;
+						this.editForm.editSlug = this.editPageModal.editSlug;
 					}
 				}
 			}
-		},
-
-		created() {
-
 		},
 
 		methods: {
@@ -89,9 +82,9 @@
 				this.updatePageMeta(this.editForm)
 					.then( (response) => {
 						this.hideEditPageModal();
-				})
-					.catch( (response) => {
-						console.dir(response);
+					})
+					.catch( (error) => {
+						console.dir(error);
 					});
 			}
 		}

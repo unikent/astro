@@ -72,6 +72,26 @@ let store = new Vuex.Store({
 			}
 		},
 
+		/**
+		 * Mutates a page slug, both in the pages list and in the editor if it is the page being edited.
+		 * As a side-effect of this, path must also be updated.
+		 * @todo Cascade the updated path to all the subpages (this is done in the API, but we haven't reloaded the data).
+		 * @param state
+		 * @param {string} slug - The new slug.
+		 */
+		setPageSlug: function(state, { id, slug} ) {
+			if(state.page.pageData && state.page.pageData.id === id){
+				let path = state.page.pageData.path;
+				path = path.substr(0, path.lastIndexOf(state.page.pageData.slug)) + slug;
+				state.page.pageData.path = path;
+				state.page.pageData.slug = slug;
+			}
+			const pg = state.site.findPageById(state.site.pages, id);
+			if(pg){
+				pg.slug = slug;
+			}
+		},
+
 		changeView(state, currentView) {
 			state.currentView = currentView;
 		},
