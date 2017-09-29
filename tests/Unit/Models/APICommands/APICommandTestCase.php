@@ -4,8 +4,10 @@ namespace Tests\Unit\Models\APICommands;
 
 use App\Models\Contracts\APICommand;
 use App\Models\LocalAPIClient;
+use App\Models\PublishingGroup;
 use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Validator;
@@ -13,6 +15,7 @@ use App\Models\User;
 
 abstract class APICommandTestCase extends TestCase
 {
+	use DatabaseTransactions;
     /**
      * @var array A valid (existing) layout name and version
      */
@@ -30,6 +33,36 @@ abstract class APICommandTestCase extends TestCase
      * @return APICommand A new instance of the class to test.
      */
     abstract public function fixture();
+
+	/**
+	 * Create a site with an initial draft page hierarchy to use for testing.
+	 * @param LocalAPIClient $api Used to create the site, etc.
+	 * @param $structure
+	 * @param string $name - The name for the site to add.
+	 * @return Site - The created Site.
+	 */
+    public function setupSite(LocalAPIClient $api, $structure, $name)
+	{
+		$pubgroup = PublishingGroup::create(['name' => 'test']);
+		try{
+			$site = $api->createSite($pubgroup->id, "Test", "dfgkent.ac.uk", "", [ "name" => "test-layout", "version" => 1]);
+		}catch(\Exception $e){
+			dd($e);
+		}
+		$api->addTree($site->homepage->id, null, $structure);
+		return $site;
+	}
+
+	/**
+	 * Loads a site structure definition to use with $api->addTree from a php file.
+	 * Assumes that the file returns an array.
+	 * @param string $name - The name of the file without the .php extension.
+	 * @return array - An array defining the site hierarchy.
+	 */
+	public function loadSiteStructure($name)
+	{
+		return require(dirname(__FILE__) . '/../../../Support/Fixtures/site-trees/' . $name . '.php');
+	}
 
     /**
      * Get an API Client to use.
