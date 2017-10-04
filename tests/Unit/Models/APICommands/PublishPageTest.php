@@ -5,7 +5,7 @@ use App\Models\APICommands\PublishPage;
 
 class PublishPageTest extends APICommandTestCase
 {
-    public function fixture()
+    public function command()
     {
         return new PublishPage();
     }

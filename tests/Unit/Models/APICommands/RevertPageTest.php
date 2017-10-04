@@ -9,7 +9,7 @@ namespace Tests\Unit\Models\APICommands;
  */
 class RevertPageTest extends APICommandTestCase
 {
-    public function fixture()
+    public function command()
     {
         return new RevertPage();
     }

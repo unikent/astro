@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Config;
 
 class CreateSiteTest extends APICommandTestCase
 {
-    public function fixture()
+    public function command()
     {
         return new CreateSite();
     }
@@ -265,7 +265,7 @@ class CreateSiteTest extends APICommandTestCase
         $user = factory(User::class)->create();
         $title = 'Test Title';
         $layout = ['name' => 'test-layout', 'version' => 1];
-        $homepage = $this->fixture()->createHomePage($site, $title, $layout, $user);
+        $homepage = $this->command()->createHomePage($site, $title, $layout, $user);
 
         $this->assertInstanceOf(Page::class, $homepage);
         $this->assertEquals($homepage->id, $site->homepage->id);
@@ -286,7 +286,7 @@ class CreateSiteTest extends APICommandTestCase
      */
     public function execute_createsASite_WithADraftHomePage()
     {
-        $site = $this->fixture()->execute(new Collection($this->input(null)), factory(User::class)->create());
+        $site = $this->command()->execute(new Collection($this->input(null)), factory(User::class)->create());
         $this->assertEquals(Page::STATE_DRAFT, $site->homepage->version);
     }
 

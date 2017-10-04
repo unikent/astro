@@ -6,7 +6,7 @@ use App\Models\APICommands\UpdateContent;
 
 class UpdateContentTest extends APICommandTestCase
 {
-    public function fixture()
+    public function command()
     {
         return new UpdateContent();
     }
