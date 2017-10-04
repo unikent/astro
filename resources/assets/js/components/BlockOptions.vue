@@ -100,11 +100,6 @@ import BlockForm from './BlockForm';
 /* global document */
 
 export default {
-	data: function () {
-			return {
-				valid: true
-			}
-		},
 
 	name: 'block-options',
 
@@ -112,12 +107,11 @@ export default {
 
 	components: {
 		Icon,
-		BackBar
+		BackBar,
+		BlockForm
 	},
 
 	computed: {
-
-
 		...mapGetters([
 			'getCurrentBlock'
 		]),
@@ -158,7 +152,10 @@ export default {
 				this.errors.blocks[this.currentRegion][this.currentIndex].fields : {};
 		},
 
-		// @TODO - this lags when switching blocks with different rule sets- investigate
+		// TODO: move validation outside of element
+		// This component used to hang briefly while the validation rules were
+		// being transformed... this now happens when the definitions are first
+		// loaded and the rules are cached.
 		rules() {
 			return Definition.getRules(this.currentDefinition, false);
 		}
@@ -243,9 +240,10 @@ export default {
 		},
 
 		setValidation(status) {
-			if (status) {
+			if(status) {
 				this.deleteBlockValidationIssue(this.currentBlock.id);
-			} else {
+			}
+			else {
 				this.addBlockValidationIssue(this.currentBlock.id);
 			}
 		}
