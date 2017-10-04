@@ -14,9 +14,10 @@ export default {
 		/**
 		 * Age old way of turning bytes into a nicer, human readable format.
 		 *
-		 * @param      {<type>}  size       The size
+		 * @param      {number}  size       The size
 		 * @param      {number}  precision  The precision
-		 * @return     {<type>}  { description_of_the_return_value }
+		 *
+		 * @return     {string}  Formatted file size.
 		 */
 		formatBytes(size, precision = 2) {
 			const
@@ -34,7 +35,8 @@ export default {
 		 * @param      {number}  decimal     The decimal eg. 1.5
 		 * @param      {number}  multiplier  Multiplier is used to remove the
 		 * digits after our decimal point and simplify the calculation / avoid rounding issues.
-		 * @return     {string}  { description_of_the_return_value }
+		 *
+		 * @return     {string}  Aspect ratio.
 		 */
 		formatAspectRatioFromDecimal(decimal, multiplier = 1) {
 			if(decimal === multiplier) {
