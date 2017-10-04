@@ -9,6 +9,7 @@ use App\Models\APICommands\DeletePage;
 use App\Models\APICommands\MovePage;
 use App\Models\APICommands\UpdatePage;
 use App\Models\APICommands\UpdatePageSlug;
+use App\Models\APICommands\UpdateSite;
 use Astro\Renderer\API\Exception\APIErrorException;
 use Astro\Renderer\API\Data\PageData;
 use Astro\Renderer\API\Data\RouteData;
@@ -92,7 +93,7 @@ class LocalAPIClient implements APIClient
      * Run an APICommand.
      * @param string $class The name of the command class.
      * @param array $data
-     * @return Validator
+     * @return object
      * @throws ValidationException
      */
     public function execute($class, array $data)
@@ -110,7 +111,7 @@ class LocalAPIClient implements APIClient
 
     /**
      * Get the sites available to the current user.
-     * @return Validator|Collection
+     * @return null|Collection
      */
     public function getSites()
     {
@@ -126,7 +127,7 @@ class LocalAPIClient implements APIClient
      * @param string $path Path for the new site.
      * @param array $homepage_layout layout to use for the homepage for this site. [ 'name' => '...', 'version' => '...']
      * @param array $options Other options.
-     * @return Site|Validator
+     * @return Site|object
      */
     public function createSite($publishing_group_id, $name, $host, $path, $homepage_layout, $options = [])
     {
@@ -267,9 +268,22 @@ class LocalAPIClient implements APIClient
         throw new \LogicException('Copy Page not yet implemented.');
     }
 
-    public function updateSite()
+	/**
+	 * Update configuration for the given site
+	 * @param integer $id - The unique id of the site to update.
+	 * @param array $updates - Array of key => value pairs for the site configuration values to be updated. One or more of:
+	 * name => string,
+	 * host => string,
+	 * path => string,
+	 * publishing_group_id => integer,
+	 * options => array of site options. Keys with null values will be removed from the site options, only keys that are
+	 * present will be updated.
+	 * @return Site|object The updated site object.
+	 * @throws ValidationException if any errors occur.
+	 */
+    public function updateSite($id, $updates)
     {
-        throw new \LogicException('Update Site not yet implemented.');
+		return $this->execute( UpdateSite::class, array_merge($updates, ['id' => $id]));
     }
 
     public function deleteSite()

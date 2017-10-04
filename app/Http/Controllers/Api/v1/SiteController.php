@@ -64,7 +64,9 @@ class SiteController extends ApiController
      */
     public function update(Request $request, Site $site)
     {
-        return null;
+        $api = new LocalAPIClient(Auth::user());
+        $site = $api->updateSite( $site->id, $request->all());
+		return fractal($site, new SiteTransformer())->respond(200);
     }
 
     /**
