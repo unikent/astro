@@ -30,7 +30,8 @@ import { mapState, mapMutations, mapActions, mapGetters } from 'vuex';
 
 import Icon from 'components/Icon';
 import { undoStackInstance } from 'plugins/undo-redo';
-
+import { win } from 'classes/helpers';
+import Config from 'classes/Config';
 
 export default {
 	name: 'toolbar',
@@ -71,12 +72,12 @@ export default {
 		},
 
 		draftLink() {
-			return window.astro.base_url + '/draft/' + `${this.$route.params.page_id}`;
+			return `${Config.get('base_url', '')}/draft/${this.$route.params.page_id}`;
 		},
 
 		invalidBlocks() {
 			var invalidBlocks = false;
-			if (this.getInvalidBlocks().length === 0) {
+			if(this.getInvalidBlocks().length === 0) {
 				invalidBlocks = true;
 			}
 			return invalidBlocks;
@@ -127,7 +128,7 @@ export default {
 		savePage() {
 			// show the loading spinner
 			this.fullscreenLoading = true;
-			
+
 			// we want a user notification
 			// also wait till handleSavePage has finished to hide the loading spinner
 			this.handleSavePage({ notify: true })
@@ -142,7 +143,7 @@ export default {
 			opening the preview window */
 			this.handleSavePage()
 				.then(() => {
-					window.open(this.draftLink,'_blank');
+					win.open(this.draftLink,'_blank');
 				});
 		},
 

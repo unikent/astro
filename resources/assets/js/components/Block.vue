@@ -2,7 +2,7 @@
 	<div
 		class="b-block-container"
 		:style="stylesOuter"
-		:id="block_identifier"
+		:id="blockIdentifier"
 		@mouseenter="showOverlay"
 		@mouseleave="hideOverlay"
 		@click="editBlock"
@@ -114,7 +114,7 @@ export default {
 			return this.blockMeta.offset;
 		},
 
-		block_identifier() {
+		blockIdentifier() {
 			return 'block_' + this.index;
 		}
 	},

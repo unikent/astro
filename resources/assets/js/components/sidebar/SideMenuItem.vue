@@ -1,8 +1,8 @@
 <template>
-<li v-if="id!=='pages'" :class="id === active ? 'active' : ''">
+<li v-if="id !== 'pages'" :class="id === active ? 'active' : ''">
 	<el-tooltip :content="title" placement="left" :disabled="!showTooltip">
-		<a v-if="id==='errors'" href="#" @click.prevent="handleClick">
-			<el-badge :value=errorCount class="item">
+		<a v-if="id === 'errors'" href="#" @click.prevent="handleClick">
+			<el-badge :value="errorCount" class="item">
 				<icon :name="icon" className="menu-icon" />
 			</el-badge>
 		</a>
@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapGetters } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 import Icon from 'components/Icon';
 
 /* global setTimeout, clearTimeout */
@@ -39,13 +39,11 @@ export default {
 		...mapState({
 			collapsed: state => state.sidebarCollapsed,
 			invalidBlocks: state => state.page.invalidBlocks,
-
 		}),
 
-		validationIssueCount() {
-			return this.errorCount;
+		errorCount() {
+			return this.invalidBlocks.length;
 		}
-		
 	},
 
 	watch: {
@@ -62,20 +60,13 @@ export default {
 				this.showTooltip = false;
 				clearTimeout(this.timer);
 			}
-		}, 
-		invalidBlocks(blocks) {
-			console.log('invalid blocks has changed');
-			console.dir(blocks);
-			this.errorCount = blocks.length;
 		}
 	},
 
 	data() {
 		return {
-			showTooltip: false,
-			errorCount: 0
-			// errorCount: this.invalidBlocks(),
-		}
+			showTooltip: false
+		};
 	},
 
 	methods: {
@@ -85,8 +76,7 @@ export default {
 
 		handleClick(e) {
 			return this.onClick(e, this.index);
-		},
-
+		}
 	}
 };
 </script>

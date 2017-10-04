@@ -47,7 +47,7 @@ const mutations = {
 	 * @param {object} page Page object representing the current page.
 	 * @memberof state/page#
 	 */
-	setPage: function(state, page) {
+	setPage(state, page) {
 		if(!page){
 			page = {};
 		}
@@ -244,7 +244,7 @@ const actions = {
 								}
 							});
 						});
-						// @TODO - populate validations issues with those received from the api
+						// TODO: populate validations issues with those received from the api
 						commit('setLoaded');
 					});
 
@@ -281,8 +281,8 @@ const actions = {
 
 						const message = vue.$createElement(
 							'div',
-							{ 
-								'style': { 
+							{
+								'style': {
 									color: '#bb9132'
 								},
 							},
@@ -300,14 +300,14 @@ const actions = {
 									}
 								}, 'Check the error sidebar for details.')
 							],
-							
+
 						);
 						vue.$notify({
 							title: 'Saved',
 							message: message,
 							type: 'warning',
 							duration: 10000,
-							onClick: function() {
+							onClick() {
 								this.close();
 							}
 						});
@@ -461,7 +461,7 @@ const getters = {
 	},
 
 	unsavedChangesExist: (state) => () => {
-		if (state.currentSavedState.length === 0) {
+		if(state.currentSavedState.length === 0) {
 			// if user has not edited a page yet so we do not have any unsaved changes
 			return false;
 		}
@@ -470,7 +470,6 @@ const getters = {
 		}
 	}
 };
-
 
 export default {
 	state,

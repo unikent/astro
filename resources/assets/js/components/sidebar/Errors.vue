@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex';
+import { mapMutations } from 'vuex';
 import BackBar from 'components/BackBar';
 
 export default {
@@ -48,7 +48,6 @@ export default {
 		BackBar
 	},
 
-
 	methods: {
 
 		...mapMutations([
@@ -57,11 +56,12 @@ export default {
 		]),
 
 		/**
-		@TODO - implement smooth scrolling?
-		scrollTo() - simple jump to the specified block in the iframe 'editor-content'
-		- note that blocks are identified by their block position and not unique api id.
-		- this means as blocks are reordered on the page, the error markers automatically reposition accordingly
-		*/
+		 * Simple jump to the specified block in the iframe 'editor-content'
+		 * - note that blocks are identified by their block position and not unique api id.
+		 * - this means as blocks are reordered on the page, the error markers automatically reposition accordingly
+		 *
+		 * TODO: implement smooth scrolling?
+		 */
 		scrollTo(block_id, definition_name, definition_version) {
 			var el = document.getElementById('editor-content');
 			var block = el.contentWindow.document.getElementById('block_' + block_id);
@@ -71,7 +71,7 @@ export default {
 			el.contentWindow.scrollTo(0, pos.top + el.contentWindow.scrollY);
 
 			// set the current block, given its position (index) and name (definition_name + definition_version)
-			var type = definition_name + "-v" + definition_version;
+			var type = definition_name + '-v' + definition_version;
 			this.setBlock({ index: block_id, type: type });
 
 			// set the block menu item as active
@@ -79,8 +79,7 @@ export default {
 
 			// scroll to the right bit of the block options side panel
 			// we need a tiny timeout to make sure the error fields have had time to populate
-			setTimeout( () => {
-			
+			setTimeout(() => {
 				// find all the error fields...
 				var error_fields = document.getElementsByClassName('is-error');
 
@@ -99,7 +98,7 @@ export default {
 		},
 
 		// return the correct human-readable label for the specified block definition
-		label: function(name) {
+		label(name) {
 			for (var block in this.$store.state.definition.blockDefinitions) {
 				if (block == name) {
 					return this.$store.state.definition.blockDefinitions[block].label;

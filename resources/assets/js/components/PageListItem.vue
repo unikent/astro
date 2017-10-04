@@ -190,12 +190,13 @@ export default {
 		},
 
 		edit() {
-			const page_id = this.page.id;
-			if(Number.parseInt(this.$route.params.page_id) !== page_id) {
+			const pageId = this.page.id;
+
+			if(Number.parseInt(this.$route.params.page_id) !== pageId) {
 				/* prompt to save any unsaved changes before we switch to the new page */
 				this.promptToSave(() => {
 					this.setLoaded(false);
-					this.$router.push(`/site/${this.site}/page/${page_id}`);
+					this.$router.push(`/site/${this.site}/page/${pageId}`);
 				});
 			}
 			else {
