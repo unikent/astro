@@ -33,6 +33,7 @@ export default class Definition {
 	};
 
 	static definitions = {};
+	static rules = {};
 
 	static set(definition) {
 		const type = Definition.getType(definition);
@@ -43,6 +44,7 @@ export default class Definition {
 
 		if(Definition.definitions[type] === void 0) {
 			Definition.definitions[type] = definition;
+			Definition.rules[type] = this.getRules(definition);
 		}
 	}
 
@@ -282,6 +284,12 @@ export default class Definition {
 	}
 
 	static getRules(definition, includeNestedRules = true) {
+		const type = Definition.getType(definition);
+
+		if(Definition.rules[type]) {
+			return Definition.rules[type];
+		}
+
 		let rules = {};
 
 		definition.fields.forEach(field => {

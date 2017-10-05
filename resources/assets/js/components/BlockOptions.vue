@@ -152,7 +152,10 @@ export default {
 				this.errors.blocks[this.currentRegion][this.currentIndex].fields : {};
 		},
 
-		// @TODO - this lags when switching blocks with different rule sets- investigate
+		// TODO: move validation outside of element
+		// This component used to hang briefly while the validation rules were
+		// being transformed... this now happens when the definitions are first
+		// loaded and the rules are cached.
 		rules() {
 			return Definition.getRules(this.currentDefinition, false);
 		}
