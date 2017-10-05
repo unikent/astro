@@ -2,7 +2,7 @@ const keys = {};
 
 const isAlphaNumeric = (k) => {
 	return (
-		typeof k === 'string'  ?
+		typeof k === 'string' ?
 			k.match(/[a-z0-9]/) :
 			k >= 65 && k <= 90 || 48 >= k && k <= 57
 	);
@@ -20,7 +20,7 @@ const getKey = (e) => {
 	}
 };
 
-export const onKeyDown = (ctx) => {
+export const onKeyDown = () => {
 	return (e) => {
 		const key = getKey(e);
 

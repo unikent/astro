@@ -6,10 +6,10 @@
 			Add Site
 		</el-button>
 	</div>
-	<div>
-	
+
 	<div class="el-table w100 el-table--fit el-table--striped el-table--border el-table--enable-row-hover">
 		<table cellspacing="0" cellpadding="0" border="0" class="w100">
+			<thead>
 				<tr>
 					<th>
 						<div class="cell">
@@ -33,37 +33,35 @@
 			</thead>
 			<tbody v-loading.body="loading">
 				<tr
-				v-for="site in sites" 
+				v-for="site in sites"
 				:key="site.id"
 				class="el-table__row"
 				>
-				<td>
-					<div class="cell">
-						<router-link :to="`/site/${site.id}/page/${site.homepage.id}`">{{site.name}}</router-link>
-					</div>
-				</td>
+					<td>
+						<div class="cell">
+							<router-link :to="`/site/${site.id}/page/${site.homepage.id}`">{{site.name}}</router-link>
+						</div>
+					</td>
 
-				<td>
-					<div class="cell">
-						<span class="el-tag el-tag--primary">{{site.host}}{{site.path}}</span>
-					</div>
-				</td>
+					<td>
+						<div class="cell">
+							<span class="el-tag el-tag--primary">{{site.host}}{{site.path}}</span>
+						</div>
+					</td>
 
-				<td>
-					<div class="cell">
-						<el-button @click="askRemove(site.id)" type="default" size="small">
-							<icon name="delete" width="14" height="14" />
-						</el-button>
-					</div>
-				</td>
+					<td>
+						<div class="cell">
+							<el-button @click="askRemove(site.id)" type="default" size="small">
+								<icon name="delete" width="14" height="14" />
+							</el-button>
+						</div>
+					</td>
 
 
-			</tr>
-		</tbody>
-	</table>
-</div>
+				</tr>
+			</tbody>
+		</table>
 
-		
 		<el-dialog title="Add Site" v-model="dialogFormVisible">
 			<el-form :model="form" label-position="top">
 				<el-row type="flex" :gutter="20">
@@ -108,20 +106,14 @@
 					</div>
 				</div>
 
-
-	
 			</el-form>
 			<span slot="footer" class="dialog-footer">
 				<el-button @click="cancelForm">Cancel</el-button>
 				<el-button type="primary" @click="addSite">Add Site</el-button>
 			</span>
 		</el-dialog>
-
 	</div>
-
-
 </el-card>
-
 </template>
 
 <script>
@@ -157,10 +149,9 @@ export default {
 		this.fetchData();
 	},
 
-
 	methods: {
 
-		// @TODO - delete site is not yet implemented!
+		// TODO: delete site is not yet implemented!
 		askRemove(index) {
 			this.$confirm(
 				`Site ${index} will be permanently removed.\nAre you sure?`,
@@ -218,7 +209,7 @@ export default {
 			this.form.errors = [];
 			this.$api
 				.post('sites', site)
-				.then((response) => {
+				.then(() => {
 					// success, so let's refresh what data as have from the api
 					this.fetchData();
 
@@ -232,21 +223,21 @@ export default {
 						homepage_layout: []
 					};
 					this.loading = false;
-					
+
 				})
 				.catch((errors) => {
 					this.dialogFormVisible = true;
 					this.form.errorMsgs = errors.response.data.errors[0].message;
 					this.form.errorsDetails = errors.response.data.errors[0].details;
 					this.loading = false;
-				});				
+				});
 		},
 
 		fetchData() {
-			const fetchSites = this.$api.get('sites?include=homepage.revision'); 
+			const fetchSites = this.$api.get('sites?include=homepage.revision');
 			const fetchGroups = this.$api.get('pubgroups');
 			const fetchLayouts = this.$api.get('layouts/definitions');
-			
+
 			// make sure we all all the data back before continuing
 			Promise.all([fetchSites, fetchGroups, fetchLayouts])
 				.then((responses) => {
@@ -256,20 +247,21 @@ export default {
 					this.layouts = [];
 					let layouts = {};
 					layouts = responses[2].data.data;
-					for (var i = layouts.length - 1; i >= 0; i--) {
-						// @TODO - this should return an array of layout definations 
+
+					for(var i = layouts.length - 1; i >= 0; i--) {
+						// TODO: this should return an array of layout definitions
 						// so for now we are faking this and setting the version numbers to 1
 						let currentLayout = [];
 						currentLayout.name = layouts[i];
 						currentLayout.version = '1';
 						this.layouts.push(currentLayout);
 					}
-					
+
 					// now we have all the data unhide the list
 					this.loading = false;
 				})
 				.catch((errors) => {
-					// @TODO - what do we do when the API is unavaliable
+					// TODO: what do we do when the API is unavaliable
 				});
 		}
 	}

@@ -9,6 +9,7 @@ import media from './modules/media';
 import definition from './modules/definition';
 import Config from 'classes/Config';
 
+/* global process */
 
 Vue.use(Vuex);
 
@@ -62,12 +63,14 @@ let store = new Vuex.Store({
 		 * @param state
 		 * @param {string} title - The new title.
 		 */
-		setPageTitle: function(state, { id, title} ) {
-			if(state.page.pageData && state.page.pageData.id === id){
+		setPageTitle: function(state, { id, title }) {
+			if(state.page.pageData && state.page.pageData.id === id) {
 				state.page.pageData.title = title;
 			}
+
 			const pg = state.site.findPageById(state.site.pages, id);
-			if(pg){
+
+			if(pg) {
 				pg.title = title;
 			}
 		},
@@ -79,12 +82,12 @@ let store = new Vuex.Store({
 		 * @param state
 		 * @param {string} slug - The new slug.
 		 */
-		setPageSlug: function(state, { id, slug} ) {
+		setPageSlug: function(state, { id, slug }) {
 			const pg = state.site.findPageById(state.site.pages, id);
-			if(pg){
+			if(pg) {
 				state.site.setSlugAndPath(slug, pg);
 			}
-			if(state.page.pageData && state.page.pageData.id === id){
+			if(state.page.pageData && state.page.pageData.id === id) {
 				state.site.setSlugAndPath(slug, state.page.pageData);
 			}
 		},

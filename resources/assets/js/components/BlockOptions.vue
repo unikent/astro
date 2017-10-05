@@ -100,11 +100,6 @@ import BlockForm from './BlockForm';
 /* global document */
 
 export default {
-	data: function () {
-			return {
-				valid: true
-			}
-		},
 
 	name: 'block-options',
 
@@ -112,12 +107,11 @@ export default {
 
 	components: {
 		Icon,
-		BackBar
+		BackBar,
+		BlockForm
 	},
 
 	computed: {
-
-
 		...mapGetters([
 			'getCurrentBlock'
 		]),
@@ -243,9 +237,10 @@ export default {
 		},
 
 		setValidation(status) {
-			if (status) {
+			if(status) {
 				this.deleteBlockValidationIssue(this.currentBlock.id);
-			} else {
+			}
+			else {
 				this.addBlockValidationIssue(this.currentBlock.id);
 			}
 		}

@@ -23,7 +23,9 @@ const vue = new Vue();
  * Maintains the state of the Site being edited, including available Layouts and site page hierarchy.
  * @example <caption>Access site data from within a component.</caption>
  * this.$store.site.layouts; // get the layouts
+ *
  * @namespace state/site
+ *
  * @property {Array} pages - Array of Pages in the current Site.
  * @property {number} site - ID of the current Site.
  * @property {Site} currentSite - Representation of the currently selected Site in the editor, as returned by the API.
@@ -56,15 +58,15 @@ const state = {
 	 * @param {number} id - The page id to search for.
 	 * @returns {Object|null}
 	 */
-	findPageById: (pages, id) => {
-		for( var i in pages){
+	findPageById(pages, id) {
+		for(var i in pages) {
 			let page = pages[i];
-			if(page.id === id){
+			if(page.id === id) {
 				return page;
 			}
-			if(page.children && page.children.length){
+			if(page.children && page.children.length) {
 				let result = state.findPageById(page.children, id);
-				if(result){
+				if(result) {
 					return result;
 				}
 			}
@@ -74,19 +76,18 @@ const state = {
 
 	/**
 	 * Updates the slug for a page and also updates its path.
-	 * @param {string} new_slug - The new slug.
+	 * @param {string} newSlug - The new slug.
 	 * @param {Object} page - Page data object.
 	 */
-	setSlugAndPath: (new_slug, page) => {
+	setSlugAndPath(newSlug, page) {
 		let path = page.path;
-		path = path.substr(0, path.lastIndexOf(page.slug)) + new_slug;
+		path = path.substr(0, path.lastIndexOf(page.slug)) + newSlug;
 		page.path = path;
-		page.slug = new_slug;
+		page.slug = newSlug;
 	},
 };
 
 const mutations = {
-
 
 	/**
 	 * Set the current site id stored in the store.
@@ -142,6 +143,7 @@ const mutations = {
 
 	/**
 	 * Sets the title, slug and id for the edit page settings modal.
+	 *
 	 * @param state
 	 * @param {Object} page The Page to use data from.
 	 */
@@ -216,26 +218,27 @@ const actions = {
 
 	/**
 	 * Updates the Page meta details for the specified Page.
+	 *
 	 * @param dispatch
 	 * @param page
 	 * @returns {Promise<R>|Promise.<TResult>|Promise<R2|R1>}
 	 */
-	updatePageMeta({ dispatch, commit }, page) {
+	updatePageMeta({ commit }, page) {
 		return api
 			.put(`pages/${page.id}`, {
 				title: page.title,
 				options: {}
 			})
-			.then( (response) => {
-				commit('setPageTitle', response.data.data, {root: true});
+			.then((response) => {
+				commit('setPageTitle', response.data.data, { root: true });
 			})
-			.then( () => {
+			.then(() => {
 				if(state.editPageModal.editSlug) {
 					return api.put(`pages/${page.id}/slug`, {
 						slug: page.slug
 					})
 					.then((response) => {
-						commit('setPageSlug', response.data.data, {root: true});
+						commit('setPageSlug', response.data.data, { root: true });
 					})
 				}
 			}).catch((err) => {
@@ -270,11 +273,14 @@ const actions = {
 			updateDepths(page, newPage.parent.depth + 1);
 			// splice page in if page already exists in new position otherwise add it
 			commit('addPage', { ...newPage, page, push: !newPage.data });
-			const next_id = newPos+1 < newPage.parent.children.length ? newPage.parent.children[newPos+1].id : null;
+
+			const nextId = newPos + 1 < newPage.parent.children.length ?
+				newPage.parent.children[newPos + 1].id : null;
+
 			dispatch('movePageApi', {
 				page_id: page.id,
 				parent_id: newPage.parent.id,
-				next_id: next_id //newPage.data && newPage.parent.children[newPos+1] ? newPage.parent.children[newPos+1].id : null
+				next_id: nextId //newPage.data && newPage.parent.children[newPos+1] ? newPage.parent.children[newPos+1].id : null
 			});
 		}
 		else {

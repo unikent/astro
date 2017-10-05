@@ -1,9 +1,8 @@
 /**
-PublishValidationWarningModal.Vue
-
-Shows a warning message when there are validation errors, and the user tries to publish a page.
-
-*/
+ *
+ * Shows a warning message when there are validation errors, and the user tries to publish a page.
+ *
+ */
 <template>
 <el-dialog
 	title="Publish"
@@ -35,6 +34,7 @@ Shows a warning message when there are validation errors, and the user tries to 
 <script>
 import { mapState, mapMutations, mapGetters } from 'vuex';
 
+/* global setTimeout */
 
 export default {
 	name: 'publish-validation-warning-modal',
@@ -87,21 +87,21 @@ export default {
 		]),
 
 		/**
-		called when the user clicks the X icon, clicks away from the modal, or presses ESC
+		 * Called when the user clicks the X icon, clicks away from the modal, or presses ESC
 		*/
 		handleClose() {
 			this.cancel();
 		},
 
 		/**
-		cancel the modal
+		 * Closes the modal
 		*/
 		cancel() {
 			this.hidePublishValidationWarningModal();
 		},
 
 		/**
-		open the error listing in the sidebar and close the warning modal
+		 * Open the error listing in the sidebar and close the warning modal
 		*/
 		openErrors() {
 			this.cancel();
