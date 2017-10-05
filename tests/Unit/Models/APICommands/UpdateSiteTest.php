@@ -67,7 +67,7 @@ class UpdateSiteTest extends APICommandTestCase
         $this->assertTrue($validator->fails());
     }
     
-     /**
+    /**
     * @test
     * @group APICommands
     */
@@ -117,6 +117,7 @@ class UpdateSiteTest extends APICommandTestCase
         $this->assertEquals($orignalOptions['keep_this_key_2'], $site['options']['keep_this_key_2']);
         $this->assertNotEquals($orignalOptions['modify_this_key'], $site['options']['modify_this_key']);
     }
+
     /**
     * @test
     * @group APICommands
@@ -155,15 +156,40 @@ class UpdateSiteTest extends APICommandTestCase
     */
     public function execute_withName_updatesNameField()
     {
-        $this->markTestIncomplete();
+        // given we have a site with an original name
+        $originalName = 'Test Site Name';
+        $api = new LocalAPIClient(factory(\App\Models\User::class)->create());
+        $pubgroup = PublishingGroup::create(['name' => 'test']);
+        $site = $api->createSite($pubgroup->id, $originalName, "kent.ac.uk", "", [ "name" => "test-layout", "version" => 1]);
+        
+        // and we change the name
+        $updatedName = 'Updated Test Site Name';
+        $site = $this->command()->execute(new Collection(['id' => $site->id, 'name' => $updatedName]), factory(User::class)->create());
+        
+        // then the name of the site should be changed
+        $this->assertNotEquals($originalName, $site['name']);
+        $this->assertEquals($updatedName, $site['name']);
     }
+
     /**
     * @test
     * @group APICommands
     */
     public function execute_withPath_updatesPathField()
     {
-        $this->markTestIncomplete();
+        // given we have a site with an original path
+        $originalPath = "/original";
+        $api = new LocalAPIClient(factory(\App\Models\User::class)->create());
+        $pubgroup = PublishingGroup::create(['name' => 'test']);
+        $site = $api->createSite($pubgroup->id, 'Site Name', "kent.ac.uk", $originalPath, [ "name" => "test-layout", "version" => 1]);
+
+        // and we change the path
+        $updatedPath = "/updated";
+        $site = $this->command()->execute(new Collection(['id' => $site->id, 'path' => $updatedPath]), factory(User::class)->create());
+
+        // then the path of the site should be changed
+        $this->assertNotEquals($originalPath, $site['path']);
+        $this->assertEquals($updatedPath, $site['path']);
     }
     
     /**
@@ -172,7 +198,19 @@ class UpdateSiteTest extends APICommandTestCase
     */
     public function execute_withHost_updatesHostField()
     {
-        $this->markTestIncomplete();
+        // given we have a site with an original path
+        $originalHost = "lancaster.ac.uk";
+        $api = new LocalAPIClient(factory(\App\Models\User::class)->create());
+        $pubgroup = PublishingGroup::create(['name' => 'test']);
+        $site = $api->createSite($pubgroup->id, 'Site Name', $originalHost, "", [ "name" => "test-layout", "version" => 1]);
+        
+        // and we change the path
+        $updatedHost = "kent.ac.uk";
+        $site = $this->command()->execute(new Collection(['id' => $site->id, 'host' => $updatedHost]), factory(User::class)->create());
+        
+        // then the host of the site should be changed
+        $this->assertNotEquals($originalHost, $site['host']);
+        $this->assertEquals($updatedHost, $site['host']);
     }
     
     /**
@@ -181,7 +219,18 @@ class UpdateSiteTest extends APICommandTestCase
     */
     public function execute_withPublishingGroup_updatesPublishingGroupField()
     {
-        $this->markTestIncomplete();
+        // given we have a site with an original path
+        $api = new LocalAPIClient(factory(\App\Models\User::class)->create());
+        $originalPubgroup = PublishingGroup::create(['name' => 'test']);
+        $site = $api->createSite($originalPubgroup->id, 'Site Name', 'kent.ac.uk', "", [ "name" => "test-layout", "version" => 1]);
+
+        // and we change the publishing group
+        $anotherPubgroup = PublishingGroup::create(['name' => 'a different group']);
+        $site = $this->command()->execute(new Collection(['id' => $site->id, 'publishing_group_id' => $anotherPubgroup->id]), factory(User::class)->create());
+
+        // then the publishing group of the site should be changed
+        $this->assertNotEquals($originalPubgroup->id, $site['publishing_group_id']);
+        $this->assertEquals($anotherPubgroup->id, $site['publishing_group_id']);
     }
     
     
@@ -191,8 +240,18 @@ class UpdateSiteTest extends APICommandTestCase
     */
     public function execute_returnsSiteThatWasModified()
     {
-        $this->markTestIncomplete();
-    }
+         // given we have a site
+         $api = new LocalAPIClient(factory(\App\Models\User::class)->create());
+         $originalPubgroup = PublishingGroup::create(['name' => 'test']);
+         $site = $api->createSite($originalPubgroup->id, 'Site Name', 'kent.ac.uk', "", [ "name" => "test-layout", "version" => 1]);
+
+         // when we update a field
+         $updatedName = 'Redesigned Site Name';
+         $updatedSite = $this->command()->execute(new Collection(['id' => $site->id, 'name' => $updatedName]), factory(User::class)->create());
+         
+         // the site we are returned should be the same site
+         $this->assertEquals($site->id, $updatedSite->id);
+    } 
     
     /**
     * @return APICommand A new instance of the class to test.
