@@ -29,7 +29,7 @@ abstract class APICommandTestCase extends TestCase
     /**
      * @return APICommand A new instance of the class to test.
      */
-    abstract public function fixture();
+    abstract public function command();
 
     /**
      * Get an API Client to use.
@@ -74,7 +74,7 @@ abstract class APICommandTestCase extends TestCase
         if(null == $user){
             $user = factory(User::class)->states('admin')->create();
         }
-        $command = $this->fixture();
+        $command = $this->command();
         $data = collect($data);
         $validator = Validator::make(
             $data->toArray(),

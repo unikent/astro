@@ -158,7 +158,7 @@ class UpdatePageSlugTest extends APICommandTestCase
     /**
      * @return APICommand A new instance of the class to test.
      */
-    public function fixture()
+    public function command()
     {
         return new UpdatePageSlug();
     }
