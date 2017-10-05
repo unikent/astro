@@ -259,7 +259,7 @@ export default {
 
 					// now we have all the data unhide the list
 					this.loading = false;
-				}))
+				})
 				.catch((errors) => {
 					// TODO: what do we do when the API is unavaliable
 				});
