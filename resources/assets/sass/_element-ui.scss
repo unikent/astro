@@ -164,6 +164,15 @@
 	}
 }
 
+.el-button--neutral {
+	fill: #fff;
+
+	.icon {
+		margin-left: 4px;
+		vertical-align: bottom;
+	}
+}
+
 // allows a narrower tooltip in some cases
 .el-tooltip__popper--narrow {
 	max-width: 200px;
