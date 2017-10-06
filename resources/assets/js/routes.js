@@ -8,6 +8,7 @@ import Media from './views/Media';
 import Settings from './views/Settings'
 
 import Editor from './views/Editor';
+import MenuEditor from './views/MenuEditor';
 import Preview from './views/Preview';
 import NotFound from './views/NotFound';
 import Config from './classes/Config';
@@ -45,6 +46,11 @@ const routes = [
 		path: '/site/:site_id/page/:page_id',
 		component: Editor,
 		name: 'page'
+	},
+	{
+		path: '/site/:site_id/menu',
+		component: MenuEditor,
+		name: 'menu-editor'
 	},
 	{
 		path: '/preview/:page_id',
