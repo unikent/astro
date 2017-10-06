@@ -284,11 +284,11 @@ export default class Definition {
 	}
 
 	static getRules(definition, includeNestedRules = true) {
-		const type = Definition.getType(definition);
+		// const type = Definition.getType(definition);
 
-		if(Definition.rules[type]) {
-			return Definition.rules[type];
-		}
+		// if(Definition.rules[type]) {
+		// 	return Definition.rules[type];
+		// }
 
 		let rules = {};
 
