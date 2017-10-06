@@ -11,6 +11,7 @@
     "unit": "mocha-webpack --webpack-config resources/assets/js/test/webpack.config-test.babel.js \"resources/assets/js/test/unit/*.js\""
   },
   "dependencies": {
+    "async-validator": "^1.8.1",
     "axios": "^0.15.3",
     "bulma": "^0.4.0",
     "chart.js": "^2.5.0",
