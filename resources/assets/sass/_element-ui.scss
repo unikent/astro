@@ -166,7 +166,7 @@
 
 // allows a narrower tooltip in some cases
 .el-tooltip__popper--narrow {
-	max-width: 200px;
+	max-width: 300px;
 }
 
 @each $status, $colour in $status-colours {
