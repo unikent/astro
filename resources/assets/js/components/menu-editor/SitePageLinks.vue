@@ -1,19 +1,19 @@
 <template>
 <el-card>
 	<div slot="header" class="card__header">
-		<span class="card__header-text">Your pages</span>
+		<span class="card__header-text">Site pages</span>
 	</div>
-	<ul class="menu-page-list">
+	<ul class="site-page-links">
 		<li
 			v-for="(page, index) in sitePages"
-			class="menu-page-list__page"
+			class="site-page-links__item"
 		>
-			<div style="display: flex; flex-direction: column;">
+			<div class="site-page-links__site-details">
 				<span>{{ page.title }}</span>
-				<span style="font-size: 11px; color: #71787f; margin-top: 4px;">{{ page.path }}</span>
+				<span class="site-page-links__add-button">{{ page.path }}</span>
 			</div>
 
-			<el-button @click="onClick({ text: page.title, url: page.path})" size="small" style="margin-left: auto;">
+			<el-button @click="onClick({ text: page.title, url: page.path})" size="small" class="u-flex-auto-left">
 				Add to menu
 			</el-button>
 		</li>
