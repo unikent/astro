@@ -16,28 +16,28 @@ Note that the page editing toolbar is a separate component found in `components/
 
 */
 <template>
-	<div class="top-bar" v-if="showBack">
+	<div class="top-bar" :class="{ 'top-bar--homepage' : !showBack }">
 		<div>
 			<div v-show="showBack" @click="backToSites" class="top-bar-backbutton">
 				<i class="el-icon-arrow-left backbutton-icon"></i>Sites
 			</div>
 
-			<div v-if="publishStatus==='new'" class="top-bar__page-title">
+			<div v-if="showTools && publishStatus === 'new'" class="top-bar__page-title">
 				<div class="top-bar__title">{{ pageTitle }}<el-tag type="primary">Unpublished draft</el-tag></div>
 				<span class="top-bar__url">{{ renderedURL }}</span>
 			</div>
 
-			<div v-else-if="publishStatus==='published'" class="top-bar__page-title">
+			<div v-else-if="showTools && publishStatus === 'published'" class="top-bar__page-title">
 				<div class="top-bar__title">{{ pageTitle }}<el-tag type="success">Published</el-tag></div>
 				<span class="top-bar__url"><a :href="renderedURL" target="_blank">{{ renderedURL }}</a> <icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" /></span>
 			</div>
 
-			<div v-else-if="publishStatus==='draft'" class="top-bar__page-title">
+			<div v-else-if="showTools && publishStatus === 'draft'" class="top-bar__page-title">
 				<div class="top-bar__title">{{ pageTitle }}<el-tag type="warning">Draft</el-tag></div>
 				<span class="top-bar__url"><a :href="renderedURL" target="_blank">{{ renderedURL }}</a> <icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" /></span>
 			</div>
 
-			<div v-else class="top-bar__page-title">
+			<div v-else-if="showTools" class="top-bar__page-title">
 				<div class="top-bar__title">{{ pageTitle }}</div>
 				<span class="top-bar__url">{{ renderedURL }}</span>
 			</div>
@@ -45,8 +45,7 @@ Note that the page editing toolbar is a separate component found in `components/
 		</div>
 
 		<div class="top-bar__tools">
-
-			<toolbar/>
+			<toolbar v-if="showTools" />
 
 			<el-dropdown trigger="click" @command="handleCommand" class="user-menu-button">
 				<span class="el-dropdown-link">
@@ -58,25 +57,16 @@ Note that the page editing toolbar is a separate component found in `components/
 			</el-dropdown>
 		</div>
 	</div>
-	<div v-else class="top-bar
-	 				   top-bar--homepage">
-		<el-dropdown trigger="click" @command="handleCommand" class="user-menu-button">
-			<span class="el-dropdown-link">
-				{{ username }}<i class="el-icon-caret-bottom el-icon--right"></i>
-			</span>
-			<el-dropdown-menu slot="dropdown">
-				<el-dropdown-item command="sign-out">Sign out</el-dropdown-item>
-			</el-dropdown-menu>
-		</el-dropdown>
-	</div>
 </template>
 
 <script>
-	import { mapState, mapGetters, mapActions, mapMutations } from 'vuex';
+	import { mapGetters, mapActions, mapMutations } from 'vuex';
 	import Icon from 'components/Icon';
 	import Toolbar from 'components/Toolbar';
 	import promptToSave from '../mixins/promptToSave';
 	import Config from '../classes/Config.js';
+
+	/* global window */
 
 	export default {
 
@@ -106,6 +96,10 @@ Note that the page editing toolbar is a separate component found in `components/
 
 			// works out if we should show a back button or not (ie whether we're editing a page or on the homepage)
 			showBack() {
+				return ['site', 'page', 'menu-editor'].indexOf(this.$route.name) !== -1;
+			},
+
+			showTools() {
 				return ['site', 'page'].indexOf(this.$route.name) !== -1;
 			},
 

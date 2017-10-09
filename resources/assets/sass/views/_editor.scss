@@ -1,10 +1,11 @@
 .toolbar__button-save {
 	margin-left: 30px;
 }
+
 .toolbar__button-publish {
 	// extra specificity to override .el-button sibling selector
 	&.el-button {
-		margin: 0 20px;
+		margin-right: 20px;
 	}
 }
 

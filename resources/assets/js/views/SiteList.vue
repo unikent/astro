@@ -51,6 +51,11 @@
 
 					<td>
 						<div class="cell">
+							<router-link :to="`/site/${site.id}/menu`">
+								<el-button type="default" size="small">
+									Menu
+								</el-button>
+							</router-link>
 							<el-button @click="askRemove(site.id)" type="default" size="small">
 								<icon name="delete" width="14" height="14" />
 							</el-button>
@@ -238,15 +243,15 @@ export default {
 			const fetchGroups = this.$api.get('pubgroups');
 			const fetchLayouts = this.$api.get('layouts/definitions');
 
-			// make sure we all all the data back before continuing
-			Promise.all([fetchSites, fetchGroups, fetchLayouts])
-				.then((responses) => {
-					this.sites = responses[0].data.data;
-					this.publishingGroups = responses[1].data.data;
+			// make sure we get all the data back before continuing
+			this.$api
+				.all([fetchSites, fetchGroups, fetchLayouts])
+				.then(this.$api.spread((sites, groups, layouts) => {
 
+					this.sites = sites.data.data;
+					this.publishingGroups = groups.data.data;
 					this.layouts = [];
-					let layouts = {};
-					layouts = responses[2].data.data;
+					layouts = layouts.data.data;
 
 					for(var i = layouts.length - 1; i >= 0; i--) {
 						// TODO: this should return an array of layout definitions
@@ -259,7 +264,7 @@ export default {
 
 					// now we have all the data unhide the list
 					this.loading = false;
-				})
+				}))
 				.catch((errors) => {
 					// TODO: what do we do when the API is unavaliable
 				});
