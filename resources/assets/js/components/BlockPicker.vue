@@ -9,6 +9,12 @@
 	<el-tabs type="border-card">
 		<el-tab-pane label="All blocks">
 			<p>Select one or more blocks from below that you'd like to add to the page.</p>
+			<el-alert
+    title="Replacing a block with another one means you will permanently lose your changes to the original block."
+    type="warning"
+    show-icon
+	:closable="false">
+  </el-alert>
 			<div class="el-dialog__footer">
 				<el-button @click="cancel">Cancel</el-button>
 				<el-button type="primary" @click="addBlocks">Add selected blocks to the page</el-button>

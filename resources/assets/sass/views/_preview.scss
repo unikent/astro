@@ -43,7 +43,9 @@
 
 .block-overlay__options,
 .block-overlay__move,
-.block-overlay__delete {
+.block-overlay__delete,
+.block-overlay__switch,
+.block-overlay__position {
 	transition: background-color .3s ease-out;
 	position: absolute;
 	background-color: #03a9f4;
@@ -73,15 +75,72 @@
 }
 
 .block-overlay__delete {
-	bottom: 15px;
-	right: 30px;
+	top: 0px;
+	right: 50px;
 	cursor: pointer;
 	border-radius: 4px 0 0 0;
 	background-color: transparent;
 	line-height: 30px;
 	height: 30px;
 	width: 30px;
-	fill: #c74d4d;
+
+	button {
+		border: 1px solid #b32929;
+		color: #b32929;
+		background-color: #fff;
+		&:hover {
+			border: 1px solid #b32929;
+			color: #b32929;
+			background-color: #fff0f0;
+		}
+	}
+}
+
+.block-overlay__position {
+	top: 4px;
+	right: 95px;
+	cursor: pointer;
+	width: auto;
+	border-radius: 4px 0 0 0;
+	background-color: transparent;
+	line-height: 30px;
+	height: 30px;
+
+	button {
+		border: 1px solid #333;
+		color: #333;
+		background-color: #fff;
+		&:hover {
+			border: 1px solid #333;
+			color: #333;
+			background-color: #eaeaea;
+		}
+	}
+}
+
+.block-overlay__position--single {
+	top: 0;
+}
+
+.block-overlay__switch {
+	top: 0px;
+	right: 90px;
+	cursor: pointer;
+	border-radius: 4px 0 0 0;
+	background-color: transparent;
+	line-height: 30px;
+	height: 30px;
+	width: 30px;
+	button {
+		border: 1px solid #1e78ff;
+		color: #1e78ff;
+		background-color: #fff;
+		&:hover {
+			border: 1px solid #1e78ff;
+			color: #1e78ff;
+			background-color: #eff5ff;
+		}
+	}
 }
 
 .block-overlay__delete--sidebar {

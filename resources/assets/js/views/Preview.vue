@@ -10,18 +10,70 @@
 			:style="blockOverlayStyles"
 		>
 
-			<el-dropdown class="block-overlay__delete" @command="removeBlock">
-				<el-button size="mini">
-					<icon name="delete" width="20" height="20" /> <i class="el-icon-caret-bottom el-icon--right"></i>
+
+
+			<el-dropdown class="block-overlay__switch" @command="showBlockList()">
+				<el-button type="warning" size="small">
+					Swap block <i class="el-icon-caret-bottom el-icon--right"></i>
 				</el-button>
 				<el-dropdown-menu slot="dropdown">
-					<el-dropdown-item command="delete">Delete</el-dropdown-item>
+					<el-dropdown-item command="delete">Swap this for a different block...</el-dropdown-item>
 				</el-dropdown-menu>
 			</el-dropdown>
 
+
+			<!--
+			<div class="block-overlay__position block-overlay__position--single">
+				<el-button size="small">
+					Move down <i class="el-icon-arrow-down"></i>
+				</el-button>
+			</div>
+			-->
+
+			<!--
+			<div class="block-overlay__position block-overlay__position--single">
+				<el-button size="small">
+					Move up <i class="el-icon-arrow-up"></i>
+				</el-button>
+			</div>
+			-->
+
+
+
+
+			<!--
+			<el-button-group class="block-overlay__position">
+			<el-tooltip class="item" effect="dark" content="You reached a glass ceiling..." placement="top-start">
+				<el-button :disabled="true" size="small">
+					Move up <i class="el-icon-arrow-up"></i>
+				</el-button>
+			</el-tooltip>
+
+				<el-button size="small">
+					Move down <i class="el-icon-arrow-down"></i>
+				</el-button>
+			</el-button-group>
+			-->
+
+
+			<!--
+			<el-dropdown class="block-overlay__delete" @command="removeBlock">
+				<el-button size="small">
+					Delete <i class="el-icon-caret-bottom el-icon--right"></i>
+				</el-button>
+				<el-dropdown-menu slot="dropdown">
+					<el-dropdown-item command="delete">Permanently delete this block?</el-dropdown-item>
+				</el-dropdown-menu>
+			</el-dropdown>
+			-->
+
+			<!--
 			<div ref="move" class="block-overlay__move" v-show="blocks.length > 1">
 				<icon name="move" width="20" height="20" />
 			</div>
+			-->
+
+			<!--
 			<div
 				class="add-before"
 				:class="{ 'add-before--first' : currentBlockIsFirst }"
@@ -36,6 +88,12 @@
 			>
 				<icon name="plus" width="15" height="15" viewBox="0 0 15 15" />
 			</div>
+			-->
+
+
+
+
+
 		</div>
 	</div>
 	<div class="b-handle" :style="handleStyles">
@@ -220,7 +278,7 @@ export default {
 		},
 
 		removeBlock(command) {
-			// remove block but before we do so remove any validation issues it owns 
+			// remove block but before we do so remove any validation issues it owns
 			const { index, region } = this.current;
 			const blocks = this.getBlocks();
 			const blockToBeDeleted = blocks[region][index];
