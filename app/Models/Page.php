@@ -255,7 +255,7 @@ class Page extends BaumNode
             ->where(function($query) use($path) {
                 $query->whereRaw("concat(sites.path, pages.path) = ?", [$path])
                       ->orWhereRaw("concat(sites.path, pages.path) = ?", [$path.'/']);
-            });
+            })->select('pages.*'); // required to stop sites.path overriding pages.path in model
         return $query->first();
     }
 
