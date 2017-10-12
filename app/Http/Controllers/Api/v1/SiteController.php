@@ -2,13 +2,12 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Models\LocalAPIClient;
-use Auth;
 use App\Models\Site;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Transformers\Api\v1\SiteTransformer;
 use App\Http\Transformers\Api\v1\PageTransformer;
-use Respon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -24,10 +23,11 @@ class SiteController extends ApiController
 	 * @param  Request    $request
 	 * @return Response
 	 */
-	public function index(Request $request){
+	public function index(Request $request)
+	{
 	    $api = new LocalAPIClient(Auth::user());
 	    $transformer = new SiteTransformer();
-	    $transformer->setAvailableIncludes(['publishing_group','homepage']);
+	    $transformer->setAvailableIncludes(['publishing_group','homepage','role','users']);
 		return fractal($api->getSites(), $transformer)->parseIncludes($request->get('include'))->respond();
 	}
 
