@@ -78,6 +78,7 @@ An element loading spinner is shown after the user hits 'Publish'.
 
 <script>
 import { mapState, mapMutations, mapGetters } from 'vuex';
+import Config from '../classes/Config.js';
 
 
 export default {
@@ -120,7 +121,7 @@ export default {
 		},
 		// frontend URL - so the user can view their newly-published page
 		renderedURL() {
-			return 'http://' + this.siteDomain + this.sitePath + this.pagePath;
+			return `${Config.get('base_url', '')}` + '/published/' + this.siteDomain + this.sitePath + this.pagePath;
 		}
 	},
 
