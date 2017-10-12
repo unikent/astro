@@ -96,7 +96,7 @@ class PermissionsSeeder extends Seeder
 				$role->save();
 			}
 
-
+			$permission_ids = [];
 			// then add permissions to the role
 			foreach ($permission_names as $permission_name) {
 
@@ -105,9 +105,10 @@ class PermissionsSeeder extends Seeder
 					$permision = new Permission(['name' => $permission_name]);
 					$permision->save();
 				}
-
-				$role->permissions()->attach($permision->id);
+				$permission_ids[] = $permision->id;
 			}
+			
+			$role->permissions()->sync($permission_ids);
 		}
 
 	}
