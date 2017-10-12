@@ -30,5 +30,7 @@ Route::group([ 'prefix' => 'v1', 'namespace' => 'v1' ], function(){
     Route::get('sites/{site}/tree', 'SiteController@tree');
     Route::patch('sites/{site}/tree', 'SiteController@move');
 
+    Route::get('users', 'UserController@index');
+
     Route::resource('pubgroups', 'PublishingGroupController', [ 'only' => ['index']]);
 });
