@@ -192,6 +192,12 @@ This is currently implemented by the `App\Models\Api\v1\Page\PersistRequest` cla
 The `BlockBroker` also supports `getRegionConstraintRules`, where a Region definition is the only parameter. This validates that the `definition_name` on the Block instance is allowed in the given Region.
 
 
+### Notes on setting up Roles and Permissions
+The roles and permissions can be set up or refreshed with the command `artisan astro:permissions refresh`. This will add the roles and permissions specified in the `public static $roles_and_permissions` array, which can be found in the 'app/Console/Commands/SetupPermissions.php' class. It will also remove any roles/permissions that have been romoved or even renamed (adding the renamed version as a new role).
+
+To simply rename a role, use `php artisan astro:permissions rename-role --old-name="<name of role to be renamed>" --new-name="<new name of role to be renamed>"`.
+
+
 ### Testing
 PHPUnit has a good level of code coverage across the entire application.
 

@@ -144,6 +144,7 @@ class SetupPermissions extends Command
 	public function refreshAllRolesAndPermissions($value='')
 	{	
 		$role_ids = [];
+		$permission_ids = [];
 
 		foreach (self::$roles_and_permissions as $role_name => $permission_names) {
 			
@@ -155,27 +156,35 @@ class SetupPermissions extends Command
 				$this->info('New role added: ' . $role->name);
 			}
 			// then add permissions to the role
-			$permission_ids = [];
+			$role_permission_ids = [];
 			foreach ($permission_names as $permission_name) {
 
 				$permision = Permission::where('name', $permission_name)->first();
 				if (!$permision) {
 					$permision = new Permission(['name' => $permission_name]);
 					$permision->save();
-					$this->info('New permision added: ' . $role->name);
+					$this->info('New permision added: ' . $permission->name);
 				}
+				$role_permission_ids[] = $permision->id;
 				$permission_ids[] = $permision->id;
 			}
 
-			$role->permissions()->sync($permission_ids);
+			$role->permissions()->sync($role_permission_ids);
 			$role_ids[] = $role->id;
 		}
 		
 		// then remove any unspecified roles
-		$unspecified_roles = Role::whereNotIn('id', $role_ids)->pluck('id');
-		if (!$unspecified_roles->isEmpty()) {
+		$unspecified_roles = Role::whereNotIn('id', $role_ids)->pluck('id')->toArray();
+		if (!empty($unspecified_roles)) {
 			Role::destroy($unspecified_roles);
 			$this->info('Role ids removed: ' . implode(', ', $unspecified_roles));
+		}
+
+		// also remove any unspecified permissions
+		$unspecified_permissions = Permission::whereNotIn('id', $permission_ids)->pluck('id')->toArray();
+		if (!empty($unspecified_permissions)) {
+			Permission::destroy($unspecified_permissions);
+			$this->info('Permission ids removed: ' . implode(', ', $unspecified_permissions));
 		}
 	}
 
