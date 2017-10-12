@@ -159,14 +159,14 @@ class SetupPermissions extends Command
 			$role_permission_ids = [];
 			foreach ($permission_names as $permission_name) {
 
-				$permision = Permission::where('name', $permission_name)->first();
-				if (!$permision) {
-					$permision = new Permission(['name' => $permission_name]);
-					$permision->save();
+				$permission = Permission::where('name', $permission_name)->first();
+				if (!$permission) {
+					$permission = new Permission(['name' => $permission_name]);
+					$permission->save();
 					$this->info('New permision added: ' . $permission->name);
 				}
-				$role_permission_ids[] = $permision->id;
-				$permission_ids[] = $permision->id;
+				$role_permission_ids[] = $permission->id;
+				$permission_ids[] = $permission->id;
 			}
 
 			$role->permissions()->sync($role_permission_ids);
