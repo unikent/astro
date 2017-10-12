@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Role extends Model
 {
+	const OWNER = 'Site Owner';
+	const EDITOR = 'Editor';
+	const CONTRIBUTOR = 'Contributor';
+	const ADMIN = 'Admin';
+
 	/**
      * The attributes that are mass assignable.
      *
