@@ -8,7 +8,11 @@ use App\Models\Role;
 class PermissionsSeeder extends Seeder
 {
 	/**
-	 * Run the database seeds.
+	 * Seeds the database with permissions.
+	 * Run on its own with 'php artisan db:seed --class=PermissionsSeeder'
+	 * *Warning* Do not use this seed to simply rename roles, this will remove the 
+	 * 	original role alltogether and replace it with a new one, meaning that all users 
+	 * 	assigned that role will lose it (along with its permissions).
 	 *
 	 * @return void
 	 */
@@ -59,7 +63,7 @@ class PermissionsSeeder extends Seeder
 				'Assign Sites permissions',
 				'Assign page permisions',
 				'Assign Subsite permissions'
-			], 
+			],
 			'Editor' => [
 				'Edit Subsite',
 				'Edit Menu',
@@ -74,7 +78,7 @@ class PermissionsSeeder extends Seeder
 				'Publish Page',
 				'Preview page',
 				'Approval'
-			], 
+			],
 			'Contributor' => [
 				'Edit Subsite',
 				'Edit Page',
@@ -87,6 +91,8 @@ class PermissionsSeeder extends Seeder
 			]
 		];
 		
+		$role_ids = [];
+
 		foreach ($roles_and_permissions as $role_name => $permission_names) {
 			
 			// retrieve or add the role
@@ -96,8 +102,8 @@ class PermissionsSeeder extends Seeder
 				$role->save();
 			}
 
-			$permission_ids = [];
 			// then add permissions to the role
+			$permission_ids = [];
 			foreach ($permission_names as $permission_name) {
 
 				$permision = Permission::where('name', $permission_name)->first();
@@ -107,9 +113,13 @@ class PermissionsSeeder extends Seeder
 				}
 				$permission_ids[] = $permision->id;
 			}
-			
-			$role->permissions()->sync($permission_ids);
-		}
 
+			$role->permissions()->sync($permission_ids);
+			$role_ids[] = $role->id;
+		}
+		
+		// then remove any unspecified roles
+		$unspecified_roles = Role::whereNotIn('id', $role_ids)->pluck('id');
+		Role::destroy($unspecified_roles);
 	}
 }
