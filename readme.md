@@ -34,7 +34,8 @@ Astro has three separate components:
 7. Update `DEFINITIONS_PATH` in your .env to point to the newly-cloned definitions directory.
 8. Create a symlink in the `public` folder to link `uploads` to `storage/app/public/uploads`. Depending on your system this would be with something like `ln -s ../storage/app/public/uploads/ uploads`.
 9. Run `php artisan migrate --seed` and `DB_CONNECTION=mysql_test php artisan migrate`
-10. Ensure that everything is working properly, by running the test suite: `phpunit`
+10. Run `php artisan astro:permissions refresh` to setup roles and permissions
+11. Ensure that everything is working properly, by running the test suite: `phpunit`
 
 ### Editor Installation
 yarn and npm should be interchangeable for these commands
@@ -190,6 +191,12 @@ This is currently implemented by the `App\Models\Api\v1\Page\PersistRequest` cla
  - the rules are then extracted from the `BlockBroker` and merged into the default ruleset within `PersistRequest`
 
 The `BlockBroker` also supports `getRegionConstraintRules`, where a Region definition is the only parameter. This validates that the `definition_name` on the Block instance is allowed in the given Region.
+
+
+### Notes on setting up Roles and Permissions
+The roles and permissions can be set up or refreshed with the command `php artisan astro:permissions refresh`. This will add the roles and permissions specified in the `public static $roles_and_permissions` array, which can be found in the 'app/Console/Commands/SetupPermissions.php' class. It will also remove any roles/permissions that have been romoved or even renamed (adding the renamed version as a new role).
+
+To simply rename a role, use `php artisan astro:permissions rename-role --old-name="<name of role to be renamed>" --new-name="<new name of role to be renamed>"`.
 
 
 ### Testing

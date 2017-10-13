@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
 		Commands\CheckDefns::class,
         Commands\AddSite::class,
         Commands\AddUser::class,
+        Commands\SetupPermissions::class,
 	];
 
 	/**
