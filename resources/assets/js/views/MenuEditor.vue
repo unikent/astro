@@ -112,7 +112,6 @@
  * }
  */
 import Schema from 'async-validator';
-
 import Icon from 'components/Icon';
 import Draggable from 'vuedraggable';
 import ScrollInput from 'components/ScrollInput';
@@ -218,6 +217,7 @@ export default {
 	},
 
 	computed: {
+
 		status() {
 			return (
 				// if unsaved but is the same as published menu, treat as draft
@@ -238,7 +238,7 @@ export default {
 	},
 
 	methods: {
-
+		// TODO move this outside of component, store current site data in state
 		fetchSiteData() {
 			this.$api
 				.get(`sites/${this.$route.params.site_id}?include=pages`)
@@ -253,6 +253,8 @@ export default {
 						title: json.data.name,
 						// TODO: don't hardcode HTTPS
 						path: 'https://' + json.data.host + json.data.path,
+						definedHost: json.data.host,
+						definedPath: json.data.path
 					};
 					this.menu = json.data.options['menu_draft'] || [];
 					this.initialMenu = JSON.stringify(this.menu);
@@ -383,7 +385,7 @@ export default {
 
 		previewSite() {
 			win.open(
-				`${Config.get('base_url', '')}/draft/${this.site.firstPageId}`,
+				`${Config.get('base_url', '')}/draft/${this.site.definedHost}${this.site.definedPath}`,
 				'_blank'
 			);
 		},
