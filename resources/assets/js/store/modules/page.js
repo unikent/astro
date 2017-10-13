@@ -3,6 +3,7 @@ import Vue from 'vue';
 import { Definition } from 'classes/helpers';
 import api from 'plugins/http/api';
 import { eventBus } from 'plugins/eventbus';
+import Config from 'classes/Config';
 
 const vue = new Vue();
 
@@ -414,6 +415,26 @@ const getters = {
 	 */
 	currentPage: (state) => {
 		return state.pageData;
+	},
+
+	/**
+	 * Get the URL at which the current page can be previewed in the editor.
+	 * @param state
+	 * @param getters
+	 * @returns {string} Full URL
+	 */
+	draftPreviewURL: (state, getters) => {
+		return `${Config.get('base_url', '')}` + '/draft/' + getters.siteDomain + getters.sitePath + getters.pagePath;
+	},
+
+	/**
+	 * Get the URL at which the published version of the current page can be previewed in the editor.
+	 * @param state
+	 * @param getters
+	 * @returns {string} Full URL
+	 */
+	publishedPreviewURL: (state, getters) => {
+		return `${Config.get('base_url', '')}` + '/published/' + getters.siteDomain + getters.sitePath + getters.pagePath;
 	},
 
 	getFieldValue: (state) => (index, name) => {
