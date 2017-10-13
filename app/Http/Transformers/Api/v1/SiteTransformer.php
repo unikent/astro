@@ -12,7 +12,7 @@ class SiteTransformer extends FractalTransformer
 {
 
     protected $defaultIncludes = [ ];
-    protected $availableIncludes = [ 'pages','publishing_group','homepage','role', 'users' ];
+    protected $availableIncludes = [ 'pages','publishing_group','homepage', 'users' ];
 
 	public function transform(Site $site)
 	{
@@ -27,13 +27,6 @@ class SiteTransformer extends FractalTransformer
 			'options' => $site->options ? $site->options : new ArrayObject
         ];
 		return $data;
-	}
-
-	public function includeRole(Site $site)
-	{
-		if($site->currentUserRole){
-			return new FractalItem($site->currentUserRole->role, new RoleTransformer(), false);
-		}
 	}
 
 	public function includeHomepage(Site $site, ParamBag $params = null)

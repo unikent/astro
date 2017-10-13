@@ -28,5 +28,16 @@ class UserPolicy
         return false;
     }
 
+	/**
+	 * Can the currently authenticated user view details about the specified user?
+	 * @param User $current_user - Currently authenticated user
+	 * @param User $target - Target user to test for access to.
+	 * @return bool - True if the current user can view details of the user, otherwise false.
+	 */
+    public function view(User $current_user, User $target)
+	{
+		// want to allow current user to view themselves
+		return ($current_user->id == $target->id);
+	}
 
 }

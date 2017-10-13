@@ -25,7 +25,7 @@ class UserTransformer extends FractalTransformer
 	{
 		// eager load relations if not already loaded...
 		if(!$user->relationLoaded('roles')) {
-			$roles = $user->roles()->with('site,role')->get();
+			$roles = $user->roles()->with('site','role')->get();
 		}else{
 			$roles = $user->roles;
 		}
