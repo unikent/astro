@@ -15,7 +15,7 @@
 					</span>
 
 					<div class="u-flex-auto-left">
-						<el-button type="primary" @click="saveSiteUser">Save</el-button>
+						<el-button type="primary" @click="saveUsers">Save</el-button>
 					</div>
 				</div>
 				<template
@@ -144,6 +144,7 @@ export default {
 
 			users: [],
 			errors: [],
+			loading: true,
 
 			// serialised version of the users, to test equality
 			// with current users for isUnsaved computed property
@@ -169,6 +170,7 @@ export default {
 					};
 					this.users = json.data.users || [];
 					this.initialUsers = JSON.stringify(this.users);
+					this.loading = false;
 				});
 		},
 
