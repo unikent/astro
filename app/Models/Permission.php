@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Permission extends Model
 {
+  /**
+   * Define the permission strings with constants to catch sneaky typos.
+   */
 	const CREATE_SUBSITE = 'Create Subsite';
 	const EDIT_SUBSITE = 'Edit Subsite';
 	const DELETE_SUBSITE = 'Delete Subsite';
@@ -31,14 +34,7 @@ class Permission extends Model
 	const MOVE_SITE = 'Move Site';
 	const TEMPLATE_MANIPULATION = 'Template Manipulation';
 
-	/**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = ['name'];
-    
-	/**
+  	/**
 	 * Create an array mapping permission-name => [role1,role2,...] for every permission.
 	 * @return array - Array keyed by permission name with values containing the names of the roles that have that permission.
 	 */
@@ -51,6 +47,13 @@ class Permission extends Model
 		return $data;
 	}
 
+	/**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = ['name'];
+    
 	public function roles()
 	{
 		return $this->belongsToMany(Role::class, 'role_permissions');

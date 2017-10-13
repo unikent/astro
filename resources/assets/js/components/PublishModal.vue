@@ -98,6 +98,7 @@ export default {
 		]),
 
 		...mapGetters([
+			'publishedPreviewURL',
 			'pageTitle',
 			'pagePath',
 			'pageSlug',
@@ -121,7 +122,7 @@ export default {
 		},
 		// frontend URL - so the user can view their newly-published page
 		renderedURL() {
-			return `${Config.get('base_url', '')}` + '/published/' + this.siteDomain + this.sitePath + this.pagePath;
+			return this.publishedPreviewURL;
 		}
 	},
 

@@ -69,7 +69,8 @@ export default {
 		}),
 
 		...mapGetters([
-			'getInvalidBlocks'
+			'getInvalidBlocks',
+			'draftPreviewURL'
 		]),
 
 		view: {
@@ -82,7 +83,7 @@ export default {
 		},
 
 		draftLink() {
-			return `${Config.get('base_url', '')}/draft/${this.$route.params.page_id}`;
+			return this.draftPreviewURL;
 		},
 
 		invalidBlocks() {
