@@ -123,7 +123,6 @@ export default {
 		// frontend URL - so the user can view their newly-published page
 		renderedURL() {
 			return this.publishedPreviewURL;
-//			return `${Config.get('base_url', '')}` + '/published/' + this.siteDomain + this.sitePath + this.pagePath;
 		}
 	},
 

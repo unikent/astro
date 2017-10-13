@@ -238,7 +238,6 @@ export default {
 	},
 
 	methods: {
-		// TODO move this outside of component, store current site data in state
 		fetchSiteData() {
 			this.$api
 				.get(`sites/${this.$route.params.site_id}?include=pages`)
