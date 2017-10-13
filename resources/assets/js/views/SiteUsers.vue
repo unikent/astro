@@ -49,6 +49,11 @@
 											{{user.user.name}}
 										</div>
 									</td>
+									<td>
+										<div class="cell">
+											{{user.user.role}}
+										</div>
+									</td>
 								</tr>
 							</tbody>
 						</table>
