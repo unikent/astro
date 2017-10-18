@@ -7,7 +7,7 @@
 			</span>
 		</div>
 
-		<h2>Add new users to {{ this.siteTitle }}</h2>
+		<h3>Add new users to {{ this.siteTitle }}</h3>
 		<div style="display: flex; padding: 10px; margin-bottom: 40px; background-color: #f7f9fb;">
 
 			<el-select
@@ -43,7 +43,7 @@
 		</div>
 
 
-		<h2>Existing users</h2>
+		<h3>Existing users</h3>
 		<div style="display: flex; margin-bottom: 20px;">
 			<el-input
 				v-model="searchInput"
