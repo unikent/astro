@@ -15,7 +15,7 @@ class SiteController extends ApiController
 {
 
 	/**
-	 * GET /api/v1/site
+	 * GET /api/v1/sites
 	 *
 	 * Returns a list of sites accessible to the User. If the
 	 * User had 'index' access, this will return all Sites.
@@ -32,7 +32,7 @@ class SiteController extends ApiController
 	}
 
     /**
-     * POST /api/v1/site
+     * POST /api/v1/sites
      *
      * Create a new site.
      * @return Response
@@ -57,7 +57,20 @@ class SiteController extends ApiController
     }
 
     /**
-     * PUT/PATCH /api/v1/site/{site}
+     * Assign (or remove) users' roles on this site.
+     * PUT/PATCH /api/v1/sites/{site}/users
+     * @param Request $request Input in form username => ..., role => ...
+     * @param Site $site
+     */
+    public function users(Request $request, Site $site)
+    {
+        $api = new LocalAPIClient(Auth::user());
+        $site = $api->updateSiteUserRole($site->id, $request->get('username'), $request->get('role'));
+        return fractal($site, new SiteTransformer())->parseIncludes('users')->respond(200);
+    }
+
+    /**
+     * PUT/PATCH /api/v1/sites/{site}
      *
      * Update an existing site.
      * @return \Response
@@ -70,7 +83,7 @@ class SiteController extends ApiController
     }
 
     /**
-     * DELETE /api/v1/site/{site}
+     * DELETE /api/v1/sites/{site}
      *
      * Delete an existing site.
      */
@@ -81,7 +94,7 @@ class SiteController extends ApiController
     }
 
 	/**
-	 * GET /api/v1/site/{site}
+	 * GET /api/v1/sites/{site}
 	 * This endpoint supports 'include'.
 	 *
 	 * @param  Request    $request
@@ -94,7 +107,7 @@ class SiteController extends ApiController
 	}
 
 	/**
-	 * GET /api/v1/site/{site}/tree
+	 * GET /api/v1/sites/{site}/tree
 	 *
 	 * @param  Request    $request
 	 * @param  Site $site

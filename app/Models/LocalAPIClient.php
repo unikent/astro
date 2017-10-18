@@ -10,6 +10,8 @@ use App\Models\APICommands\MovePage;
 use App\Models\APICommands\UpdatePage;
 use App\Models\APICommands\UpdatePageSlug;
 use App\Models\APICommands\UpdateSite;
+use App\Models\APICommands\UpdateSiteUserRole;
+use App\Models\APICommands\UpdateSiteUsers;
 use Astro\Renderer\API\Exception\APIErrorException;
 use Astro\Renderer\API\Data\PageData;
 use Astro\Renderer\API\Data\RouteData;
@@ -193,6 +195,22 @@ class LocalAPIClient implements APIClient
         return $this->execute(UpdateContent::class, [
            'id' => $page_id,
             'blocks' => $regions
+        ]);
+    }
+
+    /**
+     * Update the role held by specified user on this site.
+     * @param int $site_id - The ID of the site to (un)assign user to.
+     * @param string $username - Username of the user to set a role for.
+     * @param string $role - Name of the role to assign or empty to remove the user from this site.
+     * @return object|Site - The updated Site.
+     */
+    public function updateSiteUserRole($site_id, $username, $role = null)
+    {
+        return $this->execute( UpdateSiteUserRole::class, [
+            'id' => $site_id,
+            'username' => $username,
+            'role' => $role
         ]);
     }
 
