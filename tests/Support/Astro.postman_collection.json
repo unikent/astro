@@ -2,7 +2,7 @@
 	"variables": [],
 	"info": {
 		"name": "Astro",
-		"_postman_id": "286a4586-104b-840f-b33a-7f694b08ac09",
+		"_postman_id": "40ef7b7a-b5b9-c52f-3b55-7dce38cde197",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
@@ -51,7 +51,10 @@
 						"description": ""
 					}
 				],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"description": "Retrieve a list of Sites."
 			},
 			"response": []
@@ -111,6 +114,36 @@
 				"body": {
 					"mode": "raw",
 					"raw": "{\n\t\"blocks\": {\n\t\t\"main\": [\n\t\t\t{\n\t\t\t\t\"id\":2,\n\t\t\t\t\"page_id\":1,\n\t\t\t\t\"order\":0,\n\t\t\t\t\"definition_name\":\"feature-panel--cta\",\n\t\t\t\t\"definition_version\":1,\n\t\t\t\t\"region_name\":\"main\",\n\t\t\t\t\"fields\":{\n\t\t\t\t\t\"cta_heading\":\"New Heading\",\n\t\t\t\t\t\"cta_sub_heading\":\"Sub-heading\",\n\t\t\t\t\t\"cta_button\": {\n\t\t\t\t\t\t\"url\":\"https://kent.ac.uk\",\n\t\t\t\t\t\t\"text\":\"Click me\"\n\t\t\t\t\t},\n\t\t\t\t\t\"cta_position\":\"header\",\n\t\t\t\t\t\"img\":{\n\t\t\t\t\t\t\"src\":{\n\t\t\t\t\t\t\t\"url\":\"/img/placeholder.jpg\",\n\t\t\t\t\t\t\t\"filename\":\"placeholder.jpg\"\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t},\n\t\t\t\t\t\t\"image_alignment\":\"center\",\n\t\t\t\t\t\t\"alt\":null\n\t\t\t\t\t},\n\t\t\t\t\t\"footer_links\":[]\n\t\t\t\t},\n\t\t\t\t\"created_by\":1,\n\t\t\t\t\"updated_by\":1,\n\t\t\t\t\"created_at\":\"2017-07-26 11:40:24\",\n\t\t\t\t\"updated_at\":\"2017-07-26 11:40:24\",\n\t\t\t\t\"media\": []\n\t\t\t}\n\t\t]\n\t}\n}"
+				},
+				"description": "Create a new Site."
+			},
+			"response": []
+		},
+		{
+			"name": "Roles - Assign user to site",
+			"request": {
+				"url": "http://astro.test:8080/api/v1/sites/1/users",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer test",
+						"description": ""
+					},
+					{
+						"key": "Accepts",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"admin\"\n}"
 				},
 				"description": "Create a new Site."
 			},
@@ -192,7 +225,10 @@
 						"description": ""
 					}
 				],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"description": "Retrieve a list of Sites."
 			},
 			"response": []
@@ -242,7 +278,10 @@
 						"description": ""
 					}
 				],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"description": "Retrieve a list of Sites."
 			},
 			"response": []
@@ -291,7 +330,10 @@
 						"description": ""
 					}
 				],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"description": "Retrieve a list of Sites."
 			},
 			"response": []
@@ -340,7 +382,10 @@
 						"description": ""
 					}
 				],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"description": "Retrieve a list of Sites."
 			},
 			"response": []
@@ -479,7 +524,10 @@
 						"description": ""
 					}
 				],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"description": "Retrieve a list of Sites."
 			},
 			"response": []
@@ -506,7 +554,10 @@
 						"description": ""
 					}
 				],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"description": "Retrieve a list of Sites."
 			},
 			"response": []
