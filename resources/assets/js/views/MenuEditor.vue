@@ -31,8 +31,10 @@
 				<draggable
 					v-if="menu.length"
 					v-model="menu"
+					@change="updateErrors"
 					:options="{
-						handle: '.menu-editor-menu__item__drag-handle'
+						handle: '.menu-editor-menu__item__drag-handle',
+						chosenClass: 'menu-editor__menu-item--dragging'
 					}"
 				>
 					<div v-for="(item, index) in menu" class="menu-editor__menu-item">
@@ -268,12 +270,8 @@ export default {
 
 		validateMenuItem(index) {
 			this.validator.validate(this.menu[index], (errors, fields) => {
-				if(errors) {
-					this.errors.splice(index, 1, fields);
-				}
-				else {
-					this.errors[index] = null;
-				}
+				// if errors exist set them, otherwise set to null
+				this.errors.splice(index, 1, errors ? fields : null);
 			});
 		},
 
@@ -394,6 +392,14 @@ export default {
 
 			if(this.timeElapsedSincePublish !== newTime) {
 				this.timeElapsedSincePublish = newTime;
+			}
+		},
+
+		updateErrors({ moved }) {
+			if(moved) {
+				const currentError = this.errors[moved.oldIndex];
+				this.errors.splice(moved.oldIndex, 1);
+				this.errors.splice(moved.newIndex, 0, currentError);
 			}
 		}
 	}
