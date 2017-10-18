@@ -19,56 +19,26 @@ use Astro\Renderer\AstroRenderer;
 use App\Models\LocalAPIClient;
 use Illuminate\Http\Request;
 use App\Models\Page;
+use App\Http\Controllers\PageController;
 
+// Authentication routes
 $this->get('auth/login', 'Auth\AuthController@login')->name('auth.login');
 $this->post('auth/login', 'Auth\AuthController@loginLocal');
 $this->get('auth/sso/respond', 'Auth\AuthController@loginSSO')->name('auth.sso.respond');
 $this->post('auth/logout', 'Auth\AuthController@logout')->name('auth.logout');
 
-Route::get('/draft/{page}', function(Request $request, Page $page) {
+// Preview draft pages in editor.
+Route::get('/draft/{host}/{path?}', 'PageController@draft')
+	->where('host', '([^/]+)')
+	->where('path', '(.*?)/?')
+	->middleware('auth');
 
-    // Template, definitions, etc locator
-    $locator = new SingleDefinitionsFolderLocator(
-        Config::get('app.definitions_path') ,
-        'Astro\Renderer\Base\Block',
-        'Astro\Renderer\Base\Layout'
-    );
-    $app_url = Config::get('app.url') . '/draft';
-    $api = new LocalAPIClient();
-    $engine = new TwigEngine(Config::get('app.definitions_path'));
+// "Preview" published pages in editor.
+Route::get('/published/{host}/{path?}', 'PageController@published')
+	->where('host', '([^/]+)')
+	->where('path', '(.*?)/?');
 
-    // controller
-    $astro = new AstroRenderer();
-    $site = $page->site;
-
-    // add in preview bar
-    $original_html = $astro->renderRoute($page->site->host, $page->site->path . $page->path, $api, $engine, $locator, Page::STATE_DRAFT);
-    $preview_bar = file_get_contents(resource_path('views/components/preview-bar.html'));
-    return preg_replace('/(<body[^>]*>)/is', '$1' . $preview_bar, $original_html, 1);
-})
-->where('route', '(.*?)/?')
-->middleware('auth');
-
-Route::get('/published/{host}/{path?}', function(Request $request, $host, $path = '') {
-    // Template, definitions, etc locator
-    $path = '/' . $path;
-
-    $locator = new SingleDefinitionsFolderLocator(
-        Config::get('app.definitions_path') ,
-        'Astro\Renderer\Base\Block',
-        'Astro\Renderer\Base\Layout'
-    );
-    $app_url = Config::get('app.url') . '/draft';
-    $api = new LocalAPIClient();
-    $engine = new TwigEngine(Config::get('app.definitions_path'));
-
-    // controller
-    $astro = new AstroRenderer();
-    return $astro->renderRoute($host, $path, $api, $engine, $locator, Page::STATE_PUBLISHED);
-})
-->where('host', '([^/]+)')
-->where('path', '(.*?)/?');
-
+// SPA wrapper
 Route::get('/{catchall?}', function($route = '') {
 	$user = Auth::user();
 	// TODO: grab user info from endpoint, rather than inline js

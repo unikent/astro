@@ -39,7 +39,6 @@
 		"laravel/tinker": "~1.0",
 		"rtconner/laravel-tagging": "^2.2",
 		"spatie/laravel-fractal": "^3.5",
-		"spatie/laravel-permission": "^1.12",
 		"unikent/astro-renderer": "dev-develop",
 		"unikent/kentauth": "dev-laravel/5.3"
 	},

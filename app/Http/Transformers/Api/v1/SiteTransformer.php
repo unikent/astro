@@ -2,10 +2,8 @@
 namespace App\Http\Transformers\Api\v1;
 
 use App\Models\Site;
-use App\Models\Page;
 use ArrayObject;
 use League\Fractal\ParamBag;
-use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item as FractalItem;
 use League\Fractal\Resource\Collection as FractalCollection;
 use League\Fractal\TransformerAbstract as FractalTransformer;
@@ -14,7 +12,7 @@ class SiteTransformer extends FractalTransformer
 {
 
     protected $defaultIncludes = [ ];
-    protected $availableIncludes = [ 'pages','publishing_group','homepage' ];
+    protected $availableIncludes = [ 'pages','publishing_group','homepage', 'users' ];
 
 	public function transform(Site $site)
 	{
@@ -51,4 +49,15 @@ class SiteTransformer extends FractalTransformer
             return new FractalCollection($site->pages, new PageTransformer(), false);
         }
     }
+
+	/**
+	 * Include the users and roles for this Site
+	 * @param Site $site
+	 */
+	public function includeUsers(Site $site)
+	{
+		if(!$site->usersRoles->isEmpty()){
+			return new FractalCollection($site->usersRoles, new SiteUserTransformer(), false);
+		}
+	}
 }
