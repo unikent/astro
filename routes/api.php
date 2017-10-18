@@ -1,6 +1,6 @@
 <?php
 
-Route::group([ 'prefix' => 'v1', 'namespace' => 'v1' ], function(){
+Route::group(['prefix' => 'v1', 'namespace' => 'v1'], function () {
 	Route::get('blocks/definitions', 'BlockController@definitions');
 	Route::get('blocks/{block_definition}/definition', 'BlockController@definition');
 	Route::get('blocks/{block_definition}/blocks', 'BlockController@blocks');
@@ -13,7 +13,7 @@ Route::group([ 'prefix' => 'v1', 'namespace' => 'v1' ], function(){
 	Route::post('media', 'MediaController@store');
 	Route::delete('media/{media}', 'MediaController@destroy');
 
-	Route::resource('pages', 'PageController', [ 'except' => [ 'index', 'create', 'edit' ]]);
+	Route::resource('pages', 'PageController', ['except' => ['index', 'create', 'edit']]);
 	Route::put('pages/{page}/content', 'PageController@updateContent');
 	Route::put('pages/{page}/slug', 'PageController@changeSlug');
 	Route::post('pages/{page}/publish', 'PageController@publish');
@@ -26,15 +26,15 @@ Route::group([ 'prefix' => 'v1', 'namespace' => 'v1' ], function(){
 
 	Route::get('routes/resolve', 'PageController@resolve');
 
-	Route::resource('sites', 'SiteController', [ 'only' => [ 'index', 'show', 'store', 'update', 'destroy' ]]);
-    Route::get('sites/{site}/tree', 'SiteController@tree');
-    Route::patch('sites/{site}/tree', 'SiteController@move');
+	Route::resource('sites', 'SiteController', ['only' => ['index', 'show', 'store', 'update', 'destroy']]);
+	Route::get('sites/{site}/tree', 'SiteController@tree');
+	Route::patch('sites/{site}/tree', 'SiteController@move');
 
-    Route::get('users', 'UserController@index');
-    Route::get('users/{username}', 'UserController@view')->where('username', '([a-z0-9_-]+)');
+	Route::get('users', 'UserController@index');
+	Route::get('users/{username}', 'UserController@view')->where('username', '([a-z0-9_-]+)');
 	Route::get('permissions', 'UserController@permissions');
-    Route::put('sites/{site}/users', 'SiteController@users');
+	Route::put('sites/{site}/users', 'SiteController@users');
 
 
-    Route::resource('pubgroups', 'PublishingGroupController', [ 'only' => ['index']]);
+	Route::resource('pubgroups', 'PublishingGroupController', ['only' => ['index']]);
 });

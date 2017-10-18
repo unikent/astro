@@ -12,12 +12,13 @@ use Illuminate\Database\Eloquent\Model;
 class UserSiteRole extends Model
 {
 	protected $table = 'user_site_roles';
-    protected $fillable = [
-        'user_id',
-        'site_id',
-        'role_id'
-    ];
+	protected $fillable = [
+		'user_id',
+		'site_id',
+		'role_id'
+	];
 	public $timestamps = false;
+
 	/**
 	 * The role in this relationship.
 	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
