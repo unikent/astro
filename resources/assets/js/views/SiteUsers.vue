@@ -91,12 +91,12 @@
 						</th>
 						<th>
 							<div class="cell">
-								Role
+								Email
 							</div>
 						</th>
 						<th>
 							<div class="cell">
-								Email
+								Role
 							</div>
 						</th>
 						<th>
@@ -124,6 +124,11 @@
 						</td>
 						<td>
 							<div class="cell">
+								{{ user.user.email }}
+							</div>
+						</td>
+						<td>
+							<div class="cell">
 								<el-select v-model="user.role" size="small" class="u-flex-auto-left">
 									<el-option-group label="Change role">
 										<el-option
@@ -140,11 +145,6 @@
 										/>
 									</el-option-group>
 								</el-select>
-							</div>
-						</td>
-						<td>
-							<div class="cell">
-								{{ user.user.email }}
 							</div>
 						</td>
 						<td>
