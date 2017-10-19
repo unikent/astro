@@ -7,17 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class Role extends Model
 {
-	const OWNER = 'Site Owner';
-	const EDITOR = 'Editor';
-	const CONTRIBUTOR = 'Contributor';
-	const ADMIN = 'Admin';
+	const OWNER = 'site.owner';
+	const EDITOR = 'site.editor';
+	const CONTRIBUTOR = 'site.contributor';
+	const ADMIN = 'admin';
 
 	/**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'slug'];
     
 	public function permissions()
 	{

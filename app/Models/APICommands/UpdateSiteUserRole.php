@@ -29,7 +29,7 @@ class UpdateSiteUserRole implements APICommand
     {
         $result = DB::transaction(function() use($input,$user){
             $user = User::where('username', $input['username'])->first();
-            $role = empty($input['role']) ? null : Role::where('name', $input['role'])->first();
+            $role = empty($input['role']) ? null : Role::where('slug', $input['role'])->first();
             UserSiteRole::where('site_id', '=', $input['id'])
                         ->where('user_id', '=', $user->id)
                         ->delete();
@@ -76,7 +76,7 @@ class UpdateSiteUserRole implements APICommand
             ],
             'role' => [
                 'nullable',
-                'exists:roles,name'
+                'exists:roles,slug'
             ]
         ];
         return $rules;
