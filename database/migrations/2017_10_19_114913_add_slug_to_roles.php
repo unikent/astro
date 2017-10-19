@@ -14,7 +14,7 @@ class AddSlugToRoles extends Migration
     public function up()
     {
         Schema::table('roles', function (Blueprint $table) {
-            $table->string('slug', 100);
+            $table->string('slug', 100)->nullable();
             $table->unique('slug', 'ui_roles_slug');
         });
     }
