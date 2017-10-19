@@ -16,7 +16,8 @@ class SetupPermissions extends Command
 	 */
 	protected $signature = 'astro:permissions
 								{action : The action to perform this could either be "refresh" or "rename-role"}
-								{--old-name=}
+								{--old-slug=}
+								{--new-slug=}
 								{--new-name=}
 								';
 
@@ -27,6 +28,37 @@ class SetupPermissions extends Command
 	 */
 	protected $description = 'A tool to set up roles and permissions';
 
+	public static $role_names = [
+		Role::OWNER => 'Owner',
+		Role::EDITOR => 'Editor',
+		Role::CONTRIBUTOR => 'Contributor'
+	];
+
+	public static $permission_names = [
+		Permission::CREATE_SUBSITE => 'Create Subsites',
+		Permission::EDIT_SUBSITE => 'Edit Subsites',
+		Permission::DELETE_SUBSITE => 'Delete Subsites',
+		Permission::EDIT_MENU => 'Edit Menus',
+		Permission::MOVE_SUBSITE => 'Move Subsites',
+		Permission::ADD_PAGE => 'Add Pages',
+		Permission::EDIT_PAGE => 'Edit Pages',
+		Permission::DELETE_PAGE => 'Delete Pages',
+		Permission::MOVE_PAGE => 'Move Pages',
+		Permission::ADD_IMAGE => 'Add Images',
+		Permission::EDIT_IMAGE => 'Edit Images',
+		Permission::USE_IMAGE => 'Use Images',
+		Permission::PUBLISH_PAGE => 'Publish Pages',
+		Permission::PREVIEW_PAGE => 'Preview Pages',
+		Permission::APPROVAL => 'Approve Pages',
+		Permission::ASSIGN_SITE_PERMISSIONS => 'Assign Site Permissions',
+		Permission::ASSIGN_PAGE_PERMISSIONS => 'Assign Page Permissions',
+		Permission::ASSIGN_SUBSITE_PERMISSIONS => 'Assign Subsite Permissions',
+		Permission::CREATE_SITE => 'Create Sites',
+		Permission::DELETE_SITE => 'Delete Sites',
+		Permission::EDIT_SITE => 'Edit Sites',
+		Permission::MOVE_SITE => 'Move Sites',
+		Permission::TEMPLATE_MANIPULATION => 'Manipulate Templates'
+	];
 
 	/**
 	 * Defines the roles and their permission.
@@ -34,31 +66,7 @@ class SetupPermissions extends Command
 	 * @var string
 	 */
 	public static $roles_and_permissions = [
-		Role::ADMIN => [
-			Permission::CREATE_SUBSITE,
-			Permission::EDIT_SUBSITE,
-			Permission::DELETE_SUBSITE,
-			Permission::EDIT_MENU,
-			Permission::MOVE_SUBSITE,
-			Permission::ADD_PAGE,
-			Permission::EDIT_PAGE,
-			Permission::DELETE_PAGE,
-			Permission::MOVE_PAGE,
-			Permission::ADD_IMAGE,
-			Permission::EDIT_IMAGE,
-			Permission::USE_IMAGE,
-			Permission::PUBLISH_PAGE,
-			Permission::PREVIEW_PAGE,
-			Permission::APPROVAL,
-			Permission::ASSIGN_SITE_PERMISSIONS,
-			Permission::ASSIGN_PAGE_PERMISSIONS,
-			Permission::ASSIGN_SUBSITE_PERMISSIONS,
-			Permission::CREATE_SITE,
-			Permission::DELETE_SITE,
-			Permission::EDIT_SITE,
-			Permission::MOVE_SITE,
-			Permission::TEMPLATE_MANIPULATION
-		],
+
 		Role::OWNER => [
 			Permission::CREATE_SUBSITE,
 			Permission::EDIT_SUBSITE,
@@ -128,11 +136,11 @@ class SetupPermissions extends Command
 				$this->refreshAllRolesAndPermissions();
 				break;
 			case 'rename-role':
-				if ($this->option('old-name') && $this->option('new-name')) {
-					$this->renameRole($this->option('old-name'), $this->option('new-name'));
+				if ($this->option('old-slug') && $this->option('new-slug') && $this->option('new-name')) {
+					$this->renameRole($this->option('old-slug'), $this->option('new-slug'), $this->option('new-name'));
 				}
 				else {
-					$this->error('You need to specify the --old-name and --new-name for the role you\'d like to edit');
+					$this->error('You need to specify the --old-slug, --new-slug and --new-name for the role you\'d like to edit');
 				}
 				break;
 			default:
@@ -146,22 +154,22 @@ class SetupPermissions extends Command
 		$role_ids = [];
 		$permission_ids = [];
 
-		foreach (self::$roles_and_permissions as $role_name => $permission_names) {
+		foreach (self::$roles_and_permissions as $role_slug => $permission_slugs) {
 			
 			// retrieve or add the role
-			$role = Role::where('name', $role_name)->first();
+			$role = Role::where('slug', $role_slug)->first();
 			if (!$role) {
-				$role = new Role(['name' => $role_name]);
+				$role = new Role(['slug' => $role_slug, 'name' => self::$role_names[$role_slug]]);
 				$role->save();
 				$this->info('New role added: ' . $role->name);
 			}
 			// then add permissions to the role
 			$role_permission_ids = [];
-			foreach ($permission_names as $permission_name) {
+			foreach ($permission_slugs as $permission_slug) {
 
-				$permission = Permission::where('name', $permission_name)->first();
+				$permission = Permission::where('slug', $permission_slug)->first();
 				if (!$permission) {
-					$permission = new Permission(['name' => $permission_name]);
+					$permission = new Permission(['slug' => $permission_slug, 'name' => self::$permission_names[$permission_slug]]);
 					$permission->save();
 					$this->info('New permision added: ' . $permission->name);
 				}
@@ -188,16 +196,17 @@ class SetupPermissions extends Command
 		}
 	}
 
-	public function renameRole($old_name, $new_name)
+	public function renameRole($old_slug, $new_slug, $new_name)
 	{
-		$role = Role::where('name', $old_name)->first();
+		$role = Role::where('slug', $old_slug)->first();
 		if ($role) {
 			$role->name = $new_name;
+			$role->slug = $new_slug;
 			$role->save();
-			$this->info('Role has been renamed from "' . $old_name . '" to "' . $new_name . '"');
+			$this->info('Role has been renamed from "' . $old_slug . '" to "' . $new_slug . '" ("'. $new_name .'")');
 		}
 		else
-			$this->warn('Role "' . $old_name . '" could not be found');
+			$this->warn('Role "' . $old_slug . '" could not be found');
 
 	}
 }

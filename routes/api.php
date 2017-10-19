@@ -33,6 +33,7 @@ Route::group([ 'prefix' => 'v1', 'namespace' => 'v1' ], function(){
     Route::get('users', 'UserController@index');
     Route::get('users/{username}', 'UserController@view')->where('username', '([a-z0-9_-]+)');
 	Route::get('permissions', 'UserController@permissions');
+	Route::get('roles', 'UserController@roles');
 
     Route::resource('pubgroups', 'PublishingGroupController', [ 'only' => ['index']]);
 });

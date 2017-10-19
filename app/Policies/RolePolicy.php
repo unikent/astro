@@ -5,7 +5,7 @@ namespace App\Policies;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class PermissionPolicy
+class RolePolicy
 {
     use HandlesAuthorization;
 
@@ -18,7 +18,7 @@ class PermissionPolicy
     }
 
     /**
-     * Determine whether the user can list all permissions
+     * Determine whether the user can list all roles
      *
      * @param  User  $user
      * @return boolean

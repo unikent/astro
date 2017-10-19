@@ -10,12 +10,10 @@ class UserRoleTransformer extends FractalTransformer
 	public function transform(UserSiteRole $role)
 	{
 		$data = [
-		  'site' => [
-		  		'id' => $role->site->id,
-			  	'name' => $role->site->name,
-			  	'host' => $role->site->host,
-			  	'path' => $role->site->path
-			  ],
+			'id' => $role->site->id,
+			'name' => $role->site->name,
+			'host' => $role->site->host,
+			'path' => $role->site->path,
 			'role' => $role->role->name
         ];
 		return $data;
