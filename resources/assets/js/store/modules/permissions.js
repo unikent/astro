@@ -11,8 +11,7 @@
 const state = {
 	permissions: {
 		'editSite': ['admin', 'moderator', 'spanner']
-	},
-	role: 'moderator',
+	}
 };
 
 const getters = {
@@ -31,20 +30,72 @@ const getters = {
 		else {
 			return false;
 		}
+	},
+
+	/**
+	 * returns the role that the logged in user has in the current site
+	 * if we do not have a current site then it returns null
+	 */
+	role: (state, getters) => () => {
+
 	}
 };
 
-const actions = {};
+const actions = {
+
+	/**
+	 * gets list of roles from the api can calls mutation to store this in the state
+	 */
+	loadGlobalRolls() {
+
+		let permissions = {};
+		
+		api
+			.get(`permissions`, {
+				// blocks: page.blocks
+			})
+			.then(({data}) => {
+				permissions = 
+				dispatch('fetchSite');
+			})
+
+
+
+	},
+
+	/**
+	 * gets list of a user's roles from the api can calls mutation to store this in the state
+	 */
+	loadUserRoles() {
+
+	}
+
+};
 
 const mutations = {
 
-	/**
-	 * updates the role that the current user has in the current site
-	 * @param {*} state 
-	 * @param {string} role_name - the name of the role being assigned
+	/** REPLACE WITH PAYLOAD
+	 * sets the role for a user within a given site
+	 * @param	{string}		username eg. 'cfc7' 
+	 * @param	{array}			array of users for a given site as returned by /api/v1/sites/1?include=users
+	 * @return	{string|null}	the rolename e.g. 'Admin', 'Editor' etc or null is the user has no role
 	 */
-	setRole(state, role_name) {
-		state.role = role_name;
+	setRole(state, user_name, site_roles) {
+
+		role = null;
+
+		if (!Array.isArray(site_roles)) {
+			roll = null
+		} else {
+			currentRole = site_roles.find(user => user.user.username === user_name);
+			if (currentRole) {
+				roll =  currentRole.role;
+			} else {
+				roll = null;
+			}
+		}
+
+		state.role = roll;
 	},
 
 	/**
@@ -54,7 +105,7 @@ const mutations = {
 	 * @param {object} permissions - the set of permissions as received from the API
 	 */
 	setPermissions(state, permissions) {
-
+		state.permissions = permissions;
 	}
 	
 };
