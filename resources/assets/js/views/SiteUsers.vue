@@ -8,10 +8,11 @@
 		</div>
 
 		<h3>Add new users to {{ this.siteTitle }}</h3>
-		<div style="display: flex; padding: 10px; margin-bottom: 40px; background-color: #f7f9fb;">
+		<div class="add-user">
 
-			<div style="width: 70%; position: relative;" 
-			:class="{ 'is-error--custom' : errors.usersToAdd }">
+			<div
+				class="add-user__select"
+				:class="{ 'is-error--custom' : errors.usersToAdd }">
 				<custom-multi-select
 					v-model="usersToAdd"
 					:items="userList"
@@ -19,18 +20,25 @@
 					value-path="user.id"
 					key-path="user.id"
 					placeholder="Search for a user"
-					style="width: 100%"
+					class="add-user__multiselect"
 				>
 					<template slot="item" scope="props">
 						<span>{{ props.item.user.name }}</span>
-						<span style="color: #8492a6; font-size: 13px">@{{ props.item.user.username }}</span>
+						<span class="add-user-multiselect__username">
+							@{{ props.item.user.username }}
+						</span>
 					</template>
 				</custom-multi-select>
-				<div v-if="errors.usersToAdd" class="el-form-item__error">{{ errors.usersToAdd }}</div>
+				<div v-if="errors.usersToAdd" class="el-form-item__error">
+					{{ errors.usersToAdd }}
+
+				</div>
 			</div>
 
-			<div class="u-flex-auto-left" style="position: relative;" 
-			:class="{ 'is-error--custom' : errors.selectedRole }">
+			<div
+				class="u-flex-auto-left add-user__role-select"
+				:class="{ 'is-error--custom' : errors.selectedRole }"
+			>
 				<el-select v-model="selectedRole" placeholder="Select role">
 					<el-option v-for="role in roles"
 						:label="role"
@@ -38,26 +46,33 @@
 						:key="role"
 					/>
 				</el-select>
-				<div v-if="errors.selectedRole" class="el-form-item__error">{{ errors.selectedRole }}</div>
+				<div v-if="errors.selectedRole" class="el-form-item__error">
+					{{ errors.selectedRole }}
+				</div>
 			</div>
 
-			<el-button @click="addUsers" type="primary" class="u-flex-auto-left">
+			<el-button
+				@click="addUsers"
+				type="primary"
+				class="u-flex-auto-left add-user__add-button"
+			>
 				Add user{{ multipleUsersToAdd ? 's' : ''}}
 			</el-button>
 		</div>
 
-
 		<h3>Existing users</h3>
-		<div style="display: flex; margin-bottom: 20px;">
+		<div class="filter-user">
 			<el-input
 				v-model="searchInput"
-				placeholder="Find a user"
+				placeholder="Find users"
 				icon="search"
-				@change="search"
-				:on-icon-click="search"
-				style="width: 200px;"
+				class="filter-user__searchbox"
 			/>
-			<el-select v-model="roleFilter" placeholder="Role" class="u-flex-auto-left" style="width: 130px;">
+			<el-select
+				v-model="roleFilter"
+				class="u-flex-auto-left filter-user__select"
+				placeholder="Role"
+			>
 				<el-option
 					label="No filter"
 					:value="null"
@@ -72,7 +87,10 @@
 			</el-select>
 		</div>
 
-		<div v-if="pagedUsers.length" class="el-table w100 el-table--fit el-table--striped el-table--border el-table--enable-row-hover">
+		<div
+			v-if="pagedUsers.length"
+			class="el-table w100 el-table--fit el-table--striped el-table--border el-table--enable-row-hover"
+		>
 			<table cellspacing="0" cellpadding="0" border="0" class="w100">
 				<thead>
 					<tr>
@@ -126,7 +144,11 @@
 						</td>
 						<td>
 							<div class="cell">
-								<el-select v-model="user.role" size="small" class="u-flex-auto-left">
+								<el-select
+									v-model="user.role"
+									size="small"
+									class="u-flex-auto-left"
+								>
 									<el-option-group label="Change role">
 										<el-option v-for="role in roles"
 											:label="role"
@@ -139,7 +161,11 @@
 						</td>
 						<td>
 							<div class="cell">
-							<el-button @click="removeUser(user.id)" type="default" size="small">
+							<el-button
+								@click="removeUser(user.id)"
+								type="default"
+								size="small"
+							>
 								<icon name="delete" width="14" height="14" />
 							</el-button>
 							</div>
@@ -151,9 +177,7 @@
 		<div v-else class="site-users__user--empty">
 			No users
 		</div>
-	</el-card>
 
-	<el-row>
 		<el-pagination
 			@size-change="handleCountChange"
 			@current-change="handlePagination"
@@ -167,7 +191,7 @@
 				<span class="show-text">Show</span>
 			</slot>
 		</el-pagination>
-	</el-row>
+	</el-card>
 </div>
 </template>
 
@@ -218,7 +242,6 @@ export default {
 			siteTitle: '',
 			roleFilter: null,
 			searchInput: '',
-			searchFilter: null,
 
 			users: [],
 
@@ -425,6 +448,10 @@ export default {
 
 	computed: {
 
+		searchFilter() {
+			return this.searchInput.length > 2 ? this.searchInput : null;
+		},
+
 		filteredUsers() {
 			const users = this.roleFilter ?
 				this.users.filter(user => user.role === this.roleFilter) :
@@ -469,20 +496,9 @@ export default {
 				.get(`sites/${this.$route.params.site_id}?include=users`)
 				.then(({ data: json }) => {
 					this.siteTitle = json.data.name;
-
 					this.users = json.data.users || [];
-
 					this.loading = false;
 				});
-		},
-
-		search() {
-			if(this.searchInput.length > 2) {
-				this.searchFilter = this.searchInput;
-			}
-			else if(this.searchFilter !== null) {
-				this.searchFilter = null;
-			}
 		},
 
 		createFilter(searchKeys, searchTerm) {
@@ -499,30 +515,35 @@ export default {
 							fields[key][0].message : null
 					);
 				});
+
+				if(!errors) {
+					this.$api
+						.post(
+							`sites/${this.$route.params.site_id}/users`,
+							this.usersToAdd.map(username => ({
+								username,
+								role: this.selectedRole
+							}))
+						)
+						.then(({ data: json }) => {
+							this.users = json.data.users || [];
+							this.resetFilters();
+
+							notify({
+								title: 'Users added successfully',
+								type: 'sucess'
+							});
+						})
+						.catch(() => {
+							this.resetFilters();
+
+							notify({
+								title: 'Users added successfully',
+								type: 'success'
+							});
+						});
+				}
 			});
-
-			this.$api
-				.post(
-					`sites/${this.$route.params.site_id}/users`,
-					this.usersToAdd.map(username => ({ username, role: this.selectedRole }))
-				)
-				.then(({ data: json }) => {
-					this.users = json.data.users || [];
-					this.resetFilters();
-
-					notify({
-						title: 'Users added successfully',
-						type: 'sucess'
-					});
-				})
-				.catch(() => {
-					this.resetFilters();
-
-					notify({
-						title: 'Users added successfully',
-						type: 'success'
-					});
-				});
 		},
 
 		removeUser(index) {
@@ -543,6 +564,10 @@ export default {
 			this.roleFilter = null;
 			this.usersToAdd = [];
 			this.selectedRole = '';
+			this.errors = {
+				usersToAdd: null,
+				selectedRole: null
+			};
 		}
 	}
 };
