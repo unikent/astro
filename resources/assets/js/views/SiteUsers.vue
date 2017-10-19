@@ -11,18 +11,20 @@
 		<div style="display: flex; padding: 10px; margin-bottom: 40px; background-color: #f7f9fb;">
 
 			<div style="width: 70%">
-				<el-select
+				<custom-multi-select
 					v-model="usersToAdd"
-					multiple
-					filterable
-					placeholder="Search for a user" style="width: 100%">
-					<el-option
-					v-for="user in userList"
-					:key="user.user.id"
-					:label="`${user.user.name} @ ${user.user.username}`"
-					:value="user.user.id">
-					</el-option>
-				</el-select>
+					:items="userList"
+					label-path="user.name"
+					value-path="user.id"
+					key-path="user.id"
+					placeholder="Search for a user"
+					style="width: 100%"
+				>
+					<template slot="item" scope="props">
+						<span>{{ props.item.user.name }}</span>
+						<span style="color: #8492a6; font-size: 13px">@{{ props.item.user.username }}</span>
+					</template>
+				</custom-multi-select>
 				<div v-if="errors.usersToAdd">{{ errors.usersToAdd }}</div>
 			</div>
 
@@ -37,8 +39,9 @@
 				<div v-if="errors.selectedRole">{{ errors.selectedRole }}</div>
 			</div>
 
-			<el-button @click="addUsers" type="primary" class="u-flex-auto-left">Add user{{ multipleUsersToAdd ? 's' : ''}}</el-button>
-			
+			<el-button @click="addUsers" type="primary" class="u-flex-auto-left">
+				Add user{{ multipleUsersToAdd ? 's' : ''}}
+			</el-button>
 		</div>
 
 
@@ -170,6 +173,7 @@
 import Schema from 'async-validator';
 
 import Icon from 'components/Icon';
+import CustomMultiSelect from 'components/CustomMultiSelect';
 import { notify } from 'classes/helpers';
 
 export default {
@@ -184,7 +188,8 @@ export default {
 	},
 
 	components: {
-		Icon
+		Icon,
+		CustomMultiSelect
 	},
 
 	created() {
@@ -480,25 +485,23 @@ export default {
 
 		createFilter(searchKeys, searchTerm) {
 			return user => searchKeys.some(
-				key => (user.user[key].indexOf(searchTerm) !== -1)
+				key => (user.user[key].toLowerCase().indexOf(searchTerm) !== -1)
 			);
 		},
 
 		addUsers() {
-
-			console.log(this.usersToAdd, this.selectedRole);
-
 			this.validator.validate(this, (errors, fields) => {
-					console.log(errors, fields)
-
-					Object.keys(this.errors).forEach(key => { 
-						this.errors[key] = fields[key] ? fields[key][0].message : null;
-					});
+				Object.keys(this.errors).forEach(key => {
+					this.errors[key] = (
+						fields && fields[key] ?
+							fields[key][0].message : null
+					);
+				});
 			});
 
 			this.$api
 				.post(
-					`sites/${this.$route.params.site_id}/users`, 
+					`sites/${this.$route.params.site_id}/users`,
 					this.usersToAdd.map(username => ({ username, role: this.selectedRole }))
 				)
 				.then(({ data: json }) => {
@@ -515,7 +518,7 @@ export default {
 
 					notify({
 						title: 'Users added successfully',
-						type: 'sucess'
+						type: 'success'
 					});
 				});
 		},
