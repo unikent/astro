@@ -10,7 +10,8 @@
 		<h3>Add new users to {{ this.siteTitle }}</h3>
 		<div style="display: flex; padding: 10px; margin-bottom: 40px; background-color: #f7f9fb;">
 
-			<div style="width: 70%">
+			<div style="width: 70%; position: relative;" 
+			:class="{ 'is-error--custom' : errors.usersToAdd }">
 				<custom-multi-select
 					v-model="usersToAdd"
 					:items="userList"
@@ -25,10 +26,11 @@
 						<span style="color: #8492a6; font-size: 13px">@{{ props.item.user.username }}</span>
 					</template>
 				</custom-multi-select>
-				<div v-if="errors.usersToAdd">{{ errors.usersToAdd }}</div>
+				<div v-if="errors.usersToAdd" class="el-form-item__error">{{ errors.usersToAdd }}</div>
 			</div>
 
-			<div class="u-flex-auto-left">
+			<div class="u-flex-auto-left" style="position: relative;" 
+			:class="{ 'is-error--custom' : errors.selectedRole }">
 				<el-select v-model="selectedRole" placeholder="Select role">
 					<el-option v-for="role in roles"
 						:label="role"
@@ -36,7 +38,7 @@
 						:key="role"
 					/>
 				</el-select>
-				<div v-if="errors.selectedRole">{{ errors.selectedRole }}</div>
+				<div v-if="errors.selectedRole" class="el-form-item__error">{{ errors.selectedRole }}</div>
 			</div>
 
 			<el-button @click="addUsers" type="primary" class="u-flex-auto-left">
