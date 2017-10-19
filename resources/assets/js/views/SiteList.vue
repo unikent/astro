@@ -80,10 +80,6 @@
 							<el-input v-model="form.host" auto-complete="off" placeholder="www.kent.ac.uk"></el-input>
 						</el-form-item>
 
-						<el-form-item label="Path">
-							<el-input v-model="form.path" auto-complete="off" placeholder=""></el-input>
-						</el-form-item>
-
 					</el-col>
 
 					<el-col :span="11" :offset="2">
@@ -93,10 +89,8 @@
 							</el-select>
 						</el-form-item>
 
-						<el-form-item label="Publishing Group">
-							<el-select v-model="form.publishing_group_id" class="w100" placeholder="Select">
-								<el-option v-for="group in publishingGroups" :label="group.name" :value="group.id" :key="group.id" />
-							</el-select>
+						<el-form-item label="Path">
+							<el-input v-model="form.path" auto-complete="off" placeholder=""></el-input>
 						</el-form-item>
 					</el-col>
 				</el-row>
@@ -137,14 +131,11 @@ export default {
 			dialogFormVisible: false,
 			loading: true,
 
-			publishingGroups: [],
-
 			form: {
 				name: '',
 				path: '',
 				host: '',
 				homepage_layout: [],
-				publishing_group_id: '',
 				errors: '',
 			}
 		};
@@ -182,7 +173,6 @@ export default {
 				host: '',
 				path: '',
 				errors: '',
-				publishing_group_id: '',
 				homepage_layout: []
 			};
 			this.loading = false;
@@ -204,7 +194,6 @@ export default {
 				name: this.form.name,
 				host: this.form.host,
 				path: this.form.path,
-				publishing_group_id: this.form.publishing_group_id,
 				homepage_layout: {
 					name: this.form.homepage_layout.name,
 					version: this.form.homepage_layout.version
@@ -224,7 +213,6 @@ export default {
 						host: '',
 						path: '',
 						errors: '',
-						publishing_group_id: '',
 						homepage_layout: []
 					};
 					this.loading = false;
@@ -240,16 +228,14 @@ export default {
 
 		fetchData() {
 			const fetchSites = this.$api.get('sites?include=homepage.revision');
-			const fetchGroups = this.$api.get('pubgroups');
 			const fetchLayouts = this.$api.get('layouts/definitions');
 
 			// make sure we get all the data back before continuing
 			this.$api
-				.all([fetchSites, fetchGroups, fetchLayouts])
-				.then(this.$api.spread((sites, groups, layouts) => {
+				.all([fetchSites, fetchLayouts])
+				.then(this.$api.spread((sites, layouts) => {
 
 					this.sites = sites.data.data;
-					this.publishingGroups = groups.data.data;
 					this.layouts = [];
 					layouts = layouts.data.data;
 
