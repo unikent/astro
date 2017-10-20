@@ -52,7 +52,7 @@ class LocalAPIClient implements APIClient
 		$this->user = $user;
 	}
 
-	public function getRouteDefinition($host, $path, $version = 'published')
+	public function getRouteDefinition($host, $path, $version = 'draft')
 	{
 		$json = $this->resolveRoute($host, $path, $version, 					[
 			'site',
