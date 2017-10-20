@@ -27,6 +27,34 @@ const getters = {
 
 	getRoles(state, getters) {
 		return state.roles;
+	},
+
+	/**
+	 * can the user perform the requested action
+	 * if the user is a global admin then let them do anything
+	 * 
+	 * @param {string} the permission to check i.e. subsite.edit, subsite.create
+	 * @returns {bool} true or false
+	 */
+	canUser: (state, getters) => (permissionSlug) => {
+
+		let permitted = false;
+		
+		// if the user has the global role of admin then then they can do anything
+		if (state.currentRole.global_role === 'admin') {
+			return true;
+		}
+		const matchedRole = state.roles.find(function(value) {
+			if (value.slug == this.permissionSlug) {
+				return true;
+			}
+		}, {permissionSlug});
+			
+		if (matchedRole) {
+			permitted = matchedRole.roles.includes(state.currentRole.role);
+		}
+		
+		return permitted;   
 	}
 };
 

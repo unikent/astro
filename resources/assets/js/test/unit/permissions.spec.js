@@ -3,7 +3,6 @@ import Vue from 'vue';
 import { mapState, mapGetters } from 'vuex';
 // import Vuex from 'vuex';
 
-// import * as WhatIsThis from 'store/modules/permissions'
 import * as permissions from 'store/modules/permissions'
 
 // Vue.use(Vuex);

@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions, mapGetters } from 'vuex';
 import Draggable from 'vuedraggable';
 
 import PageListItem from './PageListItem';
@@ -40,8 +40,6 @@ export default {
 		BackBar,
 		Draggable
 	},
-
-	mixins:[permissions],
 	
 	data() {
 		return {
@@ -54,7 +52,11 @@ export default {
 	computed: {
 		...mapState('site', {
 			pages: state => state.pages
-		})
+		}),
+
+		...mapGetters([
+			'canUser'
+		])
 	},
 
 	methods: {
