@@ -1,11 +1,10 @@
-import {expect} from 'chai'
+/**
+ * tests for permissions part of the vuex store
+ */
+import { expect } from 'chai';
 import Vue from 'vue';
 import { mapState, mapGetters } from 'vuex';
-// import Vuex from 'vuex';
-
-import * as permissions from 'store/modules/permissions'
-
-// Vue.use(Vuex);
+import permissions from 'store/modules/permissions';
 
 describe('Store Permissions', () => {
     it('userCan can match permissions to a role', () => {
@@ -40,9 +39,9 @@ describe('Store Permissions', () => {
             currentRole : 'Happy Camper'
         }
         
+        
         const action = 'subsite.edit';
-        const result = permissions.default.getters.userCan('subsite.create');
-        // const result = getters.userCan(state, 'admin');
-        console.log(result());
+        const result = permissions.getters.canUser('subsite.create');
+        console.log(result);
     })
 });
