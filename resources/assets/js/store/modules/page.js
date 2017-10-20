@@ -424,7 +424,7 @@ const getters = {
 	 * @returns {string} Full URL
 	 */
 	draftPreviewURL: (state, getters) => {
-		return `${Config.get('base_url', '')}` + '/draft/' + getters.siteDomain + getters.sitePath + getters.pagePath;
+		return `${Config.get('base_url', '')}` + '/draft/' + getters.siteDomain + getters.sitePath + (getters.pagePath == '/' ? '' : getters.pagePath);
 	},
 
 	/**
@@ -434,7 +434,7 @@ const getters = {
 	 * @returns {string} Full URL
 	 */
 	publishedPreviewURL: (state, getters) => {
-		return `${Config.get('base_url', '')}` + '/published/' + getters.siteDomain + getters.sitePath + getters.pagePath;
+		return `${Config.get('base_url', '')}` + '/published/' + getters.siteDomain + getters.sitePath + (getters.pagePath == '/' ? '' : getters.pagePath);
 	},
 
 	getFieldValue: (state) => (index, name) => {

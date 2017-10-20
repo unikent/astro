@@ -18,6 +18,10 @@
 	}
 }
 
+.menu-editor__menu-item--dragging {
+	border: 3px dashed #b7c2d4;
+}
+
 .menu-item__cell {
 	position: relative;
 	flex: 1 1 auto;

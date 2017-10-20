@@ -15,7 +15,14 @@ use App\Http\Transformers\Api\v1\Definitions\LayoutTransformer as LayoutDefiniti
 class PageTransformer extends FractalTransformer
 {
 
-    protected $availableIncludes = [ 'parent', 'revision', 'revisions', 'site', 'layout_definition' ];
+    protected $availableIncludes = [
+    	'parent',
+		'revision',
+		'revisions',
+		'site',
+		'layout_definition',
+		'ancestors'
+	];
 
     protected $full = true; // whether to include blocks with output
 
@@ -146,5 +153,16 @@ class PageTransformer extends FractalTransformer
         }
     }
 
-
+	/**
+	 * Include direct ancestors of this Page, as an array, starting with home page.
+	 * @param Page $page The page.
+	 * @return FractalCollection
+	 */
+	public function includeAncestors(Page $page)
+	{
+		$ancestors = $page->ancestors()->with('revision')->orderBy('lft')->get();
+		if($ancestors){
+			return new FractalCollection($ancestors, new PageTransformer, false);
+		}
+	}
 }
