@@ -43,9 +43,9 @@
 			>
 				<el-select v-model="selectedRole" placeholder="Select role">
 					<el-option v-for="role in roles"
-						:label="role"
-						:value="role"
-						:key="role"
+						:label="role.name"
+						:value="role.slug"
+						:key="role.slug"
 					/>
 				</el-select>
 				<div v-if="errors.selectedRole" class="el-form-item__error">
@@ -86,9 +86,9 @@
 					/>
 					<el-option-group label="Filter by role">
 						<el-option v-for="role in roles"
-							:label="role"
-							:value="role"
-							:key="role"
+							:label="role.name"
+							:value="role.slug"
+							:key="role.slug"
 						/>
 					</el-option-group>
 				</el-select>
@@ -154,9 +154,9 @@
 								>
 									<el-option-group label="Change role">
 										<el-option v-for="role in roles"
-											:label="role"
-											:value="role"
-											:key="role"
+											:label="role.name"
+											:value="role.slug"
+											:key="role.slug"
 										/>
 									</el-option-group>
 								</el-select>
@@ -248,11 +248,7 @@ export default {
 
 			users: [],
 
-			roles: [
-				'Site Owner',
-				'Editor',
-				'Contributor'
-			],
+			roles: [],
 
 			currentPage: 1,
 			count: 20,
@@ -316,13 +312,15 @@ export default {
 		fetchSiteData() {
 			const fetchUserList = this.$api.get(`users`);
 			const fetchSite = this.$api.get(`sites/${this.$route.params.site_id}?include=users`);
+			const fetchRoles = this.$api.get('roles');
 
 			this.$api
-				.all([fetchSite, fetchUserList])
-				.then(this.$api.spread((site, users) => {
+				.all([fetchSite, fetchUserList, fetchRoles])
+				.then(this.$api.spread((site, users, roles) => {
 					this.siteTitle = site.data.data.name;
 					this.users = site.data.data.users || [];
 					this.userList = users.data.data || [];
+					this.roles = roles.data.data || [];
 					this.loading = false;
 				}));
 		},
