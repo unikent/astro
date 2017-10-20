@@ -15,7 +15,8 @@
 	</div>
 
 	<div class="b-bottom-bar">
-		<el-button class="u-mla" @click="() => { this.showPageModal(pages[0]) }">+ Add Page</el-button>
+
+		<el-button v-if="canUser('page.add')" class="u-mla" @click="() => { this.showPageModal(pages[0]) }">+ Add Page</el-button>
 	</div>
 </div>
 </template>
@@ -26,6 +27,7 @@ import Draggable from 'vuedraggable';
 
 import PageListItem from './PageListItem';
 import BackBar from './BackBar';
+import permissions from '../mixins/permissions';
 
 export default {
 
@@ -39,6 +41,8 @@ export default {
 		Draggable
 	},
 
+	mixins:[permissions],
+	
 	data() {
 		return {
 
