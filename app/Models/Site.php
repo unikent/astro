@@ -1,10 +1,8 @@
 <?php
 namespace App\Models;
 
-use App\Models\Page;
-use App\Models\PublishingGroup;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Site extends Model
 {
@@ -81,5 +79,23 @@ class Site extends Model
 		return $this->belongsTo(PublishingGroup::class, 'publishing_group_id');
 	}
 
+	/**
+	 * Get the UserSiteRole for the currently authenticated user for this site.
+	 * @return mixed
+	 */
+	public function currentUserRole()
+	{
+		$user_id = Auth::user() ? Auth::user()->id : 0;
+		return $this->hasOne(UserSiteRole::class, 'site_id')
+					->where('user_id', '=', $user_id);
+	}
 
+	/**
+	 * Get the UserSiteRoles for this Site.
+	 * @return \Illuminate\Database\Eloquent\Relations\HasMany
+	 */
+	public function usersRoles()
+	{
+		return $this->hasMany(UserSiteRole::class);
+	}
 }

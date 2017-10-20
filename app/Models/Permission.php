@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Models;
 
@@ -7,36 +7,39 @@ use Illuminate\Database\Eloquent\Model;
 
 class Permission extends Model
 {
-	const CREATE_SUBSITE = 'Create Subsite';
-	const EDIT_SUBSITE = 'Edit Subsite';
-	const DELETE_SUBSITE = 'Delete Subsite';
-	const EDIT_MENU = 'Edit Menu';
-	const MOVE_SUBSITE = 'Move Subsite';
-	const ADD_PAGE = 'Add Page';
-	const EDIT_PAGE = 'Edit Page';
-	const DELETE_PAGE = 'Delete Page';
-	const MOVE_PAGE = 'Move Page';
-	const ADD_IMAGE = 'Add Image';
-	const EDIT_IMAGE = 'Edit Image';
-	const USE_IMAGE = 'Use Image';
-	const PUBLISH_PAGE = 'Publish Page';
-	const PREVIEW_PAGE = 'Preview page';
-	const APPROVAL = 'Approval';
-	const ASSIGN_SITE_PERMISSIONS = 'Assign Sites permissions';
-	const ASSIGN_PAGE_PERMISSIONS = 'Assign page permisions';
-	const ASSIGN_SUBSITE_PERMISSIONS = 'Assign Subsite permissions';
-	const CREATE_SITE = 'Create Site';
-	const DELETE_SITE = 'Delete Site';
-	const EDIT_SITE = 'Edit Site';
-	const MOVE_SITE = 'Move Site';
-	const TEMPLATE_MANIPULATION = 'Template Manipulation';
+  /**
+   * Define the permission strings with constants to catch sneaky typos.
+   */
+	const CREATE_SUBSITE = 'subsite.create';
+	const EDIT_SUBSITE = 'subsite.edit';
+	const DELETE_SUBSITE = 'subsite.delete';
+	const EDIT_MENU = 'menu.edit';
+	const MOVE_SUBSITE = 'subsite.move';
+	const ADD_PAGE = 'page.add';
+	const EDIT_PAGE = 'page.edit';
+	const DELETE_PAGE = 'page.delete';
+	const MOVE_PAGE = 'page.move';
+	const ADD_IMAGE = 'image.add';
+	const EDIT_IMAGE = 'image.edit';
+	const USE_IMAGE = 'image.use';
+	const PUBLISH_PAGE = 'page.publish';
+	const PREVIEW_PAGE = 'page.preview';
+	const APPROVAL = 'page.approve';
+	const ASSIGN_SITE_PERMISSIONS = 'permissions.site.assign';
+	const ASSIGN_PAGE_PERMISSIONS = 'permissions.page.assign';
+	const ASSIGN_SUBSITE_PERMISSIONS = 'permissions.subsite.assign ';
+	const CREATE_SITE = 'site.create';
+	const DELETE_SITE = 'site.delete';
+	const EDIT_SITE = 'site.edit';
+	const MOVE_SITE = 'site.move';
+	const TEMPLATE_MANIPULATION = 'templates.manipulate';
 
 	/**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['name'];
+    protected $fillable = ['name','slug'];
     
 	public function roles()
 	{

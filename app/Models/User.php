@@ -79,5 +79,13 @@ class User extends KentUser
         return false;
     }
 
-
+	/**
+	 * The pivot table class which contains information about which roles on which sites the user has.
+	 * To eager load the roles and sites for a user, load('roles.role,roles.site')
+	 * @return \Illuminate\Database\Eloquent\Relations\HasMany
+	 */
+    public function roles()
+	{
+		return $this->hasMany(UserSiteRole::class);
+	}
 }

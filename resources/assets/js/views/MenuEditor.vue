@@ -31,8 +31,10 @@
 				<draggable
 					v-if="menu.length"
 					v-model="menu"
+					@change="updateErrors"
 					:options="{
-						handle: '.menu-editor-menu__item__drag-handle'
+						handle: '.menu-editor-menu__item__drag-handle',
+						chosenClass: 'menu-editor__menu-item--dragging'
 					}"
 				>
 					<div v-for="(item, index) in menu" class="menu-editor__menu-item">
@@ -112,7 +114,6 @@
  * }
  */
 import Schema from 'async-validator';
-
 import Icon from 'components/Icon';
 import Draggable from 'vuedraggable';
 import ScrollInput from 'components/ScrollInput';
@@ -218,6 +219,7 @@ export default {
 	},
 
 	computed: {
+
 		status() {
 			return (
 				// if unsaved but is the same as published menu, treat as draft
@@ -238,7 +240,6 @@ export default {
 	},
 
 	methods: {
-
 		fetchSiteData() {
 			this.$api
 				.get(`sites/${this.$route.params.site_id}?include=pages`)
@@ -253,6 +254,8 @@ export default {
 						title: json.data.name,
 						// TODO: don't hardcode HTTPS
 						path: 'https://' + json.data.host + json.data.path,
+						definedHost: json.data.host,
+						definedPath: json.data.path
 					};
 					this.menu = json.data.options['menu_draft'] || [];
 					this.initialMenu = JSON.stringify(this.menu);
@@ -267,12 +270,8 @@ export default {
 
 		validateMenuItem(index) {
 			this.validator.validate(this.menu[index], (errors, fields) => {
-				if(errors) {
-					this.errors.splice(index, 1, fields);
-				}
-				else {
-					this.errors[index] = null;
-				}
+				// if errors exist set them, otherwise set to null
+				this.errors.splice(index, 1, errors ? fields : null);
 			});
 		},
 
@@ -383,7 +382,7 @@ export default {
 
 		previewSite() {
 			win.open(
-				`${Config.get('base_url', '')}/draft/${this.site.firstPageId}`,
+				`${Config.get('base_url', '')}/draft/${this.site.definedHost}${this.site.definedPath}`,
 				'_blank'
 			);
 		},
@@ -393,6 +392,14 @@ export default {
 
 			if(this.timeElapsedSincePublish !== newTime) {
 				this.timeElapsedSincePublish = newTime;
+			}
+		},
+
+		updateErrors({ moved }) {
+			if(moved) {
+				const currentError = this.errors[moved.oldIndex];
+				this.errors.splice(moved.oldIndex, 1);
+				this.errors.splice(moved.newIndex, 0, currentError);
 			}
 		}
 	}
