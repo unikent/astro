@@ -16,7 +16,7 @@
 				:class="{ 'is-error--custom' : errors.usersToAdd }">
 				<custom-multi-select
 					v-model="usersToAdd"
-					:items="userList"
+					:items="filteredUserList"
 					label-path="name"
 					value-path="username"
 					key-path="id"
@@ -208,10 +208,12 @@
 
 <script>
 import Schema from 'async-validator';
+import _ from 'lodash';
 
 import Icon from 'components/Icon';
 import CustomMultiSelect from 'components/CustomMultiSelect';
 import { notify } from 'classes/helpers';
+
 
 export default {
 
@@ -294,6 +296,10 @@ export default {
 			);
 		},
 
+		filteredUserList() {
+			return _.differenceBy(this.userList, this.users, 'name');
+		},
+
 		multipleUsersToAdd() {
 			return this.usersToAdd.length > 1;
 		},
@@ -353,42 +359,50 @@ export default {
 				});
 
 				if(!errors) {
-					const requests = this.usersToAdd.map((username, index) => this.$api
+					const requests = this.usersToAdd.map(username => this.$api
 						.put(
 							`sites/${this.$route.params.site_id}/users`,
 							{
-								username: index % 2 === 0 ? username : 'blah',
+								username,
 								role: this.selectedRole
 							}
 						)
+						.catch((error) => error.response)
 					);
 
 					this.$api
 						.all(requests)
 						.then(response => {
-							console.log(response);
-							let lastResponse;
-							for (let i = response.length - 1; i >= 0; i--) {
-								if(response[i] !== void 0){
+							let lastResponse = {}, erroredUsers = [];
+
+							for (let i = 0; i < response.length; i++) {
+								if(response[i].status == 200){
 									lastResponse = response[i];
-									console.log(i);
-									break;
+								}
+								else{
+									erroredUsers.push(JSON.parse(response[i].config.data).username);
 								}
 							}
-							this.users = lastResponse.data.data.users || [];
-							this.resetFilters();
 
-							notify({
-								title: 'Users added successfully',
-								type: 'success'
-							});
-						})
-						.catch(response => {
-							console.log(response);
-							// notify({
-							// 	title: 'Unable to add users',
-							// 	type: 'error'
-							// });
+							if(Object.keys(lastResponse).length !== 0) {
+
+								this.users = lastResponse.data.data.users || [];
+								this.resetFilters();
+
+								notify({
+									title: 'Users added successfully',
+									type: 'success'
+								});
+							}
+
+							if (erroredUsers.length > 0) {
+								notify({
+									title: 'Unable to add users',
+									message: `Adding the following users were uncuccessful: ${erroredUsers.join(', ')}`,
+									type: 'error'
+								});
+							}
+
 						});
 				}
 			});
