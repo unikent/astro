@@ -2,6 +2,17 @@
 	background-color: #f5f7fa;
 	min-height: calc(100vh - 65px);
 	padding: 20px;
+
+	&__user--empty {
+		display: flex;
+		background-color: #f7f9fb;
+		padding: 10px;
+		border: 1px solid #d7deea;
+		border-radius: 4px;
+		margin-bottom: 20px;
+		color: #71787f;
+		font-size: 14px;
+	}
 }
 
 .add-user {

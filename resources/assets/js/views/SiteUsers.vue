@@ -18,7 +18,7 @@
 					v-model="usersToAdd"
 					:items="userList"
 					label-path="name"
-					value-path="id"
+					value-path="username"
 					key-path="id"
 					:filter-callback="filterUserList"
 					placeholder="Search for a user"
@@ -64,118 +64,126 @@
 
 		<h3>Existing users</h3>
 
-		<div
-			v-if="pagedUsers.length"
-			class="el-table w100 el-table--fit el-table--striped el-table--border el-table--enable-row-hover"
-		>
-			<div class="filter-user">
-				<el-input
-					v-model="searchInput"
-					placeholder="Find users"
-					icon="search"
-					class="filter-user__searchbox"
+		<div class="filter-user">
+			<el-input
+				v-model="searchInput"
+				placeholder="Find users"
+				icon="search"
+				class="filter-user__searchbox"
+			/>
+			<el-select
+				v-model="roleFilter"
+				class="u-flex-auto-left filter-user__select"
+				placeholder="Role"
+			>
+				<el-option
+					label="No filter"
+					:value="null"
 				/>
-				<el-select
-					v-model="roleFilter"
-					class="u-flex-auto-left filter-user__select"
-					placeholder="Role"
-				>
-					<el-option
-						label="No filter"
-						:value="null"
+				<el-option-group label="Filter by role">
+					<el-option v-for="role in roles"
+						:label="role.name"
+						:value="role.slug"
+						:key="role.slug"
 					/>
-					<el-option-group label="Filter by role">
-						<el-option v-for="role in roles"
-							:label="role.name"
-							:value="role.slug"
-							:key="role.slug"
-						/>
-					</el-option-group>
-				</el-select>
-			</div>
+				</el-option-group>
+			</el-select>
+		</div>
 
-			<table cellspacing="0" cellpadding="0" border="0" class="w100">
-				<thead>
-					<tr>
-						<th>
-							<div class="cell">
-								Name
-							</div>
-						</th>
-						<th>
-							<div class="cell">
-								Username
-							</div>
-						</th>
-						<th>
-							<div class="cell">
-								Email
-							</div>
-						</th>
-						<th>
-							<div class="cell">
-								Role
-							</div>
-						</th>
-						<th>
-							<div class="cell">
-								Actions
-							</div>
-						</th>
-					</tr>
-				</thead>
-				<tbody v-loading.body="loading">
-					<tr
-						v-for="user in pagedUsers"
-						:key="user.id"
-						class="el-table__row"
-					>
-						<td>
-							<div class="cell">
-								{{ user.user.name }}
-							</div>
-						</td>
-						<td>
-							<div class="cell">
-								{{ user.user.username }}
-							</div>
-						</td>
-						<td>
-							<div class="cell">
-								{{ user.user.email }}
-							</div>
-						</td>
-						<td>
-							<div class="cell">
-								<el-select
-									v-model="user.role"
-									size="small"
-									class="u-flex-auto-left"
-								>
-									<el-option-group label="Change role">
-										<el-option v-for="role in roles"
-											:label="role.name"
-											:value="role.slug"
-											:key="role.slug"
-										/>
-									</el-option-group>
-								</el-select>
-							</div>
-						</td>
-						<td>
-							<div class="cell">
-							<el-button
-								@click="removeUser(user.id)"
-								type="default"
-								size="small"
+		<div v-if="users.length">
+			<div class="el-table w100 el-table--fit el-table--striped el-table--border el-table--enable-row-hover">
+				<table cellspacing="0" cellpadding="0" border="0" class="w100">
+					<thead>
+						<tr>
+							<th>
+								<div class="cell">
+									Name
+								</div>
+							</th>
+							<th>
+								<div class="cell">
+									Username
+								</div>
+							</th>
+							<th>
+								<div class="cell">
+									Email
+								</div>
+							</th>
+							<th>
+								<div class="cell">
+									Role
+								</div>
+							</th>
+							<th>
+								<div class="cell">
+									Actions
+								</div>
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<template v-if="pagedUsers.length">
+							<tr
+								v-for="(user, index) in pagedUsers"
+								:key="user.id"
+								class="el-table__row"
 							>
-								<icon name="delete" width="14" height="14" />
-							</el-button>
-							</div>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+								<td>
+									<div class="cell">
+										{{ user.name }}
+									</div>
+								</td>
+								<td>
+									<div class="cell">
+										{{ user.username }}
+									</div>
+								</td>
+								<td>
+									<div class="cell">
+										{{ user.email }}
+									</div>
+								</td>
+								<td>
+									<div class="cell">
+										<el-select
+											v-model="user.role"
+											size="small"
+											class="u-flex-auto-left"
+											@change="(roleSlug) => changeUserRole(user.username, roleSlug)"
+										>
+											<el-option-group label="Change role">
+												<el-option v-for="role in roles"
+													:label="role.name"
+													:value="role.slug"
+													:key="role.slug"
+												/>
+											</el-option-group>
+										</el-select>
+									</div>
+								</td>
+								<td>
+									<div class="cell">
+									<el-button
+										@click="removeUser(user.username, index)"
+										type="default"
+										size="small"
+									>
+										<icon name="delete" width="14" height="14" />
+									</el-button>
+									</div>
+								</td>
+							</tr>
+						</template>
+						<template v-else>
+							<tr>
+								<td colspan="5" align="center"><div class="cell">No users matching your query.</div></td>
+							</tr>
+						</template>
+					</tbody>
+				</table>
+				
+			</div>
 
 			<el-pagination
 				@size-change="handleCountChange"
@@ -252,7 +260,6 @@ export default {
 
 			currentPage: 1,
 			count: 20,
-			loading: true,
 
 			userList: [],
 			usersToAdd: [],
@@ -321,7 +328,6 @@ export default {
 					this.users = site.data.data.users || [];
 					this.userList = users.data.data || [];
 					this.roles = roles.data.data || [];
-					this.loading = false;
 				}));
 		},
 
@@ -347,37 +353,67 @@ export default {
 				});
 
 				if(!errors) {
-					this.$api
-						.post(
+					const requests = this.usersToAdd.map((username, index) => this.$api
+						.put(
 							`sites/${this.$route.params.site_id}/users`,
-							this.usersToAdd.map(username => ({
-								username,
+							{
+								username: index % 2 === 0 ? username : 'blah',
 								role: this.selectedRole
-							}))
+							}
 						)
-						.then(({ data: json }) => {
-							this.users = json.data.users || [];
-							this.resetFilters();
+					);
 
-							notify({
-								title: 'Users added successfully',
-								type: 'sucess'
-							});
-						})
-						.catch(() => {
+					this.$api
+						.all(requests)
+						.then(response => {
+							console.log(response);
+							let lastResponse;
+							for (let i = response.length - 1; i >= 0; i--) {
+								if(response[i] !== void 0){
+									lastResponse = response[i];
+									console.log(i);
+									break;
+								}
+							}
+							this.users = lastResponse.data.data.users || [];
 							this.resetFilters();
 
 							notify({
 								title: 'Users added successfully',
 								type: 'success'
 							});
+						})
+						.catch(response => {
+							console.log(response);
+							// notify({
+							// 	title: 'Unable to add users',
+							// 	type: 'error'
+							// });
 						});
 				}
 			});
 		},
 
-		removeUser(index) {
-			this.users.splice(index, 1);
+		removeUser(username, index) {
+			this.$api
+				.put(
+					`sites/${this.$route.params.site_id}/users`,
+					{username}
+				)
+				.then(({ data: json }) => {
+					this.users = json.data.users || [];
+
+					notify({
+						title: `User '${username}' has been successfully removed`,
+						type: 'success'
+					});
+				})
+				.catch(() => {
+					notify({
+						title: 'Unable to remove user',
+						type: 'error'
+					});
+				});
 		},
 
 		handleCountChange(newSize) {
@@ -389,15 +425,38 @@ export default {
 		},
 
 		resetFilters(){
-			this.handlePagination(0);
-			this.searchInput = '';
-			this.roleFilter = null;
 			this.usersToAdd = [];
 			this.selectedRole = '';
 			this.errors = {
 				usersToAdd: null,
 				selectedRole: null
 			};
+		},
+
+		changeUserRole(username, roleSlug) {
+			this.$api
+				.put(
+					`sites/${this.$route.params.site_id}/users`,
+					{
+						username,
+						role: roleSlug
+					}
+				)
+				.then(({ data: json }) => {
+					this.users = json.data.users || [];
+					notify({
+						title: 'Role successfully changed',
+						message: `The '${username}' user's role has been changed to
+							${this.roles.find(role => role.slug === roleSlug).name}`,
+						type: 'success'
+					});
+				})
+				.catch(() => {
+					notify({
+						title: `Unable to change user's role`,
+						type: 'error'
+					});
+				});
 		}
 	}
 };
