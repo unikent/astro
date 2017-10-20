@@ -84,7 +84,6 @@ Note that the page editing toolbar is a separate component found in `components/
 		},
 
 		mounted() {
-			console.log('TopBar mounted');
 			this.loadPermissions();
 		},
 
