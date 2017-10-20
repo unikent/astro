@@ -83,6 +83,11 @@ Note that the page editing toolbar is a separate component found in `components/
 			window.addEventListener('beforeunload', this.leaveAstro);
 		},
 
+		mounted() {
+			console.log('TopBar mounted');
+			this.loadPermissions();
+		},
+
 		computed: {
 
 			...mapGetters([
@@ -129,7 +134,8 @@ Note that the page editing toolbar is a separate component found in `components/
 			},
 
 			...mapActions([
-				'handleSavePage'
+				'handleSavePage',
+				'loadPermissions'
 			]),
 
 			...mapMutations([

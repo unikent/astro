@@ -1,3 +1,5 @@
+import api from 'plugins/http/api';
+
 /**
  * Simple interface for interacting with user roles and permissions
  * 
@@ -9,9 +11,7 @@
  * }
  */
 const state = {
-	permissions: {
-		'editSite': ['admin', 'moderator', 'spanner']
-	}
+	permissions: {}
 };
 
 const getters = {
@@ -46,21 +46,13 @@ const actions = {
 	/**
 	 * gets list of roles from the api can calls mutation to store this in the state
 	 */
-	loadGlobalRolls() {
-
-		let permissions = {};
-		
+	loadPermissions({commit, state}) {		
 		api
-			.get(`permissions`, {
-				// blocks: page.blocks
+			.get(`permissions`)
+			.then((response) => {
+				let permissions = response.data.data;
+				commit('setPermissions', permissions);
 			})
-			.then(({data}) => {
-				permissions = 
-				dispatch('fetchSite');
-			})
-
-
-
 	},
 
 	/**
@@ -105,6 +97,7 @@ const mutations = {
 	 * @param {object} permissions - the set of permissions as received from the API
 	 */
 	setPermissions(state, permissions) {
+		console.log(permissions);
 		state.permissions = permissions;
 	}
 	
@@ -113,5 +106,6 @@ const mutations = {
 export default {
 	state,
 	getters,
-	mutations
+	mutations,
+	actions
 };
