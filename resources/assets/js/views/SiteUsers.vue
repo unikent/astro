@@ -8,6 +8,7 @@
 		</div>
 
 		<h3>Add new users to {{ this.siteTitle }}</h3>
+
 		<div class="add-user">
 
 			<div
@@ -61,36 +62,37 @@
 		</div>
 
 		<h3>Existing users</h3>
-		<div class="filter-user">
-			<el-input
-				v-model="searchInput"
-				placeholder="Find users"
-				icon="search"
-				class="filter-user__searchbox"
-			/>
-			<el-select
-				v-model="roleFilter"
-				class="u-flex-auto-left filter-user__select"
-				placeholder="Role"
-			>
-				<el-option
-					label="No filter"
-					:value="null"
-				/>
-				<el-option-group label="Filter by role">
-					<el-option v-for="role in roles"
-						:label="role"
-						:value="role"
-						:key="role"
-					/>
-				</el-option-group>
-			</el-select>
-		</div>
 
 		<div
 			v-if="pagedUsers.length"
 			class="el-table w100 el-table--fit el-table--striped el-table--border el-table--enable-row-hover"
 		>
+			<div class="filter-user">
+				<el-input
+					v-model="searchInput"
+					placeholder="Find users"
+					icon="search"
+					class="filter-user__searchbox"
+				/>
+				<el-select
+					v-model="roleFilter"
+					class="u-flex-auto-left filter-user__select"
+					placeholder="Role"
+				>
+					<el-option
+						label="No filter"
+						:value="null"
+					/>
+					<el-option-group label="Filter by role">
+						<el-option v-for="role in roles"
+							:label="role"
+							:value="role"
+							:key="role"
+						/>
+					</el-option-group>
+				</el-select>
+			</div>
+
 			<table cellspacing="0" cellpadding="0" border="0" class="w100">
 				<thead>
 					<tr>
@@ -173,24 +175,24 @@
 					</tr>
 				</tbody>
 			</table>
+
+			<el-pagination
+				@size-change="handleCountChange"
+				@current-change="handlePagination"
+				:current-page="currentPage"
+				:page-sizes="counts"
+				:page-size="count"
+				layout="slot, sizes, ->, prev, pager, next"
+				:total="total"
+			>
+				<slot>
+					<span class="show-text">Show</span>
+				</slot>
+			</el-pagination>
 		</div>
 		<div v-else class="site-users__user--empty">
-			No users
+			No existing users to display.
 		</div>
-
-		<el-pagination
-			@size-change="handleCountChange"
-			@current-change="handlePagination"
-			:current-page="currentPage"
-			:page-sizes="counts"
-			:page-size="count"
-			layout="slot, sizes, ->, prev, pager, next"
-			:total="total"
-		>
-			<slot>
-				<span class="show-text">Show</span>
-			</slot>
-		</el-pagination>
 	</el-card>
 </div>
 </template>
