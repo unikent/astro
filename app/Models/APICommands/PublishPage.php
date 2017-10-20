@@ -5,9 +5,6 @@ namespace App\Models\APICommands;
 use App\Exceptions\UnpublishedParentException;
 use App\Models\Contracts\APICommand;
 use App\Models\Page;
-use App\Models\Revision;
-use App\Models\Scopes\VersionScope;
-use Carbon\Carbon;
 use DB;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Collection;
@@ -24,7 +21,7 @@ class PublishPage implements APICommand
      */
     public static function canBePublished($page_id)
     {
-        $page = Page::find($page_id);
+        $page = Page::draft()->find($page_id);
         if(!$page){
             return false;
         }
@@ -45,9 +42,6 @@ class PublishPage implements APICommand
         return DB::transaction(function() use($input) {
             $published_page = null;
             $page = Page::find($input['id']);
-
-            // need to do this whenever dealing with modifying
-            VersionScope::disable();
 
             // is there already a published page at this path?
             $published_page = $page->publishedVersion();
@@ -151,7 +145,6 @@ class PublishPage implements APICommand
                 }
             }
 */
-            VersionScope::enable();
 
             return $published_page;
         });
@@ -188,7 +181,9 @@ class PublishPage implements APICommand
     {
         return [
             'id.exists' => 'The page does not exist.',
-            'id.parent_is_published' => 'The parents of this page must be published first.'
+			'id.page_is_draft' => 'You can only publish draft pages.',
+            'id.parent_is_published' => 'The parents of this page must be published first.',
+			'id.page_is_valid' => 'You cannot publish a page with validation errors.'
         ];
     }
 
@@ -202,6 +197,7 @@ class PublishPage implements APICommand
         return [
           'id' => [
               'exists:pages,id',
+			  'page_is_draft:'.$data->get('id'),
               'parent_is_published:'.$data->get('id'),
 			  'page_is_valid'
           ],

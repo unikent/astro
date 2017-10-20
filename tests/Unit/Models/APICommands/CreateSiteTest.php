@@ -155,7 +155,7 @@ class CreateSiteTest extends APICommandTestCase
         // add subpages to the created site
         $pageone = $this->execute(AddPage::class, [
             'site_id' => $existing->id,
-            'parent_id' => $existing->homepage->id,
+            'parent_id' => $existing->draftHomepage->id,
             'slug' => 'one',
             'title' => 'Page One',
             'layout' => [
@@ -189,7 +189,7 @@ class CreateSiteTest extends APICommandTestCase
         // add subpages to the created site
         $pageone = $this->execute(AddPage::class, [
             'site_id' => $existing->id,
-            'parent_id' => $existing->homepage->id,
+            'parent_id' => $existing->draftHomepage->id,
             'slug' => 'one',
             'title' => 'Page One',
             'layout' => [
@@ -268,9 +268,9 @@ class CreateSiteTest extends APICommandTestCase
         $homepage = $this->command()->createHomePage($site, $title, $layout, $user);
 
         $this->assertInstanceOf(Page::class, $homepage);
-        $this->assertEquals($homepage->id, $site->homepage->id);
-        $this->assertEquals(null, $site->homepage->parent_id);
-        $this->assertEquals($site->id, $site->homepage->site_id);
+        $this->assertEquals($homepage->id, $site->draftHomepage->id);
+        $this->assertEquals(null, $site->draftHomepage->parent_id);
+        $this->assertEquals($site->id, $site->draftHomepage->site_id);
         $this->assertInstanceOf(Revision::class, $homepage->revision);
         $this->assertEquals($title, $homepage->revision->title);
         $this->assertEquals($layout['name'], $homepage->revision->layout_name);
@@ -287,7 +287,7 @@ class CreateSiteTest extends APICommandTestCase
     public function execute_createsASite_WithADraftHomePage()
     {
         $site = $this->command()->execute(new Collection($this->input(null)), factory(User::class)->create());
-        $this->assertEquals(Page::STATE_DRAFT, $site->homepage->version);
+        $this->assertEquals(Page::STATE_DRAFT, $site->draftHomepage->version);
     }
 
 }

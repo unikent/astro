@@ -82,7 +82,8 @@ class UpdatePage implements APICommand
 	{
 		$rules = [
 			'id' => [
-				'exists:pages,id'
+				'exists:pages,id',
+				'page_is_draft:'.$data->get('id')
 			],
 			'options' => [
 				'array',

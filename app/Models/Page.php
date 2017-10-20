@@ -2,7 +2,6 @@
 namespace App\Models;
 
 use App\Exceptions\UnpublishedParentException;
-use App\Models\Scopes\VersionScope;
 use DB;
 use Doctrine\DBAL\Version;
 use Exception;
@@ -15,9 +14,6 @@ use League\Fractal\TransformerAbstract;
  * A Page represents a path in a hierarchical site structure.
  * Each page has a current revision, and each "tree" of pages is scoped by its site_id and version (draft, published, etc).
  *
- * By default, a global Eloquent scope is applied to Pages which restricts all queries to "draft" versions.
- *
- * Add the scope "anyVersion" to a query to remove this restriction.
  * @package App\Models
  */
 class Page extends BaumNode
@@ -30,12 +26,12 @@ class Page extends BaumNode
 		'slug',
 		'draft_id',
 		'parent_id',
-        'site_id',
-        'version',
-        'path',
-        'revision_id',
-        'created_by',
-        'updated_by',
+		'site_id',
+		'version',
+		'path',
+		'revision_id',
+		'created_by',
+		'updated_by',
 	];
 
 	protected $hidden = [
@@ -44,28 +40,29 @@ class Page extends BaumNode
 	];
 
 	// nested set implementation has a tree for each site_id+version combination.
-    protected $scoped = ['site_id','version'];
+	protected $scoped = ['site_id', 'version'];
 
-    // The draft state of this page.
-    const STATE_NEW = 'new';  // not published
-    const STATE_DRAFT = 'draft'; // modified since last published
-    const STATE_DELETED = 'deleted'; // deleted since last published
-    const STATE_MOVED = 'moved'; // moved since last published
-    const STATE_PUBLISHED = 'published'; // not modified since last published
-    const STATE_EMPTY = 'empty'; // no draft or published state.
+	// The draft state of this page.
+	const STATE_NEW = 'new';  // not published
+	const STATE_DRAFT = 'draft'; // modified since last published
+	const STATE_DELETED = 'deleted'; // deleted since last published
+	const STATE_MOVED = 'moved'; // moved since last published
+	const STATE_PUBLISHED = 'published'; // not modified since last published
+	const STATE_EMPTY = 'empty'; // no draft or published state.
 
 
-    /**
-     * Create a new Eloquent model instance.
-     *
-     * @param  array  $attributes
-     * @return void
-     */
-    public function __construct($attributes = []){
-        parent::__construct($attributes);
+	/**
+	 * Create a new Eloquent model instance.
+	 *
+	 * @param  array $attributes
+	 * @return void
+	 */
+	public function __construct($attributes = [])
+	{
+		parent::__construct($attributes);
 
-        $this->parent_id = $this->parent_id ?: null;
-    }
+		$this->parent_id = $this->parent_id ?: null;
+	}
 
 
 	/**
@@ -77,168 +74,183 @@ class Page extends BaumNode
 	{
 		parent::boot();
 
-		// restrict requests to the draft pages.
-        // or not as it appears to mess things up elsewhere...
-		static::addGlobalScope(new VersionScope());
-
-		static::saving(function($node){
+		static::saving(function ($node) {
 			$node->path = $node->generatePath();
 		});
 	}
 
-    /**
-     * Generate the blocks array for this page.
-     * @return array
-     */
+	/**
+	 * Generate the blocks array for this page.
+	 * @return array
+	 */
 	public function bake()
-    {
-        $data = [];
-        $blocksByRegion = $this->blocks()
-                                ->with('media')
-                                ->orderBy('order')
-                                ->get()
-                                ->groupBy('region_name');
-        $this->load('blocks.media');
-        foreach($blocksByRegion as $region => $blocks){
-            $data[$region] = [];
-            foreach($blocks as $block){
-                $block->embedMedia();
-                $data[$region][] = [
-                    'id' => $block->id,
-                    'definition_name' => $block->definition_name,
-                    'definition_version' => $block->definition_version,
-                    'region_name' => $block->region_name,
-                    'fields' => $block->fields,
+	{
+		$data = [];
+		$blocksByRegion = $this->blocks()
+			->with('media')
+			->orderBy('order')
+			->get()
+			->groupBy('region_name');
+		$this->load('blocks.media');
+		foreach ($blocksByRegion as $region => $blocks) {
+			$data[$region] = [];
+			foreach ($blocks as $block) {
+				$block->embedMedia();
+				$data[$region][] = [
+					'id' => $block->id,
+					'definition_name' => $block->definition_name,
+					'definition_version' => $block->definition_version,
+					'region_name' => $block->region_name,
+					'fields' => $block->fields,
 					'errors' => $block->errors
-                ];
-            }
-        }
-        return $data;
-    }
+				];
+			}
+		}
+		return $data;
+	}
 
-    /************************************************************************
-     * Relations
-     ************************************************************************/
+	/************************************************************************
+	 * Relations
+	 ************************************************************************/
 
-    /**
-     * The Site that this Page belongs to.
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
+	/**
+	 * The Site that this Page belongs to.
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+	 */
 	public function site()
 	{
 		return $this->belongsTo(Site::class, 'site_id');
 	}
 
-    /**
-     * The current Revision attached to this Page.
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function revision()
-    {
-        return $this->belongsTo(Revision::class, 'revision_id');
-    }
+	/**
+	 * The current Revision attached to this Page.
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+	 */
+	public function revision()
+	{
+		return $this->belongsTo(Revision::class, 'revision_id');
+	}
 
-    /**
-     * The Blocks linked to this Page.
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function blocks()
-    {
-        return $this->hasMany(Block::class, 'page_id');
-    }
+	/**
+	 * The Blocks linked to this Page.
+	 * @return \Illuminate\Database\Eloquent\Relations\HasMany
+	 */
+	public function blocks()
+	{
+		return $this->hasMany(Block::class, 'page_id');
+	}
 
-    /************************************************************************
-     * Query Scopes
-     ************************************************************************/
+	/************************************************************************
+	 * Query Scopes
+	 ************************************************************************/
 
-    /**
-     * Restrict query to draft version of the site.
-     * @param $query
-     * @return mixed
-     */
+	/**
+	 * Restrict query to draft version of the site.
+	 * @param $query
+	 * @return mixed
+	 */
 	public function scopeDraft($query)
-    {
-        return $this->scopeVersion($query, self::STATE_DRAFT);
-    }
+	{
+		return $this->scopeVersion($query, self::STATE_DRAFT);
+	}
 
-    /**
-     * Restrict query to published version of the site.
-     * @param $query
-     * @return mixed
-     */
-    public function scopePublished($query)
-    {
-        return $this->scopeVersion($query, self::STATE_PUBLISHED);
-    }
+	/**
+	 * Restrict query to published version of the site.
+	 * @param $query
+	 * @return mixed
+	 */
+	public function scopePublished($query)
+	{
+		return $this->scopeVersion($query, self::STATE_PUBLISHED);
+	}
 
-    /**
-     * Restrict query to specific version of the site.
-     * @param $query
-     * @return mixed
-     */
-    public function scopeVersion($query, $version)
-    {
-        return $query->withoutGlobalScope(VersionScope::class)
-                    ->where('version', $version);
-    }
+	/**
+	 * Restrict query to specific version of the site.
+	 * @param $query
+	 * @return mixed
+	 */
+	public function scopeVersion($query, $version)
+	{
+		return $query->where('version', $version);
+	}
 
-    /**
-     * Removes the default drafts-only global scope for the query.
-     * @param $query
-     * @return mixed
-     */
-    public function scopeAnyVersion($query)
-    {
-        return $query->withoutGlobalScope(VersionScope::class);
-    }
+	/**
+	 * Restrict query to specific site.
+	 * @param $query
+	 * @param $site_id
+	 * @return mixed
+	 */
+	public function scopeforSite($query, $site_id)
+	{
+		return $query->where('site_id', $site_id);
+	}
 
-    /**
-     * Restrict query to specific site.
-     * @param $query
-     * @param $site_id
-     * @return mixed
-     */
-    public function scopeforSite($query, $site_id)
-    {
-        return $query->where('site_id', $site_id);
-    }
-
-    /**
-     * Restrict query to page on site with specific path.
-     * @param $query
-     * @param $site_id
-     * @param $path
-     * @return mixed
-     */
-    public static function scopeForSiteAndPath($query, $site_id, $path)
-    {
-        return $query->where('site_id', $site_id)
-                    ->where('path', $path);
-    }
+	/**
+	 * Restrict query to page on site with specific path.
+	 * @param $query
+	 * @param $site_id
+	 * @param $path
+	 * @return mixed
+	 */
+	public static function scopeForSiteAndPath($query, $site_id, $path)
+	{
+		return $query->where('site_id', $site_id)
+			->where('path', $path);
+	}
 
 
-    /**************************************************************************
-     * Utility Methods
-     */
-    public function publishedVersion()
-    {
-        if(Page::STATE_PUBLISHED == $this->version){
-            return $this;
-        }
-        return Page::published()
-                    ->forSiteAndPath($this->site_id, $this->path)
-                    ->first();
-    }
+	/**************************************************************************
+	 * Utility Methods
+	 */
+	public function publishedVersion()
+	{
+		if (Page::STATE_PUBLISHED == $this->version) {
+			return $this;
+		}
+		return Page::published()
+			->forSiteAndPath($this->site_id, $this->path)
+			->first();
+	}
+
+	/**
+	 * Get the next sibling page to this one.
+	 * @return Page|null
+	 */
+	public function nextPage()
+	{
+		return $this->siblingsAndSelf()->get()->first(
+			function ($item) {
+				return $item->lft == $this->rgt+1;
+			}
+		);
+	}
+
+	/**
+	 * Get the previous sibling page to this one.
+	 * @return Page|null
+	 */
+	public function previousPage()
+	{
+		return $this->siblingsAndSelf()->get()->first(
+			function ($item) {
+				return $item->rgt == $this->lft-1;
+			}
+		);
+	}
+
 
     /**
      * Find a Page by site id and path.
      * @param $site_id
      * @param $path
+	 * @param string $version - The page version (draft, published)
      * @return mixed
      */
-    public static function findBySiteAndPath($site_id, $path)
+    public static function findBySiteAndPath($site_id, $path, $version = Page::STATE_DRAFT)
     {
-        return Page::forSiteAndPath($site_id,$path)->first();
+        return Page::forSiteAndPath($site_id,$path)
+					->version($version)
+					->first();
     }
 
     /**

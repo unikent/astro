@@ -35,8 +35,9 @@ class RouteServiceProvider extends ServiceProvider
         // Force the application URL
         $url->forceRootUrl(config('app.url'));
 
+        // only bind draft pages by id
 	    Route::bind('page', function($value){
-	        return Page::where('id', '=', $value)->firstOrFail();
+	        return Page::draft()->where('id', '=', $value)->firstOrFail();
 	    });
 
 	    Route::bind('block_definition', function($value){

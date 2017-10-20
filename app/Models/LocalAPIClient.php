@@ -54,7 +54,15 @@ class LocalAPIClient implements APIClient
 
 	public function getRouteDefinition($host, $path, $version = 'published')
 	{
-		$json = $this->resolveRoute($host, $path, $version);
+		$json = $this->resolveRoute($host, $path, $version, 					[
+			'site',
+			'ancestors',
+			'parent',
+			'children',
+			'siblings',
+			'previous',
+			'next'
+		]);
 		$data = $json ? json_decode($json->content(), true) : null;
 		if (null === $data) {
 			throw new RouteNotFoundException();//APIErrorException('Non json data returned from API for path "' . $path . '"',APIErrorException::ERR_INVALID_JSON);

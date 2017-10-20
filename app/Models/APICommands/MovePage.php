@@ -122,12 +122,13 @@ class MovePage implements APICommand
         return [
             'id' => [
                 'required',
-                'exists:pages,id'
+                'page_is_draft:'.$data->get('id')
             ],
             // parent must exist and be in the same site as this page
             'parent_id' => [
                 'required',
                 'exists:pages,id',
+				'page_is_draft:'.$data->get('parent_id'),
                 'same_site:' . $data->get('id'),
                 'not_descendant_or_self:'.$data->get('id')
              ],

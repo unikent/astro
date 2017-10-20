@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Traits\Tracked;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
 
@@ -72,16 +73,32 @@ class Revision extends Model
         $this->published_at = $this->published_at ? $this->published_at : Carbon::now();
     }
 
+	/**
+	 * Relations
+	 */
+
+	/**
+	 * The RevisionSet this Revision belongs to.
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+	 */
     public function set()
     {
         return $this->belongsTo(RevisionSet::class, 'revision_set_id');
     }
 
+	/**
+	 * Get the draft page that uses this revision.
+	 * @return HasOne
+	 */
     public function draftPage()
     {
         return $this->hasOne(Page::class, 'revision_id')->where('version', Page::STATE_DRAFT);
     }
 
+	/**
+	 * Get the published page that uses this revision.
+	 * @return HasOne
+	 */
     public function publishedPage()
     {
         return $this->hasOne(Page::class, 'revision_id')->where('version', Page::STATE_PUBLISHED);

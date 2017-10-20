@@ -96,7 +96,8 @@ class UpdatePageSlug implements APICommand
         $parent_id = $page ? $page->parent_id : null;
         $rules = [
             'id' => [
-                'page_is_a_subpage'
+                'page_is_a_subpage',
+				'page_is_draft:'.$data->get('id')
             ],
             'slug' => [
                 // slug is required and can only contain lowercase letters, numbers, hyphen or underscore.

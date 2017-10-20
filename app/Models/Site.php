@@ -2,6 +2,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Auth;
 
 class Site extends Model
@@ -28,28 +30,25 @@ class Site extends Model
      * Relationships
      ************************************************************/
 
-    /**
-     * The homepage for a version of this site. Defaults to DRAFT.
-     * @param string $version The version of the site to get the homepage for. Defaults to Page::STATE_DRAFT
-     * @return mixed
-     */
-    public function homepage($version = Page::STATE_DRAFT)
-    {
-        return $this->hasOne(Page::class, 'site_id')
-            ->whereNull('parent_id')
-            ->where('version', $version);
-    }
+	/**
+	 * The draft version of the homepage of this site.
+	 * This should always exist.
+	 * @return HasOne
+	 */
+    public function draftHomepage()
+	{
+		return $this->homepage(Page::STATE_DRAFT);
+	}
 
-    /**
-     * All the pages of a version of this site.
-     * @param string $version The version of the site to get the homepage for. Defaults to Page::STATE_DRAFT
-     * @return mixed
-     */
-    public function pages($version = Page::STATE_DRAFT)
-    {
-        return $this->hasMany(Page::class, 'site_id')
-                    ->where('version', $version);
-    }
+	/**
+	 * The published version of the homepage of this site.
+	 * May not exist if the homepage has not been published.
+	 * @return HasOne
+	 */
+    public function publishedHomepage()
+	{
+		return $this->homepage(Page::STATE_PUBLISHED);
+	}
 
     /**
      * All the draft pages for this site.
@@ -66,8 +65,7 @@ class Site extends Model
      */
     public function publishedPages()
     {
-        return $this->hasMany(Page::class, 'site_id')
-                    ->where('published_id');
+        return $this->pages(Page::STATE_PUBLISHED);
     }
 
     /**
@@ -97,5 +95,32 @@ class Site extends Model
 	public function usersRoles()
 	{
 		return $this->hasMany(UserSiteRole::class);
+	}
+
+	/*
+	 * Relationship utility methods.
+	 */
+
+	/**
+	 * All the pages of a version of this site.
+	 * @param string $version The version of the site to get the homepage for. Defaults to Page::STATE_DRAFT
+	 * @return HasMany
+	 */
+	public function pages($version = Page::STATE_DRAFT)
+	{
+		return $this->hasMany(Page::class, 'site_id')
+					->where('version', $version);
+	}
+
+	/**
+	 * Utility to get the homepage for a version of this site.
+	 * @param string $version The version of the site to get the homepage for. Defaults to Page::STATE_DRAFT
+	 * @return HasOne
+	 */
+	public function homepage($version)
+	{
+		return $this->hasOne(Page::class, 'site_id')
+			->whereNull('parent_id')
+			->where('version', $version);
 	}
 }

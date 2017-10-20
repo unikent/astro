@@ -140,7 +140,8 @@ class UpdateContent implements APICommand
     {
         $rules = [
             'id' => [
-                'exists:pages,id'
+                'exists:pages,id',
+				'page_is_draft:'.$data->get('id')
             ],
             'blocks' => [
                 'present',

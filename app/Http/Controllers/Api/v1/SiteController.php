@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Models\LocalAPIClient;
+use App\Models\Page;
 use App\Models\Site;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -27,8 +28,8 @@ class SiteController extends ApiController
 	public function index(Request $request)
 	{
 		$api = new LocalAPIClient(Auth::user());
-		$transformer = new SiteTransformer();
-		$transformer->setAvailableIncludes(['publishing_group', 'homepage', 'users']);
+		$transformer = new SiteTransformer($request->get('version', Page::STATE_DRAFT));
+//		$transformer->setAvailableIncludes(['publishing_group', 'homepage', 'users']);
 		return fractal($api->getSites(), $transformer)->parseIncludes($request->get('include'))->respond();
 	}
 
@@ -105,7 +106,9 @@ class SiteController extends ApiController
 	public function show(Request $request, Site $site)
 	{
 		$this->authorize('read', $site);
-		return fractal($site, new SiteTransformer)->parseIncludes($request->get('include'))->respond();
+		return fractal($site, new SiteTransformer($request->get('version', Page::STATE_DRAFT)))
+			->parseIncludes($request->get('include'))
+			->respond();
 	}
 
 	/**
@@ -118,13 +121,12 @@ class SiteController extends ApiController
 	public function tree(Request $request, Site $site)
 	{
 		$this->authorize('read', $site);
-		$site->load([
-			'pages',
-			'pages.revision',
-		]);
 		$data = $this->pagesToHierarchy(
 			fractal(
-				$site->pages()->orderBy('lft')->with(['revision'])->get(),
+				$site->pages($request->get('version', Page::STATE_DRAFT))
+					->orderBy('lft')
+					->with(['revision'])
+					->get(),
 				new PageTransformer()
 			)
 				->parseIncludes($request->get('include'))
