@@ -27,7 +27,6 @@ import Draggable from 'vuedraggable';
 
 import PageListItem from './PageListItem';
 import BackBar from './BackBar';
-import permissions from '../mixins/permissions';
 
 export default {
 
