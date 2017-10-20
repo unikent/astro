@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use App\Exceptions\UnpublishedParentException;
@@ -202,6 +203,11 @@ class Page extends BaumNode
 	/**************************************************************************
 	 * Utility Methods
 	 */
+
+	/**
+	 * Get the published version of this page.
+	 * @return Page The published version of this page if it exists (which may be this Page)
+	 */
 	public function publishedVersion()
 	{
 		if (Page::STATE_PUBLISHED == $this->version) {
@@ -220,7 +226,7 @@ class Page extends BaumNode
 	{
 		return $this->siblingsAndSelf()->get()->first(
 			function ($item) {
-				return $item->lft == $this->rgt+1;
+				return $item->lft == $this->rgt + 1;
 			}
 		);
 	}
@@ -233,43 +239,43 @@ class Page extends BaumNode
 	{
 		return $this->siblingsAndSelf()->get()->first(
 			function ($item) {
-				return $item->rgt == $this->lft-1;
+				return $item->rgt == $this->lft - 1;
 			}
 		);
 	}
 
 
-    /**
-     * Find a Page by site id and path.
-     * @param $site_id
-     * @param $path
+	/**
+	 * Find a Page by site id and path.
+	 * @param $site_id
+	 * @param $path
 	 * @param string $version - The page version (draft, published)
-     * @return mixed
-     */
-    public static function findBySiteAndPath($site_id, $path, $version = Page::STATE_DRAFT)
-    {
-        return Page::forSiteAndPath($site_id,$path)
-					->version($version)
-					->first();
-    }
+	 * @return mixed
+	 */
+	public static function findBySiteAndPath($site_id, $path, $version = Page::STATE_DRAFT)
+	{
+		return Page::forSiteAndPath($site_id, $path)
+			->version($version)
+			->first();
+	}
 
-    /**
-     * Find a Page based on host (domain name) and path.
-     * @param $host
-     * @param $path
-     * @return $this
-     */
-    public static function findByHostAndPath($host, $path, $version = Page::STATE_PUBLISHED)
-    {
-        $query = Page::version($version)
-            ->join('sites', 'site_id', '=', 'sites.id')
-            ->where('sites.host', $host)
-            ->where(function($query) use($path) {
-                $query->whereRaw("concat(sites.path, pages.path) = ?", [$path])
-                      ->orWhereRaw("concat(sites.path, pages.path) = ?", [$path.'/']);
-            })->select('pages.*'); // required to stop sites.path overriding pages.path in model
-        return $query->first();
-    }
+	/**
+	 * Find a Page based on host (domain name) and path.
+	 * @param $host
+	 * @param $path
+	 * @return $this
+	 */
+	public static function findByHostAndPath($host, $path, $version = Page::STATE_PUBLISHED)
+	{
+		$query = Page::version($version)
+			->join('sites', 'site_id', '=', 'sites.id')
+			->where('sites.host', $host)
+			->where(function ($query) use ($path) {
+				$query->whereRaw("concat(sites.path, pages.path) = ?", [$path])
+					->orWhereRaw("concat(sites.path, pages.path) = ?", [$path . '/']);
+			})->select('pages.*'); // required to stop sites.path overriding pages.path in model
+		return $query->first();
+	}
 
 	/**
 	 * Assembles a path using the ancestor slugs within the Route tree
@@ -277,16 +283,16 @@ class Page extends BaumNode
 	 */
 	public function generatePath()
 	{
-		if(!$this->parent_id && $this->slug){
+		if (!$this->parent_id && $this->slug) {
 			throw new Exception('A root Page cannot have a slug.');
 		}
 
 		$path = '/';
 
-		$chain = $this->parent_id ? $this->parent->ancestorsAndSelf([ 'slug' ])->get() : [];
+		$chain = $this->parent_id ? $this->parent->ancestorsAndSelf(['slug'])->get() : [];
 
-		foreach($chain as $ancestor){
-			if(empty($ancestor->slug)) continue; // If there are any ancestors without a path, skip.
+		foreach ($chain as $ancestor) {
+			if (empty($ancestor->slug)) continue; // If there are any ancestors without a path, skip.
 			$path .= $ancestor->slug . '/';
 		}
 
@@ -294,82 +300,83 @@ class Page extends BaumNode
 	}
 
 
-    /**
-     * Set the revision for this page.
-     * @param null|Revision $revision
-     */
-    public function setRevision($revision)
-    {
-        $this->revision_id = $revision ? $revision->id : null;
-        if($revision && !$revision->blocks){
-            $revision->blocks = $this->bake();
-            $revision->save();
-        }
-        if($this->isPublishedVersion()){
-            $revision->setPublished();
-        }
-        $this->save();
-        return $this;
-    }
+	/**
+	 * Set the revision for this page.
+	 * @param null|Revision $revision
+	 */
+	public function setRevision($revision)
+	{
+		$this->revision_id = $revision ? $revision->id : null;
+		if ($revision && !$revision->blocks) {
+			$revision->blocks = $this->bake();
+			$revision->save();
+		}
+		if ($this->isPublishedVersion()) {
+			$revision->setPublished();
+		}
+		$this->save();
+		return $this;
+	}
 
-    /**
-     * Is this a published version of a page?
-     * @return bool
-     */
-    public function isPublishedVersion()
-    {
-        return Page::STATE_PUBLISHED == $this->version;
-    }
+	/**
+	 * Is this a published version of a page?
+	 * @return bool
+	 */
+	public function isPublishedVersion()
+	{
+		return Page::STATE_PUBLISHED == $this->version;
+	}
 
-    /**
-     * Loads the Layout definition, optionally including Regions
-     *
-     * @param boolean $includeRegions
-     * @return void
-     */
-    public function loadLayoutDefinition($includeRegions = false)
-    {
-        $file = LayoutDefinition::locateDefinition($this->revision->layout_name, $this->revision->layout_version);
-        $definition = LayoutDefinition::fromDefinitionFile($file);
+	/**
+	 * Loads the Layout definition, optionally including Regions
+	 *
+	 * @param boolean $includeRegions
+	 * @return void
+	 */
+	public function loadLayoutDefinition($includeRegions = false)
+	{
+		$file = LayoutDefinition::locateDefinition($this->revision->layout_name, $this->revision->layout_version);
+		$definition = LayoutDefinition::fromDefinitionFile($file);
 
-        if($includeRegions) $definition->loadRegionDefinitions();
+		if ($includeRegions) $definition->loadRegionDefinitions();
 
-        $this->layoutDefinition = $definition;
-    }
+		$this->layoutDefinition = $definition;
+	}
 
-    /**
-     * Returns the layoutDefinitions Collection, loading from disk if necessary,
-     * optionally including Regions.
-     *
-     * @param boolean $includeRegions
-     * @return LayoutDefinition
-     */
-    public function getLayoutDefinition($includeRegions = false){
-        if(!$this->layoutDefinition){
-            $this->loadLayoutDefinition($includeRegions);
+	/**
+	 * Returns the layoutDefinitions Collection, loading from disk if necessary,
+	 * optionally including Regions.
+	 *
+	 * @param boolean $includeRegions
+	 * @return LayoutDefinition
+	 */
+	public function getLayoutDefinition($includeRegions = false)
+	{
+		if (!$this->layoutDefinition) {
+			$this->loadLayoutDefinition($includeRegions);
 
-        } elseif($includeRegions) {
-            // If using a previously-loaded $layoutDefinition, region definitions may not be present.
-            // By calling getRegionDefinitions rather than loadRegionDefinitions, RegionDefinitions get loaded,
-            // but only if they are not already present. A call to laodRegionDefinitions would force a new load
-            // operation regardless.
-            $this->layoutDefinition->getRegionDefinitions();
-        }
+		} elseif ($includeRegions) {
+			// If using a previously-loaded $layoutDefinition, region definitions may not be present.
+			// By calling getRegionDefinitions rather than loadRegionDefinitions, RegionDefinitions get loaded,
+			// but only if they are not already present. A call to laodRegionDefinitions would force a new load
+			// operation regardless.
+			$this->layoutDefinition->getRegionDefinitions();
+		}
 
-        return $this->layoutDefinition;
-    }
+		return $this->layoutDefinition;
+	}
 
 
-    /**
-     * Deletes all blocks in the given Region
-     *
-     * @param  string $region
-     * @return void
-     */
-    public function clearRegion($region){
-        Block::deleteForPageRegion($this, $region);
-    }
-
+	/**
+	 * Deletes all blocks in the given Region
+	 *
+	 * @param  string $region
+	 * @return void
+	 */
+	public function clearRegion($region)
+	{
+		Block::deleteForPageRegion($this, $region);
+	}
 
 
 }

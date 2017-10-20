@@ -18,7 +18,9 @@ use App\Models\Traits\ResolvesRoutes;
 
 /**
  * Handles requests for pages via the api
- * *** NOTE *** All Page $page parameters automatically resolved via the RouteProvider will only resolve DRAFT pages.
+ * *** NOTE ***
+ * Where $page route parameters for controller methods are auto-resolved by the RouteProvider based on an id,
+ * these will be restricted to pages in DRAFT version.
  * @package App\Http\Controllers\Api\v1
  */
 class PageController extends ApiController
@@ -36,8 +38,8 @@ class PageController extends ApiController
 		$path = $request->get('path');
         $host = $request->get('host');
         $include = $request->get('include');
-        $published = $request->get('version', Page::STATE_DRAFT);
-		return $this->resolveRoute($host, $path, $published, $include);
+        $version = $request->get('version', Page::STATE_DRAFT);
+		return $this->resolveRoute($host, $path, $version, $include);
 
 	}
 

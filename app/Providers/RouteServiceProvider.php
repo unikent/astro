@@ -30,30 +30,30 @@ class RouteServiceProvider extends ServiceProvider
 	{
 		parent::boot();
 
-        /** @var \Illuminate\Routing\UrlGenerator $url */
-        $url = $this->app['url'];
-        // Force the application URL
-        $url->forceRootUrl(config('app.url'));
+		/** @var \Illuminate\Routing\UrlGenerator $url */
+		$url = $this->app['url'];
+		// Force the application URL
+		$url->forceRootUrl(config('app.url'));
 
-        // only bind draft pages by id
-	    Route::bind('page', function($value){
-	        return Page::draft()->where('id', '=', $value)->firstOrFail();
-	    });
+		// only bind draft pages by id
+		Route::bind('page', function ($value) {
+			return Page::draft()->where('id', '=', $value)->firstOrFail();
+		});
 
-	    Route::bind('block_definition', function($value){
-	        $path = BlockDefinition::locateDefinitionOrFail($value, request()->get('version', null));
-	        return BlockDefinition::fromDefinitionFile($path);
-	    });
+		Route::bind('block_definition', function ($value) {
+			$path = BlockDefinition::locateDefinitionOrFail($value, request()->get('version', null));
+			return BlockDefinition::fromDefinitionFile($path);
+		});
 
-	    Route::bind('layout_definition', function($value){
-	        $path = LayoutDefinition::locateDefinitionOrFail($value, request()->get('version', null));
-	        return LayoutDefinition::fromDefinitionFile($path);
-	    });
+		Route::bind('layout_definition', function ($value) {
+			$path = LayoutDefinition::locateDefinitionOrFail($value, request()->get('version', null));
+			return LayoutDefinition::fromDefinitionFile($path);
+		});
 
-	    Route::bind('region_definition', function($value){
-	        $path = RegionDefinition::locateDefinitionOrFail($value, request()->get('version', null));
-	        return RegionDefinition::fromDefinitionFile($path);
-	    });
+		Route::bind('region_definition', function ($value) {
+			$path = RegionDefinition::locateDefinitionOrFail($value, request()->get('version', null));
+			return RegionDefinition::fromDefinitionFile($path);
+		});
 	}
 
 	/**
@@ -80,8 +80,8 @@ class RouteServiceProvider extends ServiceProvider
 	protected function mapWebRoutes()
 	{
 		Route::middleware('web')
-			 ->namespace($this->namespace)
-			 ->group(base_path('routes/web.php'));
+			->namespace($this->namespace)
+			->group(base_path('routes/web.php'));
 	}
 
 	/**
@@ -94,8 +94,8 @@ class RouteServiceProvider extends ServiceProvider
 	protected function mapApiRoutes()
 	{
 		Route::prefix('api')
-			 ->namespace('App\Http\Controllers\Api')
-			 ->middleware('api')
-			 ->group(base_path('routes/api.php'));
+			->namespace('App\Http\Controllers\Api')
+			->middleware('api')
+			->group(base_path('routes/api.php'));
 	}
 }

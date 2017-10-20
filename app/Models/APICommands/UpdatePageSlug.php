@@ -17,24 +17,24 @@ use App\Models\Page;
 class UpdatePageSlug implements APICommand
 {
 
-    /**
-     * Carry out the command, based on the provided $input.
-     * @param array $input The input options as key=>value pairs.
-     * @return mixed
-     */
-    public function execute($input, Authenticatable $user)
-    {
-        $result = DB::transaction(function() use($input,$user){
-            $page = Page::find($input['id']);
-            if($input['slug'] == $page->slug){
-            	return $page;
+	/**
+	 * Carry out the command, based on the provided $input.
+	 * @param array $input The input options as key=>value pairs.
+	 * @return mixed
+	 */
+	public function execute($input, Authenticatable $user)
+	{
+		$result = DB::transaction(function () use ($input, $user) {
+			$page = Page::find($input['id']);
+			if ($input['slug'] == $page->slug) {
+				return $page;
 			}
 			$this->updateSlugAndPaths($page, $input['slug']);
 			$page->refresh();
-            return $page;
-        });
-        return $result;
-    }
+			return $page;
+		});
+		return $result;
+	}
 
 
 	/**
@@ -42,7 +42,7 @@ class UpdatePageSlug implements APICommand
 	 * @param Page $page The Page which is moving
 	 * @param Page $parent The Page which will be the new parent.
 	 */
-	public function updateSlugAndPaths($page,$slug)
+	public function updateSlugAndPaths($page, $slug)
 	{
 		$replace_length = strlen($page->path); // get length to replace
 		$replace_with = (strlen($page->parent->path) == 1 ? '' : $page->parent->path) . '/' . $slug;
@@ -71,42 +71,42 @@ class UpdatePageSlug implements APICommand
 		$page->save();
 	}
 
-    /**
-     * Get the error messages for this command.
-     * @param Collection $data The input data for this command.
-     * @return array Custom error messages mapping field_name => message
-     */
-    public function messages(Collection $data, Authenticatable $user)
-    {
-        return [
+	/**
+	 * Get the error messages for this command.
+	 * @param Collection $data The input data for this command.
+	 * @return array Custom error messages mapping field_name => message
+	 */
+	public function messages(Collection $data, Authenticatable $user)
+	{
+		return [
 			'id.page_is_a_subpage' => 'You cannot change the slug of the homepage.',
-        	'slug.regex' => 'Slug can only contain lowercase letters, numbers and hyphens.',
+			'slug.regex' => 'Slug can only contain lowercase letters, numbers and hyphens.',
 			'slug_unchanged_or_unique' => 'A page with the slug "' . $data->get('slug') . '" already exists at this level.'
 		];
-    }
+	}
 
-    /**
-     * Get the validation rules for this command.
-     * @param Collection $data The input data for this command.
-     * @return array The validation rules for this command.
-     */
-    public function rules(Collection $data, Authenticatable $user)
-    {
-        $page = Page::find($data->get('id'));
-        $parent_id = $page ? $page->parent_id : null;
-        $rules = [
-            'id' => [
-                'page_is_a_subpage',
-				'page_is_draft:'.$data->get('id')
-            ],
-            'slug' => [
-                // slug is required and can only contain lowercase letters, numbers, hyphen or underscore.
-                'required',
-                'regex:/^[a-z0-9_-]+$/',
-                // there must not be an existing draft page with the same slug under the parent page
-				'slug_unchanged_or_unique:'.$data->get('id')
-            ],
-        ];
-        return $rules;
-    }
+	/**
+	 * Get the validation rules for this command.
+	 * @param Collection $data The input data for this command.
+	 * @return array The validation rules for this command.
+	 */
+	public function rules(Collection $data, Authenticatable $user)
+	{
+		$page = Page::find($data->get('id'));
+		$parent_id = $page ? $page->parent_id : null;
+		$rules = [
+			'id' => [
+				'page_is_a_subpage',
+				'page_is_draft:' . $data->get('id')
+			],
+			'slug' => [
+				// slug is required and can only contain lowercase letters, numbers, hyphen or underscore.
+				'required',
+				'regex:/^[a-z0-9_-]+$/',
+				// there must not be an existing draft page with the same slug under the parent page
+				'slug_unchanged_or_unique:' . $data->get('id')
+			],
+		];
+		return $rules;
+	}
 }
