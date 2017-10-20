@@ -2,7 +2,7 @@
 	"variables": [],
 	"info": {
 		"name": "Astro",
-		"_postman_id": "286a4586-104b-840f-b33a-7f694b08ac09",
+		"_postman_id": "07fe8fec-9a15-b20b-56bc-597a660d5f25",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
@@ -11,7 +11,7 @@
 			"name": "Sites - List",
 			"request": {
 				"url": {
-					"raw": "http://astro.test:8080/api/v1/sites?include=publishing_group,homepage.draft,drafts,role,users",
+					"raw": "http://astro.test:8080/api/v1/sites?include=publishing_group,homepage.draft,drafts,users",
 					"protocol": "http",
 					"host": [
 						"astro",
@@ -26,7 +26,7 @@
 					"query": [
 						{
 							"key": "include",
-							"value": "publishing_group,homepage.draft,drafts,role,users",
+							"value": "publishing_group,homepage.draft,drafts,users",
 							"equals": true,
 							"description": ""
 						}
@@ -51,7 +51,117 @@
 						"description": ""
 					}
 				],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"description": "Retrieve a list of Sites."
+			},
+			"response": []
+		},
+		{
+			"name": "Site - Get",
+			"request": {
+				"url": {
+					"raw": "http://astro.test:8080/api/v1/sites/1?include=role,users",
+					"protocol": "http",
+					"host": [
+						"astro",
+						"test"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"sites",
+						"1"
+					],
+					"query": [
+						{
+							"key": "include",
+							"value": "role,users",
+							"equals": true,
+							"description": ""
+						}
+					],
+					"variable": []
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer test",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Accepts",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"description": "Retrieve a list of Sites."
+			},
+			"response": []
+		},
+		{
+			"name": "Site - Get Structure",
+			"request": {
+				"url": {
+					"raw": "http://astro.test:8080/api/v1/sites/1/tree?include=draft.pagecontent",
+					"protocol": "http",
+					"host": [
+						"astro",
+						"test"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"sites",
+						"1",
+						"tree"
+					],
+					"query": [
+						{
+							"key": "include",
+							"value": "draft.pagecontent",
+							"equals": true,
+							"description": ""
+						}
+					],
+					"variable": []
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer test",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Accepts",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"description": "Retrieve a list of Sites."
 			},
 			"response": []
@@ -81,6 +191,36 @@
 				"body": {
 					"mode": "raw",
 					"raw": "{\n\t\"name\": \"Another site\",\n\t\"host\": \"astro.dev\",\n\t\"path\": \"/sam/says\",\n\t\"publishing_group_id\": \"3\",\n\t\"homepage_layout\": {\n\t\t\"name\": \"kent-homepage\",\n\t\t\"version\": \"1\"\n\t}\n}"
+				},
+				"description": "Create a new Site."
+			},
+			"response": []
+		},
+		{
+			"name": "Site - Update",
+			"request": {
+				"url": "http://astro.test:8080/api/v1/sites/1",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer test",
+						"description": ""
+					},
+					{
+						"key": "Accepts",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Arrh!\"\n}"
 				},
 				"description": "Create a new Site."
 			},
@@ -147,205 +287,6 @@
 			"response": []
 		},
 		{
-			"name": "Site - Get Structure",
-			"request": {
-				"url": {
-					"raw": "http://astro.test:8080/api/v1/sites/1/tree?include=draft.pagecontent",
-					"protocol": "http",
-					"host": [
-						"astro",
-						"test"
-					],
-					"port": "8080",
-					"path": [
-						"api",
-						"v1",
-						"sites",
-						"1",
-						"tree"
-					],
-					"query": [
-						{
-							"key": "include",
-							"value": "draft.pagecontent",
-							"equals": true,
-							"description": ""
-						}
-					],
-					"variable": []
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer test",
-						"description": ""
-					},
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"description": ""
-					},
-					{
-						"key": "Accepts",
-						"value": "application/json",
-						"description": ""
-					}
-				],
-				"body": {},
-				"description": "Retrieve a list of Sites."
-			},
-			"response": []
-		},
-		{
-			"name": "Site - Get",
-			"request": {
-				"url": {
-					"raw": "http://astro.test:8080/api/v1/sites/1?include=role,users",
-					"protocol": "http",
-					"host": [
-						"astro",
-						"test"
-					],
-					"port": "8080",
-					"path": [
-						"api",
-						"v1",
-						"sites",
-						"1"
-					],
-					"query": [
-						{
-							"key": "include",
-							"value": "role,users",
-							"equals": true,
-							"description": ""
-						}
-					],
-					"variable": []
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer test",
-						"description": ""
-					},
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"description": ""
-					},
-					{
-						"key": "Accepts",
-						"value": "application/json",
-						"description": ""
-					}
-				],
-				"body": {},
-				"description": "Retrieve a list of Sites."
-			},
-			"response": []
-		},
-		{
-			"name": "Publishing Groups - List",
-			"request": {
-				"url": {
-					"raw": "http://astro.test:8080/api/v1/pubgroups?include=sites,users",
-					"protocol": "http",
-					"host": [
-						"astro",
-						"test"
-					],
-					"port": "8080",
-					"path": [
-						"api",
-						"v1",
-						"pubgroups"
-					],
-					"query": [
-						{
-							"key": "include",
-							"value": "sites,users",
-							"equals": true,
-							"description": ""
-						}
-					],
-					"variable": []
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer test",
-						"description": ""
-					},
-					{
-						"key": "accepts",
-						"value": "application/json",
-						"description": ""
-					},
-					{
-						"key": "content-type",
-						"value": "application/json",
-						"description": ""
-					}
-				],
-				"body": {},
-				"description": "Retrieve a list of Sites."
-			},
-			"response": []
-		},
-		{
-			"name": "Layouts List",
-			"request": {
-				"url": {
-					"raw": "http://astro.test:8080/api/v1/sites?include=publishing_group,homepage.draft,drafts",
-					"protocol": "http",
-					"host": [
-						"astro",
-						"test"
-					],
-					"port": "8080",
-					"path": [
-						"api",
-						"v1",
-						"sites"
-					],
-					"query": [
-						{
-							"key": "include",
-							"value": "publishing_group,homepage.draft,drafts",
-							"equals": true,
-							"description": ""
-						}
-					],
-					"variable": []
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer test",
-						"description": ""
-					},
-					{
-						"key": "accepts",
-						"value": "application/json",
-						"description": ""
-					},
-					{
-						"key": "content-type",
-						"value": "application/json",
-						"description": ""
-					}
-				],
-				"body": {},
-				"description": "Retrieve a list of Sites."
-			},
-			"response": []
-		},
-		{
 			"name": "Page - Rename Slug",
 			"request": {
 				"url": "http://astro.dev:8080/api/v1/page/1",
@@ -406,10 +347,32 @@
 			"response": []
 		},
 		{
-			"name": "Site - Update",
+			"name": "Layouts List",
 			"request": {
-				"url": "http://astro.test:8080/api/v1/sites/1",
-				"method": "PUT",
+				"url": {
+					"raw": "http://astro.test:8080/api/v1/sites?include=publishing_group,homepage.draft,drafts",
+					"protocol": "http",
+					"host": [
+						"astro",
+						"test"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"sites"
+					],
+					"query": [
+						{
+							"key": "include",
+							"value": "publishing_group,homepage.draft,drafts",
+							"equals": true,
+							"description": ""
+						}
+					],
+					"variable": []
+				},
+				"method": "GET",
 				"header": [
 					{
 						"key": "Authorization",
@@ -417,21 +380,21 @@
 						"description": ""
 					},
 					{
-						"key": "Accepts",
+						"key": "accepts",
 						"value": "application/json",
 						"description": ""
 					},
 					{
-						"key": "Content-Type",
+						"key": "content-type",
 						"value": "application/json",
 						"description": ""
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Arrh!\"\n}"
+					"raw": ""
 				},
-				"description": "Create a new Site."
+				"description": "Retrieve a list of Sites."
 			},
 			"response": []
 		},
@@ -479,15 +442,70 @@
 						"description": ""
 					}
 				],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"description": "Retrieve a list of Sites."
 			},
 			"response": []
 		},
 		{
-			"name": "Permissions - List",
+			"name": "Roles - Assign user to site",
 			"request": {
-				"url": "http://astro.test:8080/api/v1/permissions",
+				"url": "http://astro.test:8080/api/v1/sites/1/users",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer test",
+						"description": ""
+					},
+					{
+						"key": "Accepts",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"admin\"\n}"
+				},
+				"description": "Create a new Site."
+			},
+			"response": []
+		},
+		{
+			"name": "Roles - List",
+			"request": {
+				"url": {
+					"raw": "http://astro.test:8080/api/v1/roles?include=permissions:full",
+					"protocol": "http",
+					"host": [
+						"astro",
+						"test"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"roles"
+					],
+					"query": [
+						{
+							"key": "include",
+							"value": "permissions:full",
+							"equals": true,
+							"description": ""
+						}
+					],
+					"variable": []
+				},
 				"method": "GET",
 				"header": [
 					{
@@ -506,7 +524,62 @@
 						"description": ""
 					}
 				],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"description": "Retrieve a list of Sites."
+			},
+			"response": []
+		},
+		{
+			"name": "Permissions - List",
+			"request": {
+				"url": {
+					"raw": "http://astro.test:8080/api/v1/permissions?include=roles:full",
+					"protocol": "http",
+					"host": [
+						"astro",
+						"test"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"permissions"
+					],
+					"query": [
+						{
+							"key": "include",
+							"value": "roles:full",
+							"equals": true,
+							"description": ""
+						}
+					],
+					"variable": []
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer test",
+						"description": ""
+					},
+					{
+						"key": "accepts",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "content-type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"description": "Retrieve a list of Sites."
 			},
 			"response": []

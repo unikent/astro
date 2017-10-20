@@ -1,9 +1,11 @@
 <?php
 namespace App\Http\Controllers\Api\v1;
 
+use App\Http\Transformers\Api\v1\RoleTransformer;
 use App\Http\Transformers\Api\v1\UserTransformer;
 use App\Http\Transformers\Api\v1\PermissionTransformer;
 use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -43,15 +45,28 @@ class UserController extends ApiController
 
 	/**
 	 * Get all the permissions available in the system and the roles that have each one.
-	 * GET /api/v1/permissions
+	 * GET /api/v1/permissions?include=permissions:full
 	 * @param Request
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	public function permissions()
+	public function permissions(Request $request)
 	{
 		$this->authorize('list', Permission::class);
 		$permissions = Permission::with('roles')->get();
-		return response()->json(['data' => Permission::toArrayWithRoles() ]);
+		return fractal($permissions, new PermissionTransformer())->parseIncludes($request->get('include'))->respond();
 	}
 
+	/**
+	 * Get all the roles available in the system optionally including the permissions belonging to each role as a list
+	 * of slugs or objects.
+	 * GET /api/v1/roles?include=permissions:full
+	 * @param Request
+	 * @return \Illuminate\Http\JsonResponse
+	 */
+	public function roles(Request $request)
+	{
+		$this->authorize('list', Role::class);
+		$roles = Role::with('permissions')->get();
+		return fractal($roles, new RoleTransformer())->parseIncludes($request->get('include'))->respond();
+	}
 }
