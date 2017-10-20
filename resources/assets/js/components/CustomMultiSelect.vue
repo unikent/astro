@@ -30,7 +30,8 @@ export default {
 		'label-path',
 		'value-path',
 		'key-path',
-		'placeholder'
+		'placeholder',
+		'filter-callback'
 	],
 
 	data() {
@@ -57,11 +58,7 @@ export default {
 
 		// TODO: make generic (based on props)
 		filteredItems() {
-			return this.searchFor !== '' ? this.items.filter(
-				item => ['name', 'username', 'email'].some(
-					key => item.user[key].toLowerCase().indexOf(this.searchFor.toLowerCase()) !== -1
-				)
-			) : this.items;
+			return this.searchFor !== '' ? this.items.filter(item => this.filterCallback(item, this.searchFor)) : this.items;
 		}
 
 	},

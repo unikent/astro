@@ -17,16 +17,17 @@
 				<custom-multi-select
 					v-model="usersToAdd"
 					:items="userList"
-					label-path="user.name"
-					value-path="user.id"
-					key-path="user.id"
+					label-path="name"
+					value-path="id"
+					key-path="id"
+					:filter-callback="filterUserList"
 					placeholder="Search for a user"
 					class="add-user__multiselect"
 				>
 					<template slot="item" scope="props">
-						<span>{{ props.item.user.name }}</span>
+						<span>{{ props.item.name }}</span>
 						<span class="add-user-multiselect__username">
-							@{{ props.item.user.username }}
+							@{{ props.item.username }}
 						</span>
 					</template>
 				</custom-multi-select>
@@ -257,188 +258,7 @@ export default {
 			count: 20,
 			loading: true,
 
-			userList: [
-  {
-    "user": {
-      "name": "Trudy Mclean",
-      "email": "trudymclean@quintity.com",
-      "username": "user1",
-      "id": 1
-    },
-    "role": "Site Owner"
-  },
-  {
-    "user": {
-      "name": "Terry Bentley",
-      "email": "terrybentley@quintity.com",
-      "username": "user2",
-      "id": 2
-    },
-    "role": "Contributor"
-  },
-  {
-    "user": {
-      "name": "Josefina Jenkins",
-      "email": "josefinajenkins@quintity.com",
-      "username": "user3",
-      "id": 3
-    },
-    "role": "Editor"
-  },
-  {
-    "user": {
-      "name": "Zamora Estes",
-      "email": "zamoraestes@quintity.com",
-      "username": "user4",
-      "id": 4
-    },
-    "role": "Editor"
-  },
-  {
-    "user": {
-      "name": "Carissa Clay",
-      "email": "carissaclay@quintity.com",
-      "username": "user5",
-      "id": 5
-    },
-    "role": "Editor"
-  },
-  {
-    "user": {
-      "name": "Figueroa Gay",
-      "email": "figueroagay@quintity.com",
-      "username": "user6",
-      "id": 6
-    },
-    "role": "Contributor"
-  },
-  {
-    "user": {
-      "name": "Avis Sharp",
-      "email": "avissharp@quintity.com",
-      "username": "user7",
-      "id": 7
-    },
-    "role": "Contributor"
-  },
-  {
-    "user": {
-      "name": "Nicholson Mack",
-      "email": "nicholsonmack@quintity.com",
-      "username": "user8",
-      "id": 8
-    },
-    "role": "Editor"
-  },
-  {
-    "user": {
-      "name": "Geraldine Clayton",
-      "email": "geraldineclayton@quintity.com",
-      "username": "user9",
-      "id": 9
-    },
-    "role": "Editor"
-  },
-  {
-    "user": {
-      "name": "Fitzpatrick Higgins",
-      "email": "fitzpatrickhiggins@quintity.com",
-      "username": "user10",
-      "id": 10
-    },
-    "role": "Contributor"
-  },
-  {
-    "user": {
-      "name": "Madeleine Ross",
-      "email": "madeleineross@quintity.com",
-      "username": "user11",
-      "id": 11
-    },
-    "role": "Site Owner"
-  },
-  {
-    "user": {
-      "name": "Rhoda Hooper",
-      "email": "rhodahooper@quintity.com",
-      "username": "user12",
-      "id": 12
-    },
-    "role": "Contributor"
-  },
-  {
-    "user": {
-      "name": "Patel Walsh",
-      "email": "patelwalsh@quintity.com",
-      "username": "user13",
-      "id": 13
-    },
-    "role": "Contributor"
-  },
-  {
-    "user": {
-      "name": "Annie Rodriquez",
-      "email": "annierodriquez@quintity.com",
-      "username": "user14",
-      "id": 14
-    },
-    "role": "Editor"
-  },
-  {
-    "user": {
-      "name": "Pickett Rich",
-      "email": "pickettrich@quintity.com",
-      "username": "user15",
-      "id": 15
-    },
-    "role": "Editor"
-  },
-  {
-    "user": {
-      "name": "Petersen Morin",
-      "email": "petersenmorin@quintity.com",
-      "username": "user16",
-      "id": 16
-    },
-    "role": "Site Owner"
-  },
-  {
-    "user": {
-      "name": "Gallegos Spencer",
-      "email": "gallegosspencer@quintity.com",
-      "username": "user17",
-      "id": 17
-    },
-    "role": "Editor"
-  },
-  {
-    "user": {
-      "name": "Barker Mann",
-      "email": "barkermann@quintity.com",
-      "username": "user18",
-      "id": 18
-    },
-    "role": "Site Owner"
-  },
-  {
-    "user": {
-      "name": "Spencer Snider",
-      "email": "spencersnider@quintity.com",
-      "username": "user19",
-      "id": 19
-    },
-    "role": "Editor"
-  },
-  {
-    "user": {
-      "name": "Solis Garrison",
-      "email": "solisgarrison@quintity.com",
-      "username": "user20",
-      "id": 20
-    },
-    "role": "Contributor"
-  }
-],
+			userList: [],
 			usersToAdd: [],
 			selectedRole: '',
 			errors: {
@@ -494,18 +314,28 @@ export default {
 
 	methods: {
 		fetchSiteData() {
+			const fetchUserList = this.$api.get(`users`);
+			const fetchSite = this.$api.get(`sites/${this.$route.params.site_id}?include=users`);
+
 			this.$api
-				.get(`sites/${this.$route.params.site_id}?include=users`)
-				.then(({ data: json }) => {
-					this.siteTitle = json.data.name;
-					this.users = json.data.users || [];
+				.all([fetchSite, fetchUserList])
+				.then(this.$api.spread((site, users) => {
+					this.siteTitle = site.data.data.name;
+					this.users = site.data.data.users || [];
+					this.userList = users.data.data || [];
 					this.loading = false;
-				});
+				}));
 		},
 
 		createFilter(searchKeys, searchTerm) {
 			return user => searchKeys.some(
-				key => (user.user[key].toLowerCase().indexOf(searchTerm) !== -1)
+				key => (user[key].toLowerCase().indexOf(searchTerm) !== -1)
+			);
+		},
+
+		filterUserList(item, searchTerm) {
+			return ['name', 'username', 'email'].some(
+				key => item[key].toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
 			);
 		},
 
