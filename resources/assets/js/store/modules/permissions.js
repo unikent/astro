@@ -41,6 +41,7 @@ const getters = {
 		let permitted = false;
 		
 		// if the user has the global role of admin then then they can do anything
+		// @TODO - admin should not live in the current role as they might have no particular role with this site
 		if (state.currentRole.global_role === 'admin') {
 			return true;
 		}
