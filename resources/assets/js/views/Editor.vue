@@ -35,7 +35,8 @@ export default {
 	},
 
 	created() {
-        this.$store.commit('site/updateCurrentSiteID', this.$route.params.site_id);
+		this.$store.commit('site/updateCurrentSiteID', this.$route.params.site_id);
+		this.$store.dispatch('loadSitePermissions', this.$route.params.site_id );
 		this.views = {
 			desktop: {
 				icon: 'desktop',
