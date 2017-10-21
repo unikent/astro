@@ -6,23 +6,24 @@ import api from 'plugins/http/api';
  * permissions is an array with the following structure
  * 
 [
-        {
-            "name": "Create Subsites",
-            "slug": "subsite.create",
-            "roles": [
-                "site.owner"
-            ]
-        },
+		{
+			"name": "Create Subsites",
+			"slug": "subsite.create",
+			"roles": [
+				"site.owner"
+			]
+		},
 		...
  */
 const state = {
 	roles: [],
-	currentRole: {}
+	currentRole: '',
+	globalRole: '',
 };
 
 const getters = {
 	getCurrentRole(state, getters) {
-		return state.currentRole;
+		return state.currentSiteRole;
 	},
 
 	getRoles(state, getters) {
@@ -52,7 +53,7 @@ const getters = {
 		}, {permissionSlug});
 			
 		if (matchedRole) {
-			permitted = matchedRole.roles.includes(state.currentRole.role);
+			permitted = matchedRole.roles.includes(state.currentRole);
 		}
 		
 		return permitted;   
@@ -86,14 +87,28 @@ const actions = {
 			.then(({data}) => {
 				const userList = data.data.users;
 				if (userList) {
-					const currentRole = userList.find((element) => element.name === window.astro.username);
-					commit('setCurrentRole', currentRole);
+					const currentUser = userList.find((element) => element.name === window.astro.username);
+					commit('setCurrentRole', currentUser.role);
 				}
 				else {
 					commit('setCurrentRole', {});
 				}
 			});
 	}
+
+	/**
+	 * gets list of the logged in user's gloabl role 
+	 * 
+	 * called from TopBar.vue->mounted
+	 * 
+	 * @param {string} user_name - the name of the user 
+	 */
+	// loadGlobalRole({commit, state}, user_name) {
+		
+	// 	api
+	// 		.get(`users/${user_name}`)
+
+	// }
 
 };
 
