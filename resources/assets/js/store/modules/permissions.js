@@ -42,8 +42,7 @@ const getters = {
 		let permitted = false;
 		
 		// if the user has the global role of admin then then they can do anything
-		// @TODO - admin should not live in the current role as they might have no particular role with this site
-		if (state.currentRole.global_role === 'admin') {
+		if (state.globalRole === 'admin') {
 			return true;
 		}
 		const matchedRole = state.roles.find(function(value) {
@@ -94,7 +93,7 @@ const actions = {
 					commit('setCurrentRole', {});
 				}
 			});
-	}
+	},
 
 	/**
 	 * gets list of the logged in user's gloabl role 
@@ -103,14 +102,19 @@ const actions = {
 	 * 
 	 * @param {string} user_name - the name of the user 
 	 */
-	// loadGlobalRole({commit, state}, user_name) {
-		
-	// 	api
-	// 		.get(`users/${user_name}`)
+	loadGlobalRole({commit, state}, user_name) {	
+		// @TODO - username for admin is Admin, make assumption that all username should be lowercase
+		api
+			.get(`users/${user_name.toLowerCase()}`)
+			.then(({data}) => {
+				commit('setGlobalRole', data.data.global_role);
+			})
+			.catch(()=> {
+				commit('setGlobalRole', '');
+			})
+	}
 
-	// }
-
-};
+}
 
 const mutations = {
 
@@ -126,11 +130,20 @@ const mutations = {
 
 	/**
 	 * sets the current role for the site
-	 * @param {*} state 
-	 * @param {*} currentRole 
+	 * @param {vuex state} state 
+	 * @param {string} currentRole 
 	 */
 	setCurrentRole(state, currentRole) {
 		state.currentRole = currentRole;
+	},
+
+	/**
+	 * sets the user's global role
+	 * @param {vuex state} state 
+	 * @param {string} gloablRole 
+	 */
+	setGlobalRole(state, gloablRole) {
+		state.globalRole = gloablRole;
 	}
 };
 

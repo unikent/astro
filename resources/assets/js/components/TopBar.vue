@@ -85,6 +85,7 @@ Note that the page editing toolbar is a separate component found in `components/
 
 		mounted() {
 			this.loadPermissions();
+			this.loadGlobalRole(window.astro.username);
 		},
 
 		computed: {
@@ -134,7 +135,8 @@ Note that the page editing toolbar is a separate component found in `components/
 
 			...mapActions([
 				'handleSavePage',
-				'loadPermissions'
+				'loadPermissions',
+				'loadGlobalRole'
 			]),
 
 			...mapMutations([
