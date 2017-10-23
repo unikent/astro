@@ -1,0 +1,44 @@
+html {
+	font-size: 1em;
+	box-sizing: border-box;
+	line-height: 1.15;
+	-ms-text-size-adjust: 100%;
+	-webkit-text-size-adjust: 100%;
+	-ms-overflow-style: scrollbar;
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+	font-weight: 300;
+	color: map-get($theme-colours, c2);
+	margin: 0 0 .8rem;
+}
+
+h1 {
+  margin-top: 0;
+  font-size: 1.296rem;
+}
+
+h2 {
+	font-size: 1.215rem;
+}
+
+h3 {
+	font-size: 1.138rem;
+}
+
+h4 {
+	font-size: 1.067rem;
+}
+
+p {margin-bottom: 1.3em;}

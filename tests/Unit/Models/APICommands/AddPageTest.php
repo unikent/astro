@@ -47,7 +47,7 @@ class AddPageTest extends APICommandTestCase
             'site_id' => $this->site->id,
             'slug' => 'foo',
             'next_id' => null,
-            'parent_id' => $this->site->homepage->id,
+            'parent_id' => $this->site->draftHomepage->id,
             'layout' => [
                 'name' => 'test-layout',
                 'version' => 1

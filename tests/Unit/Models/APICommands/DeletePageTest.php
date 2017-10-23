@@ -24,7 +24,7 @@ class DeletePageTest extends APICommandTestCase
             'name' => 'test-layout',
             'version' => 1
         ]);
-        $page = $this->api()->addPage($this->site->homepage->id, null, 'foo', $this->test_layout, 'Foo');
+        $page = $this->api()->addPage($this->site->draftHomepage->id, null, 'foo', $this->test_layout, 'Foo');
         return [
             'id' => $page->id
         ];

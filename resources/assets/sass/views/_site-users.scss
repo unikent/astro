@@ -1,0 +1,58 @@
+.site-users {
+	background-color: #f5f7fa;
+	min-height: calc(100vh - 65px);
+	padding: 20px;
+
+	&__user--empty {
+		display: flex;
+		background-color: #f7f9fb;
+		padding: 10px;
+		border: 1px solid #d7deea;
+		border-radius: 4px;
+		margin-bottom: 20px;
+		color: #71787f;
+		font-size: 14px;
+	}
+}
+
+.add-user {
+	display: flex;
+	padding: 10px;
+	margin-bottom: 40px;
+	background-color: #f7f9fb;
+
+	&__select {
+		width: 70%;
+		position: relative;
+	}
+
+	&__multiselect {
+		width: 100%;
+
+		&__username {
+			color: #8492a6;
+			font-size: 13px;
+		}
+	}
+
+	&__role-select {
+		position: relative;
+	}
+
+	&__add-button {
+		height: 36px;
+	}
+}
+
+.filter-user {
+	display: flex;
+	margin-bottom: 20px;
+
+	&__searchbox {
+		width: 200px;
+	}
+
+	&__select {
+		width: 130px;
+	}
+}

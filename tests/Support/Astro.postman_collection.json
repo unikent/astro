@@ -11,7 +11,7 @@
 			"name": "Sites - List",
 			"request": {
 				"url": {
-					"raw": "http://astro.test:8080/api/v1/sites?include=publishing_group,homepage.draft,drafts,users",
+					"raw": "http://astro.test:8080/api/v1/sites?include=homepage,pages&version=published",
 					"protocol": "http",
 					"host": [
 						"astro",
@@ -26,7 +26,13 @@
 					"query": [
 						{
 							"key": "include",
-							"value": "publishing_group,homepage.draft,drafts,users",
+							"value": "homepage,pages",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "version",
+							"value": "published",
 							"equals": true,
 							"description": ""
 						}
@@ -63,7 +69,7 @@
 			"name": "Site - Get",
 			"request": {
 				"url": {
-					"raw": "http://astro.test:8080/api/v1/sites/1?include=role,users",
+					"raw": "http://astro.test:8080/api/v1/sites/1?include=users,pages",
 					"protocol": "http",
 					"host": [
 						"astro",
@@ -79,7 +85,7 @@
 					"query": [
 						{
 							"key": "include",
-							"value": "role,users",
+							"value": "users,pages",
 							"equals": true,
 							"description": ""
 						}
@@ -116,7 +122,7 @@
 			"name": "Site - Get Structure",
 			"request": {
 				"url": {
-					"raw": "http://astro.test:8080/api/v1/sites/1/tree?include=draft.pagecontent",
+					"raw": "http://astro.test:8080/api/v1/sites/1/tree?version=published",
 					"protocol": "http",
 					"host": [
 						"astro",
@@ -132,8 +138,8 @@
 					],
 					"query": [
 						{
-							"key": "include",
-							"value": "draft.pagecontent",
+							"key": "version",
+							"value": "published",
 							"equals": true,
 							"description": ""
 						}
@@ -190,7 +196,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Another site\",\n\t\"host\": \"astro.dev\",\n\t\"path\": \"/sam/says\",\n\t\"publishing_group_id\": \"3\",\n\t\"homepage_layout\": {\n\t\t\"name\": \"kent-homepage\",\n\t\t\"version\": \"1\"\n\t}\n}"
+					"raw": "{\n\t\"name\": \"Test site\",\n\t\"host\": \"astro.test\",\n\t\"path\": \"/sam/says\",\n\t\"publishing_group_id\": \"1\",\n\t\"homepage_layout\": {\n\t\t\"name\": \"kent-homepage\",\n\t\t\"version\": \"1\"\n\t}\n}"
 				},
 				"description": "Create a new Site."
 			},
@@ -223,6 +229,59 @@
 					"raw": "{\n\t\"name\": \"Arrh!\"\n}"
 				},
 				"description": "Create a new Site."
+			},
+			"response": []
+		},
+		{
+			"name": "Page - Get",
+			"request": {
+				"url": {
+					"raw": "http://astro.test:8080/api/v1/pages/4?include=ancestors,siblings,parent,next,previous,children",
+					"protocol": "http",
+					"host": [
+						"astro",
+						"test"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"pages",
+						"4"
+					],
+					"query": [
+						{
+							"key": "include",
+							"value": "ancestors,siblings,parent,next,previous,children",
+							"equals": true,
+							"description": ""
+						}
+					],
+					"variable": []
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer test",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Accepts",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"description": "Retrieve a list of Sites."
 			},
 			"response": []
 		},
@@ -572,6 +631,78 @@
 					},
 					{
 						"key": "content-type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"description": "Retrieve a list of Sites."
+			},
+			"response": []
+		},
+		{
+			"name": "Route - Retrieve Page Data",
+			"request": {
+				"url": {
+					"raw": "http://astro.test:8080/api/v1/routes/resolve?include=ancestors,siblings,parent,next,previous,children,site&host=example.com&path=/undergraduate",
+					"protocol": "http",
+					"host": [
+						"astro",
+						"test"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"routes",
+						"resolve"
+					],
+					"query": [
+						{
+							"key": "include",
+							"value": "ancestors,siblings,parent,next,previous,children,site",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "host",
+							"value": "example.com",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "path",
+							"value": "/undergraduate",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "version",
+							"value": "draft",
+							"equals": true,
+							"description": "",
+							"disabled": true
+						}
+					],
+					"variable": []
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer test",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Accepts",
 						"value": "application/json",
 						"description": ""
 					}

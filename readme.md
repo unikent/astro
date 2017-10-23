@@ -119,11 +119,6 @@ and must be published to the **live** site structure in order for them to take e
 When a **Page** is published a new **Page** is created with the same site_id, path, slug, revision_id and a version of "published",
 putting it in a completely separate nested set **scope** (tree) to the draft version.
 
-A **Global Scope** is applied by default to all **Page** queries which restricts the queries to pages with a version of "draft".
-This can be removed on a per-query basis, or disabled completely using the static method ``VersionScope::disable()``. This
-must be done **before any operations (creates, updates, deletes, etc)** which might need to query for non-draft pages.
-
-
 ##### Authorization 
 
 Only admin users can create and manage **Sites**.
