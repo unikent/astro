@@ -4,7 +4,9 @@
 import { expect } from 'chai';
 import Vue from 'vue';
 import { mapState, mapGetters } from 'vuex';
-import permissions from 'store/modules/permissions';
+// import getters  from 'store/modules/permissions';
+import permissions  from 'store/modules/permissions';
+
 
 describe('Store Permissions', () => {
     it('userCan can match permissions to a role', () => {
@@ -36,12 +38,14 @@ describe('Store Permissions', () => {
                 }
             ], 
 
-            currentRole : 'Happy Camper'
+            currentRole : 'Happy Camper',
+            globalRole: 'admin'
         }
         
-        
-        const action = 'subsite.edit';
-        const result = permissions.getters.canUser('subsite.create');
+        // jumping thru hoops to get the argument passing working here
+        // better ideas/syntax welcome here :-)
+        const result = permissions.getters.canUser(state)('subsite.create');
         console.log(result);
+        // console.log(result);
     })
 });
