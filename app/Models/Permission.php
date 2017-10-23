@@ -34,6 +34,7 @@ class Permission extends Model
 	const DELETE_SITE = 'site.delete';
 	const EDIT_SITE = 'site.edit';
 	const MOVE_SITE = 'site.move';
+	const VIEW_SITE = 'site.view';
 	const TEMPLATE_MANIPULATION = 'templates.manipulate';
 
 	/**

@@ -11,7 +11,7 @@ class SitePolicy
 {
     use HandlesAuthorization;
 
-    public function before($user, $ability)
+    public function before(User $user, $ability)
     {
         if($user->isAdmin()){
             return true;
@@ -37,7 +37,7 @@ class SitePolicy
      */
     public function view(User $user, Site $site)
     {
-		return $user->hasPermissionForSite(Permission::EDIT_SITE, $site->id);
+		return $user->hasPermissionForSite(Permission::VIEW_SITE, $site->id);
     }
 
 	/**
@@ -58,7 +58,7 @@ class SitePolicy
      * @param  \App\Models\Site  $site
      * @return boolean
      */
-    public function create(User $user, Site $site)
+    public function create(User $user)
     {
     	return $user->isAdmin();
     }

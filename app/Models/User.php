@@ -102,7 +102,8 @@ class User extends KentUser
 				->where('site_id', '=', $site_id)
 				->first();
 		if($role){
-			return $role->permissions()->whereIn('slug', $permission)->count() > 0;
+			// user->roles is UserSiteRole relationship, need to get the role from that
+			return $role->role->permissions()->whereIn('slug', $permission)->count() > 0;
 		}
 		return false;
 	}

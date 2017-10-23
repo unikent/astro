@@ -11,7 +11,14 @@ class PagePolicy
 {
     use HandlesAuthorization;
 
-    /**
+	public function before(User $user, $ability)
+	{
+		if($user->isAdmin()){
+			return true;
+		}
+	}
+
+	/**
      * Determine whether the user can view the page.
      *
      * @param  \App\Models\User  $user
@@ -34,9 +41,9 @@ class PagePolicy
      * @param  Page  $page
      * @return boolean
      */
-    public function create(User $user, Page $page)
+    public function create(User $user, $site_id)
     {
-    	return $user->hasPermissionForSite(Permission::EDIT_SITE, $page->site_id);
+    	return $user->hasPermissionForSite(Permission::EDIT_SITE, $site_id);
     }
 
     /**

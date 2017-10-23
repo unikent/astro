@@ -35,6 +35,7 @@ class SetupPermissions extends Command
 	];
 
 	public static $permission_names = [
+		Permission::VIEW_SITE => 'View Pages',
 		Permission::REVERT_PAGE => 'Revert pages',
 		Permission::LIST_SITES => 'List Sites',
 		Permission::CREATE_SUBSITE => 'Create Subsites',
@@ -70,6 +71,7 @@ class SetupPermissions extends Command
 	public static $roles_and_permissions = [
 
 		Role::OWNER => [
+			Permission::VIEW_SITE,
 			Permission::REVERT_PAGE,
 			Permission::CREATE_SUBSITE,
 			Permission::EDIT_SUBSITE,
@@ -92,6 +94,7 @@ class SetupPermissions extends Command
 			Permission::ASSIGN_SUBSITE_PERMISSIONS
 		],
 		Role::EDITOR => [
+			Permission::VIEW_SITE,
 			Permission::REVERT_PAGE,
 			Permission::LIST_SITES,
 			Permission::EDIT_SUBSITE,
@@ -109,6 +112,7 @@ class SetupPermissions extends Command
 			Permission::APPROVAL
 		],
 		Role::CONTRIBUTOR => [
+			Permission::VIEW_SITE,
 			Permission::LIST_SITES,
 			Permission::EDIT_SUBSITE,
 			Permission::EDIT_PAGE,

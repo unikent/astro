@@ -67,7 +67,8 @@ class PageController extends ApiController
 	 */
 	public function store(Request $request)
 	{
-		$this->authorize('create', Page::class);
+		$parent = Page::findOrFail($request->get('parent_id'));
+		$this->authorize('create', [Page::class, $parent->site_id]);
 		$api = new LocalAPIClient(Auth::user());
 		$page = $api->execute(AddPage::class, $request->all());
 
