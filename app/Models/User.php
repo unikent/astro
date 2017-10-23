@@ -4,9 +4,6 @@ namespace App\Models;
 
 use KentAuth\Models\User as KentUser;
 
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-
 class User extends KentUser
 {
 
@@ -34,34 +31,13 @@ class User extends KentUser
 	  }
 
     /**
-     * Register callback to ensure user has a publishing group with their username.
-     */
-    protected static function boot()
-    {
-        parent::boot();
-        static::created(function($user){
-            // We want every user to automatically have a publishing group with their username.
-            $group = PublishingGroup::where('name', '=', $user->username)->first();
-            if(!$group){
-                $group = PublishingGroup::create(['name' => $user->username]);
-            }
-            $group->users()->sync($user, false);
-        });
-    }
-
-    public function publishing_groups()
-    {
-        return $this->belongsToMany(PublishingGroup::class, 'publishing_groups_users');
-    }
-
-    /**
      * Can this user edit the site with this id?
      * @param Site $site The ID of the site to check for.
      * @return mixed
      */
     public function canEditSite(Site $site)
     {
-      return $this->isAdmin() || $site->publishing_group->users()->contains($this->id);
+      return $this->isAdmin() || $this->hasPermissionForSite(Permission::EDIT_SITE, $site->id);
     }
 
     /**

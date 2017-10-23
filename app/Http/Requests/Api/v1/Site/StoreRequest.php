@@ -38,7 +38,6 @@ class StoreRequest extends FormRequest
         }
         $rules = [
             'name' => ['required', 'max:190' ],
-            'publishing_group_id' => [ 'required' ],
             'host' => [
                 'required',
                 'max:100',
@@ -61,7 +60,6 @@ class StoreRequest extends FormRequest
                 'integer'
             ]
         ];
-        $rules['publishing_group_id'][] = Rule::exists('publishing_groups', 'id');
         return $rules;
     }
 }

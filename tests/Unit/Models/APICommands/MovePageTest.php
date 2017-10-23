@@ -8,20 +8,16 @@
 
 namespace Tests\Unit\Models\APICommands;
 
-use App\Models\APICommands\DeletePage;
 use App\Models\APICommands\MovePage;
 use App\Models\Contracts\APICommand;
-use App\Models\PublishingGroup;
 
 class MovePageTest extends APICommandTestCase
 {
-    protected $pubgroup = null;
     protected $site = null;
 
     public function getValidData()
     {
-        $this->pubgroup = $this->pubgroup ? $this->pubgroup : factory(PublishingGroup::class)->create();
-        $this->site = $this->site ? $this->site : $this->api()->createSite($this->pubgroup->id,'Test Site', 'example.org', null, [
+        $this->site = $this->site ? $this->site : $this->api()->createSite('Test Site', 'example.org', null, [
             'name' => 'test-layout',
             'version' => 1
         ]);

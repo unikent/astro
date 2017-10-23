@@ -3,13 +3,10 @@ namespace Tests\Unit\Models;
 
 use App\Models\Block;
 use App\Models\LocalAPIClient;
-use App\Models\PublishingGroup;
 use App\Models\User;
 use Exception;
 use Tests\TestCase;
 use App\Models\Page;
-use App\Models\Redirect;
-use App\Http\Transformers\Api\v1\PageTransformer;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PageTest extends TestCase
@@ -36,11 +33,8 @@ class PageTest extends TestCase
 	function scopePublished_ReturnsPublishedPagesOnly()
 	{
 	    $user = factory(User::class)->create();
-	    $pubgroup = factory(PublishingGroup::class)->create();
-	    $pubgroup->users()->attach($user);
         $api = new LocalAPIClient($user);
         $site = $api->createSite(
-            $pubgroup->id,
             'test',
             'example.com',
             '',
@@ -60,11 +54,8 @@ class PageTest extends TestCase
 	function scopeDrafts_ReturnsDraftPagesOnly()
 	{
         $user = factory(User::class)->create();
-        $pubgroup = factory(PublishingGroup::class)->create();
-        $pubgroup->users()->attach($user);
         $api = new LocalAPIClient($user);
         $site = $api->createSite(
-            $pubgroup->id,
             'test',
             'example.com',
             '',
@@ -84,11 +75,8 @@ class PageTest extends TestCase
     function scopeVersion_restrictsToSpecifiedVersion()
     {
         $user = factory(User::class)->create();
-        $pubgroup = factory(PublishingGroup::class)->create();
-        $pubgroup->users()->attach($user);
         $api = new LocalAPIClient($user);
         $site = $api->createSite(
-            $pubgroup->id,
             'test',
             'example.com',
             '',

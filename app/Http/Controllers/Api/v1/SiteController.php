@@ -46,7 +46,6 @@ class SiteController extends ApiController
 		$this->authorize('create', Site::class);
 		$api = new LocalAPIClient(Auth::user());
 		$site = $api->createSite(
-			$request->get('publishing_group_id'),
 			$request->get('name'),
 			$request->get('host'),
 			$request->get('path'),

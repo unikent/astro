@@ -19,13 +19,11 @@ class ListSites implements APICommand
     public function execute($input, Authenticatable $user)
     {
         $sites = null;
-        if(!Gate::allows('index', Site::class)){
-            $pgs = $user->publishing_groups->pluck('id');
-            $sites = Site::whereIn('publishing_group_id', $pgs)->get();
-        }
-        else{
-            $sites = Site::get();
-        }
+        if($user->isAdmin()){
+			$sites = Site::get();
+		}else {
+			$sites = Site::whereIn('id', $user->roles->pluck('site_id'))->get();
+		}
         return $sites;
     }
 

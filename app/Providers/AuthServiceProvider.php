@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use App\Models\Permission;
-use App\Models\PublishingGroup;
 use App\Models\Role;
 use App\Models\Site;
 use App\Models\Page;
@@ -11,7 +10,6 @@ use App\Models\Media;
 use App\Models\User;
 use App\Policies\PagePolicy;
 use App\Policies\PermissionPolicy;
-use App\Policies\PublishingGroupPolicy;
 use App\Policies\RolePolicy;
 use App\Policies\SitePolicy;
 use App\Policies\MediaPolicy;
@@ -38,7 +36,6 @@ class AuthServiceProvider extends ServiceProvider
 		BlockDefinition::class => BlockDefinitionPolicy::class,
 		LayoutDefinition::class => LayoutDefinitionPolicy::class,
 		RegionDefinition::class => RegionDefinitionPolicy::class,
-        PublishingGroup::class => PublishingGroupPolicy::class,
 		User::class => UserPolicy::class,
 		Permission::class => PermissionPolicy::class,
 		Role::class => RolePolicy::class

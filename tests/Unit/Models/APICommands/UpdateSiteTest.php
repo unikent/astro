@@ -11,7 +11,6 @@ namespace Tests\Unit\Models\APICommands;
 use App\Models\APICommands\UpdateSite;
 use App\Models\Contracts\APICommand;
 use App\Models\LocalAPIClient;
-use App\Models\PublishingGroup;
 use App\Models\User;
 use Illuminate\Support\Collection;
 
@@ -40,8 +39,7 @@ class UpdateSiteTest extends APICommandTestCase
     public function validation_whenValidSiteButNoFieldsAreProvided_fails()
     {
         $api = new LocalAPIClient(factory(\App\Models\User::class)->create());
-        $pubgroup = PublishingGroup::create(['name' => 'test']);
-        $site = $api->createSite($pubgroup->id, "Test", "kent.ac.uk", "", [ "name" => "test-layout", "version" => 1]);
+        $site = $api->createSite("Test", "kent.ac.uk", "", [ "name" => "test-layout", "version" => 1]);
 
         $validator = $this->validator(['id' => $site->id] );
         $this->assertTrue($validator->fails());
@@ -54,8 +52,7 @@ class UpdateSiteTest extends APICommandTestCase
     public function validation_whenOptionsIsPresentButNotArray_fails()
     {
         $api = new LocalAPIClient(factory(\App\Models\User::class)->create());
-        $pubgroup = PublishingGroup::create(['name' => 'test']);
-        $site = $api->createSite($pubgroup->id, "Test", "kent.ac.uk", "", [ "name" => "test-layout", "version" => 1]);
+        $site = $api->createSite("Test", "kent.ac.uk", "", [ "name" => "test-layout", "version" => 1]);
 
         $validator = $this->validator([
             'id' => $site->id,
@@ -74,8 +71,7 @@ class UpdateSiteTest extends APICommandTestCase
     public function validation_whenOptionsIsArray_passes()
     {
         $api = new LocalAPIClient(factory(\App\Models\User::class)->create());
-        $pubgroup = PublishingGroup::create(['name' => 'test']);
-        $site = $api->createSite($pubgroup->id, "Test", "kent.ac.uk", "", [ "name" => "test-layout", "version" => 1]);
+        $site = $api->createSite("Test", "kent.ac.uk", "", [ "name" => "test-layout", "version" => 1]);
 
         $validator = $this->validator([
             'id' => $site->id,
@@ -94,8 +90,7 @@ class UpdateSiteTest extends APICommandTestCase
     {
         // given we have a site
         $api = new LocalAPIClient(factory(\App\Models\User::class)->create());
-        $pubgroup = PublishingGroup::create(['name' => 'test']);
-        $site = $api->createSite($pubgroup->id, "Test", "kent.ac.uk", "", [ "name" => "test-layout", "version" => 1]);
+        $site = $api->createSite("Test", "kent.ac.uk", "", [ "name" => "test-layout", "version" => 1]);
         
         // with some options
         $orignalOptions = [
@@ -126,8 +121,7 @@ class UpdateSiteTest extends APICommandTestCase
     {
         // given we have a site
         $api = new LocalAPIClient(factory(\App\Models\User::class)->create());
-        $pubgroup = PublishingGroup::create(['name' => 'test']);
-        $site = $api->createSite($pubgroup->id, "Test", "kent.ac.uk", "", [ "name" => "test-layout", "version" => 1]);
+        $site = $api->createSite("Test", "kent.ac.uk", "", [ "name" => "test-layout", "version" => 1]);
         
         // with some options
         $orignalOptions = [
@@ -159,8 +153,7 @@ class UpdateSiteTest extends APICommandTestCase
         // given we have a site with an original name
         $originalName = 'Test Site Name';
         $api = new LocalAPIClient(factory(\App\Models\User::class)->create());
-        $pubgroup = PublishingGroup::create(['name' => 'test']);
-        $site = $api->createSite($pubgroup->id, $originalName, "kent.ac.uk", "", [ "name" => "test-layout", "version" => 1]);
+        $site = $api->createSite( $originalName, "kent.ac.uk", "", [ "name" => "test-layout", "version" => 1]);
         
         // and we change the name
         $updatedName = 'Updated Test Site Name';
@@ -180,8 +173,7 @@ class UpdateSiteTest extends APICommandTestCase
         // given we have a site with an original path
         $originalPath = "/original";
         $api = new LocalAPIClient(factory(\App\Models\User::class)->create());
-        $pubgroup = PublishingGroup::create(['name' => 'test']);
-        $site = $api->createSite($pubgroup->id, 'Site Name', "kent.ac.uk", $originalPath, [ "name" => "test-layout", "version" => 1]);
+        $site = $api->createSite('Site Name', "kent.ac.uk", $originalPath, [ "name" => "test-layout", "version" => 1]);
 
         // and we change the path
         $updatedPath = "/updated";
@@ -201,8 +193,7 @@ class UpdateSiteTest extends APICommandTestCase
         // given we have a site with an original path
         $originalHost = "lancaster.ac.uk";
         $api = new LocalAPIClient(factory(\App\Models\User::class)->create());
-        $pubgroup = PublishingGroup::create(['name' => 'test']);
-        $site = $api->createSite($pubgroup->id, 'Site Name', $originalHost, "", [ "name" => "test-layout", "version" => 1]);
+        $site = $api->createSite('Site Name', $originalHost, "", [ "name" => "test-layout", "version" => 1]);
         
         // and we change the path
         $updatedHost = "kent.ac.uk";
@@ -217,33 +208,11 @@ class UpdateSiteTest extends APICommandTestCase
     * @test
     * @group APICommands
     */
-    public function execute_withPublishingGroup_updatesPublishingGroupField()
-    {
-        // given we have a site with an original path
-        $api = new LocalAPIClient(factory(\App\Models\User::class)->create());
-        $originalPubgroup = PublishingGroup::create(['name' => 'test']);
-        $site = $api->createSite($originalPubgroup->id, 'Site Name', 'kent.ac.uk', "", [ "name" => "test-layout", "version" => 1]);
-
-        // and we change the publishing group
-        $anotherPubgroup = PublishingGroup::create(['name' => 'a different group']);
-        $site = $this->command()->execute(new Collection(['id' => $site->id, 'publishing_group_id' => $anotherPubgroup->id]), factory(User::class)->create());
-
-        // then the publishing group of the site should be changed
-        $this->assertNotEquals($originalPubgroup->id, $site['publishing_group_id']);
-        $this->assertEquals($anotherPubgroup->id, $site['publishing_group_id']);
-    }
-    
-    
-    /**
-    * @test
-    * @group APICommands
-    */
     public function execute_returnsSiteThatWasModified()
     {
          // given we have a site
          $api = new LocalAPIClient(factory(\App\Models\User::class)->create());
-         $originalPubgroup = PublishingGroup::create(['name' => 'test']);
-         $site = $api->createSite($originalPubgroup->id, 'Site Name', 'kent.ac.uk', "", [ "name" => "test-layout", "version" => 1]);
+         $site = $api->createSite('Site Name', 'kent.ac.uk', "", [ "name" => "test-layout", "version" => 1]);
 
          // when we update a field
          $updatedName = 'Redesigned Site Name';

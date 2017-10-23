@@ -30,7 +30,6 @@ class CreateSiteTest extends APICommandTestCase
     {
         return [
             'name' => 'A Valid Name',
-            'publishing_group_id' => factory(\App\Models\PublishingGroup::class)->create()->getKey(),
             'host' => 'example.com',
             'path' => '',
             'homepage_layout' => [
@@ -63,26 +62,6 @@ class CreateSiteTest extends APICommandTestCase
         $this->assertTrue( $this->validator($data)->fails());
         $data['name'] = str_repeat('a',200);
         $this->assertTrue( $this->validator($data)->fails());
-    }
-
-    /**
-     * @test
-     * @group APICommands
-     */
-    public function validation_whenPublishingGroupIsMissing_fails()
-    {
-        $data = $this->input(null, 'publishing_group_id');
-        $this->assertTrue($this->validator($data)->fails());
-    }
-
-    /**
-     * @test
-     * @group APICommands
-     */
-    public function validation_whenPublishingGroupDoesNotExist_fails()
-    {
-        $data = $this->input(['publishing_group_id' => 0xffffff]);
-        $this->assertTrue($this->validator($data)->fails());
     }
 
     /**
