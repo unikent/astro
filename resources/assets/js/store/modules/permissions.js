@@ -34,6 +34,7 @@ const getters = {
 	 * can the user perform the requested action
 	 * if the user is a global admin then let them do anything
 	 * 
+	 * @param {object} state - the vuex state
 	 * @param {string} the permission to check i.e. subsite.edit, subsite.create
 	 * @returns {bool} true or false
 	 */
@@ -63,8 +64,9 @@ const actions = {
 
 	/**
 	 * gets list of roles from the api can calls mutation to store this in the state
-	 * 
 	 * called from TopBar.vue->mounted
+	 * 
+	 * @param {object} state - the vuex state
 	 */
 	loadPermissions({commit, state}) {		
 		api
@@ -77,16 +79,20 @@ const actions = {
 
 	/**
 	 * gets list of a user's roles from the api can calls mutation to store this in the state
-	 * 
 	 * called from Editor.vue->created
+	 * 
+	 * @param {object} state - the vuex state
+	 * @param {object}	payload
+	 * @param {int}		payload.site_id  - the id of the current site
+	 * @param {string}	payload.username -  the name of the user
 	 */
-	loadSitePermissions({commit, state}, site_id) {
+	loadSiteRole({commit, state}, payload) {
 		api
-			.get(`sites/${site_id}?include=users`)
+			.get(`sites/${payload.site_id}?include=users`)
 			.then(({data}) => {
 				const userList = data.data.users;
 				if (userList) {
-					const currentUser = userList.find((element) => element.name === window.astro.username);
+					const currentUser = userList.find((element) => element.name === payload.username);
 					commit('setCurrentRole', currentUser.role);
 				}
 				else {
@@ -97,15 +103,14 @@ const actions = {
 
 	/**
 	 * gets list of the logged in user's gloabl role 
-	 * 
 	 * called from TopBar.vue->mounted
 	 * 
-	 * @param {string} user_name - the name of the user 
+	 * @param {string} username - the name of the user 
 	 */
-	loadGlobalRole({commit, state}, user_name) {	
-		// @TODO - username for admin is Admin, make assumption that all username should be lowercase
+	loadGlobalRole({commit, state}, username) {	
+		// note - username for admin is Admin, make assumption that all username should be lowercase
 		api
-			.get(`users/${user_name.toLowerCase()}`)
+			.get(`users/${username.toLowerCase()}`)
 			.then(({data}) => {
 				commit('setGlobalRole', data.data.global_role);
 			})
@@ -121,7 +126,7 @@ const mutations = {
 	/**
 	 * Used to initially set the permissions the editor understands
 	 * 
-	 * @param {*} state 
+	 * @param {object} vuex state 
 	 * @param {object} permissions - the set of permissions as received from the API
 	 */
 	setPermissions(state, permissions) {
@@ -130,7 +135,8 @@ const mutations = {
 
 	/**
 	 * sets the current role for the site
-	 * @param {vuex state} state 
+	 * 
+	 * @param {object} state - the vuex state
 	 * @param {string} currentRole 
 	 */
 	setCurrentRole(state, currentRole) {
@@ -139,7 +145,8 @@ const mutations = {
 
 	/**
 	 * sets the user's global role
-	 * @param {vuex state} state 
+	 * 
+	 * @param {object} state - the vuex state
 	 * @param {string} gloablRole 
 	 */
 	setGlobalRole(state, gloablRole) {
