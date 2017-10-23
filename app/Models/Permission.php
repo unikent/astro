@@ -29,6 +29,7 @@ class Permission extends Model
 	const ASSIGN_PAGE_PERMISSIONS = 'permissions.page.assign';
 	const ASSIGN_SUBSITE_PERMISSIONS = 'permissions.subsite.assign ';
 	const CREATE_SITE = 'site.create';
+	const LIST_SITES = 'site.list';
 	const DELETE_SITE = 'site.delete';
 	const EDIT_SITE = 'site.edit';
 	const MOVE_SITE = 'site.move';

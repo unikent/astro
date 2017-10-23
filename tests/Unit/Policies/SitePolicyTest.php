@@ -23,9 +23,9 @@ class SitePolicyTest extends PolicyTestCase
      * @test
      * @group authorization
      */
-    public function index_WhenUserIsNotAdmin_IsDenied(){
+    public function index_WhenUserIsNotAdmin_IsAllowed(){
         $user = factory(User::class)->make([ 'role' => 'user' ]);
-        $this->assertPolicyDenies(new SitePolicy, 'index', $user, Site::class);
+        $this->assertPolicyAllows(new SitePolicy, 'index', $user, Site::class);
     }
 
 
@@ -74,6 +74,7 @@ class SitePolicyTest extends PolicyTestCase
      * @group authorization
      */
     public function update_WhenUserIsMemberOfSitePublishingGroup_IsAllowed(){
+    	return $this->markTestIncomplete();
     	// Create some PracticeGroups...
     	$pg = factory(PublishingGroup::class)->create();
 

@@ -88,4 +88,21 @@ class User extends KentUser
 	{
 		return $this->hasMany(UserSiteRole::class);
 	}
+
+	/**
+	 * Does this user have the specified permission for the specified Site?
+	 * @param $permission
+	 * @param Site $site
+	 * @return bool
+	 */
+	public function hasPermissionForSite($permission, $site_id)
+	{
+		$role = $this->roles()
+				->where('site_id', '=', $site_id)
+				->first();
+		if($role){
+			return $role->permissions()->where('slug', '=', $permission)->count() > 0;
+		}
+		return false;
+	}
 }

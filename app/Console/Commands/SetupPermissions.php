@@ -35,6 +35,7 @@ class SetupPermissions extends Command
 	];
 
 	public static $permission_names = [
+		Permission::LIST_SITES => 'List Sites',
 		Permission::CREATE_SUBSITE => 'Create Subsites',
 		Permission::EDIT_SUBSITE => 'Edit Subsites',
 		Permission::DELETE_SUBSITE => 'Delete Subsites',
@@ -72,6 +73,7 @@ class SetupPermissions extends Command
 			Permission::EDIT_SUBSITE,
 			Permission::DELETE_SUBSITE,
 			Permission::EDIT_MENU,
+			Permission::LIST_SITES,
 			Permission::MOVE_SUBSITE,
 			Permission::ADD_PAGE,
 			Permission::EDIT_PAGE,
@@ -88,6 +90,7 @@ class SetupPermissions extends Command
 			Permission::ASSIGN_SUBSITE_PERMISSIONS
 		],
 		Role::EDITOR => [
+			Permission::LIST_SITES,
 			Permission::EDIT_SUBSITE,
 			Permission::EDIT_MENU,
 			Permission::MOVE_SUBSITE,
@@ -103,6 +106,7 @@ class SetupPermissions extends Command
 			Permission::APPROVAL
 		],
 		Role::CONTRIBUTOR => [
+			Permission::LIST_SITES,
 			Permission::EDIT_SUBSITE,
 			Permission::EDIT_PAGE,
 			Permission::ADD_IMAGE,
