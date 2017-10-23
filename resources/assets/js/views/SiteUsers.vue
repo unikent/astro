@@ -21,7 +21,9 @@
 					value-path="username"
 					key-path="id"
 					:filter-callback="filterUserList"
-					placeholder="Search for a user"
+					placeholder="Search for a user to add"
+					no-data-text="No more users to add"
+					no-match-text="No users matching your query"
 					class="add-user__multiselect"
 				>
 					<template slot="item" scope="props">
@@ -150,7 +152,7 @@
 											v-model="user.role"
 											size="small"
 											class="u-flex-auto-left"
-											@change="(roleSlug) => changeUserRole(user.username, roleSlug)"
+											@change="(roleSlug) => changeUserRole(user, roleSlug)"
 										>
 											<el-option-group label="Change role">
 												<el-option v-for="role in roles"
@@ -165,7 +167,7 @@
 								<td>
 									<div class="cell">
 									<el-button
-										@click="removeUser(user.username)"
+										@click="removeUser(user)"
 										type="default"
 										size="small"
 									>
@@ -405,7 +407,7 @@ export default {
 			});
 		},
 
-		removeUser(username ) {
+		removeUser({ name, username }) {
 			this.$api
 				.put(
 					`sites/${this.$route.params.site_id}/users`,
@@ -416,7 +418,7 @@ export default {
 
 					notify({
 						title: 'User access successfully revoked',
-						message: `'${username}' no longer has access to this site.`,
+						message: `${name} no longer has access to this site.`,
 						type: 'success'
 					});
 				})
@@ -445,7 +447,7 @@ export default {
 			};
 		},
 
-		changeUserRole(username, roleSlug) {
+		changeUserRole({ name, username }, roleSlug) {
 			this.$api
 				.put(
 					`sites/${this.$route.params.site_id}/users`,
@@ -460,7 +462,7 @@ export default {
 
 					notify({
 						title: 'Role successfully changed',
-						message: `'${username}' is now ${aOrAn(roleName)} ${roleName}`,
+						message: `${name} is now ${aOrAn(roleName)} ${roleName}`,
 						type: 'success'
 					});
 				})
