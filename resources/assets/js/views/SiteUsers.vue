@@ -151,6 +151,7 @@
 											size="small"
 											class="u-flex-auto-left"
 											@change="(roleSlug) => changeUserRole(user.username, roleSlug)"
+											:key="user.username"
 										>
 											<el-option-group label="Change role">
 												<el-option v-for="role in roles"
@@ -398,7 +399,7 @@ export default {
 							if (erroredUsers.length > 0) {
 								notify({
 									title: 'Unable to add users',
-									message: `Adding the following users were uncuccessful: ${erroredUsers.join(', ')}`,
+									message: `Adding the following users were unsuccessful: ${erroredUsers.join(', ')}`,
 									type: 'error'
 								});
 							}
