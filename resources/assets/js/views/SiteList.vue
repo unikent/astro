@@ -56,6 +56,11 @@
 									Menu
 								</el-button>
 							</router-link>
+							<router-link :to="`/site/${site.id}/users`">
+								<el-button type="default" size="small">
+									Manage users
+								</el-button>
+							</router-link>
 							<el-button @click="askRemove(site.id)" type="default" size="small">
 								<icon name="delete" width="14" height="14" />
 							</el-button>
