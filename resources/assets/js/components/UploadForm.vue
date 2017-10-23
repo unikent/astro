@@ -36,7 +36,8 @@ export default {
 		onSuccess: {
 			type: Function,
 			default: () => {}
-		}
+		},
+		site_id: Number
 	},
 
 	components: {
@@ -66,7 +67,7 @@ export default {
 			if(!options.data) {
 				options.data = {};
 			}
-
+			options.data['site_ids[]'] = this.site_id;
 			return upload(options);
 		}
 	}
