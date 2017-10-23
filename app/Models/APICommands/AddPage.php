@@ -92,13 +92,14 @@ class AddPage implements APICommand
         return [
             'parent_id' => [
                 'required',
-                'exists:pages,id'
+                'exists:pages,id',
+				'page_is_draft:'.$data->get('parent_id')
              ],
             // if next_id exists it must have the parent_id specified for the new route / page.
             'next_id' => [
                 'nullable',
                 Rule::exists('pages','id')
-                    ->where('parent_id', $data->get('parent_id'))
+                    ->where( function($query) use($data) { $query->where('parent_id', $data->get('parent_id'));})
             ],
             'slug' => [
                 // slug is required and can only contain lowercase letters, numbers, hyphen or underscore.

@@ -4,7 +4,6 @@ namespace Tests\Unit\Models;
 use App\Models\Block;
 use App\Models\LocalAPIClient;
 use App\Models\PublishingGroup;
-use App\Models\Scopes\VersionScope;
 use App\Models\User;
 use Exception;
 use Tests\TestCase;
@@ -18,17 +17,6 @@ class PageTest extends TestCase
     function getTestSite()
     {
 
-    }
-
-    /**
-     * @test
-     */
-    function draftVersionScope_isSetByDefaultWhenPageIsBooted()
-    {
-        $page = new Page();
-        $scope = Page::getGlobalScope(VersionScope::class);
-        $this->assertInstanceOf(VersionScope::class, $scope);
-        $this->assertEquals(Page::STATE_DRAFT, $scope->version);
     }
 
     /**
@@ -58,7 +46,7 @@ class PageTest extends TestCase
             '',
             ['name' => 'test-layout', 'version' => 1]
         );
-        $api->publishPage($site->homepage->id);
+        $api->publishPage($site->draftHomepage->id);
 	    $pages = Page::published()->get();
 	    $this->assertCount(1, $pages);
 	    foreach($pages as $page){
@@ -82,7 +70,7 @@ class PageTest extends TestCase
             '',
             ['name' => 'test-layout', 'version' => 1]
         );
-        $api->publishPage($site->homepage->id);
+        $api->publishPage($site->draftHomepage->id);
         $pages = Page::draft()->get();
         $this->assertCount(1, $pages);
         foreach($pages as $page){
@@ -106,37 +94,13 @@ class PageTest extends TestCase
             '',
             ['name' => 'test-layout', 'version' => 1]
         );
-        $api->publishPage($site->homepage->id);
+        $api->publishPage($site->draftHomepage->id);
         $pages = Page::version(Page::STATE_DRAFT)->get();
         $this->assertCount(1, $pages);
         $this->assertEquals(Page::STATE_DRAFT, $pages[0]->version);
         $pages = Page::version(Page::STATE_PUBLISHED)->get();
         $this->assertCount(1, $pages);
         $this->assertEquals(Page::STATE_PUBLISHED, $pages[0]->version);
-    }
-
-    /**
-     * @test
-     */
-    public function scopeAny_removesVersionScope()
-    {
-        $user = factory(User::class)->create();
-        $pubgroup = factory(PublishingGroup::class)->create();
-        $pubgroup->users()->attach($user);
-        $api = new LocalAPIClient($user);
-        $site = $api->createSite(
-            $pubgroup->id,
-            'test',
-            'example.com',
-            '',
-            ['name' => 'test-layout', 'version' => 1]
-        );
-        $api->publishPage($site->homepage->id);
-        $pages = Page::anyVersion()->orderBy('version')->get();
-
-        $this->assertCount(2, $pages);
-        $this->assertEquals(Page::STATE_DRAFT, $pages[0]->version);
-        $this->assertEquals(Page::STATE_PUBLISHED, $pages[1]->version);
     }
 
     /**

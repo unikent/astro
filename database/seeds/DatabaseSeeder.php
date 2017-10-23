@@ -91,7 +91,7 @@ class DatabaseSeeder extends Seeder
         $site = $client->createSite(
             1, 'Test Site', 'example.com', '', ['name'=>'kent-homepage','version'=>1]
         );
-        $client->addTree( $site->homepage->id, null, $this->testTree);
+        $client->addTree( $site->draftHomepage->id, null, $this->testTree);
         $client->publishPage(Page::forSiteAndPath($site->id, '/')->first()->id);
         $client->publishPage(Page::forSiteAndPath($site->id, '/postgraduate')->first()->id);
         $client->publishPage(Page::forSiteAndPath($site->id, '/postgraduate/2018')->first()->id);
