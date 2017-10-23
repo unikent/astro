@@ -27,9 +27,7 @@ class StoreRequest extends FormRequest
     {
         return [
             'upload' => 'required|file',
-
-            'site_ids' => 'required_without:publishing_group_ids|array',
-            'publishing_group_ids' => 'required_without:site_ids|array',
+            'site_ids' => 'required|array'
         ];
     }
 

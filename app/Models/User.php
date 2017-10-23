@@ -4,9 +4,6 @@ namespace App\Models;
 
 use KentAuth\Models\User as KentUser;
 
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-
 class User extends KentUser
 {
 
@@ -34,34 +31,13 @@ class User extends KentUser
 	  }
 
     /**
-     * Register callback to ensure user has a publishing group with their username.
-     */
-    protected static function boot()
-    {
-        parent::boot();
-        static::created(function($user){
-            // We want every user to automatically have a publishing group with their username.
-            $group = PublishingGroup::where('name', '=', $user->username)->first();
-            if(!$group){
-                $group = PublishingGroup::create(['name' => $user->username]);
-            }
-            $group->users()->sync($user, false);
-        });
-    }
-
-    public function publishing_groups()
-    {
-        return $this->belongsToMany(PublishingGroup::class, 'publishing_groups_users');
-    }
-
-    /**
      * Can this user edit the site with this id?
      * @param Site $site The ID of the site to check for.
      * @return mixed
      */
     public function canEditSite(Site $site)
     {
-      return $this->isAdmin() || $site->publishing_group->users()->contains($this->id);
+      return $this->isAdmin() || $this->hasPermissionForSite(Permission::EDIT_SITE, $site->id);
     }
 
     /**
@@ -87,5 +63,24 @@ class User extends KentUser
     public function roles()
 	{
 		return $this->hasMany(UserSiteRole::class);
+	}
+
+	/**
+	 * Does this user have the specified permission for the specified Site?
+	 * @param $permission
+	 * @param Site $site
+	 * @return bool
+	 */
+	public function hasPermissionForSite($permission, $site_id)
+	{
+		$permission = is_array($permission) ? $permission : [$permission];
+		$role = $this->roles()
+				->where('site_id', '=', $site_id)
+				->first();
+		if($role){
+			// user->roles is UserSiteRole relationship, need to get the role from that
+			return $role->role->permissions()->whereIn('slug', $permission)->count() > 0;
+		}
+		return false;
 	}
 }

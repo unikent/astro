@@ -77,20 +77,6 @@ class Media extends Model
 	}
 
 	/**
-	 * Scope a query to include Media items associated with the given PublishingGroups.
-	 *
-	 * @param Builder $query
-	 * @param Array $publishing_groups
-	 * @return Builder
-	 */
-	public function scopePublishingGroups(Builder $query, Array $publishing_groups)
-	{
-		$query->whereHas('publishing_groups', function($q) use ($publishing_groups) {
-			$q->whereIn('publishing_groups.id', $publishing_groups);
-		});
-	}
-
-	/**
 	 * Scope a query to include Media items associated with the given Blocks.
 	 *
 	 * @param Builder $query
@@ -126,11 +112,6 @@ class Media extends Model
 	public function scopeMimeTypes(Builder $query, Array $mime_types)
 	{
 		$query->whereIn('mime_type', $mime_types);
-	}
-
-	public function publishing_groups()
-	{
-		return $this->belongsToMany(PublishingGroup::class, 'media_publishing_groups');
 	}
 
 	public function sites()

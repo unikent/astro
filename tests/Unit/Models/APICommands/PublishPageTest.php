@@ -14,7 +14,6 @@ class PublishPageTest extends APICommandTestCase
     {
         return [
             'name' => 'A Valid Name',
-            'publishing_group_id' => factory(\App\Models\PublishingGroup::class)->create()->getKey(),
             'host' => 'example.com',
             'path' => '',
             'homepage_layout' => [

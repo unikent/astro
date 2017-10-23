@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Models\PublishingGroup;
 use ArrayObject;
 use Illuminate\Console\Command;
 use App\Models\User;
@@ -17,7 +16,6 @@ class AddUser extends Command
      */
     protected $signature = 'astro:adduser 
                                 {username}
-                                {publishinggroup? : The Publishing Group Name (if blank user will be added to a publishing group with their own username).} 
                                 {name? : The users name (only required if the user account does not already exist).}
                                 {email? : The users email (only required if the user account does not already exist).}
                             ';
@@ -27,7 +25,7 @@ class AddUser extends Command
      *
      * @var string
      */
-    protected $description = 'Add a user to a publishing group, creating the user if the account does not exist.';
+    protected $description = 'Add a user if the account does not exist.';
 
     /**
      * Create a new command instance.
@@ -47,16 +45,7 @@ class AddUser extends Command
     public function handle()
     {
         $name = $this->argument('name');
-        $pubgroup = null;
         $username = $this->argument('username');
-        $pubgroup_name = $this->argument('publishinggroup');
-        if($pubgroup_name && $pubgroup_name != $username){
-            $pubgroup = PublishingGroup::where('name', $pubgroup_name)->first();
-            if(!$pubgroup){
-                $this->error('Publishing group "' . $pubgroup_name . '" does not exist.');
-                return;
-            }
-        }
         $email = $this->argument('email');
         if(preg_match('/^[a-z0-9_-]{1,30}$/i', $username)){
             $user = User::where('username', $username)->first();
@@ -85,15 +74,10 @@ class AddUser extends Command
                 $user->settings =new ArrayObject();
                 $user->save();
                 $this->info('User created.');
-            }
-            if(!$pubgroup) {
-                // if we didn't find a pub group above, but got to here, we just want to make sure the
-                // user is a member of a publishing group named after their username.
-                // New users will have this group, but legacy ones will need it created.
-                $pubgroup = PublishingGroup::firstOrCreate(['name' => $username]);
-            }
-            $pubgroup->users()->syncWithoutDetaching([$user->id]);
-            $this->info('User "'.$username.'" added to publishing group "' . ($pubgroup_name ? $pubgroup_name : $username) . '"');
+				$this->info('User "'.$username.'" added.');
+            }else{
+            	$this->info('User "'.$username.'" already exists.');
+			}
         }else{
             $this->error('Username must be between 1 and 30 alphanumeric characters.');
         }

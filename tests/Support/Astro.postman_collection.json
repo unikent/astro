@@ -196,7 +196,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Test site\",\n\t\"host\": \"astro.test\",\n\t\"path\": \"/sam/says\",\n\t\"publishing_group_id\": \"1\",\n\t\"homepage_layout\": {\n\t\t\"name\": \"kent-homepage\",\n\t\t\"version\": \"1\"\n\t}\n}"
+					"raw": "{\n\t\"name\": \"Test site\",\n\t\"host\": \"astro.test\",\n\t\"path\": \"/sam/sayys\",\n\t\"homepage_layout\": {\n\t\t\"name\": \"kent-homepage\",\n\t\t\"version\": \"1\"\n\t}\n}"
 				},
 				"description": "Create a new Site."
 			},
@@ -226,7 +226,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Arrh!\"\n}"
+					"raw": "{\n\t\"name\": \"hhhhh!\"\n}"
 				},
 				"description": "Create a new Site."
 			},
@@ -236,7 +236,7 @@
 			"name": "Page - Get",
 			"request": {
 				"url": {
-					"raw": "http://astro.test:8080/api/v1/pages/4?include=ancestors,siblings,parent,next,previous,children",
+					"raw": "http://astro.test:8080/api/v1/pages/4?include=ancestors,siblings,parent,next,previous,children,site",
 					"protocol": "http",
 					"host": [
 						"astro",
@@ -252,7 +252,7 @@
 					"query": [
 						{
 							"key": "include",
-							"value": "ancestors,siblings,parent,next,previous,children",
+							"value": "ancestors,siblings,parent,next,previous,children,site",
 							"equals": true,
 							"description": ""
 						}
