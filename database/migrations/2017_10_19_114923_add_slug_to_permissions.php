@@ -28,7 +28,7 @@ class AddSlugToPermissions extends Migration
     public function down()
     {
         Schema::table('permissions', function (Blueprint $table) {
-            $table->unique('permissions_name_unique');
+            $table->unique('name', 'permissions_name_unique');
 			$table->dropUnique('ui_perms_slug');
 			$table->dropColumn('slug');
         });

@@ -28,7 +28,7 @@ class AddSlugToRoles extends Migration
     public function down()
     {
         Schema::table('roles', function (Blueprint $table) {
-            $table->unique('roles_name_unique');
+            $table->unique('name','roles_name_unique');
             $table->dropUnique('ui_roles_slug');
             $table->dropColumn('slug');
         });

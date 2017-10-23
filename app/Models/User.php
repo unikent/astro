@@ -97,11 +97,12 @@ class User extends KentUser
 	 */
 	public function hasPermissionForSite($permission, $site_id)
 	{
+		$permission = is_array($permission) ? $permission : [$permission];
 		$role = $this->roles()
 				->where('site_id', '=', $site_id)
 				->first();
 		if($role){
-			return $role->permissions()->where('slug', '=', $permission)->count() > 0;
+			return $role->permissions()->whereIn('slug', $permission)->count() > 0;
 		}
 		return false;
 	}

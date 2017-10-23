@@ -67,7 +67,7 @@ class PageController extends ApiController
 	 */
 	public function store(Request $request)
 	{
-		$this->authorize('create', new Page);
+		$this->authorize('create', Page::class);
 		$api = new LocalAPIClient(Auth::user());
 		$page = $api->execute(AddPage::class, $request->all());
 
@@ -148,6 +148,7 @@ class PageController extends ApiController
 	 */
 	public function publishTree(Request $request, Page $page)
 	{
+		$this->authorize('publish', $page);
 		$routes = $page->draftRoute->descendantsAndSelf()->get();
 
 		DB::beginTransaction();
