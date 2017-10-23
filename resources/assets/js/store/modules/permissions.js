@@ -92,7 +92,7 @@ const actions = {
 			.then(({data}) => {
 				const userList = data.data.users;
 				if (userList) {
-					const currentUser = userList.find((element) => element.name === payload.username);
+					const currentUser = userList.find((element) => element.username === payload.username);
 					commit('setCurrentRole', currentUser.role);
 				}
 				else {
