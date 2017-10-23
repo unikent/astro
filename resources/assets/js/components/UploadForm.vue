@@ -67,8 +67,6 @@ export default {
 				options.data = {};
 			}
 
-			// TODO: add actual publishing group here, when available
-			options.data['publishing_group_ids[]'] = 1;
 			return upload(options);
 		}
 	}
