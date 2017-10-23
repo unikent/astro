@@ -5,6 +5,7 @@ use App\Models\Page;
 use League\Fractal\ParamBag;
 use League\Fractal\Resource\Item as FractalItem;
 use League\Fractal\Resource\Collection as FractalCollection;
+use League\Fractal\Resource\Item;
 use League\Fractal\TransformerAbstract as FractalTransformer;
 use App\Http\Transformers\Api\v1\Definitions\LayoutTransformer as LayoutDefinitionTransformer;
 
@@ -21,7 +22,11 @@ class PageTransformer extends FractalTransformer
 		'revisions',
 		'site',
 		'layout_definition',
-		'ancestors'
+		'ancestors',
+		'children',
+		'siblings',
+		'next',
+		'previous'
 	];
 
     protected $full = true; // whether to include blocks with output
@@ -91,7 +96,7 @@ class PageTransformer extends FractalTransformer
     public function includeSite(Page $page)
     {
         if($page->site){
-            return new FractalItem($page->site, new SiteTransformer, false);
+            return new FractalItem($page->site, new SiteTransformer($page->version), false);
         }
     }
 
@@ -165,4 +170,57 @@ class PageTransformer extends FractalTransformer
 			return new FractalCollection($ancestors, new PageTransformer, false);
 		}
 	}
+
+	/**
+	 * Get the children of this page in order.
+	 * @param Page $page
+	 * @return FractalCollection
+	 */
+	public function includeChildren(Page $page)
+	{
+		$children = $page->children()->with('revision')->orderBy('lft')->get();
+		if($children){
+			return new FractalCollection($children, new PageTransformer, false);
+		}
+	}
+
+	/**
+	 * Get the siblings of this page in order.
+	 * @param Page $page
+	 * @return FractalCollection
+	 */
+	public function includeSiblings(Page $page)
+	{
+		$siblings = $page->siblingsAndSelf()->with('revision')->orderBy('lft')->get();
+		if($siblings){
+			return new FractalCollection($siblings, new PageTransformer, false);
+		}
+	}
+
+	/**
+	 * Get the "next" sibling page to this one
+	 * @param Page $page
+	 * @return Item
+	 */
+	public function includeNext(Page $page)
+	{
+		$sibling = $page->nextPage();
+		if($sibling){
+			return new Item($sibling, new PageTransformer, false);
+		}
+	}
+
+	/**
+	 * Get the "previous" sibling page to this one
+	 * @param Page $page
+	 * @return Item
+	 */
+	public function includePrevious(Page $page)
+	{
+		$sibling = $page->previousPage();
+		if($sibling){
+			return new Item($sibling, new PageTransformer, false);
+		}
+	}
+
 }

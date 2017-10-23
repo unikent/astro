@@ -71,8 +71,8 @@ class LocalAPIClientTest extends TestCase
             $publishing_group_id, 'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
         );
         $this->assertInstanceOf(Site::class, $site);
-        $this->assertInstanceOf(Page::class, $site->homepage);
-        $this->assertInstanceOf(Revision::class, $site->homepage->revision);
+        $this->assertInstanceOf(Page::class, $site->draftHomepage);
+        $this->assertInstanceOf(Revision::class, $site->draftHomepage->revision);
     }
 
     /**
@@ -88,7 +88,7 @@ class LocalAPIClientTest extends TestCase
         );
         $new_page_title = 'This is a page :)';
         $newpage = $client->addPage(
-            $site->homepage->id,
+            $site->draftHomepage->id,
             null,
             'foo',
             [
@@ -113,7 +113,7 @@ class LocalAPIClientTest extends TestCase
         $site = $client->createSite(
             $publishing_group_id, 'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
         );
-        $client->addTree($site->homepage->id, null, $this->testTree);
+        $client->addTree($site->draftHomepage->id, null, $this->testTree);
         $expected = [
             "/",
             "/undergraduate",
@@ -137,7 +137,7 @@ class LocalAPIClientTest extends TestCase
         $site = $client->createSite(
             $publishing_group_id, 'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
         );
-        $client->addTree($site->homepage->id, null, $this->testTree);
+        $client->addTree($site->draftHomepage->id, null, $this->testTree);
         $parent = Page::findBySiteAndPath($site->id,'/undergraduate');
         $new_page_title = 'test';
         $newpage = $client->addPage(
@@ -197,7 +197,7 @@ class LocalAPIClientTest extends TestCase
         );
         $new_page_title = 'This is a page :)';
         $newpage = $client->addPage(
-            $site->homepage->id,
+            $site->draftHomepage->id,
             null,
             'foo',
             ['name' => 'test-layout', 'version' => 1],
@@ -205,8 +205,8 @@ class LocalAPIClientTest extends TestCase
         );
         $this->assertInstanceOf(Page::class, $newpage);
         $newpage = $client->addPage(
-            $site->homepage->children()->first()->id,
-            $site->homepage->id,
+            $site->draftHomepage->children()->first()->id,
+            $site->draftHomepage->id,
             'bar',
             ['name' => 'test-layout', 'version' => 1],
             $new_page_title
@@ -225,7 +225,7 @@ class LocalAPIClientTest extends TestCase
         $site = $client->createSite(
             $publishing_group_id, 'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
         );
-        $client->addTree( $site->homepage->id, null, $this->testTree);
+        $client->addTree( $site->draftHomepage->id, null, $this->testTree);
         $parent1 = Page::findBySiteAndPath($site->id, '/undergraduate/2018');
         $parent2 = Page::findBySiteAndPath($site->id, '/postgraduate/2017');
         $client->addPage(
@@ -284,7 +284,7 @@ class LocalAPIClientTest extends TestCase
         $site = $client->createSite(
             $publishing_group_id, 'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
         );
-        $client->updatePageContent($site->homepage->id, null);
+        $client->updatePageContent($site->draftHomepage->id, null);
     }
 
     /**
@@ -298,11 +298,11 @@ class LocalAPIClientTest extends TestCase
         $site = $client->createSite(
             $publishing_group_id, 'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
         );
-        $homepage = $site->homepage;
+        $homepage = $site->draftHomepage;
         $old_revision = $homepage->revision;
         $homepage = $client->updatePageContent($homepage->id, ['main' => []]);
         $this->assertInstanceOf(Page::class, $homepage);
-        $this->assertInstanceOf(Revision::class, $site->homepage->revision);
+        $this->assertInstanceOf(Revision::class, $site->draftHomepage->revision);
         $new_revision = $homepage->revision;
         $this->assertNotEquals($new_revision->id, $old_revision->id);
     }

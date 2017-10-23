@@ -96,7 +96,7 @@ Note that the page editing toolbar is a separate component found in `components/
 
 			// works out if we should show a back button or not (ie whether we're editing a page or on the homepage)
 			showBack() {
-				return ['site', 'page', 'menu-editor'].indexOf(this.$route.name) !== -1;
+				return ['site', 'page', 'menu-editor', 'site-users'].indexOf(this.$route.name) !== -1;
 			},
 
 			showTools() {

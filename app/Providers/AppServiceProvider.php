@@ -33,6 +33,7 @@ class AppServiceProvider extends ServiceProvider
 				}
 				if($page->parent_id){ // can change slug on home page
 					$ok = Page::where('parent_id', '=', $page->parent_id)
+								->where('version', Page::STATE_DRAFT)
 								->where('slug', $value)
 								->count() == 0;
 					return $ok;
@@ -46,7 +47,8 @@ class AppServiceProvider extends ServiceProvider
 				->whereNotNull('parent_id')->exists();
 		});
 
-        Validator::extend('parent_is_published', function( $attr, $value ) { return PublishPage::canBePublished($value); });
+		Validator::extend('parent_is_published', function( $attr, $value ) { return PublishPage::canBePublished($value); });
+		Validator::extend('page_is_draft', function( $attr, $value ) { return ($page = Page::find($value) ) && $page->version == Page::STATE_DRAFT; });
 
         Validator::extend('page_is_valid', function($attr, $id) {
         	$page = Page::find($id);
@@ -76,7 +78,7 @@ class AppServiceProvider extends ServiceProvider
          */
 		Validator::extend('same_site', function($attribute, $value, $parameters, $validator){
 		    $site_id = DB::table('pages')->where('id', $parameters[0])->value('site_id');
-		    return DB::table('pages')->where('id', $value)->where('site_id', $site_id)->exists();
+		    return DB::table('pages')->where('id', $value)->where('site_id', $site_id)->where('version', Page::STATE_DRAFT)->exists();
         });
 
         /**

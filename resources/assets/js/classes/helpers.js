@@ -1,10 +1,13 @@
 import Config from 'classes/Config';
 import DefinitionClass from 'classes/Definition';
+import Vue from 'vue';
 
 /* global self, console, document */
 /* eslint-disable no-console */
 
 let winObj;
+
+const vue = new Vue();
 
 // window object exists
 if(typeof self === 'object' && self.self === self) {
@@ -130,7 +133,7 @@ export const smoothScrollTo = (options) => {
 	el.addEventListener('transitionend', onEnd, false);
 };
 
-export const readingSpeedFromString = (str, timeToNotice = 500) => {
+export const readingSpeedFromString = (str = '', timeToNotice = 500) => {
 	// average reading speed (CPM) + half a second to notice snackbar
 	return Math.ceil((str.length * 60000) / 863) + timeToNotice;
 };
@@ -148,4 +151,16 @@ export const prettyDate = (date) => {
 	diff = Math.round(diff);
 
 	return `${i > 0 ? 'about ' : ''}${diff} ${unit[i]}${diff == 1 ? '' : 's'} ago`;
+};
+
+export const notify = ({ title, message, type }) => {
+	vue.$notify({
+		title,
+		message,
+		type,
+		duration: readingSpeedFromString(message, 3000),
+		onClick() {
+			this.close();
+		}
+	});
 };

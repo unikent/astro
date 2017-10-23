@@ -119,7 +119,7 @@ import Draggable from 'vuedraggable';
 import ScrollInput from 'components/ScrollInput';
 import MenuItemField from 'components/menu-editor/MenuItemField';
 import SitePageLinks from 'components/menu-editor/SitePageLinks';
-import { win, readingSpeedFromString, prettyDate } from 'classes/helpers';
+import { win, notify, prettyDate } from 'classes/helpers';
 import Config from 'classes/Config';
 
 /* global setInterval, clearInterval */
@@ -299,7 +299,7 @@ export default {
 
 		publishMenu() {
 			if(this.hasErrors()) {
-				this.notify({
+				notify({
 					title: 'Menu not published',
 					message: `
 						There are some validation issues with this menu.
@@ -344,7 +344,7 @@ export default {
 
 					const hasErrors = this.hasErrors();
 
-					this.notify({
+					notify({
 						title: `Menu ${verb}`,
 						message: (
 							hasErrors ? `
@@ -357,7 +357,7 @@ export default {
 					});
 				})
 				.catch(() => {
-					this.notify({
+					notify({
 						title: `Menu not ${verb}`,
 						message: `
 							An error was encountered, please try again later.
@@ -366,18 +366,6 @@ export default {
 						type: 'error'
 					});
 				});
-		},
-
-		notify({ title, message, type }) {
-			this.$notify({
-				title,
-				message,
-				type,
-				duration: readingSpeedFromString(message, 3000),
-				onClick() {
-					this.close();
-				}
-			});
 		},
 
 		previewSite() {

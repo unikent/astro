@@ -91,15 +91,6 @@ class PublishPageTest extends APICommandTestCase
      * @test
      * @group APICommands
      */
-    public function execute_restoresDraftVersionScope()
-    {
-        $this->markTestIncomplete();
-    }
-
-    /**
-     * @test
-     * @group APICommands
-     */
     public function execute_whenThisPageIsAlreadyPublishedHere_leavesPublishedDescendantsUnchanged()
     {
         $this->markTestIncomplete();
