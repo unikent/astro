@@ -146,7 +146,7 @@
 								</td>
 								<td>
 									<div class="cell">
-										<el-select
+										<el-select-fixed-change-event
 											v-model="user.role"
 											size="small"
 											class="u-flex-auto-left"
@@ -159,13 +159,13 @@
 													:key="role.slug"
 												/>
 											</el-option-group>
-										</el-select>
+										</el-select-fixed-change-event>
 									</div>
 								</td>
 								<td>
 									<div class="cell">
 									<el-button
-										@click="removeUser(user.username, index)"
+										@click="removeUser(user.username)"
 										type="default"
 										size="small"
 									>
@@ -182,7 +182,6 @@
 						</template>
 					</tbody>
 				</table>
-				
 			</div>
 
 			<el-pagination
@@ -212,7 +211,8 @@ import _ from 'lodash';
 
 import Icon from 'components/Icon';
 import CustomMultiSelect from 'components/CustomMultiSelect';
-import { notify } from 'classes/helpers';
+import ElSelectFixedChangeEvent from 'components/ELSelectFixed';
+import { notify, aOrAn } from 'classes/helpers';
 
 
 export default {
@@ -228,7 +228,8 @@ export default {
 
 	components: {
 		Icon,
-		CustomMultiSelect
+		CustomMultiSelect,
+		ElSelectFixedChangeEvent
 	},
 
 	created() {
@@ -275,21 +276,17 @@ export default {
 
 	computed: {
 
-		searchFilter() {
-			return this.searchInput.length > 2 ? this.searchInput : null;
-		},
-
 		filteredUsers() {
 			const users = this.roleFilter ?
 				this.users.filter(user => user.role === this.roleFilter) :
 				this.users;
 
 			return (
-				this.searchFilter !== null ?
+				this.searchInput.length > 1 ?
 					users.filter(
 						this.createFilter(
 							['name', 'username', 'email'],
-							this.searchFilter.toLowerCase()
+							this.searchInput.toLowerCase()
 						)
 					) :
 					users
@@ -323,7 +320,7 @@ export default {
 
 	methods: {
 		fetchSiteData() {
-			const fetchUserList = this.$api.get(`users`);
+			const fetchUserList = this.$api.get('users');
 			const fetchSite = this.$api.get(`sites/${this.$route.params.site_id}?include=users`);
 			const fetchRoles = this.$api.get('roles');
 
@@ -375,11 +372,11 @@ export default {
 						.then(response => {
 							let lastResponse = {}, erroredUsers = [];
 
-							for (let i = 0; i < response.length; i++) {
-								if(response[i].status == 200){
+							for(let i = 0; i < response.length; i++) {
+								if(response[i].status === 200) {
 									lastResponse = response[i];
 								}
-								else{
+								else {
 									erroredUsers.push(JSON.parse(response[i].config.data).username);
 								}
 							}
@@ -398,7 +395,7 @@ export default {
 							if (erroredUsers.length > 0) {
 								notify({
 									title: 'Unable to add users',
-									message: `Adding the following users were uncuccessful: ${erroredUsers.join(', ')}`,
+									message: `Adding the following users was unsuccessful: ${erroredUsers.join(', ')}`,
 									type: 'error'
 								});
 							}
@@ -408,17 +405,18 @@ export default {
 			});
 		},
 
-		removeUser(username, index) {
+		removeUser(username ) {
 			this.$api
 				.put(
 					`sites/${this.$route.params.site_id}/users`,
-					{username}
+					{ username }
 				)
 				.then(({ data: json }) => {
 					this.users = json.data.users || [];
 
 					notify({
-						title: `User '${username}' has been successfully removed`,
+						title: 'User access successfully revoked',
+						message: `'${username}' no longer has access to this site.`,
 						type: 'success'
 					});
 				})
@@ -457,11 +455,12 @@ export default {
 					}
 				)
 				.then(({ data: json }) => {
+					const roleName = this.roles.find(role => role.slug === roleSlug).name;
 					this.users = json.data.users || [];
+
 					notify({
 						title: 'Role successfully changed',
-						message: `The '${username}' user's role has been changed to
-							${this.roles.find(role => role.slug === roleSlug).name}`,
+						message: `'${username}' is now ${aOrAn(roleName)} ${roleName}`,
 						type: 'success'
 					});
 				})
