@@ -1,5 +1,5 @@
 <template>
-<div class="menu-editor">
+<div class="menu-editor" v-if="canUserEditMenu">
 	<div class="columns">
 		<div class="column">
 			<el-card>
@@ -83,6 +83,16 @@
 		</div>
 	</div>
 </div>
+<div class="menu-editor" v-else>
+	<el-alert
+		title="You cannot edit the menu for this site"
+		type="error"
+		description="You do not have permission to edit the menu for this site. Please contact the site owner."
+		:closable="false"
+		show-icon
+	>
+  </el-alert>
+</div>
 </template>
 
 <script>
@@ -121,6 +131,8 @@ import MenuItemField from 'components/menu-editor/MenuItemField';
 import SitePageLinks from 'components/menu-editor/SitePageLinks';
 import { win, notify, prettyDate } from 'classes/helpers';
 import Config from 'classes/Config';
+import { mapGetters, mapActions } from 'vuex';
+import permissions  from 'store/modules/permissions'; // this is to use canUser directly and provide our own state for the site
 
 /* global setInterval, clearInterval */
 
@@ -205,6 +217,9 @@ export default {
 			errors: [],
 			sitePages: [],
 
+			// slug of the user's current role on this site if they have one
+			currentRole: '',
+
 			// serialised version of the menu, to test equality
 			// with current menu for isUnsaved computed property
 			initialMenu: null,
@@ -219,6 +234,26 @@ export default {
 	},
 
 	computed: {
+
+		...mapGetters([
+			'getPermissions',
+			'getGlobalRole'
+		]),
+
+		/**
+		 * checks to see if the current user has the permissions to edit menus for this site
+		 * @returns {boolean}
+		 */
+		canUserEditMenu() {
+			let siteState = {};
+
+			siteState.currentRole = this.currentRole;
+			siteState.permissions = this.getPermissions;
+			siteState.globalRole = this.getGlobalRole;
+	
+			return permissions.getters.canUser(siteState)('site.options.edit');
+		},
+
 
 		status() {
 			return (
@@ -240,9 +275,10 @@ export default {
 	},
 
 	methods: {
+
 		fetchSiteData() {
 			this.$api
-				.get(`sites/${this.$route.params.site_id}?include=pages`)
+				.get(`sites/${this.$route.params.site_id}?include=pages,role,users`)
 				.then(({ data: json }) => {
 					const publishedMenu = (
 						json.data.options['menu_published'] ||
@@ -263,6 +299,15 @@ export default {
 					this.lastPublishedDate = publishedMenu.last_published;
 					this.sitePages = json.data.pages;
 
+					// store the current user's role for this site if they have one
+					let siteUsers = json.data.users;
+					if (siteUsers) {
+						const currentRole = siteUsers.find((element) => element.username === window.astro.username);
+						if (currentRole) {
+							this.currentRole = currentRole.role;
+						} 
+					}
+						
 					this.menu.forEach((item, i) => this.validateMenuItem(i));
 					this.updateTimeElapsedSincePublish();
 				});
