@@ -11,7 +11,7 @@ describe('Store Permissions - canUser', () => {
 
 	beforeEach(() => {
 		state = {
-			roles : [
+			permissions : [
 				{
 					'name': 'Create Subsites',
 					'slug': 'subsite.create',
