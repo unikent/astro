@@ -152,7 +152,7 @@ export default {
 				name: '',
 				path: '',
 				host: '',
-				homepage_layout: [],
+				homepage_layout: '',
 				errors: '',
 			}
 		};
@@ -190,7 +190,7 @@ export default {
 				host: '',
 				path: '',
 				errors: '',
-				homepage_layout: []
+				homepage_layout: ''
 			};
 			this.loading = false;
 		},
@@ -230,7 +230,7 @@ export default {
 						host: '',
 						path: '',
 						errors: '',
-						homepage_layout: []
+						homepage_layout: ''
 					};
 					this.loading = false;
 
