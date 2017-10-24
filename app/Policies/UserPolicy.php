@@ -14,7 +14,6 @@ class UserPolicy
         if($user->isAdmin()){
             return true;
         }
-        return true;
     }
 
     /**
@@ -25,7 +24,7 @@ class UserPolicy
      */
     public function index(User $user)
     {
-        return false;
+        return true;
     }
 
 	/**
@@ -36,8 +35,8 @@ class UserPolicy
 	 */
     public function view(User $current_user, User $target)
 	{
-		// want to allow current user to view themselves
-		return ($current_user->id == $target->id);
+		// for now let all users view other users
+		return true;
 	}
 
 }

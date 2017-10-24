@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Page;
+use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -10,18 +11,14 @@ class PagePolicy
 {
     use HandlesAuthorization;
 
-    /**
-     * Determine whether the user can index page.
-     *
-     * @param  User  $user
-     * @return boolean
-     */
-    public function index(User $user)
-    {
-        return true;
-    }
+	public function before(User $user, $ability)
+	{
+		if($user->isAdmin()){
+			return true;
+		}
+	}
 
-    /**
+	/**
      * Determine whether the user can view the page.
      *
      * @param  \App\Models\User  $user
@@ -30,8 +27,11 @@ class PagePolicy
      */
     public function read(User $user, Page $page)
     {
-        // TODO: If page is published, OR if user has R/W access to site
-        return true;
+    	return $user->hasPermissionForSite([
+    		Permission::PREVIEW_PAGE,
+			Permission::PUBLISH_PAGE,
+			Permission::EDIT_SITE
+			], $page->site_id);
     }
 
     /**
@@ -41,10 +41,9 @@ class PagePolicy
      * @param  Page  $page
      * @return boolean
      */
-    public function create(User $user, Page $page)
+    public function create(User $user, $site_id)
     {
-        // TODO: If user has W access to site
-        return true;
+    	return $user->hasPermissionForSite(Permission::EDIT_SITE, $site_id);
     }
 
     /**
@@ -56,8 +55,7 @@ class PagePolicy
      */
     public function update(User $user, Page $page)
     {
-        // TODO: If user has W access to site
-        return true;
+        return $user->hasPermissionForSite(Permission::EDIT_SITE, $page->site_id);
     }
 
     /**
@@ -69,7 +67,7 @@ class PagePolicy
      */
     public function publish(User $user, Page $page)
     {
-        return true;
+        return $user->hasPermissionForSite(Permission::PUBLISH_PAGE, $page->site_id);
     }
 
     /**
@@ -81,7 +79,7 @@ class PagePolicy
      */
     public function revert(User $user, Page $page)
     {
-        return true;
+        return $user->hasPermissionForSite(Permission::REVERT_PAGE, $page->site_id);
     }
 
     /**
@@ -93,8 +91,7 @@ class PagePolicy
      */
     public function delete(User $user, Page $page)
     {
-        // TODO: If user has W access to site
-        return true;
+        return $user->hasPermissionForSite(Permission::DELETE_PAGE, $page->site_id);
     }
 
     /**
@@ -106,6 +103,6 @@ class PagePolicy
      */
     public function forceDelete(User $user, Page $page)
     {
-        return true;
+        return $user->hasPermissionForSite(Permission::DELETE_PAGE, $page->site_id);
     }
 }

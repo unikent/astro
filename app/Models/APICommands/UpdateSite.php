@@ -10,7 +10,7 @@ use App\Models\Site;
 use Illuminate\Validation\Rule;
 
 /**
- * Updates meta for a site including its name, domain name, path, publishing group and any other options.
+ * Updates meta for a site including its name, domain name, path and any other options.
  * @package App\Models\APICommands
  */
 class UpdateSite implements APICommand
@@ -19,7 +19,7 @@ class UpdateSite implements APICommand
      * Names of the primitive data types which map to single fields in the site table which
      * may be included as part of the update.
      */
-    const UPDATABLE_PRIMITIVE_FIELDS = ['name', 'path', 'host', 'publishing_group_id'];
+    const UPDATABLE_PRIMITIVE_FIELDS = ['name', 'path', 'host',];
 
     /**
      * Take a set of options (key, values) and a set of changes to those options
@@ -107,11 +107,7 @@ class UpdateSite implements APICommand
                 'max:190',
                 'string'
             ],
-            'publishing_group_id' => [
-                Rule::exists('publishing_groups', 'id'),
-                'nullable'
-            ],
-            'host' => [
+             'host' => [
                 'nullable',
                 'max:100',
                 'regex:/^[a-z0-9.-]+(:[0-9]+)?$/',

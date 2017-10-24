@@ -35,8 +35,6 @@ class PersistRequest extends FormRequest
             'route.parent_id' => [ 'required_with:route.slug' ],
 
             'site_id' => [],
-            'site.name' => [ 'required_with:site.publishing_group_id', 'max:190' ],
-            'site.publishing_group_id' => [ 'required_with:site.name' ],
 
             'is_published' => 'filled|boolean',
 
@@ -62,7 +60,6 @@ class PersistRequest extends FormRequest
 
         $rules['site_id'][] = Rule::exists('sites', 'id');
 
-        $rules['site.publishing_group_id'][] = Rule::exists('publishing_groups', 'id');
 
         // For each block instance...
         if($this->has('blocks')){

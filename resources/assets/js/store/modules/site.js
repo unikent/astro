@@ -15,7 +15,6 @@ const vue = new Vue();
  * @property {string} updated_at - The YYYY-MM-DD HH:MM:SS timestamp for when this site was updated.
  * @property {string} created_by - The username of the user who created this Site.
  * @property {string} updated_by - The username of the user who last updated this Site.
- * @property {PublishingGroup} publishing_group - The Publishing Group this site is a member of. May be null if data not loaded.
  * @property {Page} homepage - Representation of the Page which is the home page for this site. May be null if data not loaded.
  */
 

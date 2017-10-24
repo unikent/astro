@@ -8,37 +8,24 @@
 
 namespace Tests\Unit\Models\APICommands;
 
-use App\Console\Commands\AddSite;
 use App\Models\APICommands\AddPage;
 use App\Models\APICommands\CreateSite;
 use App\Models\Contracts\APICommand;
-use App\Models\Page;
-use App\Models\PublishingGroup;
-use App\Models\Revision;
-
-use App\Models\Site;
-use ClassesWithParents\E;
-use Exception;
-use Illuminate\Support\Facades\Config;
 
 class AddPageTest extends APICommandTestCase
 {
-    protected $pubgroup = null;
     protected $site = null;
 
     public function createSite()
     {
-        $publishing_group = factory(PublishingGroup::class)->create();
         $site = $this->execute(CreateSite::class, [
-            'publishing_group_id' => $publishing_group->id,
 
         ]);
     }
 
     public function getValidData()
     {
-        $this->pubgroup = $this->pubgroup ? $this->pubgroup : factory(PublishingGroup::class)->create();
-        $this->site = $this->site ? $this->site : $this->api()->createSite($this->pubgroup->id,'Test Site', 'example.org', null, [
+        $this->site = $this->site ? $this->site : $this->api()->createSite('Test Site', 'example.org', null, [
             'name' => 'test-layout',
             'version' => 1
         ]);

@@ -7,9 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Permission extends Model
 {
-  /**
-   * Define the permission strings with constants to catch sneaky typos.
-   */
+	/**
+	 * Define the permission strings with constants to catch sneaky typos.
+	 */
+	const REVERT_PAGE = 'page.revert';
 	const CREATE_SUBSITE = 'subsite.create';
 	const EDIT_SUBSITE = 'subsite.edit';
 	const DELETE_SUBSITE = 'subsite.delete';
@@ -29,9 +30,11 @@ class Permission extends Model
 	const ASSIGN_PAGE_PERMISSIONS = 'permissions.page.assign';
 	const ASSIGN_SUBSITE_PERMISSIONS = 'permissions.subsite.assign ';
 	const CREATE_SITE = 'site.create';
+	const LIST_SITES = 'site.list';
 	const DELETE_SITE = 'site.delete';
 	const EDIT_SITE = 'site.edit';
 	const MOVE_SITE = 'site.move';
+	const VIEW_SITE = 'site.view';
 	const TEMPLATE_MANIPULATION = 'templates.manipulate';
 
 	/**

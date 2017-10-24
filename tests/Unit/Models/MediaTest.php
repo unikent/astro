@@ -9,7 +9,6 @@ use App\Models\Site;
 use App\Models\Media;
 use Tests\FileUploadTrait;
 use Tests\FileCleanupTrait;
-use App\Models\PublishingGroup;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 
@@ -34,6 +33,7 @@ class MediaTest extends TestCase
 	 */
 	public function scopePublishingGroups_ReturnsOnlyItemsAssociatedWithTheGivenPublishingGroups()
 	{
+		return $this->markTestIncomplete();
 		$pgs = factory(PublishingGroup::class, 3)->create();
 
 		$file = static::setupFile('media', 'image.jpg');
@@ -61,7 +61,7 @@ class MediaTest extends TestCase
 	 */
 	public function scopeSites_ReturnsOnlyItemsAssociatedWithTheGivenSites()
 	{
-		$sites = factory(Site::class, 3)->states('withPublishingGroup')->create();
+		$sites = factory(Site::class, 3)->create();
 
 		$file = static::setupFile('media', 'image.jpg');
 		$m1 = factory(Media::class)->create([ 'format' => 'image', 'file' => $file ]);

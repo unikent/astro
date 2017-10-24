@@ -58,11 +58,6 @@ export default {
 					title: 'Sites'
 				},
 				{
-					link: '/media',
-					icon: 'media',
-					title: 'Media Manager'
-				},
-				{
 					link: '/settings',
 					icon: 'settings',
 					title: 'Settings'
