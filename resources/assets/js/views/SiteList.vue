@@ -63,7 +63,7 @@ This shouldn't matter, since admin is a 'let them do anything' switch,  but if w
 
 					<td>
 						<div class="cell">
-							<router-link :to="`/site/${site.id}/menu`" v-if="canUserOnSite('menu.edit', site.currentRole)">
+							<router-link :to="`/site/${site.id}/menu`" v-if="canUserOnSite('site.options.edit', site.currentRole)">
 								<el-button type="default" size="small">
 									Menu
 								</el-button>
