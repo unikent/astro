@@ -159,6 +159,38 @@ export default {
 		this.fetchData();
 	},
 
+	computed: {
+		sitesWithRoles: function() {
+			let sitesWithRoles = [];
+
+			for (var i = 0, len = this.sites.length; i < len; i++) {
+				let currentSite = this.sites[i];
+			
+				if (currentSite.users) {
+					// console.log(currentSite.users);
+					console.log(window.astro.username);
+					console.dir(currentSite.users);
+					console.log(currentSite.users.find((element) => element.username === window.astro.username));
+					
+					currentSite['currentRole'] = 'cheese';
+					
+				}
+			// 	if (siteUsers) {
+			// 		// console.log(siteUsers);
+			// 		// console.log(' we have ', currentRole);
+			// // 		var currentUser = userList.find((element) => element.name === window.astro.username);
+			// // 		console.log(curretUser);
+			// 	}
+			// 	else {
+			// 		// commit('setCurrentRole', {});
+			// 	}
+
+			  sitesWithRoles.push(currentSite);
+			}
+			return sitesWithRoles;
+		}
+	},
+
 	methods: {
 
 		// TODO: delete site is not yet implemented!
@@ -244,7 +276,7 @@ export default {
 		},
 
 		fetchData() {
-			const fetchSites = this.$api.get('sites?include=homepage.revision');
+			const fetchSites = this.$api.get('sites?include=homepage.revision,users');
 			const fetchGroups = this.$api.get('pubgroups');
 			const fetchLayouts = this.$api.get('layouts/definitions');
 
