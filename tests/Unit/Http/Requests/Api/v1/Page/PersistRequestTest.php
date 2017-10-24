@@ -19,7 +19,7 @@ class PersistRequestTest extends RequestTestCase
         $page = $page ?: factory(Page::class)->make();
         $route = $route ?: factory(Page::class)->states('withParent')->make([ 'page_id' => $page->getKey() ]);
 
-        $site = $site ?: factory(Site::class)->states('withPublishingGroup')->make();
+        $site = $site ?: factory(Site::class)->make();
 
         $block = $block ?: factory(Block::class)->make();
 
@@ -685,7 +685,7 @@ class PersistRequestTest extends RequestTestCase
         $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );
-        $site = factory(Site::class)->states('withPublishingGroup')->create();
+        $site = factory(Site::class)->create();
 
         $attrs = $this->getAttrs();
         $attrs['site_id'] = $site->getKey();
@@ -763,7 +763,6 @@ class PersistRequestTest extends RequestTestCase
         );
         $attrs = $this->getAttrs();
         unset($attrs['site']['name']);
-        unset($attrs['site']['publishing_group_id']);
 
         $request = $this->mockRequest('POST', $attrs);
         $validator = $request->getValidatorInstance();
@@ -782,7 +781,6 @@ class PersistRequestTest extends RequestTestCase
         );
         $attrs = $this->getAttrs();
         $attrs['site']['name'] = '';
-        $attrs['site']['publishing_group_id'] = '';
 
         $request = $this->mockRequest('POST', $attrs);
         $validator = $request->getValidatorInstance();
@@ -838,7 +836,6 @@ class PersistRequestTest extends RequestTestCase
             'This test has not been implemented yet.'
         );
         $attrs = $this->getAttrs();
-        unset($attrs['site']['publishing_group_id']);
 
         $request = $this->mockRequest('POST', $attrs);
         $validator = $request->getValidatorInstance();

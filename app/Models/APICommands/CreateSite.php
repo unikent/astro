@@ -27,7 +27,6 @@ class CreateSite implements APICommand
         return DB::transaction(function() use($user, $input) {
             $site = Site::create([
                 'name' => $input->get('name'),
-                'publishing_group_id' => $input->get('publishing_group_id'),
                 'host' => $input->get('host'),
                 'path' => $input->get('path'),
                 'options' => []
@@ -98,7 +97,6 @@ class CreateSite implements APICommand
         $version = !empty($layout['version']) ? $layout['version'] : null;
         $rules = [
             'name' => ['required', 'max:190' ],
-            'publishing_group_id' => [ 'required' ],
             'host' => [
                 'required',
                 'max:100',
@@ -123,7 +121,6 @@ class CreateSite implements APICommand
                 'integer'
             ]
         ];
-        $rules['publishing_group_id'][] = Rule::exists('publishing_groups', 'id');
         return $rules;
     }
 }

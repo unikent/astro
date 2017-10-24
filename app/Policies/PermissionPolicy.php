@@ -14,7 +14,6 @@ class PermissionPolicy
         if($user->isAdmin()){
             return true;
         }
-        return true;
     }
 
     /**
@@ -25,7 +24,7 @@ class PermissionPolicy
      */
     public function list(User $user)
     {
-        return false;
+        return true;
     }
 
 

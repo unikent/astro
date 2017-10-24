@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Models\LocalAPIClient;
-use App\Models\PublishingGroup;
 use Illuminate\Console\Command;
 use Illuminate\Validation\ValidationException;
 use App\Models\User;
@@ -16,7 +15,6 @@ class AddSite extends Command
      * @var string
      */
     protected $signature = 'astro:addsite
-                                {publishinggroup : The name of the publishing group for the site.}
                                 {name : The name for the site.}
                                 {host : The host or domain name for the site.}
                                 {path : The root path for the URL for the site.}
@@ -28,7 +26,7 @@ class AddSite extends Command
      *
      * @var string
      */
-    protected $description = 'Creates a new site, assigning it to an existing publishing group.';
+    protected $description = 'Creates a new site.';
 
     /**
      * Create a new command instance.
@@ -47,18 +45,6 @@ class AddSite extends Command
      */
     public function handle()
     {
-        $pg_name = $this->argument('publishinggroup');
-        if(!preg_match('/^[a-z0-9_ -]+$/i', $pg_name)){
-            $this->error('"' . $pg_name . '" is not a valid publishing group name.');
-            return;
-        }
-        $pubgroup = PublishingGroup::where('name', $pg_name)->first();
-        if(!$pubgroup){
-            $pubgroup = PublishingGroup::create([
-               'name' => $pg_name
-            ]);
-            $this->info('Publishing group "'.$pg_name.'" created.');
-        }
         $name = $this->argument('name');
         $host = $this->argument('host');
         $path = $this->argument('path');
@@ -70,8 +56,8 @@ class AddSite extends Command
         $user = User::where('role', 'admin')->first();
         $api = new LocalAPIClient($user);
         try{
-            $site = $api->createSite($pubgroup->id, $name, $host, $path, [ 'name' => $matches[1], 'version' => $matches[2] ]);
-            $this->info('Site "'.$site->name.'" created in publishing group "'.$site->publishing_group->name . '"');
+            $site = $api->createSite($name, $host, $path, [ 'name' => $matches[1], 'version' => $matches[2] ]);
+            $this->info('Site "'.$site->name.'" created.');
         }catch( ValidationException $e){
             foreach($e->validator->getMessageBag()->toArray() as $field => $errors){
                 $err = $field . "\n";

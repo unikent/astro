@@ -36,7 +36,8 @@ export default {
 		onSuccess: {
 			type: Function,
 			default: () => {}
-		}
+		},
+		site_id: Number
 	},
 
 	components: {
@@ -66,9 +67,7 @@ export default {
 			if(!options.data) {
 				options.data = {};
 			}
-
-			// TODO: add actual publishing group here, when available
-			options.data['publishing_group_ids[]'] = 1;
+			options.data['site_ids[]'] = this.site_id;
 			return upload(options);
 		}
 	}

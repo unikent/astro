@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Models\LocalAPIClient;
 use App\Models\Page;
+use App\Models\Permission;
 use App\Models\Site;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -27,6 +28,7 @@ class SiteController extends ApiController
 	 */
 	public function index(Request $request)
 	{
+		$this->authorize('index', Site::class);
 		$api = new LocalAPIClient(Auth::user());
 		$transformer = new SiteTransformer($request->get('version', Page::STATE_DRAFT));
 		return fractal($api->getSites(), $transformer)->parseIncludes($request->get('include'))->respond();
@@ -41,9 +43,9 @@ class SiteController extends ApiController
 	 */
 	public function store(Request $request)
 	{
+		$this->authorize('create', Site::class);
 		$api = new LocalAPIClient(Auth::user());
 		$site = $api->createSite(
-			$request->get('publishing_group_id'),
 			$request->get('name'),
 			$request->get('host'),
 			$request->get('path'),
@@ -65,6 +67,7 @@ class SiteController extends ApiController
 	 */
 	public function users(Request $request, Site $site)
 	{
+		$this->authorize('assign', $site);
 		$api = new LocalAPIClient(Auth::user());
 		$site = $api->updateSiteUserRole($site->id, $request->get('username'), $request->get('role'));
 		return fractal($site, new SiteTransformer())->parseIncludes('users')->respond(200);
@@ -78,6 +81,7 @@ class SiteController extends ApiController
 	 */
 	public function update(Request $request, Site $site)
 	{
+		$this->authorize('update', $site);
 		$api = new LocalAPIClient(Auth::user());
 		$site = $api->updateSite($site->id, $request->all());
 		return fractal($site, new SiteTransformer())->respond(200);
@@ -104,7 +108,7 @@ class SiteController extends ApiController
 	 */
 	public function show(Request $request, Site $site)
 	{
-		$this->authorize('read', $site);
+		$this->authorize('view', $site);
 		return fractal($site, new SiteTransformer($request->get('version', Page::STATE_DRAFT)))
 			->parseIncludes($request->get('include'))
 			->respond();
@@ -119,7 +123,7 @@ class SiteController extends ApiController
 	 */
 	public function tree(Request $request, Site $site)
 	{
-		$this->authorize('read', $site);
+		$this->authorize('view', $site);
 		$data = $this->pagesToHierarchy(
 			fractal(
 				$site->pages($request->get('version', Page::STATE_DRAFT))
@@ -137,8 +141,15 @@ class SiteController extends ApiController
 		return new JsonResponse($data);
 	}
 
-	public function move(Request $request)
+	/**
+	 * PUT/PATCH /api/v1/sites/{site}/???
+	 * @param Request $request
+	 * @param Page $page
+	 * @return object
+	 */
+	public function move(Request $request, Site $site)
 	{
+		$this->authorize('movepages', $site);
 		$api = new LocalAPIClient(Auth::user());
 		$result = $api->movePage(
 			$request->get('page_id'),

@@ -3,7 +3,6 @@
 namespace Tests\Unit\Models;
 
 use App\Models\LocalAPIClient;
-use App\Models\PublishingGroup;
 use App\Models\Revision;
 use Illuminate\Contracts\Validation\ValidationException;
 use Illuminate\Contracts\Validation\Validator;
@@ -65,10 +64,9 @@ class LocalAPIClientTest extends TestCase
      */
     public function createSite_createsASite()
     {
-        $publishing_group_id = factory(PublishingGroup::class)->create()->getKey();
         $client = $this->fixture();
         $site = $client->createSite(
-            $publishing_group_id, 'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
+            'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
         );
         $this->assertInstanceOf(Site::class, $site);
         $this->assertInstanceOf(Page::class, $site->draftHomepage);
@@ -81,10 +79,9 @@ class LocalAPIClientTest extends TestCase
      */
     public function addPage_addsAPage()
     {
-        $publishing_group_id = factory(PublishingGroup::class)->create()->getKey();
         $client = $this->fixture();
         $site = $client->createSite(
-            $publishing_group_id, 'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
+            'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
         );
         $new_page_title = 'This is a page :)';
         $newpage = $client->addPage(
@@ -108,10 +105,9 @@ class LocalAPIClientTest extends TestCase
      */
     public function addTree_addsMultiplePages()
     {
-        $publishing_group_id = factory(PublishingGroup::class)->create()->getKey();
         $client = $this->fixture();
         $site = $client->createSite(
-            $publishing_group_id, 'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
+            'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
         );
         $client->addTree($site->draftHomepage->id, null, $this->testTree);
         $expected = [
@@ -132,10 +128,9 @@ class LocalAPIClientTest extends TestCase
      */
     public function addPage_addsAPageAtTheEnd_ifNoBeforeID()
     {
-        $publishing_group_id = factory(PublishingGroup::class)->create()->getKey();
         $client = $this->fixture();
         $site = $client->createSite(
-            $publishing_group_id, 'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
+            'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
         );
         $client->addTree($site->draftHomepage->id, null, $this->testTree);
         $parent = Page::findBySiteAndPath($site->id,'/undergraduate');
@@ -167,10 +162,9 @@ class LocalAPIClientTest extends TestCase
     function addPage_withNoParent_fails()
     {
         $this->expectException(\Illuminate\Validation\ValidationException::class);
-        $publishing_group_id = factory(PublishingGroup::class)->create()->getKey();
         $client = $this->fixture();
         $site = $client->createSite(
-            $publishing_group_id, 'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
+             'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
         );
         $new_page_title = 'This is a page :)';
         $newpage = $client->addPage(
@@ -190,10 +184,9 @@ class LocalAPIClientTest extends TestCase
     function addPage_whenBeforeIsARoot_fails()
     {
         $this->expectException(\Illuminate\Validation\ValidationException::class);
-        $publishing_group_id = factory(PublishingGroup::class)->create()->getKey();
         $client = $this->fixture();
         $site = $client->createSite(
-            $publishing_group_id, 'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
+            'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
         );
         $new_page_title = 'This is a page :)';
         $newpage = $client->addPage(
@@ -220,10 +213,9 @@ class LocalAPIClientTest extends TestCase
     public function addPage_addsAPageBeforeAnotherPage_ifBeforeID()
     {
         $this->expectException(\Illuminate\Validation\ValidationException::class);
-        $publishing_group_id = factory(PublishingGroup::class)->create()->getKey();
         $client = $this->fixture();
         $site = $client->createSite(
-            $publishing_group_id, 'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
+             'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
         );
         $client->addTree( $site->draftHomepage->id, null, $this->testTree);
         $parent1 = Page::findBySiteAndPath($site->id, '/undergraduate/2018');
@@ -264,10 +256,9 @@ class LocalAPIClientTest extends TestCase
     function updateContent_withNoDraftId_fails()
     {
         $this->expectException(\Illuminate\Validation\ValidationException::class);
-        $publishing_group_id = factory(PublishingGroup::class)->create()->getKey();
         $client = $this->fixture();
         $site = $client->createSite(
-            $publishing_group_id, 'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
+            'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
         );
         $client->updatePageContent(null, []);
     }
@@ -279,10 +270,9 @@ class LocalAPIClientTest extends TestCase
     public function updateContent_withNoBlocks_fails()
     {
         $this->expectException(\Illuminate\Validation\ValidationException::class);
-        $publishing_group_id = factory(PublishingGroup::class)->create()->getKey();
         $client = $this->fixture();
         $site = $client->createSite(
-            $publishing_group_id, 'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
+            'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
         );
         $client->updatePageContent($site->draftHomepage->id, null);
     }
@@ -293,10 +283,9 @@ class LocalAPIClientTest extends TestCase
      */
     public function updateContent_withValidData_works()
     {
-        $publishing_group_id = factory(PublishingGroup::class)->create()->getKey();
         $client = $this->fixture();
         $site = $client->createSite(
-            $publishing_group_id, 'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
+            'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
         );
         $homepage = $site->draftHomepage;
         $old_revision = $homepage->revision;

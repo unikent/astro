@@ -19,6 +19,7 @@
 			:accept="accept"
 			:multiple="multiple"
 			:on-success="onSuccess"
+			:site_id="this.$route.params.site_id"
 		/>
 	</div>
 </template>
@@ -41,7 +42,8 @@ export default {
 		onSuccess: {
 			type: Function,
 			default: () => {}
-		}
+		},
+		site_id: Number
 	},
 
 	components: {

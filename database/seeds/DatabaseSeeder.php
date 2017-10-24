@@ -17,8 +17,6 @@ class DatabaseSeeder extends Seeder
         'revision_sets',
 	    'pages',
         'sites',
-        'publishing_groups',
-        'publishing_groups_users',
 		'users',
 	];
 
@@ -73,11 +71,6 @@ class DatabaseSeeder extends Seeder
 
 		$this->cleanDatabase();
 
-		DB::table('publishing_groups')->insert([
-		    'id' => 1,
-		    'name' => 'Test Group'
-        ]);
-
 		$user = factory(User::class)->create([
 			'username' => 'admin',
 			'name'=> 'Admin',
@@ -89,7 +82,7 @@ class DatabaseSeeder extends Seeder
 
         $client = new LocalAPIClient($user);
         $site = $client->createSite(
-            1, 'Test Site', 'example.com', '', ['name'=>'kent-homepage','version'=>1]
+            'Test Site', 'example.com', '', ['name'=>'kent-homepage','version'=>1]
         );
         $client->addTree( $site->draftHomepage->id, null, $this->testTree);
         $client->publishPage(Page::forSiteAndPath($site->id, '/')->first()->id);

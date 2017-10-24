@@ -14,7 +14,6 @@ class RolePolicy
         if($user->isAdmin()){
             return true;
         }
-        return true;
     }
 
     /**
@@ -25,7 +24,7 @@ class RolePolicy
      */
     public function list(User $user)
     {
-        return false;
+        return true;
     }
 
 

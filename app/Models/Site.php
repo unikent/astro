@@ -11,7 +11,6 @@ class Site extends Model
 
     public $fillable = [
         'name',
-        'publishing_group_id',
         'host',
         'path',
         'created_by',
@@ -67,15 +66,6 @@ class Site extends Model
     {
         return $this->pages(Page::STATE_PUBLISHED);
     }
-
-    /**
-     * The publishing group for this site.
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-	public function publishing_group()
-	{
-		return $this->belongsTo(PublishingGroup::class, 'publishing_group_id');
-	}
 
 	/**
 	 * Get the UserSiteRole for the currently authenticated user for this site.

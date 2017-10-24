@@ -123,7 +123,6 @@ class LocalAPIClient implements APIClient
 
 	/**
 	 * Create a new site.
-	 * @param int $publishing_group_id ID of the publishing group for the new site.
 	 * @param string $name Name for the new site.
 	 * @param string $host Hostname for the new site.
 	 * @param string $path Path for the new site.
@@ -131,10 +130,9 @@ class LocalAPIClient implements APIClient
 	 * @param array $options Other options.
 	 * @return Site|object
 	 */
-	public function createSite($publishing_group_id, $name, $host, $path, $homepage_layout, $options = [])
+	public function createSite($name, $host, $path, $homepage_layout, $options = [])
 	{
 		return $this->execute(CreateSite::class, [
-			'publishing_group_id' => $publishing_group_id,
 			'name' => $name,
 			'host' => $host,
 			'path' => $path,
@@ -293,7 +291,6 @@ class LocalAPIClient implements APIClient
 	 * name => string,
 	 * host => string,
 	 * path => string,
-	 * publishing_group_id => integer,
 	 * options => array of site options. Keys with null values will be removed from the site options, only keys that are
 	 * present will be updated.
 	 * @return Site|object The updated site object.

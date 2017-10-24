@@ -75,20 +75,12 @@
 		<el-dialog title="Add Site" v-model="dialogFormVisible">
 			<el-form :model="form" label-position="top">
 				<el-row type="flex" :gutter="20">
+
 					<el-col :span="11">
 
 						<el-form-item label="Name">
 							<el-input v-model="form.name" auto-complete="off"></el-input>
 						</el-form-item>
-
-						<el-form-item label="Host">
-							<el-input v-model="form.host" auto-complete="off" placeholder="www.kent.ac.uk"></el-input>
-						</el-form-item>
-
-						<el-form-item label="Path">
-							<el-input v-model="form.path" auto-complete="off" placeholder=""></el-input>
-						</el-form-item>
-
 					</el-col>
 
 					<el-col :span="11" :offset="2">
@@ -97,13 +89,27 @@
 								<el-option v-for="layout in layouts" :label="layout.name" :value="layout" :key="layout.name" />
 							</el-select>
 						</el-form-item>
+					</el-col>
 
-						<el-form-item label="Publishing Group">
-							<el-select v-model="form.publishing_group_id" class="w100" placeholder="Select">
-								<el-option v-for="group in publishingGroups" :label="group.name" :value="group.id" :key="group.id" />
-							</el-select>
+				</el-row>
+
+				<el-row type="flex" :gutter="20">
+
+					<el-col :span="11">
+
+						<el-form-item label="Host">
+							<el-input v-model="form.host" auto-complete="off" placeholder="www.kent.ac.uk"></el-input>
+						</el-form-item>
+
+					</el-col>
+
+					<el-col :span="11" :offset="2">
+
+						<el-form-item label="Path">
+							<el-input v-model="form.path" auto-complete="off" placeholder=""></el-input>
 						</el-form-item>
 					</el-col>
+
 				</el-row>
 
 				<div class="el-alert el-alert--error" v-if="form.errorMsgs">
@@ -142,14 +148,11 @@ export default {
 			dialogFormVisible: false,
 			loading: true,
 
-			publishingGroups: [],
-
 			form: {
 				name: '',
 				path: '',
 				host: '',
-				homepage_layout: [],
-				publishing_group_id: '',
+				homepage_layout: '',
 				errors: '',
 			}
 		};
@@ -216,13 +219,16 @@ export default {
 		cancelForm() {
 			this.dialogFormVisible = false;
 			// reset the form
+			this.resetForm();
+		},
+
+		resetForm() {
 			this.form = {
 				name: '',
 				host: '',
 				path: '',
 				errors: '',
-				publishing_group_id: '',
-				homepage_layout: []
+				homepage_layout: ''
 			};
 			this.loading = false;
 		},
@@ -243,7 +249,6 @@ export default {
 				name: this.form.name,
 				host: this.form.host,
 				path: this.form.path,
-				publishing_group_id: this.form.publishing_group_id,
 				homepage_layout: {
 					name: this.form.homepage_layout.name,
 					version: this.form.homepage_layout.version
@@ -258,15 +263,7 @@ export default {
 					this.fetchData();
 
 					// reset the form
-					this.form = {
-						name: '',
-						host: '',
-						path: '',
-						errors: '',
-						publishing_group_id: '',
-						homepage_layout: []
-					};
-					this.loading = false;
+					this.resetForm();
 
 				})
 				.catch((errors) => {
@@ -279,16 +276,14 @@ export default {
 
 		fetchData() {
 			const fetchSites = this.$api.get('sites?include=homepage.revision,users');
-			const fetchGroups = this.$api.get('pubgroups');
 			const fetchLayouts = this.$api.get('layouts/definitions');
 
 			// make sure we get all the data back before continuing
 			this.$api
-				.all([fetchSites, fetchGroups, fetchLayouts])
-				.then(this.$api.spread((sites, groups, layouts) => {
+				.all([fetchSites, fetchLayouts])
+				.then(this.$api.spread((sites, layouts) => {
 
 					this.sites = sites.data.data;
-					this.publishingGroups = groups.data.data;
 					this.layouts = [];
 					layouts = layouts.data.data;
 

@@ -21,7 +21,6 @@ class SiteTransformer extends FractalTransformer
 
     protected $defaultIncludes = [ ];
     protected $availableIncludes = [
-		'publishing_group',
 		'draft_homepage',
 		'published_homepage',
 		'draft_pages',
@@ -162,16 +161,5 @@ class SiteTransformer extends FractalTransformer
 		}
 	}
 
-	/**
-	 * @param Site $site
-	 * @return Item
-	 * @deprecated
-	 */
-	public function includePublishingGroup(Site $site)
-	{
-		if($site->publishing_group){
-			return new FractalItem($site->publishing_group, new PublishingGroupTransformer, false);
-		}
-	}
 
 }

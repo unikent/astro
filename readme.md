@@ -123,9 +123,8 @@ putting it in a completely separate nested set **scope** (tree) to the draft ver
 
 Only admin users can create and manage **Sites**.
 
-Each **Site** has a **PublishingGroup** (which can have many **Sites**), and only users who are members of that 
-**PublishingGroup** have the ability to edit a **Page** within that Site.
-
+Users are added to **Roles** on **Sites**. Each **Role** has a predefined list of **Permissions** which determine what a user
+can do on the site they have a role on.
 
 ##### Notes on Publishing
 Pages are published via `/api/v1/page/ID/publish`. Internally this calls `$page->publish($transformer)`. When publishing:
