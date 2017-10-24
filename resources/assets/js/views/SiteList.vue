@@ -1,8 +1,20 @@
+/**
+List of Sites
+
+This provides a list of sites which are avaliable to the logged in user
+
+Note
+----
+Permission checking - we're checking on two admin only permissions which are not actually defined for the Actions buttons. These permissions are 
+1. site.create
+2. site.delete
+This shouldn't matter, since admin is a 'let them do anything' switch,  but if we need to add them we should make the names consistent. 
+ */
 <template>
 <el-card>
 	<div slot="header" class="manage-table__header">
 		<span class="main-header">Manage sites</span>
-		<el-button type="default" @click="dialogFormVisible = true" class="manage-table__add-button">
+		<el-button v-if="canUser('site.create')" type="default" @click="dialogFormVisible = true" class="manage-table__add-button">
 			Add Site
 		</el-button>
 	</div>
@@ -33,7 +45,7 @@
 			</thead>
 			<tbody v-loading.body="loading">
 				<tr
-				v-for="site in sites"
+				v-for="site in sitesWithRoles"
 				:key="site.id"
 				class="el-table__row"
 				>
@@ -51,17 +63,17 @@
 
 					<td>
 						<div class="cell">
-							<router-link :to="`/site/${site.id}/menu`">
+							<router-link :to="`/site/${site.id}/menu`" v-if="canUserOnSite('menu.edit', site.currentRole)">
 								<el-button type="default" size="small">
 									Menu
 								</el-button>
 							</router-link>
-							<router-link :to="`/site/${site.id}/users`">
+							<router-link :to="`/site/${site.id}/users`" v-if="canUserOnSite('permissions.site.assign', site.currentRole)">
 								<el-button type="default" size="small">
 									Manage users
 								</el-button>
 							</router-link>
-							<el-button @click="askRemove(site.id)" type="default" size="small">
+							<el-button @click="askRemove(site.id)" type="default" size="small" v-if="canUserOnSite('site.delete', site.currentRole)">
 								<icon name="delete" width="14" height="14" />
 							</el-button>
 						</div>
@@ -134,6 +146,8 @@
 
 <script>
 import Icon from 'components/Icon';
+import { mapGetters } from 'vuex';
+import permissions  from 'store/modules/permissions'; // this is to use canUser directly and provide our own state for each site in the list
 
 export default {
 
@@ -163,32 +177,27 @@ export default {
 	},
 
 	computed: {
+
+		...mapGetters([
+			'canUser',
+			'getPermissions',
+			'getGlobalRole'
+		]),
+
+
 		sitesWithRoles: function() {
 			let sitesWithRoles = [];
 
 			for (var i = 0, len = this.sites.length; i < len; i++) {
+				// if the site has a role for the user then add the currentRole to the list of sites
 				let currentSite = this.sites[i];
-			
+				currentSite['currentRole'] = ''; // set a default
 				if (currentSite.users) {
-					// console.log(currentSite.users);
-					// console.log(window.astro.username);
-					// console.dir(currentSite.users);
 					let result = currentSite.users.find((element) => element.username === window.astro.username);
 					if (result) {
-						console.log('result is ', result);
+						currentSite['currentRole'] = result.role;
 					}
-					currentSite['currentRole'] = 'cheese';
-					
 				}
-			// 	if (siteUsers) {
-			// 		// console.log(siteUsers);
-			// 		// console.log(' we have ', currentRole);
-			// // 		var currentUser = userList.find((element) => element.name === window.astro.username);
-			// // 		console.log(curretUser);
-			// 	}
-			// 	else {
-			// 		// commit('setCurrentRole', {});
-			// 	}
 
 			  sitesWithRoles.push(currentSite);
 			}
@@ -197,6 +206,22 @@ export default {
 	},
 
 	methods: {
+
+		/**
+		 * a wrapper around canUser which provides a fake state to make it work in the context
+		 * of sites which are not loaded into the vuex state 
+		 * 
+		 * @param {string} permissionSlug - the slug of the permission ie. page.publish
+		 * @param {string} siteRole - the role the user has on the site ie. site.owner
+		 */
+		canUserOnSite(permissionSlug, siteRole) {
+			let siteState = {};
+			siteState.currentRole = siteRole;
+			siteState.permissions = this.getPermissions;
+			siteState.globalRole = this.getGlobalRole;
+	
+			return permissions.getters.canUser(siteState)(permissionSlug);
+		},
 
 		// TODO: delete site is not yet implemented!
 		askRemove(index) {
