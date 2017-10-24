@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\v1;
 
+use App\Models\APICommands\UpdateSite;
 use App\Models\LocalAPIClient;
 use App\Models\Page;
 use App\Models\Permission;
@@ -81,7 +82,15 @@ class SiteController extends ApiController
 	 */
 	public function update(Request $request, Site $site)
 	{
-		$this->authorize('update', $site);
+		// @TODO split API into different methods to handle different levels of permission
+		// for eg updating options vs updating site path, domain, etc.
+		if(array_first($request->all(), function($value, $field){
+			return in_array($field, UpdateSite::UPDATABLE_PRIMITIVE_FIELDS);
+		})){
+			$this->authorize('update', $site);
+		}elseif($request->has('options')){
+			$this->authorize('updateOptions', $site);
+		}
 		$api = new LocalAPIClient(Auth::user());
 		$site = $api->updateSite($site->id, $request->all());
 		return fractal($site, new SiteTransformer())->respond(200);

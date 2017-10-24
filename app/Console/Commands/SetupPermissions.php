@@ -41,7 +41,7 @@ class SetupPermissions extends Command
 		Permission::CREATE_SUBSITE => 'Create Subsites',
 		Permission::EDIT_SUBSITE => 'Edit Subsites',
 		Permission::DELETE_SUBSITE => 'Delete Subsites',
-		Permission::EDIT_MENU => 'Edit Menus',
+		Permission::EDIT_SITE_OPTIONS => 'Edit Site Options',
 		Permission::MOVE_SUBSITE => 'Move Subsites',
 		Permission::ADD_PAGE => 'Add Pages',
 		Permission::EDIT_PAGE => 'Edit Pages',
@@ -72,11 +72,12 @@ class SetupPermissions extends Command
 
 		Role::OWNER => [
 			Permission::VIEW_SITE,
+			Permission::EDIT_SITE_OPTIONS,
+			Permission::EDIT_SITE,
 			Permission::REVERT_PAGE,
 			Permission::CREATE_SUBSITE,
 			Permission::EDIT_SUBSITE,
 			Permission::DELETE_SUBSITE,
-			Permission::EDIT_MENU,
 			Permission::LIST_SITES,
 			Permission::MOVE_SUBSITE,
 			Permission::ADD_PAGE,
@@ -94,11 +95,11 @@ class SetupPermissions extends Command
 			Permission::ASSIGN_SUBSITE_PERMISSIONS
 		],
 		Role::EDITOR => [
+			Permission::EDIT_SITE_OPTIONS,
 			Permission::VIEW_SITE,
 			Permission::REVERT_PAGE,
 			Permission::LIST_SITES,
 			Permission::EDIT_SUBSITE,
-			Permission::EDIT_MENU,
 			Permission::MOVE_SUBSITE,
 			Permission::ADD_PAGE,
 			Permission::EDIT_PAGE,

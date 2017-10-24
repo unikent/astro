@@ -10,11 +10,11 @@ class Permission extends Model
 	/**
 	 * Define the permission strings with constants to catch sneaky typos.
 	 */
+	const EDIT_SITE_OPTIONS = 'site.options.edit';
 	const REVERT_PAGE = 'page.revert';
 	const CREATE_SUBSITE = 'subsite.create';
 	const EDIT_SUBSITE = 'subsite.edit';
 	const DELETE_SUBSITE = 'subsite.delete';
-	const EDIT_MENU = 'menu.edit';
 	const MOVE_SUBSITE = 'subsite.move';
 	const ADD_PAGE = 'page.add';
 	const EDIT_PAGE = 'page.edit';
