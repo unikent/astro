@@ -15,13 +15,14 @@
 	</div>
 
 	<div class="b-bottom-bar">
-		<el-button class="u-mla" @click="() => { this.showPageModal(pages[0]) }">+ Add Page</el-button>
+
+		<el-button v-if="canUser('page.add')" class="u-mla" @click="() => { this.showPageModal(pages[0]) }">+ Add Page</el-button>
 	</div>
 </div>
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions, mapGetters } from 'vuex';
 import Draggable from 'vuedraggable';
 
 import PageListItem from './PageListItem';
@@ -38,7 +39,7 @@ export default {
 		BackBar,
 		Draggable
 	},
-
+	
 	data() {
 		return {
 
@@ -50,7 +51,11 @@ export default {
 	computed: {
 		...mapState('site', {
 			pages: state => state.pages
-		})
+		}),
+
+		...mapGetters([
+			'canUser'
+		])
 	},
 
 	methods: {

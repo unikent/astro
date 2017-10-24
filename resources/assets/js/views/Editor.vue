@@ -35,7 +35,8 @@ export default {
 	},
 
 	created() {
-        this.$store.commit('site/updateCurrentSiteID', this.$route.params.site_id);
+		this.$store.commit('site/updateCurrentSiteID', this.$route.params.site_id);
+		this.$store.dispatch('loadSiteRole', {site_id: this.$route.params.site_id, username: window.astro.username});
 		this.views = {
 			desktop: {
 				icon: 'desktop',

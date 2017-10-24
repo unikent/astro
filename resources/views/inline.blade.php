@@ -24,7 +24,8 @@
 		'csrf_token' => csrf_token(),
 		'base_url' => Request::getBaseUrl(),
 		'api_url' => '/api/v1/',
-		'username' => $user,
+		'username' => $username,
+		'user'     => $user,
 		'api_token' => $api_token,
 		'debug' => config('app.debug')
 	]); ?>;
