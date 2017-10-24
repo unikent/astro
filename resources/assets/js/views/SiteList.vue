@@ -185,6 +185,10 @@ export default {
 		cancelForm() {
 			this.dialogFormVisible = false;
 			// reset the form
+			this.resetForm();
+		},
+
+		resetForm() {
 			this.form = {
 				name: '',
 				host: '',
@@ -225,14 +229,7 @@ export default {
 					this.fetchData();
 
 					// reset the form
-					this.form = {
-						name: '',
-						host: '',
-						path: '',
-						errors: '',
-						homepage_layout: ''
-					};
-					this.loading = false;
+					this.resetForm();
 
 				})
 				.catch((errors) => {
