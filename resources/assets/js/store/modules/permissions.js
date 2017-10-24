@@ -2,21 +2,20 @@ import api from 'plugins/http/api';
 
 /**
  * Simple interface for interacting with user roles and permissions
- * 
- * permissions is an array with the following structure
- * 
-[
-		{
-			"name": "Create Subsites",
-			"slug": "subsite.create",
-			"roles": [
-				"site.owner"
-			]
-		},
-		...
+ * @namespace state/permissions
+ *
+ * @property {Array}	permissions		Array of objects of permissions, with the following format...
+	 * @property {object} 
+	 * @property {string}	name 	the name of the permission, ie. 'Create Subsites'
+	 * @property {Array}	roles	list of role slugs which have this permission ie. ['site.ower','site.editor' etc etc]
+	 * @property {string}	slug	slug of the name of the permssion, ie. 'subsite.create'
+ 
+ * @property {string}	currentRole		slug of the users' role within the site ie. 'site.ower' - set to empty string if they have no role
+ * @property {string}	globalRole		slug of the users' gloabl role within the syste ie. 'admin' or 'user' - set to empty string if they have no role
  */
+
 const state = {
-	roles: [],
+	permissions: [],
 	currentRole: '',
 	globalRole: '',
 };
@@ -26,8 +25,8 @@ const getters = {
 		return state.currentSiteRole;
 	},
 
-	getRoles(state, getters) {
-		return state.roles;
+	getPermissions(state, getters) {
+		return state.permissions;
 	},
 
 	/**
@@ -46,7 +45,7 @@ const getters = {
 		if (state.globalRole === 'admin') {
 			return true;
 		}
-		const matchedRole = state.roles.find(function(value) {
+		const matchedRole = state.permissions.find(function(value) {
 			if (value.slug == this.permissionSlug) {
 				return true;
 			}
@@ -93,10 +92,14 @@ const actions = {
 				const userList = data.data.users;
 				if (userList) {
 					const currentUser = userList.find((element) => element.username === payload.username);
-					commit('setCurrentRole', currentUser.role);
+					if (currentUser) {
+						commit('setCurrentRole', currentUser.role);
+					} else {
+						commit('setCurrentRole', '');
+					}
 				}
 				else {
-					commit('setCurrentRole', {});
+					commit('setCurrentRole', '');
 				}
 			});
 	},
@@ -108,9 +111,8 @@ const actions = {
 	 * @param {string} username - the name of the user 
 	 */
 	loadGlobalRole({commit, state}, username) {	
-		// note - username for admin is Admin, make assumption that all username should be lowercase
 		api
-			.get(`users/${username.toLowerCase()}`)
+			.get(`users/${username}`)
 			.then(({data}) => {
 				commit('setGlobalRole', data.data.global_role);
 			})
@@ -130,7 +132,7 @@ const mutations = {
 	 * @param {object} permissions - the set of permissions as received from the API
 	 */
 	setPermissions(state, permissions) {
-		state.roles = permissions;
+		state.permissions = permissions;
 	},
 
 	/**
