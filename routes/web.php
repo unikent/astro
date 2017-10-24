@@ -46,6 +46,7 @@ Route::get('/{catchall?}', function($route = '') {
 		'route'      => $route,
 		'is_preview' => starts_with($route, 'preview/'),
 		'user'       => $user->name,
+		'username'   => $user->username,
 		'api_token'  => $user->api_token
 	]);
 })
