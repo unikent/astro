@@ -168,10 +168,12 @@ export default {
 			
 				if (currentSite.users) {
 					// console.log(currentSite.users);
-					console.log(window.astro.username);
-					console.dir(currentSite.users);
-					console.log(currentSite.users.find((element) => element.username === window.astro.username));
-					
+					// console.log(window.astro.username);
+					// console.dir(currentSite.users);
+					let result = currentSite.users.find((element) => element.username === window.astro.username);
+					if (result) {
+						console.log('result is ', result);
+					}
 					currentSite['currentRole'] = 'cheese';
 					
 				}
