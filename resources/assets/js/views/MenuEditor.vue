@@ -217,7 +217,7 @@ export default {
 			errors: [],
 			sitePages: [],
 
-			loaded: false, // to prevent the menu from flashing
+			loaded: false, // to prevent the alert from flashing
 
 			// slug of the user's current role on this site if they have one
 			currentRole: '',
