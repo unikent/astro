@@ -12,22 +12,24 @@
 		</el-select>
 	</el-tooltip>
 
-	<el-button class="toolbar__button-save" type="primary" @click="savePage" v-loading.fullscreen.lock="fullscreenLoading">Save</el-button>
+	<el-button v-if="canUser('page.edit')" class="toolbar__button-save" type="primary" @click="savePage" v-loading.fullscreen.lock="fullscreenLoading">Save</el-button>
 
-	<el-button class="toolbar__button-preview" :plain="true" type="primary" @click="previewPage">Preview <icon name="newwindow" aria-hidden="true" width="14" height="14" class="ico" /></el-button>
+	<el-button v-if="canUser('page.preview')" class="toolbar__button-preview" :plain="true" type="primary" @click="previewPage">Preview <icon name="newwindow" aria-hidden="true" width="14" height="14" class="ico" /></el-button>
 
-	<el-button
-		class="toolbar__button-publish"
-		v-if="invalidBlocks"
-		type="success"
-		@click="showPublishModal"
-	>Publish...</el-button>
-	<el-button
-		class="toolbar__button-publish"
-		v-else
-		type="success"
-		@click="showPublishValidationWarningModal"
-	>Publish...</el-button>
+	<template v-if="canUser('page.publish')">
+		<el-button
+			class="toolbar__button-publish"
+			v-if="invalidBlocks"
+			type="success"
+			@click="showPublishModal"
+		>Publish...</el-button>
+		<el-button
+			class="toolbar__button-publish"
+			v-else
+			type="success"
+			@click="showPublishValidationWarningModal"
+		>Publish...</el-button>
+	</template>
 
 </div>
 
@@ -70,7 +72,8 @@ export default {
 
 		...mapGetters([
 			'getInvalidBlocks',
-			'draftPreviewURL'
+			'draftPreviewURL',
+			'canUser'
 		]),
 
 		view: {
