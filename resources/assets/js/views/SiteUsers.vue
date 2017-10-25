@@ -62,6 +62,10 @@
 			</el-button>
 		</div>
 
+		<p class="add-user-note">
+			<strong>Note:</strong> Before you can add a user to this site, they would need to have logged in at least once.
+		</p>
+
 		<h3>Existing users</h3>
 
 		<div class="filter-user">
