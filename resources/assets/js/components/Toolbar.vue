@@ -1,7 +1,7 @@
 <template>
 <div class="toolbar">
 
-	<el-tooltip class="item" effect="dark" content="Switch preview mode" placement="top">
+	<el-tooltip v-if="canUser('page.edit')" class="item" effect="dark" content="Switch preview mode" placement="top">
 		<el-select placeholder="view" v-model="view" class="switch-view">
 			<el-option v-for="(view, key) in views" :label="view.label" :value="key" :key="view.label">
 				<div class="view-icon">

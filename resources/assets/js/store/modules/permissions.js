@@ -1,4 +1,5 @@
 import api from 'plugins/http/api';
+import { debug } from 'classes/helpers';
 
 /**
  * Simple interface for interacting with user roles and permissions
@@ -90,7 +91,7 @@ const actions = {
 	 * @param {string}	payload.username -  the name of the user
 	 */
 	loadSiteRole({commit, state}, payload) {
-		api
+		return api
 			.get(`sites/${payload.site_id}?include=users`)
 			.then(({data}) => {
 				const userList = data.data.users;
@@ -105,6 +106,9 @@ const actions = {
 				else {
 					commit('setCurrentRole', '');
 				}
+			})
+			.catch(error => {
+				debug(`[Error loading site roles] ${error}`);
 			});
 	},
 

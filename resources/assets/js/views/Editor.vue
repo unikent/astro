@@ -1,5 +1,5 @@
 <template>
-<div class="page">
+<div class="page"  v-if="canUser('site.view')">
 
 	<div class="editor-body">
 		<div class="editor-wrapper" ref="editor">
@@ -14,10 +14,20 @@
 
 	<modal-container />
 </div>
+<div class="page" v-else v-show="showPermissionsError">
+	<el-alert
+		title="You don't have access to this site"
+		type="error"
+		description="You don't have permission to access this site. Please contact the site owner."
+		:closable="false"
+		show-icon
+	>
+  </el-alert>
+</div>
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import { Loading } from 'element-ui';
 
 import Config from 'classes/Config';
@@ -34,9 +44,23 @@ export default {
 		Icon
 	},
 
+	data() {
+		return {
+			showPermissionsError: false
+		}
+	},
+
 	created() {
 		this.$store.commit('site/updateCurrentSiteID', this.$route.params.site_id);
-		this.$store.dispatch('loadSiteRole', {site_id: this.$route.params.site_id, username: window.astro.username});
+		this.$store.dispatch('loadSiteRole', {site_id: this.$route.params.site_id, username: window.astro.username})
+		.then(() => {
+			if (this.canUser('site.view')) {
+				this.showLoader();
+			} else {
+				this.showPermissionsError = true;
+			}
+		});
+
 		this.views = {
 			desktop: {
 				icon: 'desktop',
@@ -85,6 +109,10 @@ export default {
 			pageLoaded: state => state.page.loaded
 		}),
 
+		...mapGetters([
+			'canUser'
+		]),
+
 		getPreviewUrl() {
 			// TODO: Don't reload page when page_id changes, use state instead
 			return `${Config.get('base_url', '')}/preview/${this.$route.params.page_id}`;
@@ -109,10 +137,6 @@ export default {
 				this.showLoader();
 			}
 		}
-	},
-
-	mounted() {
-		this.showLoader();
 	}
 };
 </script>
