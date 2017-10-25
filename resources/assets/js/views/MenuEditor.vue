@@ -83,7 +83,7 @@
 		</div>
 	</div>
 </div>
-<div class="menu-editor" v-else>
+<div class="menu-editor" v-else v-show="loaded">
 	<el-alert
 		title="You cannot edit the menu for this site"
 		type="error"
@@ -217,6 +217,8 @@ export default {
 			errors: [],
 			sitePages: [],
 
+			loaded: false, // to prevent the menu from flashing
+
 			// slug of the user's current role on this site if they have one
 			currentRole: '',
 
@@ -307,7 +309,10 @@ export default {
 							this.currentRole = currentRole.role;
 						} 
 					}
-						
+					
+					// show the alert if needed
+					this.loaded = true;
+
 					this.menu.forEach((item, i) => this.validateMenuItem(i));
 					this.updateTimeElapsedSincePublish();
 				});
