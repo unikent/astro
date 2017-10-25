@@ -43,7 +43,7 @@ class PagePolicy
      */
     public function create(User $user, $site_id)
     {
-    	return $user->hasPermissionForSite(Permission::EDIT_SITE, $site_id);
+    	return $user->hasPermissionForSite(Permission::ADD_PAGE, $site_id);
     }
 
     /**
@@ -55,7 +55,7 @@ class PagePolicy
      */
     public function update(User $user, Page $page)
     {
-        return $user->hasPermissionForSite(Permission::EDIT_SITE, $page->site_id);
+        return $user->hasPermissionForSite(Permission::EDIT_PAGE, $page->site_id);
     }
 
     /**

@@ -108,4 +108,15 @@ class SitePolicy
     {
         return $user->hasPermissionForSite(Permission::DELETE_SITE, $site->id);
     }
+
+	/**
+	 * Can the user move pages on this site?
+	 * @param User $user
+	 * @param Site $site
+	 * @return bool
+	 */
+    public function movepages(User $user, Site $site)
+	{
+		return $user->hasPermissionForSite(Permission::MOVE_PAGE, $site->id);
+	}
 }
