@@ -253,7 +253,7 @@ export default {
 			siteState.permissions = this.getPermissions;
 			siteState.globalRole = this.getGlobalRole;
 	
-			return permissions.getters.canUser(siteState)('menu.edit');
+			return permissions.getters.canUser(siteState)('site.options.edit');
 		},
 
 
