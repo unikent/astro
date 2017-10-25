@@ -455,25 +455,35 @@ export default {
 		},
 
 		removeUser(username, index) {
-			this.$api
-				.put(
-					`sites/${this.$route.params.site_id}/users`,
-					{username}
-				)
-				.then(({ data: json }) => {
-					this.users = json.data.users || [];
+			this.$confirm(`Are you sure you want to remove "${username}" from this site?`, 'Warning', {
+				confirmButtonText: 'OK',
+				cancelButtonText: 'Cancel',
+				type: 'warning'
+			})
+			.then(() => {
+				this.$api
+					.put(
+						`sites/${this.$route.params.site_id}/users`,
+						{username}
+					)
+					.then(({ data: json }) => {
+						this.users = json.data.users || [];
 
-					notify({
-						title: `User '${username}' has been successfully removed`,
-						type: 'success'
+						notify({
+							title: `User '${username}' has been successfully removed`,
+							type: 'success'
+						});
+					})
+					.catch(() => {
+						notify({
+							title: 'Unable to remove user',
+							type: 'error'
+						});
 					});
-				})
-				.catch(() => {
-					notify({
-						title: 'Unable to remove user',
-						type: 'error'
-					});
-				});
+			}).catch(() => {
+				
+			});
+			
 		},
 
 		handleCountChange(newSize) {
