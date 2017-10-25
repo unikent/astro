@@ -19,7 +19,7 @@
 		:class="{ 'page-list__title--selected': pageData.id===this.page.id }"
 	>
 		<span class="page-list__item__drag-handle">
-			<icon v-if="!root && isDraggable" name="arrow" width="14" height="14" />
+			<icon v-if="!root && canUser('page.move')" name="arrow" width="14" height="14" />
 		</span>
 
 		<span ref="name" class="page-list__text" @click="edit">
@@ -50,7 +50,7 @@
 		}"
 		@end="handleDragEnd"
 		class="add-gutter"
-		v-if="depth <= 2 && canUser('page.move')"
+		v-if="depth <= 2"
 		:move="handleMove"
 	>
 		<template v-if="hasChildren">
@@ -68,23 +68,6 @@
 			/>
 		</template>
 	</draggable>
-	<div v-else class="add-gutter">
-		<template v-if="hasChildren">
-			<page-list-item
-				:class="{'page-list__item--collapsed': !open && depth !== 0}"
-				v-for="(child, index) in page.children"
-				:page="child"
-				:site="site"
-				:isDraggable="false"
-				:key="child.id"
-				:open-modal="openModal"
-				:open-edit-modal="openEditModal"
-				:path="`${path}.${index}`"
-				:depth="depth + 1"
-			/>
-		</template>
-	</div>
-
 </div>
 </template>
 
@@ -97,7 +80,7 @@ import promptToSave from '../mixins/promptToSave';
 export default {
 	name: 'page-list-item',
 
-	props: ['page', 'on-add', 'flatten', 'open-modal', 'open-edit-modal', 'path', 'depth', 'isDraggable'],
+	props: ['page', 'on-add', 'flatten', 'open-modal', 'open-edit-modal', 'path', 'depth'],
 
 	components: {
 		Icon,
