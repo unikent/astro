@@ -5,7 +5,7 @@
 	class="tabbed-dialog"
 >
 	<el-tabs type="border-card">
-		<el-tab-pane label="Upload media">
+		<el-tab-pane v-if="canUser('image.add')" label="Upload media">
 			<media-upload
 				:multiple="false"
 				:allow-types="false"
@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex';
+import { mapState, mapMutations, mapGetters } from 'vuex';
 import PagedResults from 'components/media/PagedResults';
 import MediaUpload from 'components/MediaUpload';
 
@@ -84,7 +84,11 @@ export default {
 
 		fieldPath() {
 			return this.mediaPicker.fieldPath;
-		}
+		},
+
+		...mapGetters([
+			'canUser'
+		])
 	},
 
 	watch: {
