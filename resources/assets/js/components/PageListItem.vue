@@ -19,7 +19,7 @@
 		:class="{ 'page-list__title--selected': pageData.id===this.page.id }"
 	>
 		<span class="page-list__item__drag-handle">
-			<icon v-if="!root" name="arrow" width="14" height="14" />
+			<icon v-if="!root && canUser('page.move')" name="arrow" width="14" height="14" />
 		</span>
 
 		<span ref="name" class="page-list__text" @click="edit">
@@ -33,9 +33,9 @@
 			</el-button>
 
 			<el-dropdown-menu slot="dropdown">
-				<el-dropdown-item command="openEditModal">Edit page settings</el-dropdown-item>
-				<el-dropdown-item v-show="!root" :disabled="depth > 2" command="openModal">Add subpage</el-dropdown-item>
-				<el-dropdown-item v-show="!root" command="remove" divided>Delete</el-dropdown-item>
+				<el-dropdown-item command="openEditModal" v-if="canUser('page.edit')">Edit page settings</el-dropdown-item>
+				<el-dropdown-item v-show="!root" :disabled="depth > 2" command="openModal" v-if="canUser('page.add')">Add subpage</el-dropdown-item>
+				<el-dropdown-item v-show="!root" command="remove" divided v-if="canUser('page.delete')">Delete</el-dropdown-item>
 			</el-dropdown-menu>
 		</el-dropdown>
 		<!-- End page options dropdown -->
@@ -59,6 +59,7 @@
 				v-for="(child, index) in page.children"
 				:page="child"
 				:site="site"
+				:isDraggable="true"
 				:key="child.id"
 				:open-modal="openModal"
 				:open-edit-modal="openEditModal"
@@ -103,6 +104,10 @@ export default {
 		...mapState({
 			pageData: state => state.page.pageData
 		}),
+
+		...mapGetters([
+			'canUser'
+		]),
 
 		root() {
 			return this.depth === 0;

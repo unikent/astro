@@ -1,4 +1,5 @@
 import api from 'plugins/http/api';
+import { debug } from 'classes/helpers';
 
 /**
  * Simple interface for interacting with user roles and permissions
@@ -29,6 +30,10 @@ const getters = {
 		return state.permissions;
 	},
 
+	getGlobalRole(state, getters) {
+		return state.globalRole;
+	},
+
 	/**
 	 * can the user perform the requested action
 	 * if the user is a global admin then let them do anything
@@ -38,7 +43,7 @@ const getters = {
 	 * @returns {bool} true or false
 	 */
 	canUser: (state, getters) => (permissionSlug) => {
-
+		
 		let permitted = false;
 		
 		// if the user has the global role of admin then then they can do anything
@@ -86,7 +91,7 @@ const actions = {
 	 * @param {string}	payload.username -  the name of the user
 	 */
 	loadSiteRole({commit, state}, payload) {
-		api
+		return api
 			.get(`sites/${payload.site_id}?include=users`)
 			.then(({data}) => {
 				const userList = data.data.users;
@@ -101,6 +106,9 @@ const actions = {
 				else {
 					commit('setCurrentRole', '');
 				}
+			})
+			.catch(error => {
+				debug(`[Error loading site roles] ${error}`);
 			});
 	},
 
