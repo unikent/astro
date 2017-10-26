@@ -379,7 +379,9 @@ export default {
 					} 
 
 					// show the alert if needed
-					this.loaded = true;
+					if (!this.canUserManageUsers()) {
+						this.loaded = true;
+					}
 				}));
 		},
 
@@ -480,8 +482,6 @@ export default {
 							type: 'error'
 						});
 					});
-			}).catch(() => {
-				
 			});
 			
 		},
