@@ -81,7 +81,7 @@
 				placeholder="Role"
 			>
 				<el-option
-					label="No filter"
+					label="Filter by role"
 					:value="null"
 				/>
 				<el-option-group label="Filter by role">
