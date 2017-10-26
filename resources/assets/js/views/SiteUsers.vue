@@ -209,7 +209,7 @@
 		</div>
 	</el-card>
 </div>
-<div class="menu-editor" v-else v-show="loaded">
+<div class="menu-editor" v-else v-show="showPermissionsError">
 	<el-alert
 		title="You cannot manage users for this site"
 		type="error"
@@ -277,7 +277,7 @@ export default {
 
 			roles: [],
 
-			loaded: false, // to prevent the alert from flashing on load
+			showPermissionsError: false, // to prevent the alert from flashing on load
 
 			// slug of the user's current role on this site if they have one
 			currentRole: '',
@@ -380,7 +380,7 @@ export default {
 
 					// show the alert if needed
 					if (!this.canUserManageUsers()) {
-						this.loaded = true;
+						this.showPermissionsError = true;
 					}
 				}));
 		},

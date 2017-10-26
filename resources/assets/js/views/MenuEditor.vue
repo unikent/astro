@@ -83,7 +83,7 @@
 		</div>
 	</div>
 </div>
-<div class="menu-editor" v-else v-show="loaded">
+<div class="menu-editor" v-else v-show="showPermissionsError">
 	<el-alert
 		title="You cannot edit the menu for this site"
 		type="error"
@@ -217,7 +217,7 @@ export default {
 			errors: [],
 			sitePages: [],
 
-			loaded: false, // to prevent the alert from flashing
+			showPermissionsError: false, // to prevent the alert from flashing
 
 			// slug of the user's current role on this site if they have one
 			currentRole: '',
@@ -311,7 +311,9 @@ export default {
 					}
 					
 					// show the alert if needed
-					this.loaded = true;
+					if (!this.canUserEditMenu()) {
+						this.showPermissionsError = true;
+					}
 
 					this.menu.forEach((item, i) => this.validateMenuItem(i));
 					this.updateTimeElapsedSincePublish();
