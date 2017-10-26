@@ -311,7 +311,7 @@ export default {
 					}
 					
 					// show the alert if needed
-					if (!this.canUserEditMenu()) {
+					if (!this.canUserEditMenu) {
 						this.showPermissionsError = true;
 					}
 

@@ -379,7 +379,7 @@ export default {
 					} 
 
 					// show the alert if needed
-					if (!this.canUserManageUsers()) {
+					if (!this.canUserManageUsers) {
 						this.showPermissionsError = true;
 					}
 				}));
