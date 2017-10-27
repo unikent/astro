@@ -25,7 +25,7 @@
 
 <script>
 import _ from 'lodash';
-import blocks from 'cms-prototype-blocks';
+import blocks from 'theme';
 import { mapState, mapGetters, mapMutations } from 'vuex';
 import imagesLoaded from 'imagesloaded';
 

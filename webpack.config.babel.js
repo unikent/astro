@@ -1,11 +1,13 @@
 import path from 'path';
 import webpack from 'webpack';
-
 import SvgStorePlugin from 'external-svg-sprite-loader/lib/SvgStorePlugin';
 import WebpackNotifierPlugin from 'webpack-notifier';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import FriendlyErrorsPlugin from 'friendly-errors-webpack-plugin';
 import CircularDependencyPlugin from 'circular-dependency-plugin';
+import dotenv from 'dotenv';
+// load from .env into process.env
+dotenv.config()
 
 /* global __dirname, process */
 
@@ -33,7 +35,15 @@ export default {
 				loader: 'vue-loader',
 				options: {
 					loaders: {
-						js: 'babel-loader',
+						js: {
+							loader: 'babel-loader',
+							options: {
+								presets: [ // copied and pasted to make this still work with absolute theme / blocks directory
+									require.resolve('babel-preset-es2015'),
+									require.resolve('babel-preset-stage-2')
+								]
+							}
+						},
 						scss: ExtractTextPlugin.extract({
 							use: ['css-loader', 'sass-loader'],
 							fallback: 'vue-style-loader'
@@ -206,8 +216,17 @@ export default {
 			'plugins'   : resolve('js/plugins'),
 			'store'     : resolve('js/store'),
 			'views'     : resolve('js/views'),
-			'IconPath'  : resolve('icons')
+			'IconPath'  : resolve('icons'),
+			'theme'		: process.env.DEFINITIONS_PATH  // "theme" replaces "cms-prototype-blocks"
 		}
+	},
+	resolveLoader: { // required for absolute theme / blocks directory path
+		modules: [
+			path.resolve(__dirname, 'node_modules'),
+			'node_modules'
+		],
+		extensions: ['.js', '.json'],
+		mainFields: ['loader', 'main']
 	},
 
 	devtool: isProduction ? false : 'source-map',

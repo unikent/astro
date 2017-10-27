@@ -59,7 +59,7 @@ import { win, findParent, smoothScrollTo } from 'classes/helpers';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
 
-import { layouts } from 'cms-prototype-blocks/layouts';
+import { layouts } from 'theme/layouts';
 
 /* global document, window */
 
