@@ -21,7 +21,7 @@
 			class="toolbar__button-publish"
 			v-if="invalidBlocks"
 			type="success"
-			@click="showPublishModal"
+			@click="publishPage"
 		>Publish...</el-button>
 		<el-button
 			class="toolbar__button-publish"
@@ -158,6 +158,14 @@ export default {
 			this.handleSavePage()
 				.then(() => {
 					win.open(this.draftLink,'_blank');
+				});
+		},
+
+		/* save page and then open publish modal */
+		publishPage() {
+			this.handleSavePage()
+				.then(() => {
+					this.showPublishModal();
 				});
 		},
 
