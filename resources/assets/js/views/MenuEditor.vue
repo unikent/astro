@@ -383,7 +383,7 @@ export default {
 				};
 			}
 
-			this.$api
+			return this.$api
 				.patch(`sites/${this.$route.params.site_id}`, data)
 				.then(() => {
 
@@ -421,10 +421,20 @@ export default {
 		},
 
 		previewSite() {
-			win.open(
-				`${Config.get('base_url', '')}/draft/${this.site.definedHost}${this.site.definedPath}`,
-				'_blank'
-			);
+			if(this.isUnsaved) {
+				this.updateMenu('draft', true).then(() => {
+					win.open(
+						`${Config.get('base_url', '')}/draft/${this.site.definedHost}${this.site.definedPath}`,
+						'_blank'
+					);
+				});
+			}
+			else{
+				win.open(
+					`${Config.get('base_url', '')}/draft/${this.site.definedHost}${this.site.definedPath}`,
+					'_blank'
+				);
+			}
 		},
 
 		updateTimeElapsedSincePublish() {
