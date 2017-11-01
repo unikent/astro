@@ -112,7 +112,7 @@ class Page extends BaumNode
 
 	/**
 	 * Get the published state of the page.
-	 * @return string One of 'draft', 'modified', 'published'
+	 * @return string One of 'new', 'draft', 'published'
 	 */
 	public function getStatusAttribute()
 	{
