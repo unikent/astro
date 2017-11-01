@@ -12,11 +12,11 @@ use Illuminate\Contracts\Auth\Authenticatable;
 
 /**
  * Moving a Page always moves its subpages with it.
+ * It also always moves any published version of the page and subpages.
  * @package App\Models\APICommands
  */
 class MovePage implements APICommand
 {
-
 	/**
 	 * Moving a Page
 	 * @param $input
@@ -28,18 +28,56 @@ class MovePage implements APICommand
 			$page = Page::find($input['id']);
 			$parent = Page::find($input['parent_id']);
 			$next = Page::find(!empty($input['next_id']) ? $input['next_id'] : null);
-			if ($parent->id != $page->parent_id) {
-				$redirects = $this->getRedirects($page);
-				if ($redirects) {
-					Redirect::insert($redirects);
+
+			$old_parent_id = $page->parent_id;
+			// if we need to move published version, then we should get it before updating paths
+			// as the only way we can identify published version is by shared paths.
+			$published = $page->publishedVersion();
+
+			// now we update the paths if we have moved rather than just reordered the page.
+			if ($parent->id != $old_parent_id) {
+				if( $published ){
+					$published_parent = $parent->publishedVersion();
+					$this->updatePaths($published, $published_parent);
 				}
 				$this->updatePaths($page, $parent);
 			}
+
+			// moving or reordering (baum operations only)
+
+			// if we are moving it before a page...
 			if ($next) {
 				$page->makePreviousSiblingOf($next);
+				if($published){
+					// if the next page has been published, we can just move the published version before that too
+					$next_copy = $next;
+					// it is possible that the next page we have moved before has not itself been published, and
+					// that therefore we cannot move our published page to "before" the published version of it, as it
+					// does not exist.
+					// if so, we try to find the first of its following siblings which has been published to move the
+					// published version before.
+					// and if that fails, we just move it to the end of the published parent's children.
+					while($next_copy && !$next_copy->publishedVersion()) {
+						$next_copy = $next_copy->nextPage();
+					}
+					if($next_copy){
+						$published->makePreviousSiblingOf($next_copy->publishedVersion());
+					}
+					else{
+						$published->makeLastChildOf($parent->publishedVersion());
+					}
+				}
 			} else {
+				// otherwise just add to end of parent
 				$page->makeLastChildOf($parent);
+				// and if a published version exists, move it to the end of the
+				// parent's published version...
+				if($published){
+					$published->makeLastChildOf($parent->publishedVersion());
+				}
 			}
+
+
 			$page->refresh();
 			return $page;
 		});
@@ -65,7 +103,6 @@ class MovePage implements APICommand
 	public function getRedirects($page)
 	{
 		$redirects = [];
-		$remove_length = strlen($page->parent->path);
 		foreach ($page->getDescendantsAndSelf() as $item) {
 			$redirects[] = [
 				'path' => $item->path,
@@ -122,7 +159,8 @@ class MovePage implements APICommand
 		return [
 			'id' => [
 				'required',
-				'page_is_draft:' . $data->get('id')
+				'page_is_draft:' . $data->get('id'),
+				'page_is_new_or_new_parent_is_not_new:'.$data->get('parent_id')
 			],
 			// parent must exist and be in the same site as this page
 			'parent_id' => [

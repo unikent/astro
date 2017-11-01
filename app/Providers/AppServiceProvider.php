@@ -47,6 +47,17 @@ class AppServiceProvider extends ServiceProvider
 				->whereNotNull('parent_id')->exists();
 		});
 
+		/**
+		 * Ensure page being moved has not been published, or that the new parent has been published.
+		 */
+		Validator::extend('page_is_new_or_new_parent_is_not_new', function($attr, $value, $parameters) {
+			$page = Page::find($value);
+			$parent = Page::find(!empty($parameters[0]) ? $parameters[0] : null);
+			if($page && $parent){
+				return !$page->publishedVersion() || $parent->publishedVersion();
+			}
+		});
+
 		Validator::extend('parent_is_published', function( $attr, $value ) { return PublishPage::canBePublished($value); });
 		Validator::extend('page_is_draft', function( $attr, $value ) { return ($page = Page::find($value) ) && $page->version == Page::STATE_DRAFT; });
 
