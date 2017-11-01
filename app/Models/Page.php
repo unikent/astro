@@ -44,7 +44,7 @@ class Page extends BaumNode
 	protected $scoped = ['site_id', 'version'];
 
 	// The draft state of this page.
-	const STATE_NEW = 'new';  // not published
+	const STATE_NEW = 'new'; // not published
 	const STATE_DRAFT = 'draft'; // modified since last published
 	const STATE_DELETED = 'deleted'; // deleted since last published
 	const STATE_MOVED = 'moved'; // moved since last published
@@ -108,6 +108,31 @@ class Page extends BaumNode
 			}
 		}
 		return $data;
+	}
+
+	/**
+	 * Get the published state of the page.
+	 * @return string One of 'new', 'draft', 'published'
+	 */
+	public function getStatusAttribute()
+	{
+		if(Page::STATE_DRAFT == $this->version){
+			$compare_to = $this->publishedVersion();
+		}
+		else {
+			$compare_to = $this->draftVersion();
+		}
+		if($compare_to){
+			if($compare_to->revision_id == $this->revision_id){
+				return Page::STATE_PUBLISHED;
+			}
+			else{
+				return Page::STATE_DRAFT;
+			}
+		}
+		else{
+			return Page::STATE_NEW;
+		}
 	}
 
 	/************************************************************************
@@ -214,6 +239,20 @@ class Page extends BaumNode
 			return $this;
 		}
 		return Page::published()
+			->forSiteAndPath($this->site_id, $this->path)
+			->first();
+	}
+
+	/**
+	 * Get the draft version of this page.
+	 * @return Page The draft version of this page if it exists (which may be this Page)
+	 */
+	public function draftVersion()
+	{
+		if (Page::STATE_DRAFT == $this->version) {
+			return $this;
+		}
+		return Page::draft()
 			->forSiteAndPath($this->site_id, $this->path)
 			->first();
 	}

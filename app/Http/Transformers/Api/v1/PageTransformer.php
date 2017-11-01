@@ -57,8 +57,9 @@ class PageTransformer extends FractalTransformer
             'parent_id' => $page->parent_id,
             'site_id' => $page->site_id,
             'revision_id' => $page->revision_id,
-			'valid' => $page->revision->valid
-        ];
+			'valid' => $page->revision->valid,
+			'status' => $page->status
+		];
 		if($this->full){
             $data['blocks'] = $page->revision->blocks;
         }
