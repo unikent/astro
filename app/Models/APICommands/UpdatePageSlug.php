@@ -12,6 +12,7 @@ use App\Models\Page;
 /**
  * Updates the slug for a page.
  * Updates the path for the page and all of its descendants.
+ * Also does this for published version of pages.
  * @package App\Models\APICommands
  */
 class UpdatePageSlug implements APICommand

@@ -353,7 +353,7 @@ const getters = {
 	 * @todo - implement once supported by the API.
 	 */
 	publishStatus: (state) =>  {
-		return (state.loaded ? 'new' : '');
+		return (state.loaded ? state.pageData.status : '');
 	},
 
 	/**
