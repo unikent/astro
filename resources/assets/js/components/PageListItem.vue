@@ -35,6 +35,7 @@
 			<el-dropdown-menu slot="dropdown">
 				<el-dropdown-item command="openEditModal" v-if="canUser('page.edit')">Edit page settings</el-dropdown-item>
 				<el-dropdown-item v-show="!root" :disabled="depth > 2" command="openModal" v-if="canUser('page.add')">Add subpage</el-dropdown-item>
+				<el-dropdown-item v-show="!root" command="unpublish" divided v-if="canUser('page.publish')">Unpublish</el-dropdown-item>
 				<el-dropdown-item v-show="!root" command="remove" divided v-if="canUser('page.delete')">Delete</el-dropdown-item>
 			</el-dropdown-menu>
 		</el-dropdown>
@@ -136,7 +137,8 @@ export default {
 
 		...mapMutations([
 			'setLoaded',
-			'updateMenuActive'
+			'updateMenuActive',
+			'showUnpublishModal'
 		]),
 
 		...mapActions({
@@ -223,6 +225,11 @@ export default {
 					id:this.page.id
 				})
 			});
+		},
+
+		unpublish() {
+			// console.log(this.page);
+			this.showUnpublishModal(this.page);
 		},
 
 		handleCommand(command) {

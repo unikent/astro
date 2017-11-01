@@ -46,6 +46,10 @@ let store = new Vuex.Store({
 		publishModal: {
 			visible: false
 		},
+		unpublishModal: {
+			page: {},
+			visible: false
+		},
 		publishValidationWarningModal: {
 			visible: false
 		},
@@ -147,6 +151,18 @@ let store = new Vuex.Store({
 
 		hidePublishModal(state) {
 			state.publishModal.visible = false;
+		},
+
+		showUnpublishModal(state, page) {
+			// update the page in the store
+			state.unpublishModal.page = page;
+			state.unpublishModal.visible = true;
+		},
+
+		hideUnpublishModal(state) {
+			// remove the page in the store here
+			state.unpublishModal.page = {};
+			state.unpublishModal.visible = false;
 		},
 
 		showPublishValidationWarningModal(state) {
