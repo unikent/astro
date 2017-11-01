@@ -112,13 +112,18 @@ class Page extends BaumNode
 
 	/**
 	 * Get the published state of the page.
-	 * @return string One of 'draft', 'modified', 'published'
+	 * @return string One of 'new', 'draft', 'published'
 	 */
 	public function getStatusAttribute()
 	{
-		$published = $this->publishedVersion();
-		if($published){
-			if($published->revision_id == $this->revision_id){
+		if(Page::STATE_DRAFT == $this->version){
+			$compare_to = $this->publishedVersion();
+		}
+		else {
+			$compare_to = $this->draftVersion();
+		}
+		if($compare_to){
+			if($compare_to->revision_id == $this->revision_id){
 				return Page::STATE_PUBLISHED;
 			}
 			else{
@@ -234,6 +239,20 @@ class Page extends BaumNode
 			return $this;
 		}
 		return Page::published()
+			->forSiteAndPath($this->site_id, $this->path)
+			->first();
+	}
+
+	/**
+	 * Get the draft version of this page.
+	 * @return Page The draft version of this page if it exists (which may be this Page)
+	 */
+	public function draftVersion()
+	{
+		if (Page::STATE_DRAFT == $this->version) {
+			return $this;
+		}
+		return Page::draft()
 			->forSiteAndPath($this->site_id, $this->path)
 			->first();
 	}
