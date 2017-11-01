@@ -35,11 +35,13 @@ class CreatePublishingGroupsUsers extends Migration
      */
     public function down()
     {
-        Schema::table('publishing_groups_users', function(Blueprint $table) {
-            $table->dropForeign('publishing_groups_users_user_id_fk');
-            $table->dropForeign('publishing_groups_users_publishing_group_id_fk');
-        });
+    	if(Schema::hasTable('publishing_groups_users')) {
+			Schema::table('publishing_groups_users', function (Blueprint $table) {
+				$table->dropForeign('publishing_groups_users_user_id_fk');
+				$table->dropForeign('publishing_groups_users_publishing_group_id_fk');
+			});
 
-        Schema::dropIfExists('publishing_groups_users');
+			Schema::dropIfExists('publishing_groups_users');
+		}
     }
 }
