@@ -99,6 +99,7 @@ class SiteTransformer extends FractalTransformer
 	public function includeDraftPages(Site $site, ParamBag $params)
 	{
 		$pages = $site->draftPages()
+			->with('published')
 			->orderBy('lft')
 			->get();
 		if($pages){

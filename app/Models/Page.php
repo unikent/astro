@@ -44,8 +44,8 @@ class Page extends BaumNode
 	protected $scoped = ['site_id', 'version'];
 
 	// The draft state of this page.
-	const STATE_NEW = 'new';  // not published
 	const STATE_DRAFT = 'draft'; // modified since last published
+	const STATE_NEW = 'new'; // not yet published
 	const STATE_DELETED = 'deleted'; // deleted since last published
 	const STATE_MOVED = 'moved'; // moved since last published
 	const STATE_PUBLISHED = 'published'; // not modified since last published
@@ -108,6 +108,26 @@ class Page extends BaumNode
 			}
 		}
 		return $data;
+	}
+
+	/**
+	 * Get the published state of the page.
+	 * @return string One of 'draft', 'modified', 'published'
+	 */
+	public function getStatusAttribute()
+	{
+		$published = $this->publishedVersion();
+		if($published){
+			if($published->revision_id == $this->revision_id){
+				return Page::STATE_PUBLISHED;
+			}
+			else{
+				return Page::STATE_DRAFT;
+			}
+		}
+		else{
+			return Page::STATE_NEW;
+		}
 	}
 
 	/************************************************************************
