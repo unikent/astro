@@ -14,6 +14,8 @@ c. toolbar with device view, save, preview, publish actions, as well as the logo
 
 Note that the page editing toolbar is a separate component found in `components/Toolbar.vue`
 
+TODO: Add last published date after the page status
+
 */
 <template>
 	<div class="top-bar" :class="{ 'top-bar--homepage' : !showBack }">
@@ -22,18 +24,16 @@ Note that the page editing toolbar is a separate component found in `components/
 				<i class="el-icon-arrow-left backbutton-icon"></i>Sites
 			</div>
 
-			<div v-if="showTools && publishStatus === 'new'" class="top-bar__page-title">
-				<div class="top-bar__title">{{ pageTitle }}<el-tag type="primary">Unpublished draft</el-tag></div>
-				<span class="top-bar__url">{{ renderedURL }}</span>
+			<div v-if="showTools && ['draft', 'new'].includes(publishStatus)" class="top-bar__page-title">
+				<div class="top-bar__title">
+					{{ pageTitle }}
+					<el-tag type="warning">Draft</el-tag>
+				</div>
+				<span class="top-bar__url"><a :href="renderedURL" target="_blank">{{ renderedURL }}</a> <icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" /></span>
 			</div>
 
 			<div v-else-if="showTools && publishStatus === 'published'" class="top-bar__page-title">
 				<div class="top-bar__title">{{ pageTitle }}<el-tag type="success">Published</el-tag></div>
-				<span class="top-bar__url"><a :href="renderedURL" target="_blank">{{ renderedURL }}</a> <icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" /></span>
-			</div>
-
-			<div v-else-if="showTools && publishStatus === 'draft'" class="top-bar__page-title">
-				<div class="top-bar__title">{{ pageTitle }}<el-tag type="warning">Draft</el-tag></div>
 				<span class="top-bar__url"><a :href="renderedURL" target="_blank">{{ renderedURL }}</a> <icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" /></span>
 			</div>
 
