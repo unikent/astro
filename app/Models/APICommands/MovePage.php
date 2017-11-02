@@ -27,18 +27,18 @@ class MovePage implements APICommand
 		return DB::transaction(function () use ($input, $user) {
 			$page = Page::find($input['id']);
 			$parent = Page::find($input['parent_id']);
-			$next = Page::find(!empty($input['next_id']) ? $input['next_id'] : null);
+			$next_sibling = Page::find(!empty($input['next_id']) ? $input['next_id'] : null);
 
 			$old_parent_id = $page->parent_id;
 			// if we need to move published version, then we should get it before updating paths
 			// as the only way we can identify published version is by shared paths.
-			$published = $page->publishedVersion();
+			$published_page = $page->publishedVersion();
 
 			// now we update the paths if we have moved rather than just reordered the page.
 			if ($parent->id != $old_parent_id) {
-				if( $published ){
+				if( $published_page ){
 					$published_parent = $parent->publishedVersion();
-					$this->updatePaths($published, $published_parent);
+					$this->updatePaths($published_page, $published_parent);
 				}
 				$this->updatePaths($page, $parent);
 			}
@@ -46,11 +46,11 @@ class MovePage implements APICommand
 			// moving or reordering (baum operations only)
 
 			// if we are moving it before a page...
-			if ($next) {
-				$page->makePreviousSiblingOf($next);
-				if($published){
+			if ($next_sibling) {
+				$page->makePreviousSiblingOf($next_sibling);
+				if($published_page){
 					// if the next page has been published, we can just move the published version before that too
-					$next_copy = $next;
+					$next_copy = $next_sibling;
 					// it is possible that the next page we have moved before has not itself been published, and
 					// that therefore we cannot move our published page to "before" the published version of it, as it
 					// does not exist.
@@ -61,19 +61,21 @@ class MovePage implements APICommand
 						$next_copy = $next_copy->nextPage();
 					}
 					if($next_copy){
-						$published->makePreviousSiblingOf($next_copy->publishedVersion());
+						$published_page->makePreviousSiblingOf($next_copy->publishedVersion());
 					}
 					else{
-						$published->makeLastChildOf($parent->publishedVersion());
+						$published_page->makeLastChildOf($parent->publishedVersion());
 					}
 				}
-			} else {
-				// otherwise just add to end of parent
+			} 
+
+			// otherwise just add to end of parent
+			else {
 				$page->makeLastChildOf($parent);
 				// and if a published version exists, move it to the end of the
 				// parent's published version...
-				if($published){
-					$published->makeLastChildOf($parent->publishedVersion());
+				if($published_page){
+					$published_page->makeLastChildOf($parent->publishedVersion());
 				}
 			}
 
