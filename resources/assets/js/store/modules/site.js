@@ -50,40 +50,7 @@ const state = {
 		slug: '',
 		id: 0,
 		editSlug: false
-	},
-	/**
-	 * Finds and returns the page with the specified id if it is present in the pages tree.
-	 * @param {Array} pages - Array of Pages to search.
-	 * @param {number} id - The page id to search for.
-	 * @returns {Object|null}
-	 */
-	findPageById(pages, id) {
-		for(var i in pages) {
-			let page = pages[i];
-			if(page.id === id) {
-				return page;
-			}
-			if(page.children && page.children.length) {
-				let result = state.findPageById(page.children, id);
-				if(result) {
-					return result;
-				}
-			}
-		}
-		return null;
-	},
-
-	/**
-	 * Updates the slug for a page and also updates its path.
-	 * @param {string} newSlug - The new slug.
-	 * @param {Object} page - Page data object.
-	 */
-	setSlugAndPath(newSlug, page) {
-		let path = page.path;
-		path = path.substr(0, path.lastIndexOf(page.slug)) + newSlug;
-		page.path = path;
-		page.slug = newSlug;
-	},
+	}
 };
 
 const mutations = {
@@ -151,6 +118,60 @@ const mutations = {
 		state.editPageModal.slug = page.slug;
 		state.editPageModal.id = page.id;
 		state.editPageModal.editSlug = !!page.parent_id;
+	},
+
+	/**
+	 * Mutates a page title, both in the pages list and in the editor if it is the page being edited.
+	 *
+	 * @param state
+	 * @param {string} title - The new title.
+	 */
+	setPageTitleInPagesList(state, { id, title }) {
+		const page = findPageById(state.pages, id);
+
+		if(page) {
+			page.title = title;
+		}
+	},
+
+	/**
+	 * Updates the slug for a page and also updates its path.
+	 *
+	 * @param state
+	 * @param {string} slug - The new slug.
+	 * @param {Object} page - Page data object.
+	 *
+	 */
+	setPageSlugAndPathsInPagesList(state, { id, slug }) {
+		const page = findPageById(state.pages, id);
+
+		if(page) {
+			page.slug = slug;
+
+			updatePaths(
+				page,
+				page.path.substr(0, page.path.lastIndexOf(page.slug)) + slug
+			);
+		}
+	},
+
+	/**
+	 * Updates the status for a page.
+	 *
+	 * @param state
+	 * @param {string} arrayPath - The array path to the page in the page list
+	 * eg. "0.0.1" for pagelist[0][0][1]
+	 * @param {string} id - The page id.
+	 * @param {string} status - The new status.
+	 *
+	 */
+	setPageStatusInPagesList(state, { arrayPath, id, status }) {
+		if(arrayPath) {
+			getPage(state.pages, arrayPath).status = status;
+		}
+		else if(id) {
+			findPageById(state.pages, id).status = status;
+		}
 	}
 };
 
@@ -254,7 +275,6 @@ const actions = {
 			});
 	},
 
-
 	movePage({ dispatch, commit, state }, { toPath, fromPath }) {
 		const
 			newPage = getPageInfo(toPath),
@@ -314,10 +334,17 @@ const actions = {
 	hideEditPageModal({ commit }) {
 		commit('setEditPageModalVisibility', false);
 	}
-
 };
 
 const getters = {
+
+	getPage: (state) => (path) => {
+		if(path === null) {
+			return {};
+		}
+
+		return getPage(state.pages, path);
+	}
 };
 
 const
@@ -355,6 +382,37 @@ const
 
 		if(currPage.children && currPage.children.length) {
 			currPage.children.forEach(page => updateDepths(page, depth + 1));
+		}
+	},
+
+	/**
+	 * Finds and returns the page with the specified id if it is present in the pages tree.
+	 *
+	 * @param {Array} pages - Array of Pages to search.
+	 * @param {number} id - The page id to search for.
+	 * @returns {Object|null}
+	 */
+	findPageById = (pages, id) => {
+		for(var i in pages) {
+			let page = pages[i];
+			if(page.id === Number.parseInt(id)) {
+				return page;
+			}
+			if(page.children && page.children.length) {
+				let result = findPageById(page.children, id);
+				if(result) {
+					return result;
+				}
+			}
+		}
+		return null;
+	},
+
+	updatePaths = (currPage, path) => {
+		currPage.path = path;
+
+		if(currPage.children && currPage.children.length) {
+			currPage.children.forEach(page => updatePaths(page, path + '/' + page.slug));
 		}
 	};
 
