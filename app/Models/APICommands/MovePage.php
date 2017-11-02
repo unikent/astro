@@ -149,6 +149,7 @@ class MovePage implements APICommand
 	public function messages(Collection $data, Authenticatable $user)
 	{
 		return [
+			'id.page_is_new_or_new_parent_is_not_new' => 'A previously published page cannot be moved into an unpublished parent',
 			'parent_id.same_site' => 'The parent must be in the same site.',
 			'parent_id.exists' => 'Parent not foundy',
 			'parent_id.required' => 'Where my parent?',
