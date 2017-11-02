@@ -149,7 +149,7 @@ class PageController extends ApiController
 	 */
 	public function unpublish(Request $request, Page $page)
 	{
-		$this->authorize('unpublish', $page);
+		$this->authorize('delete', $page);
 		$api = new LocalAPIClient(Auth::user());
 		$result = $api->unpublishPage($page->id);
 		return fractal($result, new PageTransformer(true))->respond();
