@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\APICommands\ListSites;
 use App\Models\APICommands\PublishPage;
+use App\Models\APICommands\UnpublishPage;
 use App\Models\APICommands\UpdateContent;
 use App\Models\APICommands\DeletePage;
 use App\Models\APICommands\MovePage;
@@ -274,9 +275,11 @@ class LocalAPIClient implements APIClient
 		]);
 	}
 
-	public function unpublishPage()
+	public function unpublishPage($id)
 	{
-		throw new \LogicException('Unpublish Page not yet implemented.');
+		return $this->execute(UnpublishPage::class, [
+			'id' => $id
+		]);
 	}
 
 	public function copyPage()

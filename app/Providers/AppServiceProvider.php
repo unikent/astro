@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
 	{
 		Schema::defaultStringLength(191); // Fix for the webfarm running older MySQL
 
-        Validator::extend('slug_unchanged_or_unique', function($attr, $value, $parameters, $validator) {
+		Validator::extend('slug_unchanged_or_unique', function($attr, $value, $parameters, $validator) {
 			$id = isset($parameters[0]) ? $parameters[0] : null;
 			$page = Page::find($id);
 			if($page ){
@@ -40,7 +40,7 @@ class AppServiceProvider extends ServiceProvider
 				}
 			}
 			return false;
-        });
+		});
 
 		Validator::extend('page_is_a_subpage', function($attr, $id) {
 			return Page::where('id', '=', $id)
@@ -59,20 +59,24 @@ class AppServiceProvider extends ServiceProvider
 		});
 
 		Validator::extend('parent_is_published', function( $attr, $value ) { return PublishPage::canBePublished($value); });
+
+		Validator::extend('page_is_published', function( $attr, $value ) { return  (($page = Page::find($value)) && $page->publishedVersion()); });
+
 		Validator::extend('page_is_draft', function( $attr, $value ) { return ($page = Page::find($value) ) && $page->version == Page::STATE_DRAFT; });
 
-        Validator::extend('page_is_valid', function($attr, $id) {
-        	$page = Page::find($id);
-        	return $page && $page->revision->valid;
+		Validator::extend('page_is_valid', function($attr, $id) {
+			$page = Page::find($id);
+			return $page && $page->revision->valid;
 		});
 
-        Validator::extend('unique_site_path', function($attr, $value, $parameters, $validator) {
-            $host = isset($parameters[0]) ? $parameters[0] : null;
-            return (new UniqueSitePathRule($host))->passes($attr, $value);
-        });
-        Validator::extend('layout_exists', function($attribute, $value, $parameters, $validator){
-           return (new LayoutExistsRule(empty($parameters[0]) ? 0 : $parameters[0]))->passes($attribute,$value);
-        });
+		Validator::extend('unique_site_path', function($attr, $value, $parameters, $validator) {
+			$host = isset($parameters[0]) ? $parameters[0] : null;
+			return (new UniqueSitePathRule($host))->passes($attr, $value);
+		});
+
+		Validator::extend('layout_exists', function($attribute, $value, $parameters, $validator){
+		   return (new LayoutExistsRule(empty($parameters[0]) ? 0 : $parameters[0]))->passes($attribute,$value);
+		});
 
 		Validator::extend('definition_exists', function ($attribute, $value, $parameters, $validator){
 			$data = $validator->getData();
@@ -84,24 +88,24 @@ class AppServiceProvider extends ServiceProvider
 			return $class::locateDefinition($name, $version) ? true : false;
 		});
 
-        /**
-         * Refactor this into something that just checks if two rows have a field with identical id... if that doesnt already exist in laravel...
-         */
+		/**
+		 * Refactor this into something that just checks if two rows have a field with identical id... if that doesnt already exist in laravel...
+		 */
 		Validator::extend('same_site', function($attribute, $value, $parameters, $validator){
-		    $site_id = DB::table('pages')->where('id', $parameters[0])->value('site_id');
-		    return DB::table('pages')->where('id', $value)->where('site_id', $site_id)->where('version', Page::STATE_DRAFT)->exists();
-        });
+			$site_id = DB::table('pages')->where('id', $parameters[0])->value('site_id');
+			return DB::table('pages')->where('id', $value)->where('site_id', $site_id)->where('version', Page::STATE_DRAFT)->exists();
+		});
 
-        /**
-         */
+		/**
+		 */
 		Validator::extend('not_descendant_or_self', function($attribute, $value, $parameters, $validator){
-		     $page = Page::find($parameters[0]);
-		     if(!$page){
-		         return false;
-             }
-             $is = !$page->descendantsAndSelf()->where('id', $value)->exists();
-		     return $is;
-        });
+			 $page = Page::find($parameters[0]);
+			 if(!$page){
+				 return false;
+			 }
+			 $is = !$page->descendantsAndSelf()->where('id', $value)->exists();
+			 return $is;
+		});
 	}
 
 	/**
