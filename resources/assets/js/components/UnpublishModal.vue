@@ -23,14 +23,15 @@ An element loading spinner is shown after the user hits 'Unpublish'.
 	v-loading.fullscreen.lock="loading"
 	element-loading-text="Publishing your page..."
 	class="publish-modal"
-	:before-close="handleClose"
+	:callback="handleClose"
 	:close-on-press-escape="false"
 	:close-on-click-modal="false"
+	v-if="pages.length"
 >
 
 	<div :style="unpublished===true || error!=='' ? 'display:none;': 'display:block;'">
 		<el-alert
-			:title="`Unpublish the page ${unpublishModal.page.title}`"
+			:title="`Unpublish the page ${getSelectedPage.title}`"
 			type="warning"
 			:description="renderedURL"
 			show-icon
@@ -41,7 +42,7 @@ An element loading spinner is shown after the user hits 'Unpublish'.
 		<p>It will still appear in your page listing as 'unpublished' and you will be able to edit or republish it later.</p>
 		<div class="publish-modal__buttons">
 			<span slot="footer" class="dialog-footer">
-				<el-button @click="cancelUnpublish">Cancel</el-button>
+				<el-button @click="hideUnpublishModal">Cancel</el-button>
 				<el-button type="danger" @click="unpublishPage">Unpublish now</el-button>
 			</span>
 		</div>
@@ -49,7 +50,7 @@ An element loading spinner is shown after the user hits 'Unpublish'.
 
 	<div :style="unpublished===true ? 'display:block;': 'display:none;'">
 		<el-alert
-			:title="`You have successfully unpublished the page ${unpublishModal.page.title}`"
+			:title="`You have successfully unpublished the page ${getSelectedPage.title}`"
 			type="success"
 			show-icon
 			:closable="false"
@@ -60,7 +61,7 @@ An element loading spinner is shown after the user hits 'Unpublish'.
 		<p>You can edit or republish it just like any other unpublished page.</p>
 		<div class="publish-modal__buttons">
 			<span slot="footer" class="dialog-footer">
-				<el-button type="primary" @click="cancelUnpublish">Close</el-button>
+				<el-button type="primary" @click="hideUnpublishModal">Close</el-button>
 			</span>
 		</div>
 	</div>
@@ -82,7 +83,7 @@ An element loading spinner is shown after the user hits 'Unpublish'.
 		</el-collapse>
 		<div class="publish-modal__buttons">
 			<span slot="footer" class="dialog-footer">
-				<el-button type="primary" @click="cancelUnpublish">Close</el-button>
+				<el-button type="primary" @click="hideUnpublishModal">Close</el-button>
 			</span>
 		</div>
 	</div>
@@ -90,9 +91,7 @@ An element loading spinner is shown after the user hits 'Unpublish'.
 </template>
 
 <script>
-import { mapState, mapMutations, mapGetters } from 'vuex';
-import Config from '../classes/Config.js';
-
+import { mapState, mapMutations, mapGetters, mapActions } from 'vuex';
 
 export default {
 	name: 'unpublish-modal',
@@ -110,10 +109,22 @@ export default {
 			'unpublishModal'
 		]),
 
+		...mapState('site', [
+			'pages'
+		]),
+
 		...mapGetters([
 			'siteDomain',
 			'sitePath'
 		]),
+
+		...mapGetters('site', [
+			'getPage'
+		]),
+
+		getSelectedPage() {
+			return this.getPage(this.unpublishModal.pagePath);
+		},
 
 		// basically controls show/hide of the modal
 		unpublishModalVisible: {
@@ -121,14 +132,15 @@ export default {
 				return this.unpublishModal.visible;
 			},
 			set(visible) {
-				if (!visible) {
+				if(!visible) {
 					this.hideUnpublishModal();
 				}
 			}
 		},
+
 		// frontend URL - so the user can view the page's url
 		renderedURL() {
-			return this.siteDomain + this.sitePath + this.unpublishModal.page.path;
+			return this.siteDomain + this.sitePath + this.getSelectedPage.path;
 		}
 	},
 
@@ -136,6 +148,10 @@ export default {
 		...mapMutations([
 			'showUnpublishModal',
 			'hideUnpublishModal'
+		]),
+
+		...mapActions([
+			'setPageStatusGlobally'
 		]),
 
 		/**
@@ -151,6 +167,12 @@ export default {
 				.then(() => {
 					this.loading = false;
 					this.unpublished = true;
+
+					this.setPageStatusGlobally({
+						arrayPath: this.unpublishModal.pagePath,
+						status: 'new'
+					});
+
 					this.error = '';
 				})
 				.catch((error) => {
@@ -169,20 +191,9 @@ export default {
 		called when the user clicks the X icon, clicks away from the modal, or presses ESC
 		*/
 		handleClose() {
-			this.cancelPublish();
-		},
-
-		/**
-		cancel the unpublish modal
-		*/
-		cancelUnpublish() {
-			// need a bit of time to hide the modal before we turn off the unpublished state, because the modal takes a little while to disappear
-			setTimeout(() => {
-				this.loading = false;
-				this.unpublished = false;
-				this.error = '';
-			}, 300);
-			this.hideUnpublishModal();
+			this.loading = false;
+			this.unpublished = false;
+			this.error = '';
 		}
 	}
 };

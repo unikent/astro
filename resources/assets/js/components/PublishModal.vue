@@ -23,16 +23,16 @@ An element loading spinner is shown after the user hits 'Publish'.
 	v-loading.fullscreen.lock="loading"
 	element-loading-text="Publishing your page..."
 	class="publish-modal"
-	:before-close="handleClose"
+	:callback="handleClose"
 	:close-on-press-escape="false"
 	:close-on-click-modal="false"
 >
 	<div :style="published===true || error!=='' ? 'display:none;': 'display:block;'">
-		<p>You're about to publish the page <strong>{{ pageTitle }}</strong></p>
+		<p>You're about to publish the page <strong>{{ getSelectedPage.title }}</strong></p>
 		<p>It will be published to the URL <el-tag type="gray">{{ renderedURL }}</el-tag></p>
 		<div class="publish-modal__buttons">
 			<span slot="footer" class="dialog-footer">
-				<el-button @click="cancelPublish">Cancel</el-button>
+				<el-button @click="hidePublishModal">Cancel</el-button>
 				<el-button type="danger" @click="publishPage">Publish now</el-button>
 			</span>
 		</div>
@@ -48,7 +48,7 @@ An element loading spinner is shown after the user hits 'Publish'.
 		<div class="publish-modal__message">View your new page now at <a :href="renderedURL" target="_blank">{{ renderedURL }}</a> (opens in a new tab)</div>
 		<div class="publish-modal__buttons">
 			<span slot="footer" class="dialog-footer">
-				<el-button type="primary" @click="cancelPublish">Close</el-button>
+				<el-button type="primary" @click="hidePublishModal">Close</el-button>
 			</span>
 		</div>
 	</div>
@@ -69,7 +69,7 @@ An element loading spinner is shown after the user hits 'Publish'.
 		</el-collapse>
 		<div class="publish-modal__buttons">
 			<span slot="footer" class="dialog-footer">
-				<el-button type="primary" @click="cancelPublish">Close</el-button>
+				<el-button type="primary" @click="hidePublishModal">Close</el-button>
 			</span>
 		</div>
 	</div>
@@ -77,9 +77,7 @@ An element loading spinner is shown after the user hits 'Publish'.
 </template>
 
 <script>
-import { mapState, mapMutations, mapGetters } from 'vuex';
-import Config from '../classes/Config.js';
-
+import { mapState, mapMutations, mapGetters, mapActions } from 'vuex';
 
 export default {
 	name: 'publish-modal',
@@ -98,31 +96,33 @@ export default {
 		]),
 
 		...mapGetters([
-			'publishedPreviewURL',
-			'pageTitle',
-			'pagePath',
-			'pageSlug',
 			'siteDomain',
 			'sitePath'
 		]),
+
+		...mapGetters('site', [
+			'getPage'
+		]),
+
+		getSelectedPage() {
+			return this.getPage(this.publishModal.pagePath);
+		},
 
 		// basically controls show/hide of the modal
 		publishModalVisible: {
 			get() {
 				return this.publishModal.visible;
 			},
-			set(value) {
-				if(value) {
-					this.showPublishModal();
-				}
-				else {
+			set(visible) {
+				if(!visible) {
 					this.hidePublishModal();
 				}
 			}
 		},
-		// frontend URL - so the user can view their newly-published page
+
+		// frontend URL - so the user can view the page's url
 		renderedURL() {
-			return this.publishedPreviewURL;
+			return this.siteDomain + this.sitePath + this.getSelectedPage.path;
 		}
 	},
 
@@ -132,6 +132,10 @@ export default {
 			'hidePublishModal'
 		]),
 
+		...mapActions([
+			'setPageStatusGlobally'
+		]),
+
 		/**
 		publish the page
 		*/
@@ -139,12 +143,28 @@ export default {
 			// show the loading spinner first, in case of latency on publish
 			// when the publish has finished ok, hide the spinner and show the published message in the modal
 			// if there's a problem, show an error message
+			const pageId = this.$route.params.page_id;
 			this.loading = true;
 			this.$api
-				.post('pages/' + this.$route.params.page_id + '/publish', this.page)
+				.post('pages/' + pageId + '/publish', this.page)
 				.then(() => {
 					this.loading = false;
 					this.published = true;
+
+					let idOrArrayPath;
+
+					if(this.publishModal.pagePath !== null) {
+						idOrArrayPath = { arrayPath: this.publishModal.pagePath };
+					}
+					else {
+						idOrArrayPath = { id: pageId };
+					}
+
+					this.setPageStatusGlobally({
+						...idOrArrayPath,
+						status: 'published'
+					});
+
 					this.error = '';
 				})
 				.catch((error) => {
@@ -163,20 +183,9 @@ export default {
 		called when the user clicks the X icon, clicks away from the modal, or presses ESC
 		*/
 		handleClose() {
-			this.cancelPublish();
-		},
-
-		/**
-		cancel the publish modal
-		*/
-		cancelPublish() {
-			// need a bit of time to hide the modal before we turn off the published state, because the modal takes a little while to disappear
-			setTimeout(() => {
-				this.loading = false;
-				this.published = false;
-				this.error = '';
-			}, 300);
-			this.hidePublishModal();
+			this.loading = false;
+			this.published = false;
+			this.error = '';
 		}
 	}
 };
