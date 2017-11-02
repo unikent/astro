@@ -33,10 +33,46 @@
 			</el-button>
 
 			<el-dropdown-menu slot="dropdown">
-				<el-dropdown-item command="openEditModal" v-if="canUser('page.edit')">Edit page settings</el-dropdown-item>
-				<el-dropdown-item v-show="!root" :disabled="depth > 2" command="openModal" v-if="canUser('page.add')">Add subpage</el-dropdown-item>
-				<el-dropdown-item command="unpublish" divided v-if="canUser('page.publish')" :disabled="page.status != 'new'">Unpublish</el-dropdown-item>
-				<el-dropdown-item v-show="!root" command="remove" divided v-if="canUser('page.delete')">Delete</el-dropdown-item>
+				<el-dropdown-item
+					command="openEditModal"
+					v-if="canUser('page.edit')"
+				>
+					Edit page settings
+				</el-dropdown-item>
+
+				<el-dropdown-item
+					v-show="!root"
+					:disabled="depth > 2"
+					command="openModal"
+					v-if="canUser('page.add')"
+				>
+					Add subpage
+				</el-dropdown-item>
+
+				<el-dropdown-item
+					command="publish"
+					v-if="canUser('page.publish')"
+					:disabled="page.status === 'published'"
+				>
+					Publish
+				</el-dropdown-item>
+
+				<el-dropdown-item
+					command="unpublish"
+					v-if="canUser('page.delete')"
+					:disabled="page.status === 'new'"
+				>
+					Unpublish
+				</el-dropdown-item>
+
+				<el-dropdown-item
+					v-show="!root"
+					command="remove"
+					divided
+					v-if="canUser('page.delete')"
+				>
+					Delete
+				</el-dropdown-item>
 			</el-dropdown-menu>
 		</el-dropdown>
 		<!-- End page options dropdown -->
@@ -88,7 +124,7 @@ export default {
 		Draggable
 	},
 
-	mixins:[promptToSave],
+	mixins: [promptToSave],
 
 	data() {
 		return {
@@ -138,7 +174,8 @@ export default {
 		...mapMutations([
 			'setLoaded',
 			'updateMenuActive',
-			'showUnpublishModal'
+			'showUnpublishModal',
+			'showPublishModal'
 		]),
 
 		...mapActions({
@@ -227,9 +264,12 @@ export default {
 			});
 		},
 
+		publish() {
+			this.showPublishModal(this.path);
+		},
+
 		unpublish() {
-			// console.log(this.page);
-			this.showUnpublishModal(this.page);
+			this.showUnpublishModal(this.path);
 		},
 
 		handleCommand(command) {
