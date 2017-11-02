@@ -243,14 +243,14 @@ const actions = {
 	 * @param page
 	 * @returns {Promise<R>|Promise.<TResult>|Promise<R2|R1>}
 	 */
-	updatePageMeta({ commit }, page) {
+	updatePageMeta({ dispatch }, page) {
 		return api
 			.put(`pages/${page.id}`, {
 				title: page.title,
 				options: {}
 			})
 			.then((response) => {
-				commit('setPageTitle', response.data.data, { root: true });
+				dispatch('setPageTitleGlobally', response.data.data, { root: true });
 			})
 			.then(() => {
 				if(state.editPageModal.editSlug) {
@@ -258,7 +258,11 @@ const actions = {
 						slug: page.slug
 					})
 					.then((response) => {
-						commit('setPageSlug', response.data.data, { root: true });
+						dispatch(
+							'setPageSlugAndPathGlobally',
+							{ ...response.data.data, id: page.id },
+							{ root: true }
+						);
 					})
 				}
 			}).catch((err) => {

@@ -44,10 +44,11 @@ let store = new Vuex.Store({
 		},
 		currentView: 'desktop',
 		publishModal: {
+			pagePath: null,
 			visible: false
 		},
 		unpublishModal: {
-			page: {},
+			pagePath: null,
 			visible: false
 		},
 		publishValidationWarningModal: {
@@ -62,40 +63,6 @@ let store = new Vuex.Store({
 	getters: {},
 
 	mutations: {
-
-		/**
-		 * Mutates a page title, both in the pages list and in the editor if it is the page being edited.
-		 * @param state
-		 * @param {string} title - The new title.
-		 */
-		setPageTitle: function(state, { id, title }) {
-			if(state.page.pageData && state.page.pageData.id === id) {
-				state.page.pageData.title = title;
-			}
-
-			const pg = state.site.findPageById(state.site.pages, id);
-
-			if(pg) {
-				pg.title = title;
-			}
-		},
-
-		/**
-		 * Mutates a page slug, both in the pages list and in the editor if it is the page being edited.
-		 * As a side-effect of this, path must also be updated.
-		 * @todo Cascade the updated path to all the subpages (this is done in the API, but we haven't reloaded the data).
-		 * @param state
-		 * @param {string} slug - The new slug.
-		 */
-		setPageSlug: function(state, { id, slug }) {
-			const pg = state.site.findPageById(state.site.pages, id);
-			if(pg) {
-				state.site.setSlugAndPath(slug, pg);
-			}
-			if(state.page.pageData && state.page.pageData.id === id) {
-				state.site.setSlugAndPath(slug, state.page.pageData);
-			}
-		},
 
 		changeView(state, currentView) {
 			state.currentView = currentView;
@@ -145,23 +112,27 @@ let store = new Vuex.Store({
 			state.blockPicker.insertRegion = val;
 		},
 
-		showPublishModal(state) {
+		showPublishModal(state, arrayPath) {
+			// update the page path in the store
+			state.publishModal.pagePath = arrayPath;
 			state.publishModal.visible = true;
 		},
 
 		hidePublishModal(state) {
+			// remove the page path in the store here
+			state.publishModal.pagePath = null;
 			state.publishModal.visible = false;
 		},
 
-		showUnpublishModal(state, page) {
-			// update the page in the store
-			state.unpublishModal.page = page;
+		showUnpublishModal(state, arrayPath) {
+			// update the page path in the store
+			state.unpublishModal.pagePath = arrayPath;
 			state.unpublishModal.visible = true;
 		},
 
 		hideUnpublishModal(state) {
-			// remove the page in the store here
-			state.unpublishModal.page = {};
+			// remove the page path in the store here
+			state.unpublishModal.pagePath = null;
 			state.unpublishModal.visible = false;
 		},
 
@@ -182,7 +153,48 @@ let store = new Vuex.Store({
 		}
 	},
 
-	actions: {},
+	actions: {
+
+		/**
+		 * Mutates a page title, both in the pages list and in the editor if it is the page being edited.
+		 *
+		 * @param context
+		 * @param {string} id - The page id.
+		 * @param {string} title - The new title.
+		 */
+		setPageTitleGlobally({ commit }, { id, title }) {
+			commit('setPageTitle', { id, title }, { root: true });
+			commit('site/setPageTitleInPagesList', { id, title });
+		},
+
+		/**
+		 * Mutates a page slug, both in the pages list and in the editor if it is the page being edited.
+		 * As a side-effect of this, path must also be updated.
+		 *
+		 * @param context
+		 * @param {string} id - The page id.
+		 * @param {string} slug - The new slug.
+		 */
+		setPageSlugAndPathGlobally({ commit }, { id, slug }) {
+			commit('setPageSlugAndPath', { id, slug }, { root: true });
+			commit('site/setPageSlugAndPathsInPagesList', { id, slug });
+		},
+
+		/**
+		 * Mutates a page status, both in the pages list and
+		 * in the editor if it is the page being edited.
+		 *
+		 * @param context
+		 * @param {string} id - The page id.
+		 * @param {string} arrayPath - The array path to the page in the page list
+		 * eg. "0.0.1" for pagelist[0][0][1]
+		 * @param {string} status - The new status.
+		 */
+		setPageStatusGlobally({ commit }, { id, arrayPath, status }) {
+			commit('setPageStatus', { id, status }, { root: true });
+			commit('site/setPageStatusInPagesList', { arrayPath, status });
+		}
+	},
 
 	modules: {
 		page,
