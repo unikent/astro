@@ -26,7 +26,6 @@ class UnpublishPage implements APICommand
 		return DB::transaction(function () use ($input) {
 			$page = Page::find($input['id']);
 
-			// is there already a published page at this path?
 			$page->publishedVersion()->delete();
 
 			return $page;
