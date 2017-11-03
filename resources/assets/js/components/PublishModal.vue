@@ -104,8 +104,17 @@ export default {
 			'getPage'
 		]),
 
+		getPageIdOrPath() {
+			if(this.publishModal.pagePath) {
+				return { arrayPath: this.publishModal.pagePath };
+			}
+			else {
+				return { id: this.$route.params.page_id };
+			}
+		},
+
 		getSelectedPage() {
-			return this.getPage(this.publishModal.pagePath);
+			return this.getPage(this.getPageIdOrPath);
 		},
 
 		// basically controls show/hide of the modal
@@ -143,27 +152,18 @@ export default {
 			// show the loading spinner first, in case of latency on publish
 			// when the publish has finished ok, hide the spinner and show the published message in the modal
 			// if there's a problem, show an error message
-			const pageId = this.$route.params.page_id;
 			this.loading = true;
 			this.$api
-				.post('pages/' + pageId + '/publish', this.page)
+				.post('pages/' + this.getSelectedPage.id + '/publish', this.page)
 				.then(() => {
-					this.loading = false;
-					this.published = true;
-
-					let idOrArrayPath;
-
-					if(this.publishModal.pagePath !== null) {
-						idOrArrayPath = { arrayPath: this.publishModal.pagePath };
-					}
-					else {
-						idOrArrayPath = { id: pageId };
-					}
 
 					this.setPageStatusGlobally({
-						...idOrArrayPath,
+						...this.getPageIdOrPath,
 						status: 'published'
 					});
+
+					this.loading = false;
+					this.published = true;
 
 					this.error = '';
 				})

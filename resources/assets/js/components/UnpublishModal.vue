@@ -123,7 +123,9 @@ export default {
 		]),
 
 		getSelectedPage() {
-			return this.getPage(this.unpublishModal.pagePath);
+			return this.getPage({
+				arrayPath: this.unpublishModal.pagePath
+			});
 		},
 
 		// basically controls show/hide of the modal
@@ -165,14 +167,14 @@ export default {
 			this.$api
 				.post('pages/' + this.$route.params.page_id + '/unpublish', this.page) // TODO - check this later
 				.then(() => {
-					this.loading = false;
-					this.unpublished = true;
 
 					this.setPageStatusGlobally({
 						arrayPath: this.unpublishModal.pagePath,
 						status: 'new'
 					});
 
+					this.loading = false;
+					this.unpublished = true;
 					this.error = '';
 				})
 				.catch((error) => {
