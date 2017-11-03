@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import api from 'plugins/http/api';
 import Vue from 'vue';
+import { notify } from 'classes/helpers';
 
 const vue = new Vue();
 
@@ -272,7 +273,7 @@ const actions = {
 
 	movePageApi({ dispatch }, move) {
 		// If-Unmodified-Since
-		api
+		return api
 			.patch(`sites/${state.site}/tree`, move)
 			.then(() => {
 				dispatch('fetchSite');
@@ -288,7 +289,13 @@ const actions = {
 
 		if(canDrop) {
 
-			const page = _.cloneDeep(oldPage.data);
+			const
+				page = _.cloneDeep(oldPage.data),
+				idOfnextSibling = (
+					newPos + 1 < newPage.parent.children.length ?
+						newPage.parent.children[newPos + 1].id : null
+				),
+				pagesListClone = _.cloneDeep(state.pages);
 
 			// remove old page
 			commit('removePage', oldPage);
@@ -297,13 +304,20 @@ const actions = {
 			// splice page in if page already exists in new position otherwise add it
 			commit('addPage', { ...newPage, page, push: !newPage.data });
 
-			const nextId = newPos + 1 < newPage.parent.children.length ?
-				newPage.parent.children[newPos + 1].id : null;
-
 			dispatch('movePageApi', {
 				page_id: page.id,
 				parent_id: newPage.parent.id,
-				next_id: nextId //newPage.data && newPage.parent.children[newPos+1] ? newPage.parent.children[newPos+1].id : null
+				next_id: idOfnextSibling
+			})
+			.catch(() => {
+				// restore the page list to previous state
+				commit('setSite', pagesListClone);
+
+				// TODO: Update error message based on the error type
+				notify({
+					title: 'Unable to move page',
+					type: 'error'
+				});
 			});
 		}
 		else {
