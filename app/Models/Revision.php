@@ -70,6 +70,7 @@ class Revision extends Model
 	public function setPublished()
 	{
 		$this->published_at = $this->published_at ? $this->published_at : Carbon::now();
+		$this->save();
 	}
 
 	/**

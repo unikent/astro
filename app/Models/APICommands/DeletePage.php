@@ -27,18 +27,38 @@ class DeletePage implements APICommand
         return DB::transaction(function() use($input) {
             $id = $input['id'];
             $page = Page::find($id);
-            $deletes = [];
-            foreach( $page->getDescendantsAndSelf() as $item){
-                $deletes[] = [
-                    'revision_id' => $item->revision->id,
-                    'path' => $item->path
-                ];
-            }
-            DeletedPage::insert($deletes);
+            DeletedPage::insert($this->createDeletedPages($page->getDescendantsAndSelf()));
+            // if we have a published version, delete that too
+			$published_version = $page->publishedVersion();
+			if($published_version){
+				$published_version->delete();
+			}
+			// baum deletes all descendants when deleting a page.
             $page->delete();
             return true;
         });
     }
+
+	/**
+	 * Get an array of attributes to create DeletedPage records from for this page and one for each descendant.
+	 *
+	 * @param Collection $pages - All the Pages to save as DeletedPages
+	 *
+	 * @return array - Array of DeletedPage properties to bulk insert.
+	 *
+	 * @todo - should we only do this for pages which have been published at least once or for all pages?
+	 */
+    public function createDeletedPages($pages)
+	{
+		$deletes = [];
+		foreach( $pages as $item){
+			$deletes[] = [
+				'revision_id' => $item->revision->id,
+				'path' => $item->path
+			];
+		}
+		return $deletes;
+	}
 
     /**
      * Get the error messages for this command.

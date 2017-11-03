@@ -36,10 +36,12 @@ class CreateSites extends Migration
      */
     public function down()
     {
-        Schema::table('sites', function(Blueprint $table) {
-            $table->dropForeign('sites_publishing_group_id_fk');
-        });
+		if(Schema::hasTable('publishing_groups')) {
+			Schema::table('sites', function (Blueprint $table) {
+				$table->dropForeign('sites_publishing_group_id_fk');
+			});
+		}
 
-        Schema::dropIfExists('sites');
+		Schema::dropIfExists('sites');
     }
 }
