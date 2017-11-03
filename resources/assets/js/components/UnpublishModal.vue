@@ -23,10 +23,10 @@ An element loading spinner is shown after the user hits 'Unpublish'.
 	v-loading.fullscreen.lock="loading"
 	element-loading-text="Publishing your page..."
 	class="publish-modal"
-	:callback="handleClose"
+	@open="resetOptions"
 	:close-on-press-escape="false"
 	:close-on-click-modal="false"
-	v-if="pages.length"
+	v-if="getSelectedPage"
 >
 
 	<div :style="unpublished===true || error!=='' ? 'display:none;': 'display:block;'">
@@ -189,10 +189,7 @@ export default {
 				});
 		},
 
-		/**
-		called when the user clicks the X icon, clicks away from the modal, or presses ESC
-		*/
-		handleClose() {
+		resetOptions() {
 			this.loading = false;
 			this.unpublished = false;
 			this.error = '';

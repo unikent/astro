@@ -23,11 +23,12 @@ An element loading spinner is shown after the user hits 'Publish'.
 	v-loading.fullscreen.lock="loading"
 	element-loading-text="Publishing your page..."
 	class="publish-modal"
-	:callback="handleClose"
+	@open="resetOptions"
 	:close-on-press-escape="false"
 	:close-on-click-modal="false"
+	v-if="getSelectedPage"
 >
-	<div :style="published===true || error!=='' ? 'display:none;': 'display:block;'">
+	<div v-show="!published && error === ''">
 		<p>You're about to publish the page <strong>{{ getSelectedPage.title }}</strong></p>
 		<p>It will be published to the URL <el-tag type="gray">{{ renderedURL }}</el-tag></p>
 		<div class="publish-modal__buttons">
@@ -37,7 +38,7 @@ An element loading spinner is shown after the user hits 'Publish'.
 			</span>
 		</div>
 	</div>
-	<div :style="published===true ? 'display:block;': 'display:none;'">
+	<div v-show="published">
 		<el-alert
 			title="Your page was published"
 			type="success"
@@ -52,7 +53,8 @@ An element loading spinner is shown after the user hits 'Publish'.
 			</span>
 		</div>
 	</div>
-	<div :style="published===false && error!=='' ? 'display:block;': 'display:none;'">
+
+	<div v-show="!published && error !== ''">
 		<el-alert
 			title="Page not published"
 			type="error"
@@ -179,10 +181,7 @@ export default {
 				});
 		},
 
-		/**
-		called when the user clicks the X icon, clicks away from the modal, or presses ESC
-		*/
-		handleClose() {
+		resetOptions() {
 			this.loading = false;
 			this.published = false;
 			this.error = '';
