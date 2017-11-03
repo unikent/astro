@@ -16,11 +16,22 @@
 
 	<div
 		class="page-list__title"
-		:class="{ 'page-list__title--selected': pageData.id===this.page.id }"
+		:class="{ 'page-list__title--selected': pageData.id === this.page.id }"
 	>
 		<span class="page-list__item__drag-handle">
 			<icon v-if="!root && canUser('page.move')" name="arrow" width="14" height="14" />
 		</span>
+
+		<el-tooltip
+			v-if="statuses[page.status]"
+			:content="statuses[page.status].name"
+		>
+			<el-tag
+				:type="statuses[page.status].type"
+				size="mini"
+				class="page-list__status"
+			/>
+		</el-tooltip>
 
 		<span ref="name" class="page-list__text" @click="edit">
 			{{ page.path === '/' ? 'Home page' : (page.title || page.slug) }}
@@ -124,7 +135,24 @@ export default {
 		Draggable
 	},
 
-	mixins: [promptToSave],
+	mixins:[promptToSave],
+
+	created() {
+		this.statuses = {
+			'new': {
+				name: 'Unpublished',
+				type: 'primary'
+			},
+			'draft': {
+				name: 'Draft',
+				type: 'warning'
+			},
+			'published': {
+				name: 'Published',
+				type: 'success'
+			}
+		};
+	},
 
 	data() {
 		return {
