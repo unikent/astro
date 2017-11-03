@@ -24,7 +24,15 @@ TODO: Add last published date after the page status
 				<i class="el-icon-arrow-left backbutton-icon"></i>Sites
 			</div>
 
-			<div v-if="showTools && ['draft', 'new'].includes(publishStatus)" class="top-bar__page-title">
+			<div v-if="showTools && publishStatus === 'new'" class="top-bar__page-title">
+				<div class="top-bar__title">
+					{{ pageTitle }}
+					<el-tag type="primary">Unpublished</el-tag>
+				</div>
+				<span class="top-bar__url">{{ renderedURL }}</span>
+			</div>
+
+			<div v-else-if="showTools && publishStatus === 'draft'" class="top-bar__page-title">
 				<div class="top-bar__title">
 					{{ pageTitle }}
 					<el-tag type="warning">Draft</el-tag>
