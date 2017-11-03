@@ -18,6 +18,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'v1'], function () {
 	Route::put('pages/{page}/slug', 'PageController@changeSlug');
 	Route::post('pages/{page}/publish', 'PageController@publish');
 	Route::post('pages/{page}/publish-tree', 'PageController@publishTree');
+	Route::post('pages/{page}/unpublish', 'PageController@unpublish');
 	Route::post('pages/{page}/revert', 'PageController@revert');
 	Route::delete('pages/{page}/force', 'PageController@forceDestroy');
 

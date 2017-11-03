@@ -36,11 +36,13 @@ class CreateMediaPublishingGroups extends Migration
 	 */
 	public function down()
 	{
-        Schema::table('media_publishing_groups', function(Blueprint $table) {
-            $table->dropForeign('media_publishing_groups_media_id_fk');
-            $table->dropForeign('media_publishing_groups_publishing_group_id_fk');
-        });
+		if(Schema::hasTable('publishing_groups')) {
+			Schema::table('media_publishing_groups', function (Blueprint $table) {
+				$table->dropForeign('media_publishing_groups_media_id_fk');
+				$table->dropForeign('media_publishing_groups_publishing_group_id_fk');
+			});
 
-		Schema::drop('media_publishing_groups');
+			Schema::drop('media_publishing_groups');
+		}
 	}
 }
