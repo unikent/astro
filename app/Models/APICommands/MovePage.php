@@ -26,21 +26,20 @@ class MovePage implements APICommand
 	{
 		return DB::transaction(function () use ($input, $user) {
 			$page = Page::find($input['id']);
-			$parent = Page::find($input['parent_id']);
+			$new_parent = Page::find($input['parent_id']);
 			$next_sibling = Page::find(!empty($input['next_id']) ? $input['next_id'] : null);
 
-			$old_parent_id = $page->parent_id;
 			// if we need to move published version, then we should get it before updating paths
 			// as the only way we can identify published version is by shared paths.
 			$published_page = $page->publishedVersion();
 
 			// now we update the paths if we have moved rather than just reordered the page.
-			if ($parent->id != $old_parent_id) {
+			if ($new_parent->id != $page->parent_id) {
 				if( $published_page ){
-					$published_parent = $parent->publishedVersion();
+					$published_parent = $new_parent->publishedVersion();
 					$this->updatePaths($published_page, $published_parent);
 				}
-				$this->updatePaths($page, $parent);
+				$this->updatePaths($page, $new_parent);
 			}
 
 			// moving or reordering (baum operations only)
@@ -64,18 +63,18 @@ class MovePage implements APICommand
 						$published_page->makePreviousSiblingOf($next_copy->publishedVersion());
 					}
 					else{
-						$published_page->makeLastChildOf($parent->publishedVersion());
+						$published_page->makeLastChildOf($new_parent->publishedVersion());
 					}
 				}
 			} 
 
 			// otherwise just add to end of parent
 			else {
-				$page->makeLastChildOf($parent);
+				$page->makeLastChildOf($new_parent);
 				// and if a published version exists, move it to the end of the
 				// parent's published version...
 				if($published_page){
-					$published_page->makeLastChildOf($parent->publishedVersion());
+					$published_page->makeLastChildOf($new_parent->publishedVersion());
 				}
 			}
 
