@@ -342,12 +342,15 @@ const actions = {
 
 const getters = {
 
-	getPage: (state) => (path) => {
-		if(path === null) {
-			return {};
+	getPage: (state) => ({ arrayPath, id }) => {
+		if(arrayPath === null || id === null) {
+			return null;
+		}
+		else if(arrayPath) {
+			return getPage(state.pages, arrayPath);
 		}
 
-		return getPage(state.pages, path);
+		return findPageById(state.pages, id);
 	}
 };
 
