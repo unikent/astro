@@ -193,6 +193,28 @@ const mutations = {
 
 	clearBlockValidationIssues() {
 		state.invalidBlocks = [];
+	},
+
+	setPageTitle(state, { id, title }) {
+		if(state.pageData && state.pageData.id == id) {
+			state.pageData.title = title;
+		}
+	},
+
+	setPageSlugAndPath(state, { id, slug }) {
+		if(state.pageData && state.pageData.id == id) {
+			state.pageData.slug = slug;
+			state.pageData.path = state.pageData.path.substr(
+				0,
+				state.pageData.path.lastIndexOf(state.pageData.slug)
+			) + slug
+		}
+	},
+
+	setPageStatus(state, { id, status }) {
+		if(state.pageData && state.pageData.id == id) {
+			state.pageData.status = status;
+		}
 	}
 
 };

@@ -43,7 +43,6 @@ import { mapState, mapMutations, mapActions, mapGetters } from 'vuex';
 import Icon from 'components/Icon';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { win } from 'classes/helpers';
-import Config from 'classes/Config';
 
 export default {
 	name: 'toolbar',
@@ -129,7 +128,8 @@ export default {
 		]),
 
 		...mapActions([
-			'handleSavePage'
+			'handleSavePage',
+			'setPageStatusGlobally'
 		]),
 
 		updateCurrentSavedState() {
@@ -148,6 +148,11 @@ export default {
 			this.handleSavePage({ notify: true })
 			.then(() => {
 				this.fullscreenLoading = false;
+
+				this.setPageStatusGlobally({
+					id: this.page.id,
+					status: 'draft'
+				});
 			});
 		},
 

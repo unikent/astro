@@ -28,6 +28,15 @@ $page-height: 38px;
 	opacity: .6;
 }
 
+.page-list__status {
+	display: block;
+	height: 12px;
+	width: 12px;
+	margin-top: 7px;
+	margin-right: 4px;
+	border-radius: 50%;
+}
+
 .page-list__title {
 	background-color: #fff;
 	padding: 5px;

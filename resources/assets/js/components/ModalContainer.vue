@@ -2,6 +2,7 @@
 <div>
 	<block-picker />
 	<publish-modal />
+	<unpublish-modal />
 	<media-picker />
 	<media-overlay size="small" />
 	<create-page-modal />
@@ -13,6 +14,7 @@
 <script>
 import BlockPicker from 'components/BlockPicker';
 import PublishModal from 'components/PublishModal';
+import UnpublishModal from 'components/UnpublishModal';
 import MediaPicker from 'components/MediaPicker';
 import MediaOverlay from 'components/media/MediaOverlay';
 import CreatePageModal from 'components/CreatePageModal';
@@ -26,6 +28,7 @@ export default {
 	components: {
 		BlockPicker,
 		PublishModal,
+		UnpublishModal,
 		MediaPicker,
 		MediaOverlay,
 		CreatePageModal,

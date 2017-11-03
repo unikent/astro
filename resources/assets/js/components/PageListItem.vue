@@ -16,11 +16,22 @@
 
 	<div
 		class="page-list__title"
-		:class="{ 'page-list__title--selected': pageData.id===this.page.id }"
+		:class="{ 'page-list__title--selected': pageData.id === this.page.id }"
 	>
 		<span class="page-list__item__drag-handle">
 			<icon v-if="!root && canUser('page.move')" name="arrow" width="14" height="14" />
 		</span>
+
+		<el-tooltip
+			v-if="statuses[page.status]"
+			:content="statuses[page.status].name"
+		>
+			<el-tag
+				:type="statuses[page.status].type"
+				size="mini"
+				class="page-list__status"
+			/>
+		</el-tooltip>
 
 		<span ref="name" class="page-list__text" @click="edit">
 			{{ page.path === '/' ? 'Home page' : (page.title || page.slug) }}
@@ -33,9 +44,46 @@
 			</el-button>
 
 			<el-dropdown-menu slot="dropdown">
-				<el-dropdown-item command="openEditModal" v-if="canUser('page.edit')">Edit page settings</el-dropdown-item>
-				<el-dropdown-item v-show="!root" :disabled="depth > 2" command="openModal" v-if="canUser('page.add')">Add subpage</el-dropdown-item>
-				<el-dropdown-item v-show="!root" command="remove" divided v-if="canUser('page.delete')">Delete</el-dropdown-item>
+				<el-dropdown-item
+					command="openEditModal"
+					v-if="canUser('page.edit')"
+				>
+					Edit page settings
+				</el-dropdown-item>
+
+				<el-dropdown-item
+					v-show="!root"
+					:disabled="depth > 2"
+					command="openModal"
+					v-if="canUser('page.add')"
+				>
+					Add subpage
+				</el-dropdown-item>
+
+				<el-dropdown-item
+					command="publish"
+					v-if="canUser('page.publish')"
+					:disabled="page.status === 'published'"
+				>
+					Publish
+				</el-dropdown-item>
+
+				<el-dropdown-item
+					command="unpublish"
+					v-if="canUser('page.delete')"
+					:disabled="page.status === 'new'"
+				>
+					Unpublish
+				</el-dropdown-item>
+
+				<el-dropdown-item
+					v-show="!root"
+					command="remove"
+					divided
+					v-if="canUser('page.delete')"
+				>
+					Delete
+				</el-dropdown-item>
 			</el-dropdown-menu>
 		</el-dropdown>
 		<!-- End page options dropdown -->
@@ -89,6 +137,23 @@ export default {
 
 	mixins:[promptToSave],
 
+	created() {
+		this.statuses = {
+			'new': {
+				name: 'Unpublished',
+				type: 'primary'
+			},
+			'draft': {
+				name: 'Draft',
+				type: 'warning'
+			},
+			'published': {
+				name: 'Published',
+				type: 'success'
+			}
+		};
+	},
+
 	data() {
 		return {
 			open: false
@@ -136,7 +201,9 @@ export default {
 
 		...mapMutations([
 			'setLoaded',
-			'updateMenuActive'
+			'updateMenuActive',
+			'showUnpublishModal',
+			'showPublishModal'
 		]),
 
 		...mapActions({
@@ -223,6 +290,14 @@ export default {
 					id:this.page.id
 				})
 			});
+		},
+
+		publish() {
+			this.showPublishModal(this.path);
+		},
+
+		unpublish() {
+			this.showUnpublishModal(this.path);
 		},
 
 		handleCommand(command) {

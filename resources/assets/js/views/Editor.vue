@@ -131,7 +131,9 @@ export default {
 		pageLoaded(hideLoader) {
 			this.updateCurrentSavedState();
 			if(hideLoader) {
-				this.loader.close();
+				if(this.loader) {
+					this.loader.close();
+				}
 			}
 			else {
 				this.showLoader();

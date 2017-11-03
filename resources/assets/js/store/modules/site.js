@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import api from 'plugins/http/api';
 import Vue from 'vue';
+import { notify } from 'classes/helpers';
 
 const vue = new Vue();
 
@@ -50,40 +51,7 @@ const state = {
 		slug: '',
 		id: 0,
 		editSlug: false
-	},
-	/**
-	 * Finds and returns the page with the specified id if it is present in the pages tree.
-	 * @param {Array} pages - Array of Pages to search.
-	 * @param {number} id - The page id to search for.
-	 * @returns {Object|null}
-	 */
-	findPageById(pages, id) {
-		for(var i in pages) {
-			let page = pages[i];
-			if(page.id === id) {
-				return page;
-			}
-			if(page.children && page.children.length) {
-				let result = state.findPageById(page.children, id);
-				if(result) {
-					return result;
-				}
-			}
-		}
-		return null;
-	},
-
-	/**
-	 * Updates the slug for a page and also updates its path.
-	 * @param {string} newSlug - The new slug.
-	 * @param {Object} page - Page data object.
-	 */
-	setSlugAndPath(newSlug, page) {
-		let path = page.path;
-		path = path.substr(0, path.lastIndexOf(page.slug)) + newSlug;
-		page.path = path;
-		page.slug = newSlug;
-	},
+	}
 };
 
 const mutations = {
@@ -151,6 +119,60 @@ const mutations = {
 		state.editPageModal.slug = page.slug;
 		state.editPageModal.id = page.id;
 		state.editPageModal.editSlug = !!page.parent_id;
+	},
+
+	/**
+	 * Mutates a page title, both in the pages list and in the editor if it is the page being edited.
+	 *
+	 * @param state
+	 * @param {string} title - The new title.
+	 */
+	setPageTitleInPagesList(state, { id, title }) {
+		const page = findPageById(state.pages, id);
+
+		if(page) {
+			page.title = title;
+		}
+	},
+
+	/**
+	 * Updates the slug for a page and also updates its path.
+	 *
+	 * @param state
+	 * @param {string} slug - The new slug.
+	 * @param {Object} page - Page data object.
+	 *
+	 */
+	setPageSlugAndPathsInPagesList(state, { id, slug }) {
+		const page = findPageById(state.pages, id);
+
+		if(page) {
+			page.slug = slug;
+
+			updatePaths(
+				page,
+				page.path.substr(0, page.path.lastIndexOf(page.slug)) + slug
+			);
+		}
+	},
+
+	/**
+	 * Updates the status for a page.
+	 *
+	 * @param state
+	 * @param {string} arrayPath - The array path to the page in the page list
+	 * eg. "0.0.1" for pagelist[0][0][1]
+	 * @param {string} id - The page id.
+	 * @param {string} status - The new status.
+	 *
+	 */
+	setPageStatusInPagesList(state, { arrayPath, id, status }) {
+		if(arrayPath) {
+			getPage(state.pages, arrayPath).status = status;
+		}
+		else if(id) {
+			findPageById(state.pages, id).status = status;
+		}
 	}
 };
 
@@ -222,14 +244,14 @@ const actions = {
 	 * @param page
 	 * @returns {Promise<R>|Promise.<TResult>|Promise<R2|R1>}
 	 */
-	updatePageMeta({ commit }, page) {
+	updatePageMeta({ dispatch }, page) {
 		return api
 			.put(`pages/${page.id}`, {
 				title: page.title,
 				options: {}
 			})
 			.then((response) => {
-				commit('setPageTitle', response.data.data, { root: true });
+				dispatch('setPageTitleGlobally', response.data.data, { root: true });
 			})
 			.then(() => {
 				if(state.editPageModal.editSlug) {
@@ -237,7 +259,11 @@ const actions = {
 						slug: page.slug
 					})
 					.then((response) => {
-						commit('setPageSlug', response.data.data, { root: true });
+						dispatch(
+							'setPageSlugAndPathGlobally',
+							{ ...response.data.data, id: page.id },
+							{ root: true }
+						);
 					})
 				}
 			}).catch((err) => {
@@ -247,13 +273,12 @@ const actions = {
 
 	movePageApi({ dispatch }, move) {
 		// If-Unmodified-Since
-		api
+		return api
 			.patch(`sites/${state.site}/tree`, move)
 			.then(() => {
 				dispatch('fetchSite');
 			});
 	},
-
 
 	movePage({ dispatch, commit, state }, { toPath, fromPath }) {
 		const
@@ -264,7 +289,13 @@ const actions = {
 
 		if(canDrop) {
 
-			const page = _.cloneDeep(oldPage.data);
+			const
+				page = _.cloneDeep(oldPage.data),
+				idOfnextSibling = (
+					newPos + 1 < newPage.parent.children.length ?
+						newPage.parent.children[newPos + 1].id : null
+				),
+				pagesListClone = _.cloneDeep(state.pages);
 
 			// remove old page
 			commit('removePage', oldPage);
@@ -273,13 +304,20 @@ const actions = {
 			// splice page in if page already exists in new position otherwise add it
 			commit('addPage', { ...newPage, page, push: !newPage.data });
 
-			const nextId = newPos + 1 < newPage.parent.children.length ?
-				newPage.parent.children[newPos + 1].id : null;
-
 			dispatch('movePageApi', {
 				page_id: page.id,
 				parent_id: newPage.parent.id,
-				next_id: nextId //newPage.data && newPage.parent.children[newPos+1] ? newPage.parent.children[newPos+1].id : null
+				next_id: idOfnextSibling
+			})
+			.catch(() => {
+				// restore the page list to previous state
+				commit('setSite', pagesListClone);
+
+				// TODO: Update error message based on the error type
+				notify({
+					title: 'Unable to move page',
+					type: 'error'
+				});
 			});
 		}
 		else {
@@ -314,10 +352,20 @@ const actions = {
 	hideEditPageModal({ commit }) {
 		commit('setEditPageModalVisibility', false);
 	}
-
 };
 
 const getters = {
+
+	getPage: (state) => ({ arrayPath, id }) => {
+		if(arrayPath === null || id === null) {
+			return null;
+		}
+		else if(arrayPath) {
+			return getPage(state.pages, arrayPath);
+		}
+
+		return findPageById(state.pages, id);
+	}
 };
 
 const
@@ -355,6 +403,37 @@ const
 
 		if(currPage.children && currPage.children.length) {
 			currPage.children.forEach(page => updateDepths(page, depth + 1));
+		}
+	},
+
+	/**
+	 * Finds and returns the page with the specified id if it is present in the pages tree.
+	 *
+	 * @param {Array} pages - Array of Pages to search.
+	 * @param {number} id - The page id to search for.
+	 * @returns {Object|null}
+	 */
+	findPageById = (pages, id) => {
+		for(var i in pages) {
+			let page = pages[i];
+			if(page.id === Number.parseInt(id)) {
+				return page;
+			}
+			if(page.children && page.children.length) {
+				let result = findPageById(page.children, id);
+				if(result) {
+					return result;
+				}
+			}
+		}
+		return null;
+	},
+
+	updatePaths = (currPage, path) => {
+		currPage.path = path;
+
+		if(currPage.children && currPage.children.length) {
+			currPage.children.forEach(page => updatePaths(page, path + '/' + page.slug));
 		}
 	};
 
