@@ -113,8 +113,10 @@ let store = new Vuex.Store({
 		},
 
 		showPublishModal(state, arrayPath) {
-			// update the page path in the store
-			state.publishModal.pagePath = arrayPath;
+			if(arrayPath) {
+				// update the page path in the store
+				state.publishModal.pagePath = arrayPath;
+			}
 			state.publishModal.visible = true;
 		},
 
@@ -125,8 +127,10 @@ let store = new Vuex.Store({
 		},
 
 		showUnpublishModal(state, arrayPath) {
-			// update the page path in the store
-			state.unpublishModal.pagePath = arrayPath;
+			if(arrayPath) {
+				// update the page path in the store
+				state.unpublishModal.pagePath = arrayPath;
+			}
 			state.unpublishModal.visible = true;
 		},
 
@@ -191,8 +195,8 @@ let store = new Vuex.Store({
 		 * @param {string} status - The new status.
 		 */
 		setPageStatusGlobally({ commit }, { id, arrayPath, status }) {
-			commit('setPageStatus', { id, status }, { root: true });
-			commit('site/setPageStatusInPagesList', { arrayPath, status });
+			commit('setPageStatus', { id, arrayPath, status }, { root: true });
+			commit('site/setPageStatusInPagesList', { id, arrayPath, status });
 		}
 	},
 
