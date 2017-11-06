@@ -28,7 +28,7 @@ An element loading spinner is shown after the user hits 'Publish'.
 	:close-on-click-modal="false"
 	v-if="getSelectedPage"
 >
-	<div v-show="!published && error.message === ''">
+	<div v-show="!published && error.messages.length === 0">
 		<p>You're about to publish the page <strong>{{ getSelectedPage.title }}</strong></p>
 		<p>It will be published to the URL <el-tag type="gray">{{ renderedURL }}</el-tag></p>
 		<div class="publish-modal__buttons">
@@ -54,14 +54,16 @@ An element loading spinner is shown after the user hits 'Publish'.
 		</div>
 	</div>
 
-	<div v-show="!published && error.message !== ''">
+	<div v-show="!published && error.messages.length > 0">
 		<el-alert
 			title="Sorry we had a problem publishing this page"
 			type="error"
-			:description="error.message"
 			show-icon
 			:closable=false
 			>
+			<ul>
+				<li v-for="msg in error.messages">{{ msg }}</li>
+			</ul>
 		</el-alert>
 		<el-collapse class="publish-modal__errors" v-show="error.techDetails !== ''">
 			<el-collapse-item title="Still having problems?" name="1">
@@ -89,7 +91,7 @@ export default {
 			published: false,
 			loading: false,
 			error: {
-				message: '',
+				messages: [],
 				techDetails: ''
 			}
 		}
@@ -170,17 +172,17 @@ export default {
 					this.loading = false;
 					this.published = true;
 
-					this.error.message = '';
+					this.error.messages = [];
 				})
 				.catch((error) => {
 					if (error.config && error.response && error.response.data && error.response.data.errors && error.response.data.errors.length > 0) {
 						error.response.data.errors.forEach((apiError, i) => {
-							this.error.message += ` - ${apiError.details.id}\n`;
+							this.error.messages.push(apiError.details.id);
 						});
 						this.error.techDetails = error.config.method + ' ' + error.config.url + ' ' + error.response.status + ' (' + error.response.statusText + ')';
 					}
 					else {
-						this.error.message = 'Network connection problem - you may not have a reliable connection to the internet.';
+						this.error.messages.push('Network connection problem - you may not have a reliable connection to the internet.');
 					}
 					this.loading = false;
 					this.published = false;
@@ -191,7 +193,7 @@ export default {
 			this.loading = false;
 			this.published = false;
 			this.error = {
-				message: '',
+				messages: [],
 				techDetails: ''
 			};
 		}
