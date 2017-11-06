@@ -59,10 +59,11 @@
 					Add subpage
 				</el-dropdown-item>
 
+				<!-- TODO: figure out nicest way of disallowing pages from being published if parent is new -->
 				<el-dropdown-item
 					command="publish"
 					v-if="canUser('page.publish')"
-					:disabled="page.status === 'published'"
+					:disabled="page.status === 'published' || parentStatus === 'new'"
 				>
 					Publish
 				</el-dropdown-item>
@@ -106,12 +107,13 @@
 				v-for="(child, index) in page.children"
 				:page="child"
 				:site="site"
-				:isDraggable="true"
+				:is-draggable="true"
 				:key="child.id"
 				:open-modal="openModal"
 				:open-edit-modal="openEditModal"
 				:path="`${path}.${index}`"
 				:depth="depth + 1"
+				:parent-status="page.status"
 			/>
 		</template>
 	</draggable>
@@ -127,7 +129,16 @@ import promptToSave from '../mixins/promptToSave';
 export default {
 	name: 'page-list-item',
 
-	props: ['page', 'on-add', 'flatten', 'open-modal', 'open-edit-modal', 'path', 'depth'],
+	props: [
+		'page',
+		'on-add',
+		'flatten',
+		'open-modal',
+		'open-edit-modal',
+		'path',
+		'depth',
+		'parentStatus'
+	],
 
 	components: {
 		Icon,
