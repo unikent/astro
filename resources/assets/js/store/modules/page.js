@@ -211,7 +211,7 @@ const mutations = {
 		}
 	},
 
-	setPageStatus(state, { id, status }) {
+	updatePageStatus(state, { id, status }) {
 		if(state.pageData && state.pageData.id == id) {
 			state.pageData.status = status;
 		}
@@ -358,6 +358,14 @@ const actions = {
 					duration: 0
 				});
 			});
+	},
+
+	setPageStatus({ commit, rootGetters }, { id, arrayPath, status }) {
+		if(!id) {
+			id = rootGetters['site/getPage']({ arrayPath }).id;
+		}
+
+		commit('updatePageStatus', { id, status });
 	}
 };
 
@@ -406,6 +414,10 @@ const getters = {
 	 */
 	pagePath: (state) => {
 		return (state.loaded ? state.pageData.path : '');
+	},
+
+	siteTitle: (state) => {
+		return (state.loaded ? state.pageData.site.title : '');
 	},
 
 	/**

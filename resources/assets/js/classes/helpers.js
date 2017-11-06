@@ -164,3 +164,7 @@ export const notify = ({ title, message, type }) => {
 		}
 	});
 };
+
+export const pageHasBeenPublished = (page) => {
+	return page.status !== 'new';
+};

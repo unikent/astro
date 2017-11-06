@@ -147,9 +147,6 @@ export default {
 			'setPageStatusGlobally'
 		]),
 
-		/**
-		publish the page
-		*/
 		publishPage() {
 			// show the loading spinner first, in case of latency on publish
 			// when the publish has finished ok, hide the spinner and show the published message in the modal

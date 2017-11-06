@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import api from 'plugins/http/api';
 import Vue from 'vue';
-import { notify } from 'classes/helpers';
+import { notify, pageHasBeenPublished } from 'classes/helpers';
 
 const vue = new Vue();
 
@@ -167,11 +167,23 @@ const mutations = {
 	 *
 	 */
 	setPageStatusInPagesList(state, { arrayPath, id, status }) {
+		let page;
+
 		if(arrayPath) {
-			getPage(state.pages, arrayPath).status = status;
+			page = getPage(state.pages, arrayPath);
 		}
 		else if(id) {
-			findPageById(state.pages, id).status = status;
+			page = findPageById(state.pages, id);
+		}
+
+		if(page) {
+			// propagate "new" status to all child pages.
+			if(status === 'new') {
+				updateStatuses(page, status);
+			}
+			else {
+				page.status = status;
+			}
 		}
 	}
 };
@@ -282,32 +294,45 @@ const actions = {
 
 	movePage({ dispatch, commit, state }, { toPath, fromPath }) {
 		const
-			newPage = getPageInfo(toPath),
-			oldPage = getPageInfo(fromPath),
-			canDrop = newPage.parent.depth + getDepth(oldPage.data) <= state.maxDepth,
-			newPos = Number.parseInt(toPath.substr(toPath.lastIndexOf('.') + 1, toPath.length));
+			newLocation = getLocationInfo(toPath),
+			oldLocation = getLocationInfo(fromPath),
+			withinDepthLimit = newLocation.parent.depth + getDepth(oldLocation.page) <= state.maxDepth;
 
-		if(canDrop) {
+		// don't allow moving published pages beneath unpublished parents
+		if(pageHasBeenPublished(oldLocation.page) && newLocation.parent.status === 'new') {
+			vue.$snackbar.open({
+				message: `
+					Unable to drop page(s) here.
+					Published pages can't be moved under unpublished pages.
+				`
+			});
+			return;
+		}
+
+		if(withinDepthLimit) {
 
 			const
-				page = _.cloneDeep(oldPage.data),
-				idOfnextSibling = (
-					newPos + 1 < newPage.parent.children.length ?
-						newPage.parent.children[newPos + 1].id : null
-				),
+				page = _.cloneDeep(oldLocation.page),
 				pagesListClone = _.cloneDeep(state.pages);
 
 			// remove old page
-			commit('removePage', oldPage);
+			commit('removePage', oldLocation);
 			// update current and child page depths
-			updateDepths(page, newPage.parent.depth + 1);
-			// splice page in if page already exists in new position otherwise add it
-			commit('addPage', { ...newPage, page, push: !newPage.data });
+			updateDepths(page, newLocation.parent.depth + 1);
+			// splice page in if a page already exists in new location otherwise add it
+			commit('addPage', { ...newLocation, page, push: !newLocation.page });
+
+			const
+				newPos = newLocation.index + 1,
+				nextSiblingId = (
+					newPos < newLocation.parent.children.length ?
+						newLocation.parent.children[newPos].id : null
+				);
 
 			dispatch('movePageApi', {
 				page_id: page.id,
-				parent_id: newPage.parent.id,
-				next_id: idOfnextSibling
+				parent_id: newLocation.parent.id,
+				next_id: nextSiblingId
 			})
 			.catch(() => {
 				// restore the page list to previous state
@@ -369,9 +394,9 @@ const getters = {
 };
 
 const
-	getPageInfo = (path) => {
+	getLocationInfo = (path) => {
 		return {
-			data: getPage(state.pages, path),
+			page: getPage(state.pages, path),
 			parent: getPage(state.pages, path.substr(0, path.lastIndexOf('.'))),
 			index: Number.parseInt(path.substr(path.lastIndexOf('.') + 1, path.length))
 		}
@@ -398,14 +423,6 @@ const
 		return depth;
 	},
 
-	updateDepths = (currPage, depth) => {
-		currPage.depth = depth;
-
-		if(currPage.children && currPage.children.length) {
-			currPage.children.forEach(page => updateDepths(page, depth + 1));
-		}
-	},
-
 	/**
 	 * Finds and returns the page with the specified id if it is present in the pages tree.
 	 *
@@ -429,11 +446,47 @@ const
 		return null;
 	},
 
-	updatePaths = (currPage, path) => {
-		currPage.path = path;
+	updateDepths = (currentPage, depth) => {
+		updatePageAndSubPages(
+			currentPage, 'depth', depth, ({ value }) => value + 1
+		);
+	},
 
-		if(currPage.children && currPage.children.length) {
-			currPage.children.forEach(page => updatePaths(page, path + '/' + page.slug));
+	updatePaths = (currentPage, path) => {
+		updatePageAndSubPages(
+			currentPage,
+			'path',
+			path,
+			({ page, value }) => value + '/' + page.slug
+		);
+	},
+
+	updateStatuses = (currentPage, status) => {
+		updatePageAndSubPages(currentPage, 'status', status);
+	},
+
+	/**
+	 * Update a property of a page in the pages list and update it's children
+	 * based on a transform callback (or by default update all children to
+	 * the same value).
+	 *
+	 * @param      {object}    currentPage  The current page we're walking.
+	 * @param      {string}    key          The key of the property to update.
+	 * @param      {*}         value        The value to update the property to.
+	 * @param      {Function}  transform    The callback to run for modifying our value after each iteration.
+	 */
+	updatePageAndSubPages = (
+		currentPage,
+		key,
+		value,
+		transform = ({ value }) => value
+	) => {
+		currentPage[key] = value;
+
+		if(currentPage.children && currentPage.children.length) {
+			currentPage.children.forEach(
+				page => updatePageAndSubPages(page, key, transform({ page, value }), transform)
+			);
 		}
 	};
 
