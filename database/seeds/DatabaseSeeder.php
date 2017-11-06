@@ -2,6 +2,7 @@
 
 use App\Models\LocalAPIClient;
 use App\Models\User;
+use App\Models\Role;
 use App\Models\Page;
 use Illuminate\Database\Seeder;
 
@@ -79,8 +80,34 @@ class DatabaseSeeder extends Seeder
             'api_token' => 'test'
 		]);
 
+		// create some users to test with...
+		$editor = factory(User::class)->create([
+			'username' => 'editor',
+			'name' => 'Editor',
+			'password' => Hash::make('editor'),
+			'role' => 'user',
+			'api_token' => 'editor-test'
+		]);
 
-        $client = new LocalAPIClient($user);
+		$owner = factory(User::class)->create([
+			'username' => 'owner',
+			'name' => 'Owner',
+			'password' => Hash::make('owner'),
+			'role' => 'user',
+			'api_token' => 'owner-test'
+		]);
+
+		$contributor = factory(User::class)->create([
+			'username' => 'contributor',
+			'name' => 'Contributor',
+			'password' => Hash::make('contributor'),
+			'role' => 'user',
+			'api_token' => 'contributor-test'
+		]);
+
+
+
+		$client = new LocalAPIClient($user);
         $site = $client->createSite(
             'Test Site', 'example.com', '', ['name'=>'kent-homepage','version'=>1]
         );
@@ -92,6 +119,10 @@ class DatabaseSeeder extends Seeder
         $client->publishPage(Page::forSiteAndPath($site->id, '/undergraduate')->first()->id);
         $client->publishPage(Page::forSiteAndPath($site->id, '/undergraduate/2017')->first()->id);
         $client->publishPage(Page::forSiteAndPath($site->id, '/undergraduate/2018')->first()->id);
+
+		$client->updateSiteUserRole($site->id,'editor', Role::EDITOR);
+		$client->updateSiteUserRole($site->id,'owner', Role::OWNER);
+		$client->updateSiteUserRole($site->id,'contributor', Role::CONTRIBUTOR);
     }
 
 	/**
