@@ -286,6 +286,17 @@ const actions = {
 			oldLocation = getLocationInfo(fromPath),
 			withinDepthLimit = newLocation.parent.depth + getDepth(oldLocation.page) <= state.maxDepth;
 
+		// don't allow moving published pages beneath unpublished parents
+		if(oldLocation.page.status === 'published' && newLocation.parent.status === 'new') {
+			vue.$snackbar.open({
+				message: `
+					Unable to drop page(s) here.
+					Published pages can't be moved under unpublished pages.
+				`
+			});
+			return;
+		}
+
 		if(withinDepthLimit) {
 
 			const
