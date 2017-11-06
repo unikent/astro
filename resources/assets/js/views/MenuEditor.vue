@@ -47,7 +47,6 @@
 							:index="index"
 							itemKey="text"
 							name="Link text"
-							placeholder="Homepage"
 							:errors="errors"
 							:validate="validateMenuItem"
 						/>
@@ -56,8 +55,7 @@
 							:item="item"
 							:index="index"
 							itemKey="url"
-							name="Location"
-							placeholder="https://kent.ac.uk"
+							name="URL"
 							:errors="errors"
 							:validate="validateMenuItem"
 						/>
@@ -91,7 +89,7 @@
 		:closable="false"
 		show-icon
 	>
-  </el-alert>
+	</el-alert>
 </div>
 </template>
 

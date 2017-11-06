@@ -9,7 +9,7 @@ Using a single modal rather than a series of separate ones makes the transition 
 The 3 states are:
 
 1. The initial state. User is given the option to unpublish or cancel.
-2. A successful unpublish. 
+2. A successful unpublish.
 3. An error message. Details of the error are given in a slide-down, in case they need to contact with the problem they're having.
 
 An element loading spinner is shown after the user hits 'Unpublish'.
@@ -26,10 +26,10 @@ An element loading spinner is shown after the user hits 'Unpublish'.
 	@open="resetOptions"
 	:close-on-press-escape="false"
 	:close-on-click-modal="false"
-	v-if="getSelectedPage"
+	v-if="pages.length"
 >
 
-	<div :style="unpublished===true || error!=='' ? 'display:none;': 'display:block;'">
+	<div v-show="!unpublished && error === ''">
 		<el-alert
 			:title="`Unpublish the page ${getSelectedPage.title}`"
 			type="warning"
@@ -48,7 +48,7 @@ An element loading spinner is shown after the user hits 'Unpublish'.
 		</div>
 	</div>
 
-	<div :style="unpublished===true ? 'display:block;': 'display:none;'">
+	<div v-show="unpublished">
 		<el-alert
 			:title="`You have successfully unpublished the page ${getSelectedPage.title}`"
 			type="success"
@@ -66,7 +66,7 @@ An element loading spinner is shown after the user hits 'Unpublish'.
 		</div>
 	</div>
 
-	<div :style="unpublished===false && error!=='' ? 'display:block;': 'display:none;'">
+	<div v-show="!unpublished && error !== ''">
 		<el-alert
 			title="Page not unpublished"
 			type="error"
@@ -125,7 +125,7 @@ export default {
 		getSelectedPage() {
 			return this.getPage({
 				arrayPath: this.unpublishModal.pagePath
-			});
+			}) || {};
 		},
 
 		// basically controls show/hide of the modal
@@ -156,9 +156,6 @@ export default {
 			'setPageStatusGlobally'
 		]),
 
-		/**
-		unpublish the page
-		*/
 		unpublishPage() {
 			// show the loading spinner first, in case of latency on unpublish
 			// when the unpublish has finished ok, hide the spinner and show the unpublished message in the modal
