@@ -137,7 +137,7 @@ export default {
 		'open-edit-modal',
 		'path',
 		'depth',
-		'parentStatus'
+		'parent-status'
 	],
 
 	components: {
