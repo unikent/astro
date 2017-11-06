@@ -185,7 +185,7 @@ let store = new Vuex.Store({
 		},
 
 		/**
-		 * Mutates a page status, both in the pages list and
+		 * Mutates a page's status, both in the pages list and
 		 * in the editor if it is the page being edited.
 		 *
 		 * @param context
@@ -194,8 +194,9 @@ let store = new Vuex.Store({
 		 * eg. "0.0.1" for pagelist[0][0][1]
 		 * @param {string} status - The new status.
 		 */
-		setPageStatusGlobally({ commit }, { id, arrayPath, status }) {
-			commit('setPageStatus', { id, arrayPath, status }, { root: true });
+		setPageStatusGlobally({ commit, dispatch }, { id, arrayPath, status }) {
+			// uses action as we need access to the getPage getter
+			dispatch('setPageStatus', { id, arrayPath, status }, { root: true });
 			commit('site/setPageStatusInPagesList', { id, arrayPath, status });
 		}
 	},

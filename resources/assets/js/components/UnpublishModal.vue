@@ -162,7 +162,7 @@ export default {
 			// if there's a problem, show an error message
 			this.loading = true;
 			this.$api
-				.post('pages/' + this.$route.params.page_id + '/unpublish', this.page) // TODO - check this later
+				.post('pages/' + this.getSelectedPage.id + '/unpublish', this.page) // TODO - check this later
 				.then(() => {
 
 					this.setPageStatusGlobally({
