@@ -70,7 +70,7 @@
 
 				<el-dropdown-item
 					command="unpublish"
-					v-if="canUser('page.delete')"
+					v-if="canUser('page.unpublish')"
 					:disabled="page.status === 'new'"
 				>
 					Unpublish
