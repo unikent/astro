@@ -2,14 +2,12 @@
 
 namespace App\Policies\Definitions;
 
+use App\Policies\BasePolicy;
 use App\Models\User;
-use Illuminate\Auth\Access\HandlesAuthorization;
 use App\Models\Definitions\Layout as LayoutDefinition;
 
-class LayoutPolicy
+class LayoutPolicy extends BasePolicy
 {
-    use HandlesAuthorization;
-
     /**
      * Determine whether the user can index definitions.
      *

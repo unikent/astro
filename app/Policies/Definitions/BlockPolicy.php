@@ -2,14 +2,12 @@
 
 namespace App\Policies\Definitions;
 
+use App\Policies\BasePolicy;
 use App\Models\User;
-use Illuminate\Auth\Access\HandlesAuthorization;
 use App\Models\Definitions\Block as BlockDefinition;
 
-class BlockPolicy
+class BlockPolicy extends BasePolicy
 {
-    use HandlesAuthorization;
-
     /**
      * Determine whether the user can index definition.
      *

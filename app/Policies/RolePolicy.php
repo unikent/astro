@@ -2,20 +2,11 @@
 
 namespace App\Policies;
 
+use App\Policies\BasePolicy;
 use App\Models\User;
-use Illuminate\Auth\Access\HandlesAuthorization;
 
-class RolePolicy
+class RolePolicy extends BasePolicy
 {
-    use HandlesAuthorization;
-
-    public function before($user, $ability)
-    {
-        if($user->isAdmin()){
-            return true;
-        }
-    }
-
     /**
      * Determine whether the user can list all roles
      *

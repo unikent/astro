@@ -2,26 +2,13 @@
 
 namespace App\Policies;
 
-use Gate;
-use App\Models\Site;
+use App\Policies\BasePolicy;
 use App\Models\User;
+use App\Models\Site;
 use App\Models\Media;
-use Illuminate\Auth\Access\HandlesAuthorization;
 
-class MediaPolicy
+class MediaPolicy extends BasePolicy
 {
-    use HandlesAuthorization;
-
-    public function before($user, $ability)
-    {
-        if($user->isAdmin())
-        {
-            return true;
-        }else{
-            return true;
-        }
-    }
-
     /**
      * Determine whether the user can index Media.
      *

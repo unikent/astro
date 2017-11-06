@@ -2,22 +2,13 @@
 
 namespace App\Policies;
 
+use App\Policies\BasePolicy;
 use App\Models\Permission;
 use App\Models\User;
 use App\Models\Site;
-use Illuminate\Auth\Access\HandlesAuthorization;
 
-class SitePolicy
+class SitePolicy extends BasePolicy
 {
-    use HandlesAuthorization;
-
-    public function before(User $user, $ability)
-    {
-        if($user->isAdmin()){
-            return true;
-        }
-    }
-
     /**
      * All users can view the list of Sites, the list is restricted elsewhere.
      * @param  User  $user
