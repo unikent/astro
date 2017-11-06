@@ -167,11 +167,23 @@ const mutations = {
 	 *
 	 */
 	setPageStatusInPagesList(state, { arrayPath, id, status }) {
+		let page;
+
 		if(arrayPath) {
-			getPage(state.pages, arrayPath).status = status;
+			page = getPage(state.pages, arrayPath);
 		}
 		else if(id) {
-			findPageById(state.pages, id).status = status;
+			page = findPageById(state.pages, id);
+		}
+
+		if(page) {
+			// propagate "new" status to all child pages.
+			if(status === 'new') {
+				updateStatuses(page, status);
+			}
+			else {
+				page.status = status;
+			}
 		}
 	}
 };
@@ -411,14 +423,6 @@ const
 		return depth;
 	},
 
-	updateDepths = (currPage, depth) => {
-		currPage.depth = depth;
-
-		if(currPage.children && currPage.children.length) {
-			currPage.children.forEach(page => updateDepths(page, depth + 1));
-		}
-	},
-
 	/**
 	 * Finds and returns the page with the specified id if it is present in the pages tree.
 	 *
@@ -442,11 +446,47 @@ const
 		return null;
 	},
 
-	updatePaths = (currPage, path) => {
-		currPage.path = path;
+	updateDepths = (currentPage, depth) => {
+		updatePageAndSubPages(
+			currentPage, 'depth', depth, ({ value }) => value + 1
+		);
+	},
 
-		if(currPage.children && currPage.children.length) {
-			currPage.children.forEach(page => updatePaths(page, path + '/' + page.slug));
+	updatePaths = (currentPage, path) => {
+		updatePageAndSubPages(
+			currentPage,
+			'path',
+			path,
+			({ page, value }) => value + '/' + page.slug
+		);
+	},
+
+	updateStatuses = (currentPage, status) => {
+		updatePageAndSubPages(currentPage, 'status', status);
+	},
+
+	/**
+	 * Update a property of a page in the pages list and update it's children
+	 * based on a transform callback (or by default update all children to
+	 * the same value).
+	 *
+	 * @param      {object}    currentPage  The current page we're walking.
+	 * @param      {string}    key          The key of the property to update.
+	 * @param      {*}         value        The value to update the property to.
+	 * @param      {Function}  transform    The callback to run for modifying our value after each iteration.
+	 */
+	updatePageAndSubPages = (
+		currentPage,
+		key,
+		value,
+		transform = ({ value }) => value
+	) => {
+		currentPage[key] = value;
+
+		if(currentPage.children && currentPage.children.length) {
+			currentPage.children.forEach(
+				page => updatePageAndSubPages(page, key, transform({ page, value }), transform)
+			);
 		}
 	};
 
