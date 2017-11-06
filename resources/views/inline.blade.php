@@ -34,7 +34,11 @@
 	@if (env('ENABLE_HEAP'))
 		@include('components.heap-analytics')
 	@endif
-	
+
+	@if (env('ENABLE_HOTJAR'))
+		@include('components.hotjar-analytics')
+	@endif
+
 </head>
 <body class="custom-scrollbar">
 	<div id="editor">
