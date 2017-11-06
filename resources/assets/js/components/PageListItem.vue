@@ -26,10 +26,9 @@
 			v-if="statuses[page.status]"
 			:content="statuses[page.status].name"
 		>
-			<el-tag
-				:type="statuses[page.status].type"
-				size="mini"
+			<div
 				class="page-list__status"
+				:class="{[`page-list__status--${page.status}`]: true }"
 			/>
 		</el-tooltip>
 
