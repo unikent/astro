@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import api from 'plugins/http/api';
 import Vue from 'vue';
-import { notify } from 'classes/helpers';
+import { notify, pageHasBeenPublished } from 'classes/helpers';
 
 const vue = new Vue();
 
@@ -299,7 +299,7 @@ const actions = {
 			withinDepthLimit = newLocation.parent.depth + getDepth(oldLocation.page) <= state.maxDepth;
 
 		// don't allow moving published pages beneath unpublished parents
-		if(oldLocation.page.status === 'published' && newLocation.parent.status === 'new') {
+		if(pageHasBeenPublished(oldLocation.page) && newLocation.parent.status === 'new') {
 			vue.$snackbar.open({
 				message: `
 					Unable to drop page(s) here.
