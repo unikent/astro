@@ -149,10 +149,13 @@ export default {
 			.then(() => {
 				this.fullscreenLoading = false;
 
-				this.setPageStatusGlobally({
-					id: this.page.id,
-					status: 'draft'
-				});
+				// we only need to update the status if it isn't "new" or "draft"
+				if(this.page.status === 'published') {
+					this.setPageStatusGlobally({
+						id: this.page.id,
+						status: 'draft'
+					});
+				}
 			});
 		},
 
