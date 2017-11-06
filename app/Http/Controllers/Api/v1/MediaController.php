@@ -50,7 +50,11 @@ class MediaController extends ApiController
 			$query->mimeTypes($request->get('mime_types'));
 		}
 
-		return fractal($query->orderBy('id', 'desc')->get(), new MediaTransformer)->respond(200);
+		if($request->has('order') && $request->get('order') === 'id.desc') {
+			$query->orderBy('id', 'desc');
+		}
+
+		return fractal($query->get(), new MediaTransformer)->respond(200);
 	}
 
 
