@@ -381,6 +381,10 @@ const actions = {
 
 const getters = {
 
+	/**
+     * Get a Page referenced by either its id or array path ( eg. 0.3.1 )
+	 * @param state
+	 */
 	getPage: (state) => ({ arrayPath, id }) => {
 		if(arrayPath === null || id === null) {
 			return null;
@@ -388,7 +392,6 @@ const getters = {
 		else if(arrayPath) {
 			return getPage(state.pages, arrayPath);
 		}
-
 		return findPageById(state.pages, id);
 	}
 };
@@ -402,8 +405,14 @@ const
 		}
 	},
 
-	getPage = (page, fullPath) => {
-		const path = Array.isArray(fullPath) ? fullPath : fullPath.split('.');
+	/**
+	 * Get the Page matching the specified array path.(e.g. 0.3.1)
+	 * @param {Array} page - Array of Pages.
+	 * @param {string|Array} arrayPath - Path representing the page in the hierarchy or children arrays, eg. 0.3.2 for
+	 * page[0].children[3].children[2]
+	 */
+	getPage = (page, arrayPath) => {
+		const path = Array.isArray(arrayPath) ? arrayPath : arrayPath.split('.');
 
 		for(var i = 0, length = path.length; page !== void 0 && i < length; i++) {
 			page = i > 0 ? page.children[path[i]] : page[path[i]];
