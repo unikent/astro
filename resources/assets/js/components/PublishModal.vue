@@ -46,7 +46,7 @@ An element loading spinner is shown after the user hits 'Publish'.
 			:closable=false
 			>
 		</el-alert>
-		<div class="publish-modal__message">View your new page now at <a :href="renderedURL" target="_blank">{{ renderedURL }}</a> (opens in a new tab)</div>
+		<div class="publish-modal__message">View your new page now at <a :href="previewURL" target="_blank">{{ renderedURL }}</a> (opens in a new tab)</div>
 		<div class="publish-modal__buttons">
 			<span slot="footer" class="dialog-footer">
 				<el-button type="primary" @click="hidePublishModal">Close</el-button>
@@ -82,6 +82,7 @@ An element loading spinner is shown after the user hits 'Publish'.
 
 <script>
 import { mapState, mapMutations, mapGetters, mapActions } from 'vuex';
+import { getPublishedPreviewURL } from 'classes/helpers';
 
 export default {
 	name: 'publish-modal',
@@ -134,6 +135,10 @@ export default {
 					this.hidePublishModal();
 				}
 			}
+		},
+
+		previewURL() {
+			return getPublishedPreviewURL(this.renderedURL);
 		},
 
 		// frontend URL - so the user can view the page's url

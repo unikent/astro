@@ -168,3 +168,22 @@ export const notify = ({ title, message, type }) => {
 export const pageHasBeenPublished = (page) => {
 	return page.status !== 'new';
 };
+
+
+/**
+ * Get the URL at which the current page can be previewed in the editor.
+ * @param {string} url - The page URL to mutate into a draft preview URL
+ * @returns {string} Full URL
+ */
+export const getDraftPreviewURL = (url) => {
+	return `${Config.get('base_url', '')}` + '/draft/' + url;
+};
+
+/**
+ * Get the URL at which the published version of the current page can be previewed in the editor.
+ * @param {string} url - The page URL to mutate into a published preview URL.
+ * @returns {string} Full URL
+ */
+export const getPublishedPreviewURL = (url) => {
+	return `${Config.get('base_url', '')}` + '/published/' + url;
+};

@@ -37,12 +37,12 @@ TODO: Add last published date after the page status
 					{{ pageTitle }}
 					<el-tag type="warning">Draft</el-tag>
 				</div>
-				<span class="top-bar__url"><a :href="renderedURL" target="_blank">{{ renderedURL }}</a> <icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" /></span>
+				<span class="top-bar__url"><a :href="draftPreviewURL" target="_blank">{{ renderedURL }}</a> <icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" /></span>
 			</div>
 
 			<div v-else-if="showTools && publishStatus === 'published'" class="top-bar__page-title">
 				<div class="top-bar__title">{{ pageTitle }}<el-tag type="success">Published</el-tag></div>
-				<span class="top-bar__url"><a :href="renderedURL" target="_blank">{{ renderedURL }}</a> <icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" /></span>
+				<span class="top-bar__url"><a :href="publishedPreviewURL" target="_blank">{{ renderedURL }}</a> <icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" /></span>
 			</div>
 
 			<div v-else-if="showTools" class="top-bar__page-title">
@@ -104,7 +104,9 @@ TODO: Add last published date after the page status
 				'pageSlug',
 				'pagePath',
 				'sitePath',
-				'siteDomain'
+				'siteDomain',
+				'publishedPreviewURL',
+				'draftPreviewURL'
 			]),
 
 			// works out if we should show a back button or not (ie whether we're editing a page or on the homepage)
