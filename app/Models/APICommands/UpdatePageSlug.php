@@ -65,14 +65,13 @@ class UpdatePageSlug implements APICommand
 		];
 
 		DB::update("
-          UPDATE pages 
-          SET 
-            path = CONCAT(:prefix, SUBSTRING(path, :replace_length) )
-          WHERE lft >= :lft
-          AND lft < :rgt
-          AND site_id = :site_id
-          AND version = :version
-        ",
+			UPDATE pages
+			SET path = CONCAT(:prefix, SUBSTRING(path, :replace_length))
+			WHERE lft >= :lft
+			AND lft < :rgt
+			AND site_id = :site_id
+			AND version = :version
+			",
 			$binds
 		);
 		$page->slug = $slug;
@@ -87,7 +86,8 @@ class UpdatePageSlug implements APICommand
 	public function messages(Collection $data, Authenticatable $user)
 	{
 		return [
-			'id.page_is_a_subpage' => 'You cannot change the slug of the homepage.',
+			'id.required' => 'Cannot update a page\'s slug without knowing its id.',
+			'id.page_is_a_subpage' => 'Cannot update the slug of a page that doesn\'t exist or is a homepage.',
 			'slug.regex' => 'Slug can only contain lowercase letters, numbers and hyphens.',
 			'slug_unchanged_or_unique' => 'A page with the slug "' . $data->get('slug') . '" already exists at this level.'
 		];
@@ -100,10 +100,9 @@ class UpdatePageSlug implements APICommand
 	 */
 	public function rules(Collection $data, Authenticatable $user)
 	{
-		$page = Page::find($data->get('id'));
-		$parent_id = $page ? $page->parent_id : null;
 		$rules = [
 			'id' => [
+				'required',
 				'page_is_a_subpage',
 				'page_is_draft:' . $data->get('id')
 			],

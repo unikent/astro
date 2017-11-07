@@ -183,7 +183,7 @@ export default {
 
 		fetchMedia() {
 			this.$api
-				.get('media')
+				.get('media?order=id.desc')
 				.then(({ data: json }) => {
 					this.images = json.data;
 				});

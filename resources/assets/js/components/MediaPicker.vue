@@ -132,7 +132,7 @@ export default {
 		fetchMedia() {
 			this.$api
 				// TODO: if unmodified since
-				.get('media', {})
+				.get('media?order=id.desc', {})
 				.then(({ headers, data: json }) => {
 					this.lastUpdated = headers.date;
 					this.media = json.data;

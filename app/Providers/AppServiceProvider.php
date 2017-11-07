@@ -27,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
 		Validator::extend('slug_unchanged_or_unique', function($attr, $value, $parameters, $validator) {
 			$id = isset($parameters[0]) ? $parameters[0] : null;
 			$page = Page::find($id);
-			if($page ){
+			if($page) {
 				if($page->slug == $value){ // can keep slug the same...
 					return true;
 				}
@@ -39,7 +39,8 @@ class AppServiceProvider extends ServiceProvider
 					return $ok;
 				}
 			}
-			return false;
+			// technically if a page doesn't exist its path is unique and unchanged
+			return true;
 		});
 
 		Validator::extend('page_is_a_subpage', function($attr, $id) {

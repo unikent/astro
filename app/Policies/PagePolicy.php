@@ -2,22 +2,13 @@
 
 namespace App\Policies;
 
+use App\Policies\BasePolicy;
 use App\Models\Page;
 use App\Models\Permission;
 use App\Models\User;
-use Illuminate\Auth\Access\HandlesAuthorization;
 
-class PagePolicy
+class PagePolicy extends BasePolicy
 {
-    use HandlesAuthorization;
-
-	public function before(User $user, $ability)
-	{
-		if($user->isAdmin()){
-			return true;
-		}
-	}
-
 	/**
      * Determine whether the user can view the page.
      *

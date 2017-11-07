@@ -8,6 +8,7 @@
 
 namespace Tests\Unit\Models\APICommands;
 
+use App\Models\Page;
 use App\Models\APICommands\UpdatePageSlug;
 use App\Models\Contracts\APICommand;
 
@@ -24,8 +25,18 @@ class UpdatePageSlugTest extends APICommandTestCase
      */
     public function validation_whenInput_isValid_passes()
     {
-        $validator = $this->validator($this->input(null));
-        $validator->passes();
+        $home_page = factory(Page::class)->states('withRevision')->create();
+        $child_page = factory(Page::class)->states('withRevision')->create([
+            'slug'      => 'valid-slug',
+            'parent_id' => $home_page->id,
+            'site_id'   => $home_page->site_id
+        ]);
+
+        $validator = $this->validator($this->input([
+            'slug' => 'valid-slug',
+            'id' => $child_page->id
+        ]));
+
         $this->assertTrue($validator->passes());
     }
 
@@ -33,16 +44,26 @@ class UpdatePageSlugTest extends APICommandTestCase
      * @test
      * @group APICommands
      */
-    public function validation_whenPageIsNotDraft_fails()
+    public function validation_whenPageDoesNotExist_fails()
     {
-        $this->markTestIncomplete();
+        $validator = $this->validator($this->input([
+            'slug' => 'valid-slug',
+            'id'   => 1
+        ]));
+
+        $errors = $validator->errors();
+
+        $this->assertTrue($validator->fails());
+        $this->assertTrue($errors->has('id'));
+        // "page_is_a_subpage" and "ensure page_is_draft" should both fail
+        $this->assertEquals($errors->count('id'), 2);
     }
 
     /**
      * @test
      * @group APICommands
      */
-    public function validation_whenPageDoesNotExist_fails()
+    public function validation_whenPageIsNotDraft_fails()
     {
         $this->markTestIncomplete();
     }
