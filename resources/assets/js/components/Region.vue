@@ -1,14 +1,12 @@
 <template>
 <div>
 	<template v-if="page.blocks && page.blocks[name] && page.blocks[name].length">
-		<block
-			v-for="(blockData, index) in page.blocks[name]"
-			v-if="blockData"
+		<region-section
+			v-for="(sectionData, index) in page.blocks[name]"
 			:region="name"
-			:key="`block-${blockData.id}`"
-			:type="getBlockType(blockData)"
+			:section="index"
+			:key="`section-${sectionData.id}`"
 			:index="index"
-			:blockData="blockData"
 		/>
 	</template>
 	<empty-region v-else />
@@ -19,6 +17,7 @@
 import { mapState } from 'vuex';
 import Block from 'components/Block';
 import EmptyRegion from 'components/EmptyRegion';
+import RegionSection from 'components/Section';
 
 export default {
 
@@ -28,7 +27,8 @@ export default {
 
 	components: {
 		Block,
-		EmptyRegion
+		EmptyRegion,
+		RegionSection
 	},
 
 	computed: {
@@ -38,14 +38,6 @@ export default {
 	},
 
 	methods: {
-
-		getBlockType(block) {
-			return (
-				Object.keys(block).length === 0 ?
-				'placeholder' :
-				`${block.definition_name}-v${block.definition_version}`
-			);
-		}
 
 	}
 

@@ -35,7 +35,7 @@ export default {
 
 	name: 'block',
 
-	props: ['index', 'region', 'type', 'blockData'],
+	props: ['index', 'region', 'section', 'type', 'blockData'],
 
 	data() {
 
