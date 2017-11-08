@@ -23,7 +23,7 @@ class AddSectionsToRevisionBlocks extends Migration
 					&& is_array($json['main'])
 					&& count($json['main']) > 0
 					&& isset($json['main'][0]['definition_name'])) {
-					$section = ['id' => 'catch-all', 'blocks' => $json['main']];
+					$section = ['name' => 'catch-all', 'blocks' => $json['main']];
 					$json['main'] = [$section];
 					$revision->blocks = $json;
 					$revision->save();

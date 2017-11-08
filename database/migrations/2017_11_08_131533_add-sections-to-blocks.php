@@ -15,7 +15,7 @@ class AddSectionsToBlocks extends Migration
     public function up()
     {
         Schema::table('blocks', function (Blueprint $table) {
-            $table->string('section', 50)->default('catch-all');
+            $table->string('section_name', 50)->default('catch-all');
         });
     }
 
@@ -27,7 +27,7 @@ class AddSectionsToBlocks extends Migration
     public function down()
     {
         Schema::table('blocks', function (Blueprint $table) {
-            $table->dropColumn('section');
+            $table->dropColumn('section_name');
         });
     }
 }
