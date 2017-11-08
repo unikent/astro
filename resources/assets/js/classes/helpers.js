@@ -172,18 +172,22 @@ export const pageHasBeenPublished = (page) => {
 
 /**
  * Get the URL at which the current page can be previewed in the editor.
+
  * @param {string} url - The page URL to mutate into a draft preview URL
- * @returns {string} Full URL
+
+ * @returns {string} Full URL (with any trailing slash removed)
  */
 export const getDraftPreviewURL = (url) => {
-	return `${Config.get('base_url', '')}` + '/draft/' + url;
+	return `${Config.get('base_url', '')}` + '/draft/' + (url ? url.replace(/\/$/, '') : '');
 };
 
 /**
  * Get the URL at which the published version of the current page can be previewed in the editor.
+
  * @param {string} url - The page URL to mutate into a published preview URL.
- * @returns {string} Full URL
+
+ * @returns {string} Full URL (with any trailing slash removed)
  */
 export const getPublishedPreviewURL = (url) => {
-	return `${Config.get('base_url', '')}` + '/published/' + url;
+	return `${Config.get('base_url', '')}` + '/published/' + (url ? url.replace(/\/$/, '') : '');
 };
