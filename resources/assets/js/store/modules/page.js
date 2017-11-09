@@ -23,7 +23,9 @@ const state = {
 	currentLayout: null,
 	currentLayoutVersion: 1,
 	currentBlockIndex: null,
-	currentRegion: 'main',
+	currentRegion: 'main', //TODO update this with setter once we have more than one region
+	currentSection: 'catch-all', //TODO update this with setter once we have more than one section
+	currentSectionIndex: 0, //TODO update this with setter once we have more than one section
 	blockMeta: {
 		blocks: {
 			main: []
@@ -473,7 +475,7 @@ const getters = {
 	},
 
 	getFieldValue: (state) => (index, name) => {
-		const block = state.pageData.blocks[state.currentRegion][index];
+		const block = state.pageData.blocks[state.currentRegion][state.currentSectionIndex]['blocks'][index];
 
 		if(!block) {
 			return null;
@@ -487,7 +489,7 @@ const getters = {
 	},
 
 	getCurrentBlock: (state) => () => {
-		return state.pageData.blocks[state.currentRegion][state.currentBlockIndex];
+		return state.pageData.blocks[state.currentRegion][state.currentSectionIndex]['blocks'][state.currentBlockIndex];
 	},
 
 	getBlockMeta: (state) => (index, region, prop = false) => {

@@ -123,11 +123,16 @@ export default {
 		...mapState({
 			currentIndex: state => state.page.currentBlockIndex,
 			currentRegion: state => state.page.currentRegion,
+			currentSection: state => state.page.currentSection,
+			currentSectionIndex: state => state.page.currentSectionIndex,
 			currentBlock: state => {
 				if(!state.page.pageData.blocks) {
 					return null;
 				}
-				return state.page.pageData.blocks[state.page.currentRegion][state.page.currentBlockIndex];
+				if (state.page.currentBlockIndex === null) {
+					return null;
+				}
+				return state.page.pageData.blocks[state.page.currentRegion][state.page.currentSectionIndex]['blocks'][state.page.currentBlockIndex];
 			},
 
 			currentDefinition: state => state.definition.currentBlockDefinition
