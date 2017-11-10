@@ -128,7 +128,7 @@ const mutations = {
 		blockData.splice(idx, 1, { ...blockData[idx] })
 	},
 
-	addBlock(state, { region, index, block }) {
+	addBlock(state, { region, index, block, sectionIndex }) {
 		if(region === void 0) {
 			region = state.currentRegion;
 		}
@@ -137,9 +137,8 @@ const mutations = {
 			state.blockMeta.blocks = { ... state.blockMeta.blocks, [region]: [] };
 			state.pageData.blocks = { ... state.pageData.blocks, [region]: [] };
 		}
-
 		if(index === void 0) {
-			index = state.pageData.blocks[region].length;
+			index = state.pageData.blocks[region][sectionIndex].blocks.length;
 		}
 
 		if(block) {
@@ -152,7 +151,7 @@ const mutations = {
 			dragging: false
 		});
 */
-		state.pageData.blocks[region].splice(index, 0, block || {});
+		state.pageData.blocks[region][sectionIndex].blocks.splice(index, 0, block || {});
 	},
 
 	deleteBlock(state,  { region, index } = { region: 'main', index: null }) {
@@ -242,7 +241,7 @@ const actions = {
 
 						commit('setBlockDefinitions', Definition.definitions, { root: true });
 
-						let blocks;
+/*						let blocks;
 
 						if(page.blocks) {
 							blocks = page.blocks;
@@ -252,13 +251,17 @@ const actions = {
 							blocks = {};
 						}
 
+*/
 						commit('setPage', _.cloneDeep(page));
 						commit('clearBlockValidationIssues');
 
-						Object.keys(blocks).forEach(region => {
-							blocks[region].forEach((block, index) => {
-								commit('addBlock', { region, index, block })
-							});
+						Object.keys(page.blocks).forEach(region => {
+							page.blocks[region].forEach((section, sindex) => {
+								page.blocks[region][sindex].blocks.forEach((block, bindex) => {
+									Definition.fillBlockFields(block);
+									//commit('addBlock', { region, bindex, block, sindex })
+								})
+							})
 						});
 /*
 						Object.keys(blocks).forEach(region => {

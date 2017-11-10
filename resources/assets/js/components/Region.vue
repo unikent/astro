@@ -5,7 +5,7 @@
 			v-for="(sectionData, index) in page.blocks[name]"
 			:region="name"
 			:section="index"
-			:key="`section-${sectionData.id}`"
+			:key="`section-${sectionData.name}`"
 			:index="index"
 		/>
 	</template>
