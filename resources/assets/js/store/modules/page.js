@@ -95,11 +95,10 @@ const mutations = {
 		let blockData = state.blockMeta.blocks[region];
 		blockData.splice(index, 1, { ...blockData[index], [type]: value })
 	},
-/*
-	updateFieldValue(state, { index, name, value }) {
-		let
-			idx = index !== void 0 ? index : state.currentBlockIndex,
-			fields = state.pageData.blocks[state.currentRegion][idx].fields;
+
+	updateFieldValue(state, { index, name, value,region,section }) {
+		let	idx = index;
+		let fields = state.pageData.blocks[region][section].blocks[idx].fields;
 
 		// if field exists just update it
 		if(_.has(fields, name)) {
@@ -112,7 +111,7 @@ const mutations = {
 			fields = clone;
 		}
 	},
-*/
+
 	updateBlockMedia(state, { index, value }) {
 		let
 			idx = index !== void 0 ? index : state.currentBlockIndex,

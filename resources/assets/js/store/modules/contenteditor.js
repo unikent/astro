@@ -174,7 +174,7 @@ const actions = {
 			commit('updateMenuActive', 'blocks');
 		}
 	},
-
+/*
 	updateFieldValue({ commit, state, getters}, { index, name, value }) {
 		const currentSection = getters.currentSection;
 		let
@@ -188,6 +188,7 @@ const actions = {
 			value: value
 		});
 	}
+	*/
 };
 
 export default {

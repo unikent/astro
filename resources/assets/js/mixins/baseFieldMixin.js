@@ -1,4 +1,4 @@
-import { mapActions, mapGetters, mapMutations } from 'vuex';
+import { mapActions, mapGetters, mapState, mapMutations } from 'vuex';
 
 export default {
 
@@ -28,9 +28,23 @@ export default {
 	},
 
 	methods: {
-		...mapActions([
-			'updateFieldValue'
+		...mapGetters([
+			'currentSectionIndex'
 		]),
+		...mapState({
+			currentBlockIndex: state => state.contenteditor.currentBlockIndex,
+			currentRegionName: state => state.contenteditor.currentRegionName
+		}),
+
+		updateFieldValue({name, value}){
+			this.$store.commit('updateFieldValue', {
+				name: name,
+				value: value,
+				index: this.currentBlockIndex(),
+				region: this.currentRegionName(),
+				section: this.currentSectionIndex()
+			})
+		},
 
 		// Here so we can override this at some point
 		transformValue(value) {
