@@ -113,8 +113,8 @@ export default {
 
 	computed: {
 		...mapGetters([
-//			'currentBlock',
-//			'currentDefinition'
+			'currentBlock',
+			'currentDefinition'
 		]),
 
 		...mapState([
@@ -123,9 +123,7 @@ export default {
 
 		...mapState({
 			currentIndex: state => state.contenteditor.currentBlockIndex,
-			currentRegion: state => state.contenteditor.currentRegionName,
-			currentBlock: state => state.contenteditor.currentBlock,
-			currentDefinition: state => state.contenteditor.currentDefinition
+			currentRegion: state => state.contenteditor.currentRegionName
 		}),
 
 		mode() {

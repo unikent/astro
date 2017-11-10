@@ -16,17 +16,24 @@ const state = {
 	 * @type {number} The index of the currently selected block in its section.
 	 */
 	currentBlockIndex: null,
-
-	currentSectionIndex: null,
-	currentSection: null,
-	currentDefinition: null,
-	currentBlock: null,
-	currentRegion: null
 };
 
 const getters = {
-	figureOutCurrentDefinition(state,getters,rootState){ console.log('ow');
-		return getters.currentBlock ? rootState.definitions.blockDefinitions[getters.currentBlock.definition_name + '-v' + getters.currentBlock.definition_version] : null;
+
+	/**
+	 * Get the definition for the currently selected block.
+	 * @param state
+	 * @param getters
+	 * @param rootState
+	 * @returns {*}
+	 */
+	currentDefinition(state,getters,rootState){
+		const block = getters.currentBlock;
+		if(block) {
+			const type = block.definition_name + '-v' + block.definition_version;
+			return rootState.definition.blockDefinitions[type];
+		}
+		return null;
 	},
 
 	/**
@@ -35,10 +42,8 @@ const getters = {
 	 * @param getters
 	 * @returns {Object|null}
 	 */
-	figureOutCurrentBlock(state,getters){
-		const section = getters.currentSection;
-		console.log('hi');
-		return section ? section.blocks[state.currentBlockIndex] : null;
+	currentBlock(state,getters){
+		return getters.currentSection ? getters.currentSection.blocks[state.currentBlockIndex] : null;
 	},
 
 	/**
@@ -46,9 +51,9 @@ const getters = {
 	 * @param state
 	 * @returns {Array|null}
  	*/
-//	currentRegion(state,getters,rootState){
-//		return rootState.page.pageData.blocks[state.currentRegionName];
-//	},
+	currentRegion(state,getters,rootState){
+		return rootState.page.pageData.blocks[state.currentRegionName];
+	},
 
 	/**
 	 * Get the section object containing the currently selected block.
@@ -56,21 +61,20 @@ const getters = {
 	 * @param getters
 	 * @returns {Object|null}
 	 */
-//	currentSection(state,getters){
-//		return (getters.currentSectionIndex != -1) ? getters.currentRegion[getters.currentSectionIndex] : null;
-//	},
+	currentSection(state,getters){
+		return getters.currentRegion ? getters.currentRegion[getters.currentSectionIndex] : null;
+	},
 
 	/**
 	 * Get the index in the current region of the section containing the currently selected block.
 	 * @param state
 	 * @returns {number} The index of the current named section, or -1.
 	 */
-//	currentSectionIndex(state,getters){
-//		const region = getters.currentRegion;
-//		console.log('argj');//state);
-
-//		return region ? region.findIndex(el => el.section_name === state.currentSectionName) : -1;
-//	}
+	currentSectionIndex(state,getters){
+		const region = getters.currentRegion;
+		const name = state.currentSectionName;
+		return region ? region.findIndex(el => el.name === name) : -1;
+	}
 };
 
 const mutations = {
@@ -81,16 +85,10 @@ const mutations = {
 	 * @param {string} sectionName
 	 * @param {number} blockIndex
 	 */
-	setCurrentBlock( state, {regionName, sectionName, blockIndex, allBlocks, definitions} ) {
+	setCurrentBlock( state, {regionName, sectionName, blockIndex} ) {
 		state.currentBlockIndex = blockIndex;
 		state.currentRegionName = regionName;
-		state.currentRegion = allBlocks[regionName];
 		state.currentSectionName = sectionName;
-		state.currentSectionIndex = state.currentRegion ? state.currentRegion.findIndex(el => el.name === state.currentSectionName) : -1;
-		state.currentSection = state.currentRegion ? state.currentRegion[state.currentSectionIndex] : null;
-		state.currentBlock = state.currentSection ? state.currentSection.blocks[state.currentBlockIndex] : null;
-		const type = state.currentBlock.definition_name + '-v' + state.currentBlock.definition_version;
-		state.currentDefinition = state.currentBlock ? definitions[type] : null;
 	}
 };
 
@@ -109,8 +107,6 @@ const actions = {
 	changeBlock({ commit, state, rootState}, arg ) {
 		// have we actually selected a different block?
 		if(state.currentBlockIndex !== arg.blockIndex || state.currentRegionName !== arg.regionName || state.currentSectionName !== arg.sectionName) {
-			arg['allBlocks'] = rootState.page.pageData.blocks;
-			arg['definitions'] = rootState.definition.blockDefinitions;
 			commit('setCurrentBlock', arg);
 			commit('collapseSidebar');
 		}
