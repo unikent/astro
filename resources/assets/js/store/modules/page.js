@@ -145,12 +145,13 @@ const mutations = {
 		if(block) {
 			Definition.fillBlockFields(block);
 		}
-
+/*
 		state.blockMeta.blocks[region].splice(index, 0, {
 			size: 0,
 			offset: 0,
 			dragging: false
 		});
+*/
 		state.pageData.blocks[region].splice(index, 0, block || {});
 	},
 
@@ -259,7 +260,7 @@ const actions = {
 								commit('addBlock', { region, index, block })
 							});
 						});
-
+/*
 						Object.keys(blocks).forEach(region => {
 							blocks[region].forEach((block) => {
 								if (typeof block.errors !== 'undefined' && block.errors !== null) {
@@ -267,7 +268,7 @@ const actions = {
 								}
 							});
 						});
-						// TODO: populate validations issues with those received from the api
+*/						// TODO: populate validations issues with those received from the api
 						commit('setLoaded');
 					});
 

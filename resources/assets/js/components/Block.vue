@@ -35,7 +35,7 @@ export default {
 
 	name: 'block',
 
-	props: ['index', 'region', 'type', 'blockData', 'sectionName'],
+	props: ['index', 'region', 'section', 'type', 'blockData'],
 
 	data() {
 
@@ -70,7 +70,7 @@ export default {
 			currentRegion: state => state.page.currentRegion,
 			currentBlockIndex: state => state.definition.currentBlockIndex,
 			draggingBlocks: state => state.page.dragging,
-			allBlockMeta: state => state.page.blockMeta.blocks,
+//			allBlockMeta: state => state.page.blockMeta.blocks,
 			activeMenuItem: state => state.menu.active
 		}),
 
@@ -99,11 +99,13 @@ export default {
 		},
 
 		isDragging() {
-			return this.getBlockMeta(this.index, this.region, 'dragging');
+			return false;
+//			return this.getBlockMeta(this.index, this.region, 'dragging');
 		},
 
 		blockMeta() {
-			return this.getBlockMeta(this.index, this.region);
+			return false;
+			// return this.getBlockMeta(this.index, this.region);
 		},
 
 		blockSizes() {
