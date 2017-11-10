@@ -5,7 +5,7 @@
 			v-for="(blockData, index) in page.blocks[region][section].blocks"
 			v-if="blockData"
 			:region="region"
-			:section="page.blocks[region][section].id"
+			:section="page.blocks[region][section].name"
 			:key="`block-${blockData.id}`"
 			:type="getBlockType(blockData)"
 			:index="index"

@@ -151,14 +151,14 @@ export default {
 			'collapseSidebar',
 			'revealSidebar',
 			'updateMenuActive',
-			'setCurrentBlock'
+			'changeBlock'
 		]),
 
 		editBlock() {
-			this.dispatch('setCurrentBlock', {
-				regionName: '',
-				sectionName: '',
-				blockPosition: ''
+			this.$store.dispatch('changeBlock', {
+				regionName: this.region,
+				sectionName: this.section,
+				blockIndex: this.index
 			});
 		},
 
