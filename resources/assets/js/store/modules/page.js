@@ -472,41 +472,6 @@ const getters = {
 		return `${Config.get('base_url', '')}` + '/published/' + getters.siteDomain + getters.sitePath + (getters.pagePath == '/' ? '' : getters.pagePath);
 	},
 
-	getFieldValue: (state) => (index, name) => {
-		const block = state.pageData.blocks[state.currentRegion][index];
-
-		if(!block) {
-			return null;
-		}
-
-		return _.get(block.fields, name, null);
-	},
-
-	getCurrentFieldValue: (state, getters) => (name) => {
-		return getters.getFieldValue(state.currentBlockIndex, name);
-	},
-
-	getCurrentBlock: (state) => () => {
-		return state.pageData.blocks[state.currentRegion][state.currentBlockIndex];
-	},
-
-	getBlockMeta: (state) => (index, region, prop = false) => {
-		const blockMeta = state.blockMeta.blocks[region][index];
-		return prop ? blockMeta[prop] : blockMeta;
-	},
-
-	getInvalidBlocks: (state) => () => {
-		return state.invalidBlocks;
-	},
-
-	getCurrentRegion: (state) => () => {
-		return state.currentRegion;
-	},
-
-	getBlocks: (state) => () => {
-		return state.pageData.blocks;
-	},
-
 	scaleDown: (state) => () => {
 		return state.scale;
 	},

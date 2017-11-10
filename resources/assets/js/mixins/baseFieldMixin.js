@@ -2,7 +2,7 @@ import { mapGetters, mapMutations } from 'vuex';
 
 export default {
 
-	props: ['field', 'path', 'errors'],
+	props: ['field', 'path', 'errors', 'currentDefinition'],
 
 	data() {
 		return this.field;

@@ -3,7 +3,7 @@
 	<div
 		v-for="(val, index) in currentValue"
 		class="collection-field__field-list"
-	>
+	> ** {{ val }}
 		<template v-for="f in fields">
 			<div class="ci-field">
 				<el-form-item
@@ -74,8 +74,7 @@ export default {
 
 	computed: {
 		...mapState({
-			currentIndex: state => state.page.currentBlockIndex,
-			currentDefinition: state => state.definition.currentBlockDefinition
+			currentIndex: state => state.page.currentBlockIndex
 		}),
 
 		...mapGetters([

@@ -65,6 +65,7 @@
 					:index="currentIndex"
 					:key="`${currentDefinition.name}-${currentIndex}`"
 					:scrollTo="scrollTo"
+					:currentDefinition="currentDefinition"
 					:errors="
 						typeof localErrors[field.name] !== 'string' ?
 							localErrors[field.name] :

@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 /**
  * Represents the state of the page content (blocks) editor and provides actions, getters and mutations for components
  * to interact with it.
@@ -74,7 +76,51 @@ const getters = {
 		const region = getters.currentRegion;
 		const name = state.currentSectionName;
 		return region ? region.findIndex(el => el.name === name) : -1;
-	}
+	},
+/*
+	getFieldValue: (state, getters) => (index, name) => {
+		const block = state.pageData.blocks[state.currentRegion][getters.currentSectionIndex].blocks[index];
+
+		if(!block) {
+			return null;
+		}
+
+		return _.get(block.fields, name, null);
+	},
+*/
+
+	/**
+	 * Get the value for the named field within the block currently selected in the editor.
+	 * @param state
+	 * @param getters
+	 */
+	getCurrentFieldValue: (state, getters) => (name) => {
+		const block = getters.currentBlock;
+		return _.get(block.fields, name, null);
+	},
+
+	/*
+	getCurrentBlock: (state) => () => {
+		return state.pageData.blocks[state.currentRegion][state.currentBlockIndex];
+	},
+*/
+	getBlockMeta: (state) => (index, region, prop = false) => {
+		const blockMeta = state.blockMeta.blocks[region][index];
+		return prop ? blockMeta[prop] : blockMeta;
+	},
+
+	getInvalidBlocks: (state) => () => {
+		return state.invalidBlocks;
+	},
+
+	getCurrentRegion: (state) => () => {
+		return state.currentRegion;
+	},
+
+	getBlocks: (state) => () => {
+		return state.pageData.blocks;
+	},
+
 };
 
 const mutations = {
