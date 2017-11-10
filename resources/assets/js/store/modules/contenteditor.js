@@ -135,6 +135,19 @@ const mutations = {
 		state.currentBlockIndex = blockIndex;
 		state.currentRegionName = regionName;
 		state.currentSectionName = sectionName;
+	},
+
+	mutateFields( state, { fields, name, value} ) {
+		// if field exists just update it
+		if (_.has(fields, name)) {
+			_.set(fields, name, value);
+		}
+		// otherwise update all fields to maintain reactivity
+		else {
+			const clone = {...fields};
+			_.set(clone, name, value);
+			fields = clone;
+		}
 	}
 };
 
@@ -160,6 +173,20 @@ const actions = {
 		if(rootState.menu.active!=='blocks') {
 			commit('updateMenuActive', 'blocks');
 		}
+	},
+
+	updateFieldValue({ commit, state, getters}, { index, name, value }) {
+		const currentSection = getters.currentSection;
+		let
+			idx = index !== void 0 ? index : state.currentBlockIndex;
+
+			// rootState.page.pageData.blocks[state.currentRegionName][state.currentSectionIndex].blocks[idx].fields;
+
+		commit('mutateFields', {
+			fields: currentSection ? currentSection.blocks[idx].fields : null,
+			name: name,
+			value: value
+		});
 	}
 };
 

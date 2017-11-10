@@ -95,7 +95,7 @@ const mutations = {
 		let blockData = state.blockMeta.blocks[region];
 		blockData.splice(index, 1, { ...blockData[index], [type]: value })
 	},
-
+/*
 	updateFieldValue(state, { index, name, value }) {
 		let
 			idx = index !== void 0 ? index : state.currentBlockIndex,
@@ -112,7 +112,7 @@ const mutations = {
 			fields = clone;
 		}
 	},
-
+*/
 	updateBlockMedia(state, { index, value }) {
 		let
 			idx = index !== void 0 ? index : state.currentBlockIndex,

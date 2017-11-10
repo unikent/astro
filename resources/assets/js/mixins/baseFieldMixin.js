@@ -1,4 +1,4 @@
-import { mapGetters, mapMutations } from 'vuex';
+import { mapActions, mapGetters, mapMutations } from 'vuex';
 
 export default {
 
@@ -28,7 +28,7 @@ export default {
 	},
 
 	methods: {
-		...mapMutations([
+		...mapActions([
 			'updateFieldValue'
 		]),
 

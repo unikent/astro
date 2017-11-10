@@ -17,23 +17,23 @@
 			ref="block_fields"
 		>
 			<el-form-item
-				v-for="field in currentDefinition.fields"
-				:label="field.label"
-				:prop="field.name"
+				v-for="fieldDefinition in currentDefinition.fields"
+				:label="fieldDefinition.label"
+				:prop="fieldDefinition.name"
 				:error="
-					typeof localErrors[field.name] === 'string' ?
-						localErrors[field.name] :
+					typeof localErrors[fieldDefinition.name] === 'string' ?
+						localErrors[fieldDefinition.name] :
 						null
 				"
-				:key="field.name"
+				:key="fieldDefinition.name"
 			>
 				<template slot="label">
-					<span>{{ field.label }}</span>
+					<span>{{ fieldDefinition.label }}</span>
 
 					<el-tooltip
-						v-if="field.info"
+						v-if="fieldDefinition.info"
 						popper-class="el-tooltip__popper--narrow"
-						:content="field.info"
+						:content="fieldDefinition.info"
 						placement="top"
 					>
 						<icon
@@ -53,26 +53,28 @@
 							width="14"
 							height="14"
 							viewBox="0 0 14 14"
-							@click="viewField(field.name)"
+							@click="viewField(fieldDefinition.name)"
 						/>
 					</el-tooltip>
 					-->
 				</template>
 				<component
-					:is="getField(field.type)"
-					:field="field"
-					:path="field.name"
+					:is="getField(fieldDefinition.type)"
+					:field="fieldDefinition"
+					:path="fieldDefinition.name"
 					:index="currentIndex"
 					:key="`${currentDefinition.name}-${currentIndex}`"
 					:scrollTo="scrollTo"
 					:currentDefinition="currentDefinition"
 					:errors="
-						typeof localErrors[field.name] !== 'string' ?
-							localErrors[field.name] :
+						typeof localErrors[fieldDefinition.name] !== 'string' ?
+							localErrors[fieldDefinition.name] :
 							null
 					"
 				/>
 			</el-form-item>
+
+
 		</block-form>
 
 		<!-- TODO: make this look nice -->
