@@ -113,7 +113,8 @@ export default {
 
 	computed: {
 		...mapGetters([
-			'getCurrentBlock'
+//			'currentBlock',
+//			'currentDefinition'
 		]),
 
 		...mapState([
@@ -121,16 +122,10 @@ export default {
 		]),
 
 		...mapState({
-			currentIndex: state => state.page.currentBlockIndex,
-			currentRegion: state => state.page.currentRegion,
-			currentBlock: state => {
-				if(!state.page.pageData.blocks) {
-					return null;
-				}
-				return state.page.pageData.blocks[state.page.currentRegion][state.page.currentBlockIndex];
-			},
-
-			currentDefinition: state => state.definition.currentBlockDefinition
+			currentIndex: state => state.contenteditor.currentBlockIndex,
+			currentRegion: state => state.contenteditor.currentRegionName,
+			currentBlock: state => state.contenteditor.currentBlock,
+			currentDefinition: state => state.contenteditor.currentDefinition
 		}),
 
 		mode() {
@@ -139,15 +134,15 @@ export default {
 
 		blockFields: {
 			get() {
-				const currentBlock = this.getCurrentBlock();
-				if(currentBlock) {
-					return currentBlock.fields;
+				if(this.currentBlock) {
+					return this.currentBlock.fields;
 				}
 			},
 			set() {}
 		},
 
 		localErrors() {
+			return {};
 			return this.errors.blocks ?
 				this.errors.blocks[this.currentRegion][this.currentIndex].fields : {};
 		},
