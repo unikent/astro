@@ -67,8 +67,6 @@ export default {
 	computed: {
 
 		...mapState({
-			currentRegion: state => state.page.currentRegion,
-			currentBlockIndex: state => state.definition.currentBlockIndex,
 			draggingBlocks: state => state.page.dragging,
 //			allBlockMeta: state => state.page.blockMeta.blocks,
 			activeMenuItem: state => state.menu.active

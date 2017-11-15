@@ -1,6 +1,6 @@
 <template>
 <div>
-	<template v-if="sectionData && sectionData.blocks.length">
+	<template v-if="sectionData && sectionData.blocks && sectionData.blocks.length">
 		<block
 			v-for="(blockData, index) in sectionData.blocks"
 			v-if="blockData"

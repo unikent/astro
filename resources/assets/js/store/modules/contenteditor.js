@@ -78,17 +78,10 @@ const getters = {
 		const name = state.currentSectionName;
 		return region ? region.findIndex(el => el.name === name) : -1;
 	},
-/*
-	getFieldValue: (state, getters) => (index, name) => {
-		const block = state.pageData.blocks[state.currentRegion][getters.currentSectionIndex].blocks[index];
 
-		if(!block) {
-			return null;
-		}
-
-		return _.get(block.fields, name, null);
+	blocks(state, getters){
+		return getters.currentSection ? getters.currentSection.blocks : [];
 	},
-*/
 
 	/**
 	 * Get the value for the named field within the block currently selected in the editor.

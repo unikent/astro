@@ -1,5 +1,5 @@
 <template>
-<div v-else class="empty-section">
+<div v-else class="empty-region">
 	<el-button size="large" @click="addBlocks">Add block(s) to this section</el-button>
 </div>
 </template>

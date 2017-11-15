@@ -38,7 +38,9 @@ const state = {
 	loaded: false,
 	dragging: false,
 	currentSavedState: '',
-	invalidBlocks: []
+	invalidBlocks: [],
+	defaultRegion: 'main',
+	defaultSection: 'catch-all'
 };
 
 const mutations = {
@@ -127,15 +129,43 @@ const mutations = {
 		blockData.splice(idx, 1, { ...blockData[idx] })
 	},
 
-	addBlock(state, { region, index, block, sectionIndex }) {
+	/**
+	 * Adds a block to a section in a region
+	 *
+	 * @param state
+	 * @param {string} region - The name of the region to add the block to.
+	 * @param {number} index - The position in the section to add the block, or null to add at end.
+	 * @param {BlockData} block - The data representing the block to be added.
+	 * @param {number} sectionIndex - The index of the section in the specified region.
+	 * @param {string} sectionName - The name of the section to add the block to.
+     *
+	 * If the specified region and / or section do not exist in the block data, they will be added.
+	 */
+	addBlock(state, { region, index, block, sectionIndex, sectionName }) {
 		if(region === void 0) {
-			region = state.currentRegion;
+			region = state.defaultRegion;
 		}
 
+		// if region is not yet defined in block data, add it
 		if(state.pageData.blocks[region] === void 0) {
-			state.blockMeta.blocks = { ... state.blockMeta.blocks, [region]: [] };
+			state.blockMeta.blocks = { ... state.blockMeta.blocks, [`${region}`]: [] };
 			state.pageData.blocks = { ... state.pageData.blocks, [region]: [] };
 		}
+
+		// if section is not yet defined in region data, add it
+		// TODO refactor - is this necessary?  Should be more robust...
+		if(state.pageData.blocks[region][sectionIndex] === void 0){
+			let sections = state.pageData.blocks[region];
+			for(let i = sections.length; i <= sectionIndex; ++i){
+				sections.push({
+					name: (i === sectionIndex ? sectionName : 'unknown-section'),
+					blocks: []
+				});
+			}
+			state.pageData.blocks[region] = sections; // does this need to use syntax similar to the region one above for reactivity?
+			state.pageData.blocks = { ... state.pageData.blocks };
+		}
+
 		if(index === void 0) {
 			index = state.pageData.blocks[region][sectionIndex].blocks.length;
 		}

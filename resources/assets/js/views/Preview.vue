@@ -19,9 +19,7 @@
 				</el-dropdown-menu>
 			</el-dropdown>
 
-			<div ref="move" class="block-overlay__move" v-show="blocks.length > 1">
-				<icon name="move" width="20" height="20" />
-			</div>
+
 			<div
 				class="add-before"
 				:class="{ 'add-before--first' : currentBlockIsFirst }"
@@ -81,6 +79,9 @@ export default {
 			overlayStyles: {},
 			wrapperStyles: {},
 			overlayHidden: true,
+			/**
+			 * @var {BlockComponent} - The Block.vue component which is currently selected
+			 */
 			current: null
 		};
 	},
@@ -93,16 +94,16 @@ export default {
 		...mapState({
 			loadedBlocks: state => state.page.loaded,
 			currentLayout: state => state.page.currentLayout,
-			currentRegion: state => state.page.currentRegion,
+			currentRegion: state => state.contenteditor.currentRegionName,
 			layoutVersion: state => state.page.currentLayoutVersion,
-			blockMeta: state => state.page.blockMeta.blocks[state.page.currentRegion],
-			blocks: state => state.page.pageData.blocks[state.page.currentRegion]
+			blockMeta: state => state.page.blockMeta.blocks[state.page.currentRegion]
 		}),
 
 		...mapGetters([
 			'scaleDown',
 			'scaleUp',
-			'getBlocks'
+			'getBlocks',
+			'blocks'
 		]),
 
 		layout() {
@@ -119,16 +120,6 @@ export default {
 			}
 
 			return layout || null;
-		},
-
-		dragging: {
-			get() {
-				return this.$store.state.page.dragging;
-			},
-
-			set(val) {
-				return this.$store.commit('setDragging', val);
-			}
 		},
 
 		currentBlockIsFirst() {
@@ -167,9 +158,6 @@ export default {
 		document.removeEventListener('keydown', this.onKeyDown);
 		document.removeEventListener('keyup', this.onKeyUp);
 		document.removeEventListener('click', this.cancelClicks);
-		document.removeEventListener('mousedown', this.mouseDown);
-		document.removeEventListener('mouseup', this.mouseUp);
-		document.removeEventListener('mousemove', this.handlerMove);
 		win.removeEventListener('resize', this.onResize);
 	},
 
@@ -189,7 +177,6 @@ export default {
 			'deleteBlock',
 			'updateBlockMeta',
 			'setScale',
-			'addBlock',
 			'showBlockPicker',
 			'updateInsertIndex',
 			'updateInsertRegion',
@@ -272,58 +259,6 @@ export default {
 			}
 		},
 
-		mouseDown(e) {
-			if(e.button === 0 && findParent(this.moveEl, e.target, true)) {
-				this.updateStyles('wrapper', 'userSelect', 'none');
-				this.updateStyles('overlay', 'pointerEvents', 'auto');
-				this.updateStyles('handle', 'opacity', 1);
-
-				const
-					thirdOfScreen = window.innerHeight / 3,
-					scale = Math.min(
-						Math.round(
-							(thirdOfScreen / this.current.$el.getBoundingClientRect().height) * 100
-						) / 100,
-						.6
-					);
-
-				this.setScale(scale);
-
-				if(this.scaleDown() < 1) {
-					this.scale(false, e.clientY);
-				}
-
-				this.updateBlockMeta({
-					index: this.current.index,
-					region: this.current.region,
-					type: 'dragging',
-					value: true
-				});
-
-				this.hideBlockOverlayControls = true;
-				document.addEventListener('mousemove', this.handlerMove);
-
-				this.dragging = true;
-			}
-		},
-
-		mouseUp(e) {
-			if(this.dragging) {
-				this.updateStyles('wrapper', 'userSelect', 'auto');
-				this.updateStyles('handle', 'opacity', 0);
-
-				if(this.scaleDown() < 1) {
-					this.scale(true, e.clientY);
-				}
-				else {
-					this.resetAfterDrag();
-				}
-
-				this.hideBlockOverlayControls = false;
-				document.removeEventListener('mousemove', this.handlerMove);
-			}
-		},
-
 		repositionOverlay(data) {
 			let
 				offset = 0,
@@ -340,10 +275,6 @@ export default {
 		},
 
 		positionOverlay(block, setCurrent) {
-			if(this.dragging) {
-				return;
-			}
-
 			var
 				pos = block.$el.getBoundingClientRect(),
 				heightDiff = Math.round(pos.height - 30),
@@ -374,80 +305,6 @@ export default {
 
 			if(setCurrent) {
 				this.current = block;
-			}
-		},
-
-		resetAfterDrag() {
-			this.updateStyles('overlay', 'pointerEvents', 'none');
-
-			if(this.moved) {
-				this.reorderBlocks({
-					from:  this.moved.from,
-					to:    this.moved.to,
-					value: this.blocks[this.moved.from]
-				});
-			}
-
-			this.dragging = false;
-
-			for(var i = 0; i < this.blocks.length; i++) {
-				this.updateBlockMeta({
-					type: 'offset',
-					region: this.current.region,
-					index: i,
-					value: 0
-				});
-			}
-
-			this.updateBlockMeta({
-				index: this.moved ? this.moved.to : this.current.index,
-				region: this.current.region,
-				type: 'dragging',
-				value: false
-			});
-
-			this.moved = false;
-		},
-
-		scale(revert, mouseY) {
-			const scroll = window.scrollY;
-
-			if(revert) {
-				const
-					scrollScaleUp = scroll * this.scaleUp(),
-					offsetPlusScaled = (mouseY * this.scaleUp()) - mouseY;
-
-				smoothScrollTo({ y: scrollScaleUp + offsetPlusScaled });
-
-				this.wrapperStyles = Object.assign(this.wrapperStyles, {
-					transform: null,
-					transition: 'transform 0.3s ease-out'
-				});
-
-				const onEnd = () => {
-					this.resetAfterDrag();
-					this.wrapper.removeEventListener('transitionend', onEnd);
-				};
-
-				this.wrapper.addEventListener('transitionend', onEnd);
-			}
-			else {
-				const
-					scrollScaleDown = scroll * this.scaleDown(),
-					offsetMinusScaled = mouseY - (mouseY * this.scaleDown());
-
-				this.updateStyles(
-					'handle',
-					'transform',
-					'translateY(' + (((mouseY + window.scrollY) * this.scaleDown()) - 22) + 'px)'
-				);
-
-				smoothScrollTo({ y: scrollScaleDown - offsetMinusScaled });
-
-				this.wrapperStyles = Object.assign(this.wrapperStyles, {
-					transform: `scale(${this.scaleDown()})`,
-					transition: 'transform 0.3s ease-out'
-				});
 			}
 		},
 
