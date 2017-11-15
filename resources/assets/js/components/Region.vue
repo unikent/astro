@@ -7,6 +7,7 @@
 			:section="index"
 			:key="`section-${sectionData.name}`"
 			:index="index"
+			:sectionData="sectionData"
 		/>
 	</template>
 	<empty-region v-else />

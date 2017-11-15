@@ -239,18 +239,6 @@ const actions = {
 						});
 
 						commit('setBlockDefinitions', Definition.definitions, { root: true });
-
-/*						let blocks;
-
-						if(page.blocks) {
-							blocks = page.blocks;
-							delete page.blocks;
-						}
-						else {
-							blocks = {};
-						}
-
-*/
 						commit('setPage', _.cloneDeep(page));
 						commit('clearBlockValidationIssues');
 
@@ -419,6 +407,11 @@ const getters = {
 		return (state.loaded ? state.pageData.path : '');
 	},
 
+	/**
+	 * Getter to retrieve the title of the
+	 * @param state
+	 * @returns {string}
+	 */
 	siteTitle: (state) => {
 		return (state.loaded ? state.pageData.site.title : '');
 	},
