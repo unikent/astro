@@ -52,7 +52,7 @@ import imagesLoaded from 'imagesloaded';
 import Icon from 'components/Icon';
 import ResizeShim from 'components/ResizeShim';
 
-import { win, findParent, smoothScrollTo } from 'classes/helpers';
+import { win, findParent } from 'classes/helpers';
 
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';

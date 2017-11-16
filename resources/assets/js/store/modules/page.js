@@ -276,7 +276,6 @@ const actions = {
 							page.blocks[region].forEach((section, sindex) => {
 								page.blocks[region][sindex].blocks.forEach((block, bindex) => {
 									Definition.fillBlockFields(block);
-									//commit('addBlock', { region, bindex, block, sindex })
 								})
 							})
 						});

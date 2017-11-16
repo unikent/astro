@@ -4,6 +4,9 @@ import _ from 'lodash';
  * Represents the state of the page content (blocks) editor and provides actions, getters and mutations for components
  * to interact with it.
  * The page data itself is held and modified in the page module in the store.
+ *
+ * This module only cares about the currently selected (being edited) block. The Preview.vue component is responsible
+ * for determining what block is currently overlayed.
  */
 
 const state = {
@@ -19,6 +22,11 @@ const state = {
 	 * @type {number} The index of the currently selected block in its section.
 	 */
 	currentBlockIndex: null,
+
+	/**
+	 * @type {components/Block} - The currently selected block in the editor.
+	 */
+	selectedBlock: null
 };
 
 const getters = {
@@ -53,7 +61,7 @@ const getters = {
 	 * Get the region containing the currently selected block.
 	 * @param state
 	 * @returns {Array|null}
- 	*/
+	 */
 	currentRegion(state,getters,rootState){
 		return rootState.page.pageData.blocks[state.currentRegionName];
 	},
@@ -94,10 +102,10 @@ const getters = {
 	},
 
 	/*
-	getCurrentBlock: (state) => () => {
-		return state.pageData.blocks[state.currentRegion][state.currentBlockIndex];
-	},
-*/
+	 getCurrentBlock: (state) => () => {
+	 return state.pageData.blocks[state.currentRegion][state.currentBlockIndex];
+	 },
+	 */
 	getBlockMeta: (state) => (index, region, prop = false) => {
 		const blockMeta = state.blockMeta.blocks[region][index];
 		return prop ? blockMeta[prop] : blockMeta;
@@ -130,6 +138,15 @@ const mutations = {
 		state.currentRegionName = regionName;
 		state.currentSectionName = sectionName;
 	},
+
+	/**
+	 * Sets the currently selected Block component.
+	 *
+	 * @param {components/Block} block - The Block.vue component which is currently selected in the block editor.
+	 */
+	setSelectedBlock(block) {
+		state.selectedBlock = block;
+	}
 };
 
 const actions = {
