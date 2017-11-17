@@ -26,17 +26,30 @@ export default {
 
 	name: 'section',
 
-	props: ['name', 'version', 'region', 'section','sectionData'],
+	props: {
 
+		// The name of the region containing this section
+		region: {
+			type: String,
+			required: true
+		},
+
+		// The index in its region of this section
+		section: {
+			type: Number,
+			required: true
+		},
+
+		// The section data
+		sectionData: {
+			type: Object,
+			required: true
+		},
+
+	},
 	components: {
 		Block,
 		EmptySection
-	},
-
-	computed: {
-		...mapState({
-			page: state => state.page.pageData
-		})
 	},
 
 	methods: {

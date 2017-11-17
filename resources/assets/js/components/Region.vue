@@ -1,8 +1,8 @@
 <template>
 <div>
-	<template v-if="page.blocks && page.blocks[name] && page.blocks[name].length">
+	<template v-if="sections">
 		<region-section
-			v-for="(sectionData, index) in page.blocks[name]"
+			v-for="(sectionData, index) in sections"
 			:region="name"
 			:section="index"
 			:key="`section-${sectionData.name}`"
@@ -24,23 +24,25 @@ export default {
 
 	name: 'region',
 
-	props: ['name', 'version'],
-
+	props: {
+		name: { // The name of this region
+			type: String,
+			required: true
+		},
+		version: { 	// The version of this region's definition (not currently used?)
+			type: String,
+			required: false
+		}
+	},
 	components: {
-		Block,
 		EmptyRegion,
 		RegionSection
 	},
 
 	computed: {
-		...mapState({
-			page: state => state.page.pageData
-		})
+		sections() {
+			return this.$store.getters.getRegionSections(this.name);
+		}
 	},
-
-	methods: {
-
-	}
-
 };
 </script>

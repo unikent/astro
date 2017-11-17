@@ -29,14 +29,48 @@ import blocks from 'cms-prototype-blocks';
 import { mapState, mapGetters, mapMutations } from 'vuex';
 import imagesLoaded from 'imagesloaded';
 
-/* global document */
-
 export default {
 
 	name: 'block',
 
-	props: ['index', 'region', 'section', 'type', 'blockData', 'sectionName'],
+	props: {
 
+		// The index of the block in its section
+		index: {
+			type: Number,
+			required: true
+		},
+
+		// The name of the region containing the block
+		region: {
+			type: String,
+			required: true
+		},
+
+		// The index in its region of the section containing the block
+		section: {
+			type: Number,
+			required: true
+		},
+
+		// The type of the block
+		type: {
+			type: String
+		},
+
+		// The block data, including fields
+		blockData: {
+			type: Object,
+			required: true
+		},
+
+		// The name of the section containing the block
+		sectionName: {
+			type: String,
+			required: true
+		}
+
+	},
 	data() {
 
 		let startValues = {

@@ -183,6 +183,13 @@ const mutations = {
 		state.pageData.blocks[region][sectionIndex].blocks.splice(index, 0, block || {});
 	},
 
+	/**
+	 * Delete the specified block from the page.
+	 * @param state
+	 * @param {string} region - The name of the region containing the block.
+	 * @param {number} index - The index of the block in its section.
+	 * @param {number} section - The index in the region of the section containing the block.
+	 */
 	deleteBlock(state,  { region, index, section } ) {
 
 		state.pageData.blocks[region][section].blocks.splice(index, 1);
@@ -506,7 +513,62 @@ const getters = {
 		else {
 			return state.currentSavedState != JSON.stringify(state.pageData.blocks);
 		}
+	},
+
+	/**
+	 * Get a block referenced by its region, section and index.
+
+	 * @param state
+	 * @param {string} regionName - The name of the region containing the block.
+	 * @param {number} sectionIndex - The index in the region of the section containing the block.
+	 * @param {number} blockIndex - The index in the section of the block.
+	 *
+	 * @return {BlockData|null} - The Block data or null if it does not exist.
+	 */
+	getBlock: (state) => (regionName, sectionIndex, blockIndex) => {
+		return state.pageData
+			&& state.pageData.blocks
+			&& state.pageData.blocks[regionName]
+			&& sectionIndex < state.pageData.blocks[regionName].length
+			&& blockIndex < state.pageData.blocks[regionName][sectionIndex].blocks.length
+			? state.pageData.blocks[regionName][sectionIndex].blocks[blockIndex]
+			: null;
+	},
+
+	/**
+	 * Get a Section by index and region name.
+
+	 * @param state
+	 * @param {string} regionName - The name of the region containing the block.
+	 * @param {number} sectionIndex - The index in the region of the section containing the block.
+	 *
+	 * @return {Section|null} - The section or null if it does not exist.
+	 */
+	getSection: (state) => (regionName, sectionIndex) => {
+		return state.pageData
+			&& state.pageData.blocks
+			&& state.pageData.blocks[regionName]
+			&& sectionIndex < state.pageData.blocks[regionName].length
+			? state.pageData.blocks[regionName][sectionIndex]
+			: null;
+	},
+
+	/**
+	 * Get the array of sections for a specified region.
+
+	 * @param state
+	 * @param {string} regionName - The name of the region.
+	 *
+	 * @return {Array|null} - An array of sections in the specified region or null if the region does not exist.
+	 */
+	getRegionSections: (state) => (regionName) => {
+		return state.pageData
+			&& state.pageData.blocks
+			&& state.pageData.blocks[regionName]
+			? state.pageData.blocks[regionName]
+			: null;
 	}
+
 };
 
 export default {

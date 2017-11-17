@@ -209,9 +209,8 @@ export default {
 		removeBlock(command) {
 			// remove block but before we do so remove any validation issues it owns 
 			const { index, region, section } = this.current;
-//			const blocks = this.getBlocks();
-//			const blockToBeDeleted = blocks[region][index];
-//			this.deleteBlockValidationIssue(blockToBeDeleted.id);
+			const blockToBeDeleted = this.$store.getters.getBlock(region, section, index);
+			this.deleteBlockValidationIssue(blockToBeDeleted.id);
 			this.deleteBlock({ index, region, section });
 			this.hideOverlay();
 			this.current = null;
