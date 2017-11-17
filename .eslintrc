@@ -7,21 +7,25 @@
 
 	"rules": {
 		"comma-dangle": ["error", "only-multiline"],
-		"eqeqeq": "off",
+		"eqeqeq": ["error", "smart"],
 		"curly": ["error", "all"],
-		"quotes": ["error", "single"],
-		"indent": ["error", "tab", {
-			"SwitchCase": 1
-		}],
+		"quotes": ["error", "single", { "avoidEscape": true }],
+		"indent": ["error", "tab", { "SwitchCase": 1 }],
 		"block-spacing": "error",
 		"dot-location": ["error", "property"],
 		"key-spacing": "off",
 		"func-names": "off",
 		"object-shorthand": "off",
 		"quote-props": "off",
-		"no-console": ["error", { allow: ["warn", "error"] }],
-		"space-before-blocks": "off",
 		"array-bracket-spacing": ["error", "never"],
-		"brace-style": ["error", "stroustrup"]
+		"brace-style": ["error", "stroustrup"],
+		"space-before-blocks": ["error", "always"],
+		"no-whitespace-before-property": "error",
+		"space-before-function-paren": ["error", {
+			"anonymous": "never",
+			"named": "never",
+			"asyncArrow": "always"
+		}],
+		"no-trailing-spaces": "error"
 	}
 }
