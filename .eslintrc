@@ -17,6 +17,7 @@
 		"func-names": "off",
 		"object-shorthand": "off",
 		"quote-props": "off",
+		"no-console": ["error", { "allow": ["warn", "error"] }],
 		"array-bracket-spacing": ["error", "never"],
 		"brace-style": ["error", "stroustrup"],
 		"space-before-blocks": ["error", "always"],
@@ -26,6 +27,7 @@
 			"named": "never",
 			"asyncArrow": "always"
 		}],
-		"no-trailing-spaces": "error"
+		"no-trailing-spaces": "error",
+		"operator-linebreak": ["error", "after"]
 	}
 }

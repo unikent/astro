@@ -57,8 +57,8 @@ export const allowedOperations = (
 			// it makes no sense to be able to swap a block for itself
 			!(
 				Array.isArray(allowedBlocks) &&
-				allowedBlocks.length === 1
-				&& min === 1 && max === 1
+				allowedBlocks.length === 1 &&
+				min === 1 && max === 1
 			)
 		)
 	};
