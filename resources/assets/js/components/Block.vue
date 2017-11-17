@@ -35,7 +35,7 @@ export default {
 
 	name: 'block',
 
-	props: ['index', 'region', 'section', 'type', 'blockData'],
+	props: ['index', 'region', 'section', 'type', 'blockData', 'sectionName'],
 
 	data() {
 
@@ -139,7 +139,7 @@ export default {
 		editBlock() {
 			this.$store.dispatch('changeBlock', {
 				regionName: this.region,
-				sectionName: this.section,
+				sectionName: this.sectionName,
 				blockIndex: this.index
 			});
 		},
@@ -158,8 +158,8 @@ export default {
 					)
 				)
 			) {
+				this.$bus.$emit('block:hideOverlay', this);
 			}
-			this.$bus.$emit('block:hideOverlay', this);
 		},
 	}
 };

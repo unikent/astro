@@ -22,7 +22,6 @@ const state = {
 	 * @type {number} The index of the currently selected block in its section.
 	 */
 	currentBlockIndex: null,
-
 	/**
 	 * @type {components/Block} - The currently selected block in the editor.
 	 */

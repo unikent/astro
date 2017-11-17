@@ -183,17 +183,10 @@ const mutations = {
 		state.pageData.blocks[region][sectionIndex].blocks.splice(index, 0, block || {});
 	},
 
-	deleteBlock(state,  { region, index } = { region: 'main', index: null }) {
-		if(region === null) {
-			region = state.currentRegion;
-		}
+	deleteBlock(state,  { region, index, section } ) {
 
-		if(index === null) {
-			index = state.currentBlockIndex;
-		}
-
-		state.pageData.blocks[region].splice(index, 1);
-		state.blockMeta.blocks[region].splice(index, 1);
+		state.pageData.blocks[region][section].blocks.splice(index, 1);
+//		state.blockMeta.blocks[region].splice(index, 1);
 
 		// TODO: use state for this
 		Vue.nextTick(() => eventBus.$emit('block:updateOverlay', index));
