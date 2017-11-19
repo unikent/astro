@@ -3,7 +3,7 @@
  * at a particular moment in time, based on the current section data and an
  * initial constraint object (part of a region's schema).
  *
- * @param      {Object}  sectionBlocks  The section data.
+ * @param      {Array}   sectionBlocks  The section data (array of blocks).
  * @param      {Object}  constraints    The constraint object, e.g.
  * 	{
  * 		allowedBlocks: ["block-name-v1", "block-name-v1"],
