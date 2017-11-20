@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Exceptions\UnpublishedParentException;
+use App\Models\Definitions\Region;
 use DB;
 use Doctrine\DBAL\Version;
 use Exception;
@@ -94,17 +95,27 @@ class Page extends BaumNode
 			->groupBy('region_name');
 		$this->load('blocks.media');
 		foreach ($blocksByRegion as $region => $blocks) {
+			// need the region definition to get sections in the correct order
+			$regionDef = Region::fromDefinitionFile(Region::locateDefinition($region));
+			$sections = $blocks->groupBy('section_name');
 			$data[$region] = [];
-			foreach ($blocks as $block) {
-				$block->embedMedia();
-				$data[$region][] = [
-					'id' => $block->id,
-					'definition_name' => $block->definition_name,
-					'definition_version' => $block->definition_version,
-					'region_name' => $block->region_name,
-					'fields' => $block->fields,
-					'errors' => $block->errors
-				];
+			foreach($regionDef->sections as $section_def){
+				$section = ['name' => $section_def['name'], 'blocks' => []];
+				if(!empty($sections[$section_def['name']])){
+					foreach($sections[$section_def['name']] as $block){
+						$block->embedMedia();
+						$section['blocks'][] = [
+							'id' => $block->id,
+							'definition_name' => $block->definition_name,
+							'definition_version' => $block->definition_version,
+							'region_name' => $block->region_name,
+							'section_name' => $block->section_name,
+							'fields' => $block->fields,
+							'errors' => $block->errors
+						];
+					}
+				}
+				$data[$region][] = $section;
 			}
 		}
 		return $data;
