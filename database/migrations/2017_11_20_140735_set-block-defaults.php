@@ -8,7 +8,9 @@ use App\Models\Revision;
 class SetBlockDefaults extends Migration
 {
 	/**
-	 * Run the migrations.
+	 * Add migration to set a valid default for empty blocks in the database
+	 * This is because the editor no longer understands the current default set in the API, 
+	 * which was an empty array, i.e. []
 	 *
 	 * @return void
 	 */
