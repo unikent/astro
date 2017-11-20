@@ -3,6 +3,10 @@ import _ from 'lodash';
 /**
  * Represents the state of the page content (blocks) editor and provides actions, getters and mutations for components
  * to interact with it.
+ * The page data itself is held and modified in the page module in the store.
+ *
+ * This module only cares about the currently selected (being edited) block. The Preview.vue component is responsible
+ * for determining what block is currently overlayed.
  */
 
 const state = {
@@ -18,6 +22,10 @@ const state = {
 	 * @type {number} The index of the currently selected block in its section.
 	 */
 	currentBlockIndex: null,
+	/**
+	 * @type {components/Block} - The currently selected block in the editor.
+	 */
+	selectedBlock: null
 };
 
 const getters = {
@@ -52,7 +60,7 @@ const getters = {
 	 * Get the region containing the currently selected block.
 	 * @param state
 	 * @returns {Array|null}
- 	*/
+	 */
 	currentRegion(state,getters,rootState){
 		return rootState.page.pageData.blocks[state.currentRegionName];
 	},
@@ -77,17 +85,10 @@ const getters = {
 		const name = state.currentSectionName;
 		return region ? region.findIndex(el => el.name === name) : -1;
 	},
-/*
-	getFieldValue: (state, getters) => (index, name) => {
-		const block = state.pageData.blocks[state.currentRegion][getters.currentSectionIndex].blocks[index];
 
-		if(!block) {
-			return null;
-		}
-
-		return _.get(block.fields, name, null);
+	blocks(state, getters){
+		return getters.currentSection ? getters.currentSection.blocks : [];
 	},
-*/
 
 	/**
 	 * Get the value for the named field within the block currently selected in the editor.
@@ -100,10 +101,10 @@ const getters = {
 	},
 
 	/*
-	getCurrentBlock: (state) => () => {
-		return state.pageData.blocks[state.currentRegion][state.currentBlockIndex];
-	},
-*/
+	 getCurrentBlock: (state) => () => {
+	 return state.pageData.blocks[state.currentRegion][state.currentBlockIndex];
+	 },
+	 */
 	getBlockMeta: (state) => (index, region, prop = false) => {
 		const blockMeta = state.blockMeta.blocks[region][index];
 		return prop ? blockMeta[prop] : blockMeta;
@@ -137,17 +138,13 @@ const mutations = {
 		state.currentSectionName = sectionName;
 	},
 
-	mutateFields( state, { fields, name, value} ) {
-		// if field exists just update it
-		if (_.has(fields, name)) {
-			_.set(fields, name, value);
-		}
-		// otherwise update all fields to maintain reactivity
-		else {
-			const clone = {...fields};
-			_.set(clone, name, value);
-			fields = clone;
-		}
+	/**
+	 * Sets the currently selected Block component.
+	 *
+	 * @param {components/Block} block - The Block.vue component which is currently selected in the block editor.
+	 */
+	setSelectedBlock(block) {
+		state.selectedBlock = block;
 	}
 };
 
@@ -175,19 +172,6 @@ const actions = {
 		}
 	},
 
-	updateFieldValue({ commit, state, getters}, { index, name, value }) {
-		const currentSection = getters.currentSection;
-		let
-			idx = index !== void 0 ? index : state.currentBlockIndex;
-
-			// rootState.page.pageData.blocks[state.currentRegionName][state.currentSectionIndex].blocks[idx].fields;
-
-		commit('mutateFields', {
-			fields: currentSection ? currentSection.blocks[idx].fields : null,
-			name: name,
-			value: value
-		});
-	}
 };
 
 export default {

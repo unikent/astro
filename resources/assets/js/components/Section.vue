@@ -1,11 +1,12 @@
 <template>
 <div>
-	<template v-if="page.blocks[region][section] && page.blocks[region][section].blocks.length">
+	<template v-if="sectionData && sectionData.blocks && sectionData.blocks.length">
 		<block
-			v-for="(blockData, index) in page.blocks[region][section].blocks"
+			v-for="(blockData, index) in sectionData.blocks"
 			v-if="blockData"
 			:region="region"
-			:section="page.blocks[region][section].name"
+			:section="section"
+			:sectionName="sectionData.name"
 			:key="`block-${blockData.id}`"
 			:type="getBlockType(blockData)"
 			:index="index"
@@ -25,17 +26,30 @@ export default {
 
 	name: 'section',
 
-	props: ['name', 'version', 'region', 'section'],
+	props: {
 
+		// The name of the region containing this section
+		region: {
+			type: String,
+			required: true
+		},
+
+		// The index in its region of this section
+		section: {
+			type: Number,
+			required: true
+		},
+
+		// The section data
+		sectionData: {
+			type: Object,
+			required: true
+		},
+
+	},
 	components: {
 		Block,
 		EmptySection
-	},
-
-	computed: {
-		...mapState({
-			page: state => state.page.pageData
-		})
 	},
 
 	methods: {

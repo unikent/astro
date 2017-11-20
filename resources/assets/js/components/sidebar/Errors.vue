@@ -1,15 +1,17 @@
 <template>
 	<div class="sidebar__errors" :class="flash === 'errors' ? 'sidebar--flash' : ''">
 		<back-bar :title="title" />
-		<template v-if="blocks" v-for="region in blocks">
+		<template v-if="regions" v-for="(sections, regionName) in regions">
 			<!-- we could put the region title here when we use more than one region -->
-			<ul class="validation-errors" v-if="region">
-				<template v-for="(block, key) in region">
-					<template v-if="errors.indexOf(block.id) !== -1">
-						<li class="validation-errors__item warning">
-							<i class="el-icon-warning"></i>
-							<a href="#" @click="scrollTo(key, block.definition_name, block.definition_version)" class="validation-errors__link">{{ label(block.definition_name + "-v" + block.definition_version) }}</a>
-						</li>
+			<ul class="validation-errors" v-if="sections">
+				<template v-for="(sectionData, sectionIndex) in sections">
+					<template v-for="(block, blockIndex) in sectionData.blocks">
+						<template v-if="errors.indexOf(block.id) !== -1">
+							<li class="validation-errors__item warning">
+								<i class="el-icon-warning"></i>
+								<a href="#" @click="scrollTo(blockIndex, sectionIndex, regionName)" class="validation-errors__link">{{ label(block.definition_name + "-v" + block.definition_version) }}</a>
+							</li>
+						</template>
 					</template>
 				</template>
 			</ul>
@@ -31,12 +33,8 @@ export default {
 			return this.$store.state.page.invalidBlocks;
 		},
 
-		blocks() {
+		regions() {
 			return this.$store.state.page.pageData.blocks;
-		},
-
-		region() {
-			return this.$store.state.page.currentRegion;
 		},
 
 		flash() {
@@ -51,7 +49,6 @@ export default {
 	methods: {
 
 		...mapMutations([
-			'setBlock',
 			'updateMenuActive'
 		]),
 
@@ -62,20 +59,19 @@ export default {
 		 *
 		 * TODO: implement smooth scrolling?
 		 */
-		scrollTo(block_id, definition_name, definition_version) {
+		scrollTo(blockIndex, sectionIndex, regionName) {
 			var el = document.getElementById('editor-content');
-			var block = el.contentWindow.document.getElementById('block_' + block_id);
+			var block = el.contentWindow.document.getElementById('block_' + blockIndex);
 			// position of the block in the iframe
 			var pos = block.getBoundingClientRect();
 			// add on Y scroll position to pos.top to make sure the position for the next jump is relative to the current scroll position
 			el.contentWindow.scrollTo(0, pos.top + el.contentWindow.scrollY);
 
-			// set the current block, given its position (index) and name (definition_name + definition_version)
-			var type = definition_name + '-v' + definition_version;
-			this.setBlock({ index: block_id, type: type });
-
-			// set the block menu item as active
-			this.updateMenuActive('blocks');
+			this.$store.dispatch('changeBlock', {
+				regionName: regionName,
+				sectionName: this.$store.getters.getSection(regionName,sectionIndex).name,
+				blockIndex: blockIndex
+			});
 
 			// scroll to the right bit of the block options side panel
 			// we need a tiny timeout to make sure the error fields have had time to populate

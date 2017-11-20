@@ -74,6 +74,10 @@ export default {
 			'addBlock'
 		]),
 
+		...mapState([
+			'currentSectionName'
+		]),
+
 		...mapGetters([
 			'currentSectionIndex'
 		]),
@@ -113,7 +117,8 @@ export default {
 				index,
 				block,
 				region: this.blockPicker.insertRegion,
-				sectionIndex: this.currentSectionIndex()
+				sectionIndex: this.currentSectionIndex(),
+				sectionName: this.currentSectionName()
 			});
 		},
 
