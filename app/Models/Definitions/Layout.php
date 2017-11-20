@@ -35,6 +35,19 @@ class Layout extends BaseDefinition
 	}
 
 	/**
+	 * Get the default page content (regions, sections and blocks) for this layout.
+	 * @return array - [ region-name => [ [ 'name' => 'section-1-name', 'blocks' => [ ... block data ... ], ... ] ], ... ]
+	 */
+	public function getDefaultPageContent()
+	{
+		$regions = [];
+		foreach($this->getRegionDefinitions() as $region_definition) {
+			$regions[$region_definition->name] = $region_definition->getDefaultBlocks();
+		}
+		return $regions;
+	}
+
+	/**
 	 * Returns the regionDefinitions Collection, populating it from disk if necessary.
 	 *
 	 * @return Collection

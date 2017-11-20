@@ -15,7 +15,7 @@ class Region extends BaseDefinition
 	protected $blockDefinitions;
 
 	public function __construct(){
-		$this->blockDefinitions = new Collection;
+		$this->blockDefinitions = new Collection();
 	}
 
 	/**
@@ -45,6 +45,28 @@ class Region extends BaseDefinition
 		}
 
 		return $this->blockDefinitions;
+	}
+
+	/**
+	 * Get the default sections and block data for this region.
+	 * @return array - [ [ 'name' => 'section-name', 'blocks' =>
+	 */
+	public function getDefaultBlocks()
+	{
+		$sections = [];
+		foreach($this->sections as $section_def){
+			$section = [ 'name' => $section_def['name'], 'blocks' => []];
+			if($section_def['defaultBlocks']){
+				foreach($section_def['defaultBlocks'] as $block_id){
+					$block_def = Block::fromDefinitionFile(Block::locateDefinition($block_id));
+					if($block_def){
+						$section['blocks'][] = $block_def->getDefaultData($this->name, $section_def['name']);
+					}
+				}
+			}
+			$sections[] = $section;
+		}
+		return $sections;
 	}
 
 }
