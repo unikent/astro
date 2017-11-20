@@ -80,7 +80,7 @@ export default {
 			wrapperStyles: {},
 			overlayHidden: true,
 			/**
-			 * @var {BlockComponent} - The Block.vue component which is currently selected
+			 * @var {BlockComponent} - The Block.vue component which is currently hovered
 			 */
 			current: null
 		};
@@ -238,7 +238,6 @@ export default {
 		},
 
 		hideOverlay(block) {
-			console.log('hide');
 			if(block !== this.current) {
 				this.overlayHidden = true;
 				this.updateStyles('blockOverlay', 'transform', 'translateY(0)');

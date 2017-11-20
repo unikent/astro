@@ -1,4 +1,4 @@
-import { mapActions, mapGetters, mapState, mapMutations } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 
 export default {
 
@@ -12,6 +12,10 @@ export default {
 		...mapGetters([
 			'getCurrentFieldValue'
 		]),
+		...mapState({
+			currentBlockIndex: state => state.contenteditor.currentBlockIndex,
+			currentRegionName: state => state.contenteditor.currentRegionName
+		}),
 
 		value: {
 			get() {
@@ -27,21 +31,19 @@ export default {
 		}
 	},
 
+
+
 	methods: {
 		...mapGetters([
 			'currentSectionIndex'
 		]),
-		...mapState({
-			currentBlockIndex: state => state.contenteditor.currentBlockIndex,
-			currentRegionName: state => state.contenteditor.currentRegionName
-		}),
 
 		updateFieldValue({name, value}){
 			this.$store.commit('updateFieldValue', {
 				name: name,
 				value: value,
-				index: this.currentBlockIndex(),
-				region: this.currentRegionName(),
+				index: this.currentBlockIndex,
+				region: this.currentRegionName,
 				section: this.currentSectionIndex()
 			})
 		},
