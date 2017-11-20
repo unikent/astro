@@ -3,11 +3,14 @@ import Vuex from 'vuex';
 import undoRedo from '../plugins/undo-redo';
 import shareMutations from '../plugins/share-mutations';
 import shareTimeTravel from '../plugins/share-time-travel';
+
 import page from './modules/page';
 import site from './modules/site';
 import media from './modules/media';
 import permissions from './modules/permissions';
 import definition from './modules/definition';
+import contenteditor from './modules/contenteditor';
+
 import Config from 'classes/Config';
 
 /* global process */
@@ -204,6 +207,7 @@ let store = new Vuex.Store({
 	modules: {
 		page,
 		definition,
+		contenteditor,
 		site,
 		media,
 		permissions

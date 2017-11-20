@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex';
+import { mapState, mapMutations ,mapGetters} from 'vuex';
 import Vue from 'vue';
 import { uuid } from 'classes/helpers';
 import BlockList from 'components/BlockList';
@@ -74,6 +74,14 @@ export default {
 			'addBlock'
 		]),
 
+		...mapState([
+			'currentSectionName'
+		]),
+
+		...mapGetters([
+			'currentSectionIndex'
+		]),
+
 		addBlocks() {
 
 			this.selected.forEach((blockKey, i) => {
@@ -108,7 +116,9 @@ export default {
 			this.addBlock({
 				index,
 				block,
-				region: this.blockPicker.insertRegion
+				region: this.blockPicker.insertRegion,
+				sectionIndex: this.currentSectionIndex(),
+				sectionName: this.currentSectionName()
 			});
 		},
 

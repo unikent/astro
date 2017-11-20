@@ -1,14 +1,13 @@
 <template>
 <div>
-	<template v-if="page.blocks && page.blocks[name] && page.blocks[name].length">
-		<block
-			v-for="(blockData, index) in page.blocks[name]"
-			v-if="blockData"
+	<template v-if="sections">
+		<region-section
+			v-for="(sectionData, index) in sections"
 			:region="name"
-			:key="`block-${blockData.id}`"
-			:type="getBlockType(blockData)"
+			:section="index"
+			:key="`section-${sectionData.name}`"
 			:index="index"
-			:blockData="blockData"
+			:sectionData="sectionData"
 		/>
 	</template>
 	<empty-region v-else />
@@ -19,35 +18,31 @@
 import { mapState } from 'vuex';
 import Block from 'components/Block';
 import EmptyRegion from 'components/EmptyRegion';
+import RegionSection from 'components/Section';
 
 export default {
 
 	name: 'region',
 
-	props: ['name', 'version'],
-
+	props: {
+		name: { // The name of this region
+			type: String,
+			required: true
+		},
+		version: { 	// The version of this region's definition (not currently used?)
+			type: String,
+			required: false
+		}
+	},
 	components: {
-		Block,
-		EmptyRegion
+		EmptyRegion,
+		RegionSection
 	},
 
 	computed: {
-		...mapState({
-			page: state => state.page.pageData
-		})
-	},
-
-	methods: {
-
-		getBlockType(block) {
-			return (
-				Object.keys(block).length === 0 ?
-				'placeholder' :
-				`${block.definition_name}-v${block.definition_version}`
-			);
+		sections() {
+			return this.$store.getters.getRegionSections(this.name);
 		}
-
-	}
-
+	},
 };
 </script>
