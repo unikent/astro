@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
 	    'pages',
         'sites',
 		'users',
+		'blocks'
 	];
 
     public $testTree = [
