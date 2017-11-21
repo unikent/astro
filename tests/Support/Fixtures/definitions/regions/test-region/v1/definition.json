@@ -3,8 +3,19 @@
 	"name": "test-region",
 	
 	"version": 1,
-	
-	"blocks": [
-		"test-block"
+
+	"sections": [
+		{
+			"name": "test-section",
+			"allowedBlocks": [
+				"test-block"
+			],
+			"defaultBlocks": [
+				"test-block"
+			],
+			"optional": true,
+			"min": 1,
+			"max": 5
+		}
 	]
 }

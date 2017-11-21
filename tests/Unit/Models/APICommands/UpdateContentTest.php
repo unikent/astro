@@ -13,16 +13,34 @@ class UpdateContentTest extends APICommandTestCase
 
     public function getValidData()
     {
-        return [];
+        return json_decode(file_get_contents(base_path('tests/Support/Fixtures/api_requests/v1/update_content.json')), true);
     }
 
     /**
      * @test
      * @group APICommands
      */
-    public function validation_ifID_isMissingNullOrInvalid_fails()
+    public function validation_whenInput_isValid_passes()
     {
-        $this->markTestIncomplete();
+        $validator = $this->validator($this->input(null));
+        $this->assertTrue($validator->passes());
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function validation_ifID_isNullOrInvalid_fails()
+    {
+        $validator = $this->validator($this->input([
+            'id' => null
+        ]));
+        $this->assertFalse($validator->passes());
+
+        $validator = $this->validator($this->input([
+            'id' => 1 //this should not be in the database so would fail
+        ]));
+        $this->assertFalse($validator->passes());
     }
 
     /**
@@ -40,7 +58,8 @@ class UpdateContentTest extends APICommandTestCase
      */
     public function validation_ifBlocksIsNotPresent_fails()
     {
-        $this->markTestIncomplete();
+        $validator = $this->validator($this->input(null, ['blocks']));
+        $this->assertFalse($validator->passes());
     }
 
     /**
@@ -49,16 +68,28 @@ class UpdateContentTest extends APICommandTestCase
      */
     public function validation_ifBlocksIsNotArray_fails()
     {
-        $this->markTestIncomplete();
+        $validator = $this->validator($this->input([
+            'blocks' => 'a string, not an array'
+        ]));
+        $this->assertFalse($validator->passes());
+
+        $validator = $this->validator($this->input([
+            'blocks' => 50
+        ]));
+        $this->assertFalse($validator->passes());
     }
 
     /**
      * @test
      * @group APICommands
+     * @group wip
      */
     public function validation_ifBlocksIsEmptyArray_passes()
     {
-        $this->markTestIncomplete();
+        $validator = $this->validator($this->input([
+            'blocks' => []
+        ]));
+        $this->assertTrue($validator->passes());
     }
 
     /**
