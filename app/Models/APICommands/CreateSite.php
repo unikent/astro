@@ -55,7 +55,8 @@ class CreateSite implements APICommand
             'created_by' => $user->id,
             'updated_by' => $user->id
         ]);
-        $revision_set = RevisionSet::create(['site_id' => $site->id]);
+		$page->createDefaultBlocks($layout['name'], $layout['version']);
+		$revision_set = RevisionSet::create(['site_id' => $site->id]);
         $revision = Revision::create([
             'revision_set_id' => $revision_set->id,
             'title' => $title,

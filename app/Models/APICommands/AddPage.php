@@ -44,42 +44,6 @@ class AddPage implements APICommand
         });
     }
 
-	/**
-	 * Create and save all the default blocks / regions / sections for a Page based on a layout.
-	 * @param Page $page - The Page object to create blocks for.
-	 * @param string $layout_name - The name of the layout
-	 * @param integer $layout_version - The version of the layout
-	 */
-    public function createDefaultBlocks($page, $layout_name, $layout_version)
-	{
-		$layout_definition = Layout::fromDefinitionFile(Layout::locateDefinition($layout_name,$layout_version));
-		if($layout_definition){
-			$data = $layout_definition->getDefaultPageContent();
-			$this->saveBlocks($page->id, $data);
-		}
-	}
-
-	/**
-	 * Saves the default content for the page defined in blocks to the database.
-	 *
-	 * @param array $data ['region-name' => [['name' => 'section-1-name', 'blocks' => [ ... [block def 1], [block def 2]...]],...]]
-	 */
-	public function saveBlocks($page_id,$data)
-	{
-		foreach($data as $region_name => $sections){
-			foreach($sections as $section){
-				foreach($section['blocks'] as $i => $block_data) {
-					$block = new Block;
-					$block->fill($block_data);
-					$block->page_id = $page_id;
-					$block->order = $i;
-					$block->region_name = $region_name;
-					$block->section_name = $section['name'];
-					$block->save();
-				}
-			}
-		}
-	}
 
     /**
      * Adds a new page (creating a revision) at the end of this page's children.
@@ -102,7 +66,7 @@ class AddPage implements APICommand
                 'updated_by' => $user->id
             ]
         );
-        $this->createDefaultBlocks($page,$layout_name, $layout_version);
+        $page->createDefaultBlocks($layout_name, $layout_version);
         $revision_set = RevisionSet::create(['site_id' => $parent->site_id]);
         $revision = Revision::create([
             'revision_set_id' => $revision_set->id,
