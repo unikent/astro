@@ -155,9 +155,9 @@ class UpdateContent implements APICommand
 		// For each block instance...
 		if ($data->has('blocks') && is_array($data->get('blocks'))) {
 			foreach ($data->get('blocks', []) as $region => $sections) {
-				foreach ($sections as $section) {
+				foreach ($sections as $section_delta => $section) {
 					// @todo - add validation for section constraints here
-					foreach ($section['blocks'] as $delta => $block) {
+					foreach ($section['blocks'] as $block_delta => $block) {
 						// ...load the Region definition...
 						$file = RegionDefinition::locateDefinition($region);
 						$regionDefinition = RegionDefinition::fromDefinitionFile($file);
@@ -172,9 +172,10 @@ class UpdateContent implements APICommand
 
 						// ...merge any region constraint validation rules...
 						foreach ($bb->getSectionConstraintRules($regionDefinition, $section['name']) as $field => $ruleset) {
-							$key = sprintf('blocks.%s.%d.%s', $region, $delta, $field);
+							$key = sprintf('blocks.%s.%d.blocks.%d.%s', $region, $section_delta, $block_delta, $field);
 							$rules[$key] = $ruleset;
-						}					}
+						}					
+					}
 				}
 			}
 		}

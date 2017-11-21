@@ -113,9 +113,17 @@ class UpdateContentTest extends APICommandTestCase
      * @test
      * @group APICommands
      */
-    public function validation_ifBlockNotAllowedInRegion_fails()
+    public function validation_ifBlockNotAllowedInSection_fails()
     {
-        $this->markTestIncomplete();
+        $valid_data = $this->input(null);
+
+        $valid_data['blocks']['test-region'][0]['blocks'] = [
+                [
+                    "definition_name" => "another-test-block"
+                ]
+            ];          
+        $validator = $this->validator($valid_data);
+        $this->assertFalse($validator->passes());
     }
 
     /**

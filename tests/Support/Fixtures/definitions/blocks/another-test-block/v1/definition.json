@@ -1,0 +1,42 @@
+{
+	"label": "Another Test Block",
+	"name": "another-test-block",
+	
+	"version": 1,
+
+	"fields": [
+		{
+			"name": "content",
+			"label": "Content",
+			"type": "richtext",
+
+			"validation": [
+				"required"
+			]
+		},
+		
+		{
+			"name": "title_of_widget",
+			"label": "Title of Widget",
+			"type": "text",
+
+			"validation": [
+				"required",
+				"min_length:1",
+				"max_length:50"
+			]
+		},
+
+		{
+			"name": "number_of_widgets",
+			"label": "Number of Widgets",
+			"type": "integer",
+
+			"validation": [
+				"required",
+				"min_value:1",
+				"max_value:100"
+			]
+		}
+	]
+}
