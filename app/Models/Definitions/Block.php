@@ -32,6 +32,17 @@ class Block extends BaseDefinition
 	}
 
 	/**
+	 * Does the field definition provide a (explicit or implicit) default value, or do we need to investigate it further?
+	 * @param array $field_definition [ 'name' => '...', 'type' => '...', 'default' => ???, etc]
+	 * @return bool - True if we can get a default value for the field from the definition, false if eg. it is a nested field.
+	 */
+	public function hasDefaultValue($field_definition)
+	{
+		return array_key_exists('default', $field_definition) ||
+				!in_array($field_definition['type'], ['collection', 'group']);
+	}
+
+	/**
 	 * Get the default values for each field defined in $fields.
 	 *
 	 * @param array $fields - The 'fields' part of the block definition, or sub-fields.
@@ -41,10 +52,23 @@ class Block extends BaseDefinition
 	{
 		$values = [];
 		foreach($fields as $field){
-			if(isset($field['default'])){
-				$values[$field['name']] = $field['default'];
+			if($this->hasDefaultValue($field)){
+				$values[$field['name']] = array_key_exists('default', $field) ? $field['default'] : null;
 			}
-			elseif(isset($field['fields'])){ // group, collection, etc fields
+			elseif('collection' == $field['type']){
+				$min = 0;
+				foreach($field['validation'] as $rule){
+					if( preg_match('/^min:([0-9]+)$/i', $rule, $match)) {
+						$min = $match[1];
+					}
+				}
+				$vals = [];
+				for($i = 0; $i < $min; ++$i){
+					$vals[] = $this->defaultFieldValues($field['fields']);
+				}
+				$values[$field['name']] = $vals;
+			}
+			elseif( isset($field['fields'])){
 				$values[$field['name']] = $this->defaultFieldValues($field['fields']);
 			}
 		}

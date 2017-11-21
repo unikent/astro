@@ -10,6 +10,7 @@ class Region extends BaseDefinition
 
 	protected $casts = [
         'blocks' => 'array',
+		'sections' => 'array'
 	];
 
 	protected $blockDefinitions;
@@ -19,17 +20,19 @@ class Region extends BaseDefinition
 	}
 
 	/**
-	 * Loads the block definitions from disk and populates $regionDefinitions.
+	 * Loads the block definitions from disk and populates $blockDefinitions.
 	 *
 	 * @return void
 	 */
 	public function loadBlockDefinitions(){
-		foreach($this->blocks as $name){
-			$path = Block::locateDefinition($name);
+		foreach($this->sections as $section){
+			foreach( $section['allowedBlocks'] as $name) {
+				$path = Block::locateDefinition($name);
 
-			if(!is_null($path)){
-				$block = Block::fromDefinitionFile($path);
-				$this->blockDefinitions->push($block);
+				if (!is_null($path)) {
+					$block = Block::fromDefinitionFile($path);
+					$this->blockDefinitions->push($block);
+				}
 			}
 		}
 	}
@@ -40,7 +43,7 @@ class Region extends BaseDefinition
 	 * @return Collection
 	 */
 	public function getBlockDefinitions(){
-		if($this->blockDefinitions->isEmpty() && count($this->blocks)){
+		if($this->blockDefinitions->isEmpty() && count($this->sections)){
 			$this->loadBlockDefinitions();
 		}
 
