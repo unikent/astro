@@ -2,8 +2,11 @@
 
 namespace App\Models\APICommands;
 
+use App\Models\Definitions\Contracts\Definition;
+use App\Models\Definitions\Layout;
 use App\Models\Revision;
 use DB;
+use App\Models\Block;
 use App\Models\Page;
 use App\Models\RevisionSet;
 use App\Models\Contracts\APICommand;
@@ -63,6 +66,7 @@ class AddPage implements APICommand
                 'updated_by' => $user->id
             ]
         );
+        $page->createDefaultBlocks($layout_name, $layout_version);
         $revision_set = RevisionSet::create(['site_id' => $parent->site_id]);
         $revision = Revision::create([
             'revision_set_id' => $revision_set->id,
@@ -71,7 +75,7 @@ class AddPage implements APICommand
             'updated_by' => $user->id,
             'layout_name' => $layout_name,
             'layout_version' => $layout_version,
-            'blocks' => null,
+            'blocks' => $page->bake(),
             'options' => null,
 			'valid' => true
         ]);
