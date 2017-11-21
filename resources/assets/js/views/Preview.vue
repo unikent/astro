@@ -10,7 +10,7 @@
 			:style="blockOverlayStyles"
 		>
 
-			<el-dropdown class="block-overlay__delete" @command="removeBlock">
+			<el-dropdown class="block-overlay__delete" @command="removeBlock" v-if="sectionConstraints && sectionConstraints.canRemoveBlocks">
 				<el-button size="mini">
 					<icon name="delete" width="20" height="20" /> <i class="el-icon-caret-bottom el-icon--right"></i>
 				</el-button>
@@ -24,6 +24,7 @@
 				class="add-before"
 				:class="{ 'add-before--first' : currentBlockIsFirst }"
 				@click="showBlockList()"
+				v-if="sectionConstraints && sectionConstraints.canAddBlocks"
 			>
 				<icon name="plus" width="15" height="15" viewBox="0 0 15 15" />
 			</div>
@@ -31,6 +32,7 @@
 				class="add-after"
 				:class="{ 'add-after--last' : currentBlockIsLast }"
 				@click="showBlockList(1)"
+				v-if="sectionConstraints && sectionConstraints.canAddBlocks"
 			>
 				<icon name="plus" width="15" height="15" viewBox="0 0 15 15" />
 			</div>
@@ -59,6 +61,8 @@ import { onKeyDown, onKeyUp } from 'plugins/key-commands';
 
 import { layouts } from 'cms-prototype-blocks/layouts';
 
+import { allowedOperations } from 'classes/SectionConstraints';
+import { Definition } from 'classes/helpers';
 /* global document, window */
 
 export default {
@@ -82,7 +86,8 @@ export default {
 			/**
 			 * @var {BlockComponent} - The Block.vue component which is currently hovered
 			 */
-			current: null
+			current: null,
+			sectionConstraints: null
 		};
 	},
 
@@ -302,9 +307,17 @@ export default {
 				height   : `${(pos.height + addHeight)}px`
 			});
 
+
 			if(setCurrent) {
 				this.current = block;
 			}
+
+			if(this.current) {
+				const section = this.$store.getters.getSection(this.current.region, this.current.section);
+				const sectionDefinition = section ? Definition.getRegionSectionDefinition(this.current.region, this.current.section) : null;
+				this.sectionConstraints = section ? allowedOperations(section.blocks, sectionDefinition) : null;
+			}
+
 		},
 
 		updateStyles(dataName, prop, value) {
