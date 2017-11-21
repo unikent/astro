@@ -85,6 +85,7 @@ class BlockBroker extends DefinitionBroker
 
 	/**
 	 * Creates a validation rule based on Region block-constraints
+	 * @Todo update this to reflect new structure
 	 *
 	 * @param \App\Models\Definition\Region $region
 	 * @return Array
@@ -96,6 +97,27 @@ class BlockBroker extends DefinitionBroker
 				'in:' . implode(',', $region->blocks),
 			]
 		];
+	}
+
+	/**
+	 * Creates a validation rule based on Section block-constraints
+	 *
+	 * @param \App\Models\Definition\Region $region
+	 * @return Array
+	 */
+	public function getSectionConstraintRules(RegionDefinition $region, $section_name)
+	{
+		foreach ($region->sections as $section_definition) {
+			if ($section_definition['name'] === $section_name) {
+				return [
+					'definition_name' => [
+						'in:' . implode(',', $section_definition['allowedBlocks']),
+					]
+				];
+			}
+		}
+		
+		return [];
 	}
 
 }

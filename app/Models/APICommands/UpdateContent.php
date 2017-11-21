@@ -171,11 +171,10 @@ class UpdateContent implements APICommand
 						$bb = new BlockBroker($blockDefinition);
 
 						// ...merge any region constraint validation rules...
-						foreach ($bb->getRegionConstraintRules($regionDefinition) as $field => $ruleset) {
+						foreach ($bb->getSectionConstraintRules($regionDefinition, $section['name']) as $field => $ruleset) {
 							$key = sprintf('blocks.%s.%d.%s', $region, $delta, $field);
 							$rules[$key] = $ruleset;
-						}
-					}
+						}					}
 				}
 			}
 		}
