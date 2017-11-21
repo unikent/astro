@@ -226,8 +226,8 @@ const actions = {
 				title: page.title
 			})
 			.then((response) => {
-				page.id = response.data.data.id;
-				dispatch('updatePage', page);
+				page = response.data.data;
+				dispatch('fetchSite');
 			})
 			.catch((error) => {
 				vue.$notify({
