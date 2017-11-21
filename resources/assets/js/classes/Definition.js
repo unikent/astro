@@ -28,6 +28,35 @@ export default class Definition {
 	static definitions = {};
 	static rules = {};
 
+	/**
+	 * @type {{string}} Map region definition by name
+	 */
+	static regionDefinitions = {};
+
+	/**
+	 * Add a region definition indexed by name
+	 * @param {string} name
+	 * @param {Object} regionDefinition - The Region definition to add.
+	 */
+	static addRegionDefinition(regionDefinition) {
+		Definition.regionDefinitions[regionDefinition.name] = regionDefinition;
+	}
+
+	/**
+	 * Get a section definition by region name and index.
+	 * @param {string} regionName - The name of the region containing the section.
+	 * @param {number} sectionIndex - The index of the section in the region.
+	 * @returns {null|Object} - Section definition if found, otherwise null.
+	 */
+	static getRegionSectionDefinition(regionName, sectionIndex) {
+		if(Definition.regionDefinitions[regionName] !== void 0){
+			if(sectionIndex < Definition.regionDefinitions[regionName].sections.length){
+				return Definition.regionDefinitions[regionName].sections[sectionIndex];
+			}
+		}
+		return null;
+	}
+
 	static set(definition) {
 		const type = Definition.getType(definition);
 
