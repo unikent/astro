@@ -43,7 +43,9 @@ let store = new Vuex.Store({
 		blockPicker: {
 			visible: false,
 			insertIndex: 0,
-			insertRegion: 'main'
+			insertRegion: null,
+			insertSection: null,
+			allowedBlocks: null	// the constraints on what blocks can be added
 		},
 		currentView: 'desktop',
 		publishModal: {
@@ -99,7 +101,19 @@ let store = new Vuex.Store({
 			state.sidebarCollapsed = false;
 		},
 
-		showBlockPicker(state) {
+		/**
+		 * Display the block picker.
+		 * @param state
+		 * @param {string} regionName - The name of the region to add any blocks to.
+		 * @param {number} sectionIndex - The index of the section within the region to add any blocks to.
+		 * @param {number} insertIndex - The index within the section to add any blocks to.
+		 * @param {Object} blocks - List of allowed block names.
+		 */
+		showBlockPicker(state, {regionName, sectionIndex, insertIndex, blocks} ) {
+			state.blockPicker.insertRegion = regionName;
+			state.blockPicker.insertIndex = insertIndex;
+			state.blockPicker.insertSection = sectionIndex;
+			state.blockPicker.allowedBlocks = blocks;
 			state.blockPicker.visible = true;
 		},
 
