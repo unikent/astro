@@ -96,17 +96,12 @@ class UpdateContentTest extends APICommandTestCase
      * @group APICommands
      * @expectedException     Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException
      */
-    public function validation_ifBlockHasNoDefinition_fails()
+    public function validateBlock_ifBlockHasNoDefinition_fails()
     {
-        $valid_data = $this->input(null);
-
-        $valid_data['blocks']['test-region'][0]['blocks'] = [
-                [
+        $update_content = new UpdateContent();
+        $update_content->validateBlock([
                     "definition_name" => "non-existent-test-block"
-                ]
-            ];          
-        $validator = $this->validator($valid_data);
-        $validator->passes();
+                ]);
     }
 
     /**
@@ -182,7 +177,8 @@ class UpdateContentTest extends APICommandTestCase
 
         $valid_data['blocks']['test-region-with-required-section'] = $valid_data['blocks']['test-region'];
         unset($valid_data['blocks']['test-region']);
-        $valid_data['blocks']['test-region-with-required-section'][0]['blocks'] = [];
+
+        $valid_data['blocks']['test-region-with-required-section'] = [];
 
         $validator = $this->validator($valid_data);
         $this->assertFalse($validator->passes());

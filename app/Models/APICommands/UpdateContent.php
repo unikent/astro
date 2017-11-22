@@ -5,6 +5,7 @@ namespace App\Models\APICommands;
 use App\Models\Contracts\APICommand;
 use App\Models\Revision;
 use App\Models\Block;
+use App\Validation\Brokers\RegionBroker;
 use App\Validation\Brokers\BlockBroker;
 use DB;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -159,14 +160,24 @@ class UpdateContent implements APICommand
 				$file = RegionDefinition::locateDefinition($region);
 				$regionDefinition = RegionDefinition::fromDefinitionFile($file);
 
-				foreach ($sections as $section_delta => $section) {
-					// @todo - add validation for section constraints here
-					// ...load the validation rules from the definition...
-					$rb = new RegionBroker($regionDefinition);
+				$rules[sprintf('blocks.%s', $region)] = ['size:' . count($regionDefinition->sections)];
 
-					$sectionConstraintRules = $rb->getSectionConstraintRules($regionDefinition, $section['name']);
+				foreach ($sections as $section_delta => $section) {
+					// ...load the validation rules from the definition...
+
+					//test that this is a valid section in the region definition
+					$rules[sprintf('blocks.%s.%d.name', $region, $section_delta)] = [
+						'in:' . $regionDefinition->sections[$section_delta]['name']
+					];
+
+
+					$rb = new RegionBroker($regionDefinition);
+					$sectionConstraintRules = $rb->getSectionConstraintRules($section['name']);
+					if (isset($sectionConstraintRules['blockLimits']) && !empty($sectionConstraintRules['blockLimits']['blocks'])) {
+						$rules[sprintf('blocks.%s.%d.blocks', $region, $section_delta)] = $sectionConstraintRules['blockLimits']['blocks'];
+					}
 					
-					$rules[sprintf('blocks.%s.%d.blocks', $region, $section_delta)] = "min:1";
+
 					foreach ($section['blocks'] as $block_delta => $block) {
 
 						
@@ -180,7 +191,8 @@ class UpdateContent implements APICommand
 					}
 				}
 			}
-		}dd($rules, $data);
+		}
+		//dd($rules, $data);
 		return $rules;
 	}
 }

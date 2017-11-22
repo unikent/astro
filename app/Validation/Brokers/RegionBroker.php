@@ -1,11 +1,15 @@
 <?php
 namespace App\Validation\Brokers;
 
-use App\Models\Definitions\Block as BlockDefinition;
 use App\Models\Definitions\Region as RegionDefinition;
 
-class BlockBroker extends DefinitionBroker
+class RegionBroker extends DefinitionBroker
 {
+
+	public function __construct(RegionDefinition $definition)
+	{
+		$this->definition = $definition;
+	}
 
 	/**
 	 * Creates an array of validation rules based on Section block-constraints
@@ -56,7 +60,7 @@ class BlockBroker extends DefinitionBroker
 				}
 
 				$rules['blockLimits'] =  [
-					'blocks' => $block_limits;
+					'blocks' => $block_limits
 				];
 
 				return $rules;
