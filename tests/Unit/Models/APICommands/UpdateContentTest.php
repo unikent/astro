@@ -174,6 +174,77 @@ class UpdateContentTest extends APICommandTestCase
     /**
      * @test
      * @group APICommands
+     * @group wip
+     */
+    public function validation_ifSectionNotOptionalAndBlocksEmptyValidation_fails()
+    {
+        $valid_data = $this->input(null);
+
+        $valid_data['blocks']['test-region-with-required-section'] = $valid_data['blocks']['test-region'];
+        unset($valid_data['blocks']['test-region']);
+        $valid_data['blocks']['test-region-with-required-section'][0]['blocks'] = [];
+
+        $validator = $this->validator($valid_data);
+        $this->assertFalse($validator->passes());
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function validation_ifSectionOptionalAndBlocksEmptyValidation_passes()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function validation_ifSectionHasTooFewBlocksValidation_fails()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function validation_ifSectionHasTooManyBlocksValidation_fails()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function validation_ifSectionHasRightNumberOfBlocksValidation_passes()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function validation_ifSectionsInRegionMatchSectionsInDefinitionValidation_passes()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function validation_ifSectionsInRegionDoNotMatchSectionsInDefinitionValidation_fails()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group APICommands
      */
     public function execute_createsANewRevisionAndSetsItOnPage()
     {

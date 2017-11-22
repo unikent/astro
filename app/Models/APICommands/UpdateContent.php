@@ -155,30 +155,32 @@ class UpdateContent implements APICommand
 		// For each block instance...
 		if ($data->has('blocks') && is_array($data->get('blocks'))) {
 			foreach ($data->get('blocks', []) as $region => $sections) {
+				// ...load the Region definition...
+				$file = RegionDefinition::locateDefinition($region);
+				$regionDefinition = RegionDefinition::fromDefinitionFile($file);
+
 				foreach ($sections as $section_delta => $section) {
 					// @todo - add validation for section constraints here
+					// ...load the validation rules from the definition...
+					$rb = new RegionBroker($regionDefinition);
+
+					$sectionConstraintRules = $rb->getSectionConstraintRules($regionDefinition, $section['name']);
+					
+					$rules[sprintf('blocks.%s.%d.blocks', $region, $section_delta)] = "min:1";
 					foreach ($section['blocks'] as $block_delta => $block) {
-						// ...load the Region definition...
-						$file = RegionDefinition::locateDefinition($region);
-						$regionDefinition = RegionDefinition::fromDefinitionFile($file);
 
-						// ...load the Block definition...
-						$version = isset($block['definition_version']) ? $block['definition_version'] : null;
-						$file = BlockDefinition::locateDefinition($block['definition_name'], $version);
-						$blockDefinition = BlockDefinition::fromDefinitionFile($file);
-
-						// ...load the validation rules from the definition...
-						$bb = new BlockBroker($blockDefinition);
-
+						
 						// ...merge any region constraint validation rules...
-						foreach ($bb->getSectionConstraintRules($regionDefinition, $section['name']) as $field => $ruleset) {
+						$allowedBlocksRules = isset($sectionConstraintRules['allowedBlocks']) ? $sectionConstraintRules['allowedBlocks'] : [];
+
+						foreach ($allowedBlocksRules as $field => $ruleset) {
 							$key = sprintf('blocks.%s.%d.blocks.%d.%s', $region, $section_delta, $block_delta, $field);
 							$rules[$key] = $ruleset;
 						}					
 					}
 				}
 			}
-		}
+		}dd($rules, $data);
 		return $rules;
 	}
 }
