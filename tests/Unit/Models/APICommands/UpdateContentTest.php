@@ -169,7 +169,6 @@ class UpdateContentTest extends APICommandTestCase
     /**
      * @test
      * @group APICommands
-     * @group wip
      */
     public function validation_ifSectionNotOptionalAndBlocksEmptyValidation_fails()
     {
@@ -178,7 +177,37 @@ class UpdateContentTest extends APICommandTestCase
         $valid_data['blocks']['test-region-with-required-section'] = $valid_data['blocks']['test-region'];
         unset($valid_data['blocks']['test-region']);
 
-        $valid_data['blocks']['test-region-with-required-section'] = [];
+        $valid_data['blocks']['test-region-with-required-section'][0]['blocks'] = [];
+
+        $validator = $this->validator($valid_data);
+        $this->assertFalse($validator->passes());
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     * @group wip
+     */
+    public function validation_ifSectionOptionalAndBlocksEmptyValidation_passes()
+    {
+        $valid_data = $this->input(null);
+
+        $valid_data['blocks']['test-region'][0]['blocks'] = [];
+
+        $validator = $this->validator($valid_data);
+        $this->assertTrue($validator->passes());
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function validation_ifSectionHasTooFewBlocksValidation_fails()
+    {
+        $valid_data = $this->input(null);
+
+        unset($valid_data['blocks']['test-region'][0]['blocks'][1]);
+        unset($valid_data['blocks']['test-region'][0]['blocks'][2]);
 
         $validator = $this->validator($valid_data);
         $this->assertFalse($validator->passes());
@@ -188,27 +217,20 @@ class UpdateContentTest extends APICommandTestCase
      * @test
      * @group APICommands
      */
-    public function validation_ifSectionOptionalAndBlocksEmptyValidation_passes()
-    {
-        $this->markTestIncomplete();
-    }
-
-    /**
-     * @test
-     * @group APICommands
-     */
-    public function validation_ifSectionHasTooFewBlocksValidation_fails()
-    {
-        $this->markTestIncomplete();
-    }
-
-    /**
-     * @test
-     * @group APICommands
-     */
     public function validation_ifSectionHasTooManyBlocksValidation_fails()
     {
-        $this->markTestIncomplete();
+        $valid_data = $this->input(null);
+
+        $valid_data['blocks']['test-region'][0]['blocks'][] = $valid_data['blocks']['test-region'][0]['blocks'][1];
+        $valid_data['blocks']['test-region'][0]['blocks'][] = $valid_data['blocks']['test-region'][0]['blocks'][1];
+        $valid_data['blocks']['test-region'][0]['blocks'][] = $valid_data['blocks']['test-region'][0]['blocks'][1];
+        $valid_data['blocks']['test-region'][0]['blocks'][] = $valid_data['blocks']['test-region'][0]['blocks'][1];
+        $valid_data['blocks']['test-region'][0]['blocks'][] = $valid_data['blocks']['test-region'][0]['blocks'][1];
+        $valid_data['blocks']['test-region'][0]['blocks'][] = $valid_data['blocks']['test-region'][0]['blocks'][1];
+
+
+        $validator = $this->validator($valid_data);
+        $this->assertFalse($validator->passes());
     }
 
     /**
@@ -217,7 +239,9 @@ class UpdateContentTest extends APICommandTestCase
      */
     public function validation_ifSectionHasRightNumberOfBlocksValidation_passes()
     {
-        $this->markTestIncomplete();
+        $valid_data = $this->input(null);
+        $validator = $this->validator($valid_data);
+        $this->assertTrue($validator->passes());
     }
 
     /**

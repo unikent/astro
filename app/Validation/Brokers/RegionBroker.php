@@ -39,11 +39,13 @@ class RegionBroker extends DefinitionBroker
 					];
 				}
 
-				$block_limits = [];
-
 				if (isset($section_definition['optional']) && $section_definition['optional'] ===false) {
-					$block_limits[] = 'required';
+					$rules['blocksRequired'] = [ 
+						'blocks' => ['required']
+					];
 				}
+
+				$block_limits = [];
 
 				if (isset($section_definition['size'])) {
 					$block_limits[] = 'size:'.$section_definition['size'];

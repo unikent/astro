@@ -174,7 +174,14 @@ class UpdateContent implements APICommand
 					$rb = new RegionBroker($regionDefinition);
 					$sectionConstraintRules = $rb->getSectionConstraintRules($section['name']);
 					if (isset($sectionConstraintRules['blockLimits']) && !empty($sectionConstraintRules['blockLimits']['blocks'])) {
-						$rules[sprintf('blocks.%s.%d.blocks', $region, $section_delta)] = $sectionConstraintRules['blockLimits']['blocks'];
+
+						$sectionBlocksRules = isset($sectionConstraintRules['blocksRequired']) ? $sectionConstraintRules['blocksRequired']['blocks'] : [];
+
+						if (!empty($section['blocks'])) {
+							$sectionBlocksRules = array_merge($sectionConstraintRules['blockLimits']['blocks'], $sectionBlocksRules);
+						}
+						
+						$rules[sprintf('blocks.%s.%d.blocks', $region, $section_delta)] = $sectionBlocksRules;
 					}
 					
 
