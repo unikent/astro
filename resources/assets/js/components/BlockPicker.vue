@@ -13,7 +13,11 @@
 				<el-button @click="cancel">Cancel</el-button>
 				<el-button type="primary" @click="addBlocks">Add selected blocks to the page</el-button>
 			</div>
-			<block-list :selectedBlocks="selected"/>
+			<block-list
+					:selectedBlocks="selected"
+					:blocks="allBlocks"
+					:allowedBlocks="allowedBlocks"
+			/>
 		</el-tab-pane>
 	</el-tabs>
 
@@ -37,6 +41,12 @@ export default {
 		BlockList
 	},
 
+	props: {
+		allowedBlocks: {
+			required: true
+		}
+	},
+
 	data() {
 		return {
 			selected: []
@@ -49,7 +59,8 @@ export default {
 		]),
 
 		...mapState({
-			blockDefinitions: state => state.definition.blockDefinitions
+			allBlocks: state => state.definition.blockDefinitions,
+//			allowedBlocks: state => state.blockPicker.allowedBlocks
 		}),
 
 		visible: {
@@ -58,7 +69,7 @@ export default {
 			},
 			set(value) {
 				if(value) {
-					this.showBlockPicker();
+//					this.showBlockPicker();
 				}
 				else {
 					this.hideBlockPicker();
@@ -85,7 +96,7 @@ export default {
 		addBlocks() {
 
 			this.selected.forEach((blockKey, i) => {
-				const { name, version } = this.blockDefinitions[blockKey];
+				const { name, version } = this.allBlocks[blockKey];
 				this.addThisBlockType({
 					name,
 					version,
@@ -117,7 +128,7 @@ export default {
 				index,
 				block,
 				region: this.blockPicker.insertRegion,
-				sectionIndex: this.currentSectionIndex(),
+				sectionIndex: this.blockPicker.insertSection,
 				sectionName: this.currentSectionName()
 			});
 		},

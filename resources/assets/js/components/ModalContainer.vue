@@ -1,6 +1,8 @@
 <template>
 <div>
-	<block-picker />
+	<block-picker
+		:allowedBlocks="allowedBlocks"
+	/>
 	<publish-modal />
 	<unpublish-modal />
 	<media-picker />
@@ -20,10 +22,17 @@ import MediaOverlay from 'components/media/MediaOverlay';
 import CreatePageModal from 'components/CreatePageModal';
 import EditPageModal from 'components/EditPageModal';
 import PublishValidationWarningModal from 'components/PublishValidationWarningModal';
+import { mapState } from 'vuex';
 
 export default {
 
 	name: 'modal-container',
+
+	computed: {
+		...mapState({
+			allowedBlocks: state => state.blockPicker.allowedBlocks
+		})
+	},
 
 	components: {
 		BlockPicker,

@@ -6,10 +6,31 @@
 
 <script>
 import { mapMutations } from 'vuex';
-
+import { Definition } from 'classes/helpers';
+import { allowedOperations } from 'classes/SectionConstraints';
 export default {
 
 	name: 'empty-section',
+
+	props: {
+		// The name of the region containing this section
+		region: {
+			type: String,
+			required: true
+		},
+
+		// The index in its region of this section
+		section: {
+			type: Number,
+			required: true
+		},
+
+		// The section data
+		sectionData: {
+			type: Object,
+			required: true
+		},
+	},
 
 	methods: {
 
@@ -20,9 +41,14 @@ export default {
 		]),
 
 		addBlocks() {
-			this.updateInsertIndex(0);
-			this.updateInsertRegion(this.name);
-			this.showBlockPicker();
+			const sectionDefinition = this.sectionData ? Definition.getRegionSectionDefinition(this.region, this.section) : null;
+			const sectionConstraints = this.sectionData ? allowedOperations(this.sectionData.blocks, sectionDefinition) : null;
+			this.showBlockPicker({
+				insertIndex: 0,
+				sectionIndex: this.section,
+				regionName: this.region,
+				blocks: sectionConstraints ? sectionConstraints.allowedBlocks : []
+			});
 		}
 	}
 

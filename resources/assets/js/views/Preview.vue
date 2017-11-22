@@ -331,10 +331,12 @@ export default {
 		},
 
 		showBlockList(offset = 0) {
-			const { index, region } = this.current;
-			this.updateInsertIndex(index + offset);
-			this.updateInsertRegion(region);
-			this.showBlockPicker();
+			this.showBlockPicker({
+				insertIndex: this.current.index + offset,
+				sectionIndex: this.current.section,
+				regionName: this.current.region,
+				blocks: this.sectionConstraints ? this.sectionConstraints.allowedBlocks : []
+			});
 		}
 	}
 };

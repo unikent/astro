@@ -3,7 +3,7 @@
 	<div class="block-list columns is-multiline">
 		<div
 			v-for="(block, key) in blocks"
-			v-if="block"
+			v-if="block && isAllowed(key)"
 			class="column is-one-quarter"
 		>
 			<div
@@ -25,6 +25,12 @@ export default {
 	props: {
 		'selectedBlocks': {
 			required: true
+		},
+		'blocks': {
+			required: true
+		},
+		'allowedBlocks': {
+			required: true
 		}
 	},
 
@@ -43,16 +49,19 @@ export default {
 	},
 
 	computed: {
-		blocks() {
-			return this.$store.state.definition.blockDefinitions;
-		},
-
 		labels() {
 			return this.selected.map(name => this.blocks[name].label);
 		}
 	},
 
 	methods: {
+		isAllowed(key) {
+			return key &&
+				(
+					this.allowedBlocks.indexOf(key) !== -1 ||
+					this.allowedBlocks.indexOf(key.replace(/-v[0-9]+$/, '')) !== -1
+				);
+		},
 		handleMousedown(name) {
 			const current = this.selected.indexOf(name);
 
