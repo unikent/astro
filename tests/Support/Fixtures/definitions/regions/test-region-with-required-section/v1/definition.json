@@ -1,6 +1,6 @@
 {
-	"label": "Test Region",
-	"name": "test-region",
+	"label": "Test Region With Required Section",
+	"name": "test-region-with-required-section",
 	
 	"version": 1,
 
@@ -13,8 +13,8 @@
 			"defaultBlocks": [
 				"test-block"
 			],
-			"optional": true,
-			"min": 2,
+			"optional": false,
+			"min": 1,
 			"max": 5
 		}
 	]

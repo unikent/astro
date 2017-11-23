@@ -120,23 +120,6 @@ class BlockBrokerTest extends TestCase
 	/**
 	 * @test
 	 */
-	public function getRegionConstraintRules_CreatesRuleValidatingDefinitionNameAgainstRegionContraints()
-	{
-        $file = RegionDefinition::locateDefinition('test-region');
-        $region = RegionDefinition::fromDefinitionFile($file);
-
-		$bv = new BlockBroker($this->block);
-		$rules = $bv->getRegionConstraintRules($region);
-
-		$this->assertArrayHasKey('definition_name', $rules);
-		$this->assertEquals('in:test-block', $rules['definition_name'][0]);
-	}
-
-
-
-	/**
-	 * @test
-	 */
 	public function getValidator_ReturnsValidatorInstance()
 	{
 		$bv = new BlockBroker($this->block);
