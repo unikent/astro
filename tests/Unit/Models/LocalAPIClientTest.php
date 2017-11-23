@@ -289,7 +289,9 @@ class LocalAPIClientTest extends TestCase
         );
         $homepage = $site->draftHomepage;
         $old_revision = $homepage->revision;
-        $homepage = $client->updatePageContent($homepage->id, ['main' => []]);
+
+        $valid_data = json_decode(file_get_contents(base_path('tests/Support/Fixtures/api_requests/v1/update_content.json')), true);
+        $homepage = $client->updatePageContent($homepage->id, $valid_data['blocks']);
         $this->assertInstanceOf(Page::class, $homepage);
         $this->assertInstanceOf(Revision::class, $site->draftHomepage->revision);
         $new_revision = $homepage->revision;

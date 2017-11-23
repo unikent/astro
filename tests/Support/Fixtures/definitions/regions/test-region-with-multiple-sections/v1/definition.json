@@ -1,0 +1,33 @@
+{
+	"label": "Test Region With Multiple Sections",
+	"name": "test-region-with-multiple-sections",
+	
+	"version": 1,
+
+	"sections": [
+		{
+			"name": "test-section",
+			"allowedBlocks": [
+				"test-block"
+			],
+			"defaultBlocks": [
+				"test-block"
+			],
+			"optional": false,
+			"min": 1,
+			"max": 5
+		},
+		{
+			"name": "test-section2",
+			"allowedBlocks": [
+				"test-block"
+			],
+			"defaultBlocks": [
+				"test-block"
+			],
+			"optional": false,
+			"min": 1,
+			"max": 5
+		}
+	]
+}

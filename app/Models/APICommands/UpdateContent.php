@@ -5,6 +5,7 @@ namespace App\Models\APICommands;
 use App\Models\Contracts\APICommand;
 use App\Models\Revision;
 use App\Models\Block;
+use App\Validation\Brokers\RegionBroker;
 use App\Validation\Brokers\BlockBroker;
 use DB;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -58,40 +59,43 @@ class UpdateContent implements APICommand
 	protected function processBlocks($page, $regions)
 	{
 		$errors = false;
-		foreach ($regions as $region => $blocks) {
-			// Remove any existing Blocks in the region (to avoid re-ordering existing)
-			// TODO: explore updating block order rather than deleting each time
+		foreach ($regions as $region => $sections) {
 			$page->clearRegion($region);
 
-			// Re/create all the blocks
-			if (!empty($blocks)) {
+			foreach ($sections as $section) {
+				// Remove any existing Blocks in the region (to avoid re-ordering existing)
+				// TODO: explore updating block order rather than deleting each time
+				// Re/create all the blocks
 
-				foreach ($blocks as $delta => $data) {
-					$block = new Block;
+				if (!empty($section['blocks'])) {
+					foreach ($section['blocks'] as $delta => $data) {
+						$block = new Block;
 
-					$block->fill($data);
+						$block->fill($data);
 
-					$block->page_id = $page->getKey();
+						$block->page_id = $page->getKey();
 
-					$block->order = $delta;
-					$block->region_name = $region;
+						$block->order = $delta;
+						$block->region_name = $region;
+						$block->section_name = $section['name'];
 
-					$block->errors = $this->validateBlock($block);
-					$errors = $errors || !empty($block->errors);
-					$block->save();
+						$block->errors = $this->validateBlock($block);
+						$errors = $errors || !empty($block->errors);
+						$block->save();
 
-					// associate media items with this block
-					if (isset($data['media']) && is_array($data['media'])) {
-						$media_block_ids = [];
+						// associate media items with this block
+						if (isset($data['media']) && is_array($data['media'])) {
+							$media_block_ids = [];
 
-						foreach ($data['media'] as $media) {
-							if (isset($media['id'], $media['associated_field'])) {
-								$media_block_ids[$media['id']] = [
-									'block_associated_field' => $media['associated_field']
-								];
+							foreach ($data['media'] as $media) {
+								if (isset($media['id'], $media['associated_field'])) {
+									$media_block_ids[$media['id']] = [
+										'block_associated_field' => $media['associated_field']
+									];
+								}
 							}
+							$block->media()->sync($media_block_ids);
 						}
-						$block->media()->sync($media_block_ids);
 					}
 				}
 			}
@@ -151,29 +155,52 @@ class UpdateContent implements APICommand
 		];
 		// For each block instance...
 		if ($data->has('blocks') && is_array($data->get('blocks'))) {
-			foreach ($data->get('blocks', []) as $region => $blocks) {
-				foreach ($blocks as $delta => $block) {
-					// ...load the Region definition...
-					$file = RegionDefinition::locateDefinition($region);
-					$regionDefinition = RegionDefinition::fromDefinitionFile($file);
+			foreach ($data->get('blocks', []) as $region => $sections) {
+				// ...load the Region definition...
+				$file = RegionDefinition::locateDefinition($region);
+				$regionDefinition = RegionDefinition::fromDefinitionFile($file);
+				$rb = new RegionBroker($regionDefinition);
 
-					// ...load the Block definition...
-					$version = isset($block['definition_version']) ? $block['definition_version'] : null;
-					$file = BlockDefinition::locateDefinition($block['definition_name'], $version);
-					$blockDefinition = BlockDefinition::fromDefinitionFile($file);
+				$rules[sprintf('blocks.%s', $region)] = ['size:' . count($regionDefinition->sections)];
 
+				foreach ($sections as $section_delta => $section) {
 					// ...load the validation rules from the definition...
-					$bb = new BlockBroker($blockDefinition);
 
-					// ...merge any region constraint validation rules...
-					foreach ($bb->getRegionConstraintRules($regionDefinition) as $field => $ruleset) {
-						$key = sprintf('blocks.%s.%d.%s', $region, $delta, $field);
-						$rules[$key] = $ruleset;
+					//test that this is a valid section in the region definition
+					if (isset($regionDefinition->sections[$section_delta])) {
+						$rules[sprintf('blocks.%s.%d.name', $region, $section_delta)] = [
+							'in:' . $regionDefinition->sections[$section_delta]['name']
+						];
 					}
 
+
+					$sectionConstraintRules = $rb->getSectionConstraintRules($section['name']);
+					if (!empty($sectionConstraintRules['blockLimits']['blocks'])) {
+
+						$sectionBlocksRules = !empty($sectionConstraintRules['blocksRequired']) ? $sectionConstraintRules['blocksRequired']['blocks'] : [];
+
+                        // only applying min and max rules if there are blocks
+						if (!empty($section['blocks'])) {
+							$sectionBlocksRules = array_merge($sectionConstraintRules['blockLimits']['blocks'], $sectionBlocksRules);
+						}
+						
+						$rules[sprintf('blocks.%s.%d.blocks', $region, $section_delta)] = $sectionBlocksRules;
+					}
+					
+
+					foreach ($section['blocks'] as $block_delta => $block) {
+						// ...merge any region constraint validation rules...
+						$allowedBlocksRules = $sectionConstraintRules['allowedBlocks'];
+
+						foreach ($allowedBlocksRules as $field => $ruleset) {
+							$key = sprintf('blocks.%s.%d.blocks.%d.%s', $region, $section_delta, $block_delta, $field);
+							$rules[$key] = $ruleset;
+						}					
+					}
 				}
 			}
 		}
+
 		return $rules;
 	}
 }
