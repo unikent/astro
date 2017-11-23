@@ -48,6 +48,7 @@ export const allowedOperations = (
 	}
 
 	return {
+		allowedBlocks,
 		canAddBlocks,
 		canRemoveBlocks,
 		canSwapBlocks: (

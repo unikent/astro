@@ -13,7 +13,11 @@
 			:blockData="blockData"
 		/>
 	</template>
-	<empty-section v-else />
+	<empty-section
+			:region="region"
+			:section="section"
+			:sectionData="sectionData"
+			v-else />
 </div>
 </template>
 

@@ -12,6 +12,11 @@
 </template>
 
 <script>
+
+/**
+ * Contains modal dialogs which need to cover the whole screen (both the main Editor frame and the Preview iframe).
+ */
+
 import BlockPicker from 'components/BlockPicker';
 import PublishModal from 'components/PublishModal';
 import UnpublishModal from 'components/UnpublishModal';

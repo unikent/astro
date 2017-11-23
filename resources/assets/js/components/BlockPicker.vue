@@ -13,7 +13,10 @@
 				<el-button @click="cancel">Cancel</el-button>
 				<el-button type="primary" @click="addBlocks">Add selected blocks to the page</el-button>
 			</div>
-			<block-list :selectedBlocks="selected"/>
+			<picker-list
+					:selectedOptions="selected"
+					:options="availableBlocks"
+			/>
 		</el-tab-pane>
 	</el-tabs>
 
@@ -25,16 +28,21 @@
 </template>
 
 <script>
+
+/**
+ * Modal which allows the user to select one or more blocks to add to a page section.
+ */
+
 import { mapState, mapMutations ,mapGetters} from 'vuex';
 import Vue from 'vue';
 import { uuid } from 'classes/helpers';
-import BlockList from 'components/BlockList';
+import PickerList from 'components/PickerList';
 
 export default {
 	name: 'block-picker',
 
 	components: {
-		BlockList
+		PickerList
 	},
 
 	data() {
@@ -44,13 +52,31 @@ export default {
 	},
 
 	computed: {
-		...mapState([
-			'blockPicker'
-		]),
-
 		...mapState({
-			blockDefinitions: state => state.definition.blockDefinitions
+			blockPicker: state => state.blockPicker,
+			allowedBlocks: state => state.blockPicker.allowedBlocks,
+			allBlocks: state => state.definition.blockDefinitions
 		}),
+
+		/**
+		 * Get the blocks currently available to be displayed in the block picker.
+		 * @returns {Array}
+		 */
+		availableBlocks() {
+			let blocks = {};
+			if(this.allowedBlocks) {
+				for(let i in this.allowedBlocks){
+					let block_id = this.allowedBlocks[i];
+					if (this.allBlocks[block_id]) {
+						blocks[block_id] = this.allBlocks[block_id];
+					}
+					else if(this.allBlocks[block_id + '-v1']) {
+						blocks[block_id + '-v1'] = this.allBlocks[block_id + '-v1'];
+					}
+				}
+			}
+			return blocks;
+		},
 
 		visible: {
 			get() {
@@ -58,7 +84,7 @@ export default {
 			},
 			set(value) {
 				if(value) {
-					this.showBlockPicker();
+//					this.showBlockPicker();
 				}
 				else {
 					this.hideBlockPicker();
@@ -74,18 +100,10 @@ export default {
 			'addBlock'
 		]),
 
-		...mapState([
-			'currentSectionName'
-		]),
-
-		...mapGetters([
-			'currentSectionIndex'
-		]),
-
 		addBlocks() {
 
 			this.selected.forEach((blockKey, i) => {
-				const { name, version } = this.blockDefinitions[blockKey];
+				const { name, version } = this.availableBlocks[blockKey];
 				this.addThisBlockType({
 					name,
 					version,
@@ -117,8 +135,8 @@ export default {
 				index,
 				block,
 				region: this.blockPicker.insertRegion,
-				sectionIndex: this.currentSectionIndex(),
-				sectionName: this.currentSectionName()
+				sectionIndex: this.blockPicker.insertSection,
+				sectionName: 'unknown' // TODO addBlock should not need this, sections should be setup on loading page if missing.
 			});
 		},
 

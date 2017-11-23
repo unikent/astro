@@ -262,7 +262,8 @@ const actions = {
 					.get(`layouts/${page.layout.name}/definition?include=region_definitions.block_definitions`)
 					.then(({ data: region }) => {
 
-						region.data.region_definitions.forEach((region) => {
+						region.data.region_definitions.forEach((region, regionName) => {
+							Definition.addRegionDefinition(region);
 							region.block_definitions.forEach(definition => {
 								Definition.set(definition);
 							});
