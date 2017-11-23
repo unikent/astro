@@ -261,6 +261,8 @@ class UpdateContentTest extends APICommandTestCase
     public function validation_ifTooManySectionsInRegionValidation_fails()
     {
         $invalid_data = $this->input(null);
+        
+        // test-region definition only allows one section
         $invalid_data['blocks']['test-region'][] = $invalid_data['blocks']['test-region'][0];
 
         $validator = $this->validator($invalid_data);
@@ -274,6 +276,8 @@ class UpdateContentTest extends APICommandTestCase
     public function validation_ifTooFewSectionsInRegionValidation_fails()
     {
         $invalid_data = $this->input(null);
+        
+        // test-region definition only allows one section
         unset($invalid_data['blocks']['test-region'][0]);
 
         $validator = $this->validator($invalid_data);
