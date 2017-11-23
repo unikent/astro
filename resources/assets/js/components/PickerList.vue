@@ -2,8 +2,7 @@
 <div>
 	<div class="block-list columns is-multiline">
 		<div
-			v-for="(block, key) in blocks"
-			v-if="block && isAllowed(key)"
+			v-for="(item, key) in options"
 			class="column is-one-quarter"
 		>
 			<div
@@ -11,8 +10,8 @@
 				:class="[{ 'block-move--selected': selected.indexOf(key) !== -1 }]"
 				@mousedown="handleMousedown(key)"
 			>
-				<h3>{{ block.label }}</h3>
-				<p>{{ block.info }}</p>
+				<h3>{{ item.label }}</h3>
+				<p>{{ item.info }}</p>
 			</div>
 		</div>
 	</div>
@@ -23,25 +22,33 @@
 export default {
 
 	props: {
-		'selectedBlocks': {
-			required: true
+
+		/**
+		 * The items which the user can select from.
+		 * { item_id => { item-definition }, ... }
+		 */
+		'options': {
+			required: true,
+			type: Object
 		},
-		'blocks': {
-			required: true
-		},
-		'allowedBlocks': {
-			required: true
+		/**
+		 * The items which are selected by default.
+		 * An array of strings
+		 */
+		'selectedOptions': {
+			required: false,
+			type: Array
 		}
 	},
 
 	data() {
 		return {
-			selected: this.selectedBlocks
+			selected: this.selectedOptions ? this.selectedOptions : []
 		};
 	},
 
 	watch: {
-		selectedBlocks(val) {
+		selectedOptions(val) {
 			if(val.length === 0) {
 				this.selected = val;
 			}
@@ -50,18 +57,11 @@ export default {
 
 	computed: {
 		labels() {
-			return this.selected.map(name => this.blocks[name].label);
+			return this.selected.map(name => this.options[name].label);
 		}
 	},
 
 	methods: {
-		isAllowed(key) {
-			return key &&
-				(
-					this.allowedBlocks.indexOf(key) !== -1 ||
-					this.allowedBlocks.indexOf(key.replace(/-v[0-9]+$/, '')) !== -1
-				);
-		},
 		handleMousedown(name) {
 			const current = this.selected.indexOf(name);
 

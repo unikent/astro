@@ -1,7 +1,6 @@
 <template>
 <div>
 	<block-picker
-		:allowedBlocks="allowedBlocks"
 	/>
 	<publish-modal />
 	<unpublish-modal />
@@ -14,6 +13,11 @@
 </template>
 
 <script>
+
+/**
+ * Contains modal dialogs which need to cover the whole screen (both the main Editor frame and the Preview iframe.
+ */
+
 import BlockPicker from 'components/BlockPicker';
 import PublishModal from 'components/PublishModal';
 import UnpublishModal from 'components/UnpublishModal';
@@ -27,12 +31,6 @@ import { mapState } from 'vuex';
 export default {
 
 	name: 'modal-container',
-
-	computed: {
-		...mapState({
-			allowedBlocks: state => state.blockPicker.allowedBlocks
-		})
-	},
 
 	components: {
 		BlockPicker,
