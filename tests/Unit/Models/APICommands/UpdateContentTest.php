@@ -304,7 +304,6 @@ class UpdateContentTest extends APICommandTestCase
     /**
      * @test
      * @group APICommands
-     * @group wip
      */
     public function validation_ifUnknownSectionsFoundInRegionValidation_fails()
     {

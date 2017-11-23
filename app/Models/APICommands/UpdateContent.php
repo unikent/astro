@@ -159,6 +159,7 @@ class UpdateContent implements APICommand
 				// ...load the Region definition...
 				$file = RegionDefinition::locateDefinition($region);
 				$regionDefinition = RegionDefinition::fromDefinitionFile($file);
+				$rb = new RegionBroker($regionDefinition);
 
 				$rules[sprintf('blocks.%s', $region)] = ['size:' . count($regionDefinition->sections)];
 
@@ -173,7 +174,6 @@ class UpdateContent implements APICommand
 					}
 
 
-					$rb = new RegionBroker($regionDefinition);
 					$sectionConstraintRules = $rb->getSectionConstraintRules($section['name']);
 					if (!empty($sectionConstraintRules['blockLimits']['blocks'])) {
 
@@ -199,7 +199,7 @@ class UpdateContent implements APICommand
 				}
 			}
 		}
-		
+
 		return $rules;
 	}
 }
