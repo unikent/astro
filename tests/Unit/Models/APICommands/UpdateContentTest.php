@@ -186,7 +186,6 @@ class UpdateContentTest extends APICommandTestCase
     /**
      * @test
      * @group APICommands
-     * @group wip
      */
     public function validation_ifSectionOptionalAndBlocksEmptyValidation_passes()
     {
@@ -219,17 +218,52 @@ class UpdateContentTest extends APICommandTestCase
      */
     public function validation_ifSectionHasTooManyBlocksValidation_fails()
     {
-        $valid_data = $this->input(null);
+        $invalid_data = $this->input(null);
 
-        $valid_data['blocks']['test-region'][0]['blocks'][] = $valid_data['blocks']['test-region'][0]['blocks'][1];
-        $valid_data['blocks']['test-region'][0]['blocks'][] = $valid_data['blocks']['test-region'][0]['blocks'][1];
-        $valid_data['blocks']['test-region'][0]['blocks'][] = $valid_data['blocks']['test-region'][0]['blocks'][1];
-        $valid_data['blocks']['test-region'][0]['blocks'][] = $valid_data['blocks']['test-region'][0]['blocks'][1];
-        $valid_data['blocks']['test-region'][0]['blocks'][] = $valid_data['blocks']['test-region'][0]['blocks'][1];
-        $valid_data['blocks']['test-region'][0]['blocks'][] = $valid_data['blocks']['test-region'][0]['blocks'][1];
+        // our sample page data input has 3 blocks in it, so we'll add 5 more 
+        // so that it goes over the max amount of permitted blocks in our definition
+        $invalid_data['blocks']['test-region'][0]['blocks'][] = $invalid_data['blocks']['test-region'][0]['blocks'][1];
+        $invalid_data['blocks']['test-region'][0]['blocks'][] = $invalid_data['blocks']['test-region'][0]['blocks'][1];
+        $invalid_data['blocks']['test-region'][0]['blocks'][] = $invalid_data['blocks']['test-region'][0]['blocks'][1];
+        $invalid_data['blocks']['test-region'][0]['blocks'][] = $invalid_data['blocks']['test-region'][0]['blocks'][1];
+        $invalid_data['blocks']['test-region'][0]['blocks'][] = $invalid_data['blocks']['test-region'][0]['blocks'][1];
+        $invalid_data['blocks']['test-region'][0]['blocks'][] = $invalid_data['blocks']['test-region'][0]['blocks'][1];
 
 
-        $validator = $this->validator($valid_data);
+        $validator = $this->validator($invalid_data);
+        $this->assertFalse($validator->passes());
+    }
+
+    /**
+     * This test is covered by validation_whenInput_isValid_passes
+     * @group APICommands
+     */
+    public function validation_ifSectionHasRightNumberOfBlocksValidation_passes()
+    {
+        // this is just here for completeness. Our sample valid_data should already 
+        // be valid against our definition
+    }
+
+    /**
+     * This test is covered by validation_whenInput_isValid_passes
+     * @group APICommands
+     */
+    public function validation_ifSectionsInRegionMatchSectionsInDefinitionValidation_passes()
+    {
+        // this is just here for completeness. Our sample valid_data should already 
+        // be valid against our definition
+    }
+
+    /**
+     * @test
+     * @group APICommands
+     */
+    public function validation_ifTooManySectionsInRegionValidation_fails()
+    {
+        $invalid_data = $this->input(null);
+        $invalid_data['blocks']['test-region'][] = $invalid_data['blocks']['test-region'][0];
+
+        $validator = $this->validator($invalid_data);
         $this->assertFalse($validator->passes());
     }
 
@@ -237,29 +271,48 @@ class UpdateContentTest extends APICommandTestCase
      * @test
      * @group APICommands
      */
-    public function validation_ifSectionHasRightNumberOfBlocksValidation_passes()
+    public function validation_ifTooFewSectionsInRegionValidation_fails()
     {
-        $valid_data = $this->input(null);
-        $validator = $this->validator($valid_data);
-        $this->assertTrue($validator->passes());
+        $invalid_data = $this->input(null);
+        unset($invalid_data['blocks']['test-region'][0]);
+
+        $validator = $this->validator($invalid_data);
+        $this->assertFalse($validator->passes());
     }
 
     /**
      * @test
      * @group APICommands
      */
-    public function validation_ifSectionsInRegionMatchSectionsInDefinitionValidation_passes()
+    public function validation_ifSectionsInRegionAreInWrongOrderValidation_fails()
     {
-        $this->markTestIncomplete();
+        $invalid_data = $this->input(null);
+
+        // change the region definition being used to one with multiple sections
+        $invalid_data['blocks']['test-region-with-multiple-sections'] = $invalid_data['blocks']['test-region'];
+        unset($invalid_data['blocks']['test-region']);
+
+        // add a second (permitted) section but in the wrong order
+        $invalid_data['blocks']['test-region-with-multiple-sections'][] = $invalid_data['blocks']['test-region-with-multiple-sections'][0];
+        $invalid_data['blocks']['test-region-with-multiple-sections'][0]['name'] = 'test-section2';
+
+
+        $validator = $this->validator($invalid_data);
+        $this->assertFalse($validator->passes());
     }
 
     /**
      * @test
      * @group APICommands
      */
-    public function validation_ifSectionsInRegionDoNotMatchSectionsInDefinitionValidation_fails()
+    public function validation_ifUnknownSectionsFoundInRegionValidation_fails()
     {
-        $this->markTestIncomplete();
+        $invalid_data = $this->input(null);
+
+        $invalid_data['blocks']['test-region'][0]['name'] = 'unknown-section';
+
+        $validator = $this->validator($invalid_data);
+        $this->assertFalse($validator->passes());
     }
 
     /**

@@ -166,9 +166,11 @@ class UpdateContent implements APICommand
 					// ...load the validation rules from the definition...
 
 					//test that this is a valid section in the region definition
-					$rules[sprintf('blocks.%s.%d.name', $region, $section_delta)] = [
-						'in:' . $regionDefinition->sections[$section_delta]['name']
-					];
+					if (isset($regionDefinition->sections[$section_delta])) {
+						$rules[sprintf('blocks.%s.%d.name', $region, $section_delta)] = [
+							'in:' . $regionDefinition->sections[$section_delta]['name']
+						];
+					}
 
 
 					$rb = new RegionBroker($regionDefinition);
@@ -186,7 +188,6 @@ class UpdateContent implements APICommand
 					
 
 					foreach ($section['blocks'] as $block_delta => $block) {
-
 						
 						// ...merge any region constraint validation rules...
 						$allowedBlocksRules = isset($sectionConstraintRules['allowedBlocks']) ? $sectionConstraintRules['allowedBlocks'] : [];
