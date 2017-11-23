@@ -179,6 +179,7 @@ class UpdateContent implements APICommand
 
 						$sectionBlocksRules = !empty($sectionConstraintRules['blocksRequired']) ? $sectionConstraintRules['blocksRequired']['blocks'] : [];
 
+                        // only applying min and max rules if there are blocks
 						if (!empty($section['blocks'])) {
 							$sectionBlocksRules = array_merge($sectionConstraintRules['blockLimits']['blocks'], $sectionBlocksRules);
 						}
