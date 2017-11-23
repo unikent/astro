@@ -20,16 +20,23 @@ class RegionBroker extends DefinitionBroker
 	 * @param String $section_name
 	 * @return Array [
 	 *				"allowedBlocks" => 'rules for which blocks are allowed',
-	 *				"blockLimits" => 'rules for the amount ob blocks permitted'
+	 *				"blocksRequired" => 'rules to determin if blocks are required'
+	 *				"blockLimits" => 'rules for the amount of blocks permitted'
 	 *			]
 	 */
 	public function getSectionConstraintRules($section_name)
 	{
 		$region_definition = $this->definition;
+				
+		// defining the sets of rules to be returned
+		$rules = [
+			'allowedBlocks' => [],
+			'blocksRequired' => [],
+			'blockLimits' => []
+		];
+
 		foreach ($region_definition->sections as $section_definition) {
 			if ($section_definition['name'] === $section_name) {
-				
-				$rules = [];
 
 				if (isset($section_definition['allowedBlocks'])) {
 					$rules['allowedBlocks'] = [
@@ -64,12 +71,10 @@ class RegionBroker extends DefinitionBroker
 				$rules['blockLimits'] =  [
 					'blocks' => $block_limits
 				];
-
-				return $rules;
 			}
 		}
 		
-		return [];
+		return $rules;
 	}
 
 }

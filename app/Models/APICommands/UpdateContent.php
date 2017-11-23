@@ -175,9 +175,9 @@ class UpdateContent implements APICommand
 
 					$rb = new RegionBroker($regionDefinition);
 					$sectionConstraintRules = $rb->getSectionConstraintRules($section['name']);
-					if (isset($sectionConstraintRules['blockLimits']) && !empty($sectionConstraintRules['blockLimits']['blocks'])) {
+					if (!empty($sectionConstraintRules['blockLimits']['blocks'])) {
 
-						$sectionBlocksRules = isset($sectionConstraintRules['blocksRequired']) ? $sectionConstraintRules['blocksRequired']['blocks'] : [];
+						$sectionBlocksRules = !empty($sectionConstraintRules['blocksRequired']) ? $sectionConstraintRules['blocksRequired']['blocks'] : [];
 
 						if (!empty($section['blocks'])) {
 							$sectionBlocksRules = array_merge($sectionConstraintRules['blockLimits']['blocks'], $sectionBlocksRules);
@@ -188,9 +188,8 @@ class UpdateContent implements APICommand
 					
 
 					foreach ($section['blocks'] as $block_delta => $block) {
-						
 						// ...merge any region constraint validation rules...
-						$allowedBlocksRules = isset($sectionConstraintRules['allowedBlocks']) ? $sectionConstraintRules['allowedBlocks'] : [];
+						$allowedBlocksRules = $sectionConstraintRules['allowedBlocks'];
 
 						foreach ($allowedBlocksRules as $field => $ruleset) {
 							$key = sprintf('blocks.%s.%d.blocks.%d.%s', $region, $section_delta, $block_delta, $field);
@@ -200,7 +199,7 @@ class UpdateContent implements APICommand
 				}
 			}
 		}
-		//dd($rules, $data);
+		
 		return $rules;
 	}
 }
