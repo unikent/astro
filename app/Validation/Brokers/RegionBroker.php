@@ -71,6 +71,8 @@ class RegionBroker extends DefinitionBroker
 				$rules['blockLimits'] =  [
 					'blocks' => $block_limits
 				];
+                
+                break;
 			}
 		}
 		
