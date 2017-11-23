@@ -14,7 +14,7 @@
 <script>
 
 /**
- * Contains modal dialogs which need to cover the whole screen (both the main Editor frame and the Preview iframe.
+ * Contains modal dialogs which need to cover the whole screen (both the main Editor frame and the Preview iframe).
  */
 
 import BlockPicker from 'components/BlockPicker';
