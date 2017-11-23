@@ -38,7 +38,7 @@ class UpdateContentTest extends APICommandTestCase
         $this->assertFalse($validator->passes());
 
         $validator = $this->validator($this->input([
-            'id' => 1 //this should not be in the database so would fail
+            'id' => -1 //this should not be in the database so would fail
         ]));
         $this->assertFalse($validator->passes());
     }
