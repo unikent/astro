@@ -73,9 +73,9 @@ This shouldn't matter, since admin is a 'let them do anything' switch,  but if w
 									Manage users
 								</el-button>
 							</router-link>
-							<!-- <el-button @click="askRemove(site.id)" type="default" size="small" v-if="canUserOnSite('site.delete', site.currentRole)">
+							<el-button @click="askRemove(site.id)" type="default" size="small" v-if="canUserOnSite('site.delete', site.currentRole)">
 								<icon name="delete" width="14" height="14" />
-							</el-button> -->
+							</el-button>
 						</div>
 					</td>
 
