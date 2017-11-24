@@ -110,8 +110,8 @@ const getters = {
 		return prop ? blockMeta[prop] : blockMeta;
 	},
 
-	getInvalidBlocks: (state) => () => {
-		return state.invalidBlocks;
+	getInvalidBlocks: (state, getters, rootState) => () => {
+		return rootState.page.invalidBlocks;
 	},
 
 	getCurrentRegion: (state) => () => {
