@@ -23,24 +23,20 @@ const state = {
 	currentLayout: null,
 	currentLayoutVersion: 1,
 	currentBlockIndex: null,
-	currentRegion: 'main',
+	currentRegion: null,
 	blockMeta: {
-		blocks: {
-			main: []
-		}
+		blocks: {}
 	},
 	pageData: {
-		blocks: {
-			main: []
-		}
+		blocks: {}
 	},
 	scale: .4,
 	loaded: false,
 	dragging: false,
 	currentSavedState: '',
 	invalidBlocks: [],
-	defaultRegion: 'main',
-	defaultSection: 'catch-all'
+	defaultRegion: null,
+	defaultSection: null
 };
 
 const mutations = {
@@ -55,9 +51,7 @@ const mutations = {
 			page = {};
 		}
 		if(!page.blocks) {
-			page.blocks = {
-				main: []
-			};
+			page.blocks = {};
 		}
 
 		if(page.layout) {
