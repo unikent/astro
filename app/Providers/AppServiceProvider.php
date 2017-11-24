@@ -24,6 +24,16 @@ class AppServiceProvider extends ServiceProvider
 	{
 		Schema::defaultStringLength(191); // Fix for the webfarm running older MySQL
 
+		/**
+		 * Hack to be able to validate a block's combined name and version are in the {name}-v{version}s listed
+		 * in the allowedBlocks array of section definitions.
+		 * TODO refactor so that block's have a definition_id or type instead of name and version?
+		 */
+		Validator::extend('inVersioned', function($attr, $value, $parameters){
+			$id = $value . '-v' . $parameters[0];
+			return in_array($id, explode(',',$parameters[1]));
+		});
+
 		Validator::extend('slug_unchanged_or_unique', function($attr, $value, $parameters, $validator) {
 			$id = isset($parameters[0]) ? $parameters[0] : null;
 			$page = Page::find($id);

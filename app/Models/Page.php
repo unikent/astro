@@ -94,11 +94,12 @@ class Page extends BaumNode
 			->get()
 			->groupBy('region_name');
 		$this->load('blocks.media');
-		foreach ($blocksByRegion as $region => $blocks) {
+		foreach ($blocksByRegion as $region_id => $blocks) {
 			// need the region definition to get sections in the correct order
-			$regionDef = Region::fromDefinitionFile(Region::locateDefinition($region));
+			$parts = Region::idToNameAndVersion($region_id);
+			$regionDef = Region::fromDefinitionFile(Region::locateDefinition($parts['name'], $parts['version']));
 			$sections = $blocks->groupBy('section_name');
-			$data[$region] = [];
+			$data[$region_id] = [];
 			foreach($regionDef->sections as $section_def){
 				$section = ['name' => $section_def['name'], 'blocks' => []];
 				if(!empty($sections[$section_def['name']])){
@@ -115,7 +116,7 @@ class Page extends BaumNode
 						];
 					}
 				}
-				$data[$region][] = $section;
+				$data[$region_id][] = $section;
 			}
 		}
 		return $data;

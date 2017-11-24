@@ -3,6 +3,7 @@
 namespace App\Models\APICommands;
 
 use App\Models\Contracts\APICommand;
+use App\Models\Definitions\Region;
 use App\Models\Revision;
 use App\Models\Block;
 use App\Validation\Brokers\RegionBroker;
@@ -155,20 +156,21 @@ class UpdateContent implements APICommand
 		];
 		// For each block instance...
 		if ($data->has('blocks') && is_array($data->get('blocks'))) {
-			foreach ($data->get('blocks', []) as $region => $sections) {
+			foreach ($data->get('blocks', []) as $region_id => $sections) {
 				// ...load the Region definition...
-				$file = RegionDefinition::locateDefinition($region);
+				$parts = Region::idToNameAndVersion($region_id);
+				$file = RegionDefinition::locateDefinition($parts['name'],$parts['version']);
 				$regionDefinition = RegionDefinition::fromDefinitionFile($file);
 				$rb = new RegionBroker($regionDefinition);
 
-				$rules[sprintf('blocks.%s', $region)] = ['size:' . count($regionDefinition->sections)];
+				$rules[sprintf('blocks.%s', $region_id)] = ['size:' . count($regionDefinition->sections)];
 
 				foreach ($sections as $section_delta => $section) {
 					// ...load the validation rules from the definition...
 
 					//test that this is a valid section in the region definition
 					if (isset($regionDefinition->sections[$section_delta])) {
-						$rules[sprintf('blocks.%s.%d.name', $region, $section_delta)] = [
+						$rules[sprintf('blocks.%s.%d.name', $region_id, $section_delta)] = [
 							'in:' . $regionDefinition->sections[$section_delta]['name']
 						];
 					}
@@ -184,7 +186,7 @@ class UpdateContent implements APICommand
 							$sectionBlocksRules = array_merge($sectionConstraintRules['blockLimits']['blocks'], $sectionBlocksRules);
 						}
 						
-						$rules[sprintf('blocks.%s.%d.blocks', $region, $section_delta)] = $sectionBlocksRules;
+						$rules[sprintf('blocks.%s.%d.blocks', $region_id, $section_delta)] = $sectionBlocksRules;
 					}
 					
 
@@ -193,8 +195,8 @@ class UpdateContent implements APICommand
 						$allowedBlocksRules = $sectionConstraintRules['allowedBlocks'];
 
 						foreach ($allowedBlocksRules as $field => $ruleset) {
-							$key = sprintf('blocks.%s.%d.blocks.%d.%s', $region, $section_delta, $block_delta, $field);
-							$rules[$key] = $ruleset;
+							$key = sprintf('blocks.%s.%d.blocks.%d.%s', $region_id, $section_delta, $block_delta, $field);
+							$rules[$key] = ('definition_name' == $field ? str_replace('{version}', $block['definition_version'], $ruleset) : $ruleset);
 						}					
 					}
 				}

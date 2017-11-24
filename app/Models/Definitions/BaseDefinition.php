@@ -25,6 +25,21 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
 
     protected static $defDir = '';
 
+	/**
+	 * Extract the name and version number from a definition identifier
+	 * @param string $id - Definition identifier in the form {name}-v{version}
+	 * @return array|null [ 'name' => {name}, 'version' => {version} ] or null if no match.
+	 */
+    public static function idToNameAndVersion($id)
+	{
+		if(preg_match('/^(.+)-v([0-9]+)$/', $id, $matches)){
+			return [
+				'name' => $matches[1],
+				'version' => $matches[2]
+			];
+		}
+		return null;
+	}
 
     /**
      * Dynamically retrieve attributes on the model.

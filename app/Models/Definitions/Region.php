@@ -26,8 +26,9 @@ class Region extends BaseDefinition
 	 */
 	public function loadBlockDefinitions(){
 		foreach($this->sections as $section){
-			foreach( $section['allowedBlocks'] as $name) {
-				$path = Block::locateDefinition($name);
+			foreach( $section['allowedBlocks'] as $block_id ) {
+				$parts = static::idToNameAndVersion($block_id);
+				$path = Block::locateDefinition( $parts['name'], $parts['version']);
 
 				if (!is_null($path)) {
 					$block = Block::fromDefinitionFile($path);
@@ -61,7 +62,9 @@ class Region extends BaseDefinition
 			$section = [ 'name' => $section_def['name'], 'blocks' => []];
 			if($section_def['defaultBlocks']){
 				foreach($section_def['defaultBlocks'] as $block_id){
-					$block_def = Block::fromDefinitionFile(Block::locateDefinition($block_id));
+					$parts = static::idToNameAndVersion($block_id);
+
+					$block_def = Block::fromDefinitionFile(Block::locateDefinition($parts['name'],$parts['version']));
 					if($block_def){
 						$section['blocks'][] = $block_def->getDefaultData($this->name, $section_def['name']);
 					}
