@@ -20,10 +20,10 @@
 			<el-input name="layout_version" v-model="createForm.layout_version" auto-complete="off"></el-input>
 		</el-form-item>
 		<el-form-item label="slug">
-			<el-input 
+			<el-input
 				name="slug"
 				v-model="createForm.route.slug"
-				v-bind:placeholder="suggestedSlug" 
+				v-bind:placeholder="suggestedSlug"
 				auto-complete="off" @focus="setUserEditingSlug"></el-input>
 		</el-form-item>
 	</el-form>
@@ -57,6 +57,10 @@ export default {
 				{
 					label: 'Content page',
 					name: 'content'
+				},
+				{
+					label: 'School homepage',
+					name: 'school-homepage'
 				}
 			],
 			createForm: {
