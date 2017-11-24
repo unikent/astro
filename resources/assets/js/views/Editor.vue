@@ -83,6 +83,11 @@ export default {
 		};
 	},
 
+	destroyed() {
+		// we have left the page editor so we no longer can have unsaved changes
+		this.$store.commit('resetCurrentSavedState');
+	},
+
 	methods: {
 
 		showLoader() {
