@@ -89,11 +89,7 @@ export default {
 		},
 
 		invalidBlocks() {
-			var invalidBlocks = false;
-//			if(this.getInvalidBlocks().length === 0) {
-//				invalidBlocks = true;
-//			}
-			return invalidBlocks;
+			return this.getInvalidBlocks().length === 0 ? true : false;
 		}
 	},
 
