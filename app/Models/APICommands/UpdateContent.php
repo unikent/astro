@@ -108,8 +108,7 @@ class UpdateContent implements APICommand
 	{
 		$rules = [];
 		// ...load the Block definition...
-		$version = isset($block['definition_version']) ? $block['definition_version'] : null;
-		$file = BlockDefinition::locateDefinition($block['definition_name'], $version);
+		$file = BlockDefinition::locateDefinition($block['definition_name'] . '-v' . $block['definition_version']);
 		$blockDefinition = BlockDefinition::fromDefinitionFile($file);
 
 		// ...load the validation rules from the definition...
@@ -158,8 +157,7 @@ class UpdateContent implements APICommand
 		if ($data->has('blocks') && is_array($data->get('blocks'))) {
 			foreach ($data->get('blocks', []) as $region_id => $sections) {
 				// ...load the Region definition...
-				$parts = Region::idToNameAndVersion($region_id);
-				$file = RegionDefinition::locateDefinition($parts['name'],$parts['version']);
+				$file = RegionDefinition::locateDefinition($region_id);
 				$regionDefinition = RegionDefinition::fromDefinitionFile($file);
 				$rb = new RegionBroker($regionDefinition);
 

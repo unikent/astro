@@ -17,7 +17,7 @@ class RegionBrokerTest extends TestCase
 	 */
 	public function getSectionConstraintRules_CreatesRuleValidatingAllowedBlocks()
 	{
-        $file = RegionDefinition::locateDefinition('test-region', 1);
+        $file = RegionDefinition::locateDefinition('test-region-v1');
         $region = RegionDefinition::fromDefinitionFile($file);
 		$rv = new RegionBroker($region);
 
@@ -32,7 +32,7 @@ class RegionBrokerTest extends TestCase
 	 */
 	public function getSectionConstraintRules_CreatesRuleValidatingBlockLimits()
 	{
-        $file = RegionDefinition::locateDefinition('test-region');
+        $file = RegionDefinition::locateDefinition('test-region-v1');
         $region = RegionDefinition::fromDefinitionFile($file);
 		$rv = new RegionBroker($region);
 
@@ -48,7 +48,7 @@ class RegionBrokerTest extends TestCase
 	 */
 	public function getSectionConstraintRules_CreatesRuleValidatingBlockRequired()
 	{
-        $file = RegionDefinition::locateDefinition('test-region-with-required-section');
+        $file = RegionDefinition::locateDefinition('test-region-with-required-section-v1');
         $region = RegionDefinition::fromDefinitionFile($file);
 		$rv = new RegionBroker($region);
 

@@ -28,7 +28,7 @@ class LayoutExistsRule
     */
     public function passes($attribute, $value)
     {
-        return Layout::locateDefinition($value, $this->version) != false;
+        return Layout::locateDefinition($value . '-v' . $this->version) != false;
     }
 
     /**

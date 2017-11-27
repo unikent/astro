@@ -41,17 +41,17 @@ class RouteServiceProvider extends ServiceProvider
 		});
 
 		Route::bind('block_definition', function ($value) {
-			$path = BlockDefinition::locateDefinitionOrFail($value, request()->get('version', null));
+			$path = BlockDefinition::locateDefinitionOrFail($value);
 			return BlockDefinition::fromDefinitionFile($path);
 		});
 
 		Route::bind('layout_definition', function ($value) {
-			$path = LayoutDefinition::locateDefinitionOrFail($value, request()->get('version', null));
+			$path = LayoutDefinition::locateDefinitionOrFail($value);
 			return LayoutDefinition::fromDefinitionFile($path);
 		});
 
 		Route::bind('region_definition', function ($value) {
-			$path = RegionDefinition::locateDefinitionOrFail($value, request()->get('version', null));
+			$path = RegionDefinition::locateDefinitionOrFail($value);
 			return RegionDefinition::fromDefinitionFile($path);
 		});
 	}

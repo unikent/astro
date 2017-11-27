@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\APICommands\PublishPage;
+use App\Models\Definitions\BaseDefinition;
 use App\Models\Page;
 use App\Validation\Rules\LayoutExistsRule;
 use App\Validation\Rules\UniqueSitePathRule;
@@ -96,7 +97,7 @@ class AppServiceProvider extends ServiceProvider
 			$version = (isset($parameters[1]) && isset($data[$parameters[1]])) ? $data[$parameters[1]] : null;
 
 			$class = $parameters[0];
-			return $class::locateDefinition($name, $version) ? true : false;
+			return $class::locateDefinition(BaseDefinition::idFromNameAndVersion($name,$version)) ? true : false;
 		});
 
 		/**
