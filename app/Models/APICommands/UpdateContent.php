@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Validator;
 
 class UpdateContent implements APICommand
 {
+	private $validationMessages = [];
 
 	/**
 	 * Carry out the command, based on the provided $input.
@@ -133,7 +134,7 @@ class UpdateContent implements APICommand
 	 */
 	public function messages(Collection $data, Authenticatable $user)
 	{
-		return [];
+		return $this->validationMessages;
 	}
 
 	/**
@@ -158,46 +159,82 @@ class UpdateContent implements APICommand
 			foreach ($data->get('blocks', []) as $region => $sections) {
 				// ...load the Region definition...
 				$file = RegionDefinition::locateDefinition($region);
-				$regionDefinition = RegionDefinition::fromDefinitionFile($file);
-				$rb = new RegionBroker($regionDefinition);
+				if (!empty($file)) {
 
-				$rules[sprintf('blocks.%s', $region)] = ['size:' . count($regionDefinition->sections)];
+					$regionDefinition = RegionDefinition::fromDefinitionFile($file);
+					$rb = new RegionBroker($regionDefinition);
 
-				foreach ($sections as $section_delta => $section) {
-					// ...load the validation rules from the definition...
+					$requiredSectionsCount = count($regionDefinition->sections);
+					$foundSectionsCount = count($sections);
 
-					//test that this is a valid section in the region definition
-					if (isset($regionDefinition->sections[$section_delta])) {
-						$rules[sprintf('blocks.%s.%d.name', $region, $section_delta)] = [
-							'in:' . $regionDefinition->sections[$section_delta]['name']
-						];
-					}
+					$ruleKey = sprintf('blocks.%s', $region);
+					$rules[$ruleKey] = ['size:' . $requiredSectionsCount];
+					$this->validationMessages[$ruleKey . '.size'] = "The '$region' region should have $requiredSectionsCount section within it. $foundSectionsCount found.";
 
+					foreach ($sections as $section_delta => $section) {
+						// ...load the validation rules from the definition...
 
-					$sectionConstraintRules = $rb->getSectionConstraintRules($section['name']);
-					if (!empty($sectionConstraintRules['blockLimits']['blocks'])) {
+						//test that this is a valid section in the region definition
+						if (isset($regionDefinition->sections[$section_delta])) {
 
-						$sectionBlocksRules = !empty($sectionConstraintRules['blocksRequired']) ? $sectionConstraintRules['blocksRequired']['blocks'] : [];
-
-                        // only applying min and max rules if there are blocks
-						if (!empty($section['blocks'])) {
-							$sectionBlocksRules = array_merge($sectionConstraintRules['blockLimits']['blocks'], $sectionBlocksRules);
+							$ruleKey = sprintf('blocks.%s.%d.name', $region, $section_delta);
+							$rules[$ruleKey] = [
+								'in:' . $regionDefinition->sections[$section_delta]['name']
+							];
+							$this->validationMessages[$ruleKey . '.in'] = "Expecting section '{$regionDefinition->sections[$section_delta]['name']}'. '{$section['name']}' found.";
 						}
+
+
+						// this section is not defined therefore do not apply any validation rules
+						if (isset($regionDefinition->sections[$section_delta])) {
+
+							$sectionConstraintRules = $rb->getSectionConstraintRules($section['name']);
+							if (!empty($sectionConstraintRules['blockLimits']['blocks'])) {
+
+								$sectionBlocksRules = !empty($sectionConstraintRules['blocksRequired']) ? $sectionConstraintRules['blocksRequired']['blocks'] : [];
+
+		                        // only applying min and max rules if there are blocks
+								if (!empty($section['blocks'])) {
+									$sectionBlocksRules = array_merge($sectionConstraintRules['blockLimits']['blocks'], $sectionBlocksRules);
+								}
+								
+								$ruleKey = sprintf('blocks.%s.%d.blocks', $region, $section_delta);
+								$rules[$ruleKey] = $sectionBlocksRules;
+
+								$foundBlocksCount = count($section['blocks']);
+
+								$this->validationMessages[$ruleKey . '.size'] = "Expecting :size block(s) in '{$regionDefinition->sections[$section_delta]['name']}' section. $foundBlocksCount found.";
+								$this->validationMessages[$ruleKey . '.min'] = "Expecting at least :min block(s) in '{$regionDefinition->sections[$section_delta]['name']}' section. $foundBlocksCount found.";
+								$this->validationMessages[$ruleKey . '.max'] = "Expecting no more than :max block(s) in '{$regionDefinition->sections[$section_delta]['name']}' section. $foundBlocksCount found.";
+							}
 						
-						$rules[sprintf('blocks.%s.%d.blocks', $region, $section_delta)] = $sectionBlocksRules;
+
+							foreach ($section['blocks'] as $block_delta => $block) {
+								// ...merge any region constraint validation rules...
+								$allowedBlocksRules = $sectionConstraintRules['allowedBlocks'];
+
+								foreach ($allowedBlocksRules as $field => $ruleset) {
+									$ruleKey = sprintf('blocks.%s.%d.blocks.%d.%s', $region, $section_delta, $block_delta, $field);
+									$rules[$ruleKey] = $ruleset;
+
+									$this->validationMessages[$ruleKey . '.in'] = "Expecting block to be one of ':values' in '{$regionDefinition->sections[$section_delta]['name']}'. '{$block['definition_name']}' found.";
+								}					
+							}
+
+						}
 					}
 					
-
-					foreach ($section['blocks'] as $block_delta => $block) {
-						// ...merge any region constraint validation rules...
-						$allowedBlocksRules = $sectionConstraintRules['allowedBlocks'];
-
-						foreach ($allowedBlocksRules as $field => $ruleset) {
-							$key = sprintf('blocks.%s.%d.blocks.%d.%s', $region, $section_delta, $block_delta, $field);
-							$rules[$key] = $ruleset;
-						}					
-					}
 				}
+				else {
+					// no region_defination exists therefore the region cannot be valid
+					// set a rule that expects $region to be null to force a validaiton fail
+					$ruleKey = 'blocks.' . $region;
+					$rules[$ruleKey] = [
+						'same:null'
+					];
+					$this->validationMessages[$ruleKey . '.same'] = "Expecting a valid region. '$region' found.";
+				}
+				
 			}
 		}
 
