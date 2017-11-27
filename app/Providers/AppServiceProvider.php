@@ -32,7 +32,9 @@ class AppServiceProvider extends ServiceProvider
 		 */
 		Validator::extend('inVersioned', function($attr, $value, $parameters){
 			$id = $value . '-v' . $parameters[0];
-			return in_array($id, explode(',',$parameters[1]));
+			array_shift($parameters);
+			$options = join(',',$parameters);
+			return in_array($id, explode(',',$options));
 		});
 
 		Validator::extend('slug_unchanged_or_unique', function($attr, $value, $parameters, $validator) {

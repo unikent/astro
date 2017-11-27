@@ -3,7 +3,7 @@
 	<template v-if="sections">
 		<region-section
 			v-for="(sectionData, index) in sections"
-			:region="name"
+			:region="regionID"
 			:section="index"
 			:key="`section-${sectionData.name}`"
 			:index="index"
@@ -29,7 +29,7 @@ export default {
 			type: String,
 			required: true
 		},
-		version: { 	// The version of this region's definition (not currently used?)
+		version: { 	// The version of this region's definition
 			type: String,
 			required: false
 		}
@@ -40,8 +40,11 @@ export default {
 	},
 
 	computed: {
+		regionID() {
+			return this.name + '-v' + this.version;
+		},
 		sections() {
-			return this.$store.getters.getRegionSections(this.name);
+			return this.$store.getters.getRegionSections(this.name + '-v' + this.version);
 		}
 	},
 };
