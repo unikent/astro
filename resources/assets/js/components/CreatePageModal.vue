@@ -63,8 +63,12 @@ export default {
 					name: 'school-homepage'
 				},
 				{
-					label: 'School about us',
+					label: 'School about us page',
 					name: 'school-about'
+				},
+				{
+					label: 'School research page',
+					name: 'school-research'
 				}
 			],
 			createForm: {
