@@ -62,6 +62,10 @@ export default {
 				{
 					label: 'School about us',
 					name: 'school-about-v1'
+				},
+				{
+					label: 'School staff profile',
+					name: 'school-staff-profile-v1'
 				}
 			],
 			createForm: {
