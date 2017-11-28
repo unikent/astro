@@ -99,7 +99,7 @@ class AppServiceProvider extends ServiceProvider
 			$version = (isset($parameters[1]) && isset($data[$parameters[1]])) ? $data[$parameters[1]] : null;
 
 			$class = $parameters[0];
-			return $class::locateDefinition(BaseDefinition::idFromNameAndVersion($name,$version)) ? true : false;
+			return $class::locateDefinition($class::idFromNameAndVersion($name,$version)) ? true : false;
 		});
 
 		/**

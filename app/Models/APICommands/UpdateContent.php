@@ -109,7 +109,12 @@ class UpdateContent implements APICommand
 	{
 		$rules = [];
 		// ...load the Block definition...
-		$file = BlockDefinition::locateDefinition($block['definition_name'] . '-v' . $block['definition_version']);
+		$file = BlockDefinition::locateDefinition(
+			BlockDefinition::idFromNameAndVersion(
+				$block['definition_name'],
+				$block['definition_version']
+			)
+		);
 		$blockDefinition = BlockDefinition::fromDefinitionFile($file);
 
 		// ...load the validation rules from the definition...
