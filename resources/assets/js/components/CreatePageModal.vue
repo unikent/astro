@@ -54,6 +54,14 @@ export default {
 				{
 					label: 'Content page',
 					name: 'content-v1'
+				},
+				{
+					label: 'School homepage',
+					name: 'school-homepage-v1'
+				},
+				{
+					label: 'School about us',
+					name: 'school-about-v1'
 				}
 			],
 			createForm: {

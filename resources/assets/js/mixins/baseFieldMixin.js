@@ -14,7 +14,7 @@ export default {
 		]),
 		...mapState({
 			currentBlockIndex: state => state.contenteditor.currentBlockIndex,
-			currentRegionName: state => state.contenteditor.currentRegionName
+			currentRegionName: state => state.contenteditor.currentRegionName,
 		}),
 
 		value: {
