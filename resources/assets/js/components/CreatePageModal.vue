@@ -69,6 +69,10 @@ export default {
 				{
 					label: 'Contact us page',
 					name: 'contact-us'
+				},
+				{
+					label: 'Content page (with header image)',
+					name: 'content-page--image-header'
 				}
 			],
 			createForm: {
