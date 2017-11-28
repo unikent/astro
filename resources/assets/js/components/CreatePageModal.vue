@@ -65,6 +65,10 @@ export default {
 				{
 					label: 'School about us',
 					name: 'school-about'
+				},
+				{
+					label: 'School facilities page',
+					name: 'school-facilities'
 				}
 			],
 			createForm: {
