@@ -65,7 +65,9 @@ export default {
 
 	computed: {
 		...mapState({
-			mediaPicker: state => state.media.mediaPicker
+			mediaPicker: state => state.media.mediaPicker,
+			currentBlockIndex: state => state.contenteditor.currentBlockIndex,
+			currentRegionName: state => state.contenteditor.currentRegionName
 		}),
 
 		visible: {
@@ -87,7 +89,8 @@ export default {
 		},
 
 		...mapGetters([
-			'canUser'
+			'canUser',
+			'currentSectionIndex'
 		])
 	},
 
@@ -116,7 +119,10 @@ export default {
 		setFieldMedia(media) {
 			this.updateFieldValue({
 				name: this.fieldPath,
-				value: { ...media, type: 'image' }
+				value: { ...media, type: 'image' },
+				index: this.currentBlockIndex,
+				region: this.currentRegionName,
+				section: this.currentSectionIndex
 			});
 
 			this.updateBlockMedia({
