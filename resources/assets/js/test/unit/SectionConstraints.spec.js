@@ -17,6 +17,7 @@ describe('Region section Constraints', () => {
 			const constraint = allowedOperations();
 
 			expect(constraint).to.deep.equal({
+				allowedBlocks: null,
 				canAddBlocks: true,
 				canRemoveBlocks: true,
 				canSwapBlocks: false

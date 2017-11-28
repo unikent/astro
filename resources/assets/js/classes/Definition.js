@@ -35,23 +35,22 @@ export default class Definition {
 
 	/**
 	 * Add a region definition indexed by name
-	 * @param {string} name
 	 * @param {Object} regionDefinition - The Region definition to add.
 	 */
 	static addRegionDefinition(regionDefinition) {
-		Definition.regionDefinitions[regionDefinition.name] = regionDefinition;
+		Definition.regionDefinitions[Definition.getType(regionDefinition)] = regionDefinition;
 	}
 
 	/**
 	 * Get a section definition by region name and index.
-	 * @param {string} regionName - The name of the region containing the section.
+	 * @param {string} regionID - The name and version (type) of the region containing the section.
 	 * @param {number} sectionIndex - The index of the section in the region.
 	 * @returns {null|Object} - Section definition if found, otherwise null.
 	 */
-	static getRegionSectionDefinition(regionName, sectionIndex) {
-		if(Definition.regionDefinitions[regionName] !== void 0){
-			if(sectionIndex < Definition.regionDefinitions[regionName].sections.length){
-				return Definition.regionDefinitions[regionName].sections[sectionIndex];
+	static getRegionSectionDefinition(regionID, sectionIndex) {
+		if(Definition.regionDefinitions[regionID] !== void 0){
+			if(sectionIndex < Definition.regionDefinitions[regionID].sections.length){
+				return Definition.regionDefinitions[regionID].sections[sectionIndex];
 			}
 		}
 		return null;

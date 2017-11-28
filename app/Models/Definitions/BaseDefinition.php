@@ -25,6 +25,36 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
 
     protected static $defDir = '';
 
+	/**
+	 * Extract the name and version number from a definition identifier
+
+	 * @param string $id - Definition identifier in the form {name}-v{version}
+
+	 * @return array|null [ 'name' => {name}, 'version' => {version} ] or null if no match.
+	 */
+    public static function idToNameAndVersion($id)
+	{
+		if(preg_match('/^(.+)-v([0-9]+)$/', $id, $matches)){
+			return [
+				'name' => $matches[1],
+				'version' => $matches[2]
+			];
+		}
+		return null;
+	}
+
+	/**
+	 * Get a version identifier string based on its name and version.
+
+	 * @param string $name - The definition name.
+	 * @param integer $version - The definition version.
+
+	 * @return string {name}-v{version}
+	 */
+	public static function idFromNameAndVersion($name, $version)
+	{
+		return $name . '-v' . $version;
+	}
 
     /**
      * Dynamically retrieve attributes on the model.
@@ -321,34 +351,30 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
      * Locates a Definition file on disk; when no version is specified
      * it will return the latest.
      *
-     * @param  string $name
-     * @param  int $version
+	 * @param  string $definition_id - The {name}-v{version} string identifying the definition.
      * @return string|null
      */
-    public static function locateDefinition($name, $version = null){
-        if(is_null($version)){
-            $path = sprintf('%s/%s/%s/*', Config::get('app.definitions_path'), static::$defDir, $name);
-            $glob = glob($path, GLOB_ONLYDIR);
-            $path = array_pop($glob);
-        } else {
-            $path = sprintf('%s/%s/%s/v%d', Config::get('app.definitions_path'), static::$defDir, $name, $version);
-        }
-
-        $path .= '/definition.json';
-        return file_exists($path) ? $path : null;
+    public static function locateDefinition($definition_id){
+    	$parts = static::idToNameAndVersion($definition_id);
+    	if($parts) {
+			$path = sprintf('%s/%s/%s/v%d', Config::get('app.definitions_path'), static::$defDir, $parts['name'], $parts['version']);
+			$path .= '/definition.json';
+			return file_exists($path) ? $path : null;
+		}
+		return null;
     }
 
 
     /**
      * Locates a Definition file on disk; throws an exception if no Definition is found.
      *
-     * @param  string $name
+     * @param  string $definition_id - The {name}-v{version} string identifying the definition.
      * @param  int $version
      * @throws App\Exceptions\DefinitionNotFoundException
      * @return string
      */
-    public static function locateDefinitionOrFail($name, $version = null){
-        $path = static::locateDefinition($name, $version);
+    public static function locateDefinitionOrFail($definition_id){
+        $path = static::locateDefinition($definition_id);
         if(is_null($path)) throw new DefinitionNotFoundException;
 
         return $path;

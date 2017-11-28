@@ -21,7 +21,7 @@ class BlockBrokerTest extends TestCase
 
 		Config::set('app.definitions_path', base_path('tests/Support/Fixtures/definitions'));
 
-        $file = BlockDefinition::locateDefinition('test-block');
+        $file = BlockDefinition::locateDefinition('test-block-v1');
         $this->block = BlockDefinition::fromDefinitionFile($file);
 	}
 

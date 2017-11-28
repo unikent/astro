@@ -94,11 +94,11 @@ class Page extends BaumNode
 			->get()
 			->groupBy('region_name');
 		$this->load('blocks.media');
-		foreach ($blocksByRegion as $region => $blocks) {
+		foreach ($blocksByRegion as $region_id => $blocks) {
 			// need the region definition to get sections in the correct order
-			$regionDef = Region::fromDefinitionFile(Region::locateDefinition($region));
+			$regionDef = Region::fromDefinitionFile(Region::locateDefinition($region_id));
 			$sections = $blocks->groupBy('section_name');
-			$data[$region] = [];
+			$data[$region_id] = [];
 			foreach($regionDef->sections as $section_def){
 				$section = ['name' => $section_def['name'], 'blocks' => []];
 				if(!empty($sections[$section_def['name']])){
@@ -115,7 +115,7 @@ class Page extends BaumNode
 						];
 					}
 				}
-				$data[$region][] = $section;
+				$data[$region_id][] = $section;
 			}
 		}
 		return $data;
@@ -436,7 +436,7 @@ class Page extends BaumNode
 	 */
 	public function createDefaultBlocks($layout_name, $layout_version)
 	{
-		$layout_definition = Layout::fromDefinitionFile(Layout::locateDefinition($layout_name,$layout_version));
+		$layout_definition = Layout::fromDefinitionFile(Layout::locateDefinition(Layout::idFromNameAndVersion($layout_name, $layout_version)));
 		if($layout_definition){
 			$data = $layout_definition->getDefaultPageContent();
 			$this->saveBlocks($this->id, $data);

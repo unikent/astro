@@ -180,7 +180,6 @@ export default {
 		...mapMutations([
 			'reorderBlocks',
 			'deleteBlock',
-			'updateBlockMeta',
 			'setScale',
 			'showBlockPicker',
 			'updateInsertIndex',

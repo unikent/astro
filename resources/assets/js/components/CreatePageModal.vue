@@ -16,9 +16,6 @@
 					:value="item.name">
 			</el-option>
 		</el-select>
-		<el-form-item label="Layout Version">
-			<el-input name="layout_version" v-model="createForm.layout_version" auto-complete="off"></el-input>
-		</el-form-item>
 		<el-form-item label="slug">
 			<el-input
 				name="slug"
@@ -48,29 +45,28 @@ export default {
 			layouts: [
 				{
 					label: 'Kent homepage',
-					name: 'kent-homepage'
+					name: 'kent-homepage-v1'
 				},
 				{
 					label: 'Site homepage',
-					name: 'site-homepage'
+					name: 'site-homepage-v1'
 				},
 				{
 					label: 'Content page',
-					name: 'content'
+					name: 'content-v1'
 				},
 				{
 					label: 'School homepage',
-					name: 'school-homepage'
+					name: 'school-homepage-v1'
 				},
 				{
 					label: 'School about us',
-					name: 'school-about'
+					name: 'school-about-v1'
 				}
 			],
 			createForm: {
 				title: 'New page',
-				layout_name: 'site-homepage',
-				layout_version: 1,
+				layout_name: 'site-homepage-v1',
 				route: {
 					slug: '',
 					parent_id: 1
@@ -128,7 +124,7 @@ export default {
 		},
 
 		setUserEditingSlug() {
-			if (this.userEditingSlug ==  false) {
+			if (this.userEditingSlug ===  false) {
 				this.userEditingSlug = true;
 				this.createForm.route.slug = this.suggestedSlug;
 			}
@@ -137,8 +133,7 @@ export default {
 		resetForm() {
 			this.createForm = {
 				title: 'New page',
-				layout_name: 'site-homepage',
-				layout_version: 1,
+				layout_name: 'site-homepage-v1',
 				route: {
 					slug: '',
 					parent_id: 1
@@ -146,21 +141,6 @@ export default {
 				blocks: {},
 				options: {}
 			}
-		},
-
-		saveEdit() {
-			// TODO: when endpoint is ready, update this
-			// this.updatePage({
-			// 	title: this.currentPage.title,
-			// 	id: this.currentPage.id,
-			// 	page_id: this.currentPage.page_id,
-			// 	layout_name: this.layout_name,
-			// 	layout_version: this.layout_version,
-			// 	route: {
-			// 		slug: this.currentPage.slug,
-			// 		parent_id: this.currentPage.parent_id
-			// 	}
-			// });
 		},
 
 		getLayout(layoutName) {

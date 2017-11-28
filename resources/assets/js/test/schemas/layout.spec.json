@@ -5,7 +5,13 @@
 		"name": { "type": "string" },
 		"label": { "type": "string" },
 		"version": { "type": "integer", "default": 1 },
-		"regions": { "type": "array", "items": { "type": "string" } }
+		"regions": { "type": "array", "items": { "$ref": "#/definitions/regionName" } }
 	},
-	"required": ["name", "label", "version", "regions"]
+	"required": ["name", "label", "version", "regions"],
+	"definitions": {
+		"regionName": {
+			"type": "string",
+			"pattern": "^[a-z]+(?:-+[a-z]+)*-v\\d+$"
+		}
+	}
 }

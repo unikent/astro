@@ -100,7 +100,8 @@ class UpdateContentTest extends APICommandTestCase
     {
         $update_content = new UpdateContent();
         $update_content->validateBlock([
-                    "definition_name" => "non-existent-test-block"
+                    "definition_name" => "non-existent-test-block",
+					"definition_version" => 1
                 ]);
     }
 
@@ -127,9 +128,10 @@ class UpdateContentTest extends APICommandTestCase
     {
         $valid_data = $this->input(null);
 
-        $valid_data['blocks']['test-region'][0]['blocks'] = [
+        $valid_data['blocks']['test-region-v1'][0]['blocks'] = [
                 [
-                    "definition_name" => "another-test-block"
+                    "definition_name" => "another-test-block-v1",
+					"definition_version" => 1
                 ]
             ];          
         $validator = $this->validator($valid_data);
@@ -180,10 +182,10 @@ class UpdateContentTest extends APICommandTestCase
     {
         $valid_data = $this->input(null);
 
-        $valid_data['blocks']['test-region-with-required-section'] = $valid_data['blocks']['test-region'];
-        unset($valid_data['blocks']['test-region']);
+        $valid_data['blocks']['test-region-with-required-section-v1'] = $valid_data['blocks']['test-region-v1'];
+        unset($valid_data['blocks']['test-region-v1']);
 
-        $valid_data['blocks']['test-region-with-required-section'][0]['blocks'] = [];
+        $valid_data['blocks']['test-region-with-required-section-v1'][0]['blocks'] = [];
 
         $validator = $this->validator($valid_data);
         $this->assertFalse($validator->passes());
@@ -197,7 +199,7 @@ class UpdateContentTest extends APICommandTestCase
     {
         $valid_data = $this->input(null);
 
-        $valid_data['blocks']['test-region'][0]['blocks'] = [];
+        $valid_data['blocks']['test-region-v1'][0]['blocks'] = [];
 
         $validator = $this->validator($valid_data);
         $this->assertTrue($validator->passes());
@@ -211,8 +213,8 @@ class UpdateContentTest extends APICommandTestCase
     {
         $valid_data = $this->input(null);
 
-        unset($valid_data['blocks']['test-region'][0]['blocks'][1]);
-        unset($valid_data['blocks']['test-region'][0]['blocks'][2]);
+        unset($valid_data['blocks']['test-region-v1'][0]['blocks'][1]);
+        unset($valid_data['blocks']['test-region-v1'][0]['blocks'][2]);
 
         $validator = $this->validator($valid_data);
         $this->assertFalse($validator->passes());
@@ -228,12 +230,12 @@ class UpdateContentTest extends APICommandTestCase
 
         // our sample page data input has 3 blocks in it, so we'll add 5 more 
         // so that it goes over the max amount of permitted blocks in our definition
-        $invalid_data['blocks']['test-region'][0]['blocks'][] = $invalid_data['blocks']['test-region'][0]['blocks'][1];
-        $invalid_data['blocks']['test-region'][0]['blocks'][] = $invalid_data['blocks']['test-region'][0]['blocks'][1];
-        $invalid_data['blocks']['test-region'][0]['blocks'][] = $invalid_data['blocks']['test-region'][0]['blocks'][1];
-        $invalid_data['blocks']['test-region'][0]['blocks'][] = $invalid_data['blocks']['test-region'][0]['blocks'][1];
-        $invalid_data['blocks']['test-region'][0]['blocks'][] = $invalid_data['blocks']['test-region'][0]['blocks'][1];
-        $invalid_data['blocks']['test-region'][0]['blocks'][] = $invalid_data['blocks']['test-region'][0]['blocks'][1];
+        $invalid_data['blocks']['test-region-v1'][0]['blocks'][] = $invalid_data['blocks']['test-region-v1'][0]['blocks'][1];
+        $invalid_data['blocks']['test-region-v1'][0]['blocks'][] = $invalid_data['blocks']['test-region-v1'][0]['blocks'][1];
+        $invalid_data['blocks']['test-region-v1'][0]['blocks'][] = $invalid_data['blocks']['test-region-v1'][0]['blocks'][1];
+        $invalid_data['blocks']['test-region-v1'][0]['blocks'][] = $invalid_data['blocks']['test-region-v1'][0]['blocks'][1];
+        $invalid_data['blocks']['test-region-v1'][0]['blocks'][] = $invalid_data['blocks']['test-region-v1'][0]['blocks'][1];
+        $invalid_data['blocks']['test-region-v1'][0]['blocks'][] = $invalid_data['blocks']['test-region-v1'][0]['blocks'][1];
 
 
         $validator = $this->validator($invalid_data);
@@ -269,7 +271,7 @@ class UpdateContentTest extends APICommandTestCase
         $invalid_data = $this->input(null);
         
         // test-region definition only allows one section
-        $invalid_data['blocks']['test-region'][] = $invalid_data['blocks']['test-region'][0];
+        $invalid_data['blocks']['test-region-v1'][] = $invalid_data['blocks']['test-region-v1'][0];
 
         $validator = $this->validator($invalid_data);
         $this->assertFalse($validator->passes());
@@ -284,7 +286,7 @@ class UpdateContentTest extends APICommandTestCase
         $invalid_data = $this->input(null);
         
         // test-region definition only allows one section
-        unset($invalid_data['blocks']['test-region'][0]);
+        unset($invalid_data['blocks']['test-region-v1'][0]);
 
         $validator = $this->validator($invalid_data);
         $this->assertFalse($validator->passes());
@@ -299,12 +301,12 @@ class UpdateContentTest extends APICommandTestCase
         $invalid_data = $this->input(null);
 
         // change the region definition being used to one with multiple sections
-        $invalid_data['blocks']['test-region-with-multiple-sections'] = $invalid_data['blocks']['test-region'];
-        unset($invalid_data['blocks']['test-region']);
+        $invalid_data['blocks']['test-region-with-multiple-sections-v1'] = $invalid_data['blocks']['test-region-v1'];
+        unset($invalid_data['blocks']['test-region-v1']);
 
         // add a second (permitted) section but in the wrong order
-        $invalid_data['blocks']['test-region-with-multiple-sections'][] = $invalid_data['blocks']['test-region-with-multiple-sections'][0];
-        $invalid_data['blocks']['test-region-with-multiple-sections'][0]['name'] = 'test-section2';
+        $invalid_data['blocks']['test-region-with-multiple-sections-v1'][] = $invalid_data['blocks']['test-region-with-multiple-sections-v1'][0];
+        $invalid_data['blocks']['test-region-with-multiple-sections-v1'][0]['name'] = 'test-section2';
 
 
         $validator = $this->validator($invalid_data);
@@ -319,7 +321,7 @@ class UpdateContentTest extends APICommandTestCase
     {
         $invalid_data = $this->input(null);
 
-        $invalid_data['blocks']['test-region'][0]['name'] = 'unknown-section';
+        $invalid_data['blocks']['test-region-v1'][0]['name'] = 'unknown-section';
 
         $validator = $this->validator($invalid_data);
         $this->assertFalse($validator->passes());

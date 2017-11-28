@@ -55,7 +55,7 @@ class BlockControllerTest extends ApiControllerTestCase {
      * @group authentication
      */
     public function definition_WhenUnauthenticated_Returns403(){
-        $response = $this->action('GET', BlockController::class . '@definition', 'test-block');
+        $response = $this->action('GET', BlockController::class . '@definition', 'test-block-v1');
         $response->assertStatus(401);
     }
 
@@ -77,7 +77,7 @@ class BlockControllerTest extends ApiControllerTestCase {
         Gate::shouldReceive('authorize')->with('read', Definition::class)->once();
 
         $this->authenticated();
-        $this->action('GET', BlockController::class . '@definition', 'test-block');
+        $this->action('GET', BlockController::class . '@definition', 'test-block-v1');
     }
 
     /**
@@ -87,7 +87,7 @@ class BlockControllerTest extends ApiControllerTestCase {
     public function definition_WhenAuthenticatedAndUnauthorized_Returns403(){
         $this->authenticatedAndUnauthorized();
 
-        $response = $this->action('GET', BlockController::class . '@definition', 'test-block');
+        $response = $this->action('GET', BlockController::class . '@definition', 'test-block-v1');
         $response->assertStatus(403);
     }
 
@@ -97,7 +97,7 @@ class BlockControllerTest extends ApiControllerTestCase {
     public function definition_WhenAuthorized_Returns200(){
         $this->authenticatedAndAuthorized();
 
-        $response = $this->action('GET', BlockController::class . '@definition', 'test-block');
+        $response = $this->action('GET', BlockController::class . '@definition', 'test-block-v1');
         $response->assertStatus(200);
     }
 
@@ -107,7 +107,7 @@ class BlockControllerTest extends ApiControllerTestCase {
     public function definition_WhenAuthorized_ReturnsJson(){
         $this->authenticatedAndAuthorized();
 
-        $response = $this->action('GET', BlockController::class . '@definition', 'test-block');
+        $response = $this->action('GET', BlockController::class . '@definition', 'test-block-v1');
 
         $json = $response->json();
         $this->assertArrayHasKey('data', $json);
