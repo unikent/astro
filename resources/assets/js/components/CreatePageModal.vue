@@ -65,6 +65,10 @@ export default {
 				{
 					label: 'School about us',
 					name: 'school-about'
+				},
+				{
+					label: 'Contact us page',
+					name: 'contact-us'
 				}
 			],
 			createForm: {
