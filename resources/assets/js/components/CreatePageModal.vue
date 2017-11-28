@@ -62,6 +62,10 @@ export default {
 				{
 					label: 'School about us',
 					name: 'school-about-v1'
+				},
+				{
+					label: 'School listing page',
+					name: 'school-listing-v1'
 				}
 			],
 			createForm: {
