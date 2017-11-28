@@ -18,11 +18,15 @@ export default {
 		SnackBar
 	},
 
+	created: function() {
+		// initialise the layouts in one place...
+		this.$store.dispatch('site/fetchLayouts');
+	},
+
 	computed: {
 		...mapState([
 			'wrapperStyles'
 		]),
-
 		isEditor() {
 			return ['preview', '404'].indexOf(this.$route.name) === -1;
 		}
