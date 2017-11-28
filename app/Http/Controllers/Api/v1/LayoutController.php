@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Api\v1;
 
+use App\Models\Definitions\Layout;
 use Auth;
 use Config;
 use Illuminate\Http\Request;
@@ -21,13 +22,27 @@ class LayoutController extends ApiController
 		$this->authorize('index', Definition::class);
 
 		$path = sprintf('%s/%s/', Config::get('app.definitions_path'), Definition::$defDir);
-		$layouts = glob($path . '*', GLOB_ONLYDIR);
-
+		$layouts = glob($path . '*/v*/definition.json');
+		$path_length = strlen($path);
 		foreach($layouts as &$layout){
-			$layout = str_replace($path, '', $layout);
+			$layout = preg_replace('/\/(v[0-9]+)\/definition\.json$/', '-$1', substr($layout, $path_length));
 		}
-
+		$layouts = $this->getLayoutDefinitions($layouts);
 		return response()->json([ 'data' => $layouts ]);
+	}
+
+	/**
+	 *
+	 * @param $layout_ids
+	 * @return array
+	 */
+	public function getLayoutDefinitions($layout_ids)
+	{
+		$layouts = [];
+		foreach($layout_ids as $layout_id) {
+			$layouts[$layout_id] = Layout::fromDefinitionFile(Layout::locateDefinition($layout_id));
+		}
+		return $layouts;
 	}
 
 	/**
