@@ -18,11 +18,6 @@ export default {
 		SnackBar
 	},
 
-	created: function() {
-		// initialise the layouts in one place...
-		this.$store.dispatch('site/fetchLayouts');
-	},
-
 	computed: {
 		...mapState([
 			'wrapperStyles'
