@@ -220,8 +220,8 @@ const actions = {
 				parent_id: page.route.parent_id,
 				slug: page.route.slug,
 				layout: {
-					name: page.layout_name,
-					version: page.layout_version,
+					name: page.layout_name.replace(/-v[0-9]+$/, ''),
+					version: page.layout_name.replace(/^.+?-v([0-9]+)$/, '$1'),
 				},
 				title: page.title
 			})

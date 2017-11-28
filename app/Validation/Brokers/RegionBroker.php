@@ -41,7 +41,7 @@ class RegionBroker extends DefinitionBroker
 				if (isset($section_definition['allowedBlocks'])) {
 					$rules['allowedBlocks'] = [
 						'definition_name' => [
-							'in:' . implode(',', $section_definition['allowedBlocks']),
+							'inVersioned:{version},' . implode(',', $section_definition['allowedBlocks']),
 						]
 					];
 				}

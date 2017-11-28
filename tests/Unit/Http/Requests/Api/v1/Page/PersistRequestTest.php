@@ -977,7 +977,7 @@ class PersistRequestTest extends RequestTestCase
 
         $rules = $validator->getRules();
         $this->assertArrayHasKey('blocks.test-region.0.definition_name', $rules);
-        $this->assertEquals('in:test-block', $rules['blocks.test-region.0.definition_name'][0]);
+        $this->assertEquals('in:test-block-v1', $rules['blocks.test-region.0.definition_name'][0]);
     }
 
 

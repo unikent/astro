@@ -17,14 +17,14 @@ class RegionBrokerTest extends TestCase
 	 */
 	public function getSectionConstraintRules_CreatesRuleValidatingAllowedBlocks()
 	{
-        $file = RegionDefinition::locateDefinition('test-region');
+        $file = RegionDefinition::locateDefinition('test-region-v1');
         $region = RegionDefinition::fromDefinitionFile($file);
 		$rv = new RegionBroker($region);
 
 		$rules = $rv->getSectionConstraintRules("test-section");
 
 		$this->assertArrayHasKey('definition_name', $rules['allowedBlocks']);
-		$this->assertEquals('in:test-block', $rules['allowedBlocks']['definition_name'][0]);
+		$this->assertEquals('inVersioned:{version},test-block-v1', $rules['allowedBlocks']['definition_name'][0]);
 	}
 
 	/**
@@ -32,7 +32,7 @@ class RegionBrokerTest extends TestCase
 	 */
 	public function getSectionConstraintRules_CreatesRuleValidatingBlockLimits()
 	{
-        $file = RegionDefinition::locateDefinition('test-region');
+        $file = RegionDefinition::locateDefinition('test-region-v1');
         $region = RegionDefinition::fromDefinitionFile($file);
 		$rv = new RegionBroker($region);
 
@@ -48,7 +48,7 @@ class RegionBrokerTest extends TestCase
 	 */
 	public function getSectionConstraintRules_CreatesRuleValidatingBlockRequired()
 	{
-        $file = RegionDefinition::locateDefinition('test-region-with-required-section');
+        $file = RegionDefinition::locateDefinition('test-region-with-required-section-v1');
         $region = RegionDefinition::fromDefinitionFile($file);
 		$rv = new RegionBroker($region);
 

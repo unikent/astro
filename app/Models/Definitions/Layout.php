@@ -24,9 +24,8 @@ class Layout extends BaseDefinition
 	 * @return void
 	 */
 	public function loadRegionDefinitions(){
-		foreach($this->regions as $name){
-			$path = Region::locateDefinition($name);
-
+		foreach($this->regions as $region_id){
+			$path = Region::locateDefinition($region_id);
 			if(!is_null($path)){
 				$region = Region::fromDefinitionFile($path);
 				$this->regionDefinitions->push($region);
@@ -42,7 +41,7 @@ class Layout extends BaseDefinition
 	{
 		$regions = [];
 		foreach($this->getRegionDefinitions() as $region_definition) {
-			$regions[$region_definition->name] = $region_definition->getDefaultBlocks();
+			$regions[Region::idFromNameAndVersion($region_definition->name, $region_definition->version)] = $region_definition->getDefaultBlocks();
 		}
 		return $regions;
 	}

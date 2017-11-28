@@ -20,7 +20,7 @@ class RegionTest extends TestCase
 	 * @test
 	 */
 	public function locateDefinition_WhenDefinitionIsFound_ReturnsPath(){
-		$path = Region::locateDefinition('test-region');
+		$path = Region::locateDefinition('test-region-v1');
 		$this->assertEquals(base_path('tests/Support/Fixtures/definitions/regions/test-region/v1/definition.json'), $path);
 	}
 
@@ -35,7 +35,7 @@ class RegionTest extends TestCase
 	 * @test
 	 */
 	public function locateDefinitionOrFail_WhenDefinitionIsFound_ReturnsPath(){
-		$path = Region::locateDefinitionOrFail('test-region');
+		$path = Region::locateDefinitionOrFail('test-region-v1');
 		$this->assertEquals(base_path('tests/Support/Fixtures/definitions/regions/test-region/v1/definition.json'), $path);
 	}
 
@@ -52,7 +52,7 @@ class RegionTest extends TestCase
 	 * @test
 	 */
 	public function getBlockDefinitions_ReturnsCollection(){
-		$path = Region::locateDefinition('test-region');
+		$path = Region::locateDefinition('test-region-v1');
 		$region = Region::fromDefinitionFile($path);
 
 		$this->assertInstanceOf(Collection::class, $region->getBlockDefinitions());
@@ -64,7 +64,7 @@ class RegionTest extends TestCase
 	 * Note: the 'test-region' fixture only supports 'test-block'
 	 */
 	public function getBlockDefinitions_WhenBlockDefinitionsAreNotLoaded_LoadsSupportedBlockDefinitionsIntoCollection(){
-		$path = Region::locateDefinition('test-region');
+		$path = Region::locateDefinition('test-region-v1');
 		$region = Region::fromDefinitionFile($path);
 
 		$collection = $region->getBlockDefinitions();
@@ -78,7 +78,7 @@ class RegionTest extends TestCase
 	 * Note: the 'test-region' fixture only supports 'test-block'
 	 */
 	public function getBlockDefinitions_WhenBlockDefinitionsAreLoaded_DoesNotReloadBlockDefinitions(){
-		$path = Region::locateDefinition('test-region');
+		$path = Region::locateDefinition('test-region-v1');
 
 		$region = Region::fromDefinitionFile($path);
 		$region->getBlockDefinitions(); 				// This should populate the Collection
