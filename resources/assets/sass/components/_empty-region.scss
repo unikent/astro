@@ -1,12 +1,21 @@
 .empty-region {
-	height: 100vh;
+	height: 250px;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	background-color: #eef1f6;
+	background-color: #50bfff;
+	padding: 1rem;
 
 	.el-button {
 		flex: 0 1 auto;
+	}
+
+	.el-alert__title {
+		font-size: 15px;
+	}
+
+	.el-alert__description {
+		font-size: 14px;
 	}
 }
