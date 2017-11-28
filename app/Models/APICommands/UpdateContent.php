@@ -192,9 +192,11 @@ class UpdateContent implements APICommand
 						// ...merge any region constraint validation rules...
 						$allowedBlocksRules = $sectionConstraintRules['allowedBlocks'];
 
-						foreach ($allowedBlocksRules as $field => $ruleset) {
-							$key = sprintf('blocks.%s.%d.blocks.%d.%s', $region_id, $section_delta, $block_delta, $field);
-							$rules[$key] = ('definition_name' == $field ? str_replace('{version}', $block['definition_version'], $ruleset) : $ruleset);
+						foreach ($allowedBlocksRules as $attribute => $ruleset) {
+							$key = sprintf('blocks.%s.%d.blocks.%d.%s', $region_id, $section_delta, $block_delta, $attribute);
+							// if the rule is the inVersioned one comparing {definition_name}-v{definition_version}
+							// with the list of allowedBlocks, then inject this block's version number into the rule.
+							$rules[$key] = ('definition_name' == $attribute ? str_replace('{version}', $block['definition_version'], $ruleset) : $ruleset);
 						}					
 					}
 				}
