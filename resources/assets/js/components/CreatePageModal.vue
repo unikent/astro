@@ -7,13 +7,16 @@
 		<el-form-item label="Layout">
 			<el-select
 				name="layout"
+				class="w100"
+				placeholder="Select"
 				v-model="createForm.layout"
 			>
 				<el-option
-						v-for="(item, key) in layouts"
+						v-for="(layout, key) in layouts"
+						:label="layout.label + ' (v' + layout.version + ')'"
+						:value="layout"
 						:key="key"
-						:label="item.label"
-						:value="key">
+				>
 				</el-option>
 			</el-select>
 		</el-form-item>

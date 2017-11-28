@@ -9,19 +9,20 @@ Permission checking - we're checking on two admin only permissions which are not
 1. site.create
 2. site.delete
 This shouldn't matter, since admin is a 'let them do anything' switch,  but if we need to add them we should make the names consistent. 
- */
+*/
 <template>
-<el-card>
-	<div slot="header" class="manage-table__header">
-		<span class="main-header">Manage sites</span>
-		<el-button v-if="canUser('site.create')" type="default" @click="dialogFormVisible = true" class="manage-table__add-button">
-			Add Site
-		</el-button>
-	</div>
+	<el-card>
+		<div slot="header" class="manage-table__header">
+			<span class="main-header">Manage sites</span>
+			<el-button v-if="canUser('site.create')" type="default" @click="dialogFormVisible = true"
+					   class="manage-table__add-button">
+				Add Site
+			</el-button>
+		</div>
 
-	<div class="el-table w100 el-table--fit el-table--striped el-table--border el-table--enable-row-hover">
-		<table cellspacing="0" cellpadding="0" border="0" class="w100">
-			<thead>
+		<div class="el-table w100 el-table--fit el-table--striped el-table--border el-table--enable-row-hover">
+			<table cellspacing="0" cellpadding="0" border="0" class="w100">
+				<thead>
 				<tr>
 					<th>
 						<div class="cell">
@@ -42,12 +43,12 @@ This shouldn't matter, since admin is a 'let them do anything' switch,  but if w
 					</th>
 
 				</tr>
-			</thead>
-			<tbody v-loading.body="loading">
+				</thead>
+				<tbody v-loading.body="loading">
 				<tr
-				v-for="site in sitesWithRoles"
-				:key="site.id"
-				class="el-table__row"
+						v-for="site in sitesWithRoles"
+						:key="site.id"
+						class="el-table__row"
 				>
 					<td>
 						<div class="cell">
@@ -63,271 +64,270 @@ This shouldn't matter, since admin is a 'let them do anything' switch,  but if w
 
 					<td>
 						<div class="cell">
-							<router-link :to="`/site/${site.id}/menu`" v-if="canUserOnSite('site.options.edit', site.currentRole)">
+							<router-link :to="`/site/${site.id}/menu`"
+										 v-if="canUserOnSite('site.options.edit', site.currentRole)">
 								<el-button type="default" size="small">
 									Menu
 								</el-button>
 							</router-link>
-							<router-link :to="`/site/${site.id}/users`" v-if="canUserOnSite('permissions.site.assign', site.currentRole)">
+							<router-link :to="`/site/${site.id}/users`"
+										 v-if="canUserOnSite('permissions.site.assign', site.currentRole)">
 								<el-button type="default" size="small">
 									Manage users
 								</el-button>
 							</router-link>
-							<el-button @click="askRemove(site.id)" type="default" size="small" v-if="canUserOnSite('site.delete', site.currentRole)">
-								<icon name="delete" width="14" height="14" />
+							<el-button @click="askRemove(site.id)" type="default" size="small"
+									   v-if="canUserOnSite('site.delete', site.currentRole)">
+								<icon name="delete" width="14" height="14"/>
 							</el-button>
 						</div>
 					</td>
 
 
 				</tr>
-			</tbody>
-		</table>
+				</tbody>
+			</table>
 
-		<el-dialog title="Add Site" v-model="dialogFormVisible">
-			<el-form :model="form" label-position="top">
-				<el-row type="flex" :gutter="20">
+			<el-dialog title="Add Site" v-model="dialogFormVisible">
+				<el-form :model="form" label-position="top">
+					<el-row type="flex" :gutter="20">
 
-					<el-col :span="11">
+						<el-col :span="11">
 
-						<el-form-item label="Name">
-							<el-input v-model="form.name" auto-complete="off"></el-input>
-						</el-form-item>
-					</el-col>
+							<el-form-item label="Name">
+								<el-input v-model="form.name" auto-complete="off"></el-input>
+							</el-form-item>
+						</el-col>
 
-					<el-col :span="11" :offset="2">
-						<el-form-item label="Home page layout">
-							<el-select v-model="form.homepage_layout" class="w100" placeholder="Select">
-								<el-option v-for="layout in layouts" :label="layout.name" :value="layout" :key="layout.name" />
-							</el-select>
-						</el-form-item>
-					</el-col>
+						<el-col :span="11" :offset="2">
+							<el-form-item label="Home page layout">
+								<el-select v-model="form.homepage_layout" class="w100" placeholder="Select">
+									<el-option v-for="(layout, key) in layouts"
+											   :label="layout.label + ' (v' + layout.version + ')'"
+											   :value="layout"
+											   :key="key"
+									>
+									</el-option>
+								</el-select>
+							</el-form-item>
+						</el-col>
 
-				</el-row>
+					</el-row>
 
-				<el-row type="flex" :gutter="20">
+					<el-row type="flex" :gutter="20">
 
-					<el-col :span="11">
+						<el-col :span="11">
 
-						<el-form-item label="Host">
-							<el-input v-model="form.host" auto-complete="off" placeholder="www.kent.ac.uk"></el-input>
-						</el-form-item>
+							<el-form-item label="Host">
+								<el-input v-model="form.host" auto-complete="off"
+										  placeholder="www.kent.ac.uk"></el-input>
+							</el-form-item>
 
-					</el-col>
+						</el-col>
 
-					<el-col :span="11" :offset="2">
+						<el-col :span="11" :offset="2">
 
-						<el-form-item label="Path">
-							<el-input v-model="form.path" auto-complete="off" placeholder=""></el-input>
-						</el-form-item>
-					</el-col>
+							<el-form-item label="Path">
+								<el-input v-model="form.path" auto-complete="off" placeholder=""></el-input>
+							</el-form-item>
+						</el-col>
 
-				</el-row>
+					</el-row>
 
-				<div class="el-alert el-alert--error" v-if="form.errorMsgs">
-					<i class="el-alert__icon el-icon-circle-cross is-big"></i>
-					<div class="el-alert__content">
-						<span class="el-alert__title is-bold">{{form.errorMsgs}}</span>
-						<ul v-for="error in form.errorsDetails" :key="error.id">
-							<li class="el-alert__description">{{error}}</li>
-						</ul>
+					<div class="el-alert el-alert--error" v-if="form.errorMsgs">
+						<i class="el-alert__icon el-icon-circle-cross is-big"></i>
+						<div class="el-alert__content">
+							<span class="el-alert__title is-bold">{{form.errorMsgs}}</span>
+							<ul v-for="error in form.errorsDetails" :key="error.id">
+								<li class="el-alert__description">{{error}}</li>
+							</ul>
+						</div>
 					</div>
-				</div>
 
-			</el-form>
-			<span slot="footer" class="dialog-footer">
+				</el-form>
+				<span slot="footer" class="dialog-footer">
 				<el-button @click="cancelForm">Cancel</el-button>
 				<el-button type="primary" @click="addSite">Add Site</el-button>
 			</span>
-		</el-dialog>
-	</div>
-</el-card>
+			</el-dialog>
+		</div>
+	</el-card>
 </template>
 
 <script>
-import Icon from 'components/Icon';
-import { mapGetters } from 'vuex';
-import permissions  from 'store/modules/permissions'; // this is to use canUser directly and provide our own state for each site in the list
+	import Icon from 'components/Icon';
+	import {mapGetters, mapState} from 'vuex';
+	import permissions  from 'store/modules/permissions'; // this is to use canUser directly and provide our own state for each site in the list
 
-export default {
+	export default {
 
-	components: {
-		Icon
-	},
+		components: {
+			Icon
+		},
 
-	data() {
-		return {
-			sites: [],
-			layouts: [],
-			dialogFormVisible: false,
-			loading: true,
-
-			form: {
-				name: '',
-				path: '',
-				host: '',
-				homepage_layout: '',
-				errors: '',
-			}
-		};
-	},
-
-	created() {
-		this.fetchData();
-	},
-
-	computed: {
-
-		...mapGetters([
-			'canUser',
-			'getPermissions',
-			'getGlobalRole'
-		]),
-
-
-		sitesWithRoles: function() {
-			let sitesWithRoles = [];
-
-			for (var i = 0, len = this.sites.length; i < len; i++) {
-				// if the site has a role for the user then add the currentRole to the list of sites
-				let currentSite = this.sites[i];
-				currentSite['currentRole'] = ''; // set a default
-				if (currentSite.users) {
-					let result = currentSite.users.find((element) => element.username === window.astro.username);
-					if (result) {
-						currentSite['currentRole'] = result.role;
-					}
+		data() {
+			return {
+				sites: [],
+				dialogFormVisible: false,
+				loading: true,
+				form: {
+					name: '',
+					path: '',
+					host: '',
+					homepage_layout: '',
+					errors: '',
 				}
-
-			  sitesWithRoles.push(currentSite);
-			}
-			return sitesWithRoles;
-		}
-	},
-
-	methods: {
-
-		/**
-		 * a wrapper around canUser which provides a fake state to make it work in the context
-		 * of sites which are not loaded into the vuex state 
-		 * 
-		 * @param {string} permissionSlug - the slug of the permission ie. page.publish
-		 * @param {string} siteRole - the role the user has on the site ie. site.owner
-		 */
-		canUserOnSite(permissionSlug, siteRole) {
-			let siteState = {};
-			siteState.currentRole = siteRole;
-			siteState.permissions = this.getPermissions;
-			siteState.globalRole = this.getGlobalRole;
-	
-			return permissions.getters.canUser(siteState)(permissionSlug);
-		},
-
-		// TODO: delete site is not yet implemented!
-		askRemove(index) {
-			this.$confirm(
-				`Site ${index} will be permanently removed.\nAre you sure?`,
-				'Warning',
-				{
-					confirmButtonText: 'OK',
-					cancelButtonText: 'Cancel',
-					type: 'warning'
-				}
-			).then(() => {
-				this.$message({
-					type: 'success',
-					message: 'Delete completed'
-				});
-			}).catch(() => {});
-		},
-
-		cancelForm() {
-			this.dialogFormVisible = false;
-			// reset the form
-			this.resetForm();
-		},
-
-		resetForm() {
-			this.form = {
-				name: '',
-				host: '',
-				path: '',
-				errors: '',
-				homepage_layout: ''
 			};
-			this.loading = false;
 		},
 
-		addSite() {
-			this.loading = true;
-			this.dialogFormVisible = false;
-
-			// paths needs to be blank or a srting starting with a /
-			if (this.form.path.length != 0) {
-				if (this.form.path[0] != '/') {
-					this.form.path = '/' + this.form.path;
-				}
-			}
-			let site = {};
-
-			site = ({
-				name: this.form.name,
-				host: this.form.host,
-				path: this.form.path,
-				homepage_layout: {
-					name: this.form.homepage_layout.name,
-					version: this.form.homepage_layout.version
-				}
-			});
-
-			this.form.errors = [];
-			this.$api
-				.post('sites', site)
-				.then(() => {
-					// success, so let's refresh what data as have from the api
-					this.fetchData();
-
-					// reset the form
-					this.resetForm();
-
-				})
-				.catch((errors) => {
-					this.dialogFormVisible = true;
-					this.form.errorMsgs = errors.response.data.errors[0].message;
-					this.form.errorsDetails = errors.response.data.errors[0].details;
-					this.loading = false;
-				});
+		created() {
+			this.fetchData();
 		},
 
-		fetchData() {
-			const fetchSites = this.$api.get('sites?include=homepage.revision,users');
-			const fetchLayouts = this.$api.get('layouts/definitions');
+		computed: {
+			...mapState({
+				layouts: state => state.site.layouts
+			}),
+			...mapGetters([
+				'canUser',
+				'getPermissions',
+				'getGlobalRole'
+			]),
 
-			// make sure we get all the data back before continuing
-			this.$api
-				.all([fetchSites, fetchLayouts])
-				.then(this.$api.spread((sites, layouts) => {
+			allLayouts: function() {
+				return this.layouts;
+			},
 
-					this.sites = sites.data.data;
-					this.layouts = [];
-					layouts = layouts.data.data;
+			sitesWithRoles: function() {
+				let sitesWithRoles = [];
 
-					for(var i = layouts.length - 1; i >= 0; i--) {
-						// TODO: this should return an array of layout definitions
-						// so for now we are faking this and setting the version numbers to 1
-						let currentLayout = [];
-						currentLayout.name = layouts[i];
-						currentLayout.version = '1';
-						this.layouts.push(currentLayout);
+				for (var i = 0, len = this.sites.length; i < len; i++) {
+					// if the site has a role for the user then add the currentRole to the list of sites
+					let currentSite = this.sites[i];
+					currentSite['currentRole'] = ''; // set a default
+					if (currentSite.users) {
+						let result = currentSite.users.find((element) => element.username === window.astro.username);
+						if (result) {
+							currentSite['currentRole'] = result.role;
+						}
 					}
+					sitesWithRoles.push(currentSite);
+				}
+				return sitesWithRoles;
+			}
+		},
 
-					// now we have all the data unhide the list
-					this.loading = false;
-				}))
-				.catch((errors) => {
-					// TODO: what do we do when the API is unavaliable
+		methods: {
+
+			/**
+			 * a wrapper around canUser which provides a fake state to make it work in the context
+			 * of sites which are not loaded into the vuex state
+			 *
+			 * @param {string} permissionSlug - the slug of the permission ie. page.publish
+			 * @param {string} siteRole - the role the user has on the site ie. site.owner
+			 */
+			canUserOnSite(permissionSlug, siteRole) {
+				let siteState = {};
+				siteState.currentRole = siteRole;
+				siteState.permissions = this.getPermissions;
+				siteState.globalRole = this.getGlobalRole;
+
+				return permissions.getters.canUser(siteState)(permissionSlug);
+			},
+
+			// TODO: delete site is not yet implemented!
+			askRemove(index) {
+				this.$confirm(
+					`Site ${index} will be permanently removed.\nAre you sure?`,
+					'Warning',
+					{
+						confirmButtonText: 'OK',
+						cancelButtonText: 'Cancel',
+						type: 'warning'
+					}
+				).then(() => {
+					this.$message({
+						type: 'success',
+						message: 'Delete completed'
+					});
+				}).catch(() => {
 				});
+			},
+
+			cancelForm() {
+				this.dialogFormVisible = false;
+				// reset the form
+				this.resetForm();
+			},
+
+			resetForm() {
+				this.form = {
+					name: '',
+					host: '',
+					path: '',
+					errors: '',
+					homepage_layout: ''
+				};
+				this.loading = false;
+			},
+
+			addSite() {
+				this.loading = true;
+				this.dialogFormVisible = false;
+
+				// paths needs to be blank or a srting starting with a /
+				if (this.form.path.length != 0) {
+					if (this.form.path[0] != '/') {
+						this.form.path = '/' + this.form.path;
+					}
+				}
+				let site = {};
+
+				site = ({
+					name: this.form.name,
+					host: this.form.host,
+					path: this.form.path,
+					homepage_layout: {
+						name: this.form.homepage_layout.name,
+						version: this.form.homepage_layout.version
+					}
+				});
+
+				this.form.errors = [];
+				this.$api
+					.post('sites', site)
+					.then(() => {
+						// success, so let's refresh what data as have from the api
+						this.fetchData();
+
+						// reset the form
+						this.resetForm();
+
+					})
+					.catch((errors) => {
+						this.dialogFormVisible = true;
+						this.form.errorMsgs = errors.response.data.errors[0].message;
+						this.form.errorsDetails = errors.response.data.errors[0].details;
+						this.loading = false;
+					});
+			},
+
+			fetchData() {
+				const fetchSites = this.$api.get('sites?include=homepage.revision,users');
+
+				// make sure we get all the data back before continuing
+				this.$api
+					.all([fetchSites])
+					.then(this.$api.spread((sites) => {
+
+						this.sites = sites.data.data;
+						// now we have all the data unhide the list
+						this.loading = false;
+					}))
+					.catch((errors) => {
+						// TODO: what do we do when the API is unavaliable
+					});
+			}
 		}
-	}
-};
+	};
 </script>

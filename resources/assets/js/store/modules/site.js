@@ -224,8 +224,8 @@ const actions = {
 				parent_id: page.route.parent_id,
 				slug: page.route.slug,
 				layout: {
-					name: page.layout.replace(/-v[0-9]+$/, ''),
-					version: page.layout.replace(/^.+?-v([0-9]+)$/, '$1'),
+					name: page.layout.name,
+					version: page.layout.version,
 				},
 				title: page.title
 			})
