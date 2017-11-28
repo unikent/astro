@@ -198,6 +198,10 @@ const actions = {
 			});
 	},
 
+	/**
+	 * Initialise the list of layouts available for use.
+	 * @param commit
+	 */
 	fetchLayouts({ commit }) {
 		api
 			.get('layouts/definitions')
@@ -220,8 +224,8 @@ const actions = {
 				parent_id: page.route.parent_id,
 				slug: page.route.slug,
 				layout: {
-					name: page.layout_name.replace(/-v[0-9]+$/, ''),
-					version: page.layout_name.replace(/^.+?-v([0-9]+)$/, '$1'),
+					name: page.layout.replace(/-v[0-9]+$/, ''),
+					version: page.layout.replace(/^.+?-v([0-9]+)$/, '$1'),
 				},
 				title: page.title
 			})
