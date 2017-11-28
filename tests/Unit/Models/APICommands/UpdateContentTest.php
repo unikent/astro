@@ -110,7 +110,13 @@ class UpdateContentTest extends APICommandTestCase
      */
     public function validation_ifRegionHasNoDefinition_fails()
     {
-        $this->markTestIncomplete();
+        $invalid_data = $this->input(null);
+
+        $invalid_data['blocks']['invalid-region'] = $invalid_data['blocks']['test-region'];
+        unset($invalid_data['blocks']['test-region']);
+
+        $validator = $this->validator($invalid_data);
+        $this->assertFalse($validator->passes());
     }
 
     /**

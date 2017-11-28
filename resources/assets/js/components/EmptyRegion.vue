@@ -1,6 +1,6 @@
 <template>
 <div v-else class="empty-region">
-	<h3>There are no sections in this region. Why?</h3>
+	<h3>There are no sections in this region.</h3>
 </div>
 </template>
 

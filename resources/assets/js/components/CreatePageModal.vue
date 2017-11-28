@@ -59,6 +59,14 @@ export default {
 					name: 'content'
 				},
 				{
+					label: 'School homepage',
+					name: 'school-homepage'
+				},
+				{
+					label: 'School about us page',
+					name: 'school-about'
+				},
+				{
 					label: 'School research page',
 					name: 'school-research'
 				}
