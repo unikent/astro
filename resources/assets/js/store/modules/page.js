@@ -23,24 +23,20 @@ const state = {
 	currentLayout: null,
 	currentLayoutVersion: 1,
 	currentBlockIndex: null,
-	currentRegion: 'main',
+	currentRegion: null,
 	blockMeta: {
-		blocks: {
-			main: []
-		}
+		blocks: {}
 	},
 	pageData: {
-		blocks: {
-			main: []
-		}
+		blocks: {}
 	},
 	scale: .4,
 	loaded: false,
 	dragging: false,
 	currentSavedState: '',
 	invalidBlocks: [],
-	defaultRegion: 'main',
-	defaultSection: 'catch-all'
+	defaultRegion: null,
+	defaultSection: null
 };
 
 const mutations = {
@@ -55,9 +51,7 @@ const mutations = {
 			page = {};
 		}
 		if(!page.blocks) {
-			page.blocks = {
-				main: []
-			};
+			page.blocks = {};
 		}
 
 		if(page.layout) {
@@ -320,7 +314,7 @@ const actions = {
 			.then(response => {
 				if (notify) {
 					// there are validation errors
-					if (response.data.data.valid===0) {
+					if (response.data.data.valid === 0) {
 						// create the message markup
 
 						const message = vue.$createElement(
@@ -357,7 +351,7 @@ const actions = {
 						});
 					}
 					// we're all good
-					else if (response.data.data.valid===1) {
+					else if (response.data.data.valid === 1) {
 						vue.$notify({
 							title: 'Saved',
 							message: 'You saved this page successfully.',
@@ -371,13 +365,61 @@ const actions = {
 			/**
 			unsuccessful save, such as a network problem
 			*/
-			.catch(() => {
-				vue.$notify({
-					title: 'Not saved',
-					message: 'There was a problem and this page has not been saved. Please try again later.',
-					type: 'error',
-					duration: 0
-				});
+			.catch((errorResponse) => {
+				if (_.has(errorResponse, 'response.data.errors')) {
+
+					// there seems to be a possibility to return multiple groups of error messages,
+					// so we will cater for that
+					let technicalMessages = []
+
+					// for each error message group...
+					errorResponse.response.data.errors.forEach(error => {
+						let messageLines = [];
+
+						// add title for each group
+						messageLines.push(vue.$createElement('strong', error.message));
+
+						// add detailed error messages
+						let errorsDetails = [];
+						for (var key in error.details) {
+							if (error.details.hasOwnProperty(key)) {
+								errorsDetails.push(vue.$createElement('li', error.details[key]));
+							}
+						}
+
+						let errorDetailsWrapper = vue.$createElement('ul', errorsDetails);
+						messageLines.push(errorDetailsWrapper);
+
+						// create element for each group
+						let technicalMessage = vue.$createElement('div', messageLines);
+						technicalMessages.push(technicalMessage);
+					});
+
+
+					technicalMessages = vue.$createElement('div', technicalMessages);
+					let message = vue.$createElement('div', [
+						vue.$createElement('p', 'Some errors were found on this page. Please contact us with the following details:'), 
+						technicalMessages, 
+						vue.$createElement('p', 'ID of page being edited is: ' + id)
+					]);
+
+					vue.$notify({
+						title: 'Not saved',
+						message: message,
+						type: 'error',
+						duration: 0,
+						width: '50%'
+					});
+				}
+				else{
+					// TODO: what message should we give here?
+					vue.$notify({
+						title: 'Not saved',
+						message: 'There was a problem and this page has not been saved. Please try again later.',
+						type: 'error',
+						duration: 0
+					});
+				}
 			});
 	},
 

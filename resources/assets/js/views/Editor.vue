@@ -83,6 +83,11 @@ export default {
 		};
 	},
 
+	destroyed() {
+		// we have left the page editor so remove the snapeshot of the latest saved content
+		this.$store.commit('resetCurrentSavedState');
+	},
+
 	methods: {
 
 		showLoader() {
@@ -92,13 +97,9 @@ export default {
 				customClass: 'loading-overlay'
 			});
 		},
-
-		updateCurrentSavedState() {
-			this.$store.commit('updateCurrentSavedState');
-		}
 	},
 	computed: {
-
+		
 		...mapState([
 			'displayIframeOverlay',
 			'currentView'
@@ -129,7 +130,8 @@ export default {
 
 	watch: {
 		pageLoaded(hideLoader) {
-			this.updateCurrentSavedState();
+			// update/set the current snapshot of the saved page content
+			this.$store.commit('updateCurrentSavedState');
 			if(hideLoader) {
 				if(this.loader) {
 					this.loader.close();

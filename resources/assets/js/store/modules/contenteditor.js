@@ -13,11 +13,11 @@ const state = {
 	/**
 	 * @type {string} The name of the region containing the currently selected block.
 	 */
-	currentRegionName: 'main',
+	currentRegionName: null,
 	/**
 	 * @type {string} The name of the section containing the currently selected block.
 	 */
-	currentSectionName: 'catch-all',
+	currentSectionName: null,
 	/**
 	 * @type {number} The index of the currently selected block in its section.
 	 */
@@ -110,8 +110,8 @@ const getters = {
 		return prop ? blockMeta[prop] : blockMeta;
 	},
 
-	getInvalidBlocks: (state) => () => {
-		return state.invalidBlocks;
+	getInvalidBlocks: (state, getters, rootState) => () => {
+		return rootState.page.invalidBlocks;
 	},
 
 	getCurrentRegion: (state) => () => {

@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Validator;
 
 class UpdateContent implements APICommand
 {
+	private $validationMessages = [];
 
 	/**
 	 * Carry out the command, based on the provided $input.
@@ -133,7 +134,7 @@ class UpdateContent implements APICommand
 	 */
 	public function messages(Collection $data, Authenticatable $user)
 	{
-		return [];
+		return $this->validationMessages;
 	}
 
 	/**
@@ -207,7 +208,6 @@ class UpdateContent implements APICommand
 							}
 						}
 					}
-
 				}
 				else {
 					// no region_defination exists therefore the region cannot be valid
@@ -218,10 +218,8 @@ class UpdateContent implements APICommand
 					];
 					$this->validationMessages[$ruleKey . '.same'] = "Expecting a valid region. '$region_id' found.";
 				}
-
 			}
 		}
-
 		return $rules;
 	}
 }
