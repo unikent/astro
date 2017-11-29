@@ -161,7 +161,7 @@ export default {
 			opening the preview window */
 			this.handleSavePage()
 				.then(() => {
-					win.open(this.draftLink,'_blank');
+					win.open(this.draftLink, '_blank');
 				});
 		},
 

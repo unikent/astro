@@ -5,7 +5,6 @@
 		action="media"
 		name="upload"
 		:on-error="handleError"
-		:on-progress="handleProgress"
 		:on-success="onSuccess"
 		:http-request="upload"
 		:multiple="multiple"
@@ -37,7 +36,9 @@ export default {
 			type: Function,
 			default: () => {}
 		},
+		/* eslint-disable camelcase */
 		site_id: Number
+		/* eslint-enable camelcase */
 	},
 
 	components: {
@@ -51,16 +52,12 @@ export default {
 	},
 
 	methods: {
-		handleError(err, file, fileList) {
+		handleError(err, file) {
 			if(err.response && err.response.status === 422) {
 				file.error = err.response.data.errors[0].message;
 			}
 
 			this.failedUploads.push(file);
-		},
-
-		handleProgress(e, file, fileList) {
-			console.log(e, file.uid, fileList);
 		},
 
 		upload(options) {

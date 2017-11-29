@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import Config from 'classes/Config';
 
 describe('Config class', () => {
+	/* eslint-disable camelcase */
 	const sampleOptions = {
 		csrf_token: 'CSRF_TOKEN',
 		base_url  : '',
@@ -11,6 +12,7 @@ describe('Config class', () => {
 		api_token : 'API_TOKEN',
 		debug     : false
 	};
+	/* eslint-enable camelcase */
 
 	afterEach(() => {
 		// reset config for other tests
@@ -79,8 +81,8 @@ describe('Config class', () => {
 			Config.set('test1', 'test_value_1');
 			expect(Config.get('test1', 'test_value_1')).to.equal('test_value_1');
 
-			Config.set('test2', { hello : 'world'});
-			expect(Config.get('test2', { hello : 'world'})).to.eql({ hello : 'world'});
+			Config.set('test2', { hello : 'world' });
+			expect(Config.get('test2', { hello : 'world' })).to.eql({ hello : 'world' });
 
 			Config.set('test3', ['test', 'array', {}]);
 			expect(Config.get('test3', ['test', 'array', {}])).to.eql(['test', 'array', {}]);
@@ -91,7 +93,7 @@ describe('Config class', () => {
 
 		it('Should return the value set', () => {
 			expect(Config.set('test1', 'test_value_1')).to.equal(Config.get('test1'));
-			expect(Config.set('test2', { hello : 'world'})).to.eql(Config.get('test2'));
+			expect(Config.set('test2', { hello : 'world' })).to.eql(Config.get('test2'));
 			expect(Config.set('test3', ['test', 'array', {}])).to.eql(Config.get('test3'));
 			expect(Config.set('test4', false)).to.equal(Config.get('test4'));
 		});

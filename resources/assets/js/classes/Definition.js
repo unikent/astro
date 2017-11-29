@@ -43,14 +43,14 @@ export default class Definition {
 
 	/**
 	 * Get a section definition by region name and index.
-	 * @param {string} regionID - The name and version (type) of the region containing the section.
+	 * @param {string} regionId - The name and version (type) of the region containing the section.
 	 * @param {number} sectionIndex - The index of the section in the region.
 	 * @returns {null|Object} - Section definition if found, otherwise null.
 	 */
-	static getRegionSectionDefinition(regionID, sectionIndex) {
-		if(Definition.regionDefinitions[regionID] !== void 0){
-			if(sectionIndex < Definition.regionDefinitions[regionID].sections.length){
-				return Definition.regionDefinitions[regionID].sections[sectionIndex];
+	static getRegionSectionDefinition(regionId, sectionIndex) {
+		if(Definition.regionDefinitions[regionId] !== void 0) {
+			if(sectionIndex < Definition.regionDefinitions[regionId].sections.length) {
+				return Definition.regionDefinitions[regionId].sections[sectionIndex];
 			}
 		}
 		return null;

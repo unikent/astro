@@ -37,7 +37,7 @@ const getters = {
 	 * @param rootState
 	 * @returns {*}
 	 */
-	currentDefinition(state,getters,rootState){
+	currentDefinition(state, getters, rootState) {
 		const block = getters.currentBlock;
 		if(block) {
 			const type = block.definition_name + '-v' + block.definition_version;
@@ -52,7 +52,7 @@ const getters = {
 	 * @param getters
 	 * @returns {Object|null}
 	 */
-	currentBlock(state,getters){
+	currentBlock(state, getters) {
 		return getters.currentSection ? getters.currentSection.blocks[state.currentBlockIndex] : null;
 	},
 
@@ -61,7 +61,7 @@ const getters = {
 	 * @param state
 	 * @returns {Array|null}
 	 */
-	currentRegion(state,getters,rootState){
+	currentRegion(state, getters, rootState) {
 		return rootState.page.pageData.blocks[state.currentRegionName];
 	},
 
@@ -71,7 +71,7 @@ const getters = {
 	 * @param getters
 	 * @returns {Object|null}
 	 */
-	currentSection(state,getters){
+	currentSection(state, getters) {
 		return getters.currentRegion ? getters.currentRegion[getters.currentSectionIndex] : null;
 	},
 
@@ -80,13 +80,13 @@ const getters = {
 	 * @param state
 	 * @returns {number} The index of the current named section, or -1.
 	 */
-	currentSectionIndex(state,getters){
+	currentSectionIndex(state, getters) {
 		const region = getters.currentRegion;
 		const name = state.currentSectionName;
 		return region ? region.findIndex(el => el.name === name) : -1;
 	},
 
-	blocks(state, getters){
+	blocks(state, getters) {
 		return getters.currentSection ? getters.currentSection.blocks : [];
 	},
 
@@ -132,7 +132,7 @@ const mutations = {
 	 * @param {string} sectionName
 	 * @param {number} blockIndex
 	 */
-	setCurrentBlock( state, {regionName, sectionName, blockIndex} ) {
+	setCurrentBlock( state, { regionName, sectionName, blockIndex }) {
 		state.currentBlockIndex = blockIndex;
 		state.currentRegionName = regionName;
 		state.currentSectionName = sectionName;
@@ -155,19 +155,19 @@ const actions = {
 	 * @param commit
 	 * @param state
 	 * @param rootState
-	 * @param {Object} arg
+	 * @param {Object} payload
 	 *    @param {string} regionName
 	 *    @param {string} sectionName
 	 *    @param {string} blockIndex
 	 */
-	changeBlock({ commit, state, rootState}, arg ) {
+	changeBlock({ commit, state, rootState }, payload) {
 		// have we actually selected a different block?
-		if(state.currentBlockIndex !== arg.blockIndex || state.currentRegionName !== arg.regionName || state.currentSectionName !== arg.sectionName) {
-			commit('setCurrentBlock', arg);
+		if(state.currentBlockIndex !== payload.blockIndex || state.currentRegionName !== payload.regionName || state.currentSectionName !== payload.sectionName) {
+			commit('setCurrentBlock', payload);
 			commit('collapseSidebar');
 		}
 		// make sure we get to see the block menu if we're currently seeing the pages or other sidebar and a user clicks on any block
-		if(rootState.menu.active!=='blocks') {
+		if(rootState.menu.active !== 'blocks') {
 			commit('updateMenuActive', 'blocks');
 		}
 	},

@@ -227,8 +227,9 @@ import _ from 'lodash';
 import Icon from 'components/Icon';
 import CustomMultiSelect from 'components/CustomMultiSelect';
 import { notify } from 'classes/helpers';
-import { mapGetters, mapActions } from 'vuex';
+import { mapGetters } from 'vuex';
 import permissions  from 'store/modules/permissions'; // this is to use canUser directly and provide our own state for the site
+import Config from 'classes/Config';
 
 
 export default {
@@ -308,7 +309,7 @@ export default {
 			siteState.currentRole = this.currentRole;
 			siteState.permissions = this.getPermissions;
 			siteState.globalRole = this.getGlobalRole;
-	
+
 			return permissions.getters.canUser(siteState)('permissions.site.assign');
 		},
 
@@ -360,7 +361,7 @@ export default {
 
 	methods: {
 		fetchSiteData() {
-			const fetchUserList = this.$api.get(`users`);
+			const fetchUserList = this.$api.get('users');
 			const fetchSite = this.$api.get(`sites/${this.$route.params.site_id}?include=users`);
 			const fetchRoles = this.$api.get('roles');
 
@@ -372,10 +373,10 @@ export default {
 					this.userList = users.data.data || [];
 					this.roles = roles.data.data || [];
 
-					const currentRole = this.users.find((element) => element.username === window.astro.username);
+					const currentRole = this.users.find((element) => element.username === Config.get('username'));
 					if (currentRole) {
 						this.currentRole = currentRole.role;
-					} 
+					}
 
 					// show the alert if needed
 					if (!this.canUserManageUsers) {
@@ -408,8 +409,7 @@ export default {
 				if(!errors) {
 					const requests = this.usersToAdd.map(username => this.$api
 						.put(
-							`sites/${this.$route.params.site_id}/users`,
-							{
+							`sites/${this.$route.params.site_id}/users`, {
 								username,
 								role: this.selectedRole
 							}
@@ -423,7 +423,7 @@ export default {
 							let lastResponse = {}, erroredUsers = [];
 
 							for (let i = 0; i < response.length; i++) {
-								if(response[i].status == 200){
+								if(response[i].status === 200) {
 									lastResponse = response[i];
 								}
 								else{
@@ -455,7 +455,7 @@ export default {
 			});
 		},
 
-		removeUser(username, index) {
+		removeUser(username) {
 			this.$confirm(`Are you sure you want to remove "${username}" from this site?`, 'Warning', {
 				confirmButtonText: 'OK',
 				cancelButtonText: 'Cancel',
@@ -465,7 +465,7 @@ export default {
 				this.$api
 					.put(
 						`sites/${this.$route.params.site_id}/users`,
-						{username}
+						{ username }
 					)
 					.then(({ data: json }) => {
 						this.users = json.data.users || [];
@@ -493,7 +493,7 @@ export default {
 			this.currentPage = pageNumber;
 		},
 
-		resetFilters(){
+		resetFilters() {
 			this.usersToAdd = [];
 			this.selectedRole = '';
 			this.errors = {
@@ -505,8 +505,7 @@ export default {
 		changeUserRole(username, roleSlug) {
 			this.$api
 				.put(
-					`sites/${this.$route.params.site_id}/users`,
-					{
+					`sites/${this.$route.params.site_id}/users`, {
 						username,
 						role: roleSlug
 					}
@@ -522,7 +521,7 @@ export default {
 				})
 				.catch(() => {
 					notify({
-						title: `Unable to change user's role`,
+						title: "Unable to change user's role",
 						type: 'error'
 					});
 				});

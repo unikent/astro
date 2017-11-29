@@ -55,7 +55,9 @@ export default {
 				this.updateBlockMedia({
 					value: {
 						...value,
+						/* eslint-disable camelcase */
 						associated_field: this.path
+						/* eslint-enable camelcase */
 					}
 				});
 			}

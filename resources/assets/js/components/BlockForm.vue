@@ -18,7 +18,7 @@ export default {
 		valid() {
 			if(this.fields) {
 				for (var i = this.fields.length - 1; i >= 0; i--) {
-					if (this.fields[i].validateState == 'error') {
+					if (this.fields[i].validateState === 'error') {
 						return false;
 					}
 				}

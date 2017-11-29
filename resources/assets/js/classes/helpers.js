@@ -150,7 +150,7 @@ export const prettyDate = (date) => {
 
 	diff = Math.round(diff);
 
-	return `${i > 0 ? 'about ' : ''}${diff} ${unit[i]}${diff == 1 ? '' : 's'} ago`;
+	return `${i > 0 ? 'about ' : ''}${diff} ${unit[i]}${diff === 1 ? '' : 's'} ago`;
 };
 
 export const notify = ({ title, message, type }) => {
@@ -178,7 +178,7 @@ export const pageHasBeenPublished = (page) => {
  * @returns {string} Full URL (with any trailing slash removed)
  */
 export const getDraftPreviewURL = (url) => {
-	return `${Config.get('base_url', '')}` + '/draft/' + (url ? url.replace(/\/$/, '') : '');
+	return `${Config.get('base_url', '')}/draft/${url ? url.replace(/\/$/, '') : ''}`;
 };
 
 /**
@@ -189,5 +189,5 @@ export const getDraftPreviewURL = (url) => {
  * @returns {string} Full URL (with any trailing slash removed)
  */
 export const getPublishedPreviewURL = (url) => {
-	return `${Config.get('base_url', '')}` + '/published/' + (url ? url.replace(/\/$/, '') : '');
+	return `${Config.get('base_url', '')}/published/${url ? url.replace(/\/$/, '') : ''}`;
 };

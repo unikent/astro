@@ -39,7 +39,7 @@ export default {
 		BackBar,
 		Draggable
 	},
-	
+
 	data() {
 		return {
 

@@ -15,8 +15,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
-import Block from 'components/Block';
 import EmptyRegion from 'components/EmptyRegion';
 import RegionSection from 'components/Section';
 

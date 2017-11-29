@@ -53,17 +53,15 @@ import imagesLoaded from 'imagesloaded';
 
 import Icon from 'components/Icon';
 import ResizeShim from 'components/ResizeShim';
-
 import { win, findParent } from 'classes/helpers';
-
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
-
 import { layouts } from 'cms-prototype-blocks/layouts';
-
 import { allowedOperations } from 'classes/SectionConstraints';
 import { Definition } from 'classes/helpers';
-/* global document, window */
+
+/* global document, window, console */
+/* eslint-disable no-console */
 
 export default {
 	name: 'preview-wrapper',
@@ -105,8 +103,6 @@ export default {
 		}),
 
 		...mapGetters([
-			'scaleDown',
-			'scaleUp',
 			'getBlocks',
 			'blocks'
 		]),
@@ -210,8 +206,8 @@ export default {
 				.catch(() => {});
 		},
 
-		removeBlock(command) {
-			// remove block but before we do so remove any validation issues it owns 
+		removeBlock() {
+			// remove block but before we do so remove any validation issues it owns
 			const { index, region, section } = this.current;
 			const blockToBeDeleted = this.$store.getters.getBlock(region, section, index);
 			this.deleteBlockValidationIssue(blockToBeDeleted.id);

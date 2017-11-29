@@ -63,7 +63,7 @@ export default {
 	computed: {
 		...mapState({
 			currentIndex: state => state.page.currentBlockIndex,
-			//currentDefinition: state => state.definition.currentBlockDefinition
+			// currentDefinition: state => state.definition.currentBlockDefinition
 		}),
 
 		rules() {

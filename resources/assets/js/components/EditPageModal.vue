@@ -94,7 +94,7 @@
 			 */
 			saveEdit() {
 				this.updatePageMeta(this.editForm)
-					.then((response) => {
+					.then(() => {
 						this.hideEditPageModal();
 					})
 					.catch((error) => {

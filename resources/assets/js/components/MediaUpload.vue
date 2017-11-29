@@ -43,7 +43,9 @@ export default {
 			type: Function,
 			default: () => {}
 		},
+		/* eslint-disable camelcase */
 		site_id: Number
+		/* eslint-enable camelcase */
 	},
 
 	components: {

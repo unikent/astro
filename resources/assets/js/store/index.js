@@ -109,7 +109,7 @@ let store = new Vuex.Store({
 		 * @param {number} insertIndex - The index within the section to add any blocks to.
 		 * @param {Object} blocks - List of allowed block names.
 		 */
-		showBlockPicker(state, {regionName, sectionIndex, insertIndex, blocks} ) {
+		showBlockPicker(state, { regionName, sectionIndex, insertIndex, blocks }) {
 			state.blockPicker.insertRegion = regionName;
 			state.blockPicker.insertIndex = insertIndex;
 			state.blockPicker.insertSection = sectionIndex;

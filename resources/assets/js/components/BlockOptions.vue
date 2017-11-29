@@ -92,7 +92,7 @@
 <script>
 import { mapState, mapMutations, mapGetters } from 'vuex';
 import Vue from 'vue';
-import { Definition, getTopOffset, smoothScrollTo } from 'classes/helpers';
+import { Definition, getTopOffset } from 'classes/helpers';
 import BackBar from './BackBar';
 import fields from 'components/fields';
 import containers from 'components/fields/containers';
@@ -100,7 +100,8 @@ import { heights } from 'classes/sass';
 import Icon from './Icon';
 import BlockForm from './BlockForm';
 
-/* global document */
+/* global document, console */
+/* eslint-disable no-console */
 
 export default {
 
@@ -144,8 +145,8 @@ export default {
 
 		localErrors() {
 			return {};
-			return this.errors.blocks ?
-				this.errors.blocks[this.currentRegion][this.currentIndex].fields : {};
+			// return this.errors.blocks ?
+			// 	this.errors.blocks[this.currentRegion][this.currentIndex].fields : {};
 		},
 
 		// TODO: move validation outside of element
@@ -201,7 +202,7 @@ export default {
 
 		scrollTo(el) {
 			// Vue.nextTick(() => {
-			// 	smoothScrollTo()
+			// 	smoothScrollTo() // from helpers
 			// });
 			console.log(el);
 		},
@@ -209,7 +210,7 @@ export default {
 		submitForm(formName) {
 			this.$refs[formName].validate((valid) => {
 				if(!valid) {
-					this.$snackbar.open({ message: 'Validation errors'});
+					this.$snackbar.open({ message: 'Validation errors' });
 
 					Vue.nextTick(() => {
 						const firstError = document.querySelector('.block-options-list .is-error');
