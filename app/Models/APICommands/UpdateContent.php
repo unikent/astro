@@ -182,7 +182,7 @@ class UpdateContent implements APICommand
 							];
 							$this->validationMessages[$ruleKey . '.in'] = "Expecting section '{$regionDefinition->sections[$section_delta]['name']}'. '{$section['name']}' found.";
 						}
-						// this section is not defined therefore do not apply any validation rules
+						// if this section is not defined, do not apply any validation rules
 						if (isset($regionDefinition->sections[$section_delta])) {
 							$sectionConstraintRules = $rb->getSectionConstraintRules($section['name']);
 							if (!empty($sectionConstraintRules['blockLimits']['blocks'])) {
