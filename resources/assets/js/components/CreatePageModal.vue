@@ -48,8 +48,8 @@ export default {
 					name: 'kent-homepage-v1'
 				},
 				{
-					label: 'Site homepage',
-					name: 'site-homepage-v1'
+					label: 'Showcase homepage',
+					name: 'showcase-homepage-v1'
 				},
 				{
 					label: 'Content page',
