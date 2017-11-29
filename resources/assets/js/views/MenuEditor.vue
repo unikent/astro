@@ -129,7 +129,7 @@ import MenuItemField from 'components/menu-editor/MenuItemField';
 import SitePageLinks from 'components/menu-editor/SitePageLinks';
 import { win, notify, prettyDate } from 'classes/helpers';
 import Config from 'classes/Config';
-import { mapGetters, mapActions } from 'vuex';
+import { mapGetters } from 'vuex';
 import permissions  from 'store/modules/permissions'; // this is to use canUser directly and provide our own state for the site
 
 /* global setInterval, clearInterval */
@@ -250,7 +250,7 @@ export default {
 			siteState.currentRole = this.currentRole;
 			siteState.permissions = this.getPermissions;
 			siteState.globalRole = this.getGlobalRole;
-	
+
 			return permissions.getters.canUser(siteState)('site.options.edit');
 		},
 
@@ -280,10 +280,12 @@ export default {
 			this.$api
 				.get(`sites/${this.$route.params.site_id}?include=pages,role,users`)
 				.then(({ data: json }) => {
+					/* eslint-disable camelcase */
 					const publishedMenu = (
 						json.data.options['menu_published'] ||
 						{ links: null, last_published: null }
 					);
+					/* eslint-enable camelcase */
 
 					this.site = {
 						firstPageId: json.data.pages[0].id,
@@ -302,12 +304,12 @@ export default {
 					// store the current user's role for this site if they have one
 					let siteUsers = json.data.users;
 					if (siteUsers) {
-						const currentRole = siteUsers.find((element) => element.username === window.astro.username);
+						const currentRole = siteUsers.find((element) => element.username === Config.get('username'));
 						if (currentRole) {
 							this.currentRole = currentRole.role;
-						} 
+						}
 					}
-					
+
 					// show the alert if needed
 					if (!this.canUserEditMenu) {
 						this.showPermissionsError = true;
@@ -325,7 +327,7 @@ export default {
 			});
 		},
 
-		addMenuItem({ text, url } = { text: '', url: ''}) {
+		addMenuItem({ text, url } = { text: '', url: '' }) {
 			const length = this.menu.push({
 				text,
 				url: url && url !== '' ? this.site.path + url : ''
@@ -375,10 +377,12 @@ export default {
 			if(updateType === 'published') {
 				this.lastPublishedDate = new Date().toString();
 
+				/* eslint-disable camelcase */
 				data.options['menu_published'] = {
 					links: this.menu,
 					last_published: this.lastPublishedDate
 				};
+				/* eslint-enable camelcase */
 			}
 
 			return this.$api
@@ -400,8 +404,8 @@ export default {
 							hasErrors ? `
 								The menu saved, but there are some validation errors.
 								You won\'t be able to publish your menu until these are fixed.
-							`
-							: `Successfully ${verb} menu.`
+								` :
+								`Successfully ${verb} menu.`
 						),
 						type: hasErrors ? 'warning' : 'success'
 					});

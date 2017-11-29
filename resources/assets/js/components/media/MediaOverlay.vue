@@ -113,7 +113,7 @@ export default {
 
 		media: {
 			get() {
-				return { ...this.mediaItem, colours: this.colourPalette};
+				return { ...this.mediaItem, colours: this.colourPalette };
 			},
 			set() {}
 		}

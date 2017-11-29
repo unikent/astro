@@ -33,7 +33,7 @@
  * Modal which allows the user to select one or more blocks to add to a page section.
  */
 
-import { mapState, mapMutations ,mapGetters} from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 import Vue from 'vue';
 import { uuid } from 'classes/helpers';
 import PickerList from 'components/PickerList';
@@ -65,13 +65,14 @@ export default {
 		availableBlocks() {
 			let blocks = {};
 			if(this.allowedBlocks) {
-				for(let i in this.allowedBlocks){
-					let block_id = this.allowedBlocks[i];
-					if (this.allBlocks[block_id]) {
-						blocks[block_id] = this.allBlocks[block_id];
+				for(let i in this.allowedBlocks) {
+					let blockId = this.allowedBlocks[i];
+
+					if (this.allBlocks[blockId]) {
+						blocks[blockId] = this.allBlocks[blockId];
 					}
-					else if(this.allBlocks[block_id + '-v1']) {
-						blocks[block_id + '-v1'] = this.allBlocks[block_id + '-v1'];
+					else if(this.allBlocks[blockId + '-v1']) {
+						blocks[blockId + '-v1'] = this.allBlocks[blockId + '-v1'];
 					}
 				}
 			}
@@ -125,8 +126,10 @@ export default {
 		addThisBlockType({ name, version = 1, index }) {
 
 			const block = {
+				/* eslint-disable camelcase */
 				definition_name: name,
 				definition_version: version,
+				/* eslint-enable camelcase */
 				id: uuid(),
 				fields: {}
 			};

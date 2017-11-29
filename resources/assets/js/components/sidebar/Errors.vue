@@ -23,6 +23,8 @@
 import { mapMutations } from 'vuex';
 import BackBar from 'components/BackBar';
 
+/* global document, setTimeout */
+
 export default {
 	name: 'errors',
 
@@ -69,7 +71,7 @@ export default {
 
 			this.$store.dispatch('changeBlock', {
 				regionName: regionName,
-				sectionName: this.$store.getters.getSection(regionName,sectionIndex).name,
+				sectionName: this.$store.getters.getSection(regionName, sectionIndex).name,
 				blockIndex: blockIndex
 			});
 
@@ -77,18 +79,18 @@ export default {
 			// we need a tiny timeout to make sure the error fields have had time to populate
 			setTimeout(() => {
 				// find all the error fields...
-				var error_fields = document.getElementsByClassName('is-error');
+				var errorFields = document.getElementsByClassName('is-error');
 
 				// ...and get the block options list containing div
-				var options_list = document.getElementById('block-options-list');
+				var optionsList = document.getElementById('block-options-list');
 
 				// Now get the top/bottom of the first error
 				// we need to add on the top position of the scroll to make sure the next time we're not going to go back to the top of the div
-				var error_pos_top = error_fields[0].getBoundingClientRect().top + options_list.scrollTop;
-				var error_pos_bottom = error_fields[0].getBoundingClientRect().bottom + options_list.scrollTop;
+				var errorPosTop = errorFields[0].getBoundingClientRect().top + optionsList.scrollTop;
+				var errorPosBottom = errorFields[0].getBoundingClientRect().bottom + optionsList.scrollTop;
 
 				// and finally scroll to the position of the error, adding on a bit to make sure it's properly visible
-				options_list.scrollTop = error_pos_top - (error_pos_bottom - error_pos_top) - 50;
+				optionsList.scrollTop = errorPosTop - (errorPosBottom - errorPosTop) - 50;
 			}, 1);
 
 		},
@@ -96,7 +98,7 @@ export default {
 		// return the correct human-readable label for the specified block definition
 		label(name) {
 			for (var block in this.$store.state.definition.blockDefinitions) {
-				if (block == name) {
+				if (block === name) {
 					return this.$store.state.definition.blockDefinitions[block].label;
 				}
 			}

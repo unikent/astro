@@ -75,7 +75,9 @@ export default {
 
 		visible: {
 			get() {
+				/* eslint-disable camelcase */
 				this.createForm.route.parent_id = this.pageModal.parentId;
+				/* eslint-enable camelcase */
 				return this.pageModal.visible;
 			},
 			set(show) {
@@ -103,13 +105,16 @@ export default {
 
 		addChild() {
 			// if the user has not edited the slug then use the suggested slug
-			if (this.userEditingSlug ===  false) {
+			if(!this.userEditingSlug) {
 				this.createForm.route.slug = this.suggestedSlug;
 			}
-			this.createPage({...this.createForm, layout: {
-				name: this.layouts[this.createForm.layout].name,
-				version: this.layouts[this.createForm.layout].version
-			}});
+			this.createPage({
+				...this.createForm,
+				layout: {
+					name: this.layouts[this.createForm.layout].name,
+					version: this.layouts[this.createForm.layout].version
+				}
+			});
 			this.resetForm();
 			this.visible = false;
 		},
@@ -132,7 +137,7 @@ export default {
 				blocks: {},
 				options: {}
 			}
-		},
+		}
 	}
 };
 </script>

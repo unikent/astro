@@ -37,7 +37,7 @@ export default {
 					// user decided not to save so reset the tracking of currently staved state
 					this.$store.commit('resetCurrentSavedState');
 					intendedActions();
-				}).catch((error) => {
+				}).catch(() => {
 					// TODO: either user cancels or the actions within the then have thrown an exception
 				});
 			}

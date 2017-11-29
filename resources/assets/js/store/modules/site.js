@@ -221,7 +221,9 @@ const actions = {
 	createPage({ dispatch }, page) {
 		api
 			.post('pages', {
+				/* eslint-disable camelcase */
 				parent_id: page.route.parent_id,
+				/* eslint-enable camelcase */
 				slug: page.route.slug,
 				layout: {
 					name: page.layout.name,
@@ -233,7 +235,7 @@ const actions = {
 				page = response.data.data;
 				dispatch('fetchSite');
 			})
-			.catch((error) => {
+			.catch(() => {
 				vue.$notify({
 					title: 'Page not added',
 					message: 'Please ensure that there is not already a page with the same slug',
@@ -334,9 +336,11 @@ const actions = {
 				);
 
 			dispatch('movePageApi', {
+				/* eslint-disable camelcase */
 				page_id: page.id,
 				parent_id: newLocation.parent.id,
 				next_id: nextSiblingId
+				/* eslint-enable camelcase */
 			})
 			.catch(() => {
 				// restore the page list to previous state
@@ -467,9 +471,7 @@ const
 
 	updatePaths = (currentPage, path) => {
 		updatePageAndSubPages(
-			currentPage,
-			'path',
-			path,
+			currentPage, 'path', path,
 			({ page, value }) => value + '/' + page.slug
 		);
 	},
@@ -479,11 +481,11 @@ const
 	},
 
 	/**
-	 * Update a property of a page in the pages list and update it's children
-	 * based on a transform callback (or by default update all children to
-	 * the same value).
+	 * Update a property of a page in the pages list and do the same for all
+	 * its children, based on a transform callback (by default it just updates
+	 * all children's properties to the same value).
 	 *
-	 * @param      {object}    currentPage  The current page we're walking.
+	 * @param      {object}    currentPage  The current page we're updating.
 	 * @param      {string}    key          The key of the property to update.
 	 * @param      {*}         value        The value to update the property to.
 	 * @param      {Function}  transform    The callback to run for modifying our value after each iteration.

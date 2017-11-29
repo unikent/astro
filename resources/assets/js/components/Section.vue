@@ -22,7 +22,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
 import Block from 'components/Block';
 import EmptySection from 'components/EmptySection';
 
@@ -61,8 +60,8 @@ export default {
 		getBlockType(block) {
 			return (
 				Object.keys(block).length === 0 ?
-				'placeholder' :
-				`${block.definition_name}-v${block.definition_version}`
+					'placeholder' :
+					`${block.definition_name}-v${block.definition_version}`
 			);
 		}
 

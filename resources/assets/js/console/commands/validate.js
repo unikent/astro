@@ -91,7 +91,7 @@ if(definitionsPath) {
 					errors[defType][defId][dataPath].push(
 						`${
 							dataPath !== 'root' && _.has(definition, dataPath) ?
-								` ${JSON.stringify(_.get(definition, dataPath))}`:
+								` ${JSON.stringify(_.get(definition, dataPath))}` :
 								''
 						} ${error.message} - as defined within "${schemaPath}" in JSON schema`
 					);

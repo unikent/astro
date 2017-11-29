@@ -38,7 +38,7 @@ export default {
 			'currentSectionIndex'
 		]),
 
-		updateFieldValue({name, value}){
+		updateFieldValue({ name, value }) {
 			this.$store.commit('updateFieldValue', {
 				name: name,
 				value: value,

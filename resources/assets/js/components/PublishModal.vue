@@ -178,7 +178,7 @@ export default {
 				})
 				.catch((error) => {
 					if (error.config && error.response && error.response.data && error.response.data.errors && error.response.data.errors.length > 0) {
-						error.response.data.errors.forEach((apiError, i) => {
+						error.response.data.errors.forEach(apiError => {
 							this.error.messages.push(apiError.details.id);
 						});
 						this.error.techDetails = error.config.method + ' ' + error.config.url + ' ' + error.response.status + ' (' + error.response.statusText + ')';

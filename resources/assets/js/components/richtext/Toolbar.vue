@@ -37,7 +37,8 @@
 <script>
 import Icon from '../Icon';
 
-/* global document */
+/* global document, console */
+/* eslint-disable no-console */
 
 export default {
 

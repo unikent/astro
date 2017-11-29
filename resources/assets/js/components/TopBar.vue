@@ -74,7 +74,7 @@ TODO: Add last published date after the page status
 	import promptToSave from '../mixins/promptToSave';
 	import Config from '../classes/Config.js';
 
-	/* global window */
+	/* global window, document */
 
 	export default {
 
@@ -137,8 +137,8 @@ TODO: Add last published date after the page status
 				 https://developer.mozilla.org/en/docs/Web/Events/beforeunload
 				 */
 				const unsavedChangesExist = this.unsavedChangesExist();
-				if (unsavedChangesExist == true) {
-					var confirmationMessage = "You may lose changes if you leave without saving";
+				if (unsavedChangesExist) {
+					var confirmationMessage = 'You may lose changes if you leave without saving';
 					e.returnValue = confirmationMessage;     // Gecko, Trident, Chrome 34+
 					return confirmationMessage;              // Gecko, WebKit, Chrome <34
 				}
@@ -168,7 +168,7 @@ TODO: Add last published date after the page status
 						form.appendChild(csrf);
 						document.body.appendChild(form);
 						form.submit();
-						//window.location = Config.get('base_url', '') + '/auth/logout';
+						// window.location = Config.get('base_url', '') + '/auth/logout';
 					});
 				}
 			},

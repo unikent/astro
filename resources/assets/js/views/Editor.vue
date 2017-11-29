@@ -52,11 +52,12 @@ export default {
 
 	created() {
 		this.$store.commit('site/updateCurrentSiteID', this.$route.params.site_id);
-		this.$store.dispatch('loadSiteRole', {site_id: this.$route.params.site_id, username: window.astro.username})
+		this.$store.dispatch('loadSiteRole', { siteId: this.$route.params.site_id, username: Config.get('username') })
 		.then(() => {
 			if (this.canUser('site.view')) {
 				this.showLoader();
-			} else {
+			}
+			else {
 				this.showPermissionsError = true;
 			}
 		});
@@ -99,7 +100,7 @@ export default {
 		},
 	},
 	computed: {
-		
+
 		...mapState([
 			'displayIframeOverlay',
 			'currentView'

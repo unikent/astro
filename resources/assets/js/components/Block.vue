@@ -24,7 +24,6 @@
 </template>
 
 <script>
-import _ from 'lodash';
 import blocks from 'cms-prototype-blocks';
 import { mapState, mapGetters, mapMutations } from 'vuex';
 import imagesLoaded from 'imagesloaded';
@@ -105,8 +104,7 @@ export default {
 		}),
 
 		...mapGetters([
-			'getBlockMeta',
-			'scaleUp'
+			'getBlockMeta'
 		]),
 
 		stylesOuter() {
@@ -123,7 +121,7 @@ export default {
 			// TODO: animate opacity, not box-shadow, for buttery smooth animation
 			return {
 				transform: `scale(${this.current.scale})`,
-				boxShadow: `rgba(0, 0, 0, 0.2) 0px ${this.current.shadow * this.scaleUp()}px ${this.current.shadow * this.scaleUp() * 2}px 0px`,
+				boxShadow: `rgba(0, 0, 0, 0.2) 0px ${this.current.shadow}px ${this.current.shadow * 2}px 0px`,
 				transition: this.current.transition
 			}
 		},
@@ -153,6 +151,7 @@ export default {
 			this.updateBlockMeta({
 				index: this.index,
 				region: this.region,
+				section: this.section,
 				type: 'size',
 				value: this.size.height
 			});
