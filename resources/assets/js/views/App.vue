@@ -22,7 +22,6 @@ export default {
 		...mapState([
 			'wrapperStyles'
 		]),
-
 		isEditor() {
 			return ['preview', '404'].indexOf(this.$route.name) === -1;
 		}
