@@ -182,7 +182,7 @@ class UpdateContent implements APICommand
 							];
 							$this->validationMessages[$ruleKey . '.in'] = "Expecting section '{$regionDefinition->sections[$section_delta]['name']}'. '{$section['name']}' found.";
 						}
-						// this section is not defined therefore do not apply any validation rules
+						// if this section is not defined, do not apply any validation rules
 						if (isset($regionDefinition->sections[$section_delta])) {
 							$sectionConstraintRules = $rb->getSectionConstraintRules($section['name']);
 							if (!empty($sectionConstraintRules['blockLimits']['blocks'])) {
@@ -195,6 +195,7 @@ class UpdateContent implements APICommand
 								$ruleKey = sprintf('blocks.%s.%d.blocks', $region_id, $section_delta);
 								$rules[$ruleKey] = $sectionBlocksRules;
 								$foundBlocksCount = count($section['blocks']);
+								$this->validationMessages[$ruleKey . '.required'] = "Expecting section '{$section['name']}' to contain blocks. No blocks found.";
 								$this->validationMessages[$ruleKey . '.size'] = "Expecting :size block(s) in '{$regionDefinition->sections[$section_delta]['name']}' section. $foundBlocksCount found.";
 								$this->validationMessages[$ruleKey . '.min'] = "Expecting at least :min block(s) in '{$regionDefinition->sections[$section_delta]['name']}' section. $foundBlocksCount found.";
 								$this->validationMessages[$ruleKey . '.max'] = "Expecting no more than :max block(s) in '{$regionDefinition->sections[$section_delta]['name']}' section. $foundBlocksCount found.";
