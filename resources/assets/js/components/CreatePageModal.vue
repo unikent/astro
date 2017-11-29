@@ -53,7 +53,11 @@ export default {
 				},
 				{
 					label: 'Content page',
-					name: 'content-v1'
+					name: 'content-page-v1'
+				},
+				{
+					label: 'Content page (with header image/video)',
+					name: 'content-page--image-header-v1'
 				},
 				{
 					label: 'School homepage',
