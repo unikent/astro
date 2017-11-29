@@ -32,9 +32,9 @@ class LayoutController extends ApiController
 	}
 
 	/**
-	 *
-	 * @param $layout_ids
-	 * @return array
+	 * Get layout definitions, indexed by layout_id
+	 * @param array $layout_ids - Array of layout ids to retrieve layouts for [ {name}-v{version}, ...]
+	 * @return array - Array of layout definitions, indexed by layout id
 	 */
 	public function getLayoutDefinitions($layout_ids)
 	{

@@ -12,10 +12,10 @@
 				v-model="createForm.layout"
 			>
 				<el-option
-						v-for="(layout, key) in layouts"
-						:label="layout.label + ' (v' + layout.version + ')'"
-						:value="layout"
-						:key="key"
+						v-for="(layoutDefinition, layoutID) in layouts"
+						:label="layoutDefinition.label + ' (v' + layoutDefinition.version + ')'"
+						:value="layoutID"
+						:key="layoutID"
 				>
 				</el-option>
 			</el-select>
@@ -30,7 +30,7 @@
 	</el-form>
 	<span slot="footer" class="dialog-footer">
 	<el-button @click="visible = false">Cancel</el-button>
-	<el-button type="primary" @click="addChild">Confirm</el-button>
+	<el-button type="primary" @click="addChild" :disabled="disableSubmit">Confirm</el-button>
 </span>
 </el-dialog>
 </template>
@@ -67,6 +67,12 @@ export default {
 			layouts: state => state.layouts
 		}),
 
+		disableSubmit() {
+			return this.createForm.layout === ''	 ||
+				this.createForm.title === '' ||
+				this.createForm.route.slug === '';
+		},
+
 		visible: {
 			get() {
 				this.createForm.route.parent_id = this.pageModal.parentId;
@@ -100,7 +106,10 @@ export default {
 			if (this.userEditingSlug ===  false) {
 				this.createForm.route.slug = this.suggestedSlug;
 			}
-			this.createPage(this.createForm);
+			this.createPage({...this.createForm, layout: {
+				name: this.layouts[this.createForm.layout].name,
+				version: this.layouts[this.createForm.layout].version
+			}});
 			this.resetForm();
 			this.visible = false;
 		},

@@ -102,10 +102,10 @@ This shouldn't matter, since admin is a 'let them do anything' switch,  but if w
 						<el-col :span="11" :offset="2">
 							<el-form-item label="Home page layout">
 								<el-select v-model="form.homepage_layout" class="w100" placeholder="Select">
-									<el-option v-for="(layout, key) in layouts"
-											   :label="layout.label + ' (v' + layout.version + ')'"
-											   :value="layout"
-											   :key="key"
+									<el-option v-for="(layoutDefinition, layoutID) in layouts"
+											   :label="layoutDefinition.label + ' (v' + layoutDefinition.version + ')'"
+											   :value="layoutID"
+											   :key="layoutID"
 									>
 									</el-option>
 								</el-select>
@@ -147,7 +147,7 @@ This shouldn't matter, since admin is a 'let them do anything' switch,  but if w
 				</el-form>
 				<span slot="footer" class="dialog-footer">
 				<el-button @click="cancelForm">Cancel</el-button>
-				<el-button type="primary" @click="addSite">Add Site</el-button>
+				<el-button type="primary" @click="addSite" :disabled="disableSubmit">Add Site</el-button>
 			</span>
 			</el-dialog>
 		</div>
@@ -185,6 +185,13 @@ This shouldn't matter, since admin is a 'let them do anything' switch,  but if w
 		},
 
 		computed: {
+
+			disableSubmit() {
+				return this.form.homepage_layout === ''	 ||
+						this.form.name === '' ||
+						this.form.host === '';
+			},
+
 			...mapState({
 				layouts: state => state.site.layouts
 			}),
@@ -193,10 +200,6 @@ This shouldn't matter, since admin is a 'let them do anything' switch,  but if w
 				'getPermissions',
 				'getGlobalRole'
 			]),
-
-			allLayouts: function() {
-				return this.layouts;
-			},
 
 			sitesWithRoles: function() {
 				let sitesWithRoles = [];
@@ -281,17 +284,16 @@ This shouldn't matter, since admin is a 'let them do anything' switch,  but if w
 						this.form.path = '/' + this.form.path;
 					}
 				}
-				let site = {};
 
-				site = ({
+				let site = {
 					name: this.form.name,
 					host: this.form.host,
 					path: this.form.path,
 					homepage_layout: {
-						name: this.form.homepage_layout.name,
-						version: this.form.homepage_layout.version
+						name: this.layouts[this.form.homepage_layout].name,
+						version: this.layouts[this.form.homepage_layout].version
 					}
-				});
+				};
 
 				this.form.errors = [];
 				this.$api
