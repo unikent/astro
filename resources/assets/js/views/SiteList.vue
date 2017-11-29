@@ -147,7 +147,7 @@ This shouldn't matter, since admin is a 'let them do anything' switch,  but if w
 			</el-form>
 			<span slot="footer" class="dialog-footer">
 				<el-button @click="cancelForm">Cancel</el-button>
-				<el-button type="primary" @click="addSite">Add Site</el-button>
+				<el-button type="primary" @click="addSite" :disabled="disableSubmit">Add Site</el-button>
 			</span>
 		</el-dialog>
 	</div>
