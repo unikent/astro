@@ -67,7 +67,9 @@ export default {
 					section: this.currentSectionIndex,
 					value: {
 						...value,
+						/* eslint-disable camelcase */
 						associated_field: this.path
+  						/* eslint-enable camelcase */
 					}
 				});
 			}
