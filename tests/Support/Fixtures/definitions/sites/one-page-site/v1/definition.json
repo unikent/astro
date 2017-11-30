@@ -2,7 +2,7 @@
 	"name": "one-page-site",
 	"version": 1,
 	"label": "A single page site template for testing",
-	"pages": {
+	"defaultPages": {
 		"slug": "",
 		"title": "Home Page",
 		"layout": "test-layout-v1",
