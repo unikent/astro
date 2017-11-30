@@ -52,7 +52,7 @@ class SiteController extends ApiController
 			$request->get('name'),
 			$request->get('host'),
 			$request->get('path'),
-			$request->get('homepage_layout', []),
+			$request->get('site_definition', []),
 			$request->get('options')
 		);
 		if ($site instanceof Site) {
