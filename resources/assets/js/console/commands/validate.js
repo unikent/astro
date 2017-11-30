@@ -65,9 +65,32 @@ if(definitionsPath) {
 				return;
 			}
 
-			const
-				definition = JSON.parse(fs.readFileSync(path).toString()),
-				valid = validators[defType](definition);
+			let definition, jsonString;
+
+			try {
+				jsonString = fs.readFileSync(path).toString()
+				definition = JSON.parse(jsonString);
+			}
+			catch(e) {
+				if(e instanceof SyntaxError) {
+					const
+						positionMatch = /\d+/.exec(e.stack),
+						position = positionMatch[0] && parseInt(positionMatch[0]),
+						lineNumber = jsonString && position ?
+							`${jsonString.substr(0, position).substr().split('\n').length}` :
+							'';
+
+					console.log(
+						chalk`{redBright ${e.toString()} in file (line number ${lineNumber}) "${path}"}`
+					);
+				}
+				else {
+					console.log(chalk`{redBright An error occured}`);
+				}
+				return;
+			}
+
+			const valid = validators[defType](definition);
 
 			if(!valid) {
 				validators[defType].errors.forEach(error => {
