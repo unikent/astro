@@ -126,17 +126,8 @@ export default {
 			}
 		},
 
-		blockMeta() {
-			return false;
-			// return this.getBlockMeta(this.index, this.region);
-		},
-
-		blockSizes() {
-			return this.allBlockMeta[this.region].map(block => block.size);
-		},
-
 		offset() {
-			return this.blockMeta.offset;
+			return 0;
 		},
 
 		blockIdentifier() {

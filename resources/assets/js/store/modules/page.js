@@ -73,6 +73,16 @@ const mutations = {
 		// update metadata order
 		const blockMeta = state.blockMeta.blocks[region][section].blocks.splice(from, 1)[0];
 		state.blockMeta.blocks[region][section].blocks.splice(to, 0, blockMeta);
+
+		// TODO: use state for this
+		Vue.nextTick(() => eventBus.$emit('block:updateOverlay', to));
+	},
+
+    /**
+     * @param {Object} blockMeta - The offsets and sizes of every block organised the same as pageData.blocks
+     */
+	addBlockMeta(state, blockMeta) {
+		state.blockMeta = blockMeta;
 	},
 
 	updateBlockMeta(state, { type, region, section, index, value }) {
@@ -124,7 +134,7 @@ const mutations = {
 	 * @param {BlockData} block - The data representing the block to be added.
 	 * @param {number} sectionIndex - The index of the section in the specified region.
 	 * @param {string} sectionName - The name of the section to add the block to.
-     *
+	 *
 	 * If the specified region and / or section do not exist in the block data, they will be added.
 	 */
 	addBlock(state, { region, index, block, sectionIndex, sectionName }) {
@@ -181,7 +191,7 @@ const mutations = {
 	deleteBlock(state,  { region, index, section } ) {
 
 		state.pageData.blocks[region][section].blocks.splice(index, 1);
-//		state.blockMeta.blocks[region].splice(index, 1);
+		state.blockMeta.blocks[region][section].blocks.splice(index, 1);
 
 		// TODO: use state for this
 		Vue.nextTick(() => eventBus.$emit('block:updateOverlay', index));
@@ -261,13 +271,23 @@ const actions = {
 						commit('setPage', _.cloneDeep(page));
 						commit('clearBlockValidationIssues');
 
+						const blockMeta = {
+							blocks: {}
+						};
+
 						Object.keys(page.blocks).forEach(region => {
+							blockMeta.blocks[region] = [];
 							page.blocks[region].forEach((section, sindex) => {
+								blockMeta.blocks[region].push({ blocks: [] });
 								page.blocks[region][sindex].blocks.forEach((block) => {
 									Definition.fillBlockFields(block);
+									blockMeta.blocks[region][sindex].blocks.push({ size: 0, offset: 0 });
 								});
 							});
 						});
+
+						commit('addBlockMeta', blockMeta);
+
 /*
 						Object.keys(blocks).forEach(region => {
 							blocks[region].forEach((block) => {
