@@ -70,6 +70,11 @@ export default {
 			currentRegionName: state => state.contenteditor.currentRegionName
 		}),
 
+		...mapGetters([
+			'canUser',
+			'currentSectionIndex'
+		]),
+
 		visible: {
 			get() {
 				return this.mediaPicker.visible;
@@ -86,12 +91,7 @@ export default {
 
 		fieldPath() {
 			return this.mediaPicker.fieldPath;
-		},
-
-		...mapGetters([
-			'canUser',
-			'currentSectionIndex'
-		])
+		}
 	},
 
 	watch: {
@@ -126,6 +126,9 @@ export default {
 			});
 
 			this.updateBlockMedia({
+				region: this.currentRegionName,
+				section: this.currentSectionIndex,
+				index: this.currentBlockIndex,
 				value: {
 					...media,
 					/* eslint-disable camelcase */

@@ -100,19 +100,17 @@ const mutations = {
 		}
 	},
 
-	updateBlockMedia(state, { index, value }) {
-		let
-			idx = index !== void 0 ? index : state.currentBlockIndex,
-			blockData = state.pageData.blocks[state.currentRegion];
+	updateBlockMedia(state, { index, region, section, value }) {
+		let blockData = state.pageData.blocks[region][section].blocks;
 
-		if(!blockData[idx].media) {
-			blockData[idx].media = [value];
+		if(!blockData[index].media) {
+			blockData[index].media = [value];
 		}
 		else {
-			blockData[idx].media.push(value);
+			blockData[index].media.push(value);
 		}
 
-		blockData.splice(idx, 1, { ...blockData[idx] })
+		blockData.splice(index, 1, { ...blockData[index] })
 	},
 
 	/**
@@ -124,7 +122,7 @@ const mutations = {
 	 * @param {BlockData} block - The data representing the block to be added.
 	 * @param {number} sectionIndex - The index of the section in the specified region.
 	 * @param {string} sectionName - The name of the section to add the block to.
-     *
+	 *
 	 * If the specified region and / or section do not exist in the block data, they will be added.
 	 */
 	addBlock(state, { region, index, block, sectionIndex, sectionName }) {
