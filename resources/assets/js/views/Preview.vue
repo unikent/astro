@@ -169,7 +169,7 @@ export default {
 		},
 
 		canMove() {
-			return this.currentSectionBlocks > 1;
+			return this.currentSectionBlocks.length > 1;
 		}
 	},
 
