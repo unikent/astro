@@ -16,9 +16,11 @@ use App\Policies\MediaPolicy;
 use App\Models\Definitions\Block as BlockDefinition;
 use App\Models\Definitions\Layout as LayoutDefinition;
 use App\Models\Definitions\Region as RegionDefinition;
+use App\Models\Definitions\SiteDefinition;
 use App\Policies\Definitions\BlockPolicy as BlockDefinitionPolicy;
 use App\Policies\Definitions\LayoutPolicy as LayoutDefinitionPolicy;
 use App\Policies\Definitions\RegionPolicy as RegionDefinitionPolicy;
+use App\Policies\Definitions\SiteDefinitionPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
@@ -36,6 +38,7 @@ class AuthServiceProvider extends ServiceProvider
 		BlockDefinition::class => BlockDefinitionPolicy::class,
 		LayoutDefinition::class => LayoutDefinitionPolicy::class,
 		RegionDefinition::class => RegionDefinitionPolicy::class,
+		SiteDefinition::class => SiteDefinitionPolicy::class,
 		User::class => UserPolicy::class,
 		Permission::class => PermissionPolicy::class,
 		Role::class => RolePolicy::class

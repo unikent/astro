@@ -370,7 +370,7 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
      *
      * @param  string $definition_id - The {name}-v{version} string identifying the definition.
      * @param  int $version
-     * @throws App\Exceptions\DefinitionNotFoundException
+     * @throws DefinitionNotFoundException
      * @return string
      */
     public static function locateDefinitionOrFail($definition_id){
