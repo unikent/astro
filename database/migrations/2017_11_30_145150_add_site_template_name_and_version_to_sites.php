@@ -27,8 +27,7 @@ class AddSiteTemplateNameAndVersionToSites extends Migration
     public function down()
     {
         Schema::table('sites', function (Blueprint $table) {
-            $table->dropIfExists('site_definition_name');
-            $table->dropIfExists('site_definition_version');
+            $table->dropColumn(['site_definition_name', 'site_definition_version']);
         });
     }
 }
