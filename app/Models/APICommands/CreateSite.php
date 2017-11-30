@@ -2,6 +2,7 @@
 
 namespace App\Models\APICommands;
 
+use App\Models\Definitions\Layout;
 use App\Models\Definitions\SiteDefinition;
 use App\Models\Revision;
 use App\Models\Site;
@@ -16,6 +17,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 
 class CreateSite implements APICommand
 {
+	use AddsPagesTrait;
 
     /**
      * Carry out the command, based on the provided $input.
@@ -45,11 +47,46 @@ class CreateSite implements APICommand
             if(!is_array($layout)){
             	$layout = SiteDefinition::idToNameAndVersion($layout);
 			}
-            $this->createHomePage($site, 'Home Page', $layout, $user);
+            $homepage = $this->createHomePage($site, 'Home Page', $layout, $user);
+            if(!empty($template->defaultPages['children'])){
+				$this->addPages($homepage, $template->defaultPages['children'], $user);
+			}
             $site->refresh();
             return $site;
         });
     }
+
+
+	/**
+	 * Add a hierarchy of pages to a site.
+	 * @param Page $parent - The parent page to add subpages to.
+	 * @param array $tree array of pages attributes, each of which may have a
+	 * 						children array containing subpage definitions.
+	 * Required attributes are:
+	 * - slug
+	 * - title
+	 * - layout['name']
+	 * - layout['version']
+	 */
+    public function addPages($parent, $pages, Authenticatable  $user)
+	{
+		foreach($pages as $definition) {
+			$layout = is_array($definition['layout']) ?
+								$definition['layout'] :
+								Layout::idToNameAndVersion($definition['layout']);
+			$added = $this->addPage(
+				$parent,
+				$definition['slug'],
+				$definition['title'],
+				$user,
+				$layout['name'],
+				$layout['version']
+			);
+			if(!empty($definition['children'])){
+				$this->addPages($added, $definition['children'], $user);
+			}
+		}
+	}
 
     /**
      * Create the home page for a site.

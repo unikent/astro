@@ -39,7 +39,7 @@ class UpdateSiteTest extends APICommandTestCase
     public function validation_whenValidSiteButNoFieldsAreProvided_fails()
     {
         $api = new LocalAPIClient(factory(\App\Models\User::class)->create());
-        $site = $api->createSite("Test", "kent.ac.uk", "", [ "name" => "test-layout", "version" => 1]);
+        $site = $api->createSite("Test", "kent.ac.uk", "", [ "name" => "one-page-site", "version" => 1]);
 
         $validator = $this->validator(['id' => $site->id] );
         $this->assertTrue($validator->fails());
@@ -52,7 +52,7 @@ class UpdateSiteTest extends APICommandTestCase
     public function validation_whenOptionsIsPresentButNotArray_fails()
     {
         $api = new LocalAPIClient(factory(\App\Models\User::class)->create());
-        $site = $api->createSite("Test", "kent.ac.uk", "", [ "name" => "test-layout", "version" => 1]);
+        $site = $api->createSite("Test", "kent.ac.uk", "", [ "name" => "one-page-site", "version" => 1]);
 
         $validator = $this->validator([
             'id' => $site->id,
@@ -71,7 +71,7 @@ class UpdateSiteTest extends APICommandTestCase
     public function validation_whenOptionsIsArray_passes()
     {
         $api = new LocalAPIClient(factory(\App\Models\User::class)->create());
-        $site = $api->createSite("Test", "kent.ac.uk", "", [ "name" => "test-layout", "version" => 1]);
+        $site = $api->createSite("Test", "kent.ac.uk", "", [ "name" => "one-page-site", "version" => 1]);
 
         $validator = $this->validator([
             'id' => $site->id,
@@ -90,7 +90,7 @@ class UpdateSiteTest extends APICommandTestCase
     {
         // given we have a site
         $api = new LocalAPIClient(factory(\App\Models\User::class)->create());
-        $site = $api->createSite("Test", "kent.ac.uk", "", [ "name" => "test-layout", "version" => 1]);
+        $site = $api->createSite("Test", "kent.ac.uk", "", [ "name" => "one-page-site", "version" => 1]);
         
         // with some options
         $orignalOptions = [
@@ -121,7 +121,7 @@ class UpdateSiteTest extends APICommandTestCase
     {
         // given we have a site
         $api = new LocalAPIClient(factory(\App\Models\User::class)->create());
-        $site = $api->createSite("Test", "kent.ac.uk", "", [ "name" => "test-layout", "version" => 1]);
+        $site = $api->createSite("Test", "kent.ac.uk", "", [ "name" => "one-page-site", "version" => 1]);
         
         // with some options
         $orignalOptions = [
@@ -153,7 +153,7 @@ class UpdateSiteTest extends APICommandTestCase
         // given we have a site with an original name
         $originalName = 'Test Site Name';
         $api = new LocalAPIClient(factory(\App\Models\User::class)->create());
-        $site = $api->createSite( $originalName, "kent.ac.uk", "", [ "name" => "test-layout", "version" => 1]);
+        $site = $api->createSite( $originalName, "kent.ac.uk", "", [ "name" => "one-page-site", "version" => 1]);
         
         // and we change the name
         $updatedName = 'Updated Test Site Name';
@@ -173,7 +173,7 @@ class UpdateSiteTest extends APICommandTestCase
         // given we have a site with an original path
         $originalPath = "/original";
         $api = new LocalAPIClient(factory(\App\Models\User::class)->create());
-        $site = $api->createSite('Site Name', "kent.ac.uk", $originalPath, [ "name" => "test-layout", "version" => 1]);
+        $site = $api->createSite('Site Name', "kent.ac.uk", $originalPath, [ "name" => "one-page-site", "version" => 1]);
 
         // and we change the path
         $updatedPath = "/updated";
@@ -193,7 +193,7 @@ class UpdateSiteTest extends APICommandTestCase
         // given we have a site with an original path
         $originalHost = "lancaster.ac.uk";
         $api = new LocalAPIClient(factory(\App\Models\User::class)->create());
-        $site = $api->createSite('Site Name', $originalHost, "", [ "name" => "test-layout", "version" => 1]);
+        $site = $api->createSite('Site Name', $originalHost, "", [ "name" => "one-page-site", "version" => 1]);
         
         // and we change the path
         $updatedHost = "kent.ac.uk";
@@ -212,7 +212,7 @@ class UpdateSiteTest extends APICommandTestCase
     {
          // given we have a site
          $api = new LocalAPIClient(factory(\App\Models\User::class)->create());
-         $site = $api->createSite('Site Name', 'kent.ac.uk', "", [ "name" => "test-layout", "version" => 1]);
+         $site = $api->createSite('Site Name', 'kent.ac.uk', "", [ "name" => "one-page-site", "version" => 1]);
 
          // when we update a field
          $updatedName = 'Redesigned Site Name';
