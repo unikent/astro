@@ -13,7 +13,7 @@ const envPath = path.resolve(`${__dirname}/../../../../../.env`);
 dotenv.config({ path: envPath });
 
 const
-	schemas = ['layout', 'region', 'block'],
+	schemas = ['layout', 'region', 'block', 'site'],
 	ajv = new Ajv({ $data: true }),
 	validators = schemas.reduce((validators, schemaName) => {
 		const schemaPath = path.resolve(
