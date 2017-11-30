@@ -62,14 +62,6 @@ export default {
 				{
 					label: 'School about us',
 					name: 'school-about-v1'
-				},
-				{
-					label: 'Contact us page',
-					name: 'contact-us-v1'
-				},
-				{
-					label: 'Content page (with header image)',
-					name: 'content-page--image-header-v1'
 				}
 			],
 			createForm: {
