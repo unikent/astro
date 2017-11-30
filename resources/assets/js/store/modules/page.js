@@ -78,6 +78,9 @@ const mutations = {
 		Vue.nextTick(() => eventBus.$emit('block:updateOverlay', to));
 	},
 
+    /**
+     * @param {Object} blockMeta - The offsets and sizes of every block organised the same as pageData.blocks
+     */
 	addBlockMeta(state, blockMeta) {
 		state.blockMeta = blockMeta;
 	},
