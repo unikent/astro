@@ -65,14 +65,24 @@ if(definitionsPath) {
 				return;
 			}
 
-			let definition;
+			let definition, jsonString;
 
 			try {
-				definition = JSON.parse(fs.readFileSync(path).toString());
+				jsonString = fs.readFileSync(path).toString()
+				definition = JSON.parse(jsonString);
 			}
 			catch(e) {
 				if(e instanceof SyntaxError) {
-					console.log(chalk`{redBright ${e.toString()} in file "${path}"}`);
+					const
+						positionMatch = /\d+/.exec(e.stack),
+						position = positionMatch[0] && parseInt(positionMatch[0]),
+						lineNumber = jsonString && position ?
+							`${jsonString.substr(0, position).substr().split('\n').length}` :
+							'';
+
+					console.log(
+						chalk`{redBright ${e.toString()} in file (line number ${lineNumber}) "${path}"}`
+					);
 				}
 				else {
 					console.log(chalk`{redBright An error occured}`);
