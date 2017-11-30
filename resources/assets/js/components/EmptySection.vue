@@ -1,6 +1,17 @@
 <template>
 <div v-else class="empty-region">
-	<el-button size="large" @click="addBlocks">Add block(s) to this section</el-button>
+
+	<el-alert
+		title="We left this space free for you to add some optional blocks to your page."
+		description="Don't worry, this message won't appear on your webpage. But you can add a block (or maybe more) here if you'd like to."
+		type="info"
+		:closable="false"
+		show-icon
+		style="width:85%; margin: 1rem auto"
+	>
+	</el-alert>
+
+	<el-button size="large" @click="addBlocks">Add a block</el-button>
 </div>
 </template>
 
