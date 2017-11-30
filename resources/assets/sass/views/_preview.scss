@@ -42,10 +42,8 @@
 }
 
 .block-overlay__options,
-.block-overlay__move,
-.block-overlay__delete {
+.block-overlay__move {
 	transition: background-color .3s ease-out;
-	position: absolute;
 	background-color: #03a9f4;
 	color: #fff;
 	line-height: 44px;
@@ -72,15 +70,16 @@
 	pointer-events: none;
 }
 
-.block-overlay__delete {
-	bottom: 15px;
-	right: 30px;
-	cursor: pointer;
-	border-radius: 4px 0 0 0;
-	background-color: transparent;
-	line-height: 30px;
-	height: 30px;
-	width: 30px;
+.block-overlay__buttons {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	pointer-events: auto;
+}
+
+.block-overlay__delete-button {
+	margin-left: 20px;
+	pointer-events: auto;
 	fill: #c74d4d;
 }
 
@@ -144,6 +143,14 @@
 	user-select: none;
 	text-align: center;
 	opacity: 0;
+}
+
+.move-up,
+.move-down {
+
+	&.is-disabled {
+		fill: #bfcbd9;
+	}
 }
 
 .add-before,
