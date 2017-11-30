@@ -66,11 +66,13 @@ class LocalAPIClientTest extends TestCase
     {
         $client = $this->fixture();
         $site = $client->createSite(
-            'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
+            'Test Site', 'example.com', '', ['name' => 'one-page-site', 'version' => 1]
         );
         $this->assertInstanceOf(Site::class, $site);
         $this->assertInstanceOf(Page::class, $site->draftHomepage);
+        $this->assertNull($site->draftHomepage->slug);
         $this->assertInstanceOf(Revision::class, $site->draftHomepage->revision);
+		$this->assertEquals('Home Page', $site->draftHomepage->revision->title); // as defined in the one-page-site-v1 site template
     }
 
     /**
