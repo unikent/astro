@@ -522,7 +522,7 @@ const getters = {
 			Config.get('base_url', '') + '/draft/' +
 			getters.siteDomain +
 			getters.sitePath +
-			getters.pagePath === '/' ? '' : getters.pagePath
+			(getters.pagePath === '/' ? '' : getters.pagePath)
 		);
 	},
 
@@ -537,7 +537,7 @@ const getters = {
 			Config.get('base_url', '') + '/published/' +
 			getters.siteDomain +
 			getters.sitePath +
-			getters.pagePath === '/' ? '' : getters.pagePath
+			(getters.pagePath === '/' ? '' : getters.pagePath)
 		);
 	},
 
