@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\APICommands\PublishPage;
 use App\Models\Definitions\BaseDefinition;
+use App\Models\Definitions\SiteDefinition;
 use App\Models\Page;
 use App\Validation\Rules\LayoutExistsRule;
 use App\Validation\Rules\UniqueSitePathRule;
@@ -89,7 +90,15 @@ class AppServiceProvider extends ServiceProvider
 		});
 
 		Validator::extend('layout_exists', function($attribute, $value, $parameters, $validator){
-		   return (new LayoutExistsRule(empty($parameters[0]) ? 0 : $parameters[0]))->passes($attribute,$value);
+			return (new LayoutExistsRule(empty($parameters[0]) ? 0 : $parameters[0]))->passes($attribute,$value);
+		});
+
+		/**
+		 * Checks if a requested site template definition exists.
+		 * usage in validation rules: ['definition_name_field' => 'site_definition_exists:{version}']
+		 */
+		Validator::extend('site_definition_exists', function($attribute, $value, $parameters, $validator){
+			return SiteDefinition::locateDefinition(SiteDefinition::idFromNameAndVersion($value,$parameters[0]));
 		});
 
 		Validator::extend('definition_exists', function ($attribute, $value, $parameters, $validator){

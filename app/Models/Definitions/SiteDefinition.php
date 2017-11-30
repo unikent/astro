@@ -9,7 +9,7 @@ class SiteDefinition extends BaseDefinition
 	public static $defDir = 'sites';
 
 	protected $casts = [
-        'allowedLayouts' => 'array',
+        'allowedLayouts' => 'array'
 	];
 
 	/**

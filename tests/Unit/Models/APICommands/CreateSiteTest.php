@@ -32,7 +32,7 @@ class CreateSiteTest extends APICommandTestCase
             'name' => 'A Valid Name',
             'host' => 'example.com',
             'path' => '',
-            'template_definition' => [
+            'site_definition' => [
                 'name' => 'one-page-site',
                 'version' => 1
             ]
