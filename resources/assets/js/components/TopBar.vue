@@ -95,6 +95,7 @@ TODO: Add last published date after the page status
 			this.loadPermissions();
 			this.loadGlobalRole(window.astro.username);
 			this.$store.dispatch('site/fetchLayouts');
+			this.$store.dispatch('site/fetchSiteDefinitions');
 		},
 
 		computed: {
