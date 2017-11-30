@@ -110,19 +110,17 @@ const mutations = {
 		}
 	},
 
-	updateBlockMedia(state, { index, value }) {
-		let
-			idx = index !== void 0 ? index : state.currentBlockIndex,
-			blockData = state.pageData.blocks[state.currentRegion];
+	updateBlockMedia(state, { index, region, section, value }) {
+		let blockData = state.pageData.blocks[region][section].blocks;
 
-		if(!blockData[idx].media) {
-			blockData[idx].media = [value];
+		if(!blockData[index].media) {
+			blockData[index].media = [value];
 		}
 		else {
-			blockData[idx].media.push(value);
+			blockData[index].media.push(value);
 		}
 
-		blockData.splice(idx, 1, { ...blockData[idx] })
+		blockData.splice(index, 1, { ...blockData[index] })
 	},
 
 	/**
@@ -544,7 +542,7 @@ const getters = {
 			Config.get('base_url', '') + '/draft/' +
 			getters.siteDomain +
 			getters.sitePath +
-			getters.pagePath === '/' ? '' : getters.pagePath
+			(getters.pagePath === '/' ? '' : getters.pagePath)
 		);
 	},
 
@@ -559,7 +557,7 @@ const getters = {
 			Config.get('base_url', '') + '/published/' +
 			getters.siteDomain +
 			getters.sitePath +
-			getters.pagePath === '/' ? '' : getters.pagePath
+			(getters.pagePath === '/' ? '' : getters.pagePath)
 		);
 	},
 
