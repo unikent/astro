@@ -65,9 +65,22 @@ if(definitionsPath) {
 				return;
 			}
 
-			const
-				definition = JSON.parse(fs.readFileSync(path).toString()),
-				valid = validators[defType](definition);
+			let definition;
+
+			try {
+				definition = JSON.parse(fs.readFileSync(path).toString());
+			}
+			catch(e) {
+				if(e instanceof SyntaxError) {
+					console.log(chalk`{redBright ${e.toString()} in file "${path}"}`);
+				}
+				else {
+					console.log(chalk`{redBright An error occured}`);
+				}
+				return;
+			}
+
+			const valid = validators[defType](definition);
 
 			if(!valid) {
 				validators[defType].errors.forEach(error => {
