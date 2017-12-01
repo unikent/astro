@@ -313,6 +313,8 @@ export default {
 					// success, so let's refresh what data as have from the api
 					this.fetchData();
 
+					this.$bus.$emit('top-bar:fetchSitData');
+
 					// reset the form
 					this.resetForm();
 

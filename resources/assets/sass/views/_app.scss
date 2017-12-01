@@ -60,12 +60,44 @@
 	margin-right: 6px;
 }
 
+.site-pick {
+	fill: #444;
+	color: #71787f;
+	cursor: pointer;
+	line-height: 17px;
+	font-size: 14px;
+	padding: 0;
+
+	.icon {
+		margin-bottom: 4px;
+		margin-right: 8px;
+	}
+}
+.site-picker {
+	font-size: 14px;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+
+	a {
+		text-decoration: none;
+		color: #71787f;
+
+		&:hover {
+			color: #03a9f4;
+		}
+	}
+}
+
+.site-picker li {
+	padding: 10px;
+}
+
 .user-account-button {
 	cursor: pointer;
 	fill: #71787f;
 	color: #71787f;
 	font-size: 14px;
-	margin-right: 12px;
 }
 
 .user-account-dropdown {

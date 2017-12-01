@@ -16,10 +16,52 @@ Note that the page editing toolbar is a separate component found in `components/
 
 */
 <template>
-	<div class="top-bar" :class="{ 'top-bar--homepage' : !showBack }">
+	<div class="top-bar">
 		<div>
-			<div v-show="showBack" @click="backToSites" class="top-bar-backbutton">
-				<i class="el-icon-arrow-left backbutton-icon"></i>Sites
+
+			<div
+				v-if="(!showBack && this.$route.name !== 'site-list') && sites.length > 1"
+			>
+				<el-popover
+					ref="site-picker"
+					placement="bottom-start"
+					v-model="siteDropdownVisible"
+					transition="el-zoom-in-top"
+				>
+					<ul class="site-picker">
+						<template v-for="(n, i) in Math.min(sites.length, 11)">
+							<li v-if="n !== 11">
+								<router-link :to="`/site/${sites[i].id}`" @click.native="siteDropdownVisible = false">
+									{{ sites[i].name }}
+								</router-link>
+							</li>
+							<li v-else>
+								More sites available...
+							</li>
+						</template>
+
+						<li>
+							<router-link to="/" @click.native="siteDropdownVisible = false">
+								<i class="el-icon-arrow-left"></i> Back to sites
+							</router-link>
+						</li>
+					</ul>
+				</el-popover>
+
+				<span v-popover:site-picker class="site-pick">
+					<icon name="site" />
+					{{ siteTitle }}<i class="el-icon-caret-bottom el-icon--right"></i>
+				</span>
+			</div>
+			<div
+				v-if="(!showBack && this.$route.name !== 'site-list') && sites.length === 1"
+				 class="site-pick"
+			>
+				<icon name="site" /> Site 1
+			</div>
+
+			<div v-show="showBack" @click="backToAdmin" class="top-bar-backbutton">
+				<i class="el-icon-arrow-left backbutton-icon"></i>Back
 			</div>
 
 			<div v-if="showTools && publishStatus === 'new'" class="top-bar__page-title">
@@ -61,7 +103,7 @@ Note that the page editing toolbar is a separate component found in `components/
 				popper-class="user-account-dropdown"
 			>
 				<div>
-					<div class="user-account-dropdown__item" style="">
+					<div class="user-account-dropdown__item">
 						Signed in as <strong>{{ username }}</strong>
 					</div>
 					<div class="user-account-dropdown__item user-account-dropdown__item--divided">Settings</div>
@@ -102,6 +144,10 @@ Note that the page editing toolbar is a separate component found in `components/
 		mixins: [promptToSave],
 
 		created() {
+			this.fetchSiteData();
+			// refresh our site list dropdown when a new site is added
+			// TODO: replace with more structured state, rather than an event
+			this.$bus.$on('top-bar:fetchSitData', this.fetchSiteData);
 			window.addEventListener('beforeunload', this.leaveAstro);
 		},
 
@@ -112,9 +158,15 @@ Note that the page editing toolbar is a separate component found in `components/
 			this.$store.dispatch('site/fetchSiteDefinitions');
 		},
 
+		destroyed() {
+			this.$bus.$off('top-bar:fetchSitData');
+		},
+
 		data() {
 			return {
-				accountDropdownVisible: false
+				siteDropdownVisible: false,
+				accountDropdownVisible: false,
+				sites: []
 			};
 		},
 
@@ -133,7 +185,7 @@ Note that the page editing toolbar is a separate component found in `components/
 
 			// works out if we should show a back button or not (ie whether we're editing a page or on the homepage)
 			showBack() {
-				return ['site', 'page', 'menu-editor', 'site-users'].indexOf(this.$route.name) !== -1;
+				return ['page'].indexOf(this.$route.name) !== -1;
 			},
 
 			showTools() {
@@ -152,6 +204,11 @@ Note that the page editing toolbar is a separate component found in `components/
 
 			config() {
 				return Config;
+			},
+
+			siteTitle() {
+				const site = this.sites.find(site => site.id === Number(this.$route.params.site_id));
+				return site ? site.name : '';
 			}
 		},
 
@@ -179,6 +236,14 @@ Note that the page editing toolbar is a separate component found in `components/
 				'updateMenuActive'
 			]),
 
+			fetchSiteData() {
+				this.$api
+					.get('sites')
+					.then(({ data: json }) => {
+						this.sites = json.data;
+					});
+			},
+
 			signOut() {
 				this.promptToSave(() => {
 					this.$refs['submit-form'].submit();
@@ -186,14 +251,14 @@ Note that the page editing toolbar is a separate component found in `components/
 			},
 
 			/**
-			 gets the user back to the main site listing
+			 gets the user back to the main admin area
 			 */
-			backToSites() {
+			backToAdmin() {
 				// another prompt to save the page when going back to the site listing
 				this.promptToSave(() => {
 					this.$store.commit('setLoaded', false);
 					this.$store.commit('setPage', {});
-					this.$router.push('/sites');
+					this.$router.push(`/site/${this.$route.params.site_id}`);
 				})
 			}
 		}
