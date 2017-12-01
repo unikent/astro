@@ -17,7 +17,7 @@
 						class="move-up"
 						@click="showBlockList(0, true)"
 					>
-						Swap
+						Swap block
 					</el-button>
 				</div>
 				<div v-else-if="canMove">
