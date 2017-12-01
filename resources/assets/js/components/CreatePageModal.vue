@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions, mapGetters } from 'vuex';
 import { Definition } from 'classes/helpers';
 import { slugify } from 'underscore.string';
 
@@ -64,8 +64,32 @@ export default {
 		...mapState('site', {
 			pages: state => state.pages,
 			pageModal: state => state.pageModal,
-			layouts: state => state.layouts
+			allLayouts: state => state.layouts
 		}),
+
+		...mapGetters([
+			'siteDefinition'
+		]),
+
+		layouts() {
+			if(this.siteDefinition){
+				if(this.siteDefinition.availableLayouts !== void 0) {
+					let available = {};
+					this.siteDefinition.availableLayouts.forEach((definitionID) => {
+						if(this.allLayouts[definitionID] !== void 0) {
+							available[definitionID] = this.allLayouts[definitionID];
+						}
+					}, this);
+					return available;
+				}
+				else {
+					return this.allLayouts;
+				}
+			}
+			else {
+				return [];
+			}
+		},
 
 		disableSubmit() {
 			return this.createForm.layout === ''	 ||
