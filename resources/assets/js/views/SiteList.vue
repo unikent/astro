@@ -1,14 +1,14 @@
-**
-List of Sites
-
-This provides a list of sites which are avaliable to the logged in user
-
-Note
-----
-Permission checking - we're checking on two admin only permissions which are not actually defined for the Actions buttons. These permissions are
-1. site.create
-2. site.delete
-This shouldn't matter, since admin is a 'let them do anything' switch,  but if we need to add them we should make the names consistent.
+/**
+ * List of Sites
+ *
+ * This provides a list of sites which are avaliable to the logged in user
+ *
+ * Note
+ * ----
+ * Permission checking - we're checking on two admin only permissions which are not actually defined for the Actions buttons.  * These permissions are
+ * 1. site.create
+ * 2. site.delete
+ * This shouldn't matter, since admin is a 'let them do anything' switch,  but if we need to add them we should make the names * consistent.
  */
 <template>
 <el-card>
