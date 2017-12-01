@@ -16,6 +16,7 @@
 			<picker-list
 					:selectedOptions="selected"
 					:options="availableBlocks"
+					:maxSelectableOptions="maxSelectableBlocks"
 			/>
 		</el-tab-pane>
 	</el-tabs>
@@ -55,6 +56,7 @@ export default {
 		...mapState({
 			blockPicker: state => state.blockPicker,
 			allowedBlocks: state => state.blockPicker.allowedBlocks,
+			maxSelectableBlocks: state => state.blockPicker.maxSelectableBlocks,
 			allBlocks: state => state.definition.blockDefinitions
 		}),
 

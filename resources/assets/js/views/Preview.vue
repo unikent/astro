@@ -15,6 +15,7 @@
 				<div v-if="sectionConstraints.canSwapBlocks">
 					<el-button
 						class="move-up"
+						@click="showBlockList()"
 					>
 						Swap
 					</el-button>
@@ -373,11 +374,12 @@ export default {
 		},
 
 		showBlockList(offset = 0) {
-			this.showBlockPicker({
+				this.showBlockPicker({
 				insertIndex: this.current.index + offset,
 				sectionIndex: this.current.section,
 				regionName: this.current.region,
-				blocks: this.sectionConstraints ? this.sectionConstraints.allowedBlocks : []
+				blocks: this.sectionConstraints ? this.sectionConstraints.allowedBlocks : [],
+				maxSelectableBlocks: this.sectionConstraints.canSwapBlocks ? 1 : this.sectionDefinition.max ? this.sectionDefinition.max - this.blocks.length : null
 			});
 		}
 	}
