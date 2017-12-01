@@ -21,7 +21,7 @@
 
 					<div class="u-flex-auto-left">
 						<el-button type="primary" @click="saveMenu">Save</el-button>
-						<el-button type="primary" :plain="true" class="el-button--icon" @click="previewSite">
+						<el-button type="primary" plain class="el-button--icon" @click="previewSite">
 							Preview
 							<icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" />
 						</el-button>
@@ -254,7 +254,6 @@ export default {
 			return permissions.getters.canUser(siteState)('site.options.edit');
 		},
 
-
 		status() {
 			return (
 				// if unsaved but is the same as published menu, treat as draft
@@ -403,7 +402,7 @@ export default {
 						message: (
 							hasErrors ? `
 								The menu saved, but there are some validation errors.
-								You won\'t be able to publish your menu until these are fixed.
+								You won't be able to publish your menu until these are fixed.
 								` :
 								`Successfully ${verb} menu.`
 						),

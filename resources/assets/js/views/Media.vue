@@ -93,7 +93,7 @@
 		</el-pagination>
 	</el-row>
 
-	<el-dialog title="Upload Media" v-model="showUploadForm">
+	<el-dialog title="Upload Media" :visible.sync="showUploadForm">
 		<media-upload />
 	</el-dialog>
 

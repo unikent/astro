@@ -24,7 +24,7 @@
 					placeholder="Search for a user"
 					class="add-user__multiselect"
 				>
-					<template slot="item" scope="props">
+					<template slot="item" slot-scope="props">
 						<span>{{ props.item.name }}</span>
 						<span class="add-user-multiselect__username">
 							@{{ props.item.username }}
@@ -72,7 +72,7 @@
 			<el-input
 				v-model="searchInput"
 				placeholder="Find users"
-				icon="search"
+				suffix-icon="el-icon-search"
 				class="filter-user__searchbox"
 			/>
 			<el-select

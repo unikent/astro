@@ -1,4 +1,4 @@
-/**
+**
 List of Sites
 
 This provides a list of sites which are avaliable to the logged in user
@@ -45,9 +45,9 @@ This shouldn't matter, since admin is a 'let them do anything' switch,  but if w
 			</thead>
 			<tbody v-loading.body="loading">
 				<tr
-				v-for="site in sitesWithRoles"
-				:key="site.id"
-				class="el-table__row"
+					v-for="site in sitesWithRoles"
+					:key="site.id"
+					class="el-table__row"
 				>
 					<td>
 						<div class="cell">
@@ -78,18 +78,15 @@ This shouldn't matter, since admin is a 'let them do anything' switch,  but if w
 							</el-button> -->
 						</div>
 					</td>
-
-
 				</tr>
 			</tbody>
 		</table>
 
-		<el-dialog title="Add Site" v-model="dialogFormVisible">
+		<el-dialog title="Add Site" :visible.sync="dialogFormVisible">
 			<el-form :model="form" label-position="top">
 				<el-row type="flex" :gutter="20">
 
 					<el-col :span="11">
-
 						<el-form-item label="Name">
 							<el-input v-model="form.name" auto-complete="off"></el-input>
 						</el-form-item>
@@ -271,9 +268,7 @@ export default {
 				host: '',
 				path: '',
 				errors: '',
-				/* eslint-disable camelcase */
 				siteDefinitionId: ''
-				/* eslint-enable camelcase */
 			};
 			this.loading = false;
 		},
@@ -293,12 +288,10 @@ export default {
 				name: this.form.name,
 				host: this.form.host,
 				path: this.form.path,
-				/* eslint-disable camelcase */
 				site_definition: {
 					name: this.siteDefinitions[this.form.siteDefinitionId].name,
 					version: this.siteDefinitions[this.form.siteDefinitionId].version
 				}
-				/* eslint-enable camelcase */
 			};
 
 			this.form.errors = [];
