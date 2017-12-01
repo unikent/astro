@@ -6,7 +6,7 @@
 <template>
 <el-dialog
 	title="Publish"
-	v-model="publishValidationWarningModalVisible"
+	:visible.sync="publishValidationWarningModalVisible"
 	:modal-append-to-body="true"
 	:before-close="handleClose"
 	:close-on-press-escape="false"

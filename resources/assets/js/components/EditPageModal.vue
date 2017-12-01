@@ -1,5 +1,5 @@
 <template>
-	<el-dialog title="Edit page settings" v-model="visible" :modal-append-to-body="false">
+	<el-dialog title="Edit page settings" :visible.sync="visible" :modal-append-to-body="false">
 		<el-form :model="editForm">
 			<el-form-item label="Page title">
 				<el-input name="title" v-model="editForm.title" auto-complete="off"></el-input>

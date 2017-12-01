@@ -18,7 +18,7 @@ An element loading spinner is shown after the user hits 'Unpublish'.
 <template>
 <el-dialog
 	title="Unpublish"
-	v-model="unpublishModalVisible"
+	:visible.sync="unpublishModalVisible"
 	:modal-append-to-body="true"
 	v-loading.fullscreen.lock="loading"
 	element-loading-text="Publishing your page..."

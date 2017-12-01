@@ -83,7 +83,7 @@
 
 	<!-- hide until we know what we're doing with validation -->
 	<div class="b-bottom-bar" v-show="false">
-		<el-button :plain="true" type="danger" @click="deleteThisBlock">Remove</el-button>
+		<el-button plain type="danger" @click="deleteThisBlock">Remove</el-button>
 		<el-button @click="submitForm('block_fields')">Validate</el-button>
 	</div>
 </div>

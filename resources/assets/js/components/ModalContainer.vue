@@ -1,10 +1,10 @@
 <template>
 <div>
-	<block-picker />
+	<block-picker class="el-dialog--large" />
 	<publish-modal />
 	<unpublish-modal />
 	<media-picker />
-	<media-overlay size="small" />
+	<media-overlay />
 	<create-page-modal />
 	<edit-page-modal/>
 	<publish-validation-warning-modal />

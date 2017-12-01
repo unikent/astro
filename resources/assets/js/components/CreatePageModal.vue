@@ -1,5 +1,5 @@
 <template>
-<el-dialog title="Create Page" v-model="visible" :modal-append-to-body="false">
+<el-dialog title="Create Page" :visible.sync="visible" :modal-append-to-body="false">
 	<el-form :model="createForm">
 		<el-form-item label="Page title">
 			<el-input name="title" v-model="createForm.title" auto-complete="off"></el-input>

@@ -2,9 +2,8 @@
 <el-dialog
 	class="tabbed-dialog"
 	title="Add block(s)"
-	size="large"
-	top="0%"
-	v-model="visible"
+	top="5%"
+	:visible.sync="visible"
 >
 	<el-tabs type="border-card">
 		<el-tab-pane label="All blocks">
@@ -36,7 +35,6 @@
 </template>
 
 <script>
-
 /**
  * Modal which allows the user to select one or more blocks to add to a page section.
  */

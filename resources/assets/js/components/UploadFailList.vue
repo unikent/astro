@@ -19,7 +19,7 @@
 			</a>
 			<label class="el-upload-list__item-status-label">
 				<i :class="{
-						'el-icon-circle-cross': listType === 'text',
+						'el-icon-error': listType === 'text',
 						'el-icon-check': ['picture-card', 'picture'].indexOf(listType) > -1
 				}" />
 				<i class="el-icon-close" @click="handleDelete(file)"></i>

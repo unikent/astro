@@ -1,20 +1,21 @@
 /**
-List of Sites
-
-This provides a list of sites which are avaliable to the logged in user
-
-Note
-----
-Permission checking - we're checking on two admin only permissions which are not actually defined for the Actions buttons. These permissions are
-1. site.create
-2. site.delete
-This shouldn't matter, since admin is a 'let them do anything' switch,  but if we need to add them we should make the names consistent.
+ * List of Sites
+ *
+ * This provides a list of sites which are avaliable to the logged in user
+ *
+ * Note
+ * ----
+ * Permission checking - we're checking on two admin only permissions which are not actually defined for the Actions buttons.  * These permissions are
+ * 1. site.create
+ * 2. site.delete
+ * This shouldn't matter, since admin is a 'let them do anything' switch,  but if we need to add them we should make the names * consistent.
  */
 <template>
+<div class="site-list">
 <el-card>
 	<div slot="header" class="manage-table__header">
 		<span class="main-header">Manage sites</span>
-		<el-button v-if="canUser('site.create')" type="default" @click="dialogFormVisible = true" class="manage-table__add-button">
+		<el-button v-if="canUser('site.create')" type="primary" @click="dialogFormVisible = true" class="manage-table__add-button">
 			Add Site
 		</el-button>
 	</div>
@@ -31,13 +32,13 @@ This shouldn't matter, since admin is a 'let them do anything' switch,  but if w
 
 					<th>
 						<div class="cell">
-							Location
+							URL
 						</div>
 					</th>
 
 					<th>
 						<div class="cell">
-							Actions
+							Manage
 						</div>
 					</th>
 
@@ -45,32 +46,42 @@ This shouldn't matter, since admin is a 'let them do anything' switch,  but if w
 			</thead>
 			<tbody v-loading.body="loading">
 				<tr
-				v-for="site in sitesWithRoles"
-				:key="site.id"
-				class="el-table__row"
+					v-for="site in sitesWithRoles"
+					:key="site.id"
+					class="el-table__row"
 				>
 					<td>
 						<div class="cell">
-							<router-link :to="`/site/${site.id}/page/${site.homepage.id}`">{{site.name}}</router-link>
+							<router-link :to="`/site/${site.id}`">{{site.name}}</router-link>
 						</div>
 					</td>
 
 					<td>
 						<div class="cell">
-							<span class="el-tag el-tag--primary">{{site.host}}{{site.path}}</span>
+							<el-tag type="gray">{{site.host}}{{site.path}}</el-tag>
 						</div>
 					</td>
 
 					<td>
 						<div class="cell">
+							<router-link :to="`/site/${site.id}/page/${site.homepage.id}`">
+								<el-button type="default" size="small">
+									Editor
+								</el-button>
+							</router-link>
 							<router-link :to="`/site/${site.id}/menu`" v-if="canUserOnSite('site.options.edit', site.currentRole)">
 								<el-button type="default" size="small">
 									Menu
 								</el-button>
 							</router-link>
+							<router-link :to="`/site/${site.id}/media`" v-if="canUserOnSite('image.use', site.currentRole)">
+								<el-button type="default" size="small">
+									Media
+								</el-button>
+							</router-link>
 							<router-link :to="`/site/${site.id}/users`" v-if="canUserOnSite('permissions.site.assign', site.currentRole)">
 								<el-button type="default" size="small">
-									Manage users
+									Users
 								</el-button>
 							</router-link>
 							<!-- <el-button @click="askRemove(site.id)" type="default" size="small" v-if="canUserOnSite('site.delete', site.currentRole)">
@@ -78,18 +89,15 @@ This shouldn't matter, since admin is a 'let them do anything' switch,  but if w
 							</el-button> -->
 						</div>
 					</td>
-
-
 				</tr>
 			</tbody>
 		</table>
 
-		<el-dialog title="Add Site" v-model="dialogFormVisible">
+		<el-dialog title="Add Site" :visible.sync="dialogFormVisible">
 			<el-form :model="form" label-position="top">
 				<el-row type="flex" :gutter="20">
 
 					<el-col :span="11">
-
 						<el-form-item label="Name">
 							<el-input v-model="form.name" auto-complete="off"></el-input>
 						</el-form-item>
@@ -152,6 +160,7 @@ This shouldn't matter, since admin is a 'let them do anything' switch,  but if w
 		</el-dialog>
 	</div>
 </el-card>
+</div>
 </template>
 
 <script>
@@ -271,9 +280,7 @@ export default {
 				host: '',
 				path: '',
 				errors: '',
-				/* eslint-disable camelcase */
 				siteDefinitionId: ''
-				/* eslint-enable camelcase */
 			};
 			this.loading = false;
 		},
@@ -293,12 +300,10 @@ export default {
 				name: this.form.name,
 				host: this.form.host,
 				path: this.form.path,
-				/* eslint-disable camelcase */
 				site_definition: {
 					name: this.siteDefinitions[this.form.siteDefinitionId].name,
 					version: this.siteDefinitions[this.form.siteDefinitionId].version
 				}
-				/* eslint-enable camelcase */
 			};
 
 			this.form.errors = [];
@@ -307,6 +312,8 @@ export default {
 				.then(() => {
 					// success, so let's refresh what data as have from the api
 					this.fetchData();
+
+					this.$bus.$emit('top-bar:fetchSitData');
 
 					// reset the form
 					this.resetForm();

@@ -40,7 +40,7 @@
 	@endif
 
 </head>
-<body class="custom-scrollbar">
+<body class="custom-scrollbar{{ $is_preview ? '' : ' vue-context' }}">
 	<div id="editor">
 
 	</div>

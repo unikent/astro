@@ -1,7 +1,7 @@
 <template>
 <div class="toolbar">
 
-	<el-tooltip v-if="canUser('page.edit')" class="item" effect="dark" content="Switch preview mode" placement="top">
+	<el-tooltip v-if="canUser('page.edit')" class="item" effect="dark" content="Switch edit mode" placement="top">
 		<el-select placeholder="view" v-model="view" class="switch-view">
 			<el-option v-for="(view, key) in views" :label="view.label" :value="key" :key="view.label">
 				<div class="view-icon">
@@ -14,7 +14,7 @@
 
 	<el-button v-if="canUser('page.edit')" class="toolbar__button-save" type="primary" @click="savePage" v-loading.fullscreen.lock="fullscreenLoading">Save</el-button>
 
-	<el-button v-if="canUser('page.preview')" class="toolbar__button-preview" :plain="true" type="primary" @click="previewPage">Preview <icon name="newwindow" aria-hidden="true" width="14" height="14" class="ico" /></el-button>
+	<el-button v-if="canUser('page.preview')" class="toolbar__button-preview" plain @click="previewPage">Preview <icon name="newwindow" aria-hidden="true" width="14" height="14" class="ico" /></el-button>
 
 	<template v-if="canUser('page.publish')">
 		<el-button

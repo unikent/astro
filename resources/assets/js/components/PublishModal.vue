@@ -18,7 +18,7 @@ An element loading spinner is shown after the user hits 'Publish'.
 <template>
 <el-dialog
 	title="Publish"
-	v-model="publishModalVisible"
+	:visible.sync="publishModalVisible"
 	:modal-append-to-body="true"
 	v-loading.fullscreen.lock="loading"
 	element-loading-text="Publishing your page..."
