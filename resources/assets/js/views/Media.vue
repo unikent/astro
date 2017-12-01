@@ -1,11 +1,11 @@
 <template>
 <el-card>
 	<div slot="header" class="manage-table__header">
-		<span class="main-header">Media Manager</span>
+		<span class="main-header">Manage Media</span>
 
 		<div class="u-mla u-flex">
 
-			<el-button @click="showUploadForm = true">Upload</el-button> <!-- class="upload-button" -->
+			<el-button @click="showUploadForm = true" type="primary">Upload</el-button> <!-- class="upload-button" -->
 
 			<!-- <el-input
 				placeholder="Search for media"
@@ -20,7 +20,7 @@
 
 	<div class="columns">
 
-		<div class="column is-three-quarters">
+		<div class="column is-two-thirds">
 			<!-- <el-select class="media__filter-by" placeholder="Show" value="media">
 				<el-option label="Show all" value="media" />
 				<el-option label="Image" value="image" />

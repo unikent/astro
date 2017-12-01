@@ -5,7 +5,7 @@
 			<el-card>
 				<div slot="header" class="card__header">
 					<span class="card__header-text">
-						{{ this.site.title }} menu
+						Manage Menu
 						<el-tag
 							:type="status === 'draft' ? 'primary' : 'success'"
 							class="menu-status"
@@ -21,7 +21,7 @@
 
 					<div class="u-flex-auto-left">
 						<el-button type="primary" @click="saveMenu">Save</el-button>
-						<el-button type="primary" plain class="el-button--icon" @click="previewSite">
+						<el-button plain class="el-button--icon" @click="previewSite">
 							Preview
 							<icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" />
 						</el-button>
@@ -47,6 +47,7 @@
 							:index="index"
 							itemKey="text"
 							name="Link text"
+							placeholder="Homepage"
 							:errors="errors"
 							:validate="validateMenuItem"
 						/>
@@ -55,13 +56,14 @@
 							:item="item"
 							:index="index"
 							itemKey="url"
-							name="URL"
+							name="Location"
+							placeholder="https://kent.ac.uk"
 							:errors="errors"
 							:validate="validateMenuItem"
 						/>
 
 						<span class="menu-item__cell u-flex-auto-left u-flex-grow-none">
-							<el-button @click="removeMenuItem(index)" type="default" size="small">
+							<el-button @click="removeMenuItem(index)" type="default">
 								<icon name="delete" width="14" height="14" />
 							</el-button>
 						</span>
@@ -179,7 +181,7 @@ export default {
 	},
 
 	beforeRouteLeave(to, from, next) {
-		if(this.isUnsaved) {
+		if(!this.loading && this.isUnsaved) {
 			this.$confirm(
 				'Are you sure you want to leave?',
 				'There are unsaved changes',
@@ -205,6 +207,8 @@ export default {
 
 	data() {
 		return {
+			loading: true,
+
 			site: {
 				firstPageId: 0,
 				title: '',
@@ -294,6 +298,7 @@ export default {
 						definedHost: json.data.host,
 						definedPath: json.data.path
 					};
+					this.loading = false;
 					this.menu = json.data.options['menu_draft'] || [];
 					this.initialMenu = JSON.stringify(this.menu);
 					this.publishedMenu = JSON.stringify(publishedMenu.links);
