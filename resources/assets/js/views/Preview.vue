@@ -165,7 +165,6 @@ export default {
 		},
 
 		currentBlockIsLast() {
-			console.log(this.current, this.blocks, this.blocks.length);
 			return this.current && this.current.index === this.blocks.length - 1;
 		},
 
