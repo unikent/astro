@@ -523,6 +523,29 @@ const getters = {
 	},
 
 	/**
+	 * Get the siteDefinitionId for the current site's definition.
+	 * @param state
+	 * @returns {string|null} Site definition ID in the form {name}-v{version} or null if no current site.
+	 */
+	siteDefinitionId: (state) => {
+		return (state.loaded) ?
+				(state.pageData.site.site_definition_name + '-v' + state.pageData.site.site_definition_version) :
+				null;
+	},
+
+	/**
+	 * Get the site definition for the current site.
+	 * @param state
+	 * @param getters
+	 * @param rootState
+	 * @returns {SiteDefinition|null} - The site definition for the current site, or null.
+	 */
+	siteDefinition: (state, getters, rootState) => {
+		const id = getters.siteDefinitionId;
+		return rootState.site.siteDefinitions[id] !== void 0 ? rootState.site.siteDefinitions[id] : null;
+	},
+
+	/**
 	 * Get the data representing the current page.
 	 * @param state
 	 * @returns {state/page.pageData|{blocks}|pageData|Object|*}
