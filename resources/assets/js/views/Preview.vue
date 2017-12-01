@@ -10,15 +10,50 @@
 			:style="blockOverlayStyles"
 		>
 
-			<el-dropdown class="block-overlay__delete" @command="removeBlock" v-if="sectionConstraints && sectionConstraints.canRemoveBlocks">
-				<el-button size="mini">
-					<icon name="delete" width="20" height="20" /> <i class="el-icon-caret-bottom el-icon--right"></i>
-				</el-button>
-				<el-dropdown-menu slot="dropdown">
-					<el-dropdown-item command="delete">Delete</el-dropdown-item>
-				</el-dropdown-menu>
-			</el-dropdown>
+			<div class="block-overlay__buttons" v-if="sectionConstraints">
 
+				<div v-if="sectionConstraints.canSwapBlocks">
+					<el-button
+						class="move-up"
+						@click="showBlockList(0, true)"
+					>
+						Swap block
+					</el-button>
+				</div>
+				<div v-else-if="canMove">
+					<el-button-group>
+						<el-button
+							class="move-up"
+							:disabled="currentBlockIsFirst"
+							@click="moveBlock(-1)"
+						>
+							<icon name="angle-up" width="15" height="15" viewBox="0 0 15 15" /> Move up
+						</el-button>
+
+						<el-button
+							class="move-down"
+							:disabled="currentBlockIsLast"
+							@click="moveBlock(1)"
+						>
+							Move down <icon name="angle-down" width="15" height="15" viewBox="0 0 15 15" />
+						</el-button>
+					</el-button-group>
+
+					<el-dropdown
+						class="block-overlay__delete-button"
+						@command="removeBlock"
+						v-if="sectionConstraints && sectionConstraints.canRemoveBlocks"
+					>
+						<el-button :plain="true" type="danger">
+							<icon name="delete" width="15" height="15" viewBox="0 0 15 15" /> Delete
+						</el-button>
+						<el-dropdown-menu slot="dropdown">
+							<el-dropdown-item command="delete">Confirm</el-dropdown-item>
+						</el-dropdown-menu>
+					</el-dropdown>
+				</div>
+
+			</div>
 
 			<div
 				class="add-before"
@@ -85,7 +120,9 @@ export default {
 			 * @var {BlockComponent} - The Block.vue component which is currently hovered
 			 */
 			current: null,
-			sectionConstraints: null
+			sectionDefinition: null,
+			sectionConstraints: null,
+			currentSectionBlocks: null
 		};
 	},
 
@@ -129,15 +166,15 @@ export default {
 
 		currentBlockIsLast() {
 			return this.current && this.current.index === this.blocks.length - 1;
+		},
+
+		canMove() {
+			return this.currentSectionBlocks.length > 1;
 		}
 	},
 
 	created() {
 		this.fetchPage(this.$route.params.page_id || 1);
-
-		this.$bus.$on('block:move', index => {
-			this.moved = index;
-		});
 
 		this.onKeyDown = onKeyDown(undoStackInstance);
 		this.onKeyUp = onKeyUp(undoStackInstance);
@@ -193,8 +230,7 @@ export default {
 
 			this.$bus.$on('block:showOverlay', this.showOverlay);
 			this.$bus.$on('block:hideOverlay', this.hideOverlay);
-			this.$bus.$on('block:updateOverlay', this.updateOverlay);
-			this.$bus.$on('block:move', this.repositionOverlay);
+			this.$bus.$on('block:updateOverlay', this.updateOverlay)
 		},
 
 		removeDialog(done) {
@@ -217,6 +253,16 @@ export default {
 			this.$message({
 				message: 'Block removed',
 				type: 'success'
+			});
+		},
+
+		moveBlock(num) {
+			const { index, region, section } = this.current;
+			this.reorderBlocks({
+				from: index,
+				to: index + num,
+				region,
+				section
 			});
 		},
 
@@ -309,8 +355,9 @@ export default {
 
 			if(this.current) {
 				const section = this.$store.getters.getSection(this.current.region, this.current.section);
-				const sectionDefinition = section ? Definition.getRegionSectionDefinition(this.current.region, this.current.section) : null;
-				this.sectionConstraints = section ? allowedOperations(section.blocks, sectionDefinition) : null;
+				this.sectionDefinition = section ? Definition.getRegionSectionDefinition(this.current.region, this.current.section) : null
+				this.currentSectionBlocks = section.blocks;
+				this.sectionConstraints = section ? allowedOperations(section.blocks, this.sectionDefinition) : null;
 			}
 
 		},
@@ -325,13 +372,16 @@ export default {
 			};
 		},
 
-		showBlockList(offset = 0) {
+		showBlockList(offset = 0, replaceBlocks = false) {
 			this.showBlockPicker({
 				insertIndex: this.current.index + offset,
 				sectionIndex: this.current.section,
 				regionName: this.current.region,
-				blocks: this.sectionConstraints ? this.sectionConstraints.allowedBlocks : []
+				blocks: this.sectionConstraints ? this.sectionConstraints.allowedBlocks : [],
+				maxSelectableBlocks: this.sectionConstraints.canSwapBlocks ? 1 : (this.sectionDefinition.max ? this.sectionDefinition.max - this.blocks.length : null),
+				replaceBlocks: replaceBlocks
 			});
+
 		}
 	}
 };

@@ -40,3 +40,5 @@ export { default as user }      from 'IconPath/user.svg';
 export { default as gallery }   from 'IconPath/gallery.svg';
 export { default as piechart }  from 'IconPath/pie-chart.svg';
 export { default as site }      from 'IconPath/site.svg';
+export { default as angleup }   from 'IconPath/angle-up.svg';
+export { default as angledown } from 'IconPath/angle-down.svg';

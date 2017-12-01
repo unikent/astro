@@ -8,6 +8,13 @@
 	<el-tabs type="border-card">
 		<el-tab-pane label="All blocks">
 			<p>Select one or more blocks from below that you'd like to add to the page.</p>
+			<el-alert
+				v-if="replaceBlocks" 
+				title="Replacing a block with another one means you will permanently lose your changes to the original block." 
+				type="warning"
+				:closable="false" 
+				show-icon
+			></el-alert>
 			<div class="el-dialog__footer">
 				<el-button @click="cancel">Cancel</el-button>
 				<el-button type="primary" @click="addBlocks">Add selected blocks to the page</el-button>
@@ -15,6 +22,7 @@
 			<picker-list
 					:selectedOptions="selected"
 					:options="availableBlocks"
+					:maxSelectableOptions="maxSelectableBlocks"
 			/>
 		</el-tab-pane>
 	</el-tabs>
@@ -53,6 +61,8 @@ export default {
 		...mapState({
 			blockPicker: state => state.blockPicker,
 			allowedBlocks: state => state.blockPicker.allowedBlocks,
+			maxSelectableBlocks: state => state.blockPicker.maxSelectableBlocks,
+			replaceBlocks: state => state.blockPicker.replaceBlocks,
 			allBlocks: state => state.definition.blockDefinitions
 		}),
 
@@ -106,7 +116,8 @@ export default {
 				this.addThisBlockType({
 					name,
 					version,
-					index: this.blockPicker.insertIndex + i
+					index: this.blockPicker.insertIndex + i,
+					replace: this.replaceBlocks
 				});
 			});
 
@@ -121,7 +132,7 @@ export default {
 			}
 		},
 
-		addThisBlockType({ name, version = 1, index }) {
+		addThisBlockType({ name, version = 1, index, replace = false }) {
 
 			const block = {
 				/* eslint-disable camelcase */
@@ -137,7 +148,8 @@ export default {
 				block,
 				region: this.blockPicker.insertRegion,
 				sectionIndex: this.blockPicker.insertSection,
-				sectionName: 'unknown' // TODO addBlock should not need this, sections should be setup on loading page if missing.
+				sectionName: 'unknown', // TODO addBlock should not need this, sections should be setup on loading page if missing.
+				replace: replace
 			});
 		},
 

@@ -38,6 +38,14 @@ export default {
 		'selectedOptions': {
 			required: false,
 			type: Array
+		},
+		/*
+		 * The maximum number of items that can be selected by this picker.
+		 */
+		'maxSelectableOptions': {
+			required: false,
+			type: Number,
+			default: null
 		}
 	},
 
@@ -66,7 +74,15 @@ export default {
 			const current = this.selected.indexOf(name);
 
 			if(current === -1) {
-				this.selected.push(name);
+				if (this.maxSelectableOptions !== null && this.selected.length >= this.maxSelectableOptions) {
+					this.$message({
+						type: 'warning',
+						message: 'Sorry you cannot select any more items.'
+					});
+				}
+				else {
+					this.selected.push(name);
+				}
 			}
 			else {
 				this.selected.splice(current, 1);

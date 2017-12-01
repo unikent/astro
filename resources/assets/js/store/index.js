@@ -45,7 +45,9 @@ let store = new Vuex.Store({
 			insertIndex: 0,
 			insertRegion: null,
 			insertSection: null,
-			allowedBlocks: null	// the constraints on what blocks can be added
+			allowedBlocks: null,	// the constraints on what blocks can be added
+			maxSelectableBlocks: null, // the maximum number of blocks that can be selected 
+			replaceBlocks: false //whether or not to replace the blocks in the current section
 		},
 		currentView: 'desktop',
 		publishModal: {
@@ -108,12 +110,16 @@ let store = new Vuex.Store({
 		 * @param {number} sectionIndex - The index of the section within the region to add any blocks to.
 		 * @param {number} insertIndex - The index within the section to add any blocks to.
 		 * @param {Object} blocks - List of allowed block names.
+		 * @param {number} maxSelectableBlocks - the maximum number of blocks that can be selected
+		 * @param {boolean} replaceBlocks - Replace the blocks in the section with the new one
 		 */
-		showBlockPicker(state, { regionName, sectionIndex, insertIndex, blocks }) {
+		showBlockPicker(state, { regionName, sectionIndex, insertIndex, blocks, maxSelectableBlocks, replaceBlocks }) {
 			state.blockPicker.insertRegion = regionName;
 			state.blockPicker.insertIndex = insertIndex;
 			state.blockPicker.insertSection = sectionIndex;
 			state.blockPicker.allowedBlocks = blocks;
+			state.blockPicker.maxSelectableBlocks = maxSelectableBlocks;
+			state.blockPicker.replaceBlocks = replaceBlocks
 			state.blockPicker.visible = true;
 		},
 
