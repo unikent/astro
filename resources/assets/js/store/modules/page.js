@@ -78,9 +78,9 @@ const mutations = {
 		Vue.nextTick(() => eventBus.$emit('block:updateOverlay', to));
 	},
 
-    /**
-     * @param {Object} blockMeta - The offsets and sizes of every block organised the same as pageData.blocks
-     */
+	/**
+	 * @param {Object} blockMeta - The offsets and sizes of every block organised the same as pageData.blocks
+	 */
 	addBlockMeta(state, blockMeta) {
 		state.blockMeta = blockMeta;
 	},
@@ -246,7 +246,7 @@ const mutations = {
 
 const actions = {
 
-	fetchPage({ state, commit }, id) {
+	fetchPage({ commit }, id) {
 		commit('setPage', null);
 		// TODO: refactor into smaller methods
 		api
@@ -286,15 +286,14 @@ const actions = {
 
 						commit('addBlockMeta', blockMeta);
 
-/*
-						Object.keys(blocks).forEach(region => {
-							blocks[region].forEach((block) => {
-								if (typeof block.errors !== 'undefined' && block.errors !== null) {
-									commit('addBlockValidationIssue', block.id);
-								}
-							});
-						});
-*/						// TODO: populate validations issues with those received from the api
+						// Object.keys(blocks).forEach(region => {
+						// 	blocks[region].forEach((block) => {
+						// 		if (typeof block.errors !== 'undefined' && block.errors !== null) {
+						// 			commit('addBlockValidationIssue', block.id);
+						// 		}
+						// 	});
+						// });
+						// TODO: populate validations issues with those received from the api
 						commit('setLoaded');
 					});
 
