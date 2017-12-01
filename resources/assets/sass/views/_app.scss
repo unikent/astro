@@ -9,7 +9,7 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 0 10px;
+	padding: 0 20px;
 	height: get-height(top-bar);
 }
 .top-bar--homepage {
@@ -59,7 +59,27 @@
 .backbutton-icon {
 	margin-right: 6px;
 }
-.user-menu-button {
+
+.user-account-button {
+	cursor: pointer;
+	fill: #71787f;
+	color: #71787f;
+	font-size: 14px;
+	margin-right: 12px;
+}
+
+.user-account-dropdown {
+	padding: 0;
+	font-size: 14px;
+
+	&__item {
+		padding: 15px;
+
+		&--divided {
+			border-top: 1px solid #e0e0e0;
+			color: #b4b4b5;
+		}
+	}
 }
 
 .top-bar .el-dropdown-link {

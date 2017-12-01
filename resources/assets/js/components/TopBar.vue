@@ -14,8 +14,6 @@ c. toolbar with device view, save, preview, publish actions, as well as the logo
 
 Note that the page editing toolbar is a separate component found in `components/Toolbar.vue`
 
-TODO: Add last published date after the page status
-
 */
 <template>
 	<div class="top-bar" :class="{ 'top-bar--homepage' : !showBack }">
@@ -55,14 +53,30 @@ TODO: Add last published date after the page status
 		<div class="top-bar__tools">
 			<toolbar v-if="showTools" />
 
-			<el-dropdown trigger="click" @command="handleCommand" class="user-menu-button">
-				<span class="el-dropdown-link">
-					{{ username }}<i class="el-icon-caret-bottom el-icon--right"></i>
-				</span>
-				<el-dropdown-menu slot="dropdown">
-					<el-dropdown-item command="sign-out">Sign out</el-dropdown-item>
-				</el-dropdown-menu>
-			</el-dropdown>
+			<el-popover
+				ref="user-dropdown"
+				placement="bottom-end"
+				v-model="accountDropdownVisible"
+				transition="el-zoom-in-top"
+				popper-class="user-account-dropdown"
+			>
+				<div>
+					<div class="user-account-dropdown__item" style="">
+						Signed in as <strong>{{ username }}</strong>
+					</div>
+					<div class="user-account-dropdown__item user-account-dropdown__item--divided">Settings</div>
+					<div @click="signOut" class="user-account-dropdown__item user-account-dropdown__item--clickable">
+						<form ref="submit-form" method="post" :action="`${config.get('base_url', '')}/auth/logout`">
+							<input type="hidden" name="_token" :value="config.get('csrf_token')" />
+						</form>
+						<span>Sign out</span>
+					</div>
+				</div>
+			</el-popover>
+
+			<span v-popover:user-dropdown class="user-account-button">
+				Account<i class="el-icon-caret-bottom el-icon--right"></i>
+			</span>
 		</div>
 	</div>
 </template>
@@ -74,7 +88,7 @@ TODO: Add last published date after the page status
 	import promptToSave from '../mixins/promptToSave';
 	import Config from '../classes/Config.js';
 
-	/* global window, document */
+	/* global window */
 
 	export default {
 
@@ -85,7 +99,7 @@ TODO: Add last published date after the page status
 			Toolbar
 		},
 
-		mixins:[promptToSave],
+		mixins: [promptToSave],
 
 		created() {
 			window.addEventListener('beforeunload', this.leaveAstro);
@@ -96,6 +110,12 @@ TODO: Add last published date after the page status
 			this.loadGlobalRole(window.astro.username);
 			this.$store.dispatch('site/fetchLayouts');
 			this.$store.dispatch('site/fetchSiteDefinitions');
+		},
+
+		data() {
+			return {
+				accountDropdownVisible: false
+			};
 		},
 
 		computed: {
@@ -128,6 +148,10 @@ TODO: Add last published date after the page status
 			// lets us output a calculated url for the current page in the top bar
 			renderedURL() {
 				return this.siteDomain + this.sitePath + this.pagePath;
+			},
+
+			config() {
+				return Config;
 			}
 		},
 
@@ -155,23 +179,10 @@ TODO: Add last published date after the page status
 				'updateMenuActive'
 			]),
 
-			handleCommand(command) {
-				if(command === 'sign-out') {
-					// prompts the user to save the page when they try to log out
-					this.promptToSave(() => {
-						const form = document.createElement('form');
-						form.setAttribute('method', 'post');
-						form.setAttribute('action', Config.get('base_url', '') + '/auth/logout');
-						const csrf = document.createElement('input');
-						csrf.setAttribute('type', 'hidden');
-						csrf.setAttribute('name', '_token');
-						csrf.setAttribute('value', window.astro.csrf_token);
-						form.appendChild(csrf);
-						document.body.appendChild(form);
-						form.submit();
-						// window.location = Config.get('base_url', '') + '/auth/logout';
-					});
-				}
+			signOut() {
+				this.promptToSave(() => {
+					this.$refs['submit-form'].submit();
+				});
 			},
 
 			/**
