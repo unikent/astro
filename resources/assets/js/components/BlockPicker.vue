@@ -57,6 +57,7 @@ export default {
 			blockPicker: state => state.blockPicker,
 			allowedBlocks: state => state.blockPicker.allowedBlocks,
 			maxSelectableBlocks: state => state.blockPicker.maxSelectableBlocks,
+			replaceBlocks: state => state.blockPicker.replaceBlocks,
 			allBlocks: state => state.definition.blockDefinitions
 		}),
 
@@ -110,7 +111,8 @@ export default {
 				this.addThisBlockType({
 					name,
 					version,
-					index: this.blockPicker.insertIndex + i
+					index: this.blockPicker.insertIndex + i,
+					replace: this.replaceBlocks
 				});
 			});
 
@@ -125,7 +127,7 @@ export default {
 			}
 		},
 
-		addThisBlockType({ name, version = 1, index }) {
+		addThisBlockType({ name, version = 1, index, replace = false }) {
 
 			const block = {
 				/* eslint-disable camelcase */
@@ -137,6 +139,27 @@ export default {
 			};
 
 			this.addBlock({
+				index,
+				block,
+				region: this.blockPicker.insertRegion,
+				sectionIndex: this.blockPicker.insertSection,
+				sectionName: 'unknown', // TODO addBlock should not need this, sections should be setup on loading page if missing.
+				replace: replace
+			});
+		},
+
+		replaceThisBlockType({ name, version = 1, index }) {
+
+			const block = {
+				/* eslint-disable camelcase */
+				definition_name: name,
+				definition_version: version,
+				/* eslint-enable camelcase */
+				id: uuid(),
+				fields: {}
+			};
+
+			this.swapBlock({
 				index,
 				block,
 				region: this.blockPicker.insertRegion,
