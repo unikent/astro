@@ -7,7 +7,6 @@
 		type="info"
 		:closable="false"
 		show-icon
-		style="width:85%; margin: 1rem auto"
 	>
 	</el-alert>
 
