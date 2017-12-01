@@ -11,7 +11,7 @@
 		:accept="accept"
 	>
 		<i class="el-icon-upload"></i>
-		<div class="el-upload__text">Drop {{ multiple ? 'file(s)' : 'single file' }} here or <em>click to upload</em></div>
+		<div class="el-upload__text">Drop {{ multiple ? 'one or more files' : 'a single file' }} here or <em>click to upload</em></div>
 		<div class="el-upload__tip" slot="tip">
 			Files must be less than 5MB. If this dialog is closed uploads will happen in the background.
 			<upload-fail-list
@@ -36,9 +36,7 @@ export default {
 			type: Function,
 			default: () => {}
 		},
-		/* eslint-disable camelcase */
-		site_id: Number
-		/* eslint-enable camelcase */
+		siteId: Number
 	},
 
 	components: {
@@ -53,7 +51,7 @@ export default {
 
 	methods: {
 		handleError(err, file) {
-			if(err.response && err.response.status === 422) {
+			if(err.response && err.response.data && err.response.data.errors && err.response.data.errors.length) {
 				file.error = err.response.data.errors[0].message;
 			}
 
@@ -64,7 +62,7 @@ export default {
 			if(!options.data) {
 				options.data = {};
 			}
-			options.data['site_ids[]'] = this.site_id;
+			options.data['site_ids[]'] = this.siteId;
 			return upload(options);
 		}
 	}
