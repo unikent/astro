@@ -66,11 +66,13 @@ class LocalAPIClientTest extends TestCase
     {
         $client = $this->fixture();
         $site = $client->createSite(
-            'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
+            'Test Site', 'example.com', '', ['name' => 'one-page-site', 'version' => 1]
         );
         $this->assertInstanceOf(Site::class, $site);
         $this->assertInstanceOf(Page::class, $site->draftHomepage);
+        $this->assertNull($site->draftHomepage->slug);
         $this->assertInstanceOf(Revision::class, $site->draftHomepage->revision);
+		$this->assertEquals('Home Page', $site->draftHomepage->revision->title); // as defined in the one-page-site-v1 site template
     }
 
     /**
@@ -81,7 +83,7 @@ class LocalAPIClientTest extends TestCase
     {
         $client = $this->fixture();
         $site = $client->createSite(
-            'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
+            'Test Site', 'example.com', '', ['name' => 'one-page-site', 'version' => 1]
         );
         $new_page_title = 'This is a page :)';
         $newpage = $client->addPage(
@@ -107,7 +109,7 @@ class LocalAPIClientTest extends TestCase
     {
         $client = $this->fixture();
         $site = $client->createSite(
-            'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
+            'Test Site', 'example.com', '', ['name' => 'one-page-site', 'version' => 1]
         );
         $client->addTree($site->draftHomepage->id, null, $this->testTree);
         $expected = [
@@ -130,7 +132,7 @@ class LocalAPIClientTest extends TestCase
     {
         $client = $this->fixture();
         $site = $client->createSite(
-            'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
+            'Test Site', 'example.com', '', ['name' => 'one-page-site', 'version' => 1]
         );
         $client->addTree($site->draftHomepage->id, null, $this->testTree);
         $parent = Page::findBySiteAndPath($site->id,'/undergraduate');
@@ -164,7 +166,7 @@ class LocalAPIClientTest extends TestCase
         $this->expectException(\Illuminate\Validation\ValidationException::class);
         $client = $this->fixture();
         $site = $client->createSite(
-             'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
+             'Test Site', 'example.com', '', ['name' => 'one-page-site', 'version' => 1]
         );
         $new_page_title = 'This is a page :)';
         $newpage = $client->addPage(
@@ -186,7 +188,7 @@ class LocalAPIClientTest extends TestCase
         $this->expectException(\Illuminate\Validation\ValidationException::class);
         $client = $this->fixture();
         $site = $client->createSite(
-            'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
+            'Test Site', 'example.com', '', ['name' => 'one-page-site', 'version' => 1]
         );
         $new_page_title = 'This is a page :)';
         $newpage = $client->addPage(
@@ -215,7 +217,7 @@ class LocalAPIClientTest extends TestCase
         $this->expectException(\Illuminate\Validation\ValidationException::class);
         $client = $this->fixture();
         $site = $client->createSite(
-             'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
+             'Test Site', 'example.com', '', ['name' => 'one-page-site', 'version' => 1]
         );
         $client->addTree( $site->draftHomepage->id, null, $this->testTree);
         $parent1 = Page::findBySiteAndPath($site->id, '/undergraduate/2018');
@@ -258,7 +260,7 @@ class LocalAPIClientTest extends TestCase
         $this->expectException(\Illuminate\Validation\ValidationException::class);
         $client = $this->fixture();
         $site = $client->createSite(
-            'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
+            'Test Site', 'example.com', '', ['name' => 'one-page-site', 'version' => 1]
         );
         $client->updatePageContent(null, []);
     }
@@ -272,7 +274,7 @@ class LocalAPIClientTest extends TestCase
         $this->expectException(\Illuminate\Validation\ValidationException::class);
         $client = $this->fixture();
         $site = $client->createSite(
-            'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
+            'Test Site', 'example.com', '', ['name' => 'one-page-site', 'version' => 1]
         );
         $client->updatePageContent($site->draftHomepage->id, null);
     }
@@ -285,7 +287,7 @@ class LocalAPIClientTest extends TestCase
     {
         $client = $this->fixture();
         $site = $client->createSite(
-            'Test Site', 'example.com', '', ['name' => 'test-layout', 'version' => 1]
+            'Test Site', 'example.com', '', ['name' => 'one-page-site', 'version' => 1]
         );
         $homepage = $site->draftHomepage;
         $old_revision = $homepage->revision;

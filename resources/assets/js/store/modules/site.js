@@ -40,6 +40,7 @@ const state = {
 	pages: [],
 	site: 1,
 	layouts: [],
+	siteDefinitions: {},
 	maxDepth: 3,
 	pageModal: {
 		visible: false,
@@ -73,6 +74,15 @@ const mutations = {
 
 	setLayouts(state, layouts) {
 		state.layouts = layouts;
+	},
+
+	/**
+	 * Sets the available site template definitions that can be selected from when creating a site.
+	 * @param state
+	 * @param {Object} definitions - { <name>-v<version>: {SiteDefinition}, ... }
+	 */
+	setSiteDefinitions(state, definitions) {
+		state.siteDefinitions = definitions;
 	},
 
 	addPage(state, { parent, index, page, push = false }) {
@@ -207,6 +217,18 @@ const actions = {
 			.get('layouts/definitions')
 			.then((response) => {
 				commit('setLayouts', response.data.data)
+			})
+	},
+
+	/**
+	 * Initialise the list of site definitions available for use.
+	 * @param commit
+	 */
+	fetchSiteDefinitions({ commit }) {
+		api
+			.get('sitedefinitions')
+			.then((response) => {
+				commit('setSiteDefinitions', response.data.data)
 			})
 	},
 

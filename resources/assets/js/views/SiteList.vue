@@ -96,13 +96,13 @@ This shouldn't matter, since admin is a 'let them do anything' switch,  but if w
 					</el-col>
 
 					<el-col :span="11" :offset="2">
-						<el-form-item label="Home page layout">
-							<el-select v-model="form.homepage_layout" class="w100" placeholder="Select">
+						<el-form-item label="Site Template">
+							<el-select v-model="form.siteDefinitionId" class="w100" placeholder="Select">
 								<el-option
-									v-for="(layoutDefinition, layoutID) in layouts"
-									:label="layoutDefinition.label + ' (v' + layoutDefinition.version + ')'"
-									:value="layoutID"
-									:key="layoutID"
+									v-for="(siteDefinition, siteID) in siteDefinitions"
+									:label="siteDefinition.label + ' (v' + siteDefinition.version + ')'"
+									:value="siteID"
+									:key="siteID"
 								>
 								</el-option>
 							</el-select>
@@ -175,9 +175,7 @@ export default {
 				name: '',
 				path: '',
 				host: '',
-				/* eslint-disable camelcase */
-				homepage_layout: '',
-				/* eslint-enable camelcase */
+				siteDefinitionId: '',
 				errors: '',
 			}
 		};
@@ -190,7 +188,7 @@ export default {
 	computed: {
 
 		...mapState({
-			layouts: state => state.site.layouts
+			siteDefinitions: state => state.site.siteDefinitions
 		}),
 
 		...mapGetters([
@@ -200,7 +198,7 @@ export default {
 		]),
 
 		disableSubmit() {
-			return this.form.homepage_layout === ''	 ||
+			return this.form.siteDefinitionId === ''	 ||
 					this.form.name === '' ||
 					this.form.host === '';
 		},
@@ -274,7 +272,7 @@ export default {
 				path: '',
 				errors: '',
 				/* eslint-disable camelcase */
-				homepage_layout: ''
+				siteDefinitionId: ''
 				/* eslint-enable camelcase */
 			};
 			this.loading = false;
@@ -296,9 +294,9 @@ export default {
 				host: this.form.host,
 				path: this.form.path,
 				/* eslint-disable camelcase */
-				homepage_layout: {
-					name: this.layouts[this.form.homepage_layout].name,
-					version: this.layouts[this.form.homepage_layout].version
+				site_definition: {
+					name: this.siteDefinitions[this.form.siteDefinitionId].name,
+					version: this.siteDefinitions[this.form.siteDefinitionId].version
 				}
 				/* eslint-enable camelcase */
 			};

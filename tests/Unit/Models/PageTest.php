@@ -38,7 +38,7 @@ class PageTest extends TestCase
             'test',
             'example.com',
             '',
-            ['name' => 'test-layout', 'version' => 1]
+            ['name' => 'one-page-site', 'version' => 1]
         );
         $api->publishPage($site->draftHomepage->id);
 	    $pages = Page::published()->get();
@@ -59,7 +59,7 @@ class PageTest extends TestCase
             'test',
             'example.com',
             '',
-            ['name' => 'test-layout', 'version' => 1]
+            ['name' => 'one-page-site', 'version' => 1]
         );
         $api->publishPage($site->draftHomepage->id);
         $pages = Page::draft()->get();
@@ -80,7 +80,7 @@ class PageTest extends TestCase
             'test',
             'example.com',
             '',
-            ['name' => 'test-layout', 'version' => 1]
+            ['name' => 'one-page-site', 'version' => 1]
         );
         $api->publishPage($site->draftHomepage->id);
         $pages = Page::version(Page::STATE_DRAFT)->get();
