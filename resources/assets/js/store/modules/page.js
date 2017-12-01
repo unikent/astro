@@ -132,10 +132,11 @@ const mutations = {
 	 * @param {BlockData} block - The data representing the block to be added.
 	 * @param {number} sectionIndex - The index of the section in the specified region.
 	 * @param {string} sectionName - The name of the section to add the block to.
+	 * @param {boolean} replace - Whether or not to replace the block
 	 *
 	 * If the specified region and / or section do not exist in the block data, they will be added.
 	 */
-	addBlock(state, { region, index, block, sectionIndex, sectionName }) {
+	addBlock(state, { region, index, block, sectionIndex, sectionName, replace } ) {
 
 		// if region is not yet defined in block data, add it
 		if(state.pageData.blocks[region] === void 0) {
@@ -171,12 +172,12 @@ const mutations = {
 			Definition.fillBlockFields(block);
 		}
 
-		state.blockMeta.blocks[region][sectionIndex].blocks.splice(index, 0, {
+		state.blockMeta.blocks[region][sectionIndex].blocks.splice(index, (replace ? 1 : 0), {
 			size: 0,
 			offset: 0
 		});
 
-		state.pageData.blocks[region][sectionIndex].blocks.splice(index, 0, block || {});
+		state.pageData.blocks[region][sectionIndex].blocks.splice(index, (replace ? 1 : 0), block || {});
 	},
 
 	/**
