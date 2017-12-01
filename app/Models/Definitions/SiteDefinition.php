@@ -11,32 +11,4 @@ class SiteDefinition extends BaseDefinition
 	protected $casts = [
         'allowedLayouts' => 'array'
 	];
-
-	/**
-	 * Loads the Region definitions from disk and populates $regionDefinitions.
-	 *
-	 * @return void
-	 */
-	public function loadRegionDefinitions(){
-		foreach($this->regions as $region_id){
-			$path = Region::locateDefinition($region_id);
-			if(!is_null($path)){
-				$region = Region::fromDefinitionFile($path);
-				$this->regionDefinitions->push($region);
-			}
-		}
-	}
-
-	/**
-	 * Returns the regionDefinitions Collection, populating it from disk if necessary.
-	 *
-	 * @return Collection
-	 */
-	public function getRegionDefinitions(){
-		if($this->regionDefinitions->isEmpty() && count($this->regions)){
-			$this->loadRegionDefinitions();
-		}
-
-		return $this->regionDefinitions;
-	}
 }
