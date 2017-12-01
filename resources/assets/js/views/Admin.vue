@@ -5,9 +5,7 @@
 			<ul class="admin-sidebar" role="navigation">
 				<side-menu-item
 					v-for="item in menu"
-					:link="item.link"
-					:icon="item.icon"
-					:title="item.title"
+					:item="item"
 					:key="item.link"
 				/>
 			</ul>
@@ -25,9 +23,11 @@ import Icon from 'components/Icon';
 export default {
 	name: 'Admin',
 
+	props: ['site_id'],
+
 	components: {
 		SideMenuItem: {
-			props: ['link', 'icon', 'title'],
+			props: ['item'],
 
 			components: {
 				Icon
@@ -35,35 +35,59 @@ export default {
 
 			template: `
 				<li>
-					<router-link :to="link">
-						<icon :name="icon" className="menu-icon" />
-						<span>{{ title }}</span>
+					<router-link :to="item.link" exact>
+						<icon :name="item.icon" className="menu-icon" />
+						<span>{{ item.title }}</span>
+						<icon
+							v-if="item.leave"
+							name="new-window"
+							width="14"
+							height="14"
+							class="admin-sidebar__external-link"
+						/>
 					</router-link>
 				</li>
 			`
 		}
 	},
 
-	data() {
-		return {
-			menu: [
+	computed: {
+
+		url() {
+			return `/site/${this.site_id}`;
+		},
+
+		menu() {
+			return [
 				{
-					link: '/home',
-					icon: 'home',
-					title: 'Home'
+					link: `${this.url}`,
+					icon: 'pie-chart',
+					title: 'Dashboard'
 				},
 				{
-					link: '/sites',
-					icon: 'sites',
-					title: 'Sites'
+					link: `${this.url}/page/1`,
+					icon: 'layout',
+					title: 'Editor',
+					leave: true
 				},
 				{
-					link: '/settings',
-					icon: 'settings',
-					title: 'Settings'
+					link: `${this.url}/menu`,
+					icon: 'menu-alt',
+					title: 'Menu'
+				},
+				{
+					link: `${this.url}/media`,
+					icon: 'gallery',
+					title: 'Media'
+				},
+				{
+					link: `${this.url}/users`,
+					icon: 'user',
+					title: 'Users'
 				}
-			]
-		};
+			];
+		}
+
 	}
 };
 </script>
