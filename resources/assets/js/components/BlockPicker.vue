@@ -9,6 +9,13 @@
 	<el-tabs type="border-card">
 		<el-tab-pane label="All blocks">
 			<p>Select one or more blocks from below that you'd like to add to the page.</p>
+			<el-alert
+				v-if="replaceBlocks" 
+				title="Replacing a block with another one means you will permanently lose your changes to the original block." 
+				type="warning"
+				:closable="false" 
+				show-icon
+			></el-alert>
 			<div class="el-dialog__footer">
 				<el-button @click="cancel">Cancel</el-button>
 				<el-button type="primary" @click="addBlocks">Add selected blocks to the page</el-button>
@@ -145,26 +152,6 @@ export default {
 				sectionIndex: this.blockPicker.insertSection,
 				sectionName: 'unknown', // TODO addBlock should not need this, sections should be setup on loading page if missing.
 				replace: replace
-			});
-		},
-
-		replaceThisBlockType({ name, version = 1, index }) {
-
-			const block = {
-				/* eslint-disable camelcase */
-				definition_name: name,
-				definition_version: version,
-				/* eslint-enable camelcase */
-				id: uuid(),
-				fields: {}
-			};
-
-			this.swapBlock({
-				index,
-				block,
-				region: this.blockPicker.insertRegion,
-				sectionIndex: this.blockPicker.insertSection,
-				sectionName: 'unknown' // TODO addBlock should not need this, sections should be setup on loading page if missing.
 			});
 		},
 
