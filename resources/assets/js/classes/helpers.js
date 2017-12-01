@@ -163,7 +163,16 @@ export const notify = ({ title, message, type }) => {
 			this.close();
 		}
 	});
+	// vue.$message({
+	// 	message,
+	// 	type,
+	// 	duration: readingSpeedFromString(message, 3000),
+	// });
 };
+
+// Does the given string start with a vowel? If so return "an", otherwise "a".
+// Doesn't cover all cases, but is good enough for now.
+export const aOrAn = (str) => str.match(/^[aeiou]/i) ? 'an' : 'a';
 
 export const pageHasBeenPublished = (page) => {
 	return page.status !== 'new';
