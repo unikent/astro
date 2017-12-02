@@ -154,6 +154,8 @@ export const prettyDate = (date) => {
 };
 
 export const notify = ({ title, message, type }) => {
+	// TODO:is notify is overkill for some scenarios?
+	// Element UI's $message seems more suited to success messages
 	vue.$notify({
 		title,
 		message,
@@ -163,11 +165,6 @@ export const notify = ({ title, message, type }) => {
 			this.close();
 		}
 	});
-	// vue.$message({
-	// 	message,
-	// 	type,
-	// 	duration: readingSpeedFromString(message, 3000),
-	// });
 };
 
 // Does the given string start with a vowel? If so return "an", otherwise "a".
