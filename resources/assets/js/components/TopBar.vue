@@ -57,7 +57,7 @@ Note that the page editing toolbar is a separate component found in `components/
 				v-if="(!showBack && this.$route.name !== 'site-list') && sites.length === 1"
 				 class="site-pick"
 			>
-				<icon name="site" /> Site 1
+				<icon name="site" /> {{ siteTitle }}
 			</div>
 
 			<div v-show="showBack" @click="backToAdmin" class="top-bar-backbutton">
