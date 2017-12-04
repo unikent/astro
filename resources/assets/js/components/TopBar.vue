@@ -14,14 +14,54 @@ c. toolbar with device view, save, preview, publish actions, as well as the logo
 
 Note that the page editing toolbar is a separate component found in `components/Toolbar.vue`
 
-TODO: Add last published date after the page status
-
 */
 <template>
-	<div class="top-bar" :class="{ 'top-bar--homepage' : !showBack }">
+	<div class="top-bar">
 		<div>
-			<div v-show="showBack" @click="backToSites" class="top-bar-backbutton">
-				<i class="el-icon-arrow-left backbutton-icon"></i>Sites
+
+			<div
+				v-if="(!showBack && this.$route.name !== 'site-list') && sites.length > 1"
+			>
+				<el-popover
+					ref="site-picker"
+					placement="bottom-start"
+					v-model="siteDropdownVisible"
+					transition="el-zoom-in-top"
+				>
+					<ul class="site-picker">
+						<template v-for="(n, i) in Math.min(sites.length, 11)">
+							<li v-if="n !== 11">
+								<router-link :to="`/site/${sites[i].id}`" @click.native="siteDropdownVisible = false">
+									{{ sites[i].name }}
+								</router-link>
+							</li>
+							<li v-else>
+								More sites available...
+							</li>
+						</template>
+
+						<li>
+							<router-link to="/" @click.native="siteDropdownVisible = false">
+								<i class="el-icon-arrow-left"></i> Back to sites
+							</router-link>
+						</li>
+					</ul>
+				</el-popover>
+
+				<span v-popover:site-picker class="site-pick">
+					<icon name="site" />
+					{{ siteTitle }}<i class="el-icon-caret-bottom el-icon--right"></i>
+				</span>
+			</div>
+			<div
+				v-if="(!showBack && this.$route.name !== 'site-list') && sites.length === 1"
+				 class="site-pick"
+			>
+				<icon name="site" /> {{ siteTitle }}
+			</div>
+
+			<div v-show="showBack" @click="backToAdmin" class="top-bar-backbutton">
+				<i class="el-icon-arrow-left backbutton-icon"></i>Back
 			</div>
 
 			<div v-if="showTools && publishStatus === 'new'" class="top-bar__page-title">
@@ -55,14 +95,30 @@ TODO: Add last published date after the page status
 		<div class="top-bar__tools">
 			<toolbar v-if="showTools" />
 
-			<el-dropdown trigger="click" @command="handleCommand" class="user-menu-button">
-				<span class="el-dropdown-link">
-					{{ username }}<i class="el-icon-caret-bottom el-icon--right"></i>
-				</span>
-				<el-dropdown-menu slot="dropdown">
-					<el-dropdown-item command="sign-out">Sign out</el-dropdown-item>
-				</el-dropdown-menu>
-			</el-dropdown>
+			<el-popover
+				ref="user-dropdown"
+				placement="bottom-end"
+				v-model="accountDropdownVisible"
+				transition="el-zoom-in-top"
+				popper-class="user-account-dropdown"
+			>
+				<div>
+					<div class="user-account-dropdown__item">
+						Signed in as <strong>{{ username }}</strong>
+					</div>
+					<div class="user-account-dropdown__item user-account-dropdown__item--divided">Settings</div>
+					<div @click="signOut" class="user-account-dropdown__item user-account-dropdown__item--clickable">
+						<form ref="submit-form" method="post" :action="`${config.get('base_url', '')}/auth/logout`">
+							<input type="hidden" name="_token" :value="config.get('csrf_token')" />
+						</form>
+						<span>Sign out</span>
+					</div>
+				</div>
+			</el-popover>
+
+			<span v-popover:user-dropdown class="user-account-button">
+				Account<i class="el-icon-caret-bottom el-icon--right"></i>
+			</span>
 		</div>
 	</div>
 </template>
@@ -85,15 +141,33 @@ TODO: Add last published date after the page status
 			Toolbar
 		},
 
-		mixins:[promptToSave],
+		mixins: [promptToSave],
 
 		created() {
+			this.fetchSiteData();
+			// refresh our site list dropdown when a new site is added
+			// TODO: replace with more structured state, rather than an event
+			this.$bus.$on('top-bar:fetchSitData', this.fetchSiteData);
 			window.addEventListener('beforeunload', this.leaveAstro);
 		},
 
 		mounted() {
 			this.loadPermissions();
 			this.loadGlobalRole(window.astro.username);
+			this.$store.dispatch('site/fetchLayouts');
+			this.$store.dispatch('site/fetchSiteDefinitions');
+		},
+
+		destroyed() {
+			this.$bus.$off('top-bar:fetchSitData');
+		},
+
+		data() {
+			return {
+				siteDropdownVisible: false,
+				accountDropdownVisible: false,
+				sites: []
+			};
 		},
 
 		computed: {
@@ -111,7 +185,7 @@ TODO: Add last published date after the page status
 
 			// works out if we should show a back button or not (ie whether we're editing a page or on the homepage)
 			showBack() {
-				return ['site', 'page', 'menu-editor', 'site-users'].indexOf(this.$route.name) !== -1;
+				return ['page'].indexOf(this.$route.name) !== -1;
 			},
 
 			showTools() {
@@ -126,6 +200,15 @@ TODO: Add last published date after the page status
 			// lets us output a calculated url for the current page in the top bar
 			renderedURL() {
 				return this.siteDomain + this.sitePath + this.pagePath;
+			},
+
+			config() {
+				return Config;
+			},
+
+			siteTitle() {
+				const site = this.sites.find(site => site.id === Number(this.$route.params.site_id));
+				return site ? site.name : '';
 			}
 		},
 
@@ -136,8 +219,8 @@ TODO: Add last published date after the page status
 				 https://developer.mozilla.org/en/docs/Web/Events/beforeunload
 				 */
 				const unsavedChangesExist = this.unsavedChangesExist();
-				if (unsavedChangesExist == true) {
-					var confirmationMessage = "You may lose changes if you leave without saving";
+				if (unsavedChangesExist) {
+					var confirmationMessage = 'You may lose changes if you leave without saving';
 					e.returnValue = confirmationMessage;     // Gecko, Trident, Chrome 34+
 					return confirmationMessage;              // Gecko, WebKit, Chrome <34
 				}
@@ -153,34 +236,29 @@ TODO: Add last published date after the page status
 				'updateMenuActive'
 			]),
 
-			handleCommand(command) {
-				if(command === 'sign-out') {
-					// prompts the user to save the page when they try to log out
-					this.promptToSave(() => {
-						const form = document.createElement('form');
-						form.setAttribute('method', 'post');
-						form.setAttribute('action', Config.get('base_url', '') + '/auth/logout');
-						const csrf = document.createElement('input');
-						csrf.setAttribute('type', 'hidden');
-						csrf.setAttribute('name', '_token');
-						csrf.setAttribute('value', window.astro.csrf_token);
-						form.appendChild(csrf);
-						document.body.appendChild(form);
-						form.submit();
-						//window.location = Config.get('base_url', '') + '/auth/logout';
+			fetchSiteData() {
+				this.$api
+					.get('sites')
+					.then(({ data: json }) => {
+						this.sites = json.data;
 					});
-				}
+			},
+
+			signOut() {
+				this.promptToSave(() => {
+					this.$refs['submit-form'].submit();
+				});
 			},
 
 			/**
-			 gets the user back to the main site listing
+			 gets the user back to the main admin area
 			 */
-			backToSites() {
+			backToAdmin() {
 				// another prompt to save the page when going back to the site listing
 				this.promptToSave(() => {
 					this.$store.commit('setLoaded', false);
 					this.$store.commit('setPage', {});
-					this.$router.push('/sites');
+					this.$router.push(`/site/${this.$route.params.site_id}`);
 				})
 			}
 		}

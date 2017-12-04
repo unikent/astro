@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Exceptions\UnpublishedParentException;
+use App\Models\Definitions\Region;
 use DB;
 use Doctrine\DBAL\Version;
 use Exception;
@@ -10,7 +11,7 @@ use App\Models\Definitions\Layout as LayoutDefinition;
 use Baum\Node as BaumNode;
 use Illuminate\Database\Eloquent\Collection;
 use League\Fractal\TransformerAbstract;
-
+use App\Models\Definitions\Layout;
 /**
  * A Page represents a path in a hierarchical site structure.
  * Each page has a current revision, and each "tree" of pages is scoped by its site_id and version (draft, published, etc).
@@ -93,18 +94,28 @@ class Page extends BaumNode
 			->get()
 			->groupBy('region_name');
 		$this->load('blocks.media');
-		foreach ($blocksByRegion as $region => $blocks) {
-			$data[$region] = [];
-			foreach ($blocks as $block) {
-				$block->embedMedia();
-				$data[$region][] = [
-					'id' => $block->id,
-					'definition_name' => $block->definition_name,
-					'definition_version' => $block->definition_version,
-					'region_name' => $block->region_name,
-					'fields' => $block->fields,
-					'errors' => $block->errors
-				];
+		foreach ($blocksByRegion as $region_id => $blocks) {
+			// need the region definition to get sections in the correct order
+			$regionDef = Region::fromDefinitionFile(Region::locateDefinition($region_id));
+			$sections = $blocks->groupBy('section_name');
+			$data[$region_id] = [];
+			foreach($regionDef->sections as $section_def){
+				$section = ['name' => $section_def['name'], 'blocks' => []];
+				if(!empty($sections[$section_def['name']])){
+					foreach($sections[$section_def['name']] as $block){
+						$block->embedMedia();
+						$section['blocks'][] = [
+							'id' => $block->id,
+							'definition_name' => $block->definition_name,
+							'definition_version' => $block->definition_version,
+							'region_name' => $block->region_name,
+							'section_name' => $block->section_name,
+							'fields' => $block->fields,
+							'errors' => $block->errors
+						];
+					}
+				}
+				$data[$region_id][] = $section;
 			}
 		}
 		return $data;
@@ -417,5 +428,40 @@ class Page extends BaumNode
 		Block::deleteForPageRegion($this, $region);
 	}
 
+	/**
+	 * Create and save all the default blocks / regions / sections for a Page based on a layout.
+	 * @param Page $page - The Page object to create blocks for.
+	 * @param string $layout_name - The name of the layout
+	 * @param integer $layout_version - The version of the layout
+	 */
+	public function createDefaultBlocks($layout_name, $layout_version)
+	{
+		$layout_definition = Layout::fromDefinitionFile(Layout::locateDefinition(Layout::idFromNameAndVersion($layout_name, $layout_version)));
+		if($layout_definition){
+			$data = $layout_definition->getDefaultPageContent();
+			$this->saveBlocks($this->id, $data);
+		}
+	}
 
+	/**
+	 * Saves the default content for the page defined in blocks to the database.
+	 *
+	 * @param array $data ['region-name' => [['name' => 'section-1-name', 'blocks' => [ ... [block def 1], [block def 2]...]],...]]
+	 */
+	public function saveBlocks($page_id,$data)
+	{
+		foreach($data as $region_name => $sections){
+			foreach($sections as $section){
+				foreach($section['blocks'] as $i => $block_data) {
+					$block = new Block;
+					$block->fill($block_data);
+					$block->page_id = $page_id;
+					$block->order = $i;
+					$block->region_name = $region_name;
+					$block->section_name = $section['name'];
+					$block->save();
+				}
+			}
+		}
+	}
 }

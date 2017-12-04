@@ -5,6 +5,7 @@
 		filterable
 		:placeholder="placeholder"
 		:filter-method="filterItems"
+		:no-data-text="noItemsText"
 	>
 		<el-option
 			v-for="item in filteredItems"
@@ -31,7 +32,9 @@ export default {
 		'value-path',
 		'key-path',
 		'placeholder',
-		'filter-callback'
+		'filter-callback',
+		'no-data-text',
+		'no-match-text'
 	],
 
 	data() {
@@ -56,9 +59,15 @@ export default {
 			}
 		},
 
-		// TODO: make generic (based on props)
 		filteredItems() {
-			return this.searchFor !== '' ? this.items.filter(item => this.filterCallback(item, this.searchFor)) : this.items;
+			return this.searchFor !== '' ?
+				this.items.filter(item => this.filterCallback(item, this.searchFor)) :
+				this.items;
+		},
+
+		noItemsText() {
+			return this.items.length > 0 && this.filteredItems.length === 0 ?
+				this.noMatchText : this.noDataText;
 		}
 
 	},

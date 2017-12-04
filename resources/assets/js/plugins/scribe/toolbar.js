@@ -114,7 +114,7 @@ export default (toolbarNode) => {
 							const selectOffset = selection.range.endOffset;
 
 							(
-								{start, end} = getClosestWord(
+								{ start, end } = getClosestWord(
 									selection.range.endContainer.textContent,
 									selectOffset
 								)

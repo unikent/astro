@@ -10,22 +10,56 @@
 			:style="blockOverlayStyles"
 		>
 
-			<el-dropdown class="block-overlay__delete" @command="removeBlock">
-				<el-button size="mini">
-					<icon name="delete" width="20" height="20" /> <i class="el-icon-caret-bottom el-icon--right"></i>
-				</el-button>
-				<el-dropdown-menu slot="dropdown">
-					<el-dropdown-item command="delete">Delete</el-dropdown-item>
-				</el-dropdown-menu>
-			</el-dropdown>
+			<div class="block-overlay__buttons" v-if="sectionConstraints">
 
-			<div ref="move" class="block-overlay__move" v-show="blocks.length > 1">
-				<icon name="move" width="20" height="20" />
+				<div v-if="sectionConstraints.canSwapBlocks">
+					<el-button
+						class="move-up"
+						@click="showBlockList(0, true)"
+					>
+						Swap block
+					</el-button>
+				</div>
+				<div v-else-if="canMove">
+					<el-button-group>
+						<el-button
+							class="move-up"
+							:disabled="currentBlockIsFirst"
+							@click="moveBlock(-1)"
+						>
+							<icon name="angle-up" width="15" height="15" viewBox="0 0 15 15" /> Move up
+						</el-button>
+
+						<el-button
+							class="move-down"
+							:disabled="currentBlockIsLast"
+							@click="moveBlock(1)"
+						>
+							Move down <icon name="angle-down" width="15" height="15" viewBox="0 0 15 15" />
+						</el-button>
+					</el-button-group>
+
+					<el-dropdown
+						class="block-overlay__delete-button"
+						@command="removeBlock"
+						v-if="sectionConstraints && sectionConstraints.canRemoveBlocks"
+					>
+						<el-button :plain="true" type="danger">
+							<icon name="delete" width="15" height="15" viewBox="0 0 15 15" /> Delete
+						</el-button>
+						<el-dropdown-menu slot="dropdown">
+							<el-dropdown-item command="delete">Confirm</el-dropdown-item>
+						</el-dropdown-menu>
+					</el-dropdown>
+				</div>
+
 			</div>
+
 			<div
 				class="add-before"
 				:class="{ 'add-before--first' : currentBlockIsFirst }"
 				@click="showBlockList()"
+				v-if="sectionConstraints && sectionConstraints.canAddBlocks"
 			>
 				<icon name="plus" width="15" height="15" viewBox="0 0 15 15" />
 			</div>
@@ -33,6 +67,7 @@
 				class="add-after"
 				:class="{ 'add-after--last' : currentBlockIsLast }"
 				@click="showBlockList(1)"
+				v-if="sectionConstraints && sectionConstraints.canAddBlocks"
 			>
 				<icon name="plus" width="15" height="15" viewBox="0 0 15 15" />
 			</div>
@@ -53,15 +88,15 @@ import imagesLoaded from 'imagesloaded';
 
 import Icon from 'components/Icon';
 import ResizeShim from 'components/ResizeShim';
-
-import { win, findParent, smoothScrollTo } from 'classes/helpers';
-
+import { win, findParent } from 'classes/helpers';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
-
 import { layouts } from 'cms-prototype-blocks/layouts';
+import { allowedOperations } from 'classes/SectionConstraints';
+import { Definition } from 'classes/helpers';
 
-/* global document, window */
+/* global document, window, console */
+/* eslint-disable no-console */
 
 export default {
 	name: 'preview-wrapper',
@@ -81,7 +116,13 @@ export default {
 			overlayStyles: {},
 			wrapperStyles: {},
 			overlayHidden: true,
-			current: null
+			/**
+			 * @var {BlockComponent} - The Block.vue component which is currently hovered
+			 */
+			current: null,
+			sectionDefinition: null,
+			sectionConstraints: null,
+			currentSectionBlocks: null
 		};
 	},
 
@@ -93,16 +134,14 @@ export default {
 		...mapState({
 			loadedBlocks: state => state.page.loaded,
 			currentLayout: state => state.page.currentLayout,
-			currentRegion: state => state.page.currentRegion,
+			currentRegion: state => state.contenteditor.currentRegionName,
 			layoutVersion: state => state.page.currentLayoutVersion,
-			blockMeta: state => state.page.blockMeta.blocks[state.page.currentRegion],
-			blocks: state => state.page.pageData.blocks[state.page.currentRegion]
+			blockMeta: state => state.page.blockMeta.blocks[state.page.currentRegion]
 		}),
 
 		...mapGetters([
-			'scaleDown',
-			'scaleUp',
-			'getBlocks'
+			'getBlocks',
+			'blocks'
 		]),
 
 		layout() {
@@ -121,31 +160,21 @@ export default {
 			return layout || null;
 		},
 
-		dragging: {
-			get() {
-				return this.$store.state.page.dragging;
-			},
-
-			set(val) {
-				return this.$store.commit('setDragging', val);
-			}
-		},
-
 		currentBlockIsFirst() {
 			return this.current && this.current.index === 0;
 		},
 
 		currentBlockIsLast() {
 			return this.current && this.current.index === this.blocks.length - 1;
+		},
+
+		canMove() {
+			return this.currentSectionBlocks.length > 1;
 		}
 	},
 
 	created() {
 		this.fetchPage(this.$route.params.page_id || 1);
-
-		this.$bus.$on('block:move', index => {
-			this.moved = index;
-		});
 
 		this.onKeyDown = onKeyDown(undoStackInstance);
 		this.onKeyUp = onKeyUp(undoStackInstance);
@@ -167,9 +196,6 @@ export default {
 		document.removeEventListener('keydown', this.onKeyDown);
 		document.removeEventListener('keyup', this.onKeyUp);
 		document.removeEventListener('click', this.cancelClicks);
-		document.removeEventListener('mousedown', this.mouseDown);
-		document.removeEventListener('mouseup', this.mouseUp);
-		document.removeEventListener('mousemove', this.handlerMove);
 		win.removeEventListener('resize', this.onResize);
 	},
 
@@ -187,9 +213,7 @@ export default {
 		...mapMutations([
 			'reorderBlocks',
 			'deleteBlock',
-			'updateBlockMeta',
 			'setScale',
-			'addBlock',
 			'showBlockPicker',
 			'updateInsertIndex',
 			'updateInsertRegion',
@@ -206,8 +230,7 @@ export default {
 
 			this.$bus.$on('block:showOverlay', this.showOverlay);
 			this.$bus.$on('block:hideOverlay', this.hideOverlay);
-			this.$bus.$on('block:updateOverlay', this.updateOverlay);
-			this.$bus.$on('block:move', this.repositionOverlay);
+			this.$bus.$on('block:updateOverlay', this.updateOverlay)
 		},
 
 		removeDialog(done) {
@@ -219,18 +242,27 @@ export default {
 				.catch(() => {});
 		},
 
-		removeBlock(command) {
-			// remove block but before we do so remove any validation issues it owns 
-			const { index, region } = this.current;
-			const blocks = this.getBlocks();
-			const blockToBeDeleted = blocks[region][index];
+		removeBlock() {
+			// remove block but before we do so remove any validation issues it owns
+			const { index, region, section } = this.current;
+			const blockToBeDeleted = this.$store.getters.getBlock(region, section, index);
 			this.deleteBlockValidationIssue(blockToBeDeleted.id);
-			this.deleteBlock({ index, region });
+			this.deleteBlock({ index, region, section });
 			this.hideOverlay();
 			this.current = null;
 			this.$message({
 				message: 'Block removed',
 				type: 'success'
+			});
+		},
+
+		moveBlock(num) {
+			const { index, region, section } = this.current;
+			this.reorderBlocks({
+				from: index,
+				to: index + num,
+				region,
+				section
 			});
 		},
 
@@ -272,58 +304,6 @@ export default {
 			}
 		},
 
-		mouseDown(e) {
-			if(e.button === 0 && findParent(this.moveEl, e.target, true)) {
-				this.updateStyles('wrapper', 'userSelect', 'none');
-				this.updateStyles('overlay', 'pointerEvents', 'auto');
-				this.updateStyles('handle', 'opacity', 1);
-
-				const
-					thirdOfScreen = window.innerHeight / 3,
-					scale = Math.min(
-						Math.round(
-							(thirdOfScreen / this.current.$el.getBoundingClientRect().height) * 100
-						) / 100,
-						.6
-					);
-
-				this.setScale(scale);
-
-				if(this.scaleDown() < 1) {
-					this.scale(false, e.clientY);
-				}
-
-				this.updateBlockMeta({
-					index: this.current.index,
-					region: this.current.region,
-					type: 'dragging',
-					value: true
-				});
-
-				this.hideBlockOverlayControls = true;
-				document.addEventListener('mousemove', this.handlerMove);
-
-				this.dragging = true;
-			}
-		},
-
-		mouseUp(e) {
-			if(this.dragging) {
-				this.updateStyles('wrapper', 'userSelect', 'auto');
-				this.updateStyles('handle', 'opacity', 0);
-
-				if(this.scaleDown() < 1) {
-					this.scale(true, e.clientY);
-				}
-				else {
-					this.resetAfterDrag();
-				}
-
-				this.hideBlockOverlayControls = false;
-				document.removeEventListener('mousemove', this.handlerMove);
-			}
-		},
-
 		repositionOverlay(data) {
 			let
 				offset = 0,
@@ -340,10 +320,6 @@ export default {
 		},
 
 		positionOverlay(block, setCurrent) {
-			if(this.dragging) {
-				return;
-			}
-
 			var
 				pos = block.$el.getBoundingClientRect(),
 				heightDiff = Math.round(pos.height - 30),
@@ -372,83 +348,18 @@ export default {
 				height   : `${(pos.height + addHeight)}px`
 			});
 
+
 			if(setCurrent) {
 				this.current = block;
 			}
-		},
 
-		resetAfterDrag() {
-			this.updateStyles('overlay', 'pointerEvents', 'none');
-
-			if(this.moved) {
-				this.reorderBlocks({
-					from:  this.moved.from,
-					to:    this.moved.to,
-					value: this.blocks[this.moved.from]
-				});
+			if(this.current) {
+				const section = this.$store.getters.getSection(this.current.region, this.current.section);
+				this.sectionDefinition = section ? Definition.getRegionSectionDefinition(this.current.region, this.current.section) : null
+				this.currentSectionBlocks = section.blocks;
+				this.sectionConstraints = section ? allowedOperations(section.blocks, this.sectionDefinition) : null;
 			}
 
-			this.dragging = false;
-
-			for(var i = 0; i < this.blocks.length; i++) {
-				this.updateBlockMeta({
-					type: 'offset',
-					region: this.current.region,
-					index: i,
-					value: 0
-				});
-			}
-
-			this.updateBlockMeta({
-				index: this.moved ? this.moved.to : this.current.index,
-				region: this.current.region,
-				type: 'dragging',
-				value: false
-			});
-
-			this.moved = false;
-		},
-
-		scale(revert, mouseY) {
-			const scroll = window.scrollY;
-
-			if(revert) {
-				const
-					scrollScaleUp = scroll * this.scaleUp(),
-					offsetPlusScaled = (mouseY * this.scaleUp()) - mouseY;
-
-				smoothScrollTo({ y: scrollScaleUp + offsetPlusScaled });
-
-				this.wrapperStyles = Object.assign(this.wrapperStyles, {
-					transform: null,
-					transition: 'transform 0.3s ease-out'
-				});
-
-				const onEnd = () => {
-					this.resetAfterDrag();
-					this.wrapper.removeEventListener('transitionend', onEnd);
-				};
-
-				this.wrapper.addEventListener('transitionend', onEnd);
-			}
-			else {
-				const
-					scrollScaleDown = scroll * this.scaleDown(),
-					offsetMinusScaled = mouseY - (mouseY * this.scaleDown());
-
-				this.updateStyles(
-					'handle',
-					'transform',
-					'translateY(' + (((mouseY + window.scrollY) * this.scaleDown()) - 22) + 'px)'
-				);
-
-				smoothScrollTo({ y: scrollScaleDown - offsetMinusScaled });
-
-				this.wrapperStyles = Object.assign(this.wrapperStyles, {
-					transform: `scale(${this.scaleDown()})`,
-					transition: 'transform 0.3s ease-out'
-				});
-			}
 		},
 
 		updateStyles(dataName, prop, value) {
@@ -461,11 +372,16 @@ export default {
 			};
 		},
 
-		showBlockList(offset = 0) {
-			const { index, region } = this.current;
-			this.updateInsertIndex(index + offset);
-			this.updateInsertRegion(region);
-			this.showBlockPicker();
+		showBlockList(offset = 0, replaceBlocks = false) {
+			this.showBlockPicker({
+				insertIndex: this.current.index + offset,
+				sectionIndex: this.current.section,
+				regionName: this.current.region,
+				blocks: this.sectionConstraints ? this.sectionConstraints.allowedBlocks : [],
+				maxSelectableBlocks: this.sectionConstraints.canSwapBlocks ? 1 : (this.sectionDefinition.max ? this.sectionDefinition.max - this.blocks.length : null),
+				replaceBlocks: replaceBlocks
+			});
+
 		}
 	}
 };

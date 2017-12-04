@@ -1,10 +1,10 @@
 <template>
 <div>
-	<block-picker />
+	<block-picker class="el-dialog--large" />
 	<publish-modal />
 	<unpublish-modal />
 	<media-picker />
-	<media-overlay size="small" />
+	<media-overlay />
 	<create-page-modal />
 	<edit-page-modal/>
 	<publish-validation-warning-modal />
@@ -12,6 +12,11 @@
 </template>
 
 <script>
+
+/**
+ * Contains modal dialogs which need to cover the whole screen (both the main Editor frame and the Preview iframe).
+ */
+
 import BlockPicker from 'components/BlockPicker';
 import PublishModal from 'components/PublishModal';
 import UnpublishModal from 'components/UnpublishModal';

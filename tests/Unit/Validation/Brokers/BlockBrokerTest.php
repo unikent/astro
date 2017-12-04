@@ -21,7 +21,7 @@ class BlockBrokerTest extends TestCase
 
 		Config::set('app.definitions_path', base_path('tests/Support/Fixtures/definitions'));
 
-        $file = BlockDefinition::locateDefinition('test-block');
+        $file = BlockDefinition::locateDefinition('test-block-v1');
         $this->block = BlockDefinition::fromDefinitionFile($file);
 	}
 
@@ -113,23 +113,6 @@ class BlockBrokerTest extends TestCase
 		$this->assertArrayHasKey('number_of_widgets', $rules);
 		$this->assertContains('integer', $rules['number_of_widgets']);
 		$this->assertContains('max:100', $rules['number_of_widgets']);
-	}
-
-
-
-	/**
-	 * @test
-	 */
-	public function getRegionConstraintRules_CreatesRuleValidatingDefinitionNameAgainstRegionContraints()
-	{
-        $file = RegionDefinition::locateDefinition('test-region');
-        $region = RegionDefinition::fromDefinitionFile($file);
-
-		$bv = new BlockBroker($this->block);
-		$rules = $bv->getRegionConstraintRules($region);
-
-		$this->assertArrayHasKey('definition_name', $rules);
-		$this->assertEquals('in:test-block', $rules['definition_name'][0]);
 	}
 
 

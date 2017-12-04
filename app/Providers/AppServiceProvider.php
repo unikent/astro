@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Models\APICommands\PublishPage;
+use App\Models\Definitions\BaseDefinition;
+use App\Models\Definitions\SiteDefinition;
 use App\Models\Page;
 use App\Validation\Rules\LayoutExistsRule;
 use App\Validation\Rules\UniqueSitePathRule;
@@ -23,6 +25,18 @@ class AppServiceProvider extends ServiceProvider
 	public function boot()
 	{
 		Schema::defaultStringLength(191); // Fix for the webfarm running older MySQL
+
+		/**
+		 * Hack to be able to validate a block's combined name and version are in the {name}-v{version}s listed
+		 * in the allowedBlocks array of section definitions.
+		 * TODO refactor so that block's have a definition_id or type instead of name and version?
+		 */
+		Validator::extend('inVersioned', function($attr, $value, $parameters){
+			$id = $value . '-v' . $parameters[0];
+			array_shift($parameters);
+			$options = join(',',$parameters);
+			return in_array($id, explode(',',$options));
+		});
 
 		Validator::extend('slug_unchanged_or_unique', function($attr, $value, $parameters, $validator) {
 			$id = isset($parameters[0]) ? $parameters[0] : null;
@@ -76,7 +90,15 @@ class AppServiceProvider extends ServiceProvider
 		});
 
 		Validator::extend('layout_exists', function($attribute, $value, $parameters, $validator){
-		   return (new LayoutExistsRule(empty($parameters[0]) ? 0 : $parameters[0]))->passes($attribute,$value);
+			return (new LayoutExistsRule(empty($parameters[0]) ? 0 : $parameters[0]))->passes($attribute,$value);
+		});
+
+		/**
+		 * Checks if a requested site template definition exists.
+		 * usage in validation rules: ['definition_name_field' => 'site_definition_exists:{version}']
+		 */
+		Validator::extend('site_definition_exists', function($attribute, $value, $parameters, $validator){
+			return SiteDefinition::locateDefinition(SiteDefinition::idFromNameAndVersion($value,$parameters[0]));
 		});
 
 		Validator::extend('definition_exists', function ($attribute, $value, $parameters, $validator){
@@ -86,7 +108,7 @@ class AppServiceProvider extends ServiceProvider
 			$version = (isset($parameters[1]) && isset($data[$parameters[1]])) ? $data[$parameters[1]] : null;
 
 			$class = $parameters[0];
-			return $class::locateDefinition($name, $version) ? true : false;
+			return $class::locateDefinition($class::idFromNameAndVersion($name,$version)) ? true : false;
 		});
 
 		/**

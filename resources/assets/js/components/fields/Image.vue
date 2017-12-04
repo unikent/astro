@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { mapMutations, mapGetters, mapActions } from 'vuex';
+import { mapMutations, mapState, mapGetters, mapActions } from 'vuex';
 
 import MediaPicker from 'components/MediaPicker';
 import ItemThumbnail from 'components/media/ItemThumbnail';
@@ -38,7 +38,13 @@ export default {
 	],
 
 	computed: {
+		...mapState({
+			currentBlockIndex: state => state.contenteditor.currentBlockIndex,
+			currentRegionName: state => state.contenteditor.currentRegionName
+		}),
+
 		...mapGetters([
+			'currentSectionIndex',
 			'getCurrentFieldValue'
 		]),
 
@@ -49,13 +55,21 @@ export default {
 			set(value) {
 				this.updateFieldValue({
 					name: this.path,
+					index: this.currentBlockIndex,
+					region: this.currentRegionName,
+					section: this.currentSectionIndex,
 					value: { ...value, type: 'image' }
 				});
 
 				this.updateBlockMedia({
+					index: this.currentBlockIndex,
+					region: this.currentRegionName,
+					section: this.currentSectionIndex,
 					value: {
 						...value,
+						/* eslint-disable camelcase */
 						associated_field: this.path
+  						/* eslint-enable camelcase */
 					}
 				});
 			}

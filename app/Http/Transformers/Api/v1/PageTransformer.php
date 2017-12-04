@@ -132,7 +132,7 @@ class PageTransformer extends FractalTransformer
                 return $blocksByRegion->toArray();
             }, false);
         }else{
-            return ['main' => []];
+            return [];
         }
     }
 

@@ -10,6 +10,7 @@
 					:rules="rules[name].fields[f.name]"
 					:error="getError(f.name)"
 				>
+
 					<template slot="label">
 						<span>{{ f.label }}</span>
 
@@ -62,7 +63,7 @@ export default {
 	computed: {
 		...mapState({
 			currentIndex: state => state.page.currentBlockIndex,
-			currentDefinition: state => state.definition.currentBlockDefinition
+			// currentDefinition: state => state.definition.currentBlockDefinition
 		}),
 
 		rules() {

@@ -57,7 +57,9 @@ class SiteTransformer extends FractalTransformer
             'created_at' => $site->created_at ? $site->created_at->__toString() : null,
             'updated_at' => $site->updated_at ? $site->updated_at->__toString() : null,
             'deleted_at' => $site->deleted_at ? $site->deleted_at->__toString() : null,
-			'options' => $site->options ? $site->options : new ArrayObject
+			'options' => $site->options ? $site->options : new ArrayObject,
+			'site_definition_name' => $site->site_definition_name,
+			'site_definition_version' => $site->site_definition_version
         ];
 		return $data;
 	}

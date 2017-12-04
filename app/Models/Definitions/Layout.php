@@ -24,14 +24,26 @@ class Layout extends BaseDefinition
 	 * @return void
 	 */
 	public function loadRegionDefinitions(){
-		foreach($this->regions as $name){
-			$path = Region::locateDefinition($name);
-
+		foreach($this->regions as $region_id){
+			$path = Region::locateDefinition($region_id);
 			if(!is_null($path)){
 				$region = Region::fromDefinitionFile($path);
 				$this->regionDefinitions->push($region);
 			}
 		}
+	}
+
+	/**
+	 * Get the default page content (regions, sections and blocks) for this layout.
+	 * @return array - [ region-name => [ [ 'name' => 'section-1-name', 'blocks' => [ ... block data ... ], ... ] ], ... ]
+	 */
+	public function getDefaultPageContent()
+	{
+		$regions = [];
+		foreach($this->getRegionDefinitions() as $region_definition) {
+			$regions[Region::idFromNameAndVersion($region_definition->name, $region_definition->version)] = $region_definition->getDefaultBlocks();
+		}
+		return $regions;
 	}
 
 	/**

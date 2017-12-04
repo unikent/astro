@@ -15,7 +15,8 @@ class Site extends Model
         'path',
         'created_by',
         'updated_by',
-
+		'site_definition_name',
+		'site_definition_version',
         'options'
     ];
 

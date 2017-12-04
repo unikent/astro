@@ -3,11 +3,14 @@ import Vuex from 'vuex';
 import undoRedo from '../plugins/undo-redo';
 import shareMutations from '../plugins/share-mutations';
 import shareTimeTravel from '../plugins/share-time-travel';
+
 import page from './modules/page';
 import site from './modules/site';
 import media from './modules/media';
 import permissions from './modules/permissions';
 import definition from './modules/definition';
+import contenteditor from './modules/contenteditor';
+
 import Config from 'classes/Config';
 
 /* global process */
@@ -40,7 +43,11 @@ let store = new Vuex.Store({
 		blockPicker: {
 			visible: false,
 			insertIndex: 0,
-			insertRegion: 'main'
+			insertRegion: null,
+			insertSection: null,
+			allowedBlocks: null,	// the constraints on what blocks can be added
+			maxSelectableBlocks: null, // the maximum number of blocks that can be selected 
+			replaceBlocks: false //whether or not to replace the blocks in the current section
 		},
 		currentView: 'desktop',
 		publishModal: {
@@ -96,7 +103,23 @@ let store = new Vuex.Store({
 			state.sidebarCollapsed = false;
 		},
 
-		showBlockPicker(state) {
+		/**
+		 * Display the block picker.
+		 * @param state
+		 * @param {string} regionName - The name of the region to add any blocks to.
+		 * @param {number} sectionIndex - The index of the section within the region to add any blocks to.
+		 * @param {number} insertIndex - The index within the section to add any blocks to.
+		 * @param {Object} blocks - List of allowed block names.
+		 * @param {number} maxSelectableBlocks - the maximum number of blocks that can be selected
+		 * @param {boolean} replaceBlocks - Replace the blocks in the section with the new one
+		 */
+		showBlockPicker(state, { regionName, sectionIndex, insertIndex, blocks, maxSelectableBlocks, replaceBlocks }) {
+			state.blockPicker.insertRegion = regionName;
+			state.blockPicker.insertIndex = insertIndex;
+			state.blockPicker.insertSection = sectionIndex;
+			state.blockPicker.allowedBlocks = blocks;
+			state.blockPicker.maxSelectableBlocks = maxSelectableBlocks;
+			state.blockPicker.replaceBlocks = replaceBlocks
 			state.blockPicker.visible = true;
 		},
 
@@ -204,6 +227,7 @@ let store = new Vuex.Store({
 	modules: {
 		page,
 		definition,
+		contenteditor,
 		site,
 		media,
 		permissions

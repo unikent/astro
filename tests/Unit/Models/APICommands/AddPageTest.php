@@ -26,7 +26,7 @@ class AddPageTest extends APICommandTestCase
     public function getValidData()
     {
         $this->site = $this->site ? $this->site : $this->api()->createSite('Test Site', 'example.org', null, [
-            'name' => 'test-layout',
+            'name' => 'one-page-site',
             'version' => 1
         ]);
         return [

@@ -35,8 +35,8 @@ describe('Store Permissions - canUser', () => {
 						'site.owner'
 					]
 				}
-			], 
-	
+			],
+
 			currentRole : '',
 			globalRole: 'user'
 		}
@@ -49,7 +49,7 @@ describe('Store Permissions - canUser', () => {
 		expect(result).to.equal(true);
 	}),
 
-	it('a normal user can not do a thing they are not permitted to by their role in the site', () => {  
+	it('a normal user can not do a thing they are not permitted to by their role in the site', () => {
 		let action = 'subsite.create';
 		state.currentRole = 'site.contributor';
 		let result = permissions.getters.canUser(state)(action);
@@ -63,7 +63,7 @@ describe('Store Permissions - canUser', () => {
 		let result = permissions.getters.canUser(state)(action);
 		expect(result).to.equal(false);
 	}),
-		
+
 	it('a normal user cannot do a thing if they have no role in the site', () => {
 		let action = 'subsite.create';
 		state.currentRole = null;
@@ -72,7 +72,7 @@ describe('Store Permissions - canUser', () => {
 	}),
 
 
-	// admin override check 
+	// admin override check
 	it('an admin user can do a thing they are permitted to by their role in the site', () => {
 		let action = 'subsite.create';
 		state.currentRole = 'site.owner';
@@ -81,7 +81,7 @@ describe('Store Permissions - canUser', () => {
 		expect(result).to.equal(true);
 	}),
 
-	it('an admin user can do a thing they are not permitted to by their role in the site', () => {  
+	it('an admin user can do a thing they are not permitted to by their role in the site', () => {
 		let action = 'subsite.create';
 		state.currentRole = 'site.contributor';
 		state.globalRole = 'admin';
@@ -97,7 +97,7 @@ describe('Store Permissions - canUser', () => {
 		let result = permissions.getters.canUser(state)(action);
 		expect(result).to.equal(true);
 	}),
-		
+
 	it('an admin user can do a thing if they have no role in the site', () => {
 		let action = 'subsite.create';
 		state.currentRole = null;

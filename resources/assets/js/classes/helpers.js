@@ -150,10 +150,12 @@ export const prettyDate = (date) => {
 
 	diff = Math.round(diff);
 
-	return `${i > 0 ? 'about ' : ''}${diff} ${unit[i]}${diff == 1 ? '' : 's'} ago`;
+	return `${i > 0 ? 'about ' : ''}${diff} ${unit[i]}${diff === 1 ? '' : 's'} ago`;
 };
 
 export const notify = ({ title, message, type }) => {
+	// TODO:is notify is overkill for some scenarios?
+	// Element UI's $message seems more suited to success messages
 	vue.$notify({
 		title,
 		message,
@@ -164,6 +166,10 @@ export const notify = ({ title, message, type }) => {
 		}
 	});
 };
+
+// Does the given string start with a vowel? If so return "an", otherwise "a".
+// Doesn't cover all cases, but is good enough for now.
+export const aOrAn = (str) => str.match(/^[aeiou]/i) ? 'an' : 'a';
 
 export const pageHasBeenPublished = (page) => {
 	return page.status !== 'new';
@@ -178,7 +184,7 @@ export const pageHasBeenPublished = (page) => {
  * @returns {string} Full URL (with any trailing slash removed)
  */
 export const getDraftPreviewURL = (url) => {
-	return `${Config.get('base_url', '')}` + '/draft/' + (url ? url.replace(/\/$/, '') : '');
+	return `${Config.get('base_url', '')}/draft/${url ? url.replace(/\/$/, '') : ''}`;
 };
 
 /**
@@ -189,5 +195,5 @@ export const getDraftPreviewURL = (url) => {
  * @returns {string} Full URL (with any trailing slash removed)
  */
 export const getPublishedPreviewURL = (url) => {
-	return `${Config.get('base_url', '')}` + '/published/' + (url ? url.replace(/\/$/, '') : '');
+	return `${Config.get('base_url', '')}/published/${url ? url.replace(/\/$/, '') : ''}`;
 };

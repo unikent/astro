@@ -4,20 +4,20 @@
 		v-for="(val, index) in currentValue"
 		class="collection-field__field-list"
 	>
-		<template v-for="f in fields">
+		<template v-for="fieldDefinition in fields">
 			<div class="ci-field">
 				<el-form-item
-					:label="f.label"
-					:prop="`${name}.${index}.${f.name}`"
-					:rules="getRules(f.name)"
-					:error="getError(index, f.name)"
+					:label="fieldDefinition.label"
+					:prop="`${name}.${index}.${fieldDefinition.name}`"
+					:rules="getRules(fieldDefinition.name)"
+					:error="getError(index, fieldDefinition.name)"
 				>
 					<template slot="label">
-						<span>{{ f.label }}</span>
+						<span>{{ fieldDefinition.label }}</span>
 						<el-tooltip
-							v-if="f.info"
+							v-if="fieldDefinition.info"
 							popper-class="el-tooltip__popper--narrow"
-							:content="f.info"
+							:content="fieldDefinition.info"
 							placement="top">
 							<icon
 								class="el-form-item__icon-help"
@@ -29,11 +29,11 @@
 						</el-tooltip>
 					</template>
 					<component
-						:is="getField(f.type)"
-						:field="childField(f)"
-						:path="`${name}.${index}.${f.name}`"
+						:is="getField(fieldDefinition.type)"
+						:field="childField(fieldDefinition)"
+						:path="`${name}.${index}.${fieldDefinition.name}`"
 						:index="currentIndex"
-						:key="`${name}-${f.name}-${currentIndex}`"
+						:key="`${name}-${fieldDefinition.name}-${currentIndex}`"
 					/>
 				</el-form-item>
 			</div>
@@ -74,8 +74,7 @@ export default {
 
 	computed: {
 		...mapState({
-			currentIndex: state => state.page.currentBlockIndex,
-			currentDefinition: state => state.definition.currentBlockDefinition
+			currentIndex: state => state.page.currentBlockIndex
 		}),
 
 		...mapGetters([

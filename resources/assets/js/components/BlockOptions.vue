@@ -17,23 +17,23 @@
 			ref="block_fields"
 		>
 			<el-form-item
-				v-for="field in currentDefinition.fields"
-				:label="field.label"
-				:prop="field.name"
+				v-for="fieldDefinition in currentDefinition.fields"
+				:label="fieldDefinition.label"
+				:prop="fieldDefinition.name"
 				:error="
-					typeof localErrors[field.name] === 'string' ?
-						localErrors[field.name] :
+					typeof localErrors[fieldDefinition.name] === 'string' ?
+						localErrors[fieldDefinition.name] :
 						null
 				"
-				:key="field.name"
+				:key="fieldDefinition.name"
 			>
 				<template slot="label">
-					<span>{{ field.label }}</span>
+					<span>{{ fieldDefinition.label }}</span>
 
 					<el-tooltip
-						v-if="field.info"
+						v-if="fieldDefinition.info"
 						popper-class="el-tooltip__popper--narrow"
-						:content="field.info"
+						:content="fieldDefinition.info"
 						placement="top"
 					>
 						<icon
@@ -53,25 +53,28 @@
 							width="14"
 							height="14"
 							viewBox="0 0 14 14"
-							@click="viewField(field.name)"
+							@click="viewField(fieldDefinition.name)"
 						/>
 					</el-tooltip>
 					-->
 				</template>
 				<component
-					:is="getField(field.type)"
-					:field="field"
-					:path="field.name"
+					:is="getField(fieldDefinition.type)"
+					:field="fieldDefinition"
+					:path="fieldDefinition.name"
 					:index="currentIndex"
 					:key="`${currentDefinition.name}-${currentIndex}`"
 					:scrollTo="scrollTo"
+					:currentDefinition="currentDefinition"
 					:errors="
-						typeof localErrors[field.name] !== 'string' ?
-							localErrors[field.name] :
+						typeof localErrors[fieldDefinition.name] !== 'string' ?
+							localErrors[fieldDefinition.name] :
 							null
 					"
 				/>
 			</el-form-item>
+
+
 		</block-form>
 
 		<!-- TODO: make this look nice -->
@@ -80,7 +83,7 @@
 
 	<!-- hide until we know what we're doing with validation -->
 	<div class="b-bottom-bar" v-show="false">
-		<el-button :plain="true" type="danger" @click="deleteThisBlock">Remove</el-button>
+		<el-button plain type="danger" @click="deleteThisBlock">Remove</el-button>
 		<el-button @click="submitForm('block_fields')">Validate</el-button>
 	</div>
 </div>
@@ -89,7 +92,7 @@
 <script>
 import { mapState, mapMutations, mapGetters } from 'vuex';
 import Vue from 'vue';
-import { Definition, getTopOffset, smoothScrollTo } from 'classes/helpers';
+import { Definition, getTopOffset } from 'classes/helpers';
 import BackBar from './BackBar';
 import fields from 'components/fields';
 import containers from 'components/fields/containers';
@@ -97,7 +100,8 @@ import { heights } from 'classes/sass';
 import Icon from './Icon';
 import BlockForm from './BlockForm';
 
-/* global document */
+/* global document, console */
+/* eslint-disable no-console */
 
 export default {
 
@@ -113,7 +117,8 @@ export default {
 
 	computed: {
 		...mapGetters([
-			'getCurrentBlock'
+			'currentBlock',
+			'currentDefinition'
 		]),
 
 		...mapState([
@@ -121,16 +126,8 @@ export default {
 		]),
 
 		...mapState({
-			currentIndex: state => state.page.currentBlockIndex,
-			currentRegion: state => state.page.currentRegion,
-			currentBlock: state => {
-				if(!state.page.pageData.blocks) {
-					return null;
-				}
-				return state.page.pageData.blocks[state.page.currentRegion][state.page.currentBlockIndex];
-			},
-
-			currentDefinition: state => state.definition.currentBlockDefinition
+			currentIndex: state => state.contenteditor.currentBlockIndex,
+			currentRegion: state => state.contenteditor.currentRegionName
 		}),
 
 		mode() {
@@ -139,17 +136,17 @@ export default {
 
 		blockFields: {
 			get() {
-				const currentBlock = this.getCurrentBlock();
-				if(currentBlock) {
-					return currentBlock.fields;
+				if(this.currentBlock) {
+					return this.currentBlock.fields;
 				}
 			},
 			set() {}
 		},
 
 		localErrors() {
-			return this.errors.blocks ?
-				this.errors.blocks[this.currentRegion][this.currentIndex].fields : {};
+			return {};
+			// return this.errors.blocks ?
+			// 	this.errors.blocks[this.currentRegion][this.currentIndex].fields : {};
 		},
 
 		// TODO: move validation outside of element
@@ -205,7 +202,7 @@ export default {
 
 		scrollTo(el) {
 			// Vue.nextTick(() => {
-			// 	smoothScrollTo()
+			// 	smoothScrollTo() // from helpers
 			// });
 			console.log(el);
 		},
@@ -213,7 +210,7 @@ export default {
 		submitForm(formName) {
 			this.$refs[formName].validate((valid) => {
 				if(!valid) {
-					this.$snackbar.open({ message: 'Validation errors'});
+					this.$snackbar.open({ message: 'Validation errors' });
 
 					Vue.nextTick(() => {
 						const firstError = document.querySelector('.block-options-list .is-error');

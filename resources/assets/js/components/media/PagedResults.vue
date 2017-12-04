@@ -39,7 +39,7 @@ export default {
 		allowMultiple: {},
 		counts: {
 			type: Array,
-			default: [20, 50, 100, 200]
+			default: () => [20, 50, 100, 200]
 		},
 		filter: {},
 		pickerAction: {}

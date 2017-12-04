@@ -5,7 +5,7 @@
 			<el-card>
 				<div slot="header" class="card__header">
 					<span class="card__header-text">
-						{{ this.site.title }} menu
+						Manage Menu
 						<el-tag
 							:type="status === 'draft' ? 'primary' : 'success'"
 							class="menu-status"
@@ -21,7 +21,7 @@
 
 					<div class="u-flex-auto-left">
 						<el-button type="primary" @click="saveMenu">Save</el-button>
-						<el-button type="primary" :plain="true" class="el-button--icon" @click="previewSite">
+						<el-button plain class="el-button--icon" @click="previewSite">
 							Preview
 							<icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" />
 						</el-button>
@@ -61,7 +61,7 @@
 						/>
 
 						<span class="menu-item__cell u-flex-auto-left u-flex-grow-none">
-							<el-button @click="removeMenuItem(index)" type="default" size="small">
+							<el-button @click="removeMenuItem(index)" type="default">
 								<icon name="delete" width="14" height="14" />
 							</el-button>
 						</span>
@@ -129,7 +129,7 @@ import MenuItemField from 'components/menu-editor/MenuItemField';
 import SitePageLinks from 'components/menu-editor/SitePageLinks';
 import { win, notify, prettyDate } from 'classes/helpers';
 import Config from 'classes/Config';
-import { mapGetters, mapActions } from 'vuex';
+import { mapGetters } from 'vuex';
 import permissions  from 'store/modules/permissions'; // this is to use canUser directly and provide our own state for the site
 
 /* global setInterval, clearInterval */
@@ -179,7 +179,7 @@ export default {
 	},
 
 	beforeRouteLeave(to, from, next) {
-		if(this.isUnsaved) {
+		if(!this.loading && this.isUnsaved) {
 			this.$confirm(
 				'Are you sure you want to leave?',
 				'There are unsaved changes',
@@ -205,6 +205,8 @@ export default {
 
 	data() {
 		return {
+			loading: true,
+
 			site: {
 				firstPageId: 0,
 				title: '',
@@ -250,10 +252,9 @@ export default {
 			siteState.currentRole = this.currentRole;
 			siteState.permissions = this.getPermissions;
 			siteState.globalRole = this.getGlobalRole;
-	
+
 			return permissions.getters.canUser(siteState)('site.options.edit');
 		},
-
 
 		status() {
 			return (
@@ -280,10 +281,12 @@ export default {
 			this.$api
 				.get(`sites/${this.$route.params.site_id}?include=pages,role,users`)
 				.then(({ data: json }) => {
+					/* eslint-disable camelcase */
 					const publishedMenu = (
 						json.data.options['menu_published'] ||
 						{ links: null, last_published: null }
 					);
+					/* eslint-enable camelcase */
 
 					this.site = {
 						firstPageId: json.data.pages[0].id,
@@ -293,6 +296,7 @@ export default {
 						definedHost: json.data.host,
 						definedPath: json.data.path
 					};
+					this.loading = false;
 					this.menu = json.data.options['menu_draft'] || [];
 					this.initialMenu = JSON.stringify(this.menu);
 					this.publishedMenu = JSON.stringify(publishedMenu.links);
@@ -302,12 +306,12 @@ export default {
 					// store the current user's role for this site if they have one
 					let siteUsers = json.data.users;
 					if (siteUsers) {
-						const currentRole = siteUsers.find((element) => element.username === window.astro.username);
+						const currentRole = siteUsers.find((element) => element.username === Config.get('username'));
 						if (currentRole) {
 							this.currentRole = currentRole.role;
-						} 
+						}
 					}
-					
+
 					// show the alert if needed
 					if (!this.canUserEditMenu) {
 						this.showPermissionsError = true;
@@ -325,7 +329,7 @@ export default {
 			});
 		},
 
-		addMenuItem({ text, url } = { text: '', url: ''}) {
+		addMenuItem({ text, url } = { text: '', url: '' }) {
 			const length = this.menu.push({
 				text,
 				url: url && url !== '' ? this.site.path + url : ''
@@ -375,10 +379,12 @@ export default {
 			if(updateType === 'published') {
 				this.lastPublishedDate = new Date().toString();
 
+				/* eslint-disable camelcase */
 				data.options['menu_published'] = {
 					links: this.menu,
 					last_published: this.lastPublishedDate
 				};
+				/* eslint-enable camelcase */
 			}
 
 			return this.$api
@@ -399,9 +405,9 @@ export default {
 						message: (
 							hasErrors ? `
 								The menu saved, but there are some validation errors.
-								You won\'t be able to publish your menu until these are fixed.
-							`
-							: `Successfully ${verb} menu.`
+								You won't be able to publish your menu until these are fixed.
+								` :
+								`Successfully ${verb} menu.`
 						),
 						type: hasErrors ? 'warning' : 'success'
 					});
