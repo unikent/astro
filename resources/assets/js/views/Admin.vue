@@ -59,10 +59,16 @@ export default {
 	},
 
 	created() {
-		this.$store.commit('site/updateCurrentSiteID', this.site_id);
-		this.$store.dispatch('site/fetchSite').then(() => {
-			this.homepageID = this.currentSite.pages[0].id;
-		});
+		this.fetchSiteData();
+	},
+
+	watch: {
+		site_id: function(newId, oldId) {
+			if (newId !== oldId) {
+				this.homepageID = null;
+				this.fetchSiteData();
+			}
+		}
 	},
 
 	computed: {
@@ -104,6 +110,17 @@ export default {
 					title: 'Users'
 				}
 			];
+		}
+
+	},
+
+	methods: {
+
+		fetchSiteData() {
+			this.$store.commit('site/updateCurrentSiteID', this.site_id);
+			this.$store.dispatch('site/fetchSite').then(() => {
+				this.homepageID = this.currentSite.pages[0].id;
+			});
 		}
 
 	}
