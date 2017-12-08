@@ -2,7 +2,7 @@
 <div class="admin-wrapper">
 	<aside class="left-side">
 		<section class="sidebar">
-			<ul class="admin-sidebar" role="navigation">
+			<ul v-if="homepageID" class="admin-sidebar" role="navigation">
 				<side-menu-item
 					v-for="item in menu"
 					:item="item"
@@ -18,6 +18,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import Icon from 'components/Icon';
 
 export default {
@@ -51,7 +52,30 @@ export default {
 		}
 	},
 
+	data() {
+		return {
+			homepageID: null
+		}
+	},
+
+	created() {
+		this.fetchSiteData();
+	},
+
+	watch: {
+		site_id: function(newId, oldId) {
+			if (newId !== oldId) {
+				this.homepageID = null;
+				this.fetchSiteData();
+			}
+		}
+	},
+
 	computed: {
+
+		...mapState({
+			currentSite: state => state.site
+		}),
 
 		url() {
 			return `/site/${this.site_id}`;
@@ -65,7 +89,7 @@ export default {
 					title: 'Dashboard'
 				},
 				{
-					link: `${this.url}/page/1`,
+					link: `${this.url}/page/${this.homepageID}`,
 					icon: 'layout',
 					title: 'Editor',
 					leave: true
@@ -86,6 +110,17 @@ export default {
 					title: 'Users'
 				}
 			];
+		}
+
+	},
+
+	methods: {
+
+		fetchSiteData() {
+			this.$store.commit('site/updateCurrentSiteID', this.site_id);
+			this.$store.dispatch('site/fetchSite').then(() => {
+				this.homepageID = this.currentSite.pages[0].id;
+			});
 		}
 
 	}

@@ -201,7 +201,7 @@ const mutations = {
 const actions = {
 
 	fetchSite({ commit, state }) {
-		api
+		return api
 			.get(`sites/${state.site}/tree?include=revision`)
 			.then((response) => {
 				commit('setSite', [response.data.data]);
