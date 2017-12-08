@@ -122,7 +122,8 @@ export default {
 			current: null,
 			sectionDefinition: null,
 			sectionConstraints: null,
-			currentSectionBlocks: null
+			currentSectionBlocks: null,
+			layoutDefinition: null
 		};
 	},
 
@@ -136,7 +137,8 @@ export default {
 			currentLayout: state => state.page.currentLayout,
 			currentRegion: state => state.contenteditor.currentRegionName,
 			layoutVersion: state => state.page.currentLayoutVersion,
-			blockMeta: state => state.page.blockMeta.blocks[state.page.currentRegion]
+			blockMeta: state => state.page.blockMeta.blocks[state.page.currentRegion],
+			siteLayoutDefinitions: state => state.site.layouts
 		}),
 
 		...mapGetters([
@@ -174,7 +176,14 @@ export default {
 	},
 
 	created() {
-		this.fetchPage(this.$route.params.page_id || 1);
+		var $this = this;
+		this.fetchPage(this.$route.params.page_id || 1)// is this fallback necessary?
+			.then(function () {
+				//fire off a funtion to validate the regions, section and blocks in the current page's layout.
+				$this.layoutDefinition = $this.siteLayoutDefinitions[`${$this.currentLayout}-v${$this.layoutVersion}`]
+				console.log('page fetched!!!', $this.layoutDefinition);
+				//$this.layoutDefinition now has the layout we're interested in, we can use it to do the validation
+			});
 
 		this.onKeyDown = onKeyDown(undoStackInstance);
 		this.onKeyUp = onKeyUp(undoStackInstance);

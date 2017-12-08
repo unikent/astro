@@ -250,12 +250,12 @@ const actions = {
 	fetchPage({ commit }, id) {
 		commit('setPage', null);
 		// TODO: refactor into smaller methods
-		api
+		return api
 			.get(`pages/${id}?include=blocks.media,site`)
 			.then(response => {
 				const page = response.data.data;
 
-				api
+				return api
 					.get(`layouts/${page.layout.name}-v${page.layout.version}/definition?include=region_definitions.block_definitions`)
 					.then(({ data: region }) => {
 
