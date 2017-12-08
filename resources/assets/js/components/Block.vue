@@ -194,7 +194,7 @@ export default {
 		*/
 		disableForms() {
 			// disable buttons
-			const buttonElements = this.$el.querySelectorAll('button');
+			const buttonElements = this.$el.querySelectorAll('button, submit');
 			buttonElements.forEach((buttonElement) => {
 				buttonElement.setAttribute('disabled', '');
 			});
