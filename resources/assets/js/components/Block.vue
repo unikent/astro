@@ -147,6 +147,8 @@ export default {
 				value: this.size.height
 			});
 		});
+
+		this.disableForms();
 	},
 
 
@@ -185,6 +187,25 @@ export default {
 				this.$bus.$emit('block:hideOverlay', this);
 			}
 		},
+
+		/**
+		* prevents users from submitting forms in the previewed block
+		* while still allowing the user to interact with previewed forms
+		*/
+		disableForms() {
+			// disable buttons
+			const buttonElements = this.$el.querySelectorAll('button');
+			buttonElements.forEach((buttonElement) => {
+				buttonElement.setAttribute('disabled', '');
+			});
+
+			// remove any form actions and methods
+			const formElements = this.$el.querySelectorAll('form');
+			formElements.forEach((formElement) => {
+				formElement.removeAttribute('action');
+				formElement.removeAttribute('method');
+			});
+		}
 	}
 };
 </script>
