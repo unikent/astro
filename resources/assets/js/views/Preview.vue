@@ -1,5 +1,5 @@
 <template>
-<div>
+<div v-if="layoutErrors.length === 0">
 	<div id="b-wrapper" ref="wrapper" :style="wrapperStyles">
 		<component :is="layout" />
 		<div
@@ -243,32 +243,39 @@ export default {
 
 
 			_.each($this.layoutDefinition.regions, function (regionName) {
-				
-				let regionDefinition = Definition.regionDefinitions[regionName];
 
 				// check that this defined region exist in the page's regions
 				if ($this.pageData.blocks[regionName] === void 0) {
 					$this.layoutErrors.push(`The region '${regionName}' was expected but not found on this page.`);
 				}
+				
+				let regionDefinition = Definition.regionDefinitions[regionName];
 
-				_.each(regionDefinition.sections, function(sectionDefinition, index) {
-					
-					// check that this section is in the right part of the region
-					if ($this.pageData.blocks[regionName][index].name !== sectionDefinition.name) {
-						$this.layoutErrors.push(`The section '${sectionDefinition.name}' was expected, but found '${$this.pageData.blocks[regionName][index].name}'.`);
+				if (regionDefinition !== void 0) {
+					_.each(regionDefinition.sections, function(sectionDefinition, index) {
 						
-					}
+						// check that this section is in the right part of the region
+						if ($this.pageData.blocks[regionName][index].name !== sectionDefinition.name) {
+							$this.layoutErrors.push(`The section '${sectionDefinition.name}' was expected, but found '${$this.pageData.blocks[regionName][index].name}'.`);
+							
+						}
 
-					// if the section is in the right part of the region, go ahead and check that it has the right blocks within it
-					else {
-						_.each($this.pageData.blocks[regionName][index].blocks, function (block) {
-							let fullBlockName = block.definition_name + '-v' + block.definition_version;
-							if (sectionDefinition.allowedBlocks.indexOf(fullBlockName) < 0) {
-								$this.layoutErrors.push(`The block '${fullBlockName}' is now allowed in the '${sectionDefinition.name}' section of the '${regionName}' region.`);
-							}
-						});
-					}
-				});
+						// if the section is in the right part of the region, go ahead and check that it has the right blocks within it
+						else {
+							_.each($this.pageData.blocks[regionName][index].blocks, function (block) {
+								let fullBlockName = block.definition_name + '-v' + block.definition_version;
+								if (sectionDefinition.allowedBlocks.indexOf(fullBlockName) < 0) {
+									$this.layoutErrors.push(`The block '${fullBlockName}' is now allowed in the '${sectionDefinition.name}' section of the '${regionName}' region.`);
+								}
+							});
+						}
+					});
+				}
+
+				// the defined region was not loaded in our region definitions
+				else {
+					$this.layoutErrors.push(`The defined region '${regionName}' was not found in our loaded region definitions`);
+				}
 			});
 		},
 

@@ -30,11 +30,15 @@ export default {
 	},
 
 	mounted() {
-		this.$refs['hidden-frame'].contentWindow.addEventListener('resize', this.onResize, false);
+		if (this.$refs['hidden-frame'].contentWindow) {
+			this.$refs['hidden-frame'].contentWindow.addEventListener('resize', this.onResize, false);
+		}
 	},
 
 	beforeDestroy() {
-		this.$refs['hidden-frame'].contentWindow.removeEventListener('resize', this.onResize);
+		if (this.$refs['hidden-frame'].contentWindow) {
+			this.$refs['hidden-frame'].contentWindow.removeEventListener('resize', this.onResize);
+		}
 	}
 };
 </script>
