@@ -157,12 +157,16 @@ const mutations = {
 		const page = findPageById(state.pages, id);
 
 		if(page) {
-			page.slug = slug;
-
-			updatePaths(
-				page,
-				page.path.substr(0, page.path.lastIndexOf(page.slug)) + slug
+			// get the parent's path before setting the slug
+			// as the old slug is used for substr
+			const parentPath = page.path.substr(
+				0,
+				page.path.lastIndexOf(page.slug)
 			);
+
+			updatePaths(page, parentPath + slug);
+
+			page.slug = slug;
 		}
 	},
 
