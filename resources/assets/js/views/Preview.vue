@@ -373,12 +373,16 @@ export default {
 		},
 
 		showBlockList(offset = 0, replaceBlocks = false) {
+			const maxBlocks = this.sectionDefinition.max || this.sectionDefinition.size;
+
 			this.showBlockPicker({
 				insertIndex: this.current.index + offset,
 				sectionIndex: this.current.section,
 				regionName: this.current.region,
-				blocks: this.sectionConstraints ? this.sectionConstraints.allowedBlocks : [],
-				maxSelectableBlocks: this.sectionConstraints.canSwapBlocks ? 1 : (this.sectionDefinition.max ? this.sectionDefinition.max - this.blocks.length : null),
+				blocks: this.sectionConstraints ?
+					this.sectionConstraints.allowedBlocks : [],
+				maxSelectableBlocks: this.sectionConstraints.canSwapBlocks ?
+					1 : (maxBlocks ? maxBlocks - this.blocks.length : null),
 				replaceBlocks: replaceBlocks
 			});
 
