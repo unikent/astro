@@ -223,6 +223,25 @@
 	}
 }
 
+// error cards
+.box-card.error-card {
+	background-color: #fee;
+	
+	.el-card__header {
+    	color: #fa5555;
+    	font-size: 2rem;
+
+    	.clearfix {
+    		align-items: center;
+			display: flex;
+    	}
+
+    	.error-title {
+    		padding: 0 0.5rem;
+    	}
+	}
+}
+
 @each $status, $colour in $status-colours {
 	.el-button--#{$status} {
 		@include button-variant($colour);

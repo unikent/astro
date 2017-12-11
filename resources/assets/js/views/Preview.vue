@@ -79,6 +79,18 @@
 	<div id="b-overlay" :style="overlayStyles"></div>
 	<resize-shim :onResize="onResize" />
 </div>
+<el-card v-else class="box-card error-card">
+	<div slot="header" class="clearfix">
+		<i class="error-icon el-icon-error is-big"></i>
+		<span class="error-title is-bold">A layout error occured</span>
+	</div>
+	<p>Please report the following errors to your administrator</p>
+	<ul>
+		<li v-for="layoutError in layoutErrors" class="text item">
+			{{ layoutError }}
+		</li>
+	</ul>
+</el-card>
 </template>
 
 <script>
