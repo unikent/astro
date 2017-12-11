@@ -20,8 +20,8 @@
 						Swap block
 					</el-button>
 				</div>
-				<div v-else-if="canMove">
-					<el-button-group>
+				<div v-else>
+					<el-button-group v-if="canMove">
 						<el-button
 							class="move-up"
 							:disabled="currentBlockIsFirst"
@@ -40,9 +40,9 @@
 					</el-button-group>
 
 					<el-dropdown
+						v-if="sectionConstraints && sectionConstraints.canRemoveBlocks"
 						class="block-overlay__delete-button"
 						@command="removeBlock"
-						v-if="sectionConstraints && sectionConstraints.canRemoveBlocks"
 					>
 						<el-button :plain="true" type="danger">
 							<icon name="delete" width="15" height="15" viewBox="0 0 15 15" /> Delete
