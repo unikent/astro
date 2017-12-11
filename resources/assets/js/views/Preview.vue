@@ -268,7 +268,7 @@ export default {
 						
 						// check that this section is in the right part of the region
 						if ($this.pageData.blocks[regionName][index].name !== sectionDefinition.name) {
-							$this.layoutErrors.push(`The section '${sectionDefinition.name}' was expected, but found '${$this.pageData.blocks[regionName][index].name}'.`);
+							$this.layoutErrors.push(`The section '${sectionDefinition.name}' was expected in '${regionName}' region, but found '${$this.pageData.blocks[regionName][index].name}'.`);
 							
 						}
 
