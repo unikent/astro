@@ -123,7 +123,8 @@ export default {
 			sectionDefinition: null,
 			sectionConstraints: null,
 			currentSectionBlocks: null,
-			layoutDefinition: null
+			layoutDefinition: null,
+			layoutErrors: []
 		};
 	},
 
@@ -134,6 +135,7 @@ export default {
 
 		...mapState({
 			loadedBlocks: state => state.page.loaded,
+			pageData: state => state.page.pageData,
 			currentLayout: state => state.page.currentLayout,
 			currentRegion: state => state.contenteditor.currentRegionName,
 			layoutVersion: state => state.page.currentLayoutVersion,
@@ -176,13 +178,13 @@ export default {
 	},
 
 	created() {
-		var $this = this;
+		var $this = this; // because 'this' isnt available to us in callback function after the api has returned
+
 		this.fetchPage(this.$route.params.page_id || 1)// is this fallback necessary?
 			.then(function () {
-				//fire off a funtion to validate the regions, section and blocks in the current page's layout.
-				$this.layoutDefinition = $this.siteLayoutDefinitions[`${$this.currentLayout}-v${$this.layoutVersion}`]
-				console.log('page fetched!!!', $this.layoutDefinition);
-				//$this.layoutDefinition now has the layout we're interested in, we can use it to do the validation
+
+				$this.validateLayout();
+
 			});
 
 		this.onKeyDown = onKeyDown(undoStackInstance);
@@ -228,6 +230,47 @@ export default {
 			'updateInsertRegion',
 			'deleteBlockValidationIssue'
 		]),
+
+		validateLayout(){
+
+			let $this = this;
+
+			$this.layoutDefinition = $this.siteLayoutDefinitions[`${$this.currentLayout}-v${$this.layoutVersion}`];
+			// check that we have the same number of regions in our data as we have defined
+			if (Object.keys($this.pageData.blocks).length !== $this.layoutDefinition.regions.length) {
+				$this.layoutErrors.push('The regions on this page do not match the expected regions it should have.');
+			}
+
+
+			_.each($this.layoutDefinition.regions, function (regionName) {
+				
+				let regionDefinition = Definition.regionDefinitions[regionName];
+
+				// check that this defined region exist in the page's regions
+				if ($this.pageData.blocks[regionName] === void 0) {
+					$this.layoutErrors.push(`The region '${regionName}' was expected but not found on this page.`);
+				}
+
+				_.each(regionDefinition.sections, function(sectionDefinition, index) {
+					
+					// check that this section is in the right part of the region
+					if ($this.pageData.blocks[regionName][index].name !== sectionDefinition.name) {
+						$this.layoutErrors.push(`The section '${sectionDefinition.name}' was expected, but found '${$this.pageData.blocks[regionName][index].name}'.`);
+						
+					}
+
+					// if the section is in the right part of the region, go ahead and check that it has the right blocks within it
+					else {
+						_.each($this.pageData.blocks[regionName][index].blocks, function (block) {
+							let fullBlockName = block.definition_name + '-v' + block.definition_version;
+							if (sectionDefinition.allowedBlocks.indexOf(fullBlockName) < 0) {
+								$this.layoutErrors.push(`The block '${fullBlockName}' is now allowed in the '${sectionDefinition.name}' section of the '${regionName}' region.`);
+							}
+						});
+					}
+				});
+			});
+		},
 
 		initEvents() {
 			document.addEventListener('keydown', this.onKeyDown);
