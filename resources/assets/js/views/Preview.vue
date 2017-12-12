@@ -251,7 +251,7 @@ export default {
 			this.layoutDefinition = this.siteLayoutDefinitions[layoutName];
 			// check that we have the same number of regions in our data as we have defined
 			if (Object.keys(this.pageData.blocks).length !== this.layoutDefinition.regions.length) {
-				this.layoutErrors.push('The regions on this page do not match the expected regions it should have.');
+				this.layoutErrors.push(`The regions on this page do not match the expected regions it should have in layout '${layoutName}'.`);
 			}
 
 
@@ -259,7 +259,7 @@ export default {
 
 				// check that this defined region exist in the page's regions
 				if (this.pageData.blocks[regionDefinitionName] === void 0) {
-					this.layoutErrors.push(`The region '${regionDefinitionName}' was expected but not found on this page.`);
+					this.layoutErrors.push(`The region '${regionDefinitionName}' was expected but not found on this page. Layout is '${layoutName}'.`);
 				}
 				
 				let regionDefinition = Definition.regionDefinitions[regionDefinitionName];
@@ -287,7 +287,7 @@ export default {
 
 				// the defined region was not loaded in our region definitions
 				else {
-					this.layoutErrors.push(`The defined region '${regionDefinitionName}' was not found in our loaded region definitions`);
+					this.layoutErrors.push(`The defined region '${regionDefinitionName}' was not found in our loaded region definitions.`);
 				}
 			});
 
