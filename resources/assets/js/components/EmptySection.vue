@@ -51,13 +51,19 @@ export default {
 		]),
 
 		addBlocks() {
-			const sectionDefinition = this.sectionData ? Definition.getRegionSectionDefinition(this.region, this.section) : null;
-			const sectionConstraints = this.sectionData ? allowedOperations(this.sectionData.blocks, sectionDefinition) : null;
+			const
+				sectionDefinition = this.sectionData ?
+					Definition.getRegionSectionDefinition(this.region, this.section) : null,
+				sectionConstraints = this.sectionData ?
+					allowedOperations(this.sectionData.blocks, sectionDefinition) : null,
+				maxBlocks = sectionDefinition.max || sectionDefinition.size;
+
 			this.showBlockPicker({
 				insertIndex: 0,
 				sectionIndex: this.section,
 				regionName: this.region,
-				blocks: sectionConstraints ? sectionConstraints.allowedBlocks : []
+				blocks: sectionConstraints ? sectionConstraints.allowedBlocks : [],
+				maxSelectableBlocks: maxBlocks
 			});
 		}
 	}
