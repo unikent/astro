@@ -1,5 +1,5 @@
 <template>
-<div v-if="layoutErrors.length === 0">
+<div v-if="!pageHasLayoutErrors">
 	<div id="b-wrapper" ref="wrapper" :style="wrapperStyles">
 		<component :is="layout" />
 		<div
@@ -136,8 +136,7 @@ export default {
 			sectionDefinition: null,
 			sectionConstraints: null,
 			currentSectionBlocks: null,
-			layoutDefinition: null,
-			layoutErrors: []
+			layoutDefinition: null
 		};
 	},
 
@@ -154,12 +153,17 @@ export default {
 			layoutVersion: state => state.page.currentLayoutVersion,
 			blockMeta: state => state.page.blockMeta.blocks[state.page.currentRegion],
 			siteLayoutDefinitions: state => state.site.layouts,
-			siteId: state => parseInt(state.site.site)
+			siteId: state => parseInt(state.site.site),
+			layoutErrors: state => state.page.layoutErrors
 		}),
 
 		...mapGetters([
 			'getBlocks',
 			'blocks'
+		]),
+
+		...mapMutations([
+			'setLayoutErrors'
 		]),
 
 		layout() {
@@ -188,6 +192,10 @@ export default {
 
 		canMove() {
 			return this.currentSectionBlocks.length > 1;
+		},
+
+		pageHasLayoutErrors() {
+			return this.layoutErrors.length !== 0;
 		}
 	},
 
@@ -247,11 +255,12 @@ export default {
 		validateLayout(){
 
 			let layoutName = `${this.currentLayout}-v${this.layoutVersion}`;
+			let layoutErrors = [];
 
 			this.layoutDefinition = this.siteLayoutDefinitions[layoutName];
 			// check that we have the same number of regions in our data as we have defined
 			if (Object.keys(this.pageData.blocks).length !== this.layoutDefinition.regions.length) {
-				this.layoutErrors.push(`The regions on this page do not match the expected regions it should have in layout '${layoutName}'.`);
+				layoutErrors.push(`The regions on this page do not match the expected regions it should have in layout '${layoutName}'.`);
 			}
 
 
@@ -259,7 +268,7 @@ export default {
 
 				// check that this defined region exist in the page's regions
 				if (this.pageData.blocks[regionDefinitionName] === void 0) {
-					this.layoutErrors.push(`The region '${regionDefinitionName}' was expected but not found on this page. Layout is '${layoutName}'.`);
+					layoutErrors.push(`The region '${regionDefinitionName}' was expected but not found on this page. Layout is '${layoutName}'.`);
 				}
 				
 				let regionDefinition = Definition.regionDefinitions[regionDefinitionName];
@@ -269,7 +278,7 @@ export default {
 						
 						// check that this section is in the right part of the region
 						if (this.pageData.blocks[regionDefinitionName][index].name !== sectionDefinition.name) {
-							this.layoutErrors.push(`The section '${sectionDefinition.name}' was expected in '${regionDefinitionName}' region, but found '${this.pageData.blocks[regionDefinitionName][index].name}'.`);
+							layoutErrors.push(`The section '${sectionDefinition.name}' was expected in '${regionDefinitionName}' region, but found '${this.pageData.blocks[regionDefinitionName][index].name}'.`);
 							
 						}
 
@@ -278,7 +287,7 @@ export default {
 							this.pageData.blocks[regionDefinitionName][index].blocks.forEach((block) => {
 								let fullBlockName = block.definition_name + '-v' + block.definition_version;
 								if (sectionDefinition.allowedBlocks.indexOf(fullBlockName) < 0) {
-									this.layoutErrors.push(`The block '${fullBlockName}' is not allowed in the '${sectionDefinition.name}' section of the '${regionDefinitionName}' region.`);
+									layoutErrors.push(`The block '${fullBlockName}' is not allowed in the '${sectionDefinition.name}' section of the '${regionDefinitionName}' region.`);
 								}
 							});
 						}
@@ -287,7 +296,7 @@ export default {
 
 				// the defined region was not loaded in our region definitions
 				else {
-					this.layoutErrors.push(`The defined region '${regionDefinitionName}' was not found in our loaded region definitions.`);
+					layoutErrors.push(`The defined region '${regionDefinitionName}' was not found in our loaded region definitions.`);
 				}
 			});
 
@@ -295,9 +304,11 @@ export default {
 			Object.keys(this.pageData.blocks).forEach((regionDataName) => {
 				// check that this defined region exist in the page's regions
 				if (this.layoutDefinition.regions.indexOf(regionDataName) < 0) {
-					this.layoutErrors.push(`Page contains region '${regionDataName}' which is not allowed in layout '${layoutName}'.`);
+					layoutErrors.push(`Page contains region '${regionDataName}' which is not allowed in layout '${layoutName}'.`);
 				}
 			});
+
+			this.$store.commit('setLayoutErrors', layoutErrors);
 		},
 
 		initEvents() {

@@ -77,7 +77,8 @@ Note that the page editing toolbar is a separate component found in `components/
 					{{ pageTitle }}
 					<el-tag type="warning">Draft</el-tag>
 				</div>
-				<span class="top-bar__url"><a :href="draftPreviewURL" target="_blank">{{ renderedURL }}</a> <icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" /></span>
+				<span v-if="!pageHasLayoutErrors" class="top-bar__url">
+					<a :href="draftPreviewURL" target="_blank">{{ renderedURL }}</a> <icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" /></span>
 			</div>
 
 			<div v-else-if="showTools && publishStatus === 'published'" class="top-bar__page-title">
@@ -124,7 +125,7 @@ Note that the page editing toolbar is a separate component found in `components/
 </template>
 
 <script>
-	import { mapGetters, mapActions, mapMutations } from 'vuex';
+	import { mapState, mapGetters, mapActions, mapMutations } from 'vuex';
 	import Icon from 'components/Icon';
 	import Toolbar from 'components/Toolbar';
 	import promptToSave from '../mixins/promptToSave';
@@ -183,6 +184,10 @@ Note that the page editing toolbar is a separate component found in `components/
 				'draftPreviewURL'
 			]),
 
+			...mapState({
+				layoutErrors: state => state.page.layoutErrors
+			}),
+
 			// works out if we should show a back button or not (ie whether we're editing a page or on the homepage)
 			showBack() {
 				return ['page'].indexOf(this.$route.name) !== -1;
@@ -209,6 +214,10 @@ Note that the page editing toolbar is a separate component found in `components/
 			siteTitle() {
 				const site = this.sites.find(site => site.id === Number(this.$route.params.site_id));
 				return site ? site.name : '';
+			},
+
+			pageHasLayoutErrors() {
+				return this.layoutErrors.length !== 0;
 			}
 		},
 

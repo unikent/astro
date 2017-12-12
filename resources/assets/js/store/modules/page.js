@@ -22,6 +22,7 @@ const vue = new Vue();
 const state = {
 	currentLayout: null,
 	currentLayoutVersion: 1,
+	layoutErrors: [],
 	currentBlockIndex: null,
 	currentRegion: null,
 	blockMeta: {
@@ -64,6 +65,10 @@ const mutations = {
 
 	setBlock(state, { index } = { index: null }) {
 		state.currentBlockIndex = index;
+	},
+
+	setLayoutErrors (state, layoutErrors) {
+		state.layoutErrors = layoutErrors;
 	},
 
 	reorderBlocks(state, { from, to, region, section }) {
