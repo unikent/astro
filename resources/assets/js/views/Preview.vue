@@ -90,6 +90,7 @@
 			{{ layoutError }}
 		</li>
 	</ul>
+	<p>The current page's path is: <strong>/site/{{ siteId }}/page/{{ $route.params.page_id }}</strong>.</p>
 </el-card>
 </template>
 
@@ -152,7 +153,8 @@ export default {
 			currentRegion: state => state.contenteditor.currentRegionName,
 			layoutVersion: state => state.page.currentLayoutVersion,
 			blockMeta: state => state.page.blockMeta.blocks[state.page.currentRegion],
-			siteLayoutDefinitions: state => state.site.layouts
+			siteLayoutDefinitions: state => state.site.layouts,
+			siteId: state => parseInt(state.site.site)
 		}),
 
 		...mapGetters([
