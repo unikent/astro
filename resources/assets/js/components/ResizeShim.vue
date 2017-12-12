@@ -30,9 +30,7 @@ export default {
 	},
 
 	mounted() {
-		if (this.$refs['hidden-frame'].contentWindow) {
-			this.$refs['hidden-frame'].contentWindow.addEventListener('resize', this.onResize, false);
-		}
+		this.$refs['hidden-frame'].contentWindow.addEventListener('resize', this.onResize, false);
 	},
 
 	beforeDestroy() {
