@@ -197,3 +197,22 @@ export const getDraftPreviewURL = (url) => {
 export const getPublishedPreviewURL = (url) => {
 	return `${Config.get('base_url', '')}/published/${url ? url.replace(/\/$/, '') : ''}`;
 };
+
+/**
+* prevents users from submitting forms in el
+* while still allowing the user to interact with them
+*/
+export const disableForms = (el) => {
+	// disable buttons
+	const buttonElements = el.querySelectorAll('button, submit');
+	buttonElements.forEach((buttonElement) => {
+		buttonElement.setAttribute('disabled', '');
+	});
+
+	// remove any form actions and methods
+	const formElements = el.querySelectorAll('form');
+	formElements.forEach((formElement) => {
+		formElement.removeAttribute('action');
+		formElement.removeAttribute('method');
+	});
+}

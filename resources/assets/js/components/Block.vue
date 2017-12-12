@@ -27,6 +27,7 @@
 import blocks from 'cms-prototype-blocks';
 import { mapState, mapGetters, mapMutations } from 'vuex';
 import imagesLoaded from 'imagesloaded';
+import { disableForms } from 'classes/helpers';
 
 export default {
 
@@ -148,7 +149,7 @@ export default {
 			});
 		});
 
-		this.disableForms();
+		disableForms(this.$el);
 	},
 
 
@@ -186,25 +187,6 @@ export default {
 			) {
 				this.$bus.$emit('block:hideOverlay', this);
 			}
-		},
-
-		/**
-		* prevents users from submitting forms in the previewed block
-		* while still allowing the user to interact with previewed forms
-		*/
-		disableForms() {
-			// disable buttons
-			const buttonElements = this.$el.querySelectorAll('button, submit');
-			buttonElements.forEach((buttonElement) => {
-				buttonElement.setAttribute('disabled', '');
-			});
-
-			// remove any form actions and methods
-			const formElements = this.$el.querySelectorAll('form');
-			formElements.forEach((formElement) => {
-				formElement.removeAttribute('action');
-				formElement.removeAttribute('method');
-			});
 		}
 	}
 };
