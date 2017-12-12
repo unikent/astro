@@ -190,12 +190,11 @@ export default {
 	},
 
 	created() {
-		var $this = this; // because 'this' isnt available to us in callback function after the api has returned
 
-		this.fetchPage(this.$route.params.page_id || 1)// is this fallback necessary?
-			.then(function () {
+		this.fetchPage(this.$route.params.page_id)
+			.then(() => {
 
-				$this.validateLayout();
+				this.validateLayout();
 
 			});
 
@@ -245,39 +244,39 @@ export default {
 
 		validateLayout(){
 
-			let $this = this;
+			let layoutName = `${this.currentLayout}-v${this.layoutVersion}`;
 
-			$this.layoutDefinition = $this.siteLayoutDefinitions[`${$this.currentLayout}-v${$this.layoutVersion}`];
+			this.layoutDefinition = this.siteLayoutDefinitions[layoutName];
 			// check that we have the same number of regions in our data as we have defined
-			if (Object.keys($this.pageData.blocks).length !== $this.layoutDefinition.regions.length) {
-				$this.layoutErrors.push('The regions on this page do not match the expected regions it should have.');
+			if (Object.keys(this.pageData.blocks).length !== this.layoutDefinition.regions.length) {
+				this.layoutErrors.push('The regions on this page do not match the expected regions it should have.');
 			}
 
 
-			_.each($this.layoutDefinition.regions, function (regionName) {
+			this.layoutDefinition.regions.forEach((regionDefinitionName) => {
 
 				// check that this defined region exist in the page's regions
-				if ($this.pageData.blocks[regionName] === void 0) {
-					$this.layoutErrors.push(`The region '${regionName}' was expected but not found on this page.`);
+				if (this.pageData.blocks[regionDefinitionName] === void 0) {
+					this.layoutErrors.push(`The region '${regionDefinitionName}' was expected but not found on this page.`);
 				}
 				
-				let regionDefinition = Definition.regionDefinitions[regionName];
+				let regionDefinition = Definition.regionDefinitions[regionDefinitionName];
 
 				if (regionDefinition !== void 0) {
-					_.each(regionDefinition.sections, function(sectionDefinition, index) {
+					regionDefinition.sections.forEach((sectionDefinition, index) => {
 						
 						// check that this section is in the right part of the region
-						if ($this.pageData.blocks[regionName][index].name !== sectionDefinition.name) {
-							$this.layoutErrors.push(`The section '${sectionDefinition.name}' was expected in '${regionName}' region, but found '${$this.pageData.blocks[regionName][index].name}'.`);
+						if (this.pageData.blocks[regionDefinitionName][index].name !== sectionDefinition.name) {
+							this.layoutErrors.push(`The section '${sectionDefinition.name}' was expected in '${regionDefinitionName}' region, but found '${this.pageData.blocks[regionDefinitionName][index].name}'.`);
 							
 						}
 
 						// if the section is in the right part of the region, go ahead and check that it has the right blocks within it
 						else {
-							_.each($this.pageData.blocks[regionName][index].blocks, function (block) {
+							this.pageData.blocks[regionDefinitionName][index].blocks.forEach((block) => {
 								let fullBlockName = block.definition_name + '-v' + block.definition_version;
 								if (sectionDefinition.allowedBlocks.indexOf(fullBlockName) < 0) {
-									$this.layoutErrors.push(`The block '${fullBlockName}' is now allowed in the '${sectionDefinition.name}' section of the '${regionName}' region.`);
+									this.layoutErrors.push(`The block '${fullBlockName}' is not allowed in the '${sectionDefinition.name}' section of the '${regionDefinitionName}' region.`);
 								}
 							});
 						}
@@ -286,7 +285,15 @@ export default {
 
 				// the defined region was not loaded in our region definitions
 				else {
-					$this.layoutErrors.push(`The defined region '${regionName}' was not found in our loaded region definitions`);
+					this.layoutErrors.push(`The defined region '${regionDefinitionName}' was not found in our loaded region definitions`);
+				}
+			});
+
+			// another loop through the data regions to alert the user if there are regions that are not defined
+			Object.keys(this.pageData.blocks).forEach((regionDataName) => {
+				// check that this defined region exist in the page's regions
+				if (this.layoutDefinition.regions.indexOf(regionDataName) < 0) {
+					this.layoutErrors.push(`Page contains region '${regionDataName}' which is not allowed in layout '${layoutName}'.`);
 				}
 			});
 		},
