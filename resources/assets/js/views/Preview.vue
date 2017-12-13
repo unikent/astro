@@ -270,33 +270,51 @@ export default {
 				if (this.pageData.blocks[regionDefinitionName] === void 0) {
 					layoutErrors.push(`The region '${regionDefinitionName}' was expected but not found on this page. Layout is '${layoutName}'.`);
 				}
-				
-				let regionDefinition = Definition.regionDefinitions[regionDefinitionName];
 
-				if (regionDefinition !== void 0) {
-					regionDefinition.sections.forEach((sectionDefinition, index) => {
-						
-						// check that this section is in the right part of the region
-						if (this.pageData.blocks[regionDefinitionName][index].name !== sectionDefinition.name) {
-							layoutErrors.push(`The section '${sectionDefinition.name}' was expected in '${regionDefinitionName}' region, but found '${this.pageData.blocks[regionDefinitionName][index].name}'.`);
-							
-						}
-
-						// if the section is in the right part of the region, go ahead and check that it has the right blocks within it
-						else {
-							this.pageData.blocks[regionDefinitionName][index].blocks.forEach((block) => {
-								let fullBlockName = block.definition_name + '-v' + block.definition_version;
-								if (sectionDefinition.allowedBlocks.indexOf(fullBlockName) < 0) {
-									layoutErrors.push(`The block '${fullBlockName}' is not allowed in the '${sectionDefinition.name}' section of the '${regionDefinitionName}' region.`);
-								}
-							});
-						}
-					});
-				}
-
-				// the defined region was not loaded in our region definitions
+				// we have the region in our data
 				else {
-					layoutErrors.push(`The defined region '${regionDefinitionName}' was not found in our loaded region definitions.`);
+				
+					let regionDefinition = Definition.regionDefinitions[regionDefinitionName];
+
+					if (regionDefinition !== void 0) {
+						regionDefinition.sections.forEach((sectionDefinition, index) => {
+							
+							// check that the section is present
+							if (this.pageData.blocks[regionDefinitionName][index] === void 0) {
+								layoutErrors.push(`The section '${sectionDefinition.name}' was expected in '${regionDefinitionName}' region, but found none.`);
+							}
+							
+							// check that this section is in the right part of the region
+							else if(this.pageData.blocks[regionDefinitionName][index].name !== sectionDefinition.name) {
+								layoutErrors.push(`The section '${sectionDefinition.name}' was expected in '${regionDefinitionName}' region, but found '${this.pageData.blocks[regionDefinitionName][index].name}'.`);
+								
+							}
+
+							// if the section is in the right part of the region, go ahead and check that it has the right blocks within it
+							else {
+								this.pageData.blocks[regionDefinitionName][index].blocks.forEach((block) => {
+									let fullBlockName = block.definition_name + '-v' + block.definition_version;
+									if (sectionDefinition.allowedBlocks.indexOf(fullBlockName) < 0) {
+										layoutErrors.push(`The block '${fullBlockName}' is not allowed in the '${sectionDefinition.name}' section of the '${regionDefinitionName}' region.`);
+									}
+								});
+							}
+						});
+
+						// check to see if there are more sections than defined
+						if (this.pageData.blocks[regionDefinitionName].length > regionDefinition.sections.length) {
+							for (var i = regionDefinition.sections.length; i < this.pageData.blocks[regionDefinitionName].length; i++) {
+								layoutErrors.push(`Page contains section '${this.pageData.blocks[regionDefinitionName][i].name}' which is not allowed in region '${regionDefinitionName}' of layout '${layoutName}'.`); 
+							}
+						}
+
+					}
+
+					// the defined region was not loaded in our region definitions
+					else {
+						layoutErrors.push(`The defined region '${regionDefinitionName}' was not found in our loaded region definitions.`);
+					}
+
 				}
 			});
 
