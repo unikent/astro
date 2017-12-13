@@ -46,13 +46,14 @@
 				<el-dropdown-item
 					command="openEditModal"
 					v-if="canUser('page.edit')"
+					:disabled="pageHasLayoutErrors"
 				>
 					Edit page settings
 				</el-dropdown-item>
 
 				<el-dropdown-item
 					v-show="!root"
-					:disabled="depth > 2"
+					:disabled="depth > 2 || pageHasLayoutErrors"
 					command="openModal"
 					v-if="canUser('page.add')"
 				>
@@ -63,7 +64,7 @@
 				<el-dropdown-item
 					command="publish"
 					v-if="canUser('page.publish')"
-					:disabled="page.status === 'published' || parentStatus === 'new'"
+					:disabled="page.status === 'published' || parentStatus === 'new' || pageHasLayoutErrors"
 				>
 					Publish
 				</el-dropdown-item>
@@ -177,7 +178,8 @@ export default {
 		}),
 
 		...mapState({
-			pageData: state => state.page.pageData
+			pageData: state => state.page.pageData,
+			layoutErrors: state => state.page.layoutErrors
 		}),
 
 		...mapGetters([
@@ -204,6 +206,13 @@ export default {
 			},
 			// don't set directly (use vuex instead)
 			set() {}
+		},
+
+		/**
+		 * Determines if the page this list item represents is being edited and has layout errors.
+		 */
+		pageHasLayoutErrors() {
+			return this.pageData.id === this.page.id && this.layoutErrors.length !== 0;
 		}
 	},
 
