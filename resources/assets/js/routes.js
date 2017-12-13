@@ -5,7 +5,7 @@ import Admin from './views/Admin';
 import Dashboard from './views/Dashboard';
 import SiteList from './views/SiteList';
 import Media from './views/Media';
-import Settings from './views/Settings'
+import Settings from './views/Settings';
 
 import Editor from './views/Editor';
 import MenuEditor from './views/MenuEditor';

@@ -3,6 +3,7 @@
 namespace App\Models\APICommands;
 
 use App\Models\Contracts\APICommand;
+use App\Models\Definitions\Layout;
 use App\Models\Definitions\Region;
 use App\Models\Revision;
 use App\Models\Block;
@@ -43,7 +44,7 @@ class UpdateContent implements APICommand
 				'layout_version' => $previous_revision->layout_version,
 				'created_by' => $user->id,
 				'updated_by' => $user->id,
-				'blocks' => $page->bake(),
+				'blocks' => $page->bake(Layout::idFromNameAndVersion($previous_revision->layout_name, $previous_revision->layout_version)),
 				'options' => '',
 				'valid' => !$errors
 			]);

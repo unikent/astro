@@ -62,19 +62,22 @@
 
 			visible: {
 				get() {
-					return this.editPageModal.visible;
-				},
-				set(show) {
-					if(!show) {
-						this.hideEditPageModal();
-					}
-					else {
+					const visible = this.editPageModal.visible;
+
+					if(visible) {
 						this.editForm.title = this.editPageModal.title;
 						this.editForm.slug = this.editPageModal.slug;
 						this.editForm.id = this.editPageModal.id;
 						this.editForm.editSlug = this.editPageModal.editSlug;
 						this.editForm.errorMessage = '';
 						this.editForm.editDetails = [];
+					}
+
+					return visible;
+				},
+				set(show) {
+					if(!show) {
+						this.hideEditPageModal();
 					}
 				}
 			}

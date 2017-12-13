@@ -281,20 +281,14 @@ const actions = {
 								page.blocks[region][sindex].blocks.forEach((block) => {
 									Definition.fillBlockFields(block);
 									blockMeta.blocks[region][sindex].blocks.push({ size: 0, offset: 0 });
+									if( typeof block.errors !== void 0 && block.errors !== null) {
+										commit('addBlockValidationIssue', block.id);
+									}
 								});
 							});
 						});
 
 						commit('addBlockMeta', blockMeta);
-
-						// Object.keys(blocks).forEach(region => {
-						// 	blocks[region].forEach((block) => {
-						// 		if (typeof block.errors !== 'undefined' && block.errors !== null) {
-						// 			commit('addBlockValidationIssue', block.id);
-						// 		}
-						// 	});
-						// });
-						// TODO: populate validations issues with those received from the api
 						commit('setLoaded');
 					});
 
