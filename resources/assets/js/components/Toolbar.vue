@@ -6,7 +6,7 @@
 			placeholder="view" 
 			v-model="view" 
 			class="switch-view"
-			:disabled="pageHasLayoutErrors ? true : false"
+			:disabled="pageHasLayoutErrors"
 		>
 			<el-option v-for="(view, key) in views" :label="view.label" :value="key" :key="view.label">
 				<div class="view-icon">
@@ -23,7 +23,7 @@
 		type="primary" 
 		@click="savePage" 
 		v-loading.fullscreen.lock="fullscreenLoading"
-		:disabled="pageHasLayoutErrors ? true : false"
+		:disabled="pageHasLayoutErrors"
 	>Save</el-button>
 
 	<el-button 
@@ -31,7 +31,7 @@
 		class="toolbar__button-preview" 
 		plain 
 		@click="previewPage"
-		:disabled="pageHasLayoutErrors ? true : false"
+		:disabled="pageHasLayoutErrors"
 	>Preview <icon name="newwindow" aria-hidden="true" width="14" height="14" class="ico" /></el-button>
 
 	<template v-if="canUser('page.publish')">
@@ -40,13 +40,14 @@
 			v-if="invalidBlocks"
 			type="success"
 			@click="publishPage"
-			:disabled="pageHasLayoutErrors ? true : false"
+			:disabled="pageHasLayoutErrors"
 		>Publish...</el-button>
 		<el-button
 			class="toolbar__button-publish"
 			v-else
 			type="success"
 			@click="showPublishValidationWarningModal"
+			:disabled="pageHasLayoutErrors"
 		>Publish...</el-button>
 	</template>
 

@@ -273,21 +273,21 @@ export default {
 
 				// we have the region in our data
 				else {
-				
+
 					let regionDefinition = Definition.regionDefinitions[regionDefinitionName];
 
 					if (regionDefinition !== void 0) {
 						regionDefinition.sections.forEach((sectionDefinition, index) => {
-							
+
 							// check that the section is present
 							if (this.pageData.blocks[regionDefinitionName][index] === void 0) {
 								layoutErrors.push(`The section '${sectionDefinition.name}' was expected in '${regionDefinitionName}' region, but found none.`);
 							}
-							
+
 							// check that this section is in the right part of the region
 							else if(this.pageData.blocks[regionDefinitionName][index].name !== sectionDefinition.name) {
 								layoutErrors.push(`The section '${sectionDefinition.name}' was expected in '${regionDefinitionName}' region, but found '${this.pageData.blocks[regionDefinitionName][index].name}'.`);
-								
+
 							}
 
 							// if the section is in the right part of the region, go ahead and check that it has the right blocks within it
@@ -304,7 +304,7 @@ export default {
 						// check to see if there are more sections than defined
 						if (this.pageData.blocks[regionDefinitionName].length > regionDefinition.sections.length) {
 							for (var i = regionDefinition.sections.length; i < this.pageData.blocks[regionDefinitionName].length; i++) {
-								layoutErrors.push(`Page contains an additional section '${this.pageData.blocks[regionDefinitionName][i].name}' at position ${i+1}. ${regionDefinition.sections.length} section(s) were expected in region '${regionDefinitionName}' of layout '${layoutName}'.`); 
+								layoutErrors.push(`Page contains an additional section '${this.pageData.blocks[regionDefinitionName][i].name}' at position ${i+1}. ${regionDefinition.sections.length} section(s) were expected in region '${regionDefinitionName}' of layout '${layoutName}'.`);
 							}
 						}
 
