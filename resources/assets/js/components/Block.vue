@@ -27,6 +27,7 @@
 import blocks from 'cms-prototype-blocks';
 import { mapState, mapGetters, mapMutations } from 'vuex';
 import imagesLoaded from 'imagesloaded';
+import { disableForms } from 'classes/helpers';
 
 export default {
 
@@ -147,6 +148,8 @@ export default {
 				value: this.size.height
 			});
 		});
+
+		disableForms(this.$el);
 	},
 
 
@@ -184,7 +187,7 @@ export default {
 			) {
 				this.$bus.$emit('block:hideOverlay', this);
 			}
-		},
+		}
 	}
 };
 </script>
