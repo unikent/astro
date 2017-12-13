@@ -2,6 +2,7 @@
 
 namespace App\Models\APICommands;
 
+use App\Models\Definitions\Layout;
 use App\Models\Page;
 use App\Models\Revision;
 use App\Models\RevisionSet;
@@ -44,7 +45,7 @@ trait AddsPagesTrait
 			'updated_by' => $user->id,
 			'layout_name' => $layout_name,
 			'layout_version' => $layout_version,
-			'blocks' => $page->bake(),
+			'blocks' => $page->bake(Layout::idFromNameAndVersion($layout_name, $layout_version)),
 			'options' => null,
 			'valid' => true
 		]);

@@ -82,40 +82,46 @@ class Page extends BaumNode
 	}
 
 	/**
-	 * Generate the blocks array for this page.
+	 * Generate the blocks array for this page. Ensures that all regions and sections that are part of the layout are included.
+	 * @param string $layout_id - The ID of the layout definition we are baking out the blocks for.
 	 * @return array
 	 */
-	public function bake()
+	public function bake($layout_id)
 	{
-		$data = [];
 		$blocksByRegion = $this->blocks()
 			->with('media')
 			->orderBy('order')
 			->get()
 			->groupBy('region_name');
 		$this->load('blocks.media');
+		// Get an empty (no blocks, just regions and sections) page data structure for this layout
+		$layout = LayoutDefinition::fromDefinitionFile(LayoutDefinition::locateDefinition($layout_id));
+		$data = $layout->getDataStructure();
+		// loop through all the blocks we have (indexed by region) and insert them into the page data structure
 		foreach ($blocksByRegion as $region_id => $blocks) {
-			// need the region definition to get sections in the correct order
-			$regionDef = Region::fromDefinitionFile(Region::locateDefinition($region_id));
-			$sections = $blocks->groupBy('section_name');
-			$data[$region_id] = [];
-			foreach($regionDef->sections as $section_def){
-				$section = ['name' => $section_def['name'], 'blocks' => []];
-				if(!empty($sections[$section_def['name']])){
-					foreach($sections[$section_def['name']] as $block){
-						$block->embedMedia();
-						$section['blocks'][] = [
-							'id' => $block->id,
-							'definition_name' => $block->definition_name,
-							'definition_version' => $block->definition_version,
-							'region_name' => $block->region_name,
-							'section_name' => $block->section_name,
-							'fields' => $block->fields,
-							'errors' => $block->errors
-						];
+			if(isset($data[$region_id])) {
+				$blocksBySections = $blocks->groupBy('section_name');
+				// loop through all the sections that should be in this region and if we have any blocks, add them
+				foreach($data[$region_id] as $section_index => $section) {
+					$section_name = $section['name'];
+					if(!empty($blocksBySections[$section_name])) {
+						foreach ($blocksBySections[$section_name] as $block) {
+							$block->embedMedia();
+							$data[$region_id][$section_index]['blocks'][] = [
+								'id' => $block->id,
+								'definition_name' => $block->definition_name,
+								'definition_version' => $block->definition_version,
+								'region_name' => $block->region_name,
+								'section_name' => $block->section_name,
+								'fields' => $block->fields,
+								'errors' => $block->errors
+							];
+						}
 					}
 				}
-				$data[$region_id][] = $section;
+			}
+			else {
+				// should we throw an exception here?
 			}
 		}
 		return $data;
@@ -358,7 +364,7 @@ class Page extends BaumNode
 	{
 		$this->revision_id = $revision ? $revision->id : null;
 		if ($revision && !$revision->blocks) {
-			$revision->blocks = $this->bake();
+			$revision->blocks = $this->bake(Layout::idFromNameAndVersion($revision->layout_name, $revision->layout_version));
 			$revision->save();
 		}
 		if ($this->isPublishedVersion()) {

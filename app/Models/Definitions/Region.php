@@ -38,6 +38,22 @@ class Region extends BaseDefinition
 	}
 
 	/**
+	 * Get the data structure that defines the sections for this region.
+	 * @return array Array of [ ['name' => 'section-name', 'blocks' => [] ], ... ]
+	 */
+	public function getDataStructure()
+	{
+		$sections = [];
+		foreach($this->sections as $section) {
+			$sections[] = [
+				'name' => $section['name'],
+				'blocks' => []
+			];
+		}
+		return $sections;
+	}
+
+	/**
 	 * Returns the blockDefinitions Collection, populating it from disk if necessary.
 	 *
 	 * @return Collection
