@@ -2,7 +2,12 @@
 <div class="toolbar">
 
 	<el-tooltip v-if="canUser('page.edit')" class="item" effect="dark" content="Switch edit mode" placement="top">
-		<el-select placeholder="view" v-model="view" class="switch-view">
+		<el-select 
+			placeholder="view" 
+			v-model="view" 
+			class="switch-view"
+			:disabled="pageHasLayoutErrors"
+		>
 			<el-option v-for="(view, key) in views" :label="view.label" :value="key" :key="view.label">
 				<div class="view-icon">
 					<icon :name="view.icon" aria-hidden="true" width="20" height="20" />
@@ -12,9 +17,22 @@
 		</el-select>
 	</el-tooltip>
 
-	<el-button v-if="canUser('page.edit')" class="toolbar__button-save" type="primary" @click="savePage" v-loading.fullscreen.lock="fullscreenLoading">Save</el-button>
+	<el-button 
+		v-if="canUser('page.edit')" 
+		class="toolbar__button-save" 
+		type="primary" 
+		@click="savePage" 
+		v-loading.fullscreen.lock="fullscreenLoading"
+		:disabled="pageHasLayoutErrors"
+	>Save</el-button>
 
-	<el-button v-if="canUser('page.preview')" class="toolbar__button-preview" plain @click="previewPage">Preview <icon name="newwindow" aria-hidden="true" width="14" height="14" class="ico" /></el-button>
+	<el-button 
+		v-if="canUser('page.preview')" 
+		class="toolbar__button-preview" 
+		plain 
+		@click="previewPage"
+		:disabled="pageHasLayoutErrors"
+	>Preview <icon name="newwindow" aria-hidden="true" width="14" height="14" class="ico" /></el-button>
 
 	<template v-if="canUser('page.publish')">
 		<el-button
@@ -22,12 +40,14 @@
 			v-if="invalidBlocks"
 			type="success"
 			@click="publishPage"
+			:disabled="pageHasLayoutErrors"
 		>Publish...</el-button>
 		<el-button
 			class="toolbar__button-publish"
 			v-else
 			type="success"
 			@click="showPublishValidationWarningModal"
+			:disabled="pageHasLayoutErrors"
 		>Publish...</el-button>
 	</template>
 
@@ -66,7 +86,8 @@ export default {
 
 		...mapState({
 			page: state => state.page.pageData,
-			pageLoaded: state => state.page.loaded
+			pageLoaded: state => state.page.loaded,
+			layoutErrors: state => state.page.layoutErrors
 		}),
 
 		...mapGetters([
@@ -90,6 +111,10 @@ export default {
 
 		invalidBlocks() {
 			return this.getInvalidBlocks().length === 0 ? true : false;
+		},
+
+		pageHasLayoutErrors() {
+			return this.layoutErrors.length !== 0;
 		}
 	},
 

@@ -1,5 +1,5 @@
 <template>
-<div>
+<div v-if="!pageHasLayoutErrors">
 	<div id="b-wrapper" ref="wrapper" :style="wrapperStyles">
 		<component :is="layout" />
 		<div
@@ -79,6 +79,19 @@
 	<div id="b-overlay" :style="overlayStyles"></div>
 	<resize-shim :onResize="onResize" />
 </div>
+<el-card v-else class="box-card error-card">
+	<div slot="header" class="clearfix">
+		<i class="error-icon el-icon-error is-big"></i>
+		<span class="error-title is-bold">A layout error occured</span>
+	</div>
+	<p>Please report the following errors to your administrator</p>
+	<ul>
+		<li v-for="layoutError in layoutErrors" class="text item">
+			{{ layoutError }}
+		</li>
+	</ul>
+	<p>The current page's path is: <strong>/site/{{ siteId }}/page/{{ $route.params.page_id }}</strong>.</p>
+</el-card>
 </template>
 
 <script>
@@ -122,7 +135,8 @@ export default {
 			current: null,
 			sectionDefinition: null,
 			sectionConstraints: null,
-			currentSectionBlocks: null
+			currentSectionBlocks: null,
+			layoutDefinition: null
 		};
 	},
 
@@ -133,15 +147,23 @@ export default {
 
 		...mapState({
 			loadedBlocks: state => state.page.loaded,
+			pageData: state => state.page.pageData,
 			currentLayout: state => state.page.currentLayout,
 			currentRegion: state => state.contenteditor.currentRegionName,
 			layoutVersion: state => state.page.currentLayoutVersion,
-			blockMeta: state => state.page.blockMeta.blocks[state.page.currentRegion]
+			blockMeta: state => state.page.blockMeta.blocks[state.page.currentRegion],
+			siteLayoutDefinitions: state => state.site.layouts,
+			siteId: state => parseInt(state.site.site),
+			layoutErrors: state => state.page.layoutErrors
 		}),
 
 		...mapGetters([
 			'getBlocks',
 			'blocks'
+		]),
+
+		...mapMutations([
+			'setLayoutErrors'
 		]),
 
 		layout() {
@@ -170,11 +192,21 @@ export default {
 
 		canMove() {
 			return this.currentSectionBlocks.length > 1;
+		},
+
+		pageHasLayoutErrors() {
+			return this.layoutErrors.length !== 0;
 		}
 	},
 
 	created() {
-		this.fetchPage(this.$route.params.page_id || 1);
+
+		this.fetchPage(this.$route.params.page_id)
+			.then(() => {
+
+				this.validateLayout();
+
+			});
 
 		this.onKeyDown = onKeyDown(undoStackInstance);
 		this.onKeyUp = onKeyUp(undoStackInstance);
@@ -219,6 +251,83 @@ export default {
 			'updateInsertRegion',
 			'deleteBlockValidationIssue'
 		]),
+
+		validateLayout(){
+
+			let layoutName = `${this.currentLayout}-v${this.layoutVersion}`;
+			let layoutErrors = [];
+
+			this.layoutDefinition = this.siteLayoutDefinitions[layoutName];
+			// check that we have the same number of regions in our data as we have defined
+			if (Object.keys(this.pageData.blocks).length !== this.layoutDefinition.regions.length) {
+				layoutErrors.push(`The regions on this page do not match the expected regions it should have in layout '${layoutName}'.`);
+			}
+
+
+			this.layoutDefinition.regions.forEach((regionDefinitionName) => {
+
+				// check that this defined region exist in the page's regions
+				if (this.pageData.blocks[regionDefinitionName] === void 0) {
+					layoutErrors.push(`The region '${regionDefinitionName}' was expected but not found on this page. Layout is '${layoutName}'.`);
+				}
+
+				// we have the region in our data
+				else {
+
+					let regionDefinition = Definition.regionDefinitions[regionDefinitionName];
+
+					if (regionDefinition !== void 0) {
+						regionDefinition.sections.forEach((sectionDefinition, index) => {
+
+							// check that the section is present
+							if (this.pageData.blocks[regionDefinitionName][index] === void 0) {
+								layoutErrors.push(`The section '${sectionDefinition.name}' was expected in '${regionDefinitionName}' region, but found none.`);
+							}
+
+							// check that this section is in the right part of the region
+							else if(this.pageData.blocks[regionDefinitionName][index].name !== sectionDefinition.name) {
+								layoutErrors.push(`The section '${sectionDefinition.name}' was expected in '${regionDefinitionName}' region, but found '${this.pageData.blocks[regionDefinitionName][index].name}'.`);
+
+							}
+
+							// if the section is in the right part of the region, go ahead and check that it has the right blocks within it
+							else {
+								this.pageData.blocks[regionDefinitionName][index].blocks.forEach((block) => {
+									let fullBlockName = block.definition_name + '-v' + block.definition_version;
+									if (sectionDefinition.allowedBlocks.indexOf(fullBlockName) < 0) {
+										layoutErrors.push(`The block '${fullBlockName}' is not allowed in the '${sectionDefinition.name}' section of the '${regionDefinitionName}' region.`);
+									}
+								});
+							}
+						});
+
+						// check to see if there are more sections than defined
+						if (this.pageData.blocks[regionDefinitionName].length > regionDefinition.sections.length) {
+							for (var i = regionDefinition.sections.length; i < this.pageData.blocks[regionDefinitionName].length; i++) {
+								layoutErrors.push(`Page contains an additional section '${this.pageData.blocks[regionDefinitionName][i].name}' at position ${i+1}. ${regionDefinition.sections.length} section(s) were expected in region '${regionDefinitionName}' of layout '${layoutName}'.`);
+							}
+						}
+
+					}
+
+					// the defined region was not loaded in our region definitions
+					else {
+						layoutErrors.push(`The defined region '${regionDefinitionName}' was not found in our loaded region definitions.`);
+					}
+
+				}
+			});
+
+			// another loop through the data regions to alert the user if there are regions that are not defined
+			Object.keys(this.pageData.blocks).forEach((regionDataName) => {
+				// check that this defined region exist in the page's regions
+				if (this.layoutDefinition.regions.indexOf(regionDataName) < 0) {
+					layoutErrors.push(`Page contains region '${regionDataName}' which is not allowed in layout '${layoutName}'.`);
+				}
+			});
+
+			this.$store.commit('setLayoutErrors', layoutErrors);
+		},
 
 		initEvents() {
 			document.addEventListener('keydown', this.onKeyDown);

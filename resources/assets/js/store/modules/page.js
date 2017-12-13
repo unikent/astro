@@ -22,6 +22,7 @@ const vue = new Vue();
 const state = {
 	currentLayout: null,
 	currentLayoutVersion: 1,
+	layoutErrors: [],
 	currentBlockIndex: null,
 	currentRegion: null,
 	blockMeta: {
@@ -64,6 +65,10 @@ const mutations = {
 
 	setBlock(state, { index } = { index: null }) {
 		state.currentBlockIndex = index;
+	},
+
+	setLayoutErrors (state, layoutErrors) {
+		state.layoutErrors = layoutErrors;
 	},
 
 	reorderBlocks(state, { from, to, region, section }) {
@@ -250,12 +255,12 @@ const actions = {
 	fetchPage({ commit }, id) {
 		commit('setPage', null);
 		// TODO: refactor into smaller methods
-		api
+		return api
 			.get(`pages/${id}?include=blocks.media,site`)
 			.then(response => {
 				const page = response.data.data;
 
-				api
+				return api
 					.get(`layouts/${page.layout.name}-v${page.layout.version}/definition?include=region_definitions.block_definitions`)
 					.then(({ data: region }) => {
 
