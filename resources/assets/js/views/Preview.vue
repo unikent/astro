@@ -304,7 +304,7 @@ export default {
 						// check to see if there are more sections than defined
 						if (this.pageData.blocks[regionDefinitionName].length > regionDefinition.sections.length) {
 							for (var i = regionDefinition.sections.length; i < this.pageData.blocks[regionDefinitionName].length; i++) {
-								layoutErrors.push(`Page contains section '${this.pageData.blocks[regionDefinitionName][i].name}' which is not allowed in region '${regionDefinitionName}' of layout '${layoutName}'.`); 
+								layoutErrors.push(`Page contains an additional section '${this.pageData.blocks[regionDefinitionName][i].name}' at position ${i+1}. ${regionDefinition.sections.length} section(s) were expected in region '${regionDefinitionName}' of layout '${layoutName}'.`); 
 							}
 						}
 
