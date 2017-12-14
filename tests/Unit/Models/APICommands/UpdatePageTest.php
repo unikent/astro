@@ -77,9 +77,11 @@ class UpdatePageTest extends APICommandTestCase
 	 * @test
 	 * @group APICommands
 	 */
-	public function validation_whenPageIsMissingOrNull_fails()
+	public function validation_whenPageIsNull_fails()
 	{
-		$this->markTestIncomplete();
+		$validator = $this->validator($this->input(['id' => null]));
+		$validator->passes();
+		$this->assertFalse($validator->passes());
 	}
 
 	/**
