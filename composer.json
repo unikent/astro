@@ -20,8 +20,8 @@
 			"type": "git"
 		},
 		{
-			"url": "git@github.com:theninja/framework.git",
-			"type": "git"
+			"url": "https://github.com/theninja/framework",
+			"type": "vcs"
 		}
 	],
 	"require": {
