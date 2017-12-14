@@ -2,7 +2,7 @@
 <el-dialog title="Create Page" :visible.sync="visible" :modal-append-to-body="false">
 	<el-form :model="createForm">
 		<el-form-item label="Page title">
-			<el-input name="title" v-model="createForm.title" auto-complete="off"></el-input>
+			<el-input name="title" v-model="title" auto-complete="off"></el-input>
 		</el-form-item>
 		<el-form-item label="Layout">
 			<el-select
@@ -23,9 +23,8 @@
 		<el-form-item label="slug">
 			<el-input
 				name="slug"
-				v-model="createForm.route.slug"
-				v-bind:placeholder="suggestedSlug"
-				auto-complete="off" @focus="setUserEditingSlug"></el-input>
+				v-model="createForm.slug"
+				auto-complete="off" @change="setUserEditingSlug"></el-input>
 		</el-form-item>
 	</el-form>
 	<span slot="footer" class="dialog-footer">
@@ -46,17 +45,13 @@ export default {
 
 	data() {
 		return {
+			userEditingSlug: false,
 			createForm: {
-				title: 'New page',
+				title: 'New Page',
 				layout: '',
-				route: {
-					slug: '',
-					parent_id: 1
-				},
-				blocks: {},
-				options: {}
-			},
-			userEditingSlug: false
+				slug: 'new-page',
+				parent_id: null,
+			}
 		};
 	},
 
@@ -70,6 +65,18 @@ export default {
 		...mapGetters([
 			'siteDefinition'
 		]),
+
+		title: {
+			set(val) {
+				this.createForm.title = val;
+				if(!this.userEditingSlug) {
+					this.createForm.slug = this.suggestedSlug;
+				}
+			},
+			get() {
+				return this.createForm.title;
+			}
+		},
 
 		layouts() {
 			if(this.siteDefinition){
@@ -94,13 +101,13 @@ export default {
 		disableSubmit() {
 			return this.createForm.layout === ''	 ||
 				this.createForm.title === '' ||
-				this.createForm.route.slug === '';
+				this.createForm.slug === '';
 		},
 
 		visible: {
 			get() {
 				/* eslint-disable camelcase */
-				this.createForm.route.parent_id = this.pageModal.parentId;
+				this.createForm.parent_id = this.pageModal.parentId;
 				/* eslint-enable camelcase */
 				return this.pageModal.visible;
 			},
@@ -128,10 +135,6 @@ export default {
 		}),
 
 		addChild() {
-			// if the user has not edited the slug then use the suggested slug
-			if(!this.userEditingSlug) {
-				this.createForm.route.slug = this.suggestedSlug;
-			}
 			this.createPage({
 				...this.createForm,
 				layout: {
@@ -144,22 +147,16 @@ export default {
 		},
 
 		setUserEditingSlug() {
-			if (this.userEditingSlug ===  false) {
-				this.userEditingSlug = true;
-				this.createForm.route.slug = this.suggestedSlug;
-			}
+			this.userEditingSlug = true;
 		},
 
 		resetForm() {
+			this.userEditingSlug = false;
 			this.createForm = {
 				title: 'New page',
 				layout: '',
-				route: {
-					slug: '',
-					parent_id: 1
-				},
-				blocks: {},
-				options: {}
+				slug: 'new-page',
+				parent_id: null
 			}
 		}
 	}
