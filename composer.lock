@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "23e6d6e2775d50ac3fb1f618271cef36",
+    "content-hash": "f19d73707928d5fe11c6e7095674d460",
     "packages": [
         {
             "name": "barryvdh/laravel-debugbar",
@@ -1375,7 +1375,7 @@
             "version": "dev-feature/inline-size-rule-messages",
             "source": {
                 "type": "git",
-                "url": "https://github.com/theninja/framework.git",
+                "url": "https://github.com/theninja/framework",
                 "reference": "48dd1dc51344eb12f13c9fdf93fa94d60796e535"
             },
             "dist": {
@@ -3554,7 +3554,7 @@
             "dist": {
                 "type": "path",
                 "url": "../astro-renderer",
-                "reference": "3ed333bdc8b9422fec2d04263c446f17a544af66",
+                "reference": "f9ca844af695baae91a9c2be8928fc2c0114545c",
                 "shasum": null
             },
             "require": {
@@ -3564,7 +3564,8 @@
             },
             "require-dev": {
                 "mikey179/vfsstream": "1.6.*",
-                "phpunit/phpunit": "^5.0"
+                "phpunit/phpunit": "^5.0",
+                "sphpdox/sphpdox": "dev-master"
             },
             "type": "project",
             "autoload": {

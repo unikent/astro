@@ -12,7 +12,7 @@
 			}
 		},
 		{
-			"url": "git@github.com:unikent/astro-renderer.git",
+			"url": "https://github.com/unikent/astro-renderer",
 			"type": "git"
 		},
 		{
@@ -21,7 +21,7 @@
 		},
 		{
 			"url": "https://github.com/theninja/framework",
-			"type": "vcs"
+			"type": "git"
 		}
 	],
 	"require": {
