@@ -9,13 +9,31 @@
 namespace Tests\Unit\Models\APICommands;
 
 use App\Models\APICommands\UpdatePage;
+use App\Models\Page;
 use App\Models\Contracts\APICommand;
+
+use DatabaseTransactions;
 
 class UpdatePageTest extends APICommandTestCase
 {
+
+	public $pageToBeUpdated;
+
+	public function setup()
+	{
+		parent::setup();
+		$this->pageToBeUpdated = factory(Page::class)->create();
+		$this->nonDraftPage = factory(Page::class)->create(['version' => Page::STATE_PUBLISHED]);
+	}
+	
+
 	public function getValidData()
 	{
-		return [];
+		return [
+			'id' => $this->pageToBeUpdated->id,
+			'title' => 'Page Title',
+			'options' => []
+		];
 	}
 
 	/**
@@ -35,7 +53,10 @@ class UpdatePageTest extends APICommandTestCase
 	 */
 	public function validation_whenPageIsNotDraft_fails()
 	{
-		$this->markTestIncomplete();
+		// we have an existing page which is not draft and we try to update it
+		$validator = $this->validator($this->input(['id' => $this->nonDraftPage->id]));
+		$validator->passes();
+		$this->assertFalse($validator->passes());
 	}
 
 	/**
@@ -44,7 +65,12 @@ class UpdatePageTest extends APICommandTestCase
 	 */
 	public function validation_whenPageDoesNotExist_fails()
 	{
-		$this->markTestIncomplete();
+		// find the id of a page which does not exist...
+		$highestPageID = Page::all()->sortBy('id')->pluck('id')->last();
+		$nonExistantPageID = $highestPageID + 1;
+		$validator = $this->validator($this->input(['id' => $nonExistantPageID]));
+		$validator->passes();
+		$this->assertFalse($validator->passes());
 	}
 
 	/**
