@@ -16,6 +16,7 @@
 					<el-button
 						class="move-up"
 						@click="showBlockList(0, true)"
+						size="mini"
 					>
 						Swap block
 					</el-button>
@@ -26,6 +27,7 @@
 							class="move-up"
 							:disabled="currentBlockIsFirst"
 							@click="moveBlock(-1)"
+							size="mini"
 						>
 							<icon name="angle-up" width="15" height="15" viewBox="0 0 15 15" /> Move up
 						</el-button>
@@ -34,6 +36,7 @@
 							class="move-down"
 							:disabled="currentBlockIsLast"
 							@click="moveBlock(1)"
+							size="mini"
 						>
 							Move down <icon name="angle-down" width="15" height="15" viewBox="0 0 15 15" />
 						</el-button>
@@ -43,9 +46,9 @@
 						v-if="sectionConstraints && sectionConstraints.canRemoveBlocks"
 						class="block-overlay__delete-button"
 						@command="removeBlock"
+						size="mini"
 					>
-						<el-button :plain="true" type="danger" size="mini">
-							<icon name="delete" width="15" height="15" viewBox="0 0 15 15" /> Delete
+						<el-button :plain="true" type="danger" size="mini">Delete<i class="el-icon-arrow-down el-icon--right"></i>
 						</el-button>
 						<el-dropdown-menu slot="dropdown">
 							<el-dropdown-item command="delete">Confirm</el-dropdown-item>
@@ -61,7 +64,7 @@
 				@click="showBlockList()"
 				v-if="sectionConstraints && sectionConstraints.canAddBlocks"
 			>
-				<icon name="plus" width="15" height="15" viewBox="0 0 15 15" />
+				<icon name="plus" width="16" height="16" viewBox="0 0 16 16" />
 			</div>
 			<div
 				class="add-after"
@@ -69,7 +72,7 @@
 				@click="showBlockList(1)"
 				v-if="sectionConstraints && sectionConstraints.canAddBlocks"
 			>
-				<icon name="plus" width="15" height="15" viewBox="0 0 15 15" />
+				<icon name="plus" width="16" height="16" viewBox="0 0 16 16" />
 			</div>
 		</div>
 	</div>

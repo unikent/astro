@@ -155,21 +155,26 @@
 
 .add-before,
 .add-after {
-	border-radius: 4px;
-	width: 30px;
-	height: 30px;
+	border-radius: 50%;
+	width: 32px;
+	height: 32px;
 	background-color: #fff;
-	border: 1px solid #c4c4c4;
+	border: 3px solid #04a9f4;
 	position: absolute;
 	left: 50%;
 	pointer-events: auto;
-	transition: .3s border-color ease-out;
+	transition: .3s all ease-in-out;
 	text-align: center;
 
 	&:hover {
-		border-color: #20a0ff;
 		cursor: pointer;
-		transition: .3s border-color ease-out, transform .2s ease-out;
+	}
+
+	svg {
+		transform: scale(1);
+		fill: #04a9f4;
+		stroke: #04a9f4;
+		stroke-width: 1px;
 	}
 }
 
@@ -178,7 +183,10 @@
 	transform: translate(-50%, -50%) translateY(-4px);
 
 	&:hover {
-		transform: translate(-50%, -50%) translateY(-4px) scale(1.2);
+		transform: translate(-50%, -50%) translateY(-4px) scale(1.1);
+		svg {
+			transform: scale(1);
+		}
 	}
 }
 
@@ -187,22 +195,6 @@
 	transform: translate(-50%, 50%) translateY(4px);
 
 	&:hover {
-		transform: translate(-50%, 50%) translateY(4px) scale(1.2);
-	}
-}
-
-.add-before--first {
-	transform: translate(-50%, 0);
-
-	&:hover {
-		transform: translate(-50%, 0) scale(1.2);
-	}
-}
-
-.add-after--last {
-	transform: translate(-50%, 0);
-
-	&:hover {
-		transform: translate(-50%, 0) scale(1.2);
+		transform: translate(-50%, 50%) translateY(4px) scale(1.1);
 	}
 }
