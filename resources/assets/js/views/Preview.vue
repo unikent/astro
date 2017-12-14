@@ -44,7 +44,7 @@
 						class="block-overlay__delete-button"
 						@command="removeBlock"
 					>
-						<el-button :plain="true" type="danger">
+						<el-button :plain="true" type="danger" size="mini">
 							<icon name="delete" width="15" height="15" viewBox="0 0 15 15" /> Delete
 						</el-button>
 						<el-dropdown-menu slot="dropdown">

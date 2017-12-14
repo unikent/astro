@@ -330,44 +330,37 @@ const actions = {
 
 						const message = vue.$createElement(
 							'div',
-							{
-								'style': {
-									color: '#bb9132'
-								},
-							},
+							{},
 							[
-								vue.$createElement('p', 'The page saved ok, but there are some validation errors.'),
-								vue.$createElement('p', 'You won\'t be able to publish till these are fixed.'),
+								vue.$createElement('p', { class:'el-message__content', style:'padding-bottom:1rem' }, 'The page saved ok, but there are some validation errors.'),
+								vue.$createElement('p', { class:'el-message__content', style:'padding-bottom:1rem' }, 'You won\'t be able to publish till these are fixed.'),
 								vue.$createElement('a', {
 									attrs: {
 										href: '#'
 									},
+									style:'font-size:14px',
 									on: {
 										click(e) {
 											eventBus.$emit('sidebar:openErrors', e);
 										}
 									}
-								}, 'Check the error sidebar for details.')
+								}, 'Check the error list for details.')
 							],
 
 						);
-						vue.$notify({
-							title: 'Saved',
+						vue.$message({
 							message: message,
 							type: 'warning',
-							duration: 10000,
-							onClick() {
-								this.close();
-							}
+							duration: 7000,
+							showClose: true
 						});
 					}
 					// we're all good
 					else if (response.data.data.valid === 1) {
-						vue.$notify({
-							title: 'Saved',
-							message: 'You saved this page successfully.',
+						vue.$message({
+							message: 'Page saved.',
 							type: 'success',
-							duration: 4000
+							duration: 2000
 						});
 					}
 				}
