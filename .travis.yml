@@ -10,6 +10,7 @@ env:
 install:
   - rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install $TRAVIS_NODE_VERSION
   - npm install -g yarn
+  - echo -e "machine github.com\n  login $CI_USER_TOKEN" >> ~/.netrc
 
 before_script:
   - composer self-update
@@ -28,4 +29,3 @@ notifications:
       - secure: "AYKGSOdRvNaKu2/YfOyJdB5wko74EqLJTiqw333e3sBS6KmwICo7wTagrMxD\ncSRf6YqascyZbT5uYY3siW5gQIPKCRmCh89uvbCCJKGL0b7hFs3+tG7tTC15\njo9s5vrpQM+MEZLRjyvB/1XAZ8sAUfvqTuRbqPbhRL52yztIMMs="
   on_success: always
   on_failure: always
-  
