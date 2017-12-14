@@ -206,7 +206,9 @@ export const disableForms = (el) => {
 	// disable buttons
 	const buttonElements = el.querySelectorAll('button, submit');
 	buttonElements.forEach((buttonElement) => {
-		buttonElement.setAttribute('disabled', '');
+		if(!buttonElement.classList.contains('el-button')) {
+			buttonElement.setAttribute('disabled', '');
+		}
 	});
 
 	// remove any form actions and methods
