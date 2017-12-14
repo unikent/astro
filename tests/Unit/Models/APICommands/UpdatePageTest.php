@@ -90,16 +90,9 @@ class UpdatePageTest extends APICommandTestCase
 	 */
 	public function validation_whenOptionsIsPresentButNotArray_fails()
 	{
-		$this->markTestIncomplete();
-	}
-
-	/**
-	 * @test
-	 * @group APICommands
-	 */
-	public function validation_whenTitleIsBlank_fails()
-	{
-		$this->markTestIncomplete();
+		$validator = $this->validator($this->input(['options' => 'this is not an array']));
+		$validator->passes();
+		$this->assertFalse($validator->passes());
 	}
 
 	/**
