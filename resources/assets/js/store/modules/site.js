@@ -248,9 +248,9 @@ const actions = {
 		api
 			.post('pages', {
 				/* eslint-disable camelcase */
-				parent_id: page.route.parent_id,
+				parent_id: page.parent_id,
 				/* eslint-enable camelcase */
-				slug: page.route.slug,
+				slug: page.slug,
 				layout: {
 					name: page.layout.name,
 					version: page.layout.version,
