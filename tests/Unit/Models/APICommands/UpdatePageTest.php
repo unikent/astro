@@ -145,26 +145,44 @@ class UpdatePageTest extends APICommandTestCase
 	 */
 	public function execute_withOptions_onlyCreatesANewRevisionIdenticalToPreviousRevision_exceptForOptionsTimestampsAndTrackedFields()
 	{
-		$this->markTestIncomplete();
+		// GIVEN we have an existing page 
+		$api = new LocalAPIClient(factory(\App\Models\User::class)->create());
 
-		// updated page includes fixture stuff for layout
-		// check this so that we update the page first to get that and THEN do another update
+		// NOTE: updating the page bakes in the block data from the fixtures since this isn't done by the factory
+		// so we need a bit more setup here to make this a valid test
+		$originalPage = $api->updatePage(
+			$id = $this->pageToBeUpdated->id,
+			$title = 'A title'
+		);
+
+		// WHEN we update the page with some new options
+		$options = [
+			'sausage' 	=> 'meat',
+			'apple'		=> 'fruit'
+		];
+		$updatedPage = $api->updatePage(
+			$id = $this->pageToBeUpdated->id,
+			$title = 'A title',
+			$options = $options
+		);
+
+		// THEN we should have a new revision 
+		$this->assertNotEquals($updatedPage->revision->id, $originalPage->revision->id);
 		
-		// given we have a page with a revision
-		// $originalRevision = $this->pageToBeUpdated->revision;
-		// var_dump($originalRevision->id);
-		// // when we update the page with only options
-		// $api = new LocalAPIClient(factory(\App\Models\User::class)->create());
-		// $result = $api->updatePage(
-		// 	$id = $this->pageToBeUpdated->id,
-		// 	$title = '',
-		// 	$options = [
-		// 		'an option' => 12
-		// 	]
-		// );
-		// dd($result);
-		// var_dump($result->revision, $originalRevision);
-		// // then a new revision is created which is identical except for options timestamps and tracked fields
+		// WHICH is the same apart from options, id and timestamps
+		$updatedRevision = $updatedPage->revision->toArray();
+		unset($updatedRevision['id']);
+		unset($updatedRevision['options']);
+		unset($updatedRevision['created_at']);
+		unset($updatedRevision['updated_at']);
+
+		$originalRevision = $originalPage->revision->toArray();
+		unset($originalRevision['id']);
+		unset($originalRevision['options']);
+		unset($originalRevision['created_at']);
+		unset($originalRevision['updated_at']);
+
+		$this->assertEquals($updatedRevision, $originalRevision);
 	}
 
 	/**
