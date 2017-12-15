@@ -18,10 +18,12 @@ class UpdatePageTest extends APICommandTestCase
 {
 
 	public $pageToBeUpdated;
+	public $faker;
 
 	public function setup()
 	{
 		parent::setup();
+		$this->faker = \Faker\Factory::create();
 		$this->pageToBeUpdated = factory(Page::class)->create();
 		$this->nonDraftPage = factory(Page::class)->create(['version' => Page::STATE_PUBLISHED]);
 	}
@@ -101,7 +103,10 @@ class UpdatePageTest extends APICommandTestCase
 	 */
 	public function validation_whenTitleIsOver150Characters_fails()
 	{
-		$this->markTestIncomplete();
+		$stringOver150Characters = str_pad('a title ', 150, ' more text') .  ' text to take it over 150';
+		$validator = $this->validator($this->input(['title' => $stringOver150Characters]));
+		$validator->passes();
+		$this->assertFalse($validator->passes());
 	}
 
 	/**
@@ -110,7 +115,10 @@ class UpdatePageTest extends APICommandTestCase
 	 */
 	public function validation_whenTitleIs150Characters_passes()
 	{
-		$this->markTestIncomplete();
+		$stringof150Characters = str_pad('a title ', 150, ' more text');
+		$validator = $this->validator($this->input(['title' => $stringof150Characters]));
+		$validator->passes();
+		$this->assertTrue($validator->passes());
 	}
 
 	/**
@@ -119,7 +127,10 @@ class UpdatePageTest extends APICommandTestCase
 	 */
 	public function validation_whenTitleIsUnder150Characters_passes()
 	{
-		$this->markTestIncomplete();
+		$stringofFewerThan150Characters = $this->faker->text($maxNbChars = 149);
+		$validator = $this->validator($this->input(['title' => $stringofFewerThan150Characters]));
+		$validator->passes();
+		$this->assertTrue($validator->passes());
 	}
 
 
