@@ -15,7 +15,8 @@ before_script:
   - composer self-update
   - composer --version
   - composer config github-oauth.github.com ${CI_USER_TOKEN}
-  - composer install
+  - composer validate --no-check-all --ansi
+  - composer install -n
   - php artisan key:generate
   # - php artisan migrate
   - php artisan migrate --database=test
