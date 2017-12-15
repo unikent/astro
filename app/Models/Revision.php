@@ -35,6 +35,7 @@ class Revision extends Model
 		'layout_name',
 		'layout_version',
 		'revision_set_id',
+		'options',
 		'bake',
 		'valid'
 	];
