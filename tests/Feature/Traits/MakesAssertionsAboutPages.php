@@ -98,4 +98,5 @@ trait MakesAssertionsAboutPages
 		$page2 = Page::find($sibling_id);
 		return ($page1 && $page2 && $page1->parent_id == $page2->parent_id && $page1->parent_id);
 	}
+
 }
