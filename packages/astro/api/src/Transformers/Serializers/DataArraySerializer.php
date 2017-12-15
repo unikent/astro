@@ -1,5 +1,5 @@
 <?php
-namespace App\Http\Serializers;
+namespace Astro\API\Transformers\Serializers;
 
 use League\Fractal\Serializer\DataArraySerializer as FractalDataArraySerializer;
 

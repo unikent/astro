@@ -13,6 +13,6 @@ return [
     |
     */
 
-    'default_serializer' => App\Http\Serializers\DataArraySerializer::class,
+    'default_serializer' => Astro\API\Transformers\Serializers\DataArraySerializer::class,
 
 ];
