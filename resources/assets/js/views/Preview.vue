@@ -29,7 +29,7 @@
 							@click="moveBlock(-1)"
 							size="mini"
 						>
-							<icon name="angle-up" width="15" height="15" viewBox="0 0 15 15" /> Move up
+						<i class="el-icon-arrow-up el-icon--left"></i>Move up
 						</el-button>
 
 						<el-button
@@ -38,17 +38,17 @@
 							@click="moveBlock(1)"
 							size="mini"
 						>
-							Move down <icon name="angle-down" width="15" height="15" viewBox="0 0 15 15" />
+						Move down<i class="el-icon-arrow-down el-icon--right"></i>
 						</el-button>
 					</el-button-group>
 
 					<el-dropdown
 						v-if="sectionConstraints && sectionConstraints.canRemoveBlocks"
-						class="block-overlay__delete-button"
+						class="block-overlay__-button"
 						@command="removeBlock"
 						size="mini"
 					>
-						<el-button :plain="true" type="danger" size="mini">Delete<i class="el-icon-arrow-down el-icon--right"></i>
+						<el-button :plain="true" type="danger" size="mini">Delete<i class="el-icon-caret-bottom el-icon--right"></i>
 						</el-button>
 						<el-dropdown-menu slot="dropdown">
 							<el-dropdown-item command="delete">Confirm</el-dropdown-item>

@@ -3,7 +3,7 @@
 
 	<el-alert
 		title="We left this space free for you to add some optional blocks to your page."
-		description="Don't worry, this message won't appear on your webpage. But you can add a block (or maybe more) here if you'd like to."
+		description="This message won't appear on your webpage, but you can add a block here if you'd like to."
 		type="info"
 		:closable="false"
 		show-icon
