@@ -1,7 +1,7 @@
 <?php
 namespace Tests\Support\Doubles\Models\Definitions;
 
-use App\Models\Definitions\BaseDefinition;
+use Astro\API\Models\Definitions\BaseDefinition;
 
 class Double extends BaseDefinition {
 

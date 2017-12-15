@@ -2,7 +2,7 @@
 namespace Tests\Unit\Http\Requests\Api\v1\Media;
 
 use Validator;
-use App\Models\Site;
+use Astro\API\Models\Site;
 use Tests\FileUploadTrait;
 use Tests\FileCleanupTrait;
 use Illuminate\Support\Collection;

@@ -2,7 +2,7 @@
 namespace App\Http\Requests\Api\v1\Media;
 
 use Gate;
-use App\Models\Media;
+use Astro\API\Models\Media;
 use Illuminate\Validation\Rule;
 use App\Http\Requests\FormRequest;
 

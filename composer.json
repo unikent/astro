@@ -54,7 +54,8 @@
 		],
 		"psr-4": {
 			"App\\": "app/",
-			"Tests\\": "tests/"
+			"Tests\\": "tests/",
+			"Astro\\API\\": "packages/astro/api/src"
 		}
 	},
 	"scripts": {

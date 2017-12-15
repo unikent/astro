@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\Revision;
-use App\Models\Page;
-use App\Models\RevisionSet;
+use Astro\API\Models\Revision;
+use Astro\API\Models\Page;
+use Astro\API\Models\RevisionSet;
 use Faker\Generator;
 
 $factory->define(Revision::class, function(Generator $faker){

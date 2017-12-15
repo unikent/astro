@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Config;
-use App\Models\Definitions\Block as Definition;
+use Astro\API\Models\Definitions\Block as Definition;
 
 
 class CheckDefns extends Command

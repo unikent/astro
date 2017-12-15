@@ -1,12 +1,12 @@
 <?php
 namespace Tests\Unit\Models;
 
-use App\Models\Block;
-use App\Models\LocalAPIClient;
+use Astro\API\Models\Block;
+use Astro\API\Models\LocalAPIClient;
 use App\Models\User;
 use Exception;
 use Tests\TestCase;
-use App\Models\Page;
+use Astro\API\Models\Page;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PageTest extends TestCase

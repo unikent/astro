@@ -4,8 +4,8 @@ namespace App\Http\Requests\Api\v1\Page;
 use Illuminate\Validation\Rule;
 use App\Http\Requests\FormRequest;
 use App\Validation\Brokers\BlockBroker;
-use App\Models\Definitions\Block as BlockDefinition;
-use App\Models\Definitions\Region as RegionDefinition;
+use Astro\API\Models\Definitions\Block as BlockDefinition;
+use Astro\API\Models\Definitions\Region as RegionDefinition;
 
 class PersistRequest extends FormRequest
 {
@@ -28,7 +28,7 @@ class PersistRequest extends FormRequest
     {
         $rules = [
             'title' => 'required|max:190',
-            'layout_name' => 'required|string|definition_exists:App\Models\Definitions\Layout,layout_version',
+            'layout_name' => 'required|string|definition_exists:Astro\API\Models\Definitions\Layout,layout_version',
             'layout_version' => 'required|numeric',
 
             'route.slug' => [ 'required_with:route.parent_id', 'max:190' ],

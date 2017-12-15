@@ -41,6 +41,9 @@ abstract class ApiControllerTestCase extends HttpTestCase {
 
 
     public function action($method, $action, $wildcards = [], $parameters = [], $cookies = [], $files = [], $server = [], $content = null){
+    	if(strpos($action, 'Astro\API') === 0) {
+    		$action = '\\' . $action;
+		}
         $action = str_replace('App\Http\Controllers\\', '', $action);
         $uri = $this->app['url']->action($action, $wildcards, true);
         return $this->response = $this->call($method, $uri, $parameters, $cookies, $files, $server, $content);

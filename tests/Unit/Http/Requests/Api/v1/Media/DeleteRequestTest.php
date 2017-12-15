@@ -2,7 +2,7 @@
 namespace Tests\Unit\Http\Requests\Api\v1\Media;
 
 use Validator;
-use App\Models\Site;
+use Astro\API\Models\Site;
 use Illuminate\Support\Collection;
 use Tests\Unit\Http\Requests\RequestTestCase;
 use App\Http\Requests\Api\v1\Media\DeleteRequest;

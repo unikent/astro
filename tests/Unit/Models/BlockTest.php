@@ -3,9 +3,9 @@ namespace Tests\Unit\Models;
 
 use Mockery;
 use Tests\TestCase;
-use App\Models\Page;
-use App\Models\Block;
-use App\Models\Definitions\Block as BlockDefinition;
+use Astro\API\Models\Page;
+use Astro\API\Models\Block;
+use Astro\API\Models\Definitions\Block as BlockDefinition;
 
 class BlockTest extends TestCase
 {

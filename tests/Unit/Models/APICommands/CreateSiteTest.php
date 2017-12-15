@@ -8,13 +8,13 @@
 
 namespace Tests\Unit\Models\APICommands;
 
-use App\Models\APICommands\AddPage;
-use App\Models\APICommands\CreateSite;
+use Astro\API\Models\APICommands\AddPage;
+use Astro\API\Models\APICommands\CreateSite;
 
-use App\Models\Page;
-use App\Models\Revision;
-use App\Models\RevisionSet;
-use App\Models\Site;
+use Astro\API\Models\Page;
+use Astro\API\Models\Revision;
+use Astro\API\Models\RevisionSet;
+use Astro\API\Models\Site;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;

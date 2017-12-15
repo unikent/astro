@@ -4,7 +4,7 @@ namespace App\Policies;
 
 use App\Policies\BasePolicy;
 use App\Models\User;
-use App\Models\Page;
+use Astro\API\Models\Page;
 
 class RoutePolicy extends BasePolicy
 {
@@ -23,7 +23,7 @@ class RoutePolicy extends BasePolicy
      * Determine whether the user can view the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Page  $route
+     * @param  \Astro\API\Models\Page  $route
      * @return boolean
      */
     public function read(User $user, Page $route)
@@ -41,7 +41,7 @@ class RoutePolicy extends BasePolicy
      * Determine whether the user can create definitions.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Page  $route
+     * @param  \Astro\API\Models\Page  $route
      * @return boolean
      */
     public function create(User $user, Page $route)
@@ -53,7 +53,7 @@ class RoutePolicy extends BasePolicy
      * Determine whether the user can update the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Page  $route
+     * @param  \Astro\API\Models\Page  $route
      * @return boolean
      */
     public function update(User $user, Page $route)
@@ -65,7 +65,7 @@ class RoutePolicy extends BasePolicy
      * Determine whether the user can delete the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Page  $route
+     * @param  \Astro\API\Models\Page  $route
      * @return boolean
      */
     public function delete(User $user, Page $route)

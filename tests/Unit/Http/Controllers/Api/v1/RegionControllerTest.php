@@ -2,8 +2,8 @@
 namespace Tests\Unit\Http\Controllers\Api\v1;
 
 use Gate;
-use App\Models\Definitions\Region as Definition;
-use App\Http\Controllers\Api\v1\RegionController;
+use Astro\API\Models\Definitions\Region as Definition;
+use Astro\API\Http\Controllers\Api\v1\RegionController;
 
 class RegionControllerTest extends ApiControllerTestCase {
 

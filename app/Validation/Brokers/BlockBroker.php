@@ -1,8 +1,8 @@
 <?php
 namespace App\Validation\Brokers;
 
-use App\Models\Definitions\Block as BlockDefinition;
-use App\Models\Definitions\Region as RegionDefinition;
+use Astro\API\Models\Definitions\Block as BlockDefinition;
+use Astro\API\Models\Definitions\Region as RegionDefinition;
 
 class BlockBroker extends DefinitionBroker
 {
@@ -87,7 +87,7 @@ class BlockBroker extends DefinitionBroker
 	 * Creates a validation rule based on Region block-constraints
 	 * @Todo is this needed?
 	 *
-	 * @param \App\Models\Definition\Region $region
+	 * @param \Astro\API\Models\Definition\Region $region
 	 * @return Array
 	 */
 	public function getRegionConstraintRules(RegionDefinition $region)

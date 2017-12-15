@@ -3,8 +3,8 @@ namespace Tests\Unit\Http\Controllers\Api\v1;
 
 use Gate;
 use Config;
-use App\Models\Definitions\Layout as Definition;
-use App\Http\Controllers\Api\v1\LayoutController;
+use Astro\API\Models\Definitions\Layout as Definition;
+use Astro\API\Http\Controllers\Api\v1\LayoutController;
 
 class LayoutControllerTest extends ApiControllerTestCase {
 

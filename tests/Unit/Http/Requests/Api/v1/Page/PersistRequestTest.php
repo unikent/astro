@@ -1,11 +1,11 @@
 <?php
 namespace Tests\Unit\Http\Requests\Api\v1\Page;
 
-use App\Models\Site;
-use App\Models\Block;
-use App\Models\Page;
+use Astro\API\Models\Site;
+use Astro\API\Models\Block;
+use Astro\API\Models\Page;
 use Tests\Unit\Http\Requests\RequestTestCase;
-use App\Http\Transformers\Api\v1\PageTransformer;
+use Astro\API\Transformers\Api\v1\PageTransformer;
 use App\Http\Requests\Api\v1\Page\PersistRequest;
 
 class PersistRequestTest extends RequestTestCase

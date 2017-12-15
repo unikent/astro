@@ -8,8 +8,8 @@
 
 namespace Tests\Unit\Models\APICommands;
 
-use App\Models\APICommands\DeletePage;
-use App\Models\Contracts\APICommand;
+use Astro\API\Models\APICommands\DeletePage;
+use Astro\API\Models\Contracts\APICommand;
 
 class DeletePageTest extends APICommandTestCase
 {

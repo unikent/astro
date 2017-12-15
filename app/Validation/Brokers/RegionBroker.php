@@ -1,7 +1,7 @@
 <?php
 namespace App\Validation\Brokers;
 
-use App\Models\Definitions\Region as RegionDefinition;
+use Astro\API\Models\Definitions\Region as RegionDefinition;
 
 class RegionBroker extends DefinitionBroker
 {
@@ -16,7 +16,7 @@ class RegionBroker extends DefinitionBroker
 	 * NOTE: this return value is not a ruleset but an array of rules to be assembled into 
 	 * a laravel validation ruleset elsewhere
 	 * 
-	 * @param \App\Models\Definition\Region $region
+	 * @param \Astro\API\Models\Definition\Region $region
 	 * @param String $section_name
 	 * @return Array [
 	 *				"allowedBlocks" => 'rules for which blocks are allowed',

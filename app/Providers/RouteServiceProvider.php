@@ -2,12 +2,12 @@
 
 namespace App\Providers;
 
-use App\Models\Page;
+use Astro\API\Models\Page;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Models\Definitions\Block as BlockDefinition;
-use App\Models\Definitions\Layout as LayoutDefinition;
-use App\Models\Definitions\Region as RegionDefinition;
+use Astro\API\Models\Definitions\Block as BlockDefinition;
+use Astro\API\Models\Definitions\Layout as LayoutDefinition;
+use Astro\API\Models\Definitions\Region as RegionDefinition;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
 class RouteServiceProvider extends ServiceProvider
@@ -94,7 +94,7 @@ class RouteServiceProvider extends ServiceProvider
 	protected function mapApiRoutes()
 	{
 		Route::prefix('api')
-			->namespace('App\Http\Controllers\Api')
+			->namespace('Astro\API\Http\Controllers\Api')
 			->middleware('api')
 			->group(base_path('routes/api.php'));
 	}

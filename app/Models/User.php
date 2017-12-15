@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use KentAuth\Models\User as KentUser;
+use Astro\API\Models\Permission;
+use Astro\API\Models\UserSiteRole;
 
 class User extends KentUser
 {

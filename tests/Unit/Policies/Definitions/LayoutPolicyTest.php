@@ -2,7 +2,7 @@
 namespace Tests\Policies;
 
 use Tests\Unit\PolicyTestCase;
-use App\Models\Definitions\Layout as LayoutDefinition;
+use Astro\API\Models\Definitions\Layout as LayoutDefinition;
 use App\Policies\Definitions\LayoutPolicy as LayoutDefinitionPolicy;
 
 class LayoutPolicyTest extends PolicyTestCase

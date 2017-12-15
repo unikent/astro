@@ -86,7 +86,7 @@ Definitions are represented within the system as models extending `App\Models\De
 #### Serialization
 Whenever JSON is serialized in the application, [Fractal](http://fractal.thephpleague.com/) is used to transform the data.
 
-Serialization occurs in two main areas: `App\Http\Controllers\Api\v1\*` and when a page is published ($page->publish($transformer) requires a Fractal transformer instance to ensure that the baked JSON is in the correct format for the API to serve directly).
+Serialization occurs in two main areas: `Astro\API\Http\Controllers\Api\v1\*` and when a page is published ($page->publish($transformer) requires a Fractal transformer instance to ensure that the baked JSON is in the correct format for the API to serve directly).
 
 Many of the API endpoints support Fractal 'includes' by passing an '?include=' parameter with an API request. This accepts a comma-separated list of relations to include. Where an endpoint supports includes it is noted in the docblock.
 

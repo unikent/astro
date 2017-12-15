@@ -4,7 +4,7 @@ namespace App\Policies;
 
 use App\Policies\BasePolicy;
 use App\Models\User;
-use App\Models\Redirect;
+use Astro\API\Models\Redirect;
 
 class RedirectPolicy extends BasePolicy
 {
@@ -23,7 +23,7 @@ class RedirectPolicy extends BasePolicy
      * Determine whether the user can view the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Redirect  $redirect
+     * @param  \Astro\API\Models\Redirect  $redirect
      * @return boolean
      */
     public function read(User $user, Redirect $redirect)
@@ -35,7 +35,7 @@ class RedirectPolicy extends BasePolicy
      * Determine whether the user can create definitions.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Redirect  $redirect
+     * @param  \Astro\API\Models\Redirect  $redirect
      * @return boolean
      */
     public function create(User $user, Redirect $redirect)
@@ -47,7 +47,7 @@ class RedirectPolicy extends BasePolicy
      * Determine whether the user can update the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Redirect  $redirect
+     * @param  \Astro\API\Models\Redirect  $redirect
      * @return boolean
      */
     public function update(User $user, Redirect $redirect)
@@ -59,7 +59,7 @@ class RedirectPolicy extends BasePolicy
      * Determine whether the user can delete the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Redirect  $redirect
+     * @param  \Astro\API\Models\Redirect  $redirect
      * @return boolean
      */
     public function delete(User $user, Redirect $redirect)

@@ -2,7 +2,7 @@
 namespace Tests\Policies;
 
 use App\Models\User;
-use App\Models\Site;
+use Astro\API\Models\Site;
 use App\Policies\SitePolicy;
 use Tests\Unit\PolicyTestCase;
 

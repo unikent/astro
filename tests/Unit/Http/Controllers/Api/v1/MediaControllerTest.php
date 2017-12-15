@@ -3,12 +3,12 @@ namespace Tests\Unit\Http\Controllers\Api\v1;
 
 use Gate;
 use Mockery;
-use App\Models\Site;
-use App\Models\Media;
+use Astro\API\Models\Site;
+use Astro\API\Models\Media;
 use Tests\FileUploadTrait;
 use Tests\FileCleanupTrait;
 use Illuminate\Support\Collection;
-use App\Http\Controllers\Api\v1\MediaController;
+use Astro\API\Http\Controllers\Api\v1\MediaController;
 use Illuminate\Auth\Access\AuthorizationException;
 
 class MediaControllerTest extends ApiControllerTestCase {

@@ -4,7 +4,7 @@ namespace App\Policies\Definitions;
 
 use App\Policies\BasePolicy;
 use App\Models\User;
-use App\Models\Definitions\Layout as LayoutDefinition;
+use Astro\API\Models\Definitions\Layout as LayoutDefinition;
 
 class LayoutPolicy extends BasePolicy
 {
@@ -23,7 +23,7 @@ class LayoutPolicy extends BasePolicy
      * Determine whether the user can view the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Definitions\Layout  $definition
+     * @param  \Astro\API\Models\Definitions\Layout  $definition
      * @return boolean
      */
     public function read(User $user, LayoutDefinition $definition)
@@ -46,7 +46,7 @@ class LayoutPolicy extends BasePolicy
      * Determine whether the user can update the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Definitions\Layout  $definition
+     * @param  \Astro\API\Models\Definitions\Layout  $definition
      * @return boolean
      */
     public function update(User $user, LayoutDefinition $definition)
@@ -58,7 +58,7 @@ class LayoutPolicy extends BasePolicy
      * Determine whether the user can delete the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Definitions\Layout  $definition
+     * @param  \Astro\API\Models\Definitions\Layout  $definition
      * @return boolean
      */
     public function delete(User $user, LayoutDefinition $definition)

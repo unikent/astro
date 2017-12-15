@@ -8,8 +8,8 @@
 
 namespace Tests\Unit\Models\APICommands;
 
-use App\Models\APICommands\UnpublishPage;
-use App\Models\Contracts\APICommand;
+use Astro\API\Models\APICommands\UnpublishPage;
+use Astro\API\Models\Contracts\APICommand;
 
 class UnpublishPageTest extends APICommandTestCase
 {

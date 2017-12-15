@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Models\APICommands;
 
-use App\Models\APICommands\UpdateContent;
+use Astro\API\Models\APICommands\UpdateContent;
 
 class UpdateContentTest extends APICommandTestCase
 {

@@ -3,9 +3,9 @@
 namespace App\Policies;
 
 use App\Policies\BasePolicy;
-use App\Models\Permission;
+use Astro\API\Models\Permission;
 use App\Models\User;
-use App\Models\Site;
+use Astro\API\Models\Site;
 
 class SitePolicy extends BasePolicy
 {
@@ -23,7 +23,7 @@ class SitePolicy extends BasePolicy
      * Determine whether the user can view the Site.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Site  $site
+     * @param  \Astro\API\Models\Site  $site
      * @return boolean
      */
     public function view(User $user, Site $site)
@@ -46,7 +46,7 @@ class SitePolicy extends BasePolicy
      * Determine whether the user can create Sites.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Site  $site
+     * @param  \Astro\API\Models\Site  $site
      * @return boolean
      */
     public function create(User $user)
@@ -69,7 +69,7 @@ class SitePolicy extends BasePolicy
      * Determine whether the user can update the Site.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Site  $site
+     * @param  \Astro\API\Models\Site  $site
      * @return boolean
      */
     public function update(User $user, Site $site)
@@ -92,7 +92,7 @@ class SitePolicy extends BasePolicy
      * Determine whether the user can delete the Site.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Site  $site
+     * @param  \Astro\API\Models\Site  $site
      * @return boolean
      */
     public function delete(User $user, Site $site)

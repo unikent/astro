@@ -4,8 +4,8 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 
-use App\Models\Permission;
-use App\Models\Role;
+use Astro\API\Models\Permission;
+use Astro\API\Models\Role;
 
 class SetupPermissions extends Command
 {

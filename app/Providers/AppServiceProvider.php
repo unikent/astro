@@ -2,10 +2,9 @@
 
 namespace App\Providers;
 
-use App\Models\APICommands\PublishPage;
-use App\Models\Definitions\BaseDefinition;
-use App\Models\Definitions\SiteDefinition;
-use App\Models\Page;
+use Astro\API\Models\APICommands\PublishPage;
+use Astro\API\Models\Definitions\SiteDefinition;
+use Astro\API\Models\Page;
 use App\Validation\Rules\LayoutExistsRule;
 use App\Validation\Rules\UniqueSitePathRule;
 use DB;

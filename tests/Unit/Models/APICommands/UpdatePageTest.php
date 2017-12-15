@@ -8,8 +8,8 @@
 
 namespace Tests\Unit\Models\APICommands;
 
-use App\Models\APICommands\UpdatePage;
-use App\Models\Contracts\APICommand;
+use Astro\API\Models\APICommands\UpdatePage;
+use Astro\API\Models\Contracts\APICommand;
 
 class UpdatePageTest extends APICommandTestCase
 {

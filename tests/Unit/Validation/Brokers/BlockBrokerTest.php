@@ -5,8 +5,8 @@ use Config;
 use Tests\TestCase;
 use App\Validation\Brokers\BlockBroker;
 use Illuminate\Validation\ValidationException;
-use App\Models\Definitions\Block as BlockDefinition;
-use App\Models\Definitions\Region as RegionDefinition;
+use Astro\API\Models\Definitions\Block as BlockDefinition;
+use Astro\API\Models\Definitions\Region as RegionDefinition;
 use Illuminate\Validation\Validator as LaravelValidator;
 
 class BlockBrokerTest extends TestCase

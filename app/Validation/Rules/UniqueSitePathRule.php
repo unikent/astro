@@ -2,7 +2,7 @@
 
 namespace App\Validation\Rules;
 
-use App\Models\Page;
+use Astro\API\Models\Page;
 
 class UniqueSitePathRule
 {

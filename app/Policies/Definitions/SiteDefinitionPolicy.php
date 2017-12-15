@@ -4,7 +4,7 @@ namespace App\Policies\Definitions;
 
 use App\Policies\BasePolicy;
 use App\Models\User;
-use App\Models\Definitions\SiteDefinition;
+use Astro\API\Models\Definitions\SiteDefinition;
 
 class SiteDefinitionPolicy extends BasePolicy
 {
@@ -23,7 +23,7 @@ class SiteDefinitionPolicy extends BasePolicy
      * Determine whether the user can view the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Definitions\Layout  $definition
+     * @param  \Astro\API\Models\Definitions\Layout  $definition
      * @return boolean
      */
     public function read(User $user, SiteDefinition $definition)

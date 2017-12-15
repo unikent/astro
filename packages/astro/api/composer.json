@@ -1,0 +1,13 @@
+{
+    "name": "astro/api",
+    "description": "API package for Astro site editor.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sam Yapp",
+            "email": "sam@samyapp.com"
+        }
+    ],
+    "require": {}
+}

@@ -3,8 +3,8 @@
 namespace App\Policies;
 
 use App\Policies\BasePolicy;
-use App\Models\Page;
-use App\Models\Permission;
+use Astro\API\Models\Page;
+use Astro\API\Models\Permission;
 use App\Models\User;
 
 class PagePolicy extends BasePolicy

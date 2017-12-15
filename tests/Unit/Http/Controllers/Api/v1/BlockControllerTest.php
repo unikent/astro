@@ -2,8 +2,8 @@
 namespace Tests\Unit\Http\Controllers\Api\v1;
 
 use Gate;
-use App\Models\Definitions\Block as Definition;
-use App\Http\Controllers\Api\v1\BlockController;
+use Astro\API\Models\Definitions\Block as Definition;
+use Astro\API\Http\Controllers\Api\v1\BlockController;
 
 class BlockControllerTest extends ApiControllerTestCase {
 

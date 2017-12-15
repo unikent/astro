@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Site;
+use Astro\API\Models\Site;
 
 $factory->define(Site::class, function ($faker) {
 	return [

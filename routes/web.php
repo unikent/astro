@@ -12,14 +12,6 @@
 */
 
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Config;
-use Astro\Renderer\Base\SingleDefinitionsFolderLocator;
-use Astro\Renderer\Engines\TwigEngine;
-use Astro\Renderer\AstroRenderer;
-use App\Models\LocalAPIClient;
-use Illuminate\Http\Request;
-use App\Models\Page;
-use App\Http\Controllers\PageController;
 
 // Authentication routes
 $this->get('auth/login', 'Auth\AuthController@login')->name('auth.login');
@@ -28,13 +20,13 @@ $this->get('auth/sso/respond', 'Auth\AuthController@loginSSO')->name('auth.sso.r
 $this->post('auth/logout', 'Auth\AuthController@logout')->name('auth.logout');
 
 // Preview draft pages in editor.
-Route::get('/draft/{host}/{path?}', 'PageController@draft')
+Route::get('/draft/{host}/{path?}', '\Astro\API\Http\Controllers\PageController@draft')
 	->where('host', '([^/]+)')
 	->where('path', '(.*?)/?')
 	->middleware('auth');
 
 // "Preview" published pages in editor.
-Route::get('/published/{host}/{path?}', 'PageController@published')
+Route::get('/published/{host}/{path?}', '\Astro\API\Http\Controllers\PageController@published')
 	->where('host', '([^/]+)')
 	->where('path', '(.*?)/?');
 

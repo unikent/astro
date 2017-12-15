@@ -2,7 +2,7 @@
 
 namespace App\Exceptions;
 
-use App\Models\Page;
+use Astro\API\Models\Page;
 
 /**
  * Thrown when an attempt is made to set the draft Page of a Page when it already has a draft.

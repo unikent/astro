@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Models\APICommands;
 
-use App\Models\Contracts\APICommand;
-use App\Models\LocalAPIClient;
+use Astro\API\Models\Contracts\APICommand;
+use Astro\API\Models\LocalAPIClient;
 use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Config;

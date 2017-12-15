@@ -8,8 +8,8 @@
 
 namespace Tests\Unit\Models\APICommands;
 
-use App\Models\APICommands\MovePage;
-use App\Models\Contracts\APICommand;
+use Astro\API\Models\APICommands\MovePage;
+use Astro\API\Models\Contracts\APICommand;
 
 class MovePageTest extends APICommandTestCase
 {

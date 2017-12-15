@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\LocalAPIClient;
+use Astro\API\Models\LocalAPIClient;
 use Illuminate\Console\Command;
 use Illuminate\Validation\ValidationException;
 use App\Models\User;

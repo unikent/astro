@@ -2,9 +2,9 @@
 
 namespace App\Validation\Rules;
 
-use App\Models\Definitions\BaseDefinition;
-use App\Models\Definitions\Layout;
-use App\Models\Page;
+use Astro\API\Models\Definitions\BaseDefinition;
+use Astro\API\Models\Definitions\Layout;
+use Astro\API\Models\Page;
 use Illuminate\Support\Facades\Config;
 
 class LayoutExistsRule

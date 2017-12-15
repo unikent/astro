@@ -1,7 +1,7 @@
 <?php
-use App\Models\Site;
-use App\Models\Page;
-use App\Models\Revision;
+use Astro\API\Models\Site;
+use Astro\API\Models\Page;
+use Astro\API\Models\Revision;
 
 $factory->define(Page::class, function (Faker\Generator $faker) {
     $site = factory(Site::class)->create();

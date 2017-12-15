@@ -8,9 +8,9 @@
 
 namespace Tests\Unit\Models\APICommands;
 
-use App\Models\APICommands\AddPage;
-use App\Models\APICommands\CreateSite;
-use App\Models\Contracts\APICommand;
+use Astro\API\Models\APICommands\AddPage;
+use Astro\API\Models\APICommands\CreateSite;
+use Astro\API\Models\Contracts\APICommand;
 
 class AddPageTest extends APICommandTestCase
 {

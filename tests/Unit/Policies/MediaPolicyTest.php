@@ -2,8 +2,8 @@
 namespace Tests\Policies;
 
 use App\Models\User;
-use App\Models\Site;
-use App\Models\Media;
+use Astro\API\Models\Site;
+use Astro\API\Models\Media;
 use Tests\FileUploadTrait;
 use Tests\FileCleanupTrait;
 use App\Policies\MediaPolicy;

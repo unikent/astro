@@ -2,13 +2,13 @@
 
 namespace Tests\Unit\Models;
 
-use App\Models\LocalAPIClient;
-use App\Models\Revision;
+use Astro\API\Models\LocalAPIClient;
+use Astro\API\Models\Revision;
 use Illuminate\Contracts\Validation\ValidationException;
 use Illuminate\Contracts\Validation\Validator;
 use App\Models\User;
-use App\Models\Site;
-use App\Models\Page;
+use Astro\API\Models\Site;
+use Astro\API\Models\Page;
 use Tests\TestCase;
 
 class LocalAPIClientTest extends TestCase

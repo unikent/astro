@@ -4,7 +4,7 @@ use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
 use Illuminate\Filesystem\Filesystem;
 
-use App\Models\Media;
+use Astro\API\Models\Media;
 
 class MediaSeeder extends Seeder
 {

@@ -5,7 +5,7 @@ use Config;
 use Mockery;
 use Tests\TestCase;
 use Illuminate\Support\Collection;
-use App\Models\Definitions\Layout;
+use Astro\API\Models\Definitions\Layout;
 use App\Exceptions\DefinitionNotFoundException;
 
 class LayoutTest extends TestCase

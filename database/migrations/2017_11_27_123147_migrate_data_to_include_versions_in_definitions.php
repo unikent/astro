@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Revision;
-use App\Models\Block;
+use Astro\API\Models\Revision;
+use Astro\API\Models\Block;
 use Illuminate\Database\Migrations\Migration;
 
 /**

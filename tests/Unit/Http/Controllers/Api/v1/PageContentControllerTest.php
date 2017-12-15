@@ -3,14 +3,14 @@ namespace Tests\Unit\Http\Controllers\Api\v1;
 
 use Gate;
 use Mockery;
-use App\Models\PageContent;
-use App\Models\Site;
-use App\Models\Block;
-use App\Models\Page;
-use App\Models\Redirect;
-use App\Models\Revision;
-use App\Http\Controllers\Api\v1\PageController;
-use App\Http\Transformers\Api\v1\PageContentTransformer;
+use Astro\API\Models\PageContent;
+use Astro\API\Models\Site;
+use Astro\API\Models\Block;
+use Astro\API\Models\Page;
+use Astro\API\Models\Redirect;
+use Astro\API\Models\Revision;
+use Astro\API\Http\Controllers\Api\v1\PageController;
+use Astro\API\Transformers\Api\v1\PageContentTransformer;
 use Illuminate\Auth\Access\AuthorizationException;
 
 class PageContentControllerTest extends ApiControllerTestCase {

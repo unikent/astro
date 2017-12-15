@@ -1,6 +1,6 @@
 <?php
 
-$factory->define(App\Models\Block::class, function (Faker\Generator $faker) {
+$factory->define(Astro\API\Models\Block::class, function (Faker\Generator $faker) {
 	return [
 		'region_name' => 'test-region',
 		'definition_name' => 'test-block',
@@ -8,7 +8,7 @@ $factory->define(App\Models\Block::class, function (Faker\Generator $faker) {
 	];
 });
 
-$factory->state(App\Models\Block::class, 'useTestBlock', function ($faker) {
+$factory->state(Astro\API\Models\Block::class, 'useTestBlock', function ($faker) {
     return [
     	'definition_name' => 'test-block',
 

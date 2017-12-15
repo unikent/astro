@@ -8,9 +8,9 @@
 
 namespace Tests\Unit\Models\APICommands;
 
-use App\Models\APICommands\UpdateSite;
-use App\Models\Contracts\APICommand;
-use App\Models\LocalAPIClient;
+use Astro\API\Models\APICommands\UpdateSite;
+use Astro\API\Models\Contracts\APICommand;
+use Astro\API\Models\LocalAPIClient;
 use App\Models\User;
 use Illuminate\Support\Collection;
 

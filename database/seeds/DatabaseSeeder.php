@@ -1,9 +1,9 @@
 <?php
 
-use App\Models\LocalAPIClient;
+use Astro\API\Models\LocalAPIClient;
 use App\Models\User;
-use App\Models\Role;
-use App\Models\Page;
+use Astro\API\Models\Role;
+use Astro\API\Models\Page;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder

@@ -8,9 +8,9 @@
 
 namespace Tests\Unit\Models\APICommands;
 
-use App\Models\Page;
-use App\Models\APICommands\UpdatePageSlug;
-use App\Models\Contracts\APICommand;
+use Astro\API\Models\Page;
+use Astro\API\Models\APICommands\UpdatePageSlug;
+use Astro\API\Models\Contracts\APICommand;
 
 class UpdatePageSlugTest extends APICommandTestCase
 {

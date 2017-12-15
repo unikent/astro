@@ -3,7 +3,7 @@ namespace Tests\Unit\Models\Definitions;
 
 use Config;
 use Tests\TestCase;
-use App\Models\Definitions\Block;
+use Astro\API\Models\Definitions\Block;
 use App\Exceptions\DefinitionNotFoundException;
 
 class BlockTest extends TestCase

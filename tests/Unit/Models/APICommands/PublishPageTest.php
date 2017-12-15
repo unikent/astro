@@ -1,7 +1,7 @@
 <?php
 namespace Tests\Unit\Models\APICommands;
 
-use App\Models\APICommands\PublishPage;
+use Astro\API\Models\APICommands\PublishPage;
 
 class PublishPageTest extends APICommandTestCase
 {

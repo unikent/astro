@@ -2,7 +2,7 @@
 namespace Tests\Policies;
 
 use Tests\Unit\PolicyTestCase;
-use App\Models\Definitions\Region as RegionDefinition;
+use Astro\API\Models\Definitions\Region as RegionDefinition;
 use App\Policies\Definitions\RegionPolicy as RegionDefinitionPolicy;
 
 class RegionPolicyTest extends PolicyTestCase

@@ -2,21 +2,21 @@
 
 namespace App\Providers;
 
-use App\Models\Permission;
-use App\Models\Role;
-use App\Models\Site;
-use App\Models\Page;
-use App\Models\Media;
+use Astro\API\Models\Permission;
+use Astro\API\Models\Role;
+use Astro\API\Models\Site;
+use Astro\API\Models\Page;
+use Astro\API\Models\Media;
 use App\Models\User;
 use App\Policies\PagePolicy;
 use App\Policies\PermissionPolicy;
 use App\Policies\RolePolicy;
 use App\Policies\SitePolicy;
 use App\Policies\MediaPolicy;
-use App\Models\Definitions\Block as BlockDefinition;
-use App\Models\Definitions\Layout as LayoutDefinition;
-use App\Models\Definitions\Region as RegionDefinition;
-use App\Models\Definitions\SiteDefinition;
+use Astro\API\Models\Definitions\Block as BlockDefinition;
+use Astro\API\Models\Definitions\Layout as LayoutDefinition;
+use Astro\API\Models\Definitions\Region as RegionDefinition;
+use Astro\API\Models\Definitions\SiteDefinition;
 use App\Policies\Definitions\BlockPolicy as BlockDefinitionPolicy;
 use App\Policies\Definitions\LayoutPolicy as LayoutDefinitionPolicy;
 use App\Policies\Definitions\RegionPolicy as RegionDefinitionPolicy;

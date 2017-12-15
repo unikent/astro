@@ -2,7 +2,7 @@
 namespace Tests\Policies;
 
 use Tests\Unit\PolicyTestCase;
-use App\Models\Definitions\Route;
+use Astro\API\Models\Definitions\Route;
 use App\Policies\Definitions\RoutePolicy;
 
 class PagePolicyTest extends PolicyTestCase

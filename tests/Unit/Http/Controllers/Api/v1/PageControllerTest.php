@@ -3,11 +3,11 @@ namespace Tests\Unit\Http\Controllers\Api\v1;
 
 use Gate;
 use Mockery;
-use App\Models\Block;
-use App\Models\Page;
-use App\Models\Redirect;
-use App\Http\Controllers\Api\v1\PageController;
-use App\Http\Transformers\Api\v1\PageTransformer;
+use Astro\API\Models\Block;
+use Astro\API\Models\Page;
+use Astro\API\Models\Redirect;
+use Astro\API\Http\Controllers\Api\v1\PageController;
+use Astro\API\Transformers\Api\v1\PageTransformer;
 
 class PageControllerTest extends ApiControllerTestCase {
 
