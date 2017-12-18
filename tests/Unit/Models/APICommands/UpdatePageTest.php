@@ -60,7 +60,6 @@ class UpdatePageTest extends APICommandTestCase
 	public function validation_whenPageIsNotDraft_fails()
 	{
 		// we have an existing page which is not draft and we try to update it
-		// dd($this->nonDraftPage);
 		$validator = $this->validator($this->input(['id' => $this->nonDraftPage->id]));
 		$validator->passes();
 		$this->assertFalse($validator->passes());
@@ -188,7 +187,6 @@ class UpdatePageTest extends APICommandTestCase
 	/**
 	 * @test
 	 * @group APICommands
-	 * @group cable
 	 */
 	public function execute_withOptions_onlyModifiesOptions_inOptionsArray()
 	{
@@ -250,7 +248,7 @@ class UpdatePageTest extends APICommandTestCase
 			$options = $originalSetOfOptions
 		);
 	
-		// when we update the page and set one of the options to null
+		// when we update the page and set some of the options to null
 		$optionsToRemove = [
 			'a' => null,
 			'c' => null,
@@ -261,12 +259,12 @@ class UpdatePageTest extends APICommandTestCase
 			$options = $optionsToRemove
 		);
 
-		// the nulled options are gone
+		// the the nulled options are gone
 		foreach ($optionsToRemove as $option) {
 			$this->assertFalse(isset($updatedPage->revision['options'][$option]));
 		}
 
-		// the other options remain
+		// and the other options remain
 		foreach ($originalSetOfOptions as $option => $value) {
 			if (!isset($optionsToRemove[$option])) {
 				$this->assertEquals($originalSetOfOptions[$option], $originalPage->revision['options'][$option]);
