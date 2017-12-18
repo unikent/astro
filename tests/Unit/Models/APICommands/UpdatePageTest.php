@@ -145,7 +145,7 @@ class UpdatePageTest extends APICommandTestCase
 	 */
 	public function execute_withOptions_onlyCreatesANewRevisionIdenticalToPreviousRevision_exceptForOptionsTimestampsAndTrackedFields()
 	{
-		// GIVEN we have an existing page 
+		// GIVEN we have an existing page
 		$api = new LocalAPIClient(factory(\App\Models\User::class)->create());
 
 		// NOTE: updating the page bakes in the block data from the fixtures since this isn't done by the factory
@@ -166,7 +166,7 @@ class UpdatePageTest extends APICommandTestCase
 			$options = $options
 		);
 
-		// THEN we should have a new revision 
+		// THEN we should have a new revision
 		$this->assertNotEquals($updatedPage->revision->id, $originalPage->revision->id);
 		
 		// WHICH is the same apart from options, id and timestamps
@@ -217,14 +217,14 @@ class UpdatePageTest extends APICommandTestCase
 		);
 
 		// only those options which were specified to be updated should be updated
-		foreach ($updatedSetOfOptions as $option => $value) {
-			$this->assertEquals($value, $updatedPage->revision['options'][$option]);
+		foreach ($updatedSetOfOptions as $optionKey => $optionValue) {
+			$this->assertEquals($optionValue, $updatedPage->revision['options'][$optionKey]);
 		}
 
 		// and each of the original options which were not set to be updated have remained the same
-		foreach ($originalSetOfOptions as $option => $value) {
-			if (!isset($updatedSetOfOptions[$option])) {
-				$this->assertEquals($originalSetOfOptions[$option], $originalPage->revision['options'][$option]);
+		foreach ($originalSetOfOptions as $optionKey => $value) {
+			if (!isset($updatedSetOfOptions[$optionKey])) {
+				$this->assertEquals($originalSetOfOptions[$optionKey], $originalPage->revision['options'][$optionKey]);
 			}
 		}
 	}
@@ -235,7 +235,43 @@ class UpdatePageTest extends APICommandTestCase
 	 */
 	public function execute_withOptions_removesOptionsWhereNull()
 	{
-		$this->markTestIncomplete();
+		$api = new LocalAPIClient(factory(\App\Models\User::class)->create());
+	
+		// given we have a page with a revision and some options
+		$originalSetOfOptions = [
+			'a' => 'original-a',
+			'b' => 'original-b',
+			'c' => 'original-c'
+		];
+
+		$originalPage = $api->updatePage(
+			$id = $this->pageToBeUpdated->id,
+			$title = '',
+			$options = $originalSetOfOptions
+		);
+	
+		// when we update the page and set one of the options to null
+		$optionsToRemove = [
+			'a' => null,
+			'c' => null,
+		];
+		$updatedPage = $api->updatePage(
+			$id = $this->pageToBeUpdated->id,
+			$title = '',
+			$options = $optionsToRemove
+		);
+
+		// the nulled options are gone
+		foreach ($optionsToRemove as $option) {
+			$this->assertFalse(isset($updatedPage->revision['options'][$option]));
+		}
+
+		// the other options remain
+		foreach ($originalSetOfOptions as $option => $value) {
+			if (!isset($optionsToRemove[$option])) {
+				$this->assertEquals($originalSetOfOptions[$option], $originalPage->revision['options'][$option]);
+			}
+		}
 	}
 
 	/**
@@ -244,7 +280,42 @@ class UpdatePageTest extends APICommandTestCase
 	 */
 	public function execute_withTitle_onlyCreatesANewRevisionIdenticalToPreviousRevision_exceptForTitleTimestampsAndTrackedFields()
 	{
-		$this->markTestIncomplete();
+		// GIVEN we have an existing page
+		$api = new LocalAPIClient(factory(\App\Models\User::class)->create());
+
+		// NOTE: updating the page bakes in the block data from the fixtures since this isn't done by the factory
+		// so we need a bit more setup here to make this a valid test
+		$originalPage = $api->updatePage(
+			$id = $this->pageToBeUpdated->id,
+			$title = 'A title'
+		);
+
+	
+		$updatedPage = $api->updatePage(
+			$id = $this->pageToBeUpdated->id,
+			$title = 'A different title'
+		);
+
+		// THEN we should have a new revision
+		$this->assertNotEquals($updatedPage->revision->id, $originalPage->revision->id);
+
+		// WITH a different title
+		$this->assertNotEquals($updatedPage->revision->title, $originalPage->revision->title);
+
+		// WHICH is the same apart from title, id and timestamps
+		$updatedRevision = $updatedPage->revision->toArray();
+		unset($updatedRevision['id']);
+		unset($updatedRevision['title']);
+		unset($updatedRevision['created_at']);
+		unset($updatedRevision['updated_at']);
+
+		$originalRevision = $originalPage->revision->toArray();
+		unset($originalRevision['id']);
+		unset($originalRevision['title']);
+		unset($originalRevision['created_at']);
+		unset($originalRevision['updated_at']);
+
+		$this->assertEquals($updatedRevision, $originalRevision);
 	}
 
 	/**
@@ -253,7 +324,22 @@ class UpdatePageTest extends APICommandTestCase
 	 */
 	public function execute_withNoActualChangesToData_doesNotCreateANewRevision()
 	{
-		$this->markTestIncomplete();
+		// GIVEN we have an existing page
+		$api = new LocalAPIClient(factory(\App\Models\User::class)->create());
+
+		// NOTE: updating the page bakes in the block data from the fixtures since this isn't done by the factory
+		// so we need a bit more setup here to make this a valid test
+		$originalPage = $api->updatePage(
+			$id = $this->pageToBeUpdated->id
+		);
+
+		// WHEN we update the page without actually changing any data
+		$updatedPage = $api->updatePage(
+			$id = $this->pageToBeUpdated->id
+		);
+
+		// THEN the updated page will not have a new revision
+		$this->assertEquals($originalPage->revision, $updatedPage->revision);
 	}
 
 	/**
@@ -262,7 +348,28 @@ class UpdatePageTest extends APICommandTestCase
 	 */
 	public function execute_returnsPageThatWasModified()
 	{
-		$this->markTestIncomplete();
+		// GIVEN we have an existing page
+		$api = new LocalAPIClient(factory(\App\Models\User::class)->create());
+
+		// NOTE: updating the page bakes in the block data from the fixtures since this isn't done by the factory
+		// so we need a bit more setup here to make this a valid test
+		$originalPage = $api->updatePage(
+			$id = $this->pageToBeUpdated->id,
+			$title = 'A title'
+		);
+
+		// WHEN we update the page without actually changing any data
+		$updatedPage = $api->updatePage(
+			$id = $this->pageToBeUpdated->id,
+			$title = 'A different title'
+		);
+
+		// THEN the api call has returned a modified page
+		// WITH the same ID
+		$this->assertEquals($originalPage->id, $updatedPage->id);
+
+		// BUT modified data
+		$this->assertNotEquals($originalPage->revision, $updatedPage->revision);
 	}
 
 	/**
@@ -271,7 +378,32 @@ class UpdatePageTest extends APICommandTestCase
 	 */
 	public function execute_withoutTitle_createsNewRevisionWithPreviousTitle()
 	{
-		$this->markTestIncomplete();
+		// GIVEN we have an existing page
+		$api = new LocalAPIClient(factory(\App\Models\User::class)->create());
+
+		// NOTE: updating the page bakes in the block data from the fixtures since this isn't done by the factory
+		// so we need a bit more setup here to make this a valid test
+		$originalPage = $api->updatePage(
+			$id = $this->pageToBeUpdated->id,
+			$title = 'A title'
+		);
+
+		$updatedOptions = [
+			'a' => true
+		];
+
+		// WHEN we update the page without actually the title
+		$updatedPage = $api->updatePage(
+			$id = $this->pageToBeUpdated->id,
+			$title = 'A title',
+			$updatedOptions
+		);
+
+		// THEN we have a different revision
+		$this->assertNotEquals($originalPage->revision->id, $updatedPage->revision->id);
+
+		// BUT with the same title
+		$this->assertEquals($originalPage->revision->title, $updatedPage->revision->title);
 	}
 
 	/**
