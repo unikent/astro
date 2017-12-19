@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace Astro\API\Console\Commands;
 
 use ArrayObject;
 use Illuminate\Console\Command;

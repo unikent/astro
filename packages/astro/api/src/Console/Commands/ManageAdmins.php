@@ -1,11 +1,9 @@
 <?php
 
-namespace App\Console\Commands;
+namespace Astro\API\Console\Commands;
 
-use ArrayObject;
 use Illuminate\Console\Command;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 
 class ManageAdmins extends Command
 {
