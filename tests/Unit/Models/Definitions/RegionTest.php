@@ -6,7 +6,7 @@ use Mockery;
 use Tests\TestCase;
 use Illuminate\Support\Collection;
 use Astro\API\Models\Definitions\Region;
-use App\Exceptions\DefinitionNotFoundException;
+use Astro\API\Exceptions\DefinitionNotFoundException;
 
 class RegionTest extends TestCase
 {

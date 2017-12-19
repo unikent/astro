@@ -1,5 +1,5 @@
 <?php
-namespace App\Exceptions;
+namespace Astro\API\Exceptions;
 
 use Exception;
 

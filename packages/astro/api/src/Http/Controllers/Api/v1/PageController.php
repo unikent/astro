@@ -12,7 +12,7 @@ use Exception;
 use Astro\API\Models\Page;
 use Illuminate\Http\Request;
 use Astro\API\Models\Revision;
-use App\Exceptions\UnpublishedParentException;
+use Astro\API\Exceptions\UnpublishedParentException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use App\Http\Requests\Api\v1\Route\ResolveRequest;
 use Astro\API\Models\Traits\ResolvesRoutes;

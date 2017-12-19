@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use Astro\API\Exceptions\DefinitionNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Exception;
 use Illuminate\Auth\AuthenticationException;

@@ -6,7 +6,7 @@ use Mockery;
 use Tests\TestCase;
 use Illuminate\Support\Collection;
 use Astro\API\Models\Definitions\Layout;
-use App\Exceptions\DefinitionNotFoundException;
+use Astro\API\Exceptions\DefinitionNotFoundException;
 
 class LayoutTest extends TestCase
 {

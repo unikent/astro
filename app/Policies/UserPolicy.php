@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-use App\Policies\BasePolicy;
 use App\Models\User;
 
 class UserPolicy extends BasePolicy

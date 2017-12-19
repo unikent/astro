@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-use App\Policies\BasePolicy;
 use Astro\API\Models\Permission;
 use App\Models\User;
 use Astro\API\Models\Site;

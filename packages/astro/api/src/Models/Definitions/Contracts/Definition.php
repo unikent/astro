@@ -58,7 +58,7 @@ interface Definition {
      *
      * @param  string $name
      * @param  int $version
-     * @throws App\Exceptions\DefinitionNotFoundException
+     * @throws Astro\API\Exceptions\DefinitionNotFoundException
      * @return string
      */
     public static function locateDefinitionOrFail($definition_id);

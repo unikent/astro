@@ -2,7 +2,7 @@
 
 namespace Astro\API\Models;
 
-use App\Exceptions\UnpublishedParentException;
+use Astro\API\Exceptions\UnpublishedParentException;
 use Astro\API\Models\Definitions\Region;
 use DB;
 use Doctrine\DBAL\Version;

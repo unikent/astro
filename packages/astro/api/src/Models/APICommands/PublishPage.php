@@ -2,7 +2,7 @@
 
 namespace Astro\API\Models\APICommands;
 
-use App\Exceptions\UnpublishedParentException;
+use Astro\API\Exceptions\UnpublishedParentException;
 use Astro\API\Models\Contracts\APICommand;
 use Astro\API\Models\Page;
 use DB;

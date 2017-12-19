@@ -2,7 +2,7 @@
 namespace Tests\Unit\Models\Definitions;
 
 use Tests\TestCase;
-use App\Exceptions\JsonDecodeException;
+use Astro\API\Exceptions\JsonDecodeException;
 use Tests\Support\Doubles\Models\Definitions\Double as DefinitionDouble;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 
