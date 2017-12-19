@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Policies;
+namespace Astro\API\Policies;
 
-use App\Policies\BasePolicy;
+use Astro\API\Policies\BasePolicy;
 use App\Models\User;
 
 class RolePolicy extends BasePolicy

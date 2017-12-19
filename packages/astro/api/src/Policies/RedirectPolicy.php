@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Policies\Definitions;
+namespace Astro\API\Policies;
 
-use App\Policies\BasePolicy;
+use Astro\API\Policies\BasePolicy;
 use App\Models\User;
-use Astro\API\Models\Definitions\Block as BlockDefinition;
+use Astro\API\Models\Redirect;
 
-class BlockPolicy extends BasePolicy
+class RedirectPolicy extends BasePolicy
 {
     /**
      * Determine whether the user can index definition.
@@ -23,46 +23,47 @@ class BlockPolicy extends BasePolicy
      * Determine whether the user can view the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \Astro\API\Models\Definitions\Block  $definition
+     * @param  \Astro\API\Models\Redirect  $redirect
      * @return boolean
      */
-    public function read(User $user, BlockDefinition $definition)
+    public function read(User $user, Redirect $redirect)
     {
-        return true;
+        return true; // TODO: Under what circumstances should a Redirect not return a Page?
     }
 
     /**
      * Determine whether the user can create definitions.
      *
      * @param  \App\Models\User  $user
+     * @param  \Astro\API\Models\Redirect  $redirect
      * @return boolean
      */
-    public function create(User $user)
+    public function create(User $user, Redirect $redirect)
     {
-        return false;
+        return true;
     }
 
     /**
      * Determine whether the user can update the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \Astro\API\Models\Definitions\Block  $definition
+     * @param  \Astro\API\Models\Redirect  $redirect
      * @return boolean
      */
-    public function update(User $user, BlockDefinition $definition)
+    public function update(User $user, Redirect $redirect)
     {
-        return false;
+        return true;
     }
 
     /**
      * Determine whether the user can delete the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \Astro\API\Models\Definitions\Block  $definition
+     * @param  \Astro\API\Models\Redirect  $redirect
      * @return boolean
      */
-    public function delete(User $user, BlockDefinition $definition)
+    public function delete(User $user, Redirect $redirect)
     {
-        return false;
+        return true;
     }
 }

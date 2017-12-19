@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Policies;
+namespace Astro\API\Policies;
 
 use App\Models\User;
 

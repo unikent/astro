@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Policies;
+namespace Astro\API\Policies\Definitions;
 
-use App\Policies\BasePolicy;
+use Astro\API\Policies\BasePolicy;
 use App\Models\User;
-use Astro\API\Models\Page;
+use Astro\API\Models\Definitions\Block as BlockDefinition;
 
-class RoutePolicy extends BasePolicy
+class BlockPolicy extends BasePolicy
 {
     /**
      * Determine whether the user can index definition.
@@ -23,53 +23,46 @@ class RoutePolicy extends BasePolicy
      * Determine whether the user can view the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \Astro\API\Models\Page  $route
+     * @param  \Astro\API\Models\Definitions\Block  $definition
      * @return boolean
      */
-    public function read(User $user, Page $route)
+    public function read(User $user, BlockDefinition $definition)
     {
-        if($route->isActive()){
-            return true;
-        } else {
-            // TODO: Check if user is sufficiently privileged to view inactive route
-        }
-
-        return false;
+        return true;
     }
 
     /**
      * Determine whether the user can create definitions.
      *
      * @param  \App\Models\User  $user
-     * @param  \Astro\API\Models\Page  $route
      * @return boolean
      */
-    public function create(User $user, Page $route)
+    public function create(User $user)
     {
-        return true;
+        return false;
     }
 
     /**
      * Determine whether the user can update the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \Astro\API\Models\Page  $route
+     * @param  \Astro\API\Models\Definitions\Block  $definition
      * @return boolean
      */
-    public function update(User $user, Page $route)
+    public function update(User $user, BlockDefinition $definition)
     {
-        return true;
+        return false;
     }
 
     /**
      * Determine whether the user can delete the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \Astro\API\Models\Page  $route
+     * @param  \Astro\API\Models\Definitions\Block  $definition
      * @return boolean
      */
-    public function delete(User $user, Page $route)
+    public function delete(User $user, BlockDefinition $definition)
     {
-        return true;
+        return false;
     }
 }

@@ -3,7 +3,7 @@ namespace Tests\Policies;
 
 use App\Models\User;
 use Astro\API\Models\Site;
-use App\Policies\SitePolicy;
+use Astro\API\Policies\SitePolicy;
 use Tests\Unit\PolicyTestCase;
 
 class SitePolicyTest extends PolicyTestCase

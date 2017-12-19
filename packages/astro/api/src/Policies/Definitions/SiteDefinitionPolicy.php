@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Policies\Definitions;
+namespace Astro\API\Policies\Definitions;
 
-use App\Policies\BasePolicy;
+use Astro\API\Policies\BasePolicy;
 use App\Models\User;
 use Astro\API\Models\Definitions\SiteDefinition;
 

@@ -3,7 +3,7 @@ namespace Tests\Policies;
 
 use Tests\Unit\PolicyTestCase;
 use Astro\API\Models\Definitions\Block as BlockDefinition;
-use App\Policies\Definitions\BlockPolicy as BlockDefinitionPolicy;
+use Astro\API\Policies\Definitions\BlockPolicy as BlockDefinitionPolicy;
 
 class BlockPolicyTest extends PolicyTestCase
 {

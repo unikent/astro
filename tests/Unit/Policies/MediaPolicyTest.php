@@ -6,7 +6,7 @@ use Astro\API\Models\Site;
 use Astro\API\Models\Media;
 use Tests\FileUploadTrait;
 use Tests\FileCleanupTrait;
-use App\Policies\MediaPolicy;
+use Astro\API\Policies\MediaPolicy;
 use Tests\Unit\PolicyTestCase;
 
 class MediaPolicyTest extends PolicyTestCase

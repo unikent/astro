@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Policies;
+namespace Astro\API\Policies;
 
-use App\Policies\BasePolicy;
+use Astro\API\Policies\BasePolicy;
 use App\Models\User;
-use Astro\API\Models\Redirect;
+use Astro\API\Models\Page;
 
-class RedirectPolicy extends BasePolicy
+class RoutePolicy extends BasePolicy
 {
     /**
      * Determine whether the user can index definition.
@@ -23,22 +23,28 @@ class RedirectPolicy extends BasePolicy
      * Determine whether the user can view the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \Astro\API\Models\Redirect  $redirect
+     * @param  \Astro\API\Models\Page  $route
      * @return boolean
      */
-    public function read(User $user, Redirect $redirect)
+    public function read(User $user, Page $route)
     {
-        return true; // TODO: Under what circumstances should a Redirect not return a Page?
+        if($route->isActive()){
+            return true;
+        } else {
+            // TODO: Check if user is sufficiently privileged to view inactive route
+        }
+
+        return false;
     }
 
     /**
      * Determine whether the user can create definitions.
      *
      * @param  \App\Models\User  $user
-     * @param  \Astro\API\Models\Redirect  $redirect
+     * @param  \Astro\API\Models\Page  $route
      * @return boolean
      */
-    public function create(User $user, Redirect $redirect)
+    public function create(User $user, Page $route)
     {
         return true;
     }
@@ -47,10 +53,10 @@ class RedirectPolicy extends BasePolicy
      * Determine whether the user can update the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \Astro\API\Models\Redirect  $redirect
+     * @param  \Astro\API\Models\Page  $route
      * @return boolean
      */
-    public function update(User $user, Redirect $redirect)
+    public function update(User $user, Page $route)
     {
         return true;
     }
@@ -59,10 +65,10 @@ class RedirectPolicy extends BasePolicy
      * Determine whether the user can delete the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \Astro\API\Models\Redirect  $redirect
+     * @param  \Astro\API\Models\Page  $route
      * @return boolean
      */
-    public function delete(User $user, Redirect $redirect)
+    public function delete(User $user, Page $route)
     {
         return true;
     }

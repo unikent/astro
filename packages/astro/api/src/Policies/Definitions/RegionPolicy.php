@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Policies\Definitions;
+namespace Astro\API\Policies\Definitions;
 
-use App\Policies\BasePolicy;
+use Astro\API\Policies\BasePolicy;
 use App\Models\User;
-use Astro\API\Models\Definitions\Layout as LayoutDefinition;
+use Astro\API\Models\Definitions\Region as RegionDefinition;
 
-class LayoutPolicy extends BasePolicy
+class RegionPolicy extends BasePolicy
 {
     /**
      * Determine whether the user can index definitions.
@@ -23,10 +23,10 @@ class LayoutPolicy extends BasePolicy
      * Determine whether the user can view the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \Astro\API\Models\Definitions\Layout  $definition
+     * @param  \Astro\API\Models\Definitions\Region  $definition
      * @return boolean
      */
-    public function read(User $user, LayoutDefinition $definition)
+    public function read(User $user, RegionDefinition $definition)
     {
         return true;
     }
@@ -46,10 +46,10 @@ class LayoutPolicy extends BasePolicy
      * Determine whether the user can update the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \Astro\API\Models\Definitions\Layout  $definition
+     * @param  \Astro\API\Models\Definitions\Region  $definition
      * @return boolean
      */
-    public function update(User $user, LayoutDefinition $definition)
+    public function update(User $user, RegionDefinition $definition)
     {
         return false;
     }
@@ -58,10 +58,10 @@ class LayoutPolicy extends BasePolicy
      * Determine whether the user can delete the definition.
      *
      * @param  \App\Models\User  $user
-     * @param  \Astro\API\Models\Definitions\Layout  $definition
+     * @param  \Astro\API\Models\Definitions\Region  $definition
      * @return boolean
      */
-    public function delete(User $user, LayoutDefinition $definition)
+    public function delete(User $user, RegionDefinition $definition)
     {
         return false;
     }
