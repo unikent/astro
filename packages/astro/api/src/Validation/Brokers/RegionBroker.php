@@ -1,5 +1,5 @@
 <?php
-namespace App\Validation\Brokers;
+namespace Astro\API\Validation\Brokers;
 
 use Astro\API\Models\Definitions\Region as RegionDefinition;
 

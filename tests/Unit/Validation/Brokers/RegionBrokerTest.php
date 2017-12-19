@@ -3,7 +3,7 @@ namespace Tests\Unit\Validation\Brokers;
 
 use Config;
 use Tests\TestCase;
-use App\Validation\Brokers\RegionBroker;
+use Astro\API\Validation\Brokers\RegionBroker;
 use Illuminate\Validation\ValidationException;
 use Astro\API\Models\Definitions\Block as BlockDefinition;
 use Astro\API\Models\Definitions\Region as RegionDefinition;

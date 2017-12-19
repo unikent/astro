@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Astro\Serializers;
+namespace Astro\API\Transformers\Serializers;
 
 use League\Fractal\Serializer\ArraySerializer;
 

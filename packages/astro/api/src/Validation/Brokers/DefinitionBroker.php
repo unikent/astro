@@ -1,10 +1,8 @@
 <?php
-namespace App\Validation\Brokers;
+namespace Astro\API\Validation\Brokers;
 
 use Illuminate\Validation\ValidationException;
 use Astro\API\Models\Definitions\Block as BlockDefinition;
-use Astro\API\Models\Definition\BaseDefinition as Definition;
-use Illuminate\Validation\Validator as LaravelValidator;
 use Illuminate\Support\Facades\Validator as ValidatorFacade;
 
 abstract class DefinitionBroker {

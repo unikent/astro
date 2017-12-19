@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Validation\Rules;
+namespace Astro\API\Validation\Rules;
 
 use Astro\API\Models\Page;
 

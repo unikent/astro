@@ -1,6 +1,7 @@
 <?php
-namespace App\Validation\Brokers;
+namespace Astro\API\Validation\Brokers;
 
+use Astro\API\Validation\Brokers\DefinitionBroker;
 use Astro\API\Models\Definitions\Block as BlockDefinition;
 use Astro\API\Models\Definitions\Region as RegionDefinition;
 

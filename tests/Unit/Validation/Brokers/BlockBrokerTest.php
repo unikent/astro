@@ -3,7 +3,7 @@ namespace Tests\Unit\Validation\Brokers;
 
 use Config;
 use Tests\TestCase;
-use App\Validation\Brokers\BlockBroker;
+use Astro\API\Validation\Brokers\BlockBroker;
 use Illuminate\Validation\ValidationException;
 use Astro\API\Models\Definitions\Block as BlockDefinition;
 use Astro\API\Models\Definitions\Region as RegionDefinition;
@@ -37,7 +37,7 @@ class BlockBrokerTest extends TestCase
 	 */
 	public function getRules_ReturnsValidationRulesFromDefinition()
 	{
-		$bv = new BlockBroker($this->block);
+		$bv = new \Astro\API\Validation\Brokers\BlockBroker($this->block);
 		$rules = $bv->getRules();
 
 		$this->assertArrayHasKey('content', $rules);
@@ -55,7 +55,7 @@ class BlockBrokerTest extends TestCase
 	 */
 	public function getRules_WhenDefinitionHasRequiredRule_TransformsRequiredRule()
 	{
-		$bv = new BlockBroker($this->block);
+		$bv = new \Astro\API\Validation\Brokers\BlockBroker($this->block);
 		$rules = $bv->getRules();
 
 		$this->assertArrayHasKey('content', $rules);
@@ -68,7 +68,7 @@ class BlockBrokerTest extends TestCase
 	 */
 	public function getRules_WhenDefinitionHasMinLengthRule_TransformsMinLengthRule()
 	{
-		$bv = new BlockBroker($this->block);
+		$bv = new \Astro\API\Validation\Brokers\BlockBroker($this->block);
 		$rules = $bv->getRules();
 
 		$this->assertArrayHasKey('title_of_widget', $rules);
@@ -122,7 +122,7 @@ class BlockBrokerTest extends TestCase
 	 */
 	public function getValidator_ReturnsValidatorInstance()
 	{
-		$bv = new BlockBroker($this->block);
+		$bv = new \Astro\API\Validation\Brokers\BlockBroker($this->block);
 		$this->assertInstanceOf(LaravelValidator::class, $bv->getValidator());
 	}
 

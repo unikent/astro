@@ -181,7 +181,7 @@ This is currently implemented by the `App\Models\Api\v1\Page\PersistRequest` cla
 
  - `PersistRequest` defines its own validation rules in the usual way (as a standard FormRequest);
  - the `getRules()` method also loads Block and Region definitions based on the submitted data;
- - a `App\Validation\Brokers\BlockBroker` is then instantiated for each Block instance submitted (this class transforms the validation rules in the block definition to their Laravel-compatible equivalents);
+ - a `Astro\API\Validation\Brokers\BlockBroker` is then instantiated for each Block instance submitted (this class transforms the validation rules in the block definition to their Laravel-compatible equivalents);
  - the rules are then extracted from the `BlockBroker` and merged into the default ruleset within `PersistRequest`
 
 The `BlockBroker` also supports `getRegionConstraintRules`, where a Region definition is the only parameter. This validates that the `definition_name` on the Block instance is allowed in the given Region.
