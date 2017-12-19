@@ -11,7 +11,7 @@ use Astro\API\Http\Requests\Api\v1\Media\DeleteRequest;
 use Astro\API\Http\Requests\Api\v1\Media\StoreRequest;
 use Astro\API\Transformers\Api\v1\MediaTransformer;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-use App\Jobs\ProcessMedia;
+use Astro\API\Jobs\ProcessMedia;
 
 class MediaController extends ApiController
 {
