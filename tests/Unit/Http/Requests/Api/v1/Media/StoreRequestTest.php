@@ -7,7 +7,7 @@ use Tests\FileUploadTrait;
 use Tests\FileCleanupTrait;
 use Illuminate\Support\Collection;
 use Tests\Unit\Http\Requests\RequestTestCase;
-use App\Http\Requests\Api\v1\Media\StoreRequest;
+use Astro\API\Http\Requests\Api\v1\Media\StoreRequest;
 
 class StoreRequestTest extends RequestTestCase
 {

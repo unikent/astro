@@ -1,12 +1,9 @@
 <?php
-namespace App\Http\Requests\Api\v1\Route;
+namespace Astro\API\Http\Requests\Api\v1\Media;
 
-use Gate;
-use Astro\API\Models\Page;
-use Illuminate\Validation\Rule;
-use App\Http\Requests\FormRequest;
+use Astro\API\Http\Requests\FormRequest;
 
-class ResolveRequest extends FormRequest
+class StoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,8 +23,8 @@ class ResolveRequest extends FormRequest
     public function rules()
     {
         return [
-            'path' => 'required',
-            'host' => 'required'
+            'upload' => 'required|file',
+            'site_ids' => 'required|array'
         ];
     }
 

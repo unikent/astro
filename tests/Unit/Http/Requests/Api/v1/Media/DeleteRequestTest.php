@@ -5,7 +5,7 @@ use Validator;
 use Astro\API\Models\Site;
 use Illuminate\Support\Collection;
 use Tests\Unit\Http\Requests\RequestTestCase;
-use App\Http\Requests\Api\v1\Media\DeleteRequest;
+use Astro\API\Http\Requests\Api\v1\Media\DeleteRequest;
 
 class DeleteRequestTest extends RequestTestCase
 {

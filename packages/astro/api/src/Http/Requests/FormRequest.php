@@ -1,5 +1,5 @@
 <?php
-namespace App\Http\Requests;
+namespace Astro\API\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest as LaravelFormRequest;
 
