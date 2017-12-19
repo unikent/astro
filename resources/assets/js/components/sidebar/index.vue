@@ -33,7 +33,7 @@
 		</div>
 
 		<section class="sidebar">
-			<ul class="sidebar__switcher sidebar--pages" role="navigation">
+			<ul class="sidebar__switcher" role="navigation">
 				<side-menu-pages
 					v-for="(item, index) in menu"
 					:link="item.link"
@@ -46,7 +46,7 @@
 					:onClick="openItem"
 				/>
 			</ul>
-			<ul :class="activeMenuItem==='pages'?'sidebar--deactivated':''" class="sidebar__switcher sidebar--in-page" role="navigation">
+			<ul :class="activeMenuItem==='pages'?'sidebar--deactivated':''" class="sidebar__switcher" role="navigation">
 				<side-menu-item
 					v-for="(item, index) in menu"
 					:link="item.link"

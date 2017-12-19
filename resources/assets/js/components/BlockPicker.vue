@@ -1,35 +1,27 @@
 <template>
 <el-dialog
-	class="tabbed-dialog"
-	title="Add block(s)"
+	:title="replaceBlocks ? 'Swap block' : 'Add block'"
 	top="5%"
 	:visible.sync="visible"
 >
-	<el-tabs type="border-card">
-		<el-tab-pane label="All blocks">
-			<p>Select one or more blocks from below that you'd like to add to the page.</p>
-			<el-alert
-				v-if="replaceBlocks" 
-				title="Replacing a block with another one means you will permanently lose your changes to the original block." 
-				type="warning"
-				:closable="false" 
-				show-icon
-			></el-alert>
-			<div class="el-dialog__footer">
-				<el-button @click="cancel">Cancel</el-button>
-				<el-button type="primary" @click="addBlocks">Add selected blocks to the page</el-button>
-			</div>
-			<picker-list
-					:selectedOptions="selected"
-					:options="availableBlocks"
-					:maxSelectableOptions="maxSelectableBlocks"
-			/>
-		</el-tab-pane>
-	</el-tabs>
+	<el-alert
+		v-if="replaceBlocks"
+		title="Warning"
+		description="Replacing a block with another one means you will permanently lose your changes to the original block."
+		type="warning"
+		:closable="false"
+		show-icon
+	></el-alert>
+	<picker-list
+			:selectedOptions="selected"
+			:options="availableBlocks"
+			:maxSelectableOptions="maxSelectableBlocks"
+	/>
 
 	<span slot="footer" class="dialog-footer">
 		<el-button @click="cancel">Cancel</el-button>
-		<el-button type="primary" @click="addBlocks">Add selected blocks to the page</el-button>
+		<el-button v-if="replaceBlocks" type="primary" @click="addBlocks">Swap</el-button>
+		<el-button v-else type="primary" @click="addBlocks">Add</el-button>
 	</span>
 </el-dialog>
 </template>
