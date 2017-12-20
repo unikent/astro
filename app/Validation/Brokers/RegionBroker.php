@@ -6,11 +6,6 @@ use App\Models\Definitions\Region as RegionDefinition;
 class RegionBroker extends DefinitionBroker
 {
 
-	public function __construct(RegionDefinition $definition)
-	{
-		$this->definition = $definition;
-	}
-
 	/**
 	 * Creates an array of validation rules based on Section block-constraints
 	 * NOTE: this return value is not a ruleset but an array of rules to be assembled into 
