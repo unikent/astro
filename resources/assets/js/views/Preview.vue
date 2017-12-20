@@ -135,7 +135,7 @@ export default {
 			/**
 			 * @var {BlockComponent} - The Block.vue component which is currently hovered
 			 */
-			current: null,
+			currentlyHoveredBlock: null,
 			sectionDefinition: null,
 			sectionConstraints: null,
 			currentSectionBlocks: null,
@@ -186,11 +186,11 @@ export default {
 		},
 
 		currentBlockIsFirst() {
-			return this.current && this.current.index === 0;
+			return this.currentlyHoveredBlock && this.currentlyHoveredBlock.index === 0;
 		},
 
 		currentBlockIsLast() {
-			return this.current && this.current.index === this.blocks.length - 1;
+			return this.currentlyHoveredBlock && this.currentlyHoveredBlock.index === this.blocks.length - 1;
 		},
 
 		canMove() {
@@ -221,8 +221,8 @@ export default {
 		};
 
 		this.onResize = _.throttle(() => {
-			if(this.current) {
-				this.positionOverlay(this.current);
+			if(this.currentlyHoveredBlock) {
+				this.positionOverlay(this.currentlyHoveredBlock);
 			}
 		}, 16, { trailing: true });
 	},
@@ -356,12 +356,12 @@ export default {
 
 		removeBlock() {
 			// remove block but before we do so remove any validation issues it owns
-			const { index, region, section } = this.current;
+			const { index, region, section } = this.currentlyHoveredBlock;
 			const blockToBeDeleted = this.$store.getters.getBlock(region, section, index);
 			this.deleteBlockValidationIssue(blockToBeDeleted.id);
 			this.deleteBlock({ index, region, section });
 			this.hideOverlay();
-			this.current = null;
+			this.currentlyHoveredBlock = null;
 			this.$message({
 				message: 'Block removed',
 				type: 'success'
@@ -369,7 +369,7 @@ export default {
 		},
 
 		moveBlock(num) {
-			const { index, region, section } = this.current;
+			const { index, region, section } = this.currentlyHoveredBlock;
 			this.reorderBlocks({
 				from: index,
 				to: index + num,
@@ -387,7 +387,7 @@ export default {
 		},
 
 		showOverlay(block) {
-			if(block !== this.current) {
+			if(block !== this.currentlyHoveredBlock) {
 				// wait for images to load before displaying overlay
 				imagesLoaded(block.$el, () => {
 					this.positionOverlay(block, true);
@@ -396,7 +396,7 @@ export default {
 		},
 
 		hideOverlay(block) {
-			if(block !== this.current) {
+			if(block !== this.currentlyHoveredBlock) {
 				this.overlayHidden = true;
 				this.updateStyles('blockOverlay', 'transform', 'translateY(0)');
 			}
@@ -404,12 +404,12 @@ export default {
 
 		updateOverlay(index = null) {
 			// block is hovered and wasn't just deleted
-			if(this.current && this.current.index !== index) {
-				this.positionOverlay(this.current);
+			if(this.currentlyHoveredBlock && this.currentlyHoveredBlock.index !== index) {
+				this.positionOverlay(this.currentlyHoveredBlock);
 			}
-			else if(this.current && this.current.index === index) {
+			else if(this.currentlyHoveredBlock && this.currentlyHoveredBlock.index === index) {
 				this.hideOverlay();
-				this.current = null;
+				this.currentlyHoveredBlock = null;
 			}
 			else {
 				this.hideOverlay();
@@ -462,13 +462,13 @@ export default {
 
 
 			if(setCurrent) {
-				this.current = block;
+				this.currentlyHoveredBlock = block;
 			}
 
 
-			if(this.current) {
-				const section = this.$store.getters.getSection(this.current.region, this.current.section);
-				this.sectionDefinition = section ? Definition.getRegionSectionDefinition(this.current.region, this.current.section) : null
+			if(this.currentlyHoveredBlock) {
+				const section = this.$store.getters.getSection(this.currentlyHoveredBlock.region, this.currentlyHoveredBlock.section);
+				this.sectionDefinition = section ? Definition.getRegionSectionDefinition(this.currentlyHoveredBlock.region, this.currentlyHoveredBlock.section) : null
 				this.currentSectionBlocks = section.blocks;
 				this.sectionConstraints = section ? allowedOperations(section.blocks, this.sectionDefinition) : null;
 			}
@@ -489,9 +489,9 @@ export default {
 			const maxBlocks = this.sectionDefinition.max || this.sectionDefinition.size;
 
 			this.showBlockPicker({
-				insertIndex: this.current.index + offset,
-				sectionIndex: this.current.section,
-				regionName: this.current.region,
+				insertIndex: this.currentlyHoveredBlock.index + offset,
+				sectionIndex: this.currentlyHoveredBlock.section,
+				regionName: this.currentlyHoveredBlock.region,
 				blocks: this.sectionConstraints ?
 					this.sectionConstraints.allowedBlocks : [],
 				maxSelectableBlocks: this.sectionConstraints.canSwapBlocks ?
