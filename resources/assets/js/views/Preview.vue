@@ -3,14 +3,14 @@
 	<div id="b-wrapper" ref="wrapper" :style="wrapperStyles">
 		<component :is="layout" />
 		<div
-			class="block-overlay" :class="{
+			class="block-overlay-hovered" :class="{
 				'hide-drag': hideBlockOverlayControls,
-				'block-overlay--hidden': overlayHidden
+				'block-overlay-hovered--hidden': overlayHidden
 			}"
 			:style="blockOverlayStyles"
 		>
 
-			<div class="block-overlay__buttons" v-if="sectionConstraints">
+			<div class="block-overlay-hovered__buttons" v-if="sectionConstraints">
 
 				<div v-if="sectionConstraints.canSwapBlocks">
 					<el-button
@@ -44,7 +44,7 @@
 
 					<el-dropdown
 						v-if="sectionConstraints && sectionConstraints.canRemoveBlocks"
-						class="block-overlay__-button"
+						class="block-overlay-hovered__-button"
 						@command="removeBlock"
 						size="mini"
 					>
@@ -464,6 +464,7 @@ export default {
 			if(setCurrent) {
 				this.current = block;
 			}
+
 
 			if(this.current) {
 				const section = this.$store.getters.getSection(this.current.region, this.current.section);

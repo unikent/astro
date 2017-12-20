@@ -19,30 +19,31 @@
 }
 
 .b-editable,
-.block-overlay {
-	border: 2px solid #03a9f4;
+.block-overlay-hovered {
 	position: absolute;
 	transition: border-color .3s ease-out, opacity .3s ease-out;
 	border-radius: 0;
 	pointer-events: none;
 }
 
-.block-overlay {
+.block-overlay-hovered {
 	top: 0;
 	opacity: 1;
 	border-width: 4px;
 	max-width: 100%;
+	background-color: rgba(0, 0, 0, 0.1);
+	cursor: pointer;
 }
 
-.block-overlay--hidden {
+.block-overlay-hovered--hidden {
 	transition: none;
 	opacity: 0;
 	max-height: 0;
 	transform: none;
 }
 
-.block-overlay__options,
-.block-overlay__move {
+.block-overlay-hovered__options,
+.block-overlay-hovered__move {
 	transition: background-color .3s ease-out;
 	background-color: #03a9f4;
 	color: #fff;
@@ -55,7 +56,7 @@
 	fill: #fff;
 }
 
-.block-overlay__move {
+.block-overlay-hovered__move {
 	top: 50%;
 	transform: translateY(-50%);
 	left: -4px;
@@ -63,32 +64,32 @@
 	border-radius: 0 4px 4px 0;
 }
 
-.block-overlay__options {
+.block-overlay-hovered__options {
 	top: -4px;
 	right: -4px;
 	border-radius: 0 0 0 4px;
 	pointer-events: none;
 }
 
-.block-overlay__buttons {
+.block-overlay-hovered__buttons {
 	position: absolute;
 	top: 15px;
 	right: 15px;
 	pointer-events: auto;
 }
 
-.block-overlay__delete-button {
+.block-overlay-hovered__delete-button {
 	margin-left: 20px;
 	pointer-events: auto;
 	fill: #c74d4d;
 }
 
-.block-overlay__delete--sidebar {
+.block-overlay-hovered__delete--sidebar {
 	bottom: 0;
 	right: 0;
 }
 
-.block-overlay__move {
+.block-overlay-hovered__move {
 	transition: background-color .3s ease-out;
 	position: absolute;
 	top: 50%;
@@ -105,10 +106,14 @@
 	text-align: center;
 }
 
+.block-overlay-selected {
+	border: 2px solid #03a9f4;
+}
+
 .hide-drag {
-	.block-overlay__options,
-	.block-overlay__delete,
-	.block-overlay__move,
+	.block-overlay-hovered__options,
+	.block-overlay-hovered__delete,
+	.block-overlay-hovered__move,
 	.add-before,
 	.add-after {
 		opacity: 0;
