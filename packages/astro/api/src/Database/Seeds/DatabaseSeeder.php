@@ -1,5 +1,7 @@
 <?php
 
+namespace Astro\API\Database\Seeds;
+
 use Astro\API\Models\LocalAPIClient;
 use App\Models\User;
 use Astro\API\Models\Role;
@@ -30,7 +32,7 @@ class DatabaseSeeder extends Seeder
 	 */
 	public function run()
 	{
-		if(App::environment() === 'production')
+		if(\App::environment() === 'production')
 		{
 			exit('The seeder should only be run in dev mode.');
 		}
@@ -40,7 +42,7 @@ class DatabaseSeeder extends Seeder
 		$user = factory(User::class)->create([
 			'username' => 'admin',
 			'name'=> 'Admin',
-			'password'=> Hash::make('admin'),
+			'password'=> \Hash::make('admin'),
 			'role' => 'admin',
             'api_token' => 'test'
 		]);
@@ -49,7 +51,7 @@ class DatabaseSeeder extends Seeder
 		$editor = factory(User::class)->create([
 			'username' => 'editor',
 			'name' => 'Editor',
-			'password' => Hash::make('editor'),
+			'password' => \Hash::make('editor'),
 			'role' => 'user',
 			'api_token' => 'editor-test'
 		]);
@@ -57,7 +59,7 @@ class DatabaseSeeder extends Seeder
 		$owner = factory(User::class)->create([
 			'username' => 'owner',
 			'name' => 'Owner',
-			'password' => Hash::make('owner'),
+			'password' => \Hash::make('owner'),
 			'role' => 'user',
 			'api_token' => 'owner-test'
 		]);
@@ -65,7 +67,7 @@ class DatabaseSeeder extends Seeder
 		$contributor = factory(User::class)->create([
 			'username' => 'contributor',
 			'name' => 'Contributor',
-			'password' => Hash::make('contributor'),
+			'password' => \Hash::make('contributor'),
 			'role' => 'user',
 			'api_token' => 'contributor-test'
 		]);
@@ -91,16 +93,16 @@ class DatabaseSeeder extends Seeder
 	private function cleanDatabase()
 	{
 		// allow mass assignment
-		Eloquent::unguard();
+		\Eloquent::unguard();
 
-		DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+		\DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
 		foreach($this->tables as $table)
 		{
-			DB::table($table)->truncate();
+			\DB::table($table)->truncate();
 		}
 
-		DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+		\DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 	}
 
 }

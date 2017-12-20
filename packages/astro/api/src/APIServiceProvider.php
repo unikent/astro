@@ -7,6 +7,7 @@ use Astro\API\Console\Commands\AddUser;
 use Astro\API\Console\Commands\CheckDefns;
 use Astro\API\Console\Commands\ManageAdmins;
 use Astro\API\Console\Commands\SetupPermissions;
+use Illuminate\Database\Eloquent\Factory;
 use Illuminate\Support\ServiceProvider;
 
 class APIServiceProvider extends ServiceProvider
@@ -27,6 +28,7 @@ class APIServiceProvider extends ServiceProvider
 				ManageAdmins::class,
 				SetupPermissions::class
 			]);
+			$this->loadMigrationsFrom(__DIR__.'/Database/migrations');
 		}
     }
 
@@ -37,6 +39,18 @@ class APIServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->registerEloquentFactoriesFrom( __DIR__ . '/Database/factories');
     }
+
+	/**
+	 * Register factories.
+	 *
+	 * @param  string  $path
+	 * @return void
+	 * @see https://github.com/laravel/framework/issues/11881#issuecomment-261688266
+	 */
+	protected function registerEloquentFactoriesFrom($path)
+	{
+		$this->app->make(Factory::class)->load($path);
+	}
 }

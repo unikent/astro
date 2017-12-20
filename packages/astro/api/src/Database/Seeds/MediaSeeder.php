@@ -1,5 +1,7 @@
 <?php
 
+namespace Astro\API\Database\Seeds;
+
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
 use Illuminate\Filesystem\Filesystem;
