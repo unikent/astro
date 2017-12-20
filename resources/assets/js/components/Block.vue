@@ -169,6 +169,8 @@ export default {
 				sectionName: this.sectionName,
 				blockIndex: this.index
 			});
+
+			this.showSelectedOverlay()
 		},
 
 		showHoverOverlay() {
@@ -187,6 +189,10 @@ export default {
 			) {
 				this.$bus.$emit('block:hideHoverOverlay', this);
 			}
+		},
+
+		showSelectedOverlay() {
+			this.$bus.$emit('block:showSelectedOverlay', this);
 		}
 	}
 };

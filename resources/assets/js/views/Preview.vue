@@ -75,6 +75,9 @@
 				<icon name="plus" width="16" height="16" viewBox="0 0 16 16" />
 			</div>
 		</div>
+		<div class="block-overlay-selected">
+			placeholder for selected overlay
+		</div>
 	</div>
 	<div class="b-handle" :style="handleStyles">
 		<icon name="move" width="20" height="20" />
@@ -345,7 +348,8 @@ export default {
 
 			this.$bus.$on('block:showHoverOverlay', this.showHoverOverlay);
 			this.$bus.$on('block:hideHoverOverlay', this.hideHoverOverlay);
-			this.$bus.$on('block:updateHoverOverlay', this.updateHoverOverlay)
+			this.$bus.$on('block:updateHoverOverlay', this.updateHoverOverlay);
+			this.$bus.$on('block:showSelectedOverlay', this.showSelectedOverlay);
 		},
 
 		removeDialog(done) {
@@ -394,6 +398,16 @@ export default {
 				// wait for images to load before displaying overlay
 				imagesLoaded(block.$el, () => {
 					this.positionHoverOverlay(block, true);
+				});
+			}
+		},
+
+		showSelectedOverlay(block) {
+			if(block !== this.currentlySelectedBlock) {
+				// wait for images to load before displaying overlay
+				imagesLoaded(block.$el, () => {
+					console.log('positioning selected overlay');
+					//this.positionSelectedOverlay(block, true);
 				});
 			}
 		},
