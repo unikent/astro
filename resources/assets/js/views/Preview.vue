@@ -4,10 +4,10 @@
 		<component :is="layout" />
 		<div
 			class="block-overlay-hovered" :class="{
-				'hide-drag': hideBlockOverlayControls,
-				'block-overlay-hovered--hidden': overlayHidden
+				'hide-drag': hideBlockHoverOverlayControls,
+				'block-overlay-hovered--hidden': hoverOverlayHidden
 			}"
-			:style="blockOverlayStyles"
+			:style="blockHoverOverlayStyles"
 		>
 
 			<div class="block-overlay-hovered__buttons" v-if="sectionConstraints">
@@ -79,7 +79,7 @@
 	<div class="b-handle" :style="handleStyles">
 		<icon name="move" width="20" height="20" />
 	</div>
-	<div id="b-overlay" :style="overlayStyles"></div>
+	<div id="b-overlay" :style="hoverOverlayStyles"></div>
 	<resize-shim :onResize="onResize" />
 </div>
 <el-card v-else class="box-card error-card">
@@ -127,11 +127,11 @@ export default {
 			handleStyles: {
 				fill: '#fff'
 			},
-			blockOverlayStyles: {},
-			hideBlockOverlayControls: false,
-			overlayStyles: {},
+			blockHoverOverlayStyles: {},
+			hideBlockHoverOverlayControls: false,
+			hoverOverlayStyles: {},
 			wrapperStyles: {},
-			overlayHidden: true,
+			hoverOverlayHidden: true,
 			/**
 			 * @var {BlockComponent} - The Block.vue component which is currently hovered
 			 */
@@ -158,6 +158,9 @@ export default {
 			siteLayoutDefinitions: state => state.site.layouts,
 			siteId: state => parseInt(state.site.site),
 			layoutErrors: state => state.page.layoutErrors
+			// currentBlockIndex: => state.contenteditor.currentBlockIndex,
+			// currentRegionName: => state.contenteditor.currentRegionName,
+			// currentSectionName: => state.contenteditor.currentSectionName
 		}),
 
 		...mapGetters([
@@ -222,7 +225,7 @@ export default {
 
 		this.onResize = _.throttle(() => {
 			if(this.currentlyHoveredBlock) {
-				this.positionOverlay(this.currentlyHoveredBlock);
+				this.positionHoverOverlay(this.currentlyHoveredBlock);
 			}
 		}, 16, { trailing: true });
 	},
@@ -340,9 +343,9 @@ export default {
 			document.addEventListener('mouseup', this.mouseUp);
 			win.addEventListener('resize', this.onResize);
 
-			this.$bus.$on('block:showOverlay', this.showOverlay);
-			this.$bus.$on('block:hideOverlay', this.hideOverlay);
-			this.$bus.$on('block:updateOverlay', this.updateOverlay)
+			this.$bus.$on('block:showHoverOverlay', this.showHoverOverlay);
+			this.$bus.$on('block:hideHoverOverlay', this.hideHoverOverlay);
+			this.$bus.$on('block:updateHoverOverlay', this.updateHoverOverlay)
 		},
 
 		removeDialog(done) {
@@ -360,7 +363,7 @@ export default {
 			const blockToBeDeleted = this.$store.getters.getBlock(region, section, index);
 			this.deleteBlockValidationIssue(blockToBeDeleted.id);
 			this.deleteBlock({ index, region, section });
-			this.hideOverlay();
+			this.hideHoverOverlay();
 			this.currentlyHoveredBlock = null;
 			this.$message({
 				message: 'Block removed',
@@ -386,37 +389,37 @@ export default {
 			);
 		},
 
-		showOverlay(block) {
+		showHoverOverlay(block) {
 			if(block !== this.currentlyHoveredBlock) {
 				// wait for images to load before displaying overlay
 				imagesLoaded(block.$el, () => {
-					this.positionOverlay(block, true);
+					this.positionHoverOverlay(block, true);
 				});
 			}
 		},
 
-		hideOverlay(block) {
+		hideHoverOverlay(block) {
 			if(block !== this.currentlyHoveredBlock) {
-				this.overlayHidden = true;
-				this.updateStyles('blockOverlay', 'transform', 'translateY(0)');
+				this.hoverOverlayHidden = true;
+				this.updateStyles('blockHoverOverlay', 'transform', 'translateY(0)');
 			}
 		},
 
-		updateOverlay(index = null) {
+		updateHoverOverlay(index = null) {
 			// block is hovered and wasn't just deleted
 			if(this.currentlyHoveredBlock && this.currentlyHoveredBlock.index !== index) {
-				this.positionOverlay(this.currentlyHoveredBlock);
+				this.positionHoverOverlay(this.currentlyHoveredBlock);
 			}
 			else if(this.currentlyHoveredBlock && this.currentlyHoveredBlock.index === index) {
-				this.hideOverlay();
+				this.hideHoverOverlay();
 				this.currentlyHoveredBlock = null;
 			}
 			else {
-				this.hideOverlay();
+				this.hideHoverOverlay();
 			}
 		},
 
-		repositionOverlay(data) {
+		repositionHoverOverlay(data) {
 			let
 				offset = 0,
 				to = data.to > data.from ? data.to : data.to - 1;
@@ -427,11 +430,11 @@ export default {
 				}
 			}
 
-			this.overlayHidden = false;
-			this.updateStyles('blockOverlay', 'transform', `translateY(${offset}px)`);
+			this.hoverOverlayHidden = false;
+			this.updateStyles('blockHoverOverlay', 'transform', `translateY(${offset}px)`);
 		},
 
-		positionOverlay(block, setCurrent) {
+		positionHoverOverlay(block, setCurrent) {
 			var
 				pos = block.$el.getBoundingClientRect(),
 				heightDiff = Math.round(pos.height - 30),
@@ -451,9 +454,9 @@ export default {
 				minusLeft = addWidth / 2;
 			}
 
-			this.overlayHidden = false;
+			this.hoverOverlayHidden = false;
 
-			this.updateStyles('blockOverlay', {
+			this.updateStyles('blockHoverOverlay', {
 				transform: `translateY(${(pos.top + window.scrollY - minusTop)}px)`,
 				left     : `${(pos.left + window.scrollX - minusLeft)}px`,
 				width    : `${(pos.width + addWidth)}px`,

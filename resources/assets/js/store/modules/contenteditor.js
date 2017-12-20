@@ -140,6 +140,7 @@ const mutations = {
 
 	/**
 	 * Sets the currently selected Block component.
+	 * TODO: remove this if it is not bein used
 	 *
 	 * @param {components/Block} block - The Block.vue component which is currently selected in the block editor.
 	 */
