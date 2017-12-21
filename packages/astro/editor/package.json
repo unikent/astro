@@ -8,9 +8,9 @@
     "hot": "cross-env NODE_ENV=development webpack-dev-server --hot --colors --content-base=public/",
     "production": "cross-env NODE_ENV=production webpack --progress --colors --hide-modules",
     "refresh": "php artisan migrate:refresh && php artisan db:seed",
-    "unit": "mocha-webpack --webpack-config resources/assets/js/test/webpack.config-test.babel.js \"resources/assets/js/test/unit/*.js\"",
-    "validate": "cross-env node resources/assets/js/console",
-    "eslint": "node_modules/.bin/eslint resources/assets/js/**/*.{js,vue} --format codeframe"
+    "unit": "mocha-webpack --webpack-config js/test/webpack.config-test.babel.js \"js/test/unit/*.js\"",
+    "validate": "cross-env node js/console",
+    "eslint": "node_modules/.bin/eslint js/**/*.{js,vue} --format codeframe"
   },
   "dependencies": {
     "async-validator": "^1.8.1",

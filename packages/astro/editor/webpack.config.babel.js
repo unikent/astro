@@ -10,7 +10,7 @@ import CircularDependencyPlugin from 'circular-dependency-plugin';
 /* global __dirname, process */
 
 const
-	resolve = (dir) => path.resolve(__dirname, `resources/assets/${dir}`),
+	resolve = (dir) => path.resolve(__dirname, `${dir}`),
 	isProduction = process.env.NODE_ENV === 'production';
 
 export default {
@@ -21,7 +21,7 @@ export default {
 	],
 
 	output: {
-		path: path.resolve(__dirname, 'public/build'),
+		path: path.resolve(__dirname, '../../../public/build'),
 		filename: 'js/[name].js',
 		publicPath: isProduction ? '/site-editor/build/' : '/build/'
 	},
