@@ -207,6 +207,7 @@ return [
 		// Barryvdh\Debugbar\ServiceProvider::class,
 		Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
 		Conner\Tagging\Providers\TaggingServiceProvider::class,
+		Astro\API\APIServiceProvider::class,
 
 		/*
 		 * Application Service Providers...
@@ -217,9 +218,7 @@ return [
 		App\Providers\EventServiceProvider::class,
 		App\Providers\RouteServiceProvider::class,
 		// App\Providers\ComposerServiceProvider::class,
-        Fideloper\Proxy\TrustedProxyServiceProvider::class,
-
-		Astro\API\APIServiceProvider::class
+        Fideloper\Proxy\TrustedProxyServiceProvider::class
 	],
 
 	/*

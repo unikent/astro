@@ -2,12 +2,7 @@
 
 namespace App\Providers;
 
-use Astro\API\Models\Page;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Astro\API\Models\Definitions\Block as BlockDefinition;
-use Astro\API\Models\Definitions\Layout as LayoutDefinition;
-use Astro\API\Models\Definitions\Region as RegionDefinition;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
 class RouteServiceProvider extends ServiceProvider
@@ -34,26 +29,6 @@ class RouteServiceProvider extends ServiceProvider
 		$url = $this->app['url'];
 		// Force the application URL
 		$url->forceRootUrl(config('app.url'));
-
-		// only bind draft pages by id
-		Route::bind('page', function ($value) {
-			return Page::draft()->where('id', '=', $value)->firstOrFail();
-		});
-
-		Route::bind('block_definition', function ($value) {
-			$path = BlockDefinition::locateDefinitionOrFail($value);
-			return BlockDefinition::fromDefinitionFile($path);
-		});
-
-		Route::bind('layout_definition', function ($value) {
-			$path = LayoutDefinition::locateDefinitionOrFail($value);
-			return LayoutDefinition::fromDefinitionFile($path);
-		});
-
-		Route::bind('region_definition', function ($value) {
-			$path = RegionDefinition::locateDefinitionOrFail($value);
-			return RegionDefinition::fromDefinitionFile($path);
-		});
 	}
 
 	/**
@@ -63,11 +38,7 @@ class RouteServiceProvider extends ServiceProvider
 	 */
 	public function map()
 	{
-		$this->mapApiRoutes();
-
 		$this->mapWebRoutes();
-
-		//
 	}
 
 	/**
@@ -82,20 +53,5 @@ class RouteServiceProvider extends ServiceProvider
 		Route::middleware('web')
 			->namespace($this->namespace)
 			->group(base_path('routes/web.php'));
-	}
-
-	/**
-	 * Define the "api" routes for the application.
-	 *
-	 * These routes are typically stateless.
-	 *
-	 * @return void
-	 */
-	protected function mapApiRoutes()
-	{
-		Route::prefix('api')
-			->namespace('Astro\API\Http\Controllers\Api')
-			->middleware('api')
-			->group(base_path('routes/api.php'));
 	}
 }

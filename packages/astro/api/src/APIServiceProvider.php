@@ -7,7 +7,12 @@ use Astro\API\Console\Commands\AddUser;
 use Astro\API\Console\Commands\CheckDefns;
 use Astro\API\Console\Commands\ManageAdmins;
 use Astro\API\Console\Commands\SetupPermissions;
+use Astro\API\Models\Definitions\Block;
+use Astro\API\Models\Definitions\Layout;
+use Astro\API\Models\Definitions\Region;
+use Astro\API\Models\Page;
 use Illuminate\Database\Eloquent\Factory;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class APIServiceProvider extends ServiceProvider
@@ -19,7 +24,7 @@ class APIServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //$this->loadRoutesFrom(__DIR__.'/routes.php');
+    	$this->bootRoutes();
 		if ($this->app->runningInConsole()) {
 			$this->commands([
 				AddSite::class,
@@ -31,6 +36,33 @@ class APIServiceProvider extends ServiceProvider
 			$this->loadMigrationsFrom(__DIR__.'/Database/migrations');
 		}
     }
+
+	/**
+	 * Setup all routing functionality relevant to the API.
+	 */
+    public function bootRoutes()
+	{
+		// only bind draft pages by id
+		Route::bind('page', function ($value) {
+			return Page::draft()->where('id', '=', $value)->firstOrFail();
+		});
+
+		Route::bind('block_definition', function ($value) {
+			$path = Block::locateDefinitionOrFail($value);
+			return Block::fromDefinitionFile($path);
+		});
+
+		Route::bind('layout_definition', function ($value) {
+			$path = Layout::locateDefinitionOrFail($value);
+			return Layout::fromDefinitionFile($path);
+		});
+
+		Route::bind('region_definition', function ($value) {
+			$path = Region::locateDefinitionOrFail($value);
+			return Region::fromDefinitionFile($path);
+		});
+		$this->loadRoutesFrom(__DIR__.'/routes.php');
+	}
 
     /**
      * Register the application services.

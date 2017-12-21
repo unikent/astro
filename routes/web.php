@@ -19,16 +19,6 @@ $this->post('auth/login', 'Auth\AuthController@loginLocal');
 $this->get('auth/sso/respond', 'Auth\AuthController@loginSSO')->name('auth.sso.respond');
 $this->post('auth/logout', 'Auth\AuthController@logout')->name('auth.logout');
 
-// Preview draft pages in editor.
-Route::get('/draft/{host}/{path?}', '\Astro\API\Http\Controllers\PageController@draft')
-	->where('host', '([^/]+)')
-	->where('path', '(.*?)/?')
-	->middleware('auth');
-
-// "Preview" published pages in editor.
-Route::get('/published/{host}/{path?}', '\Astro\API\Http\Controllers\PageController@published')
-	->where('host', '([^/]+)')
-	->where('path', '(.*?)/?');
 
 // SPA wrapper
 Route::get('/{catchall?}', function($route = '') {
