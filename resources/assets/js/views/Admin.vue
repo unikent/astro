@@ -2,12 +2,10 @@
 <div class="admin-wrapper">
 	<aside class="left-side">
 		<section class="sidebar">
-			<ul class="admin-sidebar" role="navigation">
+			<ul v-if="homepageID" class="admin-sidebar" role="navigation">
 				<side-menu-item
 					v-for="item in menu"
-					:link="item.link"
-					:icon="item.icon"
-					:title="item.title"
+					:item="item"
 					:key="item.link"
 				/>
 			</ul>
@@ -20,14 +18,17 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import Icon from 'components/Icon';
 
 export default {
 	name: 'Admin',
 
+	props: ['site_id'],
+
 	components: {
 		SideMenuItem: {
-			props: ['link', 'icon', 'title'],
+			props: ['item'],
 
 			components: {
 				Icon
@@ -35,9 +36,16 @@ export default {
 
 			template: `
 				<li>
-					<router-link :to="link">
-						<icon :name="icon" className="menu-icon" />
-						<span>{{ title }}</span>
+					<router-link :to="item.link" exact>
+						<icon :name="item.icon" className="menu-icon" />
+						<span>{{ item.title }}</span>
+						<icon
+							v-if="item.leave"
+							name="new-window"
+							width="14"
+							height="14"
+							class="admin-sidebar__external-link"
+						/>
 					</router-link>
 				</li>
 			`
@@ -46,24 +54,75 @@ export default {
 
 	data() {
 		return {
-			menu: [
+			homepageID: null
+		}
+	},
+
+	created() {
+		this.fetchSiteData();
+	},
+
+	watch: {
+		site_id: function(newId, oldId) {
+			if (newId !== oldId) {
+				this.homepageID = null;
+				this.fetchSiteData();
+			}
+		}
+	},
+
+	computed: {
+
+		...mapState({
+			currentSite: state => state.site
+		}),
+
+		url() {
+			return `/site/${this.site_id}`;
+		},
+
+		menu() {
+			return [
 				{
-					link: '/home',
-					icon: 'home',
-					title: 'Home'
+					link: `${this.url}`,
+					icon: 'pie-chart',
+					title: 'Dashboard'
 				},
 				{
-					link: '/sites',
-					icon: 'sites',
-					title: 'Sites'
+					link: `${this.url}/page/${this.homepageID}`,
+					icon: 'layout',
+					title: 'Editor',
+					leave: true
 				},
 				{
-					link: '/settings',
-					icon: 'settings',
-					title: 'Settings'
+					link: `${this.url}/menu`,
+					icon: 'menu-alt',
+					title: 'Menu'
+				},
+				{
+					link: `${this.url}/media`,
+					icon: 'gallery',
+					title: 'Media'
+				},
+				{
+					link: `${this.url}/users`,
+					icon: 'user',
+					title: 'Users'
 				}
-			]
-		};
+			];
+		}
+
+	},
+
+	methods: {
+
+		fetchSiteData() {
+			this.$store.commit('site/updateCurrentSiteID', this.site_id);
+			this.$store.dispatch('site/fetchSite').then(() => {
+				this.homepageID = this.currentSite.pages[0].id;
+			});
+		}
+
 	}
 };
 </script>

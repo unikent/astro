@@ -32,8 +32,8 @@ class CreateSiteTest extends APICommandTestCase
             'name' => 'A Valid Name',
             'host' => 'example.com',
             'path' => '',
-            'homepage_layout' => [
-                'name' => 'test-layout',
+            'site_definition' => [
+                'name' => 'one-page-site',
                 'version' => 1
             ]
         ];
@@ -193,15 +193,15 @@ class CreateSiteTest extends APICommandTestCase
      * @test
      * @group APICommands
      */
-    public function validation_whenDefaultLayoutNameIsMissingOrInvalid_fails()
+    public function validation_whenSiteDefinitionNameIsMissingOrInvalid_fails()
     {
-        $data = $this->input(['homepage_layout' => ['name' => '', 'layout' => 1]]);
+        $data = $this->input(['site_definition' => ['name' => '', 'version' => 1]]);
         $this->assertTrue($this->validator($data)->fails());
-        $data = $this->input(['homepage_layout' => ['name' => '//£*', 'layout' => 1]]);
+        $data = $this->input(['site_definition' => ['name' => '//£*', 'version' => 1]]);
         $this->assertTrue($this->validator($data)->fails());
-        $data = $this->input(['homepage_layout' => null ]);
+        $data = $this->input(['site_definition' => null ]);
         $this->assertTrue($this->validator($data)->fails());
-        $data = $this->input(null,['homepage_layout']);
+        $data = $this->input(null,['site_definition']);
         $this->assertTrue($this->validator($data)->fails());
     }
 
@@ -209,14 +209,14 @@ class CreateSiteTest extends APICommandTestCase
      * @test
      * @group APICommands
      */
-    public function validation_whenDefaultLayoutVersionIsMissingOrInvalid_fails()
+    public function validation_whenSiteDefinitionVersionIsMissingOrInvalid_fails()
     {
         $data = $this->input([]);
-        unset($data['homepage_layout']['version']);
+        unset($data['site_definition']['version']);
         $this->assertTrue($this->validator($data)->fails());
-        $data['homepage_layout']['version'] = 'v1';
+        $data['site_definition']['version'] = 'v1';
         $this->assertTrue($this->validator($data)->fails());
-        $data['homepage_layout']['version'] = '';
+        $data['site_definition']['version'] = '';
         $this->assertTrue($this->validator($data)->fails());
     }
 
@@ -224,13 +224,13 @@ class CreateSiteTest extends APICommandTestCase
      * @test
      * @group APICommands
      */
-    public function validation_whenDefaultLayoutDefinitionNotFound_fails()
+    public function validation_whenSiteDefinitionNotFound_fails()
     {
         $data = $this->input([]);
-        $data['homepage_layout']['name'] = 'missing-layout-name';
+        $data['site_definition']['name'] = 'missing-layout-name';
         $this->assertTrue($this->validator($data)->fails());
-        $data['homepage_layout']['name'] = 'test-layout';
-        $data['homepage_layout']['version'] = 22;
+        $data['site_definition']['name'] = 'one-page-site';
+        $data['site_definition']['version'] = 22;
         $this->assertTrue($this->validator($data)->fails());
     }
 

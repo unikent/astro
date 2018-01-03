@@ -1,15 +1,17 @@
 <template>
 	<div class="sidebar__errors" :class="flash === 'errors' ? 'sidebar--flash' : ''">
 		<back-bar :title="title" />
-		<template v-if="blocks" v-for="region in blocks">
+		<template v-if="regions" v-for="(sections, regionName) in regions">
 			<!-- we could put the region title here when we use more than one region -->
-			<ul class="validation-errors" v-if="region">
-				<template v-for="(block, key) in region">
-					<template v-if="errors.indexOf(block.id) !== -1">
-						<li class="validation-errors__item warning">
-							<i class="el-icon-warning"></i>
-							<a href="#" @click="scrollTo(key, block.definition_name, block.definition_version)" class="validation-errors__link">{{ label(block.definition_name + "-v" + block.definition_version) }}</a>
-						</li>
+			<ul class="validation-errors" v-if="sections">
+				<template v-for="(sectionData, sectionIndex) in sections">
+					<template v-for="(block, blockIndex) in sectionData.blocks">
+						<template v-if="errors.indexOf(block.id) !== -1">
+							<li class="validation-errors__item warning">
+								<i class="el-icon-warning"></i>
+								<a href="#" @click="scrollTo(blockIndex, sectionIndex, regionName)" class="validation-errors__link">{{ label(block.definition_name + "-v" + block.definition_version) }}</a>
+							</li>
+						</template>
 					</template>
 				</template>
 			</ul>
@@ -21,6 +23,8 @@
 import { mapMutations } from 'vuex';
 import BackBar from 'components/BackBar';
 
+/* global document, setTimeout */
+
 export default {
 	name: 'errors',
 
@@ -31,12 +35,8 @@ export default {
 			return this.$store.state.page.invalidBlocks;
 		},
 
-		blocks() {
+		regions() {
 			return this.$store.state.page.pageData.blocks;
-		},
-
-		region() {
-			return this.$store.state.page.currentRegion;
 		},
 
 		flash() {
@@ -51,7 +51,6 @@ export default {
 	methods: {
 
 		...mapMutations([
-			'setBlock',
 			'updateMenuActive'
 		]),
 
@@ -62,37 +61,36 @@ export default {
 		 *
 		 * TODO: implement smooth scrolling?
 		 */
-		scrollTo(block_id, definition_name, definition_version) {
+		scrollTo(blockIndex, sectionIndex, regionName) {
 			var el = document.getElementById('editor-content');
-			var block = el.contentWindow.document.getElementById('block_' + block_id);
+			var block = el.contentWindow.document.getElementById('block_' + blockIndex);
 			// position of the block in the iframe
 			var pos = block.getBoundingClientRect();
 			// add on Y scroll position to pos.top to make sure the position for the next jump is relative to the current scroll position
 			el.contentWindow.scrollTo(0, pos.top + el.contentWindow.scrollY);
 
-			// set the current block, given its position (index) and name (definition_name + definition_version)
-			var type = definition_name + '-v' + definition_version;
-			this.setBlock({ index: block_id, type: type });
-
-			// set the block menu item as active
-			this.updateMenuActive('blocks');
+			this.$store.dispatch('changeBlock', {
+				regionName: regionName,
+				sectionName: this.$store.getters.getSection(regionName, sectionIndex).name,
+				blockIndex: blockIndex
+			});
 
 			// scroll to the right bit of the block options side panel
 			// we need a tiny timeout to make sure the error fields have had time to populate
 			setTimeout(() => {
 				// find all the error fields...
-				var error_fields = document.getElementsByClassName('is-error');
+				var errorFields = document.getElementsByClassName('is-error');
 
 				// ...and get the block options list containing div
-				var options_list = document.getElementById('block-options-list');
+				var optionsList = document.getElementById('block-options-list');
 
 				// Now get the top/bottom of the first error
 				// we need to add on the top position of the scroll to make sure the next time we're not going to go back to the top of the div
-				var error_pos_top = error_fields[0].getBoundingClientRect().top + options_list.scrollTop;
-				var error_pos_bottom = error_fields[0].getBoundingClientRect().bottom + options_list.scrollTop;
+				var errorPosTop = errorFields[0].getBoundingClientRect().top + optionsList.scrollTop;
+				var errorPosBottom = errorFields[0].getBoundingClientRect().bottom + optionsList.scrollTop;
 
 				// and finally scroll to the position of the error, adding on a bit to make sure it's properly visible
-				options_list.scrollTop = error_pos_top - (error_pos_bottom - error_pos_top) - 50;
+				optionsList.scrollTop = errorPosTop - (errorPosBottom - errorPosTop) - 50;
 			}, 1);
 
 		},
@@ -100,7 +98,7 @@ export default {
 		// return the correct human-readable label for the specified block definition
 		label(name) {
 			for (var block in this.$store.state.definition.blockDefinitions) {
-				if (block == name) {
+				if (block === name) {
 					return this.$store.state.definition.blockDefinitions[block].label;
 				}
 			}

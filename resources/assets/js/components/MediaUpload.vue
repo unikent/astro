@@ -8,7 +8,7 @@
 				@change="changeAccept"
 				placeholder="Filter files"
 			>
-				<el-option label="All" value="media" />
+				<el-option label="Any" value="media" />
 				<el-option label="Image" value="image" />
 				<el-option label="Document" value="document" />
 				<el-option label="Video" value="video" />
@@ -19,7 +19,7 @@
 			:accept="accept"
 			:multiple="multiple"
 			:on-success="onSuccess"
-			:site_id="this.$route.params.site_id"
+			:site-id="Number(this.$route.params.site_id)"
 		/>
 	</div>
 </template>
@@ -28,6 +28,8 @@
 import UploadForm from 'components/UploadForm';
 
 export default {
+
+	name: 'media-upload',
 
 	props: {
 		multiple: {
@@ -43,7 +45,7 @@ export default {
 			type: Function,
 			default: () => {}
 		},
-		site_id: Number
+		siteId: Number
 	},
 
 	components: {

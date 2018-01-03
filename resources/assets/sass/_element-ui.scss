@@ -10,6 +10,12 @@
 	font-weight: 500;
 }
 
+.el-dialog--large {
+	.el-dialog {
+		min-width: 80%;
+	}
+}
+
 .editor-nav {
 	.el-tabs__nav {
 		float: none;
@@ -78,6 +84,21 @@
 		border-color: #b7c2d4;
 	}
 
+	.el-form-item.is-success {
+		.el-input__inner,
+		.el-textarea__inner {
+			border-color: #d8dce5;
+
+			&:hover {
+				border-color: #b4bccc;
+			}
+
+			&:focus {
+				border-color: #409eff;
+			}
+		}
+	}
+
 	.el-form-item.is-error {
 		.collection-field {
 
@@ -117,9 +138,14 @@
 	box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 10px;
 }
 
+.el-table--fit {
+	table {
+		width: 100%;
+	}
+}
+
 .el-table td,
 .el-table th {
-	line-height: 50px;
 	height: auto;
 }
 
@@ -194,6 +220,25 @@
 		top: auto;
 		bottom: 0;
 		left: 10px;
+	}
+}
+
+// error cards
+.box-card.error-card {
+	background-color: #fee;
+	
+	.el-card__header {
+    	color: #fa5555;
+    	font-size: 2rem;
+
+    	.clearfix {
+    		align-items: center;
+			display: flex;
+    	}
+
+    	.error-title {
+    		padding: 0 0.5rem;
+    	}
 	}
 }
 

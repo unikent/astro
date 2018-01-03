@@ -1,5 +1,5 @@
 <template>
-<div class="site-users">
+<div class="site-users" v-if="canUserManageUsers">
 	<el-card>
 		<div slot="header" class="card__header">
 			<span class="card__header-text">
@@ -21,10 +21,12 @@
 					value-path="username"
 					key-path="id"
 					:filter-callback="filterUserList"
-					placeholder="Search for a user"
+					placeholder="Search for a user to add"
+					no-data-text="No more users to add"
+					no-match-text="No users matching your query"
 					class="add-user__multiselect"
 				>
-					<template slot="item" scope="props">
+					<template slot="item" slot-scope="props">
 						<span>{{ props.item.name }}</span>
 						<span class="add-user-multiselect__username">
 							@{{ props.item.username }}
@@ -62,13 +64,17 @@
 			</el-button>
 		</div>
 
+		<p class="add-user-note">
+			<strong>Note:</strong> Before you can add a user to this site, they need to have logged in at least once.
+		</p>
+
 		<h3>Existing users</h3>
 
 		<div class="filter-user">
 			<el-input
 				v-model="searchInput"
 				placeholder="Find users"
-				icon="search"
+				suffix-icon="el-icon-search"
 				class="filter-user__searchbox"
 			/>
 			<el-select
@@ -77,7 +83,7 @@
 				placeholder="Role"
 			>
 				<el-option
-					label="No filter"
+					label="Filter by role"
 					:value="null"
 				/>
 				<el-option-group label="Filter by role">
@@ -126,7 +132,6 @@
 						<template v-if="pagedUsers.length">
 							<tr
 								v-for="(user, index) in pagedUsers"
-								:key="user.id"
 								class="el-table__row"
 							>
 								<td>
@@ -150,8 +155,7 @@
 											v-model="user.role"
 											size="small"
 											class="u-flex-auto-left"
-											@change="(roleSlug) => changeUserRole(user.username, roleSlug)"
-											:key="user.username"
+											@change="(roleSlug) => changeUserRole(user, roleSlug)"
 										>
 											<el-option-group label="Change role">
 												<el-option v-for="role in roles"
@@ -166,7 +170,7 @@
 								<td>
 									<div class="cell">
 									<el-button
-										@click="removeUser(user.username, index)"
+										@click="removeUser(user)"
 										type="default"
 										size="small"
 									>
@@ -183,7 +187,6 @@
 						</template>
 					</tbody>
 				</table>
-				
 			</div>
 
 			<el-pagination
@@ -205,6 +208,15 @@
 		</div>
 	</el-card>
 </div>
+<div class="menu-editor" v-else v-show="showPermissionsError">
+	<el-alert
+		title="You cannot manage users for this site"
+		type="error"
+		description="You do not have permission to manage users for this site. Please contact the site owner."
+		:closable="false"
+		show-icon
+	/>
+</div>
 </template>
 
 <script>
@@ -213,8 +225,10 @@ import _ from 'lodash';
 
 import Icon from 'components/Icon';
 import CustomMultiSelect from 'components/CustomMultiSelect';
-import { notify } from 'classes/helpers';
-
+import { notify, aOrAn } from 'classes/helpers';
+import { mapGetters } from 'vuex';
+import permissions  from 'store/modules/permissions'; // this is to use canUser directly and provide our own state for the site
+import Config from 'classes/Config';
 
 export default {
 
@@ -261,6 +275,11 @@ export default {
 
 			roles: [],
 
+			showPermissionsError: false, // to prevent the alert from flashing on load
+
+			// slug of the user's current role on this site if they have one
+			currentRole: '',
+
 			currentPage: 1,
 			count: 20,
 
@@ -276,8 +295,20 @@ export default {
 
 	computed: {
 
-		searchFilter() {
-			return this.searchInput.length > 2 ? this.searchInput : null;
+		...mapGetters([
+			'getPermissions',
+			'getGlobalRole'
+		]),
+
+		canUserManageUsers() {
+
+			let siteState = {};
+
+			siteState.currentRole = this.currentRole;
+			siteState.permissions = this.getPermissions;
+			siteState.globalRole = this.getGlobalRole;
+
+			return permissions.getters.canUser(siteState)('permissions.site.assign');
 		},
 
 		filteredUsers() {
@@ -286,11 +317,11 @@ export default {
 				this.users;
 
 			return (
-				this.searchFilter !== null ?
+				this.searchInput.length > 1 ?
 					users.filter(
 						this.createFilter(
 							['name', 'username', 'email'],
-							this.searchFilter.toLowerCase()
+							this.searchInput.toLowerCase()
 						)
 					) :
 					users
@@ -324,7 +355,7 @@ export default {
 
 	methods: {
 		fetchSiteData() {
-			const fetchUserList = this.$api.get(`users`);
+			const fetchUserList = this.$api.get('users');
 			const fetchSite = this.$api.get(`sites/${this.$route.params.site_id}?include=users`);
 			const fetchRoles = this.$api.get('roles');
 
@@ -335,6 +366,19 @@ export default {
 					this.users = site.data.data.users || [];
 					this.userList = users.data.data || [];
 					this.roles = roles.data.data || [];
+
+					const currentRole = this.users.find(
+						(user) => user.username === Config.get('username')
+					);
+
+					if(currentRole) {
+						this.currentRole = currentRole.role;
+					}
+
+					// show the alert if needed
+					if (!this.canUserManageUsers) {
+						this.showPermissionsError = true;
+					}
 				}));
 		},
 
@@ -362,8 +406,7 @@ export default {
 				if(!errors) {
 					const requests = this.usersToAdd.map(username => this.$api
 						.put(
-							`sites/${this.$route.params.site_id}/users`,
-							{
+							`sites/${this.$route.params.site_id}/users`, {
 								username,
 								role: this.selectedRole
 							}
@@ -377,10 +420,10 @@ export default {
 							let lastResponse = {}, erroredUsers = [];
 
 							for (let i = 0; i < response.length; i++) {
-								if(response[i].status == 200){
+								if(response[i].status === 200) {
 									lastResponse = response[i];
 								}
-								else{
+								else {
 									erroredUsers.push(JSON.parse(response[i].config.data).username);
 								}
 							}
@@ -399,7 +442,7 @@ export default {
 							if (erroredUsers.length > 0) {
 								notify({
 									title: 'Unable to add users',
-									message: `Adding the following users were unsuccessful: ${erroredUsers.join(', ')}`,
+									message: `Adding the following users was unsuccessful: ${erroredUsers.join(', ')}`,
 									type: 'error'
 								});
 							}
@@ -409,25 +452,34 @@ export default {
 			});
 		},
 
-		removeUser(username, index) {
-			this.$api
-				.put(
-					`sites/${this.$route.params.site_id}/users`,
-					{username}
-				)
-				.then(({ data: json }) => {
-					this.users = json.data.users || [];
-
-					notify({
-						title: `User '${username}' has been successfully removed`,
-						type: 'success'
-					});
+		removeUser({ name, username }) {
+			this
+				.$confirm(`Are you sure you want to remove ${name} from this site?`, 'Warning', {
+					confirmButtonText: 'OK',
+					cancelButtonText: 'Cancel',
+					type: 'warning'
 				})
-				.catch(() => {
-					notify({
-						title: 'Unable to remove user',
-						type: 'error'
-					});
+				.then(() => {
+					this.$api
+						.put(
+							`sites/${this.$route.params.site_id}/users`,
+							{ username }
+						)
+						.then(({ data: json }) => {
+							this.users = json.data.users || [];
+
+							notify({
+								title: 'User access successfully removed',
+								message: `${name} no longer has access to this site.`,
+								type: 'success'
+							});
+						})
+						.catch(() => {
+							notify({
+								title: 'Unable to remove user',
+								type: 'error'
+							});
+						});
 				});
 		},
 
@@ -439,7 +491,7 @@ export default {
 			this.currentPage = pageNumber;
 		},
 
-		resetFilters(){
+		resetFilters() {
 			this.usersToAdd = [];
 			this.selectedRole = '';
 			this.errors = {
@@ -448,27 +500,27 @@ export default {
 			};
 		},
 
-		changeUserRole(username, roleSlug) {
+		changeUserRole({ name, username }, roleSlug) {
 			this.$api
 				.put(
-					`sites/${this.$route.params.site_id}/users`,
-					{
+					`sites/${this.$route.params.site_id}/users`, {
 						username,
 						role: roleSlug
 					}
 				)
 				.then(({ data: json }) => {
+					const roleName = this.roles.find(role => role.slug === roleSlug).name;
 					this.users = json.data.users || [];
+
 					notify({
 						title: 'Role successfully changed',
-						message: `The '${username}' user's role has been changed to
-							${this.roles.find(role => role.slug === roleSlug).name}`,
+						message: `${name} is now ${aOrAn(roleName)} ${roleName}`,
 						type: 'success'
 					});
 				})
 				.catch(() => {
 					notify({
-						title: `Unable to change user's role`,
+						title: "Unable to change user's role",
 						type: 'error'
 					});
 				});

@@ -14,7 +14,6 @@ class MediaPolicyTest extends PolicyTestCase
 
     use FileUploadTrait, FileCleanupTrait;
 
-
     /**
      * @test
 	 * @group media
@@ -40,19 +39,6 @@ class MediaPolicyTest extends PolicyTestCase
 	 * @group media
      * @group authorization
      */
-    public function index_WhenUserIsAdminAndAcoIsArrayWithPublishingGroup_IsAllowed(){
-    	return $this->markTestIncomplete();
-        $user = factory(User::class)->make([ 'role' => 'admin' ]);
-        $pg = factory(PublishingGroup::class)->create();
-
-        $this->assertPolicyAllows(new MediaPolicy, 'index', $user, [ Media::class, $pg ]);
-    }
-
-    /**
-     * @test
-	 * @group media
-     * @group authorization
-     */
     public function index_WhenUserIsAdminAndAcoIsArrayWithSite_IsAllowed(){
         $user = factory(User::class)->make([ 'role' => 'admin' ]);
         $site = factory(Site::class)->create();
@@ -65,66 +51,9 @@ class MediaPolicyTest extends PolicyTestCase
 	 * @group media
      * @group authorization
      */
-    public function index_WithPublishingGroupAndUserIsNotMember_IsDenied(){
-        $user = factory(User::class)->create([ 'role' => 'user' ]);
-
-        $this->assertPolicyDenies(new MediaPolicy, 'index', $user, [ Media::class]);
-    }
-
-    /**
-     * @test
-	 * @group media
-     * @group authorization
-     */
-    public function index_WithPublishingGroupAndUserIsMember_IsAllowed(){
-		return $this->markTestIncomplete();
-        $user = factory(User::class)->create([ 'role' => 'user' ]);
-
-        $pg = factory(PublishingGroup::class)->create();
-        $pg->users()->attach($user);
-
-        $this->assertPolicyAllows(new MediaPolicy, 'index', $user, [ Media::class, $pg ]);
-    }
-
-    /**
-     * @test
-	 * @group media
-     * @group authorization
-     */
-    public function index_WithSiteAndUserIsNotMemberOfPublishingGroup_IsDenied(){
-        $user = factory(User::class)->create([ 'role' => 'user' ]);
-        $site = factory(Site::class)->create();
-
-        $this->assertPolicyDenies(new MediaPolicy, 'index', $user, [ Media::class, $site ]);
-    }
-
-    /**
-     * @test
-	 * @group media
-     * @group authorization
-     */
-    public function index_WithSiteAndUserIsMemberOfPublishingGroup_IsAllowed(){
-		return $this->markTestIncomplete();
-        $user = factory(User::class)->create([ 'role' => 'user' ]);
-
-        $site = factory(Site::class)->create();
-        $site->publishing_group->users()->attach($user);
-
-        $this->assertPolicyAllows(new MediaPolicy, 'index', $user, [ Media::class, $site ]);
-    }
-
-
-
-    /**
-     * @test
-	 * @group media
-     * @group authorization
-     */
     public function read_IsAllowed(){
     	$this->markTestIncomplete();
     }
-
-
 
     /**
      * @test
@@ -136,21 +65,6 @@ class MediaPolicyTest extends PolicyTestCase
         $media = factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]);
 
         $this->assertPolicyAllows(new MediaPolicy, 'create', $user, [ $media ]);
-    }
-
-    /**
-     * @test
-	 * @group media
-     * @group authorization
-     */
-    public function create_WhenUserIsAdminAndAcoIsMediaAndPublishingGroup_IsAllowed(){
-		return $this->markTestIncomplete();
-        $pg = factory(PublishingGroup::class)->create();
-
-        $user = factory(User::class)->make([ 'role' => 'admin' ]);
-        $media = factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]);
-
-        $this->assertPolicyAllows(new MediaPolicy, 'create', $user, [ $media, $pg ]);
     }
 
     /**
@@ -172,98 +86,9 @@ class MediaPolicyTest extends PolicyTestCase
 	 * @group media
      * @group authorization
      */
-    public function create_WhenAcoDoesNotIncludeSiteOrPublishingGroup_IsDenied(){
-    	$user = factory(User::class)->create();
-    	$media = factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]);
-
-    	$this->assertPolicyDenies(new MediaPolicy, 'create', $user, [ $media ]);
-    }
-
-    /**
-     * @test
-	 * @group media
-     * @group authorization
-     */
-    public function create_WhenAcoIncludesPublishingGroupAndUserIsNotInPublishingGroup_IsDenied(){
-		return $this->markTestIncomplete();
-    	$pg = factory(PublishingGroup::class)->create();
-
-    	$user = factory(User::class)->create();
-
-    	$media = factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]);
-    	$media->publishing_groups()->attach($pg);
-
-    	$this->assertPolicyDenies(new MediaPolicy, 'create', $user, [ $media, $pg ]);
-    }
-
-    /**
-     * @test
-	 * @group media
-     * @group authorization
-     */
-    public function create_WhenAcoIncludesPublishingGroupAndUserIsInPublishingGroup_IsAllowed(){
-		return $this->markTestIncomplete();
-
-    	$user = factory(User::class)->create();
-    	$user->publishing_groups()->attach($pg);
-
-    	$media = factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]);
-    	$media->publishing_groups()->attach($pg);
-
-    	$this->assertPolicyAllows(new MediaPolicy, 'create', $user, [ $media, $pg ]);
-    }
-
-    /**
-     * @test
-	 * @group media
-     * @group authorization
-     */
-    public function create_WhenAcoIncludesSiteAndUserIsNotInPublishingGroup_IsDenied(){
-		return $this->markTestIncomplete();
-    	$pg = factory(PublishingGroup::class)->create();
-
-    	$user = factory(User::class)->create();
-
-    	$site = factory(Site::class)->create([ 'publishing_group_id' => $pg->getKey() ]);
-
-    	$media = factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]);
-    	$media->sites()->attach($site);
-
-    	$this->assertPolicyDenies(new MediaPolicy, 'create', $user, [ $media, $site ]);
-    }
-
-    /**
-     * @test
-	 * @group media
-     * @group authorization
-     */
-    public function create_WhenAcoIncludesSiteAndUserIsInPublishingGroup_IsAllowed(){
-		return $this->markTestIncomplete();
-    	$pg = factory(PublishingGroup::class)->create();
-
-    	$user = factory(User::class)->create();
-    	$user->publishing_groups()->attach($pg);
-
-    	$site = factory(Site::class)->create([ 'publishing_group_id' => $pg->getKey() ]);
-
-    	$media = factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]);
-    	$media->sites()->attach($site);
-
-    	$this->assertPolicyAllows(new MediaPolicy, 'create', $user, [ $media, $site ]);
-    }
-
-
-
-    /**
-     * @test
-	 * @group media
-     * @group authorization
-     */
     public function update_IsAllowed(){
     	$this->markTestIncomplete();
     }
-
-
 
     /**
      * @test
@@ -282,21 +107,6 @@ class MediaPolicyTest extends PolicyTestCase
 	 * @group media
      * @group authorization
      */
-    public function delete_WhenUserIsAdminAndAcoIsMediaAndPublishingGroup_IsAllowed(){
-		return $this->markTestIncomplete();
-        $pg = factory(PublishingGroup::class)->create();
-
-        $user = factory(User::class)->make([ 'role' => 'admin' ]);
-        $media = factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]);
-
-        $this->assertPolicyAllows(new MediaPolicy, 'delete', $user, [ $media, $pg ]);
-    }
-
-    /**
-     * @test
-	 * @group media
-     * @group authorization
-     */
     public function delete_WhenUserIsAdminAndAcoIsMediaAndSite_IsAllowed(){
         $site = factory(Site::class)->create();
 
@@ -304,92 +114,6 @@ class MediaPolicyTest extends PolicyTestCase
         $media = factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]);
 
         $this->assertPolicyAllows(new MediaPolicy, 'delete', $user, [ $media, $site ]);
-    }
-
-    /**
-     * @test
-	 * @group media
-     * @group authorization
-     */
-    public function delete_WhenAcoDoesNotIncludeSiteOrPublishingGroup_IsDenied(){
-    	$user = factory(User::class)->create();
-    	$media = factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]);
-
-    	$this->assertPolicyDenies(new MediaPolicy, 'delete', $user, [ $media ]);
-    }
-
-    /**
-     * @test
-	 * @group media
-     * @group authorization
-     */
-    public function delete_WhenAcoIncludesPublishingGroupAndUserIsNotInPublishingGroup_IsDenied(){
-		return $this->markTestIncomplete();
-    	$pg = factory(PublishingGroup::class)->create();
-
-    	$user = factory(User::class)->create();
-
-    	$media = factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]);
-    	$media->publishing_groups()->attach($pg);
-
-    	$this->assertPolicyDenies(new MediaPolicy, 'delete', $user, [ $media, $pg ]);
-    }
-
-    /**
-     * @test
-	 * @group media
-     * @group authorization
-     */
-    public function delete_WhenAcoIncludesPublishingGroupAndUserIsInPublishingGroup_IsAllowed(){
-		return $this->markTestIncomplete();
-    	$pg = factory(PublishingGroup::class)->create();
-
-    	$user = factory(User::class)->create();
-    	$user->publishing_groups()->attach($pg);
-
-    	$media = factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]);
-    	$media->publishing_groups()->attach($pg);
-
-    	$this->assertPolicyAllows(new MediaPolicy, 'delete', $user, [ $media, $pg ]);
-    }
-
-    /**
-     * @test
-	 * @group media
-     * @group authorization
-     */
-    public function delete_WhenAcoIncludesSiteAndUserIsNotInPublishingGroup_IsDenied(){
-		return $this->markTestIncomplete();
-    	$pg = factory(PublishingGroup::class)->create();
-
-    	$user = factory(User::class)->create();
-
-    	$site = factory(Site::class)->create([ 'publishing_group_id' => $pg->getKey() ]);
-
-    	$media = factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]);
-    	$media->sites()->attach($site);
-
-    	$this->assertPolicyDenies(new MediaPolicy, 'delete', $user, [ $media, $site ]);
-    }
-
-    /**
-     * @test
-	 * @group media
-     * @group authorization
-     */
-    public function delete_WhenAcoIncludesSiteAndUserIsInPublishingGroup_IsAllowed(){
-		return $this->markTestIncomplete();
-    	$pg = factory(PublishingGroup::class)->create();
-
-    	$user = factory(User::class)->create();
-    	$user->publishing_groups()->attach($pg);
-
-    	$site = factory(Site::class)->create([ 'publishing_group_id' => $pg->getKey() ]);
-
-    	$media = factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]);
-    	$media->sites()->attach($site);
-
-    	$this->assertPolicyAllows(new MediaPolicy, 'delete', $user, [ $media, $site ]);
     }
 
 }

@@ -16,11 +16,21 @@
 
 	<div
 		class="page-list__title"
-		:class="{ 'page-list__title--selected': pageData.id===this.page.id }"
+		:class="{ 'page-list__title--selected': pageData.id === this.page.id }"
 	>
 		<span class="page-list__item__drag-handle">
-			<icon v-if="!root" name="arrow" width="14" height="14" />
+			<icon v-if="!root && canUser('page.move')" name="arrow" width="14" height="14" />
 		</span>
+
+		<el-tooltip
+			v-if="statuses[page.status]"
+			:content="statuses[page.status].name"
+		>
+			<div
+				class="page-list__status"
+				:class="{[`page-list__status--${page.status}`]: true }"
+			/>
+		</el-tooltip>
 
 		<span ref="name" class="page-list__text" @click="edit">
 			{{ page.path === '/' ? 'Home page' : (page.title || page.slug) }}
@@ -33,9 +43,48 @@
 			</el-button>
 
 			<el-dropdown-menu slot="dropdown">
-				<el-dropdown-item command="openEditModal">Edit page settings</el-dropdown-item>
-				<el-dropdown-item v-show="!root" :disabled="depth > 2" command="openModal">Add subpage</el-dropdown-item>
-				<el-dropdown-item v-show="!root" command="remove" divided>Delete</el-dropdown-item>
+				<el-dropdown-item
+					command="openEditModal"
+					v-if="canUser('page.edit')"
+					:disabled="pageHasLayoutErrors"
+				>
+					Edit page settings
+				</el-dropdown-item>
+
+				<el-dropdown-item
+					v-show="!root"
+					:disabled="depth > 2 || pageHasLayoutErrors"
+					command="openModal"
+					v-if="canUser('page.add')"
+				>
+					Add subpage
+				</el-dropdown-item>
+
+				<!-- TODO: figure out nicest way of disallowing pages from being published if parent is new -->
+				<el-dropdown-item
+					command="publish"
+					v-if="canUser('page.publish')"
+					:disabled="page.status === 'published' || parentStatus === 'new' || pageHasLayoutErrors"
+				>
+					Publish
+				</el-dropdown-item>
+
+				<el-dropdown-item
+					command="unpublish"
+					v-if="canUser('page.unpublish')"
+					:disabled="page.status === 'new'"
+				>
+					Unpublish
+				</el-dropdown-item>
+
+				<el-dropdown-item
+					v-show="!root"
+					command="remove"
+					divided
+					v-if="canUser('page.delete')"
+				>
+					Delete
+				</el-dropdown-item>
 			</el-dropdown-menu>
 		</el-dropdown>
 		<!-- End page options dropdown -->
@@ -59,11 +108,13 @@
 				v-for="(child, index) in page.children"
 				:page="child"
 				:site="site"
+				:is-draggable="true"
 				:key="child.id"
 				:open-modal="openModal"
 				:open-edit-modal="openEditModal"
 				:path="`${path}.${index}`"
 				:depth="depth + 1"
+				:parent-status="page.status"
 			/>
 		</template>
 	</draggable>
@@ -79,7 +130,16 @@ import promptToSave from '../mixins/promptToSave';
 export default {
 	name: 'page-list-item',
 
-	props: ['page', 'on-add', 'flatten', 'open-modal', 'open-edit-modal', 'path', 'depth'],
+	props: [
+		'page',
+		'on-add',
+		'flatten',
+		'open-modal',
+		'open-edit-modal',
+		'path',
+		'depth',
+		'parent-status'
+	],
 
 	components: {
 		Icon,
@@ -87,6 +147,23 @@ export default {
 	},
 
 	mixins:[promptToSave],
+
+	created() {
+		this.statuses = {
+			'new': {
+				name: 'Unpublished',
+				type: 'primary'
+			},
+			'draft': {
+				name: 'Draft',
+				type: 'warning'
+			},
+			'published': {
+				name: 'Published',
+				type: 'success'
+			}
+		};
+	},
 
 	data() {
 		return {
@@ -101,8 +178,13 @@ export default {
 		}),
 
 		...mapState({
-			pageData: state => state.page.pageData
+			pageData: state => state.page.pageData,
+			layoutErrors: state => state.page.layoutErrors
 		}),
+
+		...mapGetters([
+			'canUser'
+		]),
 
 		root() {
 			return this.depth === 0;
@@ -124,6 +206,13 @@ export default {
 			},
 			// don't set directly (use vuex instead)
 			set() {}
+		},
+
+		/**
+		 * Determines if the page this list item represents is being edited and has layout errors.
+		 */
+		pageHasLayoutErrors() {
+			return this.pageData.id === this.page.id && this.layoutErrors.length !== 0;
 		}
 	},
 
@@ -131,7 +220,9 @@ export default {
 
 		...mapMutations([
 			'setLoaded',
-			'updateMenuActive'
+			'updateMenuActive',
+			'showUnpublishModal',
+			'showPublishModal'
 		]),
 
 		...mapActions({
@@ -218,6 +309,14 @@ export default {
 					id:this.page.id
 				})
 			});
+		},
+
+		publish() {
+			this.showPublishModal(this.path);
+		},
+
+		unpublish() {
+			this.showUnpublishModal(this.path);
 		},
 
 		handleCommand(command) {

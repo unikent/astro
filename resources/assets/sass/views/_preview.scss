@@ -23,7 +23,7 @@
 	border: 2px solid #03a9f4;
 	position: absolute;
 	transition: border-color .3s ease-out, opacity .3s ease-out;
-	border-radius: 3px;
+	border-radius: 0;
 	pointer-events: none;
 }
 
@@ -42,10 +42,8 @@
 }
 
 .block-overlay__options,
-.block-overlay__move,
-.block-overlay__delete {
+.block-overlay__move {
 	transition: background-color .3s ease-out;
-	position: absolute;
 	background-color: #03a9f4;
 	color: #fff;
 	line-height: 44px;
@@ -72,15 +70,16 @@
 	pointer-events: none;
 }
 
-.block-overlay__delete {
-	bottom: 15px;
-	right: 30px;
-	cursor: pointer;
-	border-radius: 4px 0 0 0;
-	background-color: transparent;
-	line-height: 30px;
-	height: 30px;
-	width: 30px;
+.block-overlay__buttons {
+	position: absolute;
+	top: 15px;
+	right: 15px;
+	pointer-events: auto;
+}
+
+.block-overlay__delete-button {
+	margin-left: 20px;
+	pointer-events: auto;
 	fill: #c74d4d;
 }
 
@@ -123,7 +122,7 @@
 
 .block {
 	background-color: #fff;
-	border: 1px solid #e5e7ec;
+	//border: 1px solid #e5e7ec;
 	border-left-width: 0;
 	border-right-width: 0;
 	will-change: transform, box-shadow;
@@ -146,56 +145,56 @@
 	opacity: 0;
 }
 
+.move-up,
+.move-down {
+
+	&.is-disabled {
+		fill: #bfcbd9;
+	}
+}
+
 .add-before,
 .add-after {
-	border-radius: 4px;
-	width: 30px;
-	height: 30px;
+	border-radius: 50%;
+	width: 32px;
+	height: 32px;
 	background-color: #fff;
-	border: 1px solid #c4c4c4;
+	border: 3px solid #04a9f4;
 	position: absolute;
 	left: 50%;
 	pointer-events: auto;
-	transition: .3s border-color ease-out;
+	transition: .3s all ease-in-out;
 	text-align: center;
 
 	&:hover {
-		border-color: #20a0ff;
 		cursor: pointer;
-		transition: .3s border-color ease-out, transform .2s ease-out;
+	}
+
+	svg {
+		transform: scale(1);
+		fill: #04a9f4;
+		stroke: #04a9f4;
+		stroke-width: 1px;
 	}
 }
 
 .add-before {
 	top: 0;
-	transform: translate(-50%, -50%) translateY(-4px);
+	transform: translate(-50%, -50%) translateY(-2px);
 
 	&:hover {
-		transform: translate(-50%, -50%) translateY(-4px) scale(1.2);
+		transform: translate(-50%, -50%) translateY(-2px) scale(1.1);
+		svg {
+			transform: scale(1);
+		}
 	}
 }
 
 .add-after {
 	bottom: 0;
-	transform: translate(-50%, 50%) translateY(4px);
+	transform: translate(-50%, 50%) translateY(2px);
 
 	&:hover {
-		transform: translate(-50%, 50%) translateY(4px) scale(1.2);
-	}
-}
-
-.add-before--first {
-	transform: translate(-50%, 0);
-
-	&:hover {
-		transform: translate(-50%, 0) scale(1.2);
-	}
-}
-
-.add-after--last {
-	transform: translate(-50%, 0);
-
-	&:hover {
-		transform: translate(-50%, 0) scale(1.2);
+		transform: translate(-50%, 50%) translateY(2px) scale(1.1);
 	}
 }

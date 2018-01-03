@@ -15,8 +15,8 @@
 	<item-icon v-else />
 	<div class="image-grid__item-overlay"><slot></slot></div>
 	<div v-if="enableOptions" class="item-grid__edit">
-		<i class="el-icon-information item-grid__edit-button" @click="onEdit(item)"></i>
-		<el-dropdown trigger="click" menu-align="start">
+		<i class="el-icon-info item-grid__edit-button" @click="onEdit(item)"></i>
+		<el-dropdown trigger="click" placement="bottom-start">
 			<i class="el-icon-more"></i>
 			<el-dropdown-menu slot="dropdown">
 				<el-dropdown-item>

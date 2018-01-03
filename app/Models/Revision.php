@@ -35,6 +35,7 @@ class Revision extends Model
 		'layout_name',
 		'layout_version',
 		'revision_set_id',
+		'options',
 		'bake',
 		'valid'
 	];
@@ -70,6 +71,7 @@ class Revision extends Model
 	public function setPublished()
 	{
 		$this->published_at = $this->published_at ? $this->published_at : Carbon::now();
+		$this->save();
 	}
 
 	/**

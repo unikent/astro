@@ -1,17 +1,18 @@
 import api from 'plugins/http/api';
+import { debug } from 'classes/helpers';
 
 /**
  * Simple interface for interacting with user roles and permissions
  * @namespace state/permissions
  *
  * @property {Array}	permissions		Array of objects of permissions, with the following format...
-	 * @property {object} 
+	 * @property {object}
 	 * @property {string}	name 	the name of the permission, ie. 'Create Subsites'
 	 * @property {Array}	roles	list of role slugs which have this permission ie. ['site.ower','site.editor' etc etc]
 	 * @property {string}	slug	slug of the name of the permssion, ie. 'subsite.create'
- 
+
  * @property {string}	currentRole		slug of the users' role within the site ie. 'site.ower' - set to empty string if they have no role
- * @property {string}	globalRole		slug of the users' gloabl role within the syste ie. 'admin' or 'user' - set to empty string if they have no role
+ * @property {string}	globalRole		slug of the users' global role within the syste ie. 'admin' or 'user' - set to empty string if they have no role
  */
 
 const state = {
@@ -21,26 +22,30 @@ const state = {
 };
 
 const getters = {
-	getCurrentRole(state, getters) {
+	getCurrentRole(state) {
 		return state.currentSiteRole;
 	},
 
-	getPermissions(state, getters) {
+	getPermissions(state) {
 		return state.permissions;
+	},
+
+	getGlobalRole(state) {
+		return state.globalRole;
 	},
 
 	/**
 	 * can the user perform the requested action
 	 * if the user is a global admin then let them do anything
-	 * 
+	 *
 	 * @param {object} state - the vuex state
 	 * @param {string} the permission to check i.e. subsite.edit, subsite.create
 	 * @returns {bool} true or false
 	 */
-	canUser: (state, getters) => (permissionSlug) => {
+	canUser: (state) => (permissionSlug) => {
 
 		let permitted = false;
-		
+
 		// if the user has the global role of admin then then they can do anything
 		if (state.globalRole === 'admin') {
 			return true;
@@ -49,13 +54,13 @@ const getters = {
 			if (value.slug == this.permissionSlug) {
 				return true;
 			}
-		}, {permissionSlug});
-			
+		}, { permissionSlug });
+
 		if (matchedRole) {
 			permitted = matchedRole.roles.includes(state.currentRole);
 		}
-		
-		return permitted;   
+
+		return permitted;
 	}
 };
 
@@ -64,10 +69,10 @@ const actions = {
 	/**
 	 * gets list of roles from the api can calls mutation to store this in the state
 	 * called from TopBar.vue->mounted
-	 * 
+	 *
 	 * @param {object} state - the vuex state
 	 */
-	loadPermissions({commit, state}) {		
+	loadPermissions({ commit }) {
 		api
 			.get('permissions?include=roles')
 			.then((response) => {
@@ -79,41 +84,45 @@ const actions = {
 	/**
 	 * gets list of a user's roles from the api can calls mutation to store this in the state
 	 * called from Editor.vue->created
-	 * 
+	 *
 	 * @param {object} state - the vuex state
 	 * @param {object}	payload
-	 * @param {int}		payload.site_id  - the id of the current site
+	 * @param {int}		payload.siteId  - the id of the current site
 	 * @param {string}	payload.username -  the name of the user
 	 */
-	loadSiteRole({commit, state}, payload) {
-		api
-			.get(`sites/${payload.site_id}?include=users`)
-			.then(({data}) => {
+	loadSiteRole({ commit, state }, payload) {
+		return api
+			.get(`sites/${payload.siteId}?include=users`)
+			.then(({ data }) => {
 				const userList = data.data.users;
 				if (userList) {
 					const currentUser = userList.find((element) => element.username === payload.username);
 					if (currentUser) {
 						commit('setCurrentRole', currentUser.role);
-					} else {
+					}
+					else {
 						commit('setCurrentRole', '');
 					}
 				}
 				else {
 					commit('setCurrentRole', '');
 				}
+			})
+			.catch(error => {
+				debug(`[Error loading site roles] ${error}`);
 			});
 	},
 
 	/**
-	 * gets list of the logged in user's gloabl role 
+	 * gets list of the logged in user's global role
 	 * called from TopBar.vue->mounted
-	 * 
-	 * @param {string} username - the name of the user 
+	 *
+	 * @param {string} username - the name of the user
 	 */
-	loadGlobalRole({commit, state}, username) {	
+	loadGlobalRole({ commit, state }, username) {
 		api
 			.get(`users/${username}`)
-			.then(({data}) => {
+			.then(({ data }) => {
 				commit('setGlobalRole', data.data.global_role);
 			})
 			.catch(()=> {
@@ -127,8 +136,8 @@ const mutations = {
 
 	/**
 	 * Used to initially set the permissions the editor understands
-	 * 
-	 * @param {object} vuex state 
+	 *
+	 * @param {object} vuex state
 	 * @param {object} permissions - the set of permissions as received from the API
 	 */
 	setPermissions(state, permissions) {
@@ -137,9 +146,9 @@ const mutations = {
 
 	/**
 	 * sets the current role for the site
-	 * 
+	 *
 	 * @param {object} state - the vuex state
-	 * @param {string} currentRole 
+	 * @param {string} currentRole
 	 */
 	setCurrentRole(state, currentRole) {
 		state.currentRole = currentRole;
@@ -147,12 +156,12 @@ const mutations = {
 
 	/**
 	 * sets the user's global role
-	 * 
+	 *
 	 * @param {object} state - the vuex state
-	 * @param {string} gloablRole 
+	 * @param {string} globalRole
 	 */
-	setGlobalRole(state, gloablRole) {
-		state.globalRole = gloablRole;
+	setGlobalRole(state, globalRole) {
+		state.globalRole = globalRole;
 	}
 };
 

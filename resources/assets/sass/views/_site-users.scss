@@ -1,7 +1,4 @@
 .site-users {
-	background-color: #f5f7fa;
-	min-height: calc(100vh - 65px);
-	padding: 20px;
 
 	&__user--empty {
 		display: flex;
@@ -18,8 +15,9 @@
 .add-user {
 	display: flex;
 	padding: 10px;
-	margin-bottom: 40px;
+	margin-bottom: 10px;
 	background-color: #f7f9fb;
+	border-radius: 4px;
 
 	&__select {
 		width: 70%;
@@ -40,8 +38,13 @@
 	}
 
 	&__add-button {
-		height: 36px;
+		height: 40px;
 	}
+}
+
+.add-user-note{
+	margin-bottom: 40px;
+	font-size: 0.8rem;
 }
 
 .filter-user {
@@ -53,6 +56,6 @@
 	}
 
 	&__select {
-		width: 130px;
+		width: 160px;
 	}
 }

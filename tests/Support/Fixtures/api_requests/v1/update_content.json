@@ -1,0 +1,41 @@
+{
+	"blocks": {
+		"test-region-v1": [
+			{
+				"name": "test-section",
+				"blocks": [
+					{
+						"definition_name": "test-block",
+						"definition_version": 1,
+						"id": "abe60f34-22a3-44df-b536-477sdfbcd29d3",
+						"fields": {
+							"content": "Some block content",
+							"title_of_widget": "A widget title",
+							"number_of_widgets": 20
+						}
+					},
+					{
+						"definition_name": "test-block",
+						"definition_version": 1,
+						"id": "abe60f34-22a3-44df-b536-477sdfsdd29d3",
+						"fields": {
+							"content": "Some block content",
+							"title_of_widget": "A widget title",
+							"number_of_widgets": 10
+						}
+					},
+					{
+						"definition_name": "test-block",
+						"definition_version": 1,
+						"id": "abe60f34-22a3-44df-b536-4776fdxggdsd3",
+						"fields": {
+							"content": "Some block content",
+							"title_of_widget": "A widget title",
+							"number_of_widgets": 50
+						}
+					}
+				]
+			}
+		]
+	}
+}

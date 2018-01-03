@@ -45,7 +45,7 @@ class Block extends Model
 	 */
 	public function loadDefinition()
 	{
-		$file = BlockDefinition::locateDefinition($this->definition_name, $this->definition_version);
+		$file = BlockDefinition::locateDefinition(BlockDefinition::idFromNameAndVersion($this->definition_name, $this->definition_version));
 		$definition = BlockDefinition::fromDefinitionFile($file);
 
 		$this->definition = $definition;

@@ -24,19 +24,53 @@
 </template>
 
 <script>
-import _ from 'lodash';
 import blocks from 'cms-prototype-blocks';
 import { mapState, mapGetters, mapMutations } from 'vuex';
 import imagesLoaded from 'imagesloaded';
-
-/* global document */
+import { disableForms } from 'classes/helpers';
 
 export default {
 
 	name: 'block',
 
-	props: ['index', 'region', 'type', 'blockData'],
+	props: {
 
+		// The index of the block in its section
+		index: {
+			type: Number,
+			required: true
+		},
+
+		// The name of the region containing the block
+		region: {
+			type: String,
+			required: true
+		},
+
+		// The index in its region of the section containing the block
+		section: {
+			type: Number,
+			required: true
+		},
+
+		// The type of the block
+		type: {
+			type: String
+		},
+
+		// The block data, including fields
+		blockData: {
+			type: Object,
+			required: true
+		},
+
+		// The name of the section containing the block
+		sectionName: {
+			type: String,
+			required: true
+		}
+
+	},
 	data() {
 
 		let startValues = {
@@ -67,24 +101,19 @@ export default {
 	computed: {
 
 		...mapState({
-			currentRegion: state => state.page.currentRegion,
-			currentBlockIndex: state => state.definition.currentBlockIndex,
-			draggingBlocks: state => state.page.dragging,
-			allBlockMeta: state => state.page.blockMeta.blocks,
 			activeMenuItem: state => state.menu.active
 		}),
 
 		...mapGetters([
-			'getBlockMeta',
-			'scaleUp'
+			'getBlockMeta'
 		]),
 
 		stylesOuter() {
 			return {
-				transform: !this.draggingBlocks && this.offset === 0 ?
+				transform: this.offset === 0 ?
 					'' : `translate3d(0, ${ this.offset + this.current.y }px, 0)`,
 				zIndex: this.current.z,
-				transition: this.current.y === 0 && this.draggingBlocks ? this.current.transition : 'none',
+				transition: 'none',
 				pointerEvents: this.current.pointer
 			}
 		},
@@ -93,35 +122,17 @@ export default {
 			// TODO: animate opacity, not box-shadow, for buttery smooth animation
 			return {
 				transform: `scale(${this.current.scale})`,
-				boxShadow: `rgba(0, 0, 0, 0.2) 0px ${this.current.shadow * this.scaleUp()}px ${this.current.shadow * this.scaleUp() * 2}px 0px`,
+				boxShadow: `rgba(0, 0, 0, 0.2) 0px ${this.current.shadow}px ${this.current.shadow * 2}px 0px`,
 				transition: this.current.transition
 			}
 		},
 
-		isDragging() {
-			return this.getBlockMeta(this.index, this.region, 'dragging');
-		},
-
-		blockMeta() {
-			return this.getBlockMeta(this.index, this.region);
-		},
-
-		blockSizes() {
-			return this.allBlockMeta[this.region].map(block => block.size);
-		},
-
 		offset() {
-			return this.blockMeta.offset;
+			return 0;
 		},
 
 		blockIdentifier() {
 			return 'block_' + this.index;
-		}
-	},
-
-	watch: {
-		isDragging(dragging) {
-			dragging ? this.startDrag() : this.endDrag();
 		}
 	},
 
@@ -132,15 +143,15 @@ export default {
 			this.updateBlockMeta({
 				index: this.index,
 				region: this.region,
+				section: this.section,
 				type: 'size',
 				value: this.size.height
 			});
 		});
+
+		disableForms(this.$el);
 	},
 
-	beforeDestroy() {
-		document.removeEventListener('mousemove', this.onDrag);
-	},
 
 	methods: {
 		...mapMutations([
@@ -148,19 +159,16 @@ export default {
 			'setBlock',
 			'collapseSidebar',
 			'revealSidebar',
-			'updateMenuActive'
+			'updateMenuActive',
+			'changeBlock'
 		]),
 
 		editBlock() {
-			// set the block in the sidebar if the user clicks on a different block (including one with the same index but in a different region)
-			if(this.currentBlockIndex !== this.index || this.currentRegion !== this.region) {
-				this.collapseSidebar();
-				this.setBlock({ index: this.index, type: this.type });
-			}
-			// make sure we get to see the block menu if we're currently seeing the pages menu and a user clicks on any block
-			if(this.activeMenuItem!=='blocks') {
-				this.updateMenuActive('blocks');
-			}
+			this.$store.dispatch('changeBlock', {
+				regionName: this.region,
+				sectionName: this.sectionName,
+				blockIndex: this.index
+			});
 		},
 
 		showOverlay() {
@@ -179,150 +187,6 @@ export default {
 			) {
 				this.$bus.$emit('block:hideOverlay', this);
 			}
-		},
-
-		addTransition(dragstart = false) {
-			this.current.transition = `
-				${dragstart ? '.1s': ''} box-shadow 0.3s ease-out,
-				${dragstart ? '.1s': ''} transform 0.3s ease-out
-			`;
-
-			const onEnd = () => {
-				this.current.transition = this.start.transition;
-				this.$el.removeEventListener('transitionend', onEnd);
-
-				if(!dragstart) {
-					this.current.z = this.start.z;
-				}
-			};
-
-			this.$el.addEventListener('transitionend', onEnd);
-		},
-
-		updateY(e) {
-			const offset = e.pageY * this.scaleUp();
-
-			this.mouseY = offset;
-			this.current.y = offset - (this.size.height / 2) - this.start.y;
-		},
-
-		startDrag() {
-			this.addTransition(true);
-
-			this.start.y = this.$el.offsetTop;
-			this.size = this.$el.getBoundingClientRect();
-
-			this.updateBlockMeta({
-				index: this.index,
-				region: this.region,
-				type: 'size',
-				value: this.size.height
-			});
-
-			this.current = {
-				...this.current,
-				y: 0,
-				z: 20,
-				scale: 1.05,
-				pointer: 'none',
-				shadow: 10
-			};
-
-			let top = 0;
-			this.centerPoints = [];
-			this.lastOver = this.index;
-			this.sizes = [...this.blockSizes];
-
-			for(var i = 0; i < this.sizes.length; i++) {
-				this.centerPoints[i] = parseFloat((top + this.sizes[i] / 2).toFixed(3));
-				top += this.sizes[i];
-			}
-
-			document.addEventListener('mousemove', this.onDrag);
-			document.addEventListener('mouseup', this.stopDrag);
-		},
-
-		onDrag(e) {
-			if(this.isDragging) {
-				this.updateY(e);
-
-				let currentIndex = 0;
-
-				for(var c = 0; c < this.centerPoints.length; c++) {
-					if(this.mouseY > this.centerPoints[c]) {
-						currentIndex = c;
-					}
-				}
-
-				// if we're moving the block backwards and we're beyond the first element
-				if(currentIndex < this.lastOver && this.mouseY > this.centerPoints[0]) {
-					currentIndex++;
-				}
-
-				if(this.lastOver !== currentIndex && currentIndex < this.centerPoints.length) {
-					this.onDragOver(this.index, currentIndex)
-				}
-			}
-		},
-
-		onDragOver(from, to) {
-			const size = this.sizes.splice(this.lastOver, 1);
-			this.sizes.splice(to, 0, size[0]);
-
-			let top = 0;
-
-			this.centerPoints = [];
-
-			for(var i = 0; i < this.sizes.length; i++) {
-				this.centerPoints[i] = parseFloat((top + this.sizes[i] / 2).toFixed(3));
-
-				if(i === to) {
-					this.offsetY = top - this.start.y;
-				}
-
-				top += this.sizes[i];
-
-				let offset = 0;
-
-				const size = this.getBlockMeta(from, this.region).size;
-
-				if(i > from && i <= to) {
-					offset = -size;
-				}
-				else if(i >= to && i < from) {
-					offset = size;
-				}
-
-				this.updateBlockMeta({
-					type: 'offset',
-					region: this.region,
-					index: i,
-					value: offset
-				});
-			}
-
-			this.lastOver = to;
-			this.$bus.$emit('block:move', { from, to });
-		},
-
-		stopDrag() {
-			document.removeEventListener('mousemove', this.onDrag);
-			document.removeEventListener('mouseup', this.stopDrag);
-
-			this.addTransition();
-
-			this.current = {
-				..._.cloneDeep(this.start),
-				y: this.offsetY
-			};
-
-			this.offsetY = 0;
-			this.start.y = 0;
-			this.prevOver = null;
-		},
-
-		endDrag() {
-			this.current.y = 0;
 		}
 	}
 };

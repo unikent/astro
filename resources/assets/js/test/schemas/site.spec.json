@@ -1,0 +1,32 @@
+{
+	"$schema": "http://json-schema.org/draft-06/schema#",
+	"type": "object",
+	"properties": {
+		"name": { "type": "string" },
+		"label": { "type": "string" },
+		"version": { "type": "integer", "default": 1 },
+		"availableLayouts": { "type": "array", "items": { "$ref": "#/definitions/layoutName" } },
+		"defaultPages": { "$ref": "#/definitions/page" }
+	},
+	"required": ["name", "label", "version", "defaultPages" ],
+	"definitions": {
+		"layoutName": {
+			"type": "string",
+			"pattern": "^[a-z]+(?:-+[a-z]+)*-v\\d+$"
+		},
+		"page": {
+			"type": "object",
+			"properties": {
+				"slug": { "$ref": "#/definitions/slug" },
+				"title": { "type": "string" },
+				"layout": { "$ref": "#/definitions/layoutName" },
+				"children": { "type": "array", "items": { "$ref": "#/definitions/page" } }
+			},
+			"required": ["slug", "title", "layout"]
+		},
+		"slug": {
+			"type": "string",
+			"pattern": "^[a-z0-9A-Z-]*$"
+		}
+	}
+}

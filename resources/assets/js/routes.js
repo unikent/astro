@@ -4,7 +4,8 @@ import Admin from './views/Admin';
 
 import Dashboard from './views/Dashboard';
 import SiteList from './views/SiteList';
-import Settings from './views/Settings'
+import Media from './views/Media';
+import Settings from './views/Settings';
 
 import Editor from './views/Editor';
 import MenuEditor from './views/MenuEditor';
@@ -16,25 +17,37 @@ import Config from './classes/Config';
 const routes = [
 	{
 		path: '/',
-		component: Admin,
-		redirect: '/home',
-		children: [
-			{
-				path: 'home',
-				component: Dashboard
-			},
-			{
-				path: 'sites',
-				component: SiteList
-			},
-			{
-				path: 'settings',
-				component: Settings
-			}
-		]
+		component: SiteList,
+		name: 'site-list'
 	},
 	{
 		path: '/site/:site_id',
+		component: Admin,
+		props: true,
+		children: [
+			{
+				path: '',
+				component: Dashboard
+			},
+			{
+				path: 'menu',
+				component: MenuEditor,
+				name: 'menu-editor'
+			},
+			{
+				path: 'media',
+				component: Media,
+				name: 'media-manager'
+			},
+			{
+				path: 'users',
+				component: SiteUsers,
+				name: 'site-users'
+			},
+		]
+	},
+	{
+		path: '/site/:site_id/page',
 		component: Editor,
 		name: 'site'
 	},
@@ -44,19 +57,14 @@ const routes = [
 		name: 'page'
 	},
 	{
-		path: '/site/:site_id/menu',
-		component: MenuEditor,
-		name: 'menu-editor'
-	},
-	{
-		path: '/site/:site_id/users',
-		component: SiteUsers,
-		name: 'site-users'
-	},
-	{
 		path: '/preview/:page_id',
 		component: Preview,
 		name: 'preview'
+	},
+	{
+		path: '/user/:user_id/settings',
+		component: Settings,
+		name: 'settings'
 	},
 	{
 		path: '*',

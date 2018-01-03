@@ -1,6 +1,8 @@
 import { Line, mixins } from 'vue-chartjs';
 
-export default Line.extend({
+export default {
+
+	extends: Line,
 	mixins: [mixins.reactiveProp],
 
 	mounted() {
@@ -36,4 +38,4 @@ export default Line.extend({
 			}
 		);
 	}
-});
+};

@@ -1,5 +1,5 @@
 <template>
-<el-dialog title="Details" v-model="visible" :size="media.type === 'image' ? size : 'small'">
+<el-dialog title="Details" :visible.sync="visible" :class="{ 'el-dialog--large': media.type === 'image' }">
 	<div v-if="media" class="columns">
 		<div v-if="media.type === 'image'" class="column">
 			<div class="preview-dialog__image-outer">
@@ -113,7 +113,7 @@ export default {
 
 		media: {
 			get() {
-				return { ...this.mediaItem, colours: this.colourPalette};
+				return { ...this.mediaItem, colours: this.colourPalette };
 			},
 			set() {}
 		}

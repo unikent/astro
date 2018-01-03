@@ -11,7 +11,7 @@ $factory->define(Revision::class, function(Generator $faker){
             return factory(RevisionSet::class)->create()->getKey();
         },
         'title' => $faker->title,
-        'layout_name' => 'kent-homepage',
+        'layout_name' => 'test-layout',
         'layout_version' => 1,
         'blocks' => [],
         'options' => []

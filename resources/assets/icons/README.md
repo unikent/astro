@@ -3,7 +3,7 @@ These are themify icons (github.com/lykmapipo/themify-icons) which, sadly, don't
 Changes by github.com/theninja
 
 Added:
-undo, redo, bold, italic, table
+undo, redo, bold, italic, table, site
 
 Modified:
 eye

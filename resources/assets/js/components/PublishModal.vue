@@ -18,26 +18,27 @@ An element loading spinner is shown after the user hits 'Publish'.
 <template>
 <el-dialog
 	title="Publish"
-	v-model="publishModalVisible"
+	:visible.sync="publishModalVisible"
 	:modal-append-to-body="true"
 	v-loading.fullscreen.lock="loading"
 	element-loading-text="Publishing your page..."
 	class="publish-modal"
-	:before-close="handleClose"
+	@open="resetOptions"
 	:close-on-press-escape="false"
 	:close-on-click-modal="false"
+	v-if="getSelectedPage"
 >
-	<div :style="published===true || error!=='' ? 'display:none;': 'display:block;'">
-		<p>You're about to publish the page <strong>{{ pageTitle }}</strong></p>
+	<div v-show="!published && error.messages.length === 0">
+		<p>You're about to publish the page <strong>{{ getSelectedPage.title }}</strong></p>
 		<p>It will be published to the URL <el-tag type="gray">{{ renderedURL }}</el-tag></p>
 		<div class="publish-modal__buttons">
 			<span slot="footer" class="dialog-footer">
-				<el-button @click="cancelPublish">Cancel</el-button>
+				<el-button @click="hidePublishModal">Cancel</el-button>
 				<el-button type="danger" @click="publishPage">Publish now</el-button>
 			</span>
 		</div>
 	</div>
-	<div :style="published===true ? 'display:block;': 'display:none;'">
+	<div v-show="published">
 		<el-alert
 			title="Your page was published"
 			type="success"
@@ -45,31 +46,34 @@ An element loading spinner is shown after the user hits 'Publish'.
 			:closable=false
 			>
 		</el-alert>
-		<div class="publish-modal__message">View your new page now at <a :href="renderedURL" target="_blank">{{ renderedURL }}</a> (opens in a new tab)</div>
+		<div class="publish-modal__message">View your new page now at <a :href="previewURL" target="_blank">{{ renderedURL }}</a> (opens in a new tab)</div>
 		<div class="publish-modal__buttons">
 			<span slot="footer" class="dialog-footer">
-				<el-button type="primary" @click="cancelPublish">Close</el-button>
+				<el-button type="primary" @click="hidePublishModal">Close</el-button>
 			</span>
 		</div>
 	</div>
-	<div :style="published===false && error!=='' ? 'display:block;': 'display:none;'">
+
+	<div v-show="!published && error.messages.length > 0">
 		<el-alert
-			title="Page not published"
+			title="Sorry we had a problem publishing this page"
 			type="error"
-			description="Sorry we had a problem publishing this page. Did you save your page before publishing? Alternatively it might be a connection problem, so try again later."
 			show-icon
 			:closable=false
 			>
+			<ul>
+				<li v-for="msg in error.messages">{{ msg }}</li>
+			</ul>
 		</el-alert>
-		<el-collapse class="publish-modal__errors">
+		<el-collapse class="publish-modal__errors" v-show="error.techDetails !== ''">
 			<el-collapse-item title="Still having problems?" name="1">
 				<p>If you're having persistent problems publishing your page, contact us and let us know the following error message:</p>
-				<el-tag type="gray">{{ error }}</el-tag>
+				<el-tag type="gray">{{ error.techDetails }}</el-tag>
 			</el-collapse-item>
 		</el-collapse>
 		<div class="publish-modal__buttons">
 			<span slot="footer" class="dialog-footer">
-				<el-button type="primary" @click="cancelPublish">Close</el-button>
+				<el-button type="primary" @click="hidePublishModal">Close</el-button>
 			</span>
 		</div>
 	</div>
@@ -77,9 +81,8 @@ An element loading spinner is shown after the user hits 'Publish'.
 </template>
 
 <script>
-import { mapState, mapMutations, mapGetters } from 'vuex';
-import Config from '../classes/Config.js';
-
+import { mapState, mapMutations, mapGetters, mapActions } from 'vuex';
+import { getPublishedPreviewURL } from 'classes/helpers';
 
 export default {
 	name: 'publish-modal',
@@ -88,7 +91,10 @@ export default {
 		return {
 			published: false,
 			loading: false,
-			error: ''
+			error: {
+				messages: [],
+				techDetails: ''
+			}
 		}
 	},
 
@@ -98,31 +104,46 @@ export default {
 		]),
 
 		...mapGetters([
-			'publishedPreviewURL',
-			'pageTitle',
-			'pagePath',
-			'pageSlug',
 			'siteDomain',
 			'sitePath'
 		]),
+
+		...mapGetters('site', [
+			'getPage'
+		]),
+
+		getPageIdOrPath() {
+			if(this.publishModal.pagePath) {
+				return { arrayPath: this.publishModal.pagePath };
+			}
+			else {
+				return { id: this.$route.params.page_id };
+			}
+		},
+
+		getSelectedPage() {
+			return this.getPage(this.getPageIdOrPath);
+		},
 
 		// basically controls show/hide of the modal
 		publishModalVisible: {
 			get() {
 				return this.publishModal.visible;
 			},
-			set(value) {
-				if(value) {
-					this.showPublishModal();
-				}
-				else {
+			set(visible) {
+				if(!visible) {
 					this.hidePublishModal();
 				}
 			}
 		},
-		// frontend URL - so the user can view their newly-published page
+
+		previewURL() {
+			return getPublishedPreviewURL(this.renderedURL);
+		},
+
+		// frontend URL - so the user can view the page's url
 		renderedURL() {
-			return this.publishedPreviewURL;
+			return this.siteDomain + this.sitePath + this.getSelectedPage.path;
 		}
 	},
 
@@ -132,51 +153,51 @@ export default {
 			'hidePublishModal'
 		]),
 
-		/**
-		publish the page
-		*/
+		...mapActions([
+			'setPageStatusGlobally'
+		]),
+
 		publishPage() {
 			// show the loading spinner first, in case of latency on publish
 			// when the publish has finished ok, hide the spinner and show the published message in the modal
 			// if there's a problem, show an error message
 			this.loading = true;
 			this.$api
-				.post('pages/' + this.$route.params.page_id + '/publish', this.page)
+				.post('pages/' + this.getSelectedPage.id + '/publish', this.page)
 				.then(() => {
+
+					this.setPageStatusGlobally({
+						...this.getPageIdOrPath,
+						status: 'published'
+					});
+
 					this.loading = false;
 					this.published = true;
-					this.error = '';
+
+					this.error.messages = [];
 				})
 				.catch((error) => {
-					if (error.config && error.response) {
-						this.error = error.config.method + ' ' + error.config.url + ' ' + error.response.status + ' (' + error.response.statusText + ')';
+					if (error.config && error.response && error.response.data && error.response.data.errors && error.response.data.errors.length > 0) {
+						error.response.data.errors.forEach(apiError => {
+							this.error.messages.push(apiError.details.id);
+						});
+						this.error.techDetails = error.config.method + ' ' + error.config.url + ' ' + error.response.status + ' (' + error.response.statusText + ')';
 					}
 					else {
-						this.error = 'Network connection problem - you may not have a reliable connection to the internet.';
+						this.error.messages.push('Network connection problem - you may not have a reliable connection to the internet.');
 					}
 					this.loading = false;
 					this.published = false;
 				});
 		},
 
-		/**
-		called when the user clicks the X icon, clicks away from the modal, or presses ESC
-		*/
-		handleClose() {
-			this.cancelPublish();
-		},
-
-		/**
-		cancel the publish modal
-		*/
-		cancelPublish() {
-			// need a bit of time to hide the modal before we turn off the published state, because the modal takes a little while to disappear
-			setTimeout(() => {
-				this.loading = false;
-				this.published = false;
-				this.error = '';
-			}, 300);
-			this.hidePublishModal();
+		resetOptions() {
+			this.loading = false;
+			this.published = false;
+			this.error = {
+				messages: [],
+				techDetails: ''
+			};
 		}
 	}
 };

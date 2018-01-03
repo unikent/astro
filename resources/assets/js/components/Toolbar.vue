@@ -1,8 +1,13 @@
 <template>
 <div class="toolbar">
 
-	<el-tooltip class="item" effect="dark" content="Switch preview mode" placement="top">
-		<el-select placeholder="view" v-model="view" class="switch-view">
+	<el-tooltip v-if="canUser('page.edit')" class="item" effect="dark" content="Switch edit mode" placement="top">
+		<el-select 
+			placeholder="view" 
+			v-model="view" 
+			class="switch-view"
+			:disabled="pageHasLayoutErrors"
+		>
 			<el-option v-for="(view, key) in views" :label="view.label" :value="key" :key="view.label">
 				<div class="view-icon">
 					<icon :name="view.icon" aria-hidden="true" width="20" height="20" />
@@ -12,22 +17,39 @@
 		</el-select>
 	</el-tooltip>
 
-	<el-button class="toolbar__button-save" type="primary" @click="savePage" v-loading.fullscreen.lock="fullscreenLoading">Save</el-button>
+	<el-button 
+		v-if="canUser('page.edit')" 
+		class="toolbar__button-save" 
+		type="primary" 
+		@click="savePage" 
+		v-loading.fullscreen.lock="fullscreenLoading"
+		:disabled="pageHasLayoutErrors"
+	>Save</el-button>
 
-	<el-button class="toolbar__button-preview" :plain="true" type="primary" @click="previewPage">Preview <icon name="newwindow" aria-hidden="true" width="14" height="14" class="ico" /></el-button>
+	<el-button 
+		v-if="canUser('page.preview')" 
+		class="toolbar__button-preview" 
+		plain 
+		@click="previewPage"
+		:disabled="pageHasLayoutErrors"
+	>Preview <icon name="newwindow" aria-hidden="true" width="14" height="14" class="ico" /></el-button>
 
-	<el-button
-		class="toolbar__button-publish"
-		v-if="invalidBlocks"
-		type="success"
-		@click="showPublishModal"
-	>Publish...</el-button>
-	<el-button
-		class="toolbar__button-publish"
-		v-else
-		type="success"
-		@click="showPublishValidationWarningModal"
-	>Publish...</el-button>
+	<template v-if="canUser('page.publish')">
+		<el-button
+			class="toolbar__button-publish"
+			v-if="invalidBlocks"
+			type="success"
+			@click="publishPage"
+			:disabled="pageHasLayoutErrors"
+		>Publish...</el-button>
+		<el-button
+			class="toolbar__button-publish"
+			v-else
+			type="success"
+			@click="showPublishValidationWarningModal"
+			:disabled="pageHasLayoutErrors"
+		>Publish...</el-button>
+	</template>
 
 </div>
 
@@ -41,7 +63,6 @@ import { mapState, mapMutations, mapActions, mapGetters } from 'vuex';
 import Icon from 'components/Icon';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { win } from 'classes/helpers';
-import Config from 'classes/Config';
 
 export default {
 	name: 'toolbar',
@@ -65,12 +86,14 @@ export default {
 
 		...mapState({
 			page: state => state.page.pageData,
-			pageLoaded: state => state.page.loaded
+			pageLoaded: state => state.page.loaded,
+			layoutErrors: state => state.page.layoutErrors
 		}),
 
 		...mapGetters([
 			'getInvalidBlocks',
-			'draftPreviewURL'
+			'draftPreviewURL',
+			'canUser'
 		]),
 
 		view: {
@@ -87,11 +110,11 @@ export default {
 		},
 
 		invalidBlocks() {
-			var invalidBlocks = false;
-			if(this.getInvalidBlocks().length === 0) {
-				invalidBlocks = true;
-			}
-			return invalidBlocks;
+			return this.getInvalidBlocks().length === 0 ? true : false;
+		},
+
+		pageHasLayoutErrors() {
+			return this.layoutErrors.length !== 0;
 		}
 	},
 
@@ -126,7 +149,8 @@ export default {
 		]),
 
 		...mapActions([
-			'handleSavePage'
+			'handleSavePage',
+			'setPageStatusGlobally'
 		]),
 
 		updateCurrentSavedState() {
@@ -145,6 +169,14 @@ export default {
 			this.handleSavePage({ notify: true })
 			.then(() => {
 				this.fullscreenLoading = false;
+
+				// we only need to update the status if it isn't "new" or "draft"
+				if(this.page.status === 'published') {
+					this.setPageStatusGlobally({
+						id: this.page.id,
+						status: 'draft'
+					});
+				}
 			});
 		},
 
@@ -154,7 +186,15 @@ export default {
 			opening the preview window */
 			this.handleSavePage()
 				.then(() => {
-					win.open(this.draftLink,'_blank');
+					win.open(this.draftLink, '_blank');
+				});
+		},
+
+		/* save page and then open publish modal */
+		publishPage() {
+			this.handleSavePage()
+				.then(() => {
+					this.showPublishModal();
 				});
 		},
 

@@ -20,7 +20,7 @@ class LayoutTest extends TestCase
 	 * @test
 	 */
 	public function locateDefinition_WhenDefinitionIsFound_ReturnsPath(){
-		$path = Layout::locateDefinition('test-layout');
+		$path = Layout::locateDefinition('test-layout-v1');
 		$this->assertEquals(base_path('tests/Support/Fixtures/definitions/layouts/test-layout/v1/definition.json'), $path);
 	}
 
@@ -35,7 +35,7 @@ class LayoutTest extends TestCase
 	 * @test
 	 */
 	public function locateDefinitionOrFail_WhenDefinitionIsFound_ReturnsPath(){
-		$path = Layout::locateDefinitionOrFail('test-layout');
+		$path = Layout::locateDefinitionOrFail('test-layout-v1');
 		$this->assertEquals(base_path('tests/Support/Fixtures/definitions/layouts/test-layout/v1/definition.json'), $path);
 	}
 
@@ -52,7 +52,7 @@ class LayoutTest extends TestCase
 	 * @test
 	 */
 	public function getRegionDefinitions_ReturnsCollection(){
-		$path = Layout::locateDefinition('test-layout');
+		$path = Layout::locateDefinition('test-layout-v1');
 		$layout = Layout::fromDefinitionFile($path);
 
 		$this->assertInstanceOf(Collection::class, $layout->getRegionDefinitions());
@@ -64,7 +64,7 @@ class LayoutTest extends TestCase
 	 * Note: the 'test-layout' fixture only supports 'test-region'
 	 */
 	public function getRegionDefinitions_WhenRegionDefinitionsAreNotLoaded_LoadsSupportedRegionDefinitionsIntoCollection(){
-		$path = Layout::locateDefinition('test-layout');
+		$path = Layout::locateDefinition('test-layout-v1');
 		$layout = Layout::fromDefinitionFile($path);
 
 		$collection = $layout->getRegionDefinitions();
@@ -78,7 +78,7 @@ class LayoutTest extends TestCase
 	 * Note: the 'test-layout' fixture only supports 'test-region'
 	 */
 	public function getRegionDefinitions_WhenRegionDefinitionsAreLoaded_DoesNotReloadRegionDefinitions(){
-		$path = Layout::locateDefinition('test-layout');
+		$path = Layout::locateDefinition('test-layout-v1');
 
 		$layout = Layout::fromDefinitionFile($path);
 		$layout->getRegionDefinitions(); 				// This should populate the Collection

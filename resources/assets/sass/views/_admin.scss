@@ -24,6 +24,7 @@ the sidebar of menu items shown on the main site page
 
 	li {
 		line-height: 0;
+		position: relative;
 	}
 
 	.menu-icon {
@@ -53,5 +54,11 @@ the sidebar of menu items shown on the main site page
 		border-right: 3px solid #03a9f4;
 		background-color: #f7f9fb;
 		color: #03a9f4;
+	}
+
+	&__external-link {
+		fill: #444;
+		position: absolute;
+		right: 20px;
 	}
 }

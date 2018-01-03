@@ -224,23 +224,20 @@ class Media extends Model
 		DB::beginTransaction();
 
 		try {
-			if(is_a($this->file, File::class)){
+			if(is_a($this->file, File::class)) {
 				$this->hash = static::hash($this->file);
 				$this->filename = $this->file->getFilename();
-
-				$this->type = static::getMediaType(
-					$this->file->getClientOriginalName()
-				);
+				$this->type = static::getMediaType($this->file);
 
 				$this->fill(static::extractMeta($this->file));
 			}
 
 			$saved = parent::save();
 
-			if(is_a($this->file, File::class)){
+			if(is_a($this->file, File::class)) {
 				$path = sprintf('%s/%d', $this->filePath, $this->id);
 
-				if(is_a($this->file, UploadedFile::class)){
+				if(is_a($this->file, UploadedFile::class)) {
 					$this->filename = $this->file->getClientOriginalName();
 					$this->file->move($path, $this->filename);
 
@@ -290,12 +287,14 @@ class Media extends Model
 	}
 
 	// TODO: refactor this into something less yucky?
-	public static function getMediaType($filename) {
-		$extension = pathinfo($filename, PATHINFO_EXTENSION);
+	public static function getMediaType(File $file) {
+		$extension = $file->guessExtension();
 
 		$types = [
 			'image' => 'jpg,jpeg,png,gif,bmp,svg' ,
-			'document' => 'pdf,doc,docx,key,ppt,pptx,pps,ppsx,odt,xls,xlsx,zip,csv'
+			'document' => 'pdf,doc,docx,key,ppt,pptx,pps,ppsx,odt,xls,xlsx,zip,csv',
+			'video' => 'mp4,m4v,mov,wmv,avi,mpg,ogv',
+			'audio' => 'mp3,m4a,ogg,wav,mpga'
 		];
 
 		$extMap = [];

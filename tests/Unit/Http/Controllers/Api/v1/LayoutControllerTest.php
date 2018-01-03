@@ -56,7 +56,7 @@ class LayoutControllerTest extends ApiControllerTestCase {
      * @group authentication
      */
     public function definition_WhenUnauthenticated_Returns403(){
-        $response = $this->action('GET', LayoutController::class . '@definition', 'test-layout');
+        $response = $this->action('GET', LayoutController::class . '@definition', 'test-layout-v1');
         $response->assertStatus(401);
     }
 
@@ -78,7 +78,7 @@ class LayoutControllerTest extends ApiControllerTestCase {
         Gate::shouldReceive('authorize')->with('read', Definition::class)->once();
 
         $this->authenticated();
-        $this->action('GET', LayoutController::class . '@definition', 'test-layout');
+        $this->action('GET', LayoutController::class . '@definition', 'test-layout-v1');
     }
 
     /**
@@ -88,7 +88,7 @@ class LayoutControllerTest extends ApiControllerTestCase {
     public function definition_WhenAuthenticatedAndUnauthorized_Returns403(){
         $this->authenticatedAndUnauthorized();
 
-        $response = $this->action('GET', LayoutController::class . '@definition', 'test-layout');
+        $response = $this->action('GET', LayoutController::class . '@definition', 'test-layout-v1');
         $response->assertStatus(403);
     }
 
@@ -98,7 +98,7 @@ class LayoutControllerTest extends ApiControllerTestCase {
     public function definition_WhenAuthorized_Returns200(){
         $this->authenticatedAndAuthorized();
 
-        $response = $this->action('GET', LayoutController::class . '@definition', 'test-layout');
+        $response = $this->action('GET', LayoutController::class . '@definition', 'test-layout-v1');
         $response->assertStatus(200);
     }
 
@@ -108,11 +108,12 @@ class LayoutControllerTest extends ApiControllerTestCase {
     public function definition_WhenAuthorizedAndFound_ReturnsJson(){
         $this->authenticatedAndAuthorized();
 
-        $response = $this->action('GET', LayoutController::class . '@definition', 'test-layout');
+        $response = $this->action('GET', LayoutController::class . '@definition', 'test-layout-v1');
 
         $json = $response->json();
         $this->assertArrayHasKey('data', $json);
         $this->assertEquals('test-layout', $json['data']['name']);
+        $this->assertEquals(1, $json['data']['version']);
     }
 
     /**
@@ -122,7 +123,7 @@ class LayoutControllerTest extends ApiControllerTestCase {
         $this->authenticatedAndAuthorized();
 
         $response = $this->action('GET', LayoutController::class . '@definition', [
-            'layout_definition' => 'test-layout',
+            'layout_definition' => 'test-layout-v1',
             'include' => 'region_definitions',
         ]);
 

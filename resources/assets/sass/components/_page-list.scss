@@ -28,6 +28,30 @@ $page-height: 38px;
 	opacity: .6;
 }
 
+.page-list__status {
+	display: block;
+	height: 12px;
+	width: 12px;
+	margin-top: 7px;
+	margin-right: 4px;
+	border-radius: 50%;
+}
+
+.page-list__status--new {
+	border: 1px solid #0b63a5;
+	background-color: rgba(64, 158, 255, .5);
+}
+
+.page-list__status--published {
+	border: 1px solid #0a5f30;
+	background-color: rgba(103, 194, 58, .5);
+}
+
+.page-list__status--draft {
+	border: 1px solid #946902;
+	background-color: rgba(235, 158, 5, .5);
+}
+
 .page-list__title {
 	background-color: #fff;
 	padding: 5px;
@@ -39,7 +63,7 @@ $page-height: 38px;
 	display: flex;
 	// when the item in the menu is the current page
 	&--selected {
-		background-color: #cfeaff;
+		background-color: #e7f4ff;
 		border: 1px solid #20A0FF;
 	}
 }

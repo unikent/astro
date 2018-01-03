@@ -5,7 +5,7 @@
 	class="tabbed-dialog"
 >
 	<el-tabs type="border-card">
-		<el-tab-pane label="Upload media">
+		<el-tab-pane v-if="canUser('image.add')" label="Upload media">
 			<media-upload
 				:multiple="false"
 				:allow-types="false"
@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex';
+import { mapState, mapMutations, mapGetters } from 'vuex';
 import PagedResults from 'components/media/PagedResults';
 import MediaUpload from 'components/MediaUpload';
 
@@ -65,8 +65,15 @@ export default {
 
 	computed: {
 		...mapState({
-			mediaPicker: state => state.media.mediaPicker
+			mediaPicker: state => state.media.mediaPicker,
+			currentBlockIndex: state => state.contenteditor.currentBlockIndex,
+			currentRegionName: state => state.contenteditor.currentRegionName
 		}),
+
+		...mapGetters([
+			'canUser',
+			'currentSectionIndex'
+		]),
 
 		visible: {
 			get() {
@@ -112,13 +119,21 @@ export default {
 		setFieldMedia(media) {
 			this.updateFieldValue({
 				name: this.fieldPath,
-				value: { ...media, type: 'image' }
+				value: { ...media, type: 'image' },
+				index: this.currentBlockIndex,
+				region: this.currentRegionName,
+				section: this.currentSectionIndex
 			});
 
 			this.updateBlockMedia({
+				region: this.currentRegionName,
+				section: this.currentSectionIndex,
+				index: this.currentBlockIndex,
 				value: {
 					...media,
+					/* eslint-disable camelcase */
 					associated_field: this.fieldPath
+					/* eslint-enable camelcase */
 				}
 			});
 
@@ -128,7 +143,7 @@ export default {
 		fetchMedia() {
 			this.$api
 				// TODO: if unmodified since
-				.get('media', {})
+				.get('media?order=id.desc', {})
 				.then(({ headers, data: json }) => {
 					this.lastUpdated = headers.date;
 					this.media = json.data;

@@ -15,6 +15,8 @@
 </template>
 
 <script>
+// TODO: revisit this, as it's a nice idea :P
+
 export default {
 	data() {
 		return {
@@ -22,15 +24,9 @@ export default {
 		};
 	},
 
-	mounted() {
-		window.fail = (fail) => {
-			this.failed = fail;
-		}
-	},
-
 	methods: {
 		handleClick() {
-			console.log('open modal');
+
 		}
 	}
 };

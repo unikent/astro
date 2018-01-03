@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\APICommands\ListSites;
 use App\Models\APICommands\PublishPage;
+use App\Models\APICommands\UnpublishPage;
 use App\Models\APICommands\UpdateContent;
 use App\Models\APICommands\DeletePage;
 use App\Models\APICommands\MovePage;
@@ -126,17 +127,17 @@ class LocalAPIClient implements APIClient
 	 * @param string $name Name for the new site.
 	 * @param string $host Hostname for the new site.
 	 * @param string $path Path for the new site.
-	 * @param array $homepage_layout layout to use for the homepage for this site. [ 'name' => '...', 'version' => '...']
+	 * @param array $site_definition - The Site template to use for this site. [ 'name' => '...', 'version' => '...']
 	 * @param array $options Other options.
 	 * @return Site|object
 	 */
-	public function createSite($name, $host, $path, $homepage_layout, $options = [])
+	public function createSite($name, $host, $path, $site_definition, $options = [])
 	{
 		return $this->execute(CreateSite::class, [
 			'name' => $name,
 			'host' => $host,
 			'path' => $path,
-			'homepage_layout' => $homepage_layout,
+			'site_definition' => $site_definition,
 			'options' => $options
 		]);
 	}
@@ -274,9 +275,11 @@ class LocalAPIClient implements APIClient
 		]);
 	}
 
-	public function unpublishPage()
+	public function unpublishPage($id)
 	{
-		throw new \LogicException('Unpublish Page not yet implemented.');
+		return $this->execute(UnpublishPage::class, [
+			'id' => $id
+		]);
 	}
 
 	public function copyPage()

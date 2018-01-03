@@ -1,0 +1,21 @@
+{
+	"label": "Test Region With Required Section",
+	"name": "test-region-with-required-section",
+	
+	"version": 1,
+
+	"sections": [
+		{
+			"name": "test-section",
+			"allowedBlocks": [
+				"test-block-v1"
+			],
+			"defaultBlocks": [
+				"test-block-v1"
+			],
+			"optional": false,
+			"min": 1,
+			"max": 5
+		}
+	]
+}

@@ -27,7 +27,7 @@
 	</table>
 </div>
 <!-- <i class="el-icon-edit item-grid__edit-button" @click="showMediaDetails = true; media = getThumbnailIndex(rowIndex, colIndex)" />
-	<el-dropdown trigger="click" menu-align="start">
+	<el-dropdown trigger="click" placement="start">
 		<i class="el-icon-more"></i>
 		<el-dropdown-menu slot="dropdown">
 			<el-dropdown-item>Refresh Thumbnails</el-dropdown-item>
