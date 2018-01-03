@@ -1,7 +1,13 @@
 .panel__header .el-alert {
 	width: 85%;
 	margin: 2rem auto;
-	background-color: #ececec;
+	border: 1px solid;
+}
+
+.panel__body {
+	.el-alert--info {
+		border: 1px solid;
+	}
 }
 
 .empty-region {
