@@ -180,6 +180,7 @@
 
 .add-before {
 	top: 0;
+	font-size: 16px;
 	transform: translate(-50%, -50%) translateY(-2px);
 
 	&:hover {
@@ -192,6 +193,7 @@
 
 .add-after {
 	bottom: 0;
+	font-size: 16px;
 	transform: translate(-50%, 50%) translateY(2px);
 
 	&:hover {
