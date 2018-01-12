@@ -112,6 +112,7 @@ import { mapGetters } from 'vuex';
 import filterableMixin from 'mixins/filterableMixin';
 import paginatableMixin from 'mixins/paginatableMixin';
 import Icon from 'components/Icon';
+import CreateSiteProfileModal from 'components/CreateSiteProfileModal';
 
 export default {
 
@@ -120,7 +121,8 @@ export default {
 	mixins: [filterableMixin, paginatableMixin],
 
 	components: {
-		Icon
+		Icon,
+		CreateSiteProfileModal
 	},
 
 	created() {
