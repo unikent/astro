@@ -20,6 +20,10 @@
 			"type": "git"
 		},
 		{
+			"url": "git@gitlab.kent.ac.uk:webdev/kent-profiles.git",
+			"type": "git"
+		},
+		{
 			"url": "git@github.com:theninja/framework.git",
 			"type": "git"
 		}
@@ -40,7 +44,8 @@
 		"rtconner/laravel-tagging": "^2.2",
 		"spatie/laravel-fractal": "^3.5",
 		"unikent/astro-renderer": "dev-develop",
-		"unikent/kentauth": "dev-laravel/5.3"
+		"unikent/kentauth": "dev-laravel/5.3",
+		"unikent/kent-profiles": "dev-master"
 	},
 	"require-dev": {
 		"fzaninotto/faker": "~1.4",

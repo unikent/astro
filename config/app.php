@@ -215,9 +215,12 @@ return [
 		App\Providers\AuthServiceProvider::class,
 		// App\Providers\BroadcastServiceProvider::class,
 		App\Providers\EventServiceProvider::class,
+
+        Unikent\KentProfiles\KentProfilesServiceProvider::class,
 		App\Providers\RouteServiceProvider::class,
 		// App\Providers\ComposerServiceProvider::class,
         Fideloper\Proxy\TrustedProxyServiceProvider::class,
+
 	],
 
 	/*
