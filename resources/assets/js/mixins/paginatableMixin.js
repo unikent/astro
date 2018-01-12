@@ -29,15 +29,15 @@ export default {
 	},
 
 	computed: {
-		paginatableItems() {
+		sortedItems() {
 			const items = this.filteredItems || this.items;
 
 			if(this.sorting.prop) {
 				return (
 					// concat is so the array isn't sorted in-place
-					this.sorting.order === 'desc' ?
-						items.concat().sort(this.sortMethod).reverse() :
-						items.concat().sort(this.sortMethod)
+					this.sorting.order === 'descending' ?
+						[...items].sort(this.sortMethod).reverse() :
+						[...items].sort(this.sortMethod)
 				);
 			}
 
@@ -51,13 +51,13 @@ export default {
 
 			return (
 				this.total < (to - from) ?
-					this.paginatableItems :
-					this.paginatableItems.slice(from, to)
+					this.sortedItems :
+					this.sortedItems.slice(from, to)
 			);
 		},
 
 		total() {
-			return this.paginatableItems.length;
+			return this.sortedItems.length;
 		}
 	},
 
@@ -71,10 +71,7 @@ export default {
 		},
 
 		handleSortChange({ column, prop, order }) {
-			const sorting = {
-				prop,
-				order: order === 'ascending' ? 'asc' : 'desc'
-			};
+			const sorting = { prop, order };
 
 			if(
 				this.sorting.prop === sorting.prop &&
