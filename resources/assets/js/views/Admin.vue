@@ -111,7 +111,7 @@ export default {
 				},
 				{
 					link: `${this.url}/profiles`,
-					icon: 'user',
+					icon: 'write',
 					title: 'Profiles'
 				}
 			];
