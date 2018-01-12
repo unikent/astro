@@ -6,6 +6,7 @@ import Dashboard from './views/Dashboard';
 import SiteList from './views/SiteList';
 import Media from './views/Media';
 import Settings from './views/Settings';
+import SiteProfiles from './views/SiteProfiles';
 
 import Editor from './views/Editor';
 import MenuEditor from './views/MenuEditor';
@@ -44,6 +45,11 @@ const routes = [
 				component: SiteUsers,
 				name: 'site-users'
 			},
+			{
+				path: 'profiles',
+				component: SiteProfiles,
+				name: 'site-profiles'
+			}
 		]
 	},
 	{
