@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Page;
+use App\Models\Site;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\Definitions\Block as BlockDefinition;
@@ -38,6 +39,10 @@ class RouteServiceProvider extends ServiceProvider
 		// only bind draft pages by id
 		Route::bind('page', function ($value) {
 			return Page::draft()->where('id', '=', $value)->firstOrFail();
+		});
+
+		Route::bind('site', function($value){
+			return Site::where('id', '=', $value)->firstOrFail();
 		});
 
 		Route::bind('block_definition', function ($value) {
