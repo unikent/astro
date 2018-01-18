@@ -1,0 +1,15 @@
+.filter-site-profiles {
+	display: flex;
+	margin-bottom: 20px;
+
+	&__searchbox {
+		width: 200px;
+	}
+}
+
+.site-profiles__published-date {
+	color: #b8adb5;
+	font-size: 12px;
+	text-transform: none;
+	margin-top: 14px;
+}
