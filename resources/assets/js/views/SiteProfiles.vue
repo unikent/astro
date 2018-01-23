@@ -6,7 +6,7 @@
 			v-if="canUser('profile.create')"
 			type="primary"
 			class="manage-table__add-button"
-			@click="displayProfileCreationModal = true"
+			@click="showCreateProfileModal"
 		>
 			Add Profile
 		</el-button>
@@ -44,7 +44,7 @@
 							style="display: inline-block;"
 						/>
 					</el-tooltip>
-					{{ scope.row.first_name }} {{ scope.row.second_name }}
+					{{ scope.row.title }} {{ scope.row.first_name }} {{ scope.row.second_name }}
 				</div>
 				<div class="site-profiles__published-date">
 					Last published {{ scope.row.created_at }} by ?
@@ -202,6 +202,10 @@ export default {
 			b = b.categories[0].name;
 
 			return a === b ? 0 : (a < b ? -1 : 1);
+		},
+		
+		showCreateProfileModal() {
+			this.$bus.$emit('site-profile:showCreateProfileModal');	
 		}
 	}
 
