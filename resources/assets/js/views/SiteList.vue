@@ -84,6 +84,11 @@
 									Users
 								</el-button>
 							</router-link>
+							<router-link :to="`/site/${site.id}/profiles`" v-if="canUserOnSite('profiles.create', site.currentRole)">
+								<el-button type="default" size="small">
+									Profiles
+								</el-button>
+							</router-link>
 							<!-- <el-button @click="askRemove(site.id)" type="default" size="small" v-if="canUserOnSite('site.delete', site.currentRole)">
 								<icon name="delete" width="14" height="14" />
 							</el-button> -->
