@@ -43,10 +43,18 @@ export default {
 
 	methods: {
 		createFilter(searchKeys, searchTerm) {
-			return user => searchKeys.some(
+			const searchTerms = searchTerm.toLowerCase().split(' ');
+
+			return item => searchKeys.some(
 				key => {
-					const value = _.get(user, key);
-					return value && value.toLowerCase().indexOf(searchTerm) !== -1;
+					const value = _.get(item, key);
+
+					return value && searchTerms.some(
+						term => (
+							term.length > 1 &&
+							value.toLowerCase().indexOf(term) !== -1
+						)
+					)
 				}
 			);
 		}
