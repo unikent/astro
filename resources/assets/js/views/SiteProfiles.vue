@@ -6,6 +6,7 @@
 			v-if="canUser('profile.create')"
 			type="primary"
 			class="manage-table__add-button"
+			@click="displayProfileCreationModal = true"
 		>
 			Add Profile
 		</el-button>
@@ -22,22 +23,35 @@
 
 	<el-table
 		:data="pagedItems"
-		:default-sort="{ prop: 'name', order: 'ascending' }"
+		:default-sort="{ prop: 'second_name', order: 'ascending' }"
 		@sort-change="handleSortChange"
 		border
 	>
 		<el-table-column
-			prop="name"
+			prop="second_name"
 			label="Name"
 			sortable="custom"
 		>
 			<template slot-scope="scope">
-				<div>{{ scope.row.name }}</div>
+				<div>
+					<el-tooltip
+						v-if="statuses[scope.row.status]"
+						:content="statuses[scope.row.status].name"
+					>
+						<div
+							class="site-profiles__status"
+							:class="{[`site-profiles__status--${scope.row.status}`]: true }"
+							style="display: inline-block;"
+						/>
+					</el-tooltip>
+					{{ scope.row.first_name }} {{ scope.row.second_name }}
+				</div>
 				<div class="site-profiles__published-date">
-					Last published {{ scope.row.test_date }} by {{ scope.row.job_title }}
+					Last published {{ scope.row.created_at }} by ?
 				</div>
 			</template>
 		</el-table-column>
+
 		<el-table-column
 			prop="categories"
 			label="Categories"
@@ -45,9 +59,10 @@
 			:sort-method="categorySort"
 		>
 			<template slot-scope="scope">
-				{{ scope.row.categories.join(', ') }}
+				{{ scope.row.categories.map(cat => cat.name).join(', ') || '–' }}
 			</template>
 		</el-table-column>
+
 		<el-table-column
 			label="Action"
 			width="80"
@@ -63,6 +78,7 @@
 						<el-dropdown-item
 							command="publish"
 							v-if="canUser('profile.publish')"
+							:disabled="scope.row.status === 'published'"
 						>
 							Publish
 						</el-dropdown-item>
@@ -70,6 +86,7 @@
 						<el-dropdown-item
 							command="unpublish"
 							v-if="canUser('profile.unpublish')"
+							:disabled="scope.row.status === 'new'"
 						>
 							Unpublish
 						</el-dropdown-item>
@@ -126,13 +143,29 @@ export default {
 	},
 
 	created() {
+		this.statuses = {
+			'new': {
+				name: 'Unpublished',
+				type: 'primary'
+			},
+			'draft': {
+				name: 'Draft',
+				type: 'warning'
+			},
+			'published': {
+				name: 'Published',
+				type: 'success'
+			}
+		};
+
 		this.fetchProfiles();
 	},
 
 	data() {
 		return {
-			filters: ['name', 'job_title', 'email', 'categories.0'],
-			profiles: []
+			filters: ['first_name', 'second_name', 'job_titles', 'email', 'categories.0.name'],
+			profiles: [],
+			displayProfileCreationModal: false
 		};
 	},
 
@@ -142,14 +175,17 @@ export default {
 		]),
 
 		items() {
-			return this.profiles;
-		}
+			return this.profiles.map(profile => (profile['status'] = 'published') && profile.draft[0]);
+		},
 	},
 
 	methods: {
 		fetchProfiles() {
-			// TODO: Fetch data from API here
-			// this.profiles = [];
+			this.$api
+				.get('sites/1/profiles?include=draft,categories,socialmedia', {})
+				.then(({ data: json }) => {
+					this.profiles = json.data;
+				});
 		},
 
 		handleCommand() {},
@@ -162,8 +198,8 @@ export default {
 				return -1;
 			}
 
-			a = a.categories[0];
-			b = b.categories[0];
+			a = a.categories[0].name;
+			b = b.categories[0].name;
 
 			return a === b ? 0 : (a < b ? -1 : 1);
 		}
