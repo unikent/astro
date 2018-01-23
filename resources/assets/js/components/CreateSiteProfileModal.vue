@@ -1,7 +1,7 @@
 <template>
 <el-dialog
-	title="Create Profile"
-	:visible="false"
+	title="Create Site Profile"
+	:visible.sync="visible"
 	:modal-append-to-body="false"
 	class="el-dialog--large"
 >
@@ -20,7 +20,13 @@
 <script>
 export default {
 
-	name: 'create-page-modal',
+	name: 'create-site-profile-modal',
+
+	created() {
+		this.$bus.$on('site-profile:showCreateProfileModal', () => {
+			this.visible = true;
+		}) 
+	},
 
 	data() {
 		return {
@@ -47,6 +53,7 @@ export default {
 				categories: [],
 				solical_media: []
 			},
+			visible: false,
 			schema: {
 				username: {
 					label: 'Username'
