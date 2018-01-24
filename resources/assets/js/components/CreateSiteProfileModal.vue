@@ -297,8 +297,6 @@ export default {
 				
 				if(categoryChildren) {
 					const childIds = categoryChildren.map(childCat => childCat.id);
-
-					console.log(childIds);
 			
 					this.formData.categories = this.formData.categories.filter(
 						catId => !childIds.includes(catId)
