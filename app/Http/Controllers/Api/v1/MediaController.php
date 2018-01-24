@@ -87,13 +87,14 @@ class MediaController extends ApiController
 			$media->sites()->sync($site_ids);
 
 			DB::commit();
+
+			// TODO: implement job for processing media based on content type
+			dispatch(new ProcessMedia($media));
+
 		} catch(Exception $e){
 			DB::rollBack();
 			throw $e;
 		}
-
-		// TODO: implement job for processing media based on content type
-		dispatch(new ProcessMedia($media));
 
 		return fractal($media, new MediaTransformer)->respond(201);
 	}
