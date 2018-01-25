@@ -203,9 +203,9 @@ export default {
 
 			return a === b ? 0 : (a < b ? -1 : 1);
 		},
-		
+
 		showCreateProfileModal() {
-			this.$bus.$emit('site-profile:showCreateProfileModal');	
+			this.$bus.$emit('site-profile:showCreateProfileModal');
 		}
 	}
 
