@@ -1,17 +1,26 @@
 <template>
 <el-dialog
-	title="Create Site Profile"
+	:title="`${modalType}${extraTitleText} Site Profile`"
 	:visible.sync="visible"
 	:modal-append-to-body="false"
-	class="el-dialog--large"
 >
 	<el-form :model="formData">
 		<el-form-item v-for="(value, key) in schema" :label="schema[key].label" :key="key">
 
-			<el-input v-if="schema[key].type === 'textarea'"  type="textarea" row="5" :name="key">{{ schema[key].label }}</el-input>
+			<el-input
+				v-if="schema[key].type === 'textarea'"
+				type="textarea"
+				:rows="5"
+				:name="key"
+			>
+				{{ schema[key].label }}
+			</el-input>
 
-			<div v-else-if="schema[key].type === 'categories'">
-				<br/>
+			<div v-else-if="schema[key].type === 'richtext'" style="clear: left;">
+				<rich-text v-model="formData[key]" />
+			</div>
+
+			<div v-else-if="schema[key].type === 'categories'" style="clear: left;">
 				<el-checkbox-group v-model="formData[key]">
 
 					<ul>
@@ -22,8 +31,17 @@
 								@change="(value) => resetChildCategories(value, category.id)"
 							>
 								{{ category.name }}
+								<el-button
+									v-if="!show[category.slug] && category.children"
+									size="mini"
+									@click="showSubcategories(category.slug)"
+								>
+									<i class="el-icon-plus el-icon-right" />
+									Show subcategories
+								</el-button>
 							</el-checkbox>
-							<ul v-if="category.children">
+
+							<ul v-if="show[category.slug] && category.children">
 								<li v-for="subCategory in category.children">
 									<el-checkbox
 										:label="subCategory.id"
@@ -40,128 +58,182 @@
 				</el-checkbox-group>
 			</div>
 
+			<div v-else-if="schema[key].type === 'social-media'" style="clear: left;">
+				<div v-for="(data, index) in formData[key]">
+					<el-select v-model="data.platform" placeholder="Social media platform">
+						<el-option
+							v-for="platform in availableSocialMedia"
+							:label="platform.name"
+							:value="platform.id"
+							:key="platform.slug"
+						>
+						</el-option>
+					</el-select>
+					<el-input v-model="data.url" placeholder="URL">{{ schema[key].label }}</el-input>
+					<el-button>Delete</el-button>
+				</div>
+				<el-button>Add social media</el-button>
+			</div>
+
 			<el-input v-else :name="key">{{ schema[key].label }}</el-input>
 
 		</el-form-item>
 	</el-form>
 	<span slot="footer" class="dialog-footer">
 		<el-button>Cancel</el-button>
-		<el-button type="primary">Add profile</el-button>
+		<el-button type="primary">Save profile</el-button>
 	</span>
 </el-dialog>
 </template>
 
 <script>
+import _ from 'lodash';
+
+import RichText from 'components/richtext';
+
 export default {
 
 	name: 'create-site-profile-modal',
 
+	components: {
+		RichText
+	},
+
 	created() {
-		this.$bus.$on('site-profile:showCreateProfileModal', () => {
+		this.blankProfile = {
+			id: null,
+			username: '',
+			title: '',
+			first_name: '',
+			second_name: '',
+			job_titles: '',
+			email: '',
+			telephone: '',
+			location: '',
+			office_hours: '',
+			blog: '',
+			personal_research_website: '',
+			about: '',
+			research_interest_highlights: '',
+			research_interests: '',
+			teaching: '',
+			supervision: '',
+			professional: '',
+			date_published: '',
+			past_work: '',
+			social_media: [],
+			categories: []
+		};
+
+		this.schema = {
+			username: {
+				label: 'Username'
+			},
+			title: {
+				label: 'Title'
+			},
+			first_name: {
+				label: 'First name'
+			},
+			second_name: {
+				label: 'Second name'
+			},
+			job_titles: {
+				label: 'Job titles'
+			},
+			email: {
+				label: 'Email'
+			},
+			telephone: {
+				label: 'Telephone'
+			},
+			location: {
+				label: 'Location'
+			},
+			office_hours: {
+				label: 'Office hours'
+			},
+			blog: {
+				label: 'Blog'
+			},
+			personal_research_website: {
+				label: 'Personal research website'
+			},
+			about: {
+				label: 'About',
+				type: 'textarea'
+			},
+			research_interest_highlights: {
+				label: 'Research interest highlights',
+			},
+			research_interests: {
+				label: 'Research interests',
+				type: 'textarea'
+			},
+			teaching: {
+				label: 'Teaching',
+				type: 'richtext'
+			},
+			supervision: {
+				label: 'Supervision',
+				type: 'textarea'
+			},
+			professional: {
+				label: 'Professional',
+				type: 'textarea'
+			},
+			past_work: {
+				label: 'Past work',
+				type: 'textarea'
+			},
+			categories: {
+				label: 'Categories',
+				type: 'categories'
+			},
+			social_media: {
+				label: 'Social media',
+				type: 'social-media'
+			}
+		};
+
+		this.$bus.$on('site-profile:showCreateProfileModal', ({ type, profileData }) => {
+			this.type = type;
 			this.visible = true;
-		})
+
+			if(type === 'edit') {
+				this.formData = { ..._.cloneDeep(this.blankProfile), ...profileData };
+			}
+			else {
+				this.formData = _.cloneDeep(this.blankProfile);
+			}
+
+			this.show = {};
+		});
 	},
 
 	data() {
 		return {
-			formData: {
-				id: '',
-				username: '',
-				title: '',
-				first_name: '',
-				second_name: '',
-				job_titles: '',
-				email: '',
-				telephone: '',
-				location: '',
-				office_hours: '',
-				blog: '',
-				personal_research_website: '',
-				about: '',
-				research_interest_highlights: '',
-				research_interests: '',
-				teaching: '',
-				supervision: '',
-				professional: '',
-				date_published: '',
-				past_work: '',
-				social_media: [],
-				categories: []
-			},
+			type: 'create',
 			visible: false,
-			schema: {
-				username: {
-					label: 'Username'
+			formData: {},
+			show: {},
+			availableSocialMedia: [
+				{
+					id: 1,
+					name: 'Facebook',
+					slug: 'facebook'
 				},
-				title: {
-					label: 'Title'
+				{
+					id: 2,
+					name: 'Twitter',
+					slug: 'twitter'
 				},
-				first_name: {
-					label: 'First name'
-				},
-				second_name: {
-					label: 'Second name'
-				},
-				job_titles: {
-					label: 'Job titles'
-				},
-				email: {
-					label: 'Email'
-				},
-				telephone: {
-					label: 'Telephone'
-				},
-				location: {
-					label: 'Location'
-				},
-				office_hours: {
-					label: 'Office hours'
-				},
-				blog: {
-					label: 'Blog'
-				},
-				personal_research_website: {
-					label: 'Personal research website'
-				},
-				about: {
-					label: 'About',
-					type: 'textarea'
-				},
-				research_interest_highlights: {
-					label: 'Research interest highlights',
-				},
-				research_interests: {
-					label: 'Research interests',
-					type: 'textarea'
-				},
-				teaching: {
-					label: 'Teaching',
-					type: 'textarea'
-				},
-				supervision: {
-					label: 'Supervision',
-					type: 'textarea'
-				},
-				professional: {
-					label: 'Professional',
-					type: 'textarea'
-				},
-				past_work: {
-					label: 'Past work',
-					type: 'textarea'
-				},
-				categories: {
-					label: 'Categories',
-					type: 'categories'
-				},
-				social_media: {
-					label: 'Social media',
-					type: 'social-media'
+				{
+					id: 3,
+					name: 'LinkedIn',
+					slug: 'linkedin'
 				}
-			},
-			availableSocialMedia: {
-
-			},
+			],
 			availableCategories: [
 				{
 					'id': 1,
@@ -283,22 +355,43 @@ export default {
 		};
 	},
 
+	computed: {
+		modalType() {
+			return this.type.charAt(0).toUpperCase() + this.type.slice(1)
+		},
+
+		extraTitleText() {
+			return (
+				this.type === 'edit' ?
+					` ${this.formData.first_name} ${this.formData.second_name}` +
+					(this.formData.second_name.endsWith('s') ? '\'' : '\'s') :
+					''
+			);
+		}
+	},
+
 	methods: {
 
-		toggleParent(value, parentId) {
-			if(value && !this.formData.categories.includes(parentId)) {
+		toggleParent(checked, parentId) {
+			if(checked && !this.formData.categories.includes(parentId)) {
 				this.formData.categories.push(parentId);
 			}
 		},
 
-		resetChildCategories(value, categoryId) {
-			if(!value) {
-				const categoryChildren = this.availableCategories
-					.find(cat => cat.id === categoryId).children;
-				
-				if(categoryChildren) {
-					const childIds = categoryChildren.map(childCat => childCat.id);
-			
+		resetChildCategories(checked, categoryId) {
+			if(!checked) {
+				// get children of unchecked parent category
+				const categoryChildren = this.availableCategories.find(
+					category => category.id === categoryId
+				).children;
+
+				if(categoryChildren && categoryChildren.length) {
+					const childIds = categoryChildren.map(
+						childCategory => childCategory.id
+					);
+
+					// remove any selected subcategories that are in the
+					// children of our unchecked parent category
 					this.formData.categories = this.formData.categories.filter(
 						catId => !childIds.includes(catId)
 					);
