@@ -70,9 +70,9 @@
 						</el-option>
 					</el-select>
 					<el-input v-model="data.url" placeholder="URL">{{ schema[key].label }}</el-input>
-					<el-button>Delete</el-button>
+					<el-button @click="removeSocialMediaPlatform(index)">Delete</el-button>
 				</div>
-				<el-button>Add social media</el-button>
+				<el-button @click="addSocialMediaPlatform">Add social media</el-button>
 			</div>
 
 			<el-input v-else :name="key">{{ schema[key].label }}</el-input>
@@ -80,8 +80,8 @@
 		</el-form-item>
 	</el-form>
 	<span slot="footer" class="dialog-footer">
-		<el-button>Cancel</el-button>
-		<el-button type="primary">Save profile</el-button>
+		<el-button @click="cancel">Cancel</el-button>
+		<el-button type="primary" @click="createProfile">Save profile</el-button>
 	</span>
 </el-dialog>
 </template>
@@ -397,6 +397,34 @@ export default {
 					);
 				}
 			}
+		},
+
+		createProfile() {
+			// TODO: make API call to create/edit profile + error handling
+			this.visible = false;
+		},
+
+		cancel() {
+			this.promptToSave(success => {
+				if(success) {
+					this.visible = false;
+				}
+			});
+		},
+
+		addSocialMediaPlatform() {
+			this.formData.social_media.push({
+				platform: null,
+				url: ''
+			});
+		},
+
+		removeSocialMediaPlatform(index) {
+			this.formData.social_media.splice(index, 1);
+		},
+
+		showSubcategories(categorySlug) {
+			this.show = { ...this.show, [categorySlug]: true };
 		}
 
 	}
