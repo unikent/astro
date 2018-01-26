@@ -190,7 +190,7 @@ export default {
 	methods: {
 		fetchProfiles() {
 			this.$api
-				.get('sites/1/profiles?include=draft,categories,socialmedia', {})
+				.get('sites/1/profiles/draft?attrs=title,first_name,id,second_name,categories,published_at,updated_at')
 				.then(({ data: json }) => {
 					this.profiles = json.data;
 				});
