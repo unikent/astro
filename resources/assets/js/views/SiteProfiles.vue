@@ -6,7 +6,7 @@
 			v-if="canUser('profile.create')"
 			type="primary"
 			class="manage-table__add-button"
-			@click="showCreateProfileModal"
+			@click="(e) => showCreateProfileModal('create')"
 		>
 			Add Profile
 		</el-button>
@@ -76,8 +76,16 @@
 
 					<el-dropdown-menu slot="dropdown">
 						<el-dropdown-item
+							command="edit"
+							v-if="canUser('profile.edit')"
+						>
+							Edit
+						</el-dropdown-item>
+
+						<el-dropdown-item
 							command="publish"
 							v-if="canUser('profile.publish')"
+							divided
 							:disabled="scope.row.status === 'published'"
 						>
 							Publish
@@ -99,6 +107,7 @@
 							Delete
 						</el-dropdown-item>
 					</el-dropdown-menu>
+
 				</el-dropdown>
 			</template>
 		</el-table-column>
@@ -164,8 +173,7 @@ export default {
 	data() {
 		return {
 			filters: ['first_name', 'second_name', 'job_titles', 'email', 'categories.0.name'],
-			profiles: [],
-			displayProfileCreationModal: false
+			profiles: []
 		};
 	},
 
@@ -175,8 +183,8 @@ export default {
 		]),
 
 		items() {
-			return this.profiles.map(profile => (profile['status'] = 'published') && profile.draft[0]);
-		},
+			return this.profiles;
+		}
 	},
 
 	methods: {
@@ -188,7 +196,13 @@ export default {
 				});
 		},
 
-		handleCommand() {},
+		handleCommand(command) {
+			switch(command) {
+				// TODO: pass along profile id, so we can fetch the data from API
+				case 'edit':
+					this.showCreateProfileModal('edit')
+			}
+		},
 
 		categorySort(a, b) {
 			if(!a.categories[0]) {
@@ -204,8 +218,12 @@ export default {
 			return a === b ? 0 : (a < b ? -1 : 1);
 		},
 
-		showCreateProfileModal() {
-			this.$bus.$emit('site-profile:showCreateProfileModal');
+		showCreateProfileModal(type) {
+			// TODO: grab user profile data from API
+
+			this.$bus.$emit('site-profile:showCreateProfileModal', {
+				type
+			});
 		}
 	}
 
