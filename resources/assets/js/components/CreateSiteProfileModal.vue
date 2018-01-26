@@ -3,6 +3,7 @@
 	:title="`${modalType}${extraTitleText} Site Profile`"
 	:visible.sync="visible"
 	:modal-append-to-body="false"
+	:before-close="promptToSave"
 >
 	<el-form :model="formData">
 		<el-form-item v-for="(value, key) in schema" :label="schema[key].label" :key="key">
@@ -90,10 +91,15 @@
 import _ from 'lodash';
 
 import RichText from 'components/richtext';
+import promptToSaveMixin from 'mixins/promptToSaveMixin';
 
 export default {
 
 	name: 'create-site-profile-modal',
+
+	mixins: [
+		promptToSaveMixin
+	],
 
 	components: {
 		RichText
@@ -207,12 +213,14 @@ export default {
 				this.formData = _.cloneDeep(this.blankProfile);
 			}
 
+			this.initialData = JSON.stringify(this.formData);
 			this.show = {};
 		});
 	},
 
 	data() {
 		return {
+			// promptToSaveMixin defines "initialData" property
 			type: 'create',
 			visible: false,
 			formData: {},
@@ -367,6 +375,10 @@ export default {
 					(this.formData.second_name.endsWith('s') ? '\'' : '\'s') :
 					''
 			);
+		},
+
+		isUnsaved() {
+			return JSON.stringify(this.formData) !== this.initialData;
 		}
 	},
 
