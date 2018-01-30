@@ -74,4 +74,23 @@ class Block extends BaseDefinition
 		}
 		return $values;
 	}
+
+	/**
+	 * Provide dynamic routing.
+	 * This must be implemented by a custom block class.
+	 * @param $path - Path to route
+	 * @param $block - Reference to the block data that is being returned as part of the page.
+	 * @param $page - The Page object.
+	 * @return bool
+	 */
+	public function reroute($path, &$block, $page) {return false;}
+
+	/**
+	 * Are blocks of this type dynamic?
+	 * @return mixed
+	 */
+	public function isDynamic()
+	{
+		return $this->dynamic;
+	}
 }

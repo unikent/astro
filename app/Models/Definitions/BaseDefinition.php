@@ -323,8 +323,18 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
         if(JSON_ERROR_NONE !== json_last_error()){
             throw new JsonDecodeException(json_last_error_msg());
         }
-
-    	$instance = new static();
+		if(!empty($definition['dynamic'])){
+        	// dynamic definitions have a definition class that can do things
+        	$defn_id = static::idFromNameAndVersion($definition['name'], $definition['version']);
+        	$class_path = static::definitionPath($defn_id);
+			$class_name = str_replace('-', '_', ucfirst($definition['name']) . 'V' . $definition['version']);
+			$file_path = $class_path . '/' . $class_name. '.php';
+			require_once $file_path;
+			$instance = new $class_name();
+		}
+		else {
+			$instance = new static();
+		}
     	$instance->forceFill($definition);
 
     	return $instance;
@@ -346,6 +356,19 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
     	return static::fromDefinition(file_get_contents($path));
     }
 
+	/**
+	 * Get the path to the folder containing the specified definition.
+	 * @param string $definition_id - The {name}-v{version} string identifying the definition.
+	 * @return null|string - The path or null if $definition_id is invalid.
+	 */
+    public static function definitionPath($definition_id)
+	{
+		$parts = static::idToNameAndVersion($definition_id);
+		if($parts) {
+			return sprintf('%s/%s/%s/v%d', Config::get('app.definitions_path'), static::$defDir, $parts['name'], $parts['version']);
+		}
+		return null;
+	}
 
     /**
      * Locates a Definition file on disk; when no version is specified
@@ -355,9 +378,8 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
      * @return string|null
      */
     public static function locateDefinition($definition_id){
-    	$parts = static::idToNameAndVersion($definition_id);
-    	if($parts) {
-			$path = sprintf('%s/%s/%s/v%d', Config::get('app.definitions_path'), static::$defDir, $parts['name'], $parts['version']);
+    	$path = static::definitionPath($definition_id);
+    	if($path) {
 			$path .= '/definition.json';
 			return file_exists($path) ? $path : null;
 		}
