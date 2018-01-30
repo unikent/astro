@@ -232,14 +232,12 @@ export default {
 				this.$api.get(`sites/${site_id}/profiles/${id}/draft`)
 					.then(({data : json}) => {
 						let profileData = json.data;
-
 						// flatten categories to just ids
 						profileData.categories = profileData.categories.map(category => category.id);
-						console.table(profileData);
 						this.$bus.$emit('site-profile:showCreateProfileModal', {type, profileData});		
 					})
 					.catch(() => {
-					// TODO something sensible if we have no profile
+						// TODO something sensible if we have no profile
 					})
 			}
 			else {
