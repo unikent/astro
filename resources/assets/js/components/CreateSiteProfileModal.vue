@@ -183,7 +183,7 @@ export default {
 				})	
 			},
 			last_name: {
-				label: 'Second name',
+				label: 'Last name',
 				validation: new Schema({
 					last_name: {
 						type: 'string',
@@ -193,7 +193,7 @@ export default {
 				})	
 			},
 			roles: {
-				label: 'Job titles',
+				label: 'Roles',
 				validation: new Schema({
 					roles: {
 						type: 'string',
