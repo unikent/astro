@@ -23,12 +23,12 @@
 
 	<el-table
 		:data="pagedItems"
-		:default-sort="{ prop: 'second_name', order: 'ascending' }"
+		:default-sort="{ prop: 'last_name', order: 'ascending' }"
 		@sort-change="handleSortChange"
 		border
 	>
 		<el-table-column
-			prop="second_name"
+			prop="last_name"
 			label="Name"
 			sortable="custom"
 		>
@@ -44,7 +44,7 @@
 							style="display: inline-block;"
 						/>
 					</el-tooltip>
-					{{ scope.row.title }} {{ scope.row.first_name }} {{ scope.row.second_name }}
+					{{ scope.row.title }} {{ scope.row.first_name }} {{ scope.row.last_name }}
 				</div>
 				<div class="site-profiles__published-date">
 					Last published {{ scope.row.created_at }} by ?
@@ -172,7 +172,7 @@ export default {
 
 	data() {
 		return {
-			filters: ['first_name', 'second_name', 'job_titles', 'email', 'categories.0.name'],
+			filters: ['first_name', 'last_name', 'roles', 'email', 'categories.0.name'],
 			profiles: []
 		};
 	},
@@ -190,7 +190,7 @@ export default {
 	methods: {
 		fetchProfiles() {
 			this.$api
-				.get('sites/1/profiles/draft?attrs=title,first_name,id,second_name,categories,published_at,updated_at')
+				.get('sites/1/profiles/draft?attrs=title,first_name,id,last_name,categories,published_at,updated_at')
 				.then(({ data: json }) => {
 					this.profiles = json.data;
 				});

@@ -124,8 +124,8 @@ export default {
 			username: '',
 			title: '',
 			first_name: '',
-			second_name: '',
-			job_titles: '',
+			last_name: '',
+			roles: '',
 			email: '',
 			telephone: '',
 			location: '',
@@ -182,23 +182,23 @@ export default {
 					}
 				})	
 			},
-			second_name: {
+			last_name: {
 				label: 'Second name',
 				validation: new Schema({
-					second_name: {
+					last_name: {
 						type: 'string',
 						required: true,
 						message: 'Second name can\'t be empty.'
 					}
 				})	
 			},
-			job_titles: {
+			roles: {
 				label: 'Job titles',
 				validation: new Schema({
-					job_titles: {
+					roles: {
 						type: 'string',
 						required: true,
-						message: 'Job Tiles can\'t be empty.'
+						message: 'Roles can\'t be empty.'
 					}
 				})	
 			},
@@ -448,8 +448,8 @@ export default {
 		extraTitleText() {
 			return (
 				this.type === 'edit' ?
-					` ${this.formData.first_name} ${this.formData.second_name}` +
-					(this.formData.second_name.endsWith('s') ? '\'' : '\'s') :
+					` ${this.formData.first_name} ${this.formData.last_name}` +
+					(this.formData.last_name.endsWith('s') ? '\'' : '\'s') :
 					''
 			);
 		},
