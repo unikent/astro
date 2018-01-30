@@ -76,7 +76,7 @@
 
 					<el-dropdown-menu slot="dropdown">
 						<el-dropdown-item
-							command="edit"
+							@click.native="showCreateProfileModal('edit', scope.row.id)"
 							v-if="canUser('profile.edit')"
 						>
 							Edit
@@ -199,8 +199,8 @@ export default {
 		handleCommand(command) {
 			switch(command) {
 				// TODO: pass along profile id, so we can fetch the data from API
-				case 'edit':
-					this.showCreateProfileModal('edit')
+				// case 'edit':
+				// 	this.showCreateProfileModal('edit')
 			}
 		},
 
@@ -218,12 +218,33 @@ export default {
 			return a === b ? 0 : (a < b ? -1 : 1);
 		},
 
-		showCreateProfileModal(type) {
-			// TODO: grab user profile data from API
+		
+		/**
+		displays the create/edit site profile modal
+		
+		if editing an existing profile then retrieves the data for that profile from the API
+		@param {string} type - the 'mode' of the modal either 'edit' or 'create'
+		@param {int} id - the id of a siteProfile
+		 */
+		showCreateProfileModal(type, id) {
+			if(type === 'edit') {
+				let site_id = this.$route.params.site_id;
+				this.$api.get(`sites/${site_id}/profiles/${id}/draft`)
+					.then(({data : json}) => {
+						let profileData = json.data;
 
-			this.$bus.$emit('site-profile:showCreateProfileModal', {
-				type
-			});
+						// flatten categories to just ids
+						profileData.categories = profileData.categories.map(category => category.id);
+						console.table(profileData);
+						this.$bus.$emit('site-profile:showCreateProfileModal', {type, profileData});		
+					})
+					.catch(() => {
+					// TODO something sensible if we have no profile
+					})
+			}
+			else {
+				this.$bus.$emit('site-profile:showCreateProfileModal', {type});
+			}
 		}
 	}
 

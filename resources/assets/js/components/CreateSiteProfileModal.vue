@@ -282,13 +282,13 @@ export default {
 			this.type = type;
 			this.visible = true;
 
-			if(type === 'edit') {
+			if (profileData) {
 				this.formData = { ..._.cloneDeep(this.blankProfile), ...profileData };
-			}
-			else {
-				this.formData = _.cloneDeep(this.blankProfile);
+			} else {
+				this.formData = _.cloneDeep(this.blankProfile);				
 			}
 
+			console.table(this.formData);
 			this.initialData = JSON.stringify(this.formData);
 			this.show = {};
 		});
@@ -499,7 +499,7 @@ export default {
 				});
 			}
 		},
-
+	
 		createProfile() {
 			// TODO: make API call to create/edit profile + error handling
 			this.visible = false;
