@@ -506,7 +506,16 @@ export default {
 	
 		createProfile() {
 			// TODO: make API call to create/edit profile + error handling
-			this.visible = false;
+			// TODO new and edit have different routes
+			this.$api.put(`sites/${this.formData.site_id}/profiles/${this.formData.id}`, this.FormData)
+				.then(() => {
+					console.log('posting all this...', this.formData);
+					this.visible = false;
+				})
+				.catch((errors) => {
+					console.log(errors);
+				});
+
 		},
 
 		cancel() {
