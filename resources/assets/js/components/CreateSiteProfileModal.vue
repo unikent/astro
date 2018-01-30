@@ -6,13 +6,16 @@
 	:before-close="promptToSave"
 >
 	<el-form :model="formData">
-		<el-form-item v-for="(value, key) in schema" :label="schema[key].label" :key="key">
+		<el-form-item v-for="(value, key, index) in schema" :label="schema[key].label" :key="key">
 
 			<el-input
 				v-if="schema[key].type === 'textarea'"
+				v-model="formData[key]"
 				type="textarea"
 				:rows="5"
 				:name="key"
+				@blur="validate(index, key)"
+				@change="validate(index, key)"
 			>
 				{{ schema[key].label }}
 			</el-input>
@@ -76,8 +79,17 @@
 				<el-button @click="addSocialMediaPlatform">Add social media</el-button>
 			</div>
 
-			<el-input v-else :name="key">{{ schema[key].label }}</el-input>
+			<el-input v-else :name="key"
+				v-model="formData[key]"
+				@blur="validate(index, key)"
+				@change="validate(index, key)"
+			>
+			{{ schema[key].label }}</el-input>
 
+			<div v-if="errors[index] && errors[index][key]" class="el-form-item__error">
+				{{ errors[index][key].map((error)=> error.message).join(' ') }}
+			</div>
+		
 		</el-form-item>
 	</el-form>
 	<span slot="footer" class="dialog-footer">
@@ -89,6 +101,7 @@
 
 <script>
 import _ from 'lodash';
+import Schema from 'async-validator';
 
 import RichText from 'components/richtext';
 import promptToSaveMixin from 'mixins/promptToSaveMixin';
@@ -131,30 +144,86 @@ export default {
 			categories: []
 		};
 
+
+		// filling up the initial errors with nulls to allow us fill out those out of order
+		const numberOfFields = Object.entries(this.blankProfile).length;
+		for (let index = 0; index < numberOfFields; index++) {
+			this.errors.push(null);
+		}
+
 		this.schema = {
 			username: {
-				label: 'Username'
+				label: 'Username',
+				validation: new Schema({
+					username: {
+						type: 'string',
+						required: true,
+						message: 'Username can\'t be empty.'
+					}
+				})				
 			},
 			title: {
-				label: 'Title'
+				label: 'Title',
+				validation: new Schema({
+					title: {
+						type: 'string',
+						required: true,
+						message: 'Title can\'t be empty.'
+					}
+				})	
 			},
 			first_name: {
-				label: 'First name'
+				label: 'First name',
+				validation: new Schema({
+					first_name: {
+						type: 'string',
+						required: true,
+						message: 'First name can\'t be empty.'
+					}
+				})	
 			},
 			second_name: {
-				label: 'Second name'
+				label: 'Second name',
+				validation: new Schema({
+					second_name: {
+						type: 'string',
+						required: true,
+						message: 'Second name can\'t be empty.'
+					}
+				})	
 			},
 			job_titles: {
-				label: 'Job titles'
+				label: 'Job titles',
+				validation: new Schema({
+					job_titles: {
+						type: 'string',
+						required: true,
+						message: 'Job Tiles can\'t be empty.'
+					}
+				})	
 			},
 			email: {
-				label: 'Email'
+				label: 'Email',
+				validation: new Schema({
+					email: {
+						type: 'string',
+						required: true,
+						message: 'Email can\'t be empty.'
+					}
+				})
 			},
 			telephone: {
 				label: 'Telephone'
 			},
 			location: {
-				label: 'Location'
+				label: 'Location',
+				validation: new Schema({
+					location: {
+						type: 'string',
+						required: true,
+						message: 'Location can\'t be empty.'
+					}
+				})
 			},
 			office_hours: {
 				label: 'Office hours'
@@ -167,7 +236,14 @@ export default {
 			},
 			about: {
 				label: 'About',
-				type: 'textarea'
+				type: 'textarea',
+				validation: new Schema({
+					about: {
+						type: 'string',
+						required: true,
+						message: 'About can\'t be empty.'
+					}
+				})
 			},
 			research_interest_highlights: {
 				label: 'Research interest highlights',
@@ -225,6 +301,7 @@ export default {
 			visible: false,
 			formData: {},
 			show: {},
+			errors: [],
 			availableSocialMedia: [
 				{
 					id: 1,
@@ -408,6 +485,18 @@ export default {
 						catId => !childIds.includes(catId)
 					);
 				}
+			}
+		},
+
+		validate(index, key) {
+			console.log('validating... ', index, key);
+			if (this.schema[key].validation) {
+				console.log(this.schema[key], this.formData[key]);
+				this.schema[key].validation.validate(this.formData, (errors, fields) => {
+					// if errors exist set them, otherwise set to null
+					this.errors.splice(index, 1, errors ? fields : null);
+		
+				});
 			}
 		},
 
