@@ -64,7 +64,7 @@
 
 			<div v-else-if="schema[key].type === 'social-media'" style="clear: left;">
 				<div v-for="(data, index) in formData[key]">
-					<el-select v-model="data.platform" placeholder="Social media platform">
+					<el-select v-model="data.id" placeholder="Social media platform">
 						<el-option
 							v-for="platform in availableSocialMedia"
 							:label="platform.name"
@@ -73,7 +73,7 @@
 						>
 						</el-option>
 					</el-select>
-					<el-input v-model="data.url" placeholder="URL">{{ schema[key].label }}</el-input>
+					<el-input v-model="data.link" placeholder="URL">{{ schema[key].label }}</el-input>
 					<el-button @click="removeSocialMediaPlatform(index)">Delete</el-button>
 				</div>
 				<el-button @click="addSocialMediaPlatform">Add social media</el-button>
@@ -140,7 +140,7 @@ export default {
 			professional: '',
 			date_published: '',
 			past_work: '',
-			social_media: [],
+			socialmedia: [],
 			categories: []
 		};
 
@@ -272,7 +272,7 @@ export default {
 				label: 'Categories',
 				type: 'categories'
 			},
-			social_media: {
+			socialmedia: {
 				label: 'Social media',
 				type: 'social-media'
 			}
@@ -302,6 +302,8 @@ export default {
 			formData: {},
 			show: {},
 			errors: [],
+
+			// TODO load this from API
 			availableSocialMedia: [
 				{
 					id: 1,
@@ -319,6 +321,8 @@ export default {
 					slug: 'linkedin'
 				}
 			],
+
+			// TODO load this from api
 			availableCategories: [
 				{
 					'id': 1,
@@ -514,14 +518,16 @@ export default {
 		},
 
 		addSocialMediaPlatform() {
-			this.formData.social_media.push({
-				platform: null,
-				url: ''
+			// TODO name seems not to be used at all - review this usage
+			this.formData.socialmedia.push({
+				id: null,
+				link: '',
+				name: ''
 			});
 		},
 
 		removeSocialMediaPlatform(index) {
-			this.formData.social_media.splice(index, 1);
+			this.formData.socialmedia.splice(index, 1);
 		},
 
 		showSubcategories(categorySlug) {
