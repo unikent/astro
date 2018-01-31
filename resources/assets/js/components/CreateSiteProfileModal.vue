@@ -288,7 +288,6 @@ export default {
 				this.formData = _.cloneDeep(this.blankProfile);				
 			}
 
-			console.table(this.formData);
 			this.initialData = JSON.stringify(this.formData);
 			this.show = {};
 		});
@@ -504,15 +503,30 @@ export default {
 			}
 		},
 	
+		/*
+		makes API request to update or create the profile 
+		*/
 		createProfile() {
 			// TODO: make API call to create/edit profile + error handling
-			// TODO new and edit have different routes
-			this.$api.put(`sites/${this.formData.site_id}/profiles/${this.formData.id}`, this.FormData)
+			let profileData = {};
+			profileData.profile = (this.formData);
+
+			let site_id = this.$route.params.site_id;
+
+			if(this.type === 'edit') {
+				var apiCall = this.$api.put;
+				var endpoint = `sites/${site_id}/profiles/${this.formData.id}`
+			} else {
+				var apiCall = this.$api.post;
+				var endpoint = `sites/${site_id}/profiles`;
+			}
+
+			apiCall(endpoint, profileData)
 				.then(() => {
-					console.log('posting all this...', this.formData);
 					this.visible = false;
 				})
 				.catch((errors) => {
+					// TODO - display some userful error here!
 					console.log(errors);
 				});
 
