@@ -189,8 +189,9 @@ export default {
 
 	methods: {
 		fetchProfiles() {
+			let site_id = this.$route.params.site_id;
 			this.$api
-				.get('sites/1/profiles/draft?attrs=title,first_name,id,last_name,categories,published_at,updated_at')
+				.get(`sites/${site_id}/profiles/draft?attrs=title,first_name,id,last_name,categories,published_at,updated_at`)
 				.then(({ data: json }) => {
 					this.profiles = json.data;
 				});
@@ -236,7 +237,8 @@ export default {
 						profileData.categories = profileData.categories.map(category => category.id);
 						this.$bus.$emit('site-profile:showCreateProfileModal', {type, profileData});		
 					})
-					.catch(() => {
+					.catch((errors) => {
+						console.log(errors);
 						// TODO something sensible if we have no profile
 					})
 			}
