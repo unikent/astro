@@ -36,7 +36,7 @@
 							>
 								{{ category.name }}
 								<el-button
-									v-if="!show[category.slug] && category.children"
+									v-if="!show[category.slug] && category.children.length"
 									size="mini"
 									@click="showSubcategories(category.slug)"
 								>
@@ -45,7 +45,7 @@
 								</el-button>
 							</el-checkbox>
 
-							<ul v-if="show[category.slug] && category.children">
+							<ul v-if="show[category.slug] && category.children.length">
 								<li v-for="subCategory in category.children">
 									<el-checkbox
 										:label="subCategory.id"
@@ -285,12 +285,16 @@ export default {
 			if (profileData) {
 				this.formData = { ..._.cloneDeep(this.blankProfile), ...profileData };
 			} else {
-				this.formData = _.cloneDeep(this.blankProfile);				
+				this.formData = _.cloneDeep(this.blankProfile);
 			}
 
 			this.initialData = JSON.stringify(this.formData);
 			this.show = {};
 		});
+
+		// TODO fetch socialmedia from API
+
+		this.fetchCategories();
 	},
 
 	data() {
@@ -321,125 +325,7 @@ export default {
 				}
 			],
 
-			// TODO load this from api
-			availableCategories: [
-				{
-					'id': 1,
-					'name': 'Academic staff',
-					'slug': 'academic_staff',
-					'parent_id': null,
-					'children': [
-						{
-							'id': 2,
-							'name': 'Heads and directors',
-							'slug': 'heads_and_directors',
-							'parent_id': '1'
-						},
-						{
-							'id': 3,
-							'name': 'Research',
-							'slug': 'research',
-							'parent_id': '1'
-						},
-						{
-							'id': 4,
-							'name': 'Associate and assistants',
-							'slug': 'associate_and_assistants',
-							'parent_id': '1'
-						},
-						{
-							'id': 5,
-							'name': 'Sessional',
-							'slug': 'sessional',
-							'parent_id': '1'
-						},
-						{
-							'id': 6,
-							'name': 'Honorary',
-							'slug': 'honorary',
-							'parent_id': '1'
-						},
-						{
-							'id': 7,
-							'name': 'Emeritus',
-							'slug': 'emeritus',
-							'parent_id': '1'
-						},
-						{
-							'id': 8,
-							'name': 'Visiting',
-							'slug': 'visiting',
-							'parent_id': '1'
-						},
-						{
-							'id': 9,
-							'name': 'Supervisors',
-							'slug': 'supervisors',
-							'parent_id': '1'
-						},
-						{
-							'id': 10,
-							'name': 'Sports Ready Clinic',
-							'slug': 'sports_ready_clinic',
-							'parent_id': '1'
-						},
-						{
-							'id': 11,
-							'name': 'Director of studies',
-							'slug': 'director_of_studies',
-							'parent_id': '1'
-						},
-						{
-							'id': 12,
-							'name': 'Finance',
-							'slug': 'finance',
-							'parent_id': '1'
-						},
-						{
-							'id': 13,
-							'name': 'Management science',
-							'slug': 'management_science',
-							'parent_id': '1'
-						},
-						{
-							'id': 14,
-							'name': 'Marketing',
-							'slug': 'marketing',
-							'parent_id': '1'
-						},
-						{
-							'id': 15,
-							'name': 'People management and organisation',
-							'slug': 'people_management_and_organisation',
-							'parent_id': '1'
-						},
-						{
-							'id': 16,
-							'name': 'Strategy and international business',
-							'slug': 'strategy_and_international_business',
-							'parent_id': '1'
-						}
-					]
-				},
-				{
-					'id': 17,
-					'name': 'Research students',
-					'slug': 'research_students',
-					'parent_id': null
-				},
-				{
-					'id': 18,
-					'name': 'Technical',
-					'slug': 'technical',
-					'parent_id': null
-				},
-				{
-					'id': 19,
-					'name': 'Support and Administration',
-					'slug': 'support_and_administration',
-					'parent_id': null
-				}
-			],
+			availableCategories: [{}],
 		};
 	},
 
@@ -531,6 +417,21 @@ export default {
 				});
 
 		},
+
+		fetchSocialMediaPlatforms() {
+			},
+
+		fetchCategories() {
+			this.$api.get('profiles/categories')
+				.then(({data: json}) => {
+					this.availableCategories = _.cloneDeep(json.data);
+					console.log(json.data);
+				})
+				.catch((errors) => {
+					console.log(errors);
+				});
+		},
+
 
 		cancel() {
 			this.promptToSave(success => {
