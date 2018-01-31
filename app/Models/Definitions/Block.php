@@ -1,7 +1,6 @@
 <?php
 namespace App\Models\Definitions;
 
-
 class Block extends BaseDefinition
 {
 
@@ -83,7 +82,7 @@ class Block extends BaseDefinition
 	 * @param $page - The Page object.
 	 * @return bool
 	 */
-	public function reroute($path, &$block, $page) {return false;}
+	public function reroute($path, &$block, $page, $resolver) {return false;}
 
 	/**
 	 * Are blocks of this type dynamic?
