@@ -314,9 +314,10 @@ export default {
 			return this.type.charAt(0).toUpperCase() + this.type.slice(1)
 		},
 
+		
 		extraTitleText() {
 			return (
-				this.type === 'edit' ?
+				this.type === 'edit' && this.formData.last_name && this.formData.first_name ?
 					` ${this.formData.first_name} ${this.formData.last_name}` +
 					(this.formData.last_name.endsWith('s') ? '\'' : '\'s') :
 					''
