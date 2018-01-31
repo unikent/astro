@@ -36,7 +36,7 @@
 							>
 								{{ category.name }}
 								<el-button
-									v-if="!show[category.slug] && category.children.length"
+									v-if="!show[category.slug] && category.children && category.children.length"
 									size="mini"
 									@click="showSubcategories(category.slug)"
 								>
@@ -45,7 +45,7 @@
 								</el-button>
 							</el-checkbox>
 
-							<ul v-if="show[category.slug] && category.children.length">
+							<ul v-if="show[category.slug] && category.children && category.children.length">
 								<li v-for="subCategory in category.children">
 									<el-checkbox
 										:label="subCategory.id"
@@ -89,7 +89,7 @@
 			<div v-if="errors[index] && errors[index][key]" class="el-form-item__error">
 				{{ errors[index][key].map((error)=> error.message).join(' ') }}
 			</div>
-		
+
 		</el-form-item>
 	</el-form>
 	<span slot="footer" class="dialog-footer">
@@ -160,7 +160,7 @@ export default {
 						required: true,
 						message: 'Username can\'t be empty.'
 					}
-				})				
+				})
 			},
 			title: {
 				label: 'Title',
@@ -170,7 +170,7 @@ export default {
 						required: true,
 						message: 'Title can\'t be empty.'
 					}
-				})	
+				})
 			},
 			first_name: {
 				label: 'First name',
@@ -180,7 +180,7 @@ export default {
 						required: true,
 						message: 'First name can\'t be empty.'
 					}
-				})	
+				})
 			},
 			last_name: {
 				label: 'Last name',
@@ -190,7 +190,7 @@ export default {
 						required: true,
 						message: 'Second name can\'t be empty.'
 					}
-				})	
+				})
 			},
 			roles: {
 				label: 'Roles',
@@ -200,7 +200,7 @@ export default {
 						required: true,
 						message: 'Roles can\'t be empty.'
 					}
-				})	
+				})
 			},
 			email: {
 				label: 'Email',
@@ -292,9 +292,8 @@ export default {
 			this.show = {};
 		});
 
-		// TODO fetch socialmedia from API
-
 		this.fetchCategories();
+		this.fetchSocialMediaPlatforms();
 	},
 
 	data() {
@@ -305,26 +304,7 @@ export default {
 			formData: {},
 			show: {},
 			errors: [],
-
-			// TODO load this from API
-			availableSocialMedia: [
-				{
-					id: 1,
-					name: 'Facebook',
-					slug: 'facebook'
-				},
-				{
-					id: 2,
-					name: 'Twitter',
-					slug: 'twitter'
-				},
-				{
-					id: 3,
-					name: 'LinkedIn',
-					slug: 'linkedin'
-				}
-			],
-
+			availableSocialMedia: [{}],
 			availableCategories: [{}],
 		};
 	},
@@ -384,16 +364,15 @@ export default {
 				this.schema[key].validation.validate(this.formData, (errors, fields) => {
 					// if errors exist set them, otherwise set to null
 					this.errors.splice(index, 1, errors ? fields : null);
-		
+
 				});
 			}
 		},
-	
+
 		/*
-		makes API request to update or create the profile 
+		makes API request to update or create the profile
 		*/
 		createProfile() {
-			// TODO: make API call to create/edit profile + error handling
 			let profileData = {};
 			profileData.profile = (this.formData);
 
@@ -419,13 +398,19 @@ export default {
 		},
 
 		fetchSocialMediaPlatforms() {
-			},
+				this.$api.get('profiles/socialmediaplatforms')
+				.then(({data: json}) => {
+					this.availableSocialMedia = _.cloneDeep(json.data);
+				})
+				.catch((errors) => {
+					console.log(errors);
+				});
+		},
 
 		fetchCategories() {
 			this.$api.get('profiles/categories')
 				.then(({data: json}) => {
 					this.availableCategories = _.cloneDeep(json.data);
-					console.log(json.data);
 				})
 				.catch((errors) => {
 					console.log(errors);
