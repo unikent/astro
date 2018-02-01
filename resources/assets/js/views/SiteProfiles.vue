@@ -181,7 +181,7 @@ export default {
 		// listen for updated profile data from the edit/create dialog
 		this.$bus.$on('site-profile:updatedProfileInList', (profileData) => {
 			let profileLocation = this.findProfileLocation(profileData.id);
-			if (profileLocation) {
+			if (profileLocation !== null) {
 				this.profiles.splice(profileLocation, 1, profileData);
 			} else {
 				this.profiles.push(profileData);
