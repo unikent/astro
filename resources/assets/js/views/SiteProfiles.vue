@@ -177,6 +177,18 @@ export default {
 		};
 
 		this.fetchProfiles();
+
+		// listen for updated profile data from the edit/create dialog
+		this.$bus.$on('site-profile:updatedProfileInList', (profileData) => {
+			let profileLocation = this.findProfileLocation(profileData.id);
+			if (profileLocation) {
+				this.profiles.splice(profileLocation, 1, profileData);
+			} else {
+				this.profiles.push(profileData);
+			}
+		});
+
+
 	},
 
 	data() {
@@ -201,6 +213,21 @@ export default {
 		simpleDate(dateString) {
 			const date = new Date(dateString);
 			return `${date.toDateString()} at ${date.getHours()}:${date.getMinutes()}`
+		},
+
+		/**
+		looks up the array index of the specified profile in this.profiles
+		@augments {int} profile id
+		 */
+		findProfileLocation(profile_id) {
+			var profileLocation = null;
+				for (let index = 0; index < this.profiles.length; index++) {
+					if (this.profiles[index].id === profile_id) {
+						profileLocation = index;
+						break;
+					}
+				}
+			return profileLocation;
 		},
 
 		/**
@@ -254,13 +281,8 @@ export default {
 			this.$api.put(`sites/${site_id}/profiles/${id}/publish`)
 				.then((response) => {
 					// find location of published profile in our loaded data
-					var profileLocation = null;
-					for (let index = 0; index < this.profiles.length; index++) {
-						if (this.profiles[index].id === id) {
-							profileLocation = index;
-							break;
-						}
-					}
+
+					var profileLocation = this.findProfileLocation(id);
 					var returnedProfileData = response.data.data; 
 	
 					// updated the loaded data with our returned data where relevant 
@@ -310,14 +332,7 @@ export default {
 			let site_id = this.$route.params.site_id;
 			this.$api.put(`sites/${site_id}/profiles/${id}/unpublish`)
 				.then((response) => {
-					// find location of unpublished profile in our loaded data
-					var profileLocation = null;
-					for (let index = 0; index < this.profiles.length; index++) {
-						if (this.profiles[index].id === id) {
-							profileLocation = index;
-							break;
-						}
-					}
+					var profileLocation = this.findProfileLocation(id);
 					var returnedProfileData = response.data.data; 
 	
 					// updated the loaded data with our returned data where relevant 
@@ -353,14 +368,8 @@ export default {
 		remove(id) {
 			let site_id = this.$route.params.site_id;
 			
-			var profileLocation = null;
-			for (let index = 0; index < this.profiles.length; index++) {
-				if (this.profiles[index].id === id) {
-					profileLocation = index;
-					break;
-				}
-			}
-
+			var profileLocation = this.findProfileLocation(id);
+			
 			// we allow saving of unfinished profiles so those might have unfinished names...
 			var profileName = this.profileName(this.profiles[profileLocation]);
 

@@ -399,8 +399,11 @@ export default {
 			}
 
 			apiCall(endpoint, profileData)
-				.then(() => {
+				.then((response) => {
+					let savedProfile = response.data.data;
 					this.visible = false;
+					// tell the listing what we have changed
+					this.$bus.$emit('site-profile:updatedProfileInList', savedProfile);
 				})
 				.catch((errors) => {
 					// TODO - display some userful error here!
