@@ -335,6 +335,75 @@ export default {
 				});
 		},
 
+
+		/**
+		removes/deletes a profile
+		@param {int} id - the profile id 
+		**/
+		remove(id) {
+			let site_id = this.$route.params.site_id;
+			
+			var profileLocation = null;
+			for (let index = 0; index < this.profiles.length; index++) {
+				if (this.profiles[index].id === id) {
+					profileLocation = index;
+					break;
+				}
+			}
+
+			// we allow saving of unfinished profiles so those might have unfinished names...
+			var profileName = '';
+			if (this.profiles[profileLocation].first_name && this.profiles[profileLocation].last_name) {
+				profileName = `${this.profiles[profileLocation].first_name} ${this.profiles[profileLocation].last_name}`
+			} else if (this.profiles[profileLocation].first_name) {
+				profileName = this.profiles[profileLocation].first_name;
+			} else if (this.profiles[profileLocation].last_name) {
+				profileName = this.profiles[profileLocation].last_name;
+			} else {
+				profileName = 'Unnamed Profile';
+			}
+
+			this.$confirm(`
+				Are you sure you want to remove <strong>${profileName}</strong>
+				`, 'Remove profile?', {
+				confirmButtonText: 'Delete Profile',
+				cancelButtonText: 'Cancel',
+				dangerouslyUseHTMLString: true,
+				type: 'warning'
+			})
+			.then(() => {
+				this.$api.delete(`sites/${site_id}/profiles/${id}`)
+					.then((response) => {
+						// find location of published profile in our loaded data and remove it
+						this.profiles.splice(profileLocation, 1);
+	
+						notify({
+							title: 'Profile deleted',
+							message: `
+								Successfully deleted profile
+							`,
+							type: 'success'
+						});
+					})
+					.catch((error) => {
+						var errorMessage = error.response.data.errors[0].message;
+						var errorList = '';
+						for (var field in error.response.data.errors[0].details) {
+							errorList += '<li>' + error.response.data.errors[0].details[field] + '</li>';
+						}
+
+						notify({
+							title: 'Profile not deleted',
+							message: `
+								Not deleted profile. Try again later.
+							`,
+							type: 'error'
+						});		
+					});
+				});
+		},
+
+
 		/**
 		displays the create/edit site profile modal
 		
