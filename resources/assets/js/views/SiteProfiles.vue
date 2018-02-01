@@ -47,7 +47,7 @@
 					{{ scope.row.title }} {{ scope.row.first_name }} {{ scope.row.last_name }}
 				</div>
 				<div class="site-profiles__published-date">
-					Last published {{ scope.row.created_at }} by ?
+					Last published {{ scope.row.published_at }} by ?
 				</div>
 			</template>
 		</el-table-column>
@@ -83,7 +83,7 @@
 						</el-dropdown-item>
 
 						<el-dropdown-item
-							command="publish"
+							@click.native="publish(scope.row.id)"
 							v-if="canUser('profile.publish')"
 							divided
 							:disabled="scope.row.status === 'published'"
@@ -92,7 +92,7 @@
 						</el-dropdown-item>
 
 						<el-dropdown-item
-							command="unpublish"
+							@click.native="unpublish(scope.row.id)"
 							v-if="canUser('profile.unpublish')"
 							:disabled="scope.row.status === 'new'"
 						>
@@ -100,7 +100,7 @@
 						</el-dropdown-item>
 
 						<el-dropdown-item
-							command="remove"
+							@click.native="remove(scope.row.id)"
 							divided
 							v-if="canUser('profile.delete')"
 						>
@@ -135,9 +135,10 @@
 <script>
 import { mapGetters } from 'vuex';
 
+import Icon from 'components/Icon';
 import filterableMixin from 'mixins/filterableMixin';
 import paginatableMixin from 'mixins/paginatableMixin';
-import Icon from 'components/Icon';
+import { notify } from 'classes/helpers';
 import CreateSiteProfileModal from 'components/CreateSiteProfileModal';
 
 export default {
@@ -219,7 +220,51 @@ export default {
 			return a === b ? 0 : (a < b ? -1 : 1);
 		},
 
-		
+
+		/**
+		publishes a profile
+		@param {int} id - the profile id 
+		**/
+		publish(id) {
+			let site_id = this.$route.params.site_id;
+			this.$api.put(`sites/${site_id}/profiles/${id}/publish`)
+				.then((response) => {
+					// find location of published profile in our loaded data
+					var profileLocation = null;
+					for (let index = 0; index < this.profiles.length; index++) {
+						if (this.profiles[index].id === id) {
+							profileLocation = index;
+							break;
+						}
+					}
+					var returnedProfileData = response.data.data; 
+	
+					// updated the loaded data with our returned data where relevant 
+					this.profiles[profileLocation].status = returnedProfileData.status;
+					this.profiles[profileLocation].published_at = returnedProfileData.published_at;
+					this.profiles[profileLocation].updated_at = returnedProfileData.published_at;
+
+					notify({
+						title: 'Profile published',
+						message: `
+							Successfully published profile
+						`,
+						type: 'success'
+					});
+
+				})
+				.catch((error) => {
+					notify({
+						title: 'Profile not published',
+						message: `
+							There are some validation issues with this profile.
+							These must be fixed before publishing it.
+						`,
+						type: 'error'
+					});
+				});
+		},
+
 		/**
 		displays the create/edit site profile modal
 		
