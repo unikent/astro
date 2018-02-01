@@ -279,6 +279,50 @@ export default {
 				});
 		},
 
+
+		/**
+		unpublishes a profile
+		@param {int} id - the profile id 
+		**/
+		unpublish(id) {
+			let site_id = this.$route.params.site_id;
+			this.$api.put(`sites/${site_id}/profiles/${id}/unpublish`)
+				.then((response) => {
+					// find location of unpublished profile in our loaded data
+					var profileLocation = null;
+					for (let index = 0; index < this.profiles.length; index++) {
+						if (this.profiles[index].id === id) {
+							profileLocation = index;
+							break;
+						}
+					}
+					var returnedProfileData = response.data.data; 
+	
+					// updated the loaded data with our returned data where relevant 
+					this.profiles[profileLocation].status = returnedProfileData.status;
+					this.profiles[profileLocation].published_at = returnedProfileData.published_at;
+					this.profiles[profileLocation].updated_at = returnedProfileData.published_at;
+
+					notify({
+						title: 'Profile unpublished',
+						message: `
+							Successfully unpublished profile
+						`,
+						type: 'success'
+					});
+
+				})
+				.catch((error) => {
+					notify({
+						title: 'Profile not unpublished',
+						message: `
+							Profile not unpublished. Try again later.
+						`,
+						type: 'error'
+					});
+				});
+		},
+
 		/**
 		displays the create/edit site profile modal
 		
