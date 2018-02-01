@@ -284,12 +284,8 @@ export default {
 
 					var profileLocation = this.findProfileLocation(id);
 					var returnedProfileData = response.data.data; 
-	
-					// updated the loaded data with our returned data where relevant 
-					this.profiles[profileLocation].status = returnedProfileData.status;
-					this.profiles[profileLocation].published_at = returnedProfileData.published_at;
-					this.profiles[profileLocation].updated_at = returnedProfileData.published_at;
-
+					this.profiles.splice(profileLocation, 1, returnedProfileData);
+					
 					notify({
 						title: 'Profile published',
 						message: `
@@ -334,11 +330,7 @@ export default {
 				.then((response) => {
 					var profileLocation = this.findProfileLocation(id);
 					var returnedProfileData = response.data.data; 
-	
-					// updated the loaded data with our returned data where relevant 
-					this.profiles[profileLocation].status = returnedProfileData.status;
-					this.profiles[profileLocation].published_at = returnedProfileData.published_at;
-					this.profiles[profileLocation].updated_at = returnedProfileData.published_at;
+					this.profiles.splice(profileLocation, 1, returnedProfileData);
 
 					notify({
 						title: 'Profile unpublished',
