@@ -268,13 +268,25 @@ export default {
 
 				})
 				.catch((error) => {
-					notify({
-						title: 'Profile not published',
-						message: `
-							There are some validation issues with this profile.
-							These must be fixed before publishing it.
-						`,
+					var errorMessage = error.response.data.errors[0].message;
+					var errorList = '';
+					for (var field in error.response.data.errors[0].details) {
+						errorList += '<li>' + error.response.data.errors[0].details[field] + '</li>';
+					}
+				
+					this.$confirm(`
+						You must fix the following issues before publishing it.
+						<ul>
+						${errorList}
+						</ul>
+						`, 'Profile not published', {
+						confirmButtonText: 'Edit Profile',
+						cancelButtonText: 'Cancel',
+						dangerouslyUseHTMLString: true,
 						type: 'error'
+					})
+					.then(() => {
+						this.showCreateProfileModal('edit', id)
 					});
 				});
 		},
