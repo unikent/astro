@@ -3,6 +3,7 @@ namespace App\Models\Definitions;
 
 use Config;
 use Exception;
+use Illuminate\Events\Dispatcher;
 use JsonSerializable;
 use App\Exceptions\JsonDecodeException;
 use Illuminate\Contracts\Support\Jsonable;
@@ -22,6 +23,27 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
 
     use HasAttributes, HidesAttributes, GuardsAttributes;
 
+	/**
+	 * @var Dispatcher
+	 */
+    protected $dispatcher = null;
+
+	/**
+	 * Do any setup, etc, such as hooking into events via $this->dispatcher->listen()
+	 */
+    public function boot() {}
+
+	/**
+	 * Register any event listeners defined in this block's definition.json file
+	 */
+    public function registerListeners()
+	{
+		if(!empty($this->getAttribute('events'))) {
+			foreach($this->getAttribute('events') as $event => $method) {
+				$this->dispatcher->listen($event, [$this, $method]);
+			}
+		}
+	}
 
     protected static $defDir = '';
 
@@ -327,7 +349,7 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
         	// dynamic definitions have a definition class that can do things
         	$defn_id = static::idFromNameAndVersion($definition['name'], $definition['version']);
         	$class_path = static::definitionPath($defn_id);
-			$class_name = str_replace('-', '_', ucfirst($definition['name']) . 'V' . $definition['version']);
+			$class_name = static::getDynamicClassName($defn_id);
 			$file_path = $class_path . '/' . $class_name. '.php';
 			require_once $file_path;
 			$instance = new $class_name();
@@ -336,10 +358,29 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
 			$instance = new static();
 		}
     	$instance->forceFill($definition);
-
-    	return $instance;
+		$instance->dispatcher = app('events');
+		$instance->boot();
+		$instance->registerListeners();
+		return $instance;
     }
 
+	/**
+	 * Gets the name of the dynamic definition class.
+	 * Dynamic definition classes are the definition name (first character uppercased),
+	 * with any non-alpha-numeric characters removed (and the first following character uppercased)
+	 * @param string $definition_id {name}-v{version}
+	 * @return string - Class (and file, minus .php extension) name for the class that handles dynamic actions for this definition.
+	 */
+    public static function getDynamicClassName($definition_id)
+	{
+		$def = static::idToNameAndVersion($definition_id);
+		$parts = preg_split('/[^a-z0-9]/i', $def['name'], -1, PREG_SPLIT_NO_EMPTY);
+		$class_name = '';
+		foreach($parts as $part) {
+			$class_name .= ucfirst($part);
+		}
+		return $class_name . 'V' . $def['version'];
+	}
 
     /**
      * Returns a new model instance based on a definition file.

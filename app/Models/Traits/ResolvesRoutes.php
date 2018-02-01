@@ -18,13 +18,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 trait ResolvesRoutes
 {
-	public $listeners = [];
-
-	public function addListener($event, $callback)
-	{
-		$this->listeners[$event][] = $callback;
-	}
-
 	/**
 	 *
 	 * @param $site_id
@@ -40,15 +33,10 @@ trait ResolvesRoutes
 		// Attempt to resolve potential dynamic route
 		if(!$page) {
 			$page = $this->resolveDynamicRoute($host, $path, $version, $includes);
-			// remove any related data that wouldn't make sense here
-			$includes = preg_replace('/(siblings|next|previous|children),?/i', '', $includes);
 		}
 		if ($page) {
 			$response = fractal($page, new PageTransformer(true))
 				->parseIncludes($includes)->respond();
-			$responseData = new FilterResponseData($response->getData(true));
-			Event::dispatch('filterResponseData', $responseData);
-			$response->setData($responseData->data);
 			return $response;
 		}
 		throw new ModelNotFoundException();
@@ -78,9 +66,9 @@ trait ResolvesRoutes
 						foreach( $section['blocks'] as &$block) {
 							$definition = Block::fromDefinitionFile(Block::locateDefinition(Block::idFromNameAndVersion($block['definition_name'], $block['definition_version'])));
 							$block_path = substr($original_path, strlen($path));
-							if($definition->reroute($block_path,$block,$page, $this)) {
-								$page->revision->blocks = $blocks;
-								return $page;
+							$dynamic_page = $definition->route($block_path,$block,$page, $this);
+							if($dynamic_page) {
+								return $dynamic_page;
 							}
 						}
 					}

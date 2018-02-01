@@ -1,6 +1,7 @@
 <?php
 namespace Tests\Unit\Models\Definitions;
 
+use App\Models\Definitions\BaseDefinition;
 use Tests\TestCase;
 use App\Exceptions\JsonDecodeException;
 use Tests\Support\Doubles\Models\Definitions\Double as DefinitionDouble;
@@ -21,6 +22,26 @@ class BaseDefinitionTest extends TestCase
 		parent::tearDown();
 	}
 
+	public function dynamicClassNameData()
+	{
+		return [
+			[ 'block-v1', 'BlockV1'],
+			[ '_-block-__123-v3', 'Block123V3'],
+			[ 'some--other-definition---v4', 'SomeOtherDefinitionV4']
+		];
+	}
+
+	/**
+	 * @test
+	 * @dataProvider dynamicClassNameData
+	 * @param $input
+	 * @param $expected
+	 */
+	public function getDynamicClassName_worksAsExpected($input, $expected)
+	{
+		$result = BaseDefinition::getDynamicClassName($input);
+		$this->assertEquals($expected, $result);
+	}
 
 	/**
 	 * @test

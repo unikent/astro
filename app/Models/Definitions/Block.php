@@ -11,6 +11,32 @@ class Block extends BaseDefinition
 	];
 
 	/**
+	 * Optionally filter the data for this block.
+	 * @param array $block_data Array of data defining this instance of this block.
+	 * @return mixed Array of data.
+	 */
+	public function filterData($block_data){ return $block_data; }
+
+	/**
+	 * Provide dynamic routing.
+	 * This must be implemented by a custom block class.
+	 * @param $path - Path to route
+	 * @param $block - Reference to the block data that is being returned as part of the page.
+	 * @param $page - The Page object.
+	 * @return bool
+	 */
+	public function route($path, &$block, $page) {return false;}
+
+	/**
+	 * Are blocks of this type dynamic?
+	 * @return mixed
+	 */
+	public function isDynamic()
+	{
+		return $this->dynamic;
+	}
+
+	/**
 	 * Get default data and fields to represent an instance of this block.
 	 *
 	 * @param string $region_name - The name of the region containing this block.
@@ -72,24 +98,5 @@ class Block extends BaseDefinition
 			}
 		}
 		return $values;
-	}
-
-	/**
-	 * Provide dynamic routing.
-	 * This must be implemented by a custom block class.
-	 * @param $path - Path to route
-	 * @param $block - Reference to the block data that is being returned as part of the page.
-	 * @param $page - The Page object.
-	 * @return bool
-	 */
-	public function reroute($path, &$block, $page, $resolver) {return false;}
-
-	/**
-	 * Are blocks of this type dynamic?
-	 * @return mixed
-	 */
-	public function isDynamic()
-	{
-		return $this->dynamic;
 	}
 }
