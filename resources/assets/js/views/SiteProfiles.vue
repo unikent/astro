@@ -44,7 +44,7 @@
 							style="display: inline-block;"
 						/>
 					</el-tooltip>
-					{{ scope.row.title }} {{ scope.row.first_name }} {{ scope.row.last_name }}
+					{{ profileName(scope.row) }}
 				</div>
 
 				<div class="site-profiles__published-date" v-if="scope.row.status === 'draft'">
@@ -77,7 +77,7 @@
 			align="center"
 		>
 			<template slot-scope="scope">
-				<el-dropdown trigger="click" @command="handleCommand">
+				<el-dropdown trigger="click">
 					<el-button type="text" size="small">
 						<icon name="more-alt" width="14" height="14" style="fill: #677b98" />
 					</el-button>
@@ -203,6 +203,24 @@ export default {
 			return `${date.toDateString()} at ${date.getHours()}:${date.getMinutes()}`
 		},
 
+		/**
+		returns a formatted name
+		@augments {Object} the profile
+		**/
+		profileName(profile) {
+			var title = profile.title ? profile.title : '';
+
+			if (profile.first_name && profile.last_name) {
+				return `${title} ${profile.first_name} ${profile.last_name}`
+			} else if (profile.first_name) {
+				return `${title} ${profile.first_name}`;
+			} else if (profile.last_name) {
+				return `${title} ${profile.last_name}`;
+			} else {
+				return 'Unnamed Profile';
+			}
+		},
+
 		fetchProfiles() {
 			let site_id = this.$route.params.site_id;
 			this.$api
@@ -210,14 +228,6 @@ export default {
 				.then(({ data: json }) => {
 					this.profiles = json.data;
 				});
-		},
-
-		handleCommand(command) {
-			switch(command) {
-				// TODO: pass along profile id, so we can fetch the data from API
-				// case 'edit':
-				// 	this.showCreateProfileModal('edit')
-			}
 		},
 
 		categorySort(a, b) {
@@ -352,16 +362,7 @@ export default {
 			}
 
 			// we allow saving of unfinished profiles so those might have unfinished names...
-			var profileName = '';
-			if (this.profiles[profileLocation].first_name && this.profiles[profileLocation].last_name) {
-				profileName = `${this.profiles[profileLocation].first_name} ${this.profiles[profileLocation].last_name}`
-			} else if (this.profiles[profileLocation].first_name) {
-				profileName = this.profiles[profileLocation].first_name;
-			} else if (this.profiles[profileLocation].last_name) {
-				profileName = this.profiles[profileLocation].last_name;
-			} else {
-				profileName = 'Unnamed Profile';
-			}
+			var profileName = this.profileName(this.profiles[profileLocation]);
 
 			this.$confirm(`
 				Are you sure you want to remove <strong>${profileName}</strong>
