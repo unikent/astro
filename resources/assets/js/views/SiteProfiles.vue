@@ -46,9 +46,17 @@
 					</el-tooltip>
 					{{ scope.row.title }} {{ scope.row.first_name }} {{ scope.row.last_name }}
 				</div>
-				<div class="site-profiles__published-date">
-					Last published {{ scope.row.published_at }} by ?
+
+				<div class="site-profiles__published-date" v-if="scope.row.status === 'draft'">
+					Edited {{ simpleDate(scope.row.updated_at) }} by ???. Published {{ simpleDate(scope.row.published_at)}}
 				</div>
+				<div class="site-profiles__published-date" v-else-if="scope.row.status === 'new'">
+					Last Edited {{ simpleDate(scope.row.updated_at) }} by ????
+				</div>
+				<div class="site-profiles__published-date" v-else>
+					Last Published {{ simpleDate(scope.row.published_at)}} by ?????
+				</div>
+
 			</template>
 		</el-table-column>
 
@@ -136,9 +144,9 @@
 import { mapGetters } from 'vuex';
 
 import Icon from 'components/Icon';
+import { notify } from 'classes/helpers';
 import filterableMixin from 'mixins/filterableMixin';
 import paginatableMixin from 'mixins/paginatableMixin';
-import { notify } from 'classes/helpers';
 import CreateSiteProfileModal from 'components/CreateSiteProfileModal';
 
 export default {
@@ -189,6 +197,12 @@ export default {
 	},
 
 	methods: {
+
+		simpleDate(dateString) {
+			const date = new Date(dateString);
+			return `${date.toDateString()} at ${date.getHours()}:${date.getMinutes()}`
+		},
+
 		fetchProfiles() {
 			let site_id = this.$route.params.site_id;
 			this.$api
