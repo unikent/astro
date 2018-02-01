@@ -63,20 +63,31 @@
 			</div>
 
 			<div v-else-if="schema[key].type === 'social-media'" style="clear: left;">
-				<div v-for="(data, index) in formData[key]">
-					<el-select v-model="data.id" placeholder="Social media platform">
-						<el-option
-							v-for="platform in availableSocialMedia"
-							:label="platform.name"
-							:value="platform.id"
-							:key="platform.slug"
-						>
-						</el-option>
-					</el-select>
-					<el-input v-model="data.link" placeholder="URL">{{ schema[key].label }}</el-input>
-					<el-button @click="removeSocialMediaPlatform(index)">Delete</el-button>
-				</div>
-				<el-button @click="addSocialMediaPlatform">Add social media</el-button>
+				
+				<el-row :gutter="4" v-for="(data, index) in formData[key]">
+					<el-col :span="6">
+						<el-select v-model="data.id" placeholder="Social media platform">
+							<el-option
+								v-for="platform in availableSocialMedia"
+								:label="platform.name"
+								:value="platform.id"
+								:key="platform.slug"
+							>
+							</el-option>
+						</el-select>
+					</el-col>
+					<el-col :span="14">
+						<el-input v-model="data.link" placeholder="URL">{{ schema[key].label }}</el-input>
+					</el-col>
+					<el-col :span="4">
+						<el-button @click="removeSocialMediaPlatform(index)">Delete</el-button>
+					</el-col>
+				</el-row>
+
+					<el-form-item>
+						<el-button @click="addSocialMediaPlatform">Add social media</el-button>
+					</el-form-item>
+				
 			</div>
 
 			<el-input v-else :name="key"
