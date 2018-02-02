@@ -8,44 +8,46 @@ namespace App\Models;
  */
 class DynamicPage extends Page
 {
+	/**
+	 * The site for this page.
+	 * @var Site|null
+	 */
 	public $site = null;
+
+	/**
+	 * @var Page|null The "real" page which is a parent of this one. May also be a dynamic page.
+	 */
 	public $parent = null;
+
+	/**
+	 * The revision for this page.
+	 * @var Revision|null
+	 */
 	public $revision = null;
 
 	/**
-	 * @var Page|null The "real" page which is a parent of this one.
+	 * Create a dynamic page. Attributes should be the ones matching the attributes within the Page and Revision models.
+	 * Parameters are optional ONLY because the current implementation extending Page which extends Baum means that instances
+	 * of this class may be constructed with no parameters in order to use other methods on the class.
+	 * @todo implement this differently more loosely coupled from Eloquent
+	 * @param Page $parent - The parent of this page.
+	 * @param string $slug - The slug for this page.
+	 * @param array $attributes - Attributes and values that define this Page and its Revision. The attributes should have
+	 * the same name as those within the Page and Revision models, such as layout_name, layout_version, options, blocks, etc.
 	 */
-	protected $dynamicParent = null;
-
-	/**
-	 * DynamicPage constructor. Sets attributes based on
-	 * @param Page $parent
-	 * @param array $attributes
-	 */
-	public function __construct(array $attributes = [], Page $parent = null)
+	public function __construct(array $attributes = [], $slug = null, Page $parent = null)
 	{
 		if($parent) {
+			$attributes['slug'] = $slug;
 			parent::__construct($attributes);
-			$this->dynamicParent = $parent;
 			$this->parent = $parent;
 			$this->path = $this->parent->path . (strlen($this->parent->path) > 1 ? '/' : '') . $this->slug;
-			$this->site = $this->dynamicParent->site;
+			$this->site = $this->parent->site;
 			$this->parent_id = $this->parent->id;
 			$this->depth = $this->parent->depth + 1;
 			$this->site_id = $this->parent->site_id;
 		}
 		$this->revision = new Revision($attributes);
-	}
-
-	public function __get($what)
-	{
-		switch( $what ) {
-			case 'site':
-				return $this->dynamicParent->site;
-				break;
-
-		}
-		return parent::__get($what);
 	}
 
 	public function parent() { return $this->parent; }
@@ -56,8 +58,8 @@ class DynamicPage extends Page
 	public function getRevisions() { return []; }
 	public function getAncestorsWithRevision()
 	{
-		$ancestors = $this->dynamicParent->getAncestorsWithRevision();
-		$ancestors[] = $this->dynamicParent;
+		$ancestors = $this->parent->getAncestorsWithRevision();
+		$ancestors[] = $this->parent;
 		return $ancestors;
 	}
 }

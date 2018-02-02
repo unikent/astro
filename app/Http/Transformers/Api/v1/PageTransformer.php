@@ -80,7 +80,7 @@ class PageTransformer extends FractalTransformer
 			foreach($sections as &$section) {
 				foreach( $section['blocks'] as &$block) {
 					$definition = Block::fromDefinitionFile(Block::locateDefinition(Block::idFromNameAndVersion($block['definition_name'], $block['definition_version'])));
-					$block = $definition->filterData($block, $section['name'], $region, $blocks, $page_data);
+					$block = $definition->filterData($block, $section['name'], $region, $page_data);
 				}
 			}
 		}

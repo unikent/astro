@@ -3,7 +3,6 @@ namespace App\Models\Definitions;
 
 use Config;
 use Exception;
-use Illuminate\Events\Dispatcher;
 use JsonSerializable;
 use App\Exceptions\JsonDecodeException;
 use Illuminate\Contracts\Support\Jsonable;
@@ -22,28 +21,6 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
 {
 
     use HasAttributes, HidesAttributes, GuardsAttributes;
-
-	/**
-	 * @var Dispatcher
-	 */
-    protected $dispatcher = null;
-
-	/**
-	 * Do any setup, etc, such as hooking into events via $this->dispatcher->listen()
-	 */
-    public function boot() {}
-
-	/**
-	 * Register any event listeners defined in this block's definition.json file
-	 */
-    public function registerListeners()
-	{
-		if(!empty($this->getAttribute('events'))) {
-			foreach($this->getAttribute('events') as $event => $method) {
-				$this->dispatcher->listen($event, [$this, $method]);
-			}
-		}
-	}
 
     protected static $defDir = '';
 
@@ -358,9 +335,6 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
 			$instance = new static();
 		}
     	$instance->forceFill($definition);
-		$instance->dispatcher = app('events');
-		$instance->boot();
-		$instance->registerListeners();
 		return $instance;
     }
 
