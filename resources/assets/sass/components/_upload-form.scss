@@ -1,0 +1,26 @@
+.el-upload-list__item.is-fail .el-icon-cross,
+.el-upload-list__item.is-fail .el-icon-error {
+	color: #d65757;
+}
+
+.el-upload-list__item.is-fail:hover .el-icon-cross,
+.el-upload-list__item.is-fail:hover .el-icon-error,
+.el-upload-list__item.is-fail .el-icon-close {
+	display: none;
+}
+// .el-upload-list__item.is-fail:hover .el-icon-close {
+// 	display: inline-block;
+// 	cursor: pointer;
+// 	opacity: .75;
+// 	-webkit-transform: scale(0.7);
+// 	transform: scale(0.7);
+// 	color: #48576a;
+// }
+.el-upload-list__error {
+	padding: 10px;
+	color: #d65757;
+}
+
+.el-upload-list__item.is-fail .el-upload-list__item-status-label {
+	display: block;
+}

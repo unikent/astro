@@ -1,158 +1,247 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import page from '../stubs/page';
-import undoRedo from './undo-redo';
-import { Message } from 'element-ui';
-import api from '../plugins/http/api';
+import undoRedo from '../plugins/undo-redo';
+import shareMutations from '../plugins/share-mutations';
+import shareTimeTravel from '../plugins/share-time-travel';
 
-const debug = process.env.NODE_ENV !== 'production';
+import page from './modules/page';
+import site from './modules/site';
+import media from './modules/media';
+import permissions from './modules/permissions';
+import definition from './modules/definition';
+import contenteditor from './modules/contenteditor';
+
+import Config from 'classes/Config';
+
+/* global process */
 
 Vue.use(Vuex);
 
-const store = (
-	window.self === window.top ? {
+let store = new Vuex.Store({
 
-		state: {
-			blockIndex: null,
-			blockDef: null,
-			blockList: null,
-			page,
-			over: {
-				x: 0,
-				y: 0
-			},
-			pageName: '',
-			drag: {
-				dragging: false,
-				el: null,
-				e: null
-			},
-			preview: {
-				visible: false,
-				url: ''
-			},
-			blockInfo: {
-				sizes: [],
-				offsets: [],
-				moved: null
-			},
-			meta: {
-				blocks: []
-			}
+	/**
+	 * The global editor state
+	 * @namespace state
+	 * @property {Object} over - What coordinates the mouse is over???
+	 * @property {number} over.x - X Coordinate
+	 * @property {number} over.y - Y Coordinate
+	 * @property {Object} WrapperStyles - The styles for the wrapper.
+	 */
+	state: {
+		over: {
+			x: 0,
+			y: 0
+		},
+		wrapperStyles: {},
+		displayIframeOverlay: false,
+		errors: [],
+		undoRedo: {
+			canUndo: false,
+			canRedo: false
+		},
+		sidebarCollapsed: false,
+		blockPicker: {
+			visible: false,
+			insertIndex: 0,
+			insertRegion: null,
+			insertSection: null,
+			allowedBlocks: null,	// the constraints on what blocks can be added
+			maxSelectableBlocks: null, // the maximum number of blocks that can be selected 
+			replaceBlocks: false //whether or not to replace the blocks in the current section
+		},
+		currentView: 'desktop',
+		publishModal: {
+			pagePath: null,
+			visible: false
+		},
+		unpublishModal: {
+			pagePath: null,
+			visible: false
+		},
+		publishValidationWarningModal: {
+			visible: false
+		},
+		menu: {
+			active: 'pages',
+			flash: ''
+		}
+	},
+
+	getters: {},
+
+	mutations: {
+
+		changeView(state, currentView) {
+			state.currentView = currentView;
 		},
 
-		getters: {
-			getFieldValue: (state, getters) => (index, name) => {
-				return state.page.blocks[index].fields[name];
-			},
-
-			getCurrentFieldValue: (state, getters) => (name) => {
-				return getters.getFieldValue(state.blockIndex, name);
-			}
+		updateOver(state, position) {
+			state.over = position;
 		},
 
-		mutations: {
-			SET_BLOCKLIST(state, list) {
-				state.blockList = list;
-			},
-
-			EDIT_BLOCK(state, { index, type } = { index: null, type: null }) {
-				state.blockIndex = state.blockIndex ? null : index;
-				state.blockDef = state.blockDef ? null : state.blockList[type];
-			},
-
-			UPDATE_VALUE(state, { name, value, index }) {
-				let idx = typeof index !== 'undefined' ? index : state.blockIndex;
-				console.log(name, value, idx, state.blockIndex, typeof index);
-				const block = state.page.blocks[idx];
-				block.fields[name] = value;
-				state.page.blocks.splice(idx, 1, block);
-			},
-
-			UPDATE_OVER(state, position) {
-				state.over = position;
-			},
-
-			CHANGE_PAGE(state, name) {
-				state.pageName = name;
-			},
-
-			CHANGE_PREVIEW(state, val) {
-				state.preview = val;
-			},
-
-			REORDER_BLOCKS(state, { type, from, to, value }) {
-				state.page.blocks.splice(from, 1);
-				state.page.blocks.splice(to, 0, value);
-			},
-
-			UPDATE_BLOCK_DATA_ORDER(state, { type, from, to, value }) {
-				state.blockInfo[type].splice(from, 1);
-				state.blockInfo[type].splice(to, 0, value);
-			},
-
-			UPDATE_BLOCK_DATA(state, { type, index, value }) {
-				state.blockInfo[type].splice(index, 1, value);
-			}
+		updateWrapperStyle(state, { prop, value }) {
+			state.wrapperStyles = { ...state.wrapperStyles, [prop]: value };
 		},
 
-		actions: {
-			fetchBlockList({ commit }) {
-				api
-					.get('definitions')
-					.then((response) => {
-						commit('SET_BLOCKLIST', response.data.data);
-					});
-			},
-
-			editBlock({ commit }, data) {
-				commit('EDIT_BLOCK', data);
-			},
-
-			updateValue({ commit }, data) {
-				commit('UPDATE_VALUE', data);
-			},
-
-			updateOver({ commit }, data) {
-				commit('UPDATE_OVER', data);
-			},
-
-			changePage({ commit }, data) {
-				commit('CHANGE_PAGE', data);
-			},
-
-			changePreview({ commit }, data) {
-				commit('CHANGE_PREVIEW', data);
-			},
-
-			updateBlockData({ commit }, data) {
-				commit('UPDATE_BLOCK_DATA', data);
-			},
-
-			updateBlockDataOrder({ commit }, data) {
-				commit('UPDATE_BLOCK_DATA_ORDER', data);
-			},
-
-			reorderBlocks({ commit }, data) {
-				commit('REORDER_BLOCKS', data);
-			}
-
-			// TODO: add these actions?
-			// addRow(row, index) // uuid.v1?
-			// updateRows(index, row)
-			// deleteRow(row, index)
-			// sortRows(to, from)
+		showIframeOverlay(state, show = true) {
+			state.displayIframeOverlay = show;
 		},
 
-		plugins: [undoRedo]
+		updateErrors(state, errors) {
+			state.errors = errors;
+		},
 
-	}
+		updateUndoRedo(state, canUndoRedo) {
+			state.undoRedo = canUndoRedo;
+		},
 
-	:
+		collapseSidebar(state) {
+			state.sidebarCollapsed = true;
+		},
 
-	window.top.store
-);
+		revealSidebar(state) {
+			state.sidebarCollapsed = false;
+		},
 
-window.store = store;
+		/**
+		 * Display the block picker.
+		 * @param state
+		 * @param {string} regionName - The name of the region to add any blocks to.
+		 * @param {number} sectionIndex - The index of the section within the region to add any blocks to.
+		 * @param {number} insertIndex - The index within the section to add any blocks to.
+		 * @param {Object} blocks - List of allowed block names.
+		 * @param {number} maxSelectableBlocks - the maximum number of blocks that can be selected
+		 * @param {boolean} replaceBlocks - Replace the blocks in the section with the new one
+		 */
+		showBlockPicker(state, { regionName, sectionIndex, insertIndex, blocks, maxSelectableBlocks, replaceBlocks }) {
+			state.blockPicker.insertRegion = regionName;
+			state.blockPicker.insertIndex = insertIndex;
+			state.blockPicker.insertSection = sectionIndex;
+			state.blockPicker.allowedBlocks = blocks;
+			state.blockPicker.maxSelectableBlocks = maxSelectableBlocks;
+			state.blockPicker.replaceBlocks = replaceBlocks
+			state.blockPicker.visible = true;
+		},
 
-export default new Vuex.Store(store);
+		hideBlockPicker(state) {
+			state.blockPicker.visible = false;
+		},
+
+		updateInsertIndex(state, val) {
+			state.blockPicker.insertIndex = val;
+		},
+
+		updateInsertRegion(state, val) {
+			state.blockPicker.insertRegion = val;
+		},
+
+		showPublishModal(state, arrayPath) {
+			if(arrayPath) {
+				// update the page path in the store
+				state.publishModal.pagePath = arrayPath;
+			}
+			state.publishModal.visible = true;
+		},
+
+		hidePublishModal(state) {
+			// remove the page path in the store here
+			state.publishModal.pagePath = null;
+			state.publishModal.visible = false;
+		},
+
+		showUnpublishModal(state, arrayPath) {
+			if(arrayPath) {
+				// update the page path in the store
+				state.unpublishModal.pagePath = arrayPath;
+			}
+			state.unpublishModal.visible = true;
+		},
+
+		hideUnpublishModal(state) {
+			// remove the page path in the store here
+			state.unpublishModal.pagePath = null;
+			state.unpublishModal.visible = false;
+		},
+
+		showPublishValidationWarningModal(state) {
+			state.publishValidationWarningModal.visible = true;
+		},
+
+		hidePublishValidationWarningModal(state) {
+			state.publishValidationWarningModal.visible = false;
+		},
+
+		updateMenuActive(state, id) {
+			state.menu.active = id;
+		},
+
+		updateMenuFlash(state, id) {
+			state.menu.flash = id;
+		}
+	},
+
+	actions: {
+
+		/**
+		 * Mutates a page title, both in the pages list and in the editor if it is the page being edited.
+		 *
+		 * @param context
+		 * @param {string} id - The page id.
+		 * @param {string} title - The new title.
+		 */
+		setPageTitleGlobally({ commit }, { id, title }) {
+			commit('setPageTitle', { id, title }, { root: true });
+			commit('site/setPageTitleInPagesList', { id, title });
+		},
+
+		/**
+		 * Mutates a page slug, both in the pages list and in the editor if it is the page being edited.
+		 * As a side-effect of this, path must also be updated.
+		 *
+		 * @param context
+		 * @param {string} id - The page id.
+		 * @param {string} slug - The new slug.
+		 */
+		setPageSlugAndPathGlobally({ commit }, { id, slug }) {
+			commit('setPageSlugAndPath', { id, slug }, { root: true });
+			commit('site/setPageSlugAndPathsInPagesList', { id, slug });
+		},
+
+		/**
+		 * Mutates a page's status, both in the pages list and
+		 * in the editor if it is the page being edited.
+		 *
+		 * @param context
+		 * @param {string} id - The page id.
+		 * @param {string} arrayPath - The array path to the page in the page list
+		 * eg. "0.0.1" for pagelist[0][0][1]
+		 * @param {string} status - The new status.
+		 */
+		setPageStatusGlobally({ commit, dispatch }, { id, arrayPath, status }) {
+			// uses action as we need access to the getPage getter
+			dispatch('setPageStatus', { id, arrayPath, status }, { root: true });
+			commit('site/setPageStatusInPagesList', { id, arrayPath, status });
+		}
+	},
+
+	modules: {
+		page,
+		definition,
+		contenteditor,
+		site,
+		media,
+		permissions
+	},
+
+	plugins: [
+		shareMutations,
+		undoRedo,
+		...(Config.get('debug', false) ? [shareTimeTravel] : [])
+	],
+
+	strict: process.env.NODE_ENV !== 'production'
+
+});
+
+
+export default store;

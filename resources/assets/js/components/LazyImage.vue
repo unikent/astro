@@ -1,26 +1,40 @@
-<style>
-	.bg-img {
-		background-size: cover;
-		padding-top: 100%;
-		background-position: 50%;
-	}
-</style>
-
 <template>
-	<div v-if="bg" class="bg-img" :style="`background-image: url('${imageSrc}');`" />
-	<img v-else :src="imageSrc" />
+	<div v-if="bg && !template" :style="bgStyle" />
+	<img v-else-if="!template" :src="imageSrc" />
+	<component v-else :is="template" />
 </template>
 
 <script>
+/* global Image, console */
+
 export default {
 
-	props: [
-		'src',
-		'smallSrc',
-		'template',
-		'aspect',
-		'bg'
-	],
+	props: {
+		src: {
+			type: String,
+			required: true
+		},
+		smallSrc: {
+			required: true
+		},
+		template: {
+			type: String
+		},
+		aspect: {
+			type: Number
+		},
+		bg: {
+			type: Boolean
+		},
+		'on-start': {
+			type: Function,
+			default: () => {}
+		},
+		'on-load': {
+			type: Function,
+			default: () => {}
+		}
+	},
 
 	data() {
 		return {
@@ -28,8 +42,20 @@ export default {
 		}
 	},
 
+	computed: {
+		bgStyle() {
+			return {
+				backgroundSize: 'cover',
+				paddingTop: '100%',
+				backgroundPosition: '50%',
+				backgroundImage: `url('${this.imageSrc}')`
+			};
+		}
+	},
+
 	watch: {
 		src() {
+			this.imageSrc = this.smallSrc;
 			this.loadImage();
 		}
 	},
@@ -40,14 +66,17 @@ export default {
 
 	methods: {
 		loadImage() {
+			this.onStart();
+
 			let img = new Image();
 
-			img.addEventListener('load', (e) => {
+			img.addEventListener('load', () => {
 				this.imageSrc = this.src;
+				this.onLoad();
 			});
 
-			img.addEventListener('error', (e) => {
-				console.warn(`Oops! We couldnt load the "${img.src}" image.`);
+			img.addEventListener('error', () => {
+				console.warn(`Oops! We couldnt load "${img.src}".`);
 			});
 
 			img.src = this.src;

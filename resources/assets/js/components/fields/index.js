@@ -1,16 +1,20 @@
-import Text        from './Text.vue';
-import TextArea    from './TextArea.vue';
-import RichText    from './RichText.vue';
-import Switch      from './Switch.vue';
-import Checkbox    from './Checkbox.vue';
-import Select      from './Select.vue';
-import MultiSelect from './MultiSelect.vue';
-import Radio       from './Radio.vue';
-import ButtonGroup from './ButtonGroup.vue';
-import Link        from './Link.vue';
-import Image       from './Image.vue';
-import Video       from './Video.vue';
-import File        from './File.vue';
+import Text          from './Text';
+import TextArea      from './TextArea';
+import Number        from './Number';
+import RichText      from './RichText';
+import Switch        from './Switch';
+import Checkbox      from './Checkbox';
+import Select        from './Select';
+import MultiSelect   from './MultiSelect';
+import Radio         from './Radio';
+import ButtonGroup   from './ButtonGroup';
+import Image         from './Image';
+import File          from './File';
+import Slider        from './Slider';
+import Date          from './Date';
+import Time          from './Time';
+import DateTime      from './DateTime';
+import NestedOptions from './NestedOptions';
 
 export default {
 	text:        Text,
@@ -22,8 +26,12 @@ export default {
 	multiselect: MultiSelect,
 	radio:       Radio,
 	buttongroup: ButtonGroup,
-	link:        Link,
 	image:       Image,
-	video:       Video,
-	file:        File
-}
+	file:        File,
+	number:      Number,
+	slider:      Slider,
+	date:        Date,
+	time:        Time,
+	datetime:    DateTime,
+	nested:      NestedOptions
+};

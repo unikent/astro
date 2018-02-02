@@ -1,7 +1,9 @@
 {
-  "/js/app.js": "/js/app.js",
-  "/css/app.css": "/css/app.css",
-  "/js/vendor.js": "/js/vendor.js",
-  "/js/manifest.js": "/js/manifest.js",
-  "/img/sprite.svg": "/img/sprite.svg"
+  "/build/js/manifest.js": "/build/js/manifest.js",
+  "/build/js/vendor.js": "/build/js/vendor.js",
+  "/build/js/main.js": "/build/js/main.js",
+  "/build/css/vendor.css": "/build/css/vendor.css",
+  "/build/css/main.css": "/build/css/main.css",
+  "/build/css/kentfont.css": "/build/css/kentfont.css",
+  "/build/img/sprite.svg": "/build/img/sprite.svg"
 }

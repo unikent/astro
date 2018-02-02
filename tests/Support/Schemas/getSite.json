@@ -1,0 +1,6 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "id": "http://kent.ac.uk/json-schema/getSite.json",
+  "type": "object",
+
+}

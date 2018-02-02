@@ -4,40 +4,17 @@
 			v-for="option in options"
 			:label="option.label"
 			:value="option.value"
+			:key="option.label"
 		>
 		</el-option>
 	</el-select>
 </template>
 
 <script>
-	import { mapActions } from 'vuex';
+import baseFieldMixin from '../../mixins/baseFieldMixin';
 
-	export default {
-
-		name: 'SelectField',
-
-		props: ['field'],
-
-		data() {
-			return this.field;
-		},
-
-		computed: {
-			value: {
-				get() {
-					return this.$store.getters.getCurrentFieldValue(this.name);
-				},
-				set(value) {
-					this.updateValue({ name: this.name, value });
-				}
-			}
-		},
-
-		methods: {
-			...mapActions([
-				'updateValue'
-			])
-		}
-
-	}
+export default {
+	name: 'select-field',
+	mixins: [baseFieldMixin]
+};
 </script>

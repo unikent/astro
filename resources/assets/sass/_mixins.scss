@@ -1,23 +1,30 @@
-// Lovingly stolen (and adjusted) from Bootstrap
+/*---- functions ----*/
 
-@function breakpoint-min($name, $breakpoints: $grid-breakpoints) {
-	$min: map-get($breakpoints, $name);
-	@return if($min != 0, $min, null);
+@function get-height($key) {
+	$height: map-get($heights, $key);
+	@return nth($height, 1) + nth($height, 2);
 }
 
-@function breakpoint-infix($name, $breakpoints: $grid-breakpoints) {
-	@return if(breakpoint-min($name, $breakpoints) == null, "", "-#{$name}");
-}
 
-@mixin media-breakpoint-up($name, $breakpoints: $grid-breakpoints) {
-	$min: breakpoint-min($name, $breakpoints);
-	@if $min {
-		@media (min-width: $min) {
-			@content;
-		}
-	} @else {
-		@content;
+@mixin button-variant(
+	$background,
+	$border: darken($background, 10%),
+	$focus-background: lighten($background, 8%),
+	$focus-border: lighten($border, 10%),
+	$active-background: darken($background, 8%),
+	$active-border: darken($border, 10%)
+) {
+	background-color: $background;
+	border-color: $border;
+
+	&:focus,
+	&:hover {
+		background-color: $focus-background;
+		border-color: $focus-border;
+	}
+
+	&:active {
+		background-color: $active-background;
+		border-color: $active-border;
 	}
 }
-
-// End stolen bit

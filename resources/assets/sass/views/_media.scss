@@ -1,0 +1,155 @@
+.manage-table__search {
+	max-width: 250px;
+}
+h3 {
+	margin-top: 0;
+}
+.image-grid__item {
+	background-color: #dadde2;
+	position: relative;
+	padding-top: 100%;
+	border: 1px solid #dadde2;
+	border-radius: 2px;
+	transition: transform .2s ease-out, border .2s ease-out, box-shadow .2s ease-out;
+	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0), 0 4px 8px 0 rgba(0, 0, 0, 0);
+	overflow: hidden;
+	// improved paint performance
+	will-change: transform;
+}
+.image-grid__item .img-grid {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+.image-grid__item-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	opacity: 0;
+	background-color: #48576a;
+	background: radial-gradient(farthest-corner at 50% 50%, rgba(50, 50, 50, .3) 50%, rgba(50, 50, 50, .6) 100%);
+	transition: opacity .3s ease-out;
+}
+
+.item-grid__edit {
+
+	transform: translateY(40px);
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+
+	opacity: 0;
+	transition: transform .2s ease-out, opacity .2s ease-out;
+
+	.item-grid__edit-button {
+		position: absolute;
+		left: 10px;
+		bottom: 10px;
+		font-size: 1.2rem;
+		color: #fff;
+		cursor: pointer;
+	}
+
+	.el-dropdown {
+		position: absolute;
+		right: 10px;
+		bottom: 5px;
+		color: #fff;
+		font-size: 1.2rem;
+		cursor: pointer;
+	}
+}
+
+.image-grid__item:hover  {
+	border: 1px solid #48576a;
+	box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1), 0 4px 8px 0 rgba(0,0,0,0.2);
+
+	.image-grid__item-overlay {
+		opacity: 1;
+	}
+
+	.item-grid__edit {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.media__filter-by {
+	max-width: 120px;
+}
+
+.media__order-by {
+	max-width: 140px;
+}
+
+.media__order-attr {
+	float: left
+}
+
+.media__order-sort {
+	float: right;
+	color: #8492a6;
+	font-size: 13px
+}
+
+.preview-dialog {
+
+	&__image-outer {
+		display: flex;
+		justify-content: center;
+		background-color: #f7f9fb;
+	}
+	&__image-wrapper {
+		width:100%;
+	}
+	&__image-img {
+		padding-bottom: 100%;
+	}
+	&__details-wrapper {
+		display: flex;
+		height: 100%;
+		flex-direction: column;
+		justify-content: center;
+	}
+	&__details-colour-wrapper {
+		display: flex;
+		border-radius: 6px;
+		overflow: hidden;
+		width: 70%;
+	}
+	&__details-colours {
+		flex: auto;
+		height: 60px;
+	}
+}
+
+.el-pagination {
+	margin-top: 2em;
+}
+.el-pagination .el-select .el-input {
+	width: 68px;
+}
+.show-text {
+	margin: 0 10px 0 0;
+}
+
+.results-text {
+	font-size: 13px;
+	padding-right: 10px;
+	display: block;
+	text-align: right;
+}
+
+.u-flex {
+	display: flex;
+}
+
+.upload-button {
+	margin-right: 14px;
+}

@@ -1,43 +1,17 @@
-<style lang="scss">
-.el-upload-list__item.is-fail .el-icon-cross,
-.el-upload-list__item.is-fail .el-icon-circle-cross {
-	color: #ff7348;
-}
-
-.el-upload-list__item.is-fail:hover .el-icon-cross,
-.el-upload-list__item.is-fail:hover .el-icon-circle-cross,
-.el-upload-list__item.is-fail .el-icon-close {
-	display: none;
-}
-.el-upload-list__item.is-fail:hover .el-icon-close {
-	display: inline-block;
-	cursor: pointer;
-	opacity: .75;
-	-webkit-transform: scale(0.7);
-	transform: scale(0.7);
-	color: #48576a;
-}
-.el-upload-list__error {
-	padding: 10px;
-	color: #d65757;
-}
-</style>
-
 <template>
 	<el-upload
-		class="upload-demo"
+		class="upload-form"
 		drag
 		action="media"
 		name="upload"
 		:on-error="handleError"
-		:on-progress="handleProgress"
+		:on-success="onSuccess"
 		:http-request="upload"
-		multiple
+		:multiple="multiple"
 		:accept="accept"
-		style="margin: 0 5px;"
 	>
 		<i class="el-icon-upload"></i>
-		<div class="el-upload__text">Drop file(s) here or <em>click to upload</em></div>
+		<div class="el-upload__text">Drop {{ multiple ? 'one or more files' : 'a single file' }} here or <em>click to upload</em></div>
 		<div class="el-upload__tip" slot="tip">
 			Files must be less than 5MB. If this dialog is closed uploads will happen in the background.
 			<upload-fail-list
@@ -52,12 +26,18 @@
 import upload from '../plugins/http/upload';
 import UploadFailList from './UploadFailList';
 
-// TODO: while uploading stop visiting to different page?.
+// TODO: while uploading show global upload progress.
 
 export default {
-	props: [
-		'accept'
-	],
+	props: {
+		accept: String,
+		multiple: Boolean,
+		onSuccess: {
+			type: Function,
+			default: () => {}
+		},
+		siteId: Number
+	},
 
 	components: {
 		UploadFailList
@@ -70,19 +50,19 @@ export default {
 	},
 
 	methods: {
-		handleError(err, file, fileList) {
-			if(err.response && err.response.status === 422) {
+		handleError(err, file) {
+			if(err.response && err.response.data && err.response.data.errors && err.response.data.errors.length) {
 				file.error = err.response.data.errors[0].message;
 			}
 
 			this.failedUploads.push(file);
 		},
 
-		handleProgress(e, file, fileList) {
-			console.log(e, file.uid, fileList);
-		},
-
 		upload(options) {
+			if(!options.data) {
+				options.data = {};
+			}
+			options.data['site_ids[]'] = this.siteId;
 			return upload(options);
 		}
 	}

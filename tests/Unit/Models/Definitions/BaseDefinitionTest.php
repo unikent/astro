@@ -3,8 +3,8 @@ namespace Tests\Unit\Models\Definitions;
 
 use Tests\TestCase;
 use App\Exceptions\JsonDecodeException;
-use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Tests\Support\Doubles\Models\Definitions\Double as DefinitionDouble;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 
 class BaseDefinitionTest extends TestCase
 {

@@ -10,36 +10,43 @@
 
 	<title>Astro</title>
 
-	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/css/app.css') }}" />
-	@if ($route === 'preview')
-		<link rel="stylesheet" href="{{ url("/") }}/css/main.min.css" />
-		<link rel="stylesheet" href="https://static.kent.ac.uk/pantheon/kent-theme-assets/assets/css/kentfont.css" />
+	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/build/css/main.css') }}" />
+	@if ($is_preview)
 		<style>
 		html {
 			background-color: #f7f7f7;
-		}
-		.b-block {
-			max-width: calc(100vw - 17px);
 		}
 		</style>
 	@endif
 
 	<script>
-	window.Laravel = <?php echo json_encode([
-		'csrfToken' => csrf_token(),
-		'base' => Request::getBaseUrl(),
-		'username' => $user
+	window.astro = <?php echo json_encode([
+		'csrf_token' => csrf_token(),
+		'base_url' => Request::getBaseUrl(),
+		'api_url' => '/api/v1/',
+		'username' => $username,
+		'user'     => $user,
+		'api_token' => $api_token,
+		'debug' => config('app.debug')
 	]); ?>;
-	window.isEditor = <?php echo json_encode($route !== 'preview'); ?>;
 	</script>
+
+	@if (env('ENABLE_HEAP'))
+		@include('components.heap-analytics')
+	@endif
+
+	@if (env('ENABLE_HOTJAR'))
+		@include('components.hotjar-analytics')
+	@endif
+
 </head>
-<body class="custom-scrollbar">
+<body class="custom-scrollbar{{ $is_preview ? '' : ' vue-context' }}">
 	<div id="editor">
 
 	</div>
 
-	<script src="{{ url("/") }}{{ mix('js/manifest.js') }}"></script>
-	<script src="{{ url("/") }}{{ mix('js/vendor.js') }}"></script>
-	<script src="{{ url("/") }}{{ mix('js/app.js') }}"></script>
+	<script src="{{ url('/') }}{{ mix('/build/js/manifest.js') }}"></script>
+	<script src="{{ url('/') }}{{ mix('/build/js/vendor.js') }}"></script>
+	<script src="{{ url('/') }}{{ mix('/build/js/main.js') }}"></script>
 </body>
 </html>

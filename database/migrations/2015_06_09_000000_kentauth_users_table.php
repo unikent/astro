@@ -17,11 +17,14 @@ class KentauthUsersTable extends Migration {
 		Schema::create('users', function (Blueprint $table) {
 			$table->increments('id');
 			$table->string('username')->unique();
+            $table->string('password');
 			$table->string('name');
 			$table->string('email');
 			$table->string('role');
-			$table->integer('created_by')->index();
-			$table->integer('updated_by')->index();
+            $table->string('api_token')->unique();
+            $table->text('settings');
+			$table->integer('created_by')->index()->nullable();
+			$table->integer('updated_by')->index()->nullable();
 			$table->timestamps();
 		});
 	}

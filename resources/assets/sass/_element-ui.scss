@@ -1,0 +1,257 @@
+.el-tabs__header {
+	margin: 0;
+}
+
+.el-dropdown-menu {
+	font-size: 14px;
+}
+
+.el-dialog__title {
+	font-weight: 500;
+}
+
+.el-dialog--large {
+	.el-dialog {
+		min-width: 80%;
+	}
+}
+
+.editor-nav {
+	.el-tabs__nav {
+		float: none;
+	}
+	.el-tabs__nav-wrap {
+		margin-bottom: 0;
+	}
+	.el-tabs__item {
+		width: 50%;
+		text-align: center;
+		background-color: #fff;
+	}
+}
+
+.el-upload {
+	width: 100%;
+}
+
+.el-upload-dragger {
+	width: 100%;
+}
+
+.block-options-list	{
+	.el-form-item__label {
+		padding: 0 0 10px;
+		font-size: 14px;
+		font-weight: 500;
+		width: 100%;
+
+		span {
+			line-height: 1.5;
+		}
+	}
+
+	.el-form-item__icon-help {
+		margin-right: 5px;
+	}
+
+	.el-form-item__icon-view {
+		margin-left: auto;
+		fill: #a0a0a0;
+		float: right;
+	}
+
+	.el-form > .el-form-item + .el-form-item {
+		margin-top: 40px;
+	}
+
+	.is-error .el-upload-dragger {
+		width: 100%;
+		border-color: #d65757;
+	}
+
+	.el-form-item.is-required .el-form-item__label:before {
+		content: none;
+	}
+
+	.el-form-item.is-required .el-form-item__label:after {
+		content: '*';
+		color: #ff4949;
+	}
+
+	.el-form-item.is-error .collection-field .el-input__inner,
+	.el-form-item.is-error .collection-field .el-textarea__inner,
+	.el-form-item.is-error .collection-field .el-upload-dragger {
+		border-color: #b7c2d4;
+	}
+
+	.el-form-item.is-success {
+		.el-input__inner,
+		.el-textarea__inner {
+			border-color: #d8dce5;
+
+			&:hover {
+				border-color: #b4bccc;
+			}
+
+			&:focus {
+				border-color: #409eff;
+			}
+		}
+	}
+
+	.el-form-item.is-error {
+		.collection-field {
+
+			.el-input__inner,
+			.el-textarea__inner,
+			.el-upload-dragger {
+				border-color: #b7c2d4;
+
+				&:hover {
+					border-color: #8391a5
+				}
+				&:focus {
+					outline: 0;
+					border-color: #03a9f4;
+				}
+			}
+
+			.el-form-item.is-error {
+
+				.el-input__inner,
+				.el-textarea__inner,
+				.el-upload-dragger {
+					border-color: #d65757;
+				}
+			}
+		}
+
+		.richtext-wrapper {
+			border: 1px solid #d65757;
+		}
+	}
+}
+
+.el-dialog,
+.el-message-box {
+	border: 1px solid #dadde2;
+	box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 10px;
+}
+
+.el-table--fit {
+	table {
+		width: 100%;
+	}
+}
+
+.el-table td,
+.el-table th {
+	height: auto;
+}
+
+.el-table th > .cell,
+.el-table .cell {
+	line-height: inherit;
+}
+
+.el-table th {
+	background-color: #f7f9fb;
+}
+
+.el-table__fixed-header-wrapper thead div,
+.el-table__header-wrapper thead div {
+	background-color: #f7f9fb;
+}
+
+.el-table--striped .el-table__body tr:nth-child(2n) td {
+	background-color: #f7f9fb;
+}
+
+.el-dialog {
+	border-radius: 4px;
+}
+
+.tabbed-dialog {
+	.el-tabs--border-card > .el-tabs__header {
+		background-color: #f7f9fb;
+	}
+
+	.el-dialog__body {
+		padding: 30px 0;
+	}
+
+	.el-tabs--border-card {
+		border: 0;
+		border-top: 1px solid #dadde2;
+	}
+
+	.el-tabs--border-card {
+		box-shadow: none;
+	}
+}
+
+.el-button--neutral {
+	fill: #fff;
+
+	.icon {
+		margin-left: 4px;
+		vertical-align: bottom;
+	}
+}
+
+// allows a narrower tooltip in some cases
+.el-tooltip__popper--narrow {
+	max-width: 300px;
+}
+
+.is-error--custom {
+	padding-bottom: 16px;
+
+	.el-input__inner,
+	.el-input__inner:focus,
+	.el-input__inner:hover,
+	.el-textarea__inner,
+	.el-input-group__prepend,
+	.el-input-group__append {
+		border-color: #ff4949;
+	}
+
+	.el-form-item__error {
+		top: auto;
+		bottom: 0;
+		left: 10px;
+	}
+}
+
+// error cards
+.box-card.error-card {
+	background-color: #fee;
+	
+	.el-card__header {
+    	color: #fa5555;
+    	font-size: 2rem;
+
+    	.clearfix {
+    		align-items: center;
+			display: flex;
+    	}
+
+    	.error-title {
+    		padding: 0 0.5rem;
+    	}
+	}
+}
+
+@each $status, $colour in $status-colours {
+	.el-button--#{$status} {
+		@include button-variant($colour);
+	}
+}
+
+// modify the font and border colours of tags, to make them more readable
+@each $status, $colour in $status-font-colours {
+	.el-tag--#{$status} {
+		color: $colour;
+		border: 1px solid $colour;
+	}
+}

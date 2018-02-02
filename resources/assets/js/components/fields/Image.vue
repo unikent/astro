@@ -1,90 +1,103 @@
-<style lang="scss">
-.upload-demo .el-upload {
-	width: 100%;
-}
-</style>
-
 <template>
-<el-upload
-	class="upload-demo"
-	drag
-	action=""
-	:on-preview="handlePreview"
-	:on-remove="handleRemove"
-	:on-success="handleSuccess"
-	:on-error="handleError"
-	:file-list="fileList"
->
-	<i class="el-icon-upload"></i>
-	<div class="el-upload__text">Drop file here or <em>click to upload</em></div>
-	<div class="el-upload__tip" slot="tip">jpg/png files with a size less than 500kb</div>
-</el-upload>
+<div v-if="value" class="image-field">
+	<item-thumbnail
+		:item="item"
+		:enable-options="value.filename !== 'placeholder.jpg'"
+		:on-edit="showMediaOverlay"
+	>
+		<div class="image-field__overlay">
+			<el-button @click="showPicker">Change image</el-button>
+		</div>
+	</item-thumbnail>
+</div>
+<div v-else class="image-field__add-button">
+	<el-button @click="showPicker">Add image</el-button>
+</div>
 </template>
 
 <script>
-	import { mapActions, mapState } from 'vuex';
-	import _ from 'lodash';
+import { mapMutations, mapState, mapGetters, mapActions } from 'vuex';
 
-	export default {
+import MediaPicker from 'components/MediaPicker';
+import ItemThumbnail from 'components/media/ItemThumbnail';
 
-		name: 'ImageField',
+export default {
 
-		props: ['name'],
+	name: 'image-field',
 
-		data() {
-			return {
-				showPreview: false
-			};
-		},
+	components: {
+		MediaPicker,
+		ItemThumbnail
+	},
 
-		computed: {
-			fileList: {
-				get() {
-					const val = this.$store.getters.getCurrentFieldValue(this.name)
-					return val ? [ val ] : [];
-				},
-				set(value) {
-					this.updateValue({
-						name: this.name,
-						value: value ? _.pick(value, 'name', 'url') : value
-					});
-				}
+	props: [
+		'path',
+		'accept',
+		'multiple',
+		'field'
+	],
+
+	computed: {
+		...mapState({
+			currentBlockIndex: state => state.contenteditor.currentBlockIndex,
+			currentRegionName: state => state.contenteditor.currentRegionName
+		}),
+
+		...mapGetters([
+			'currentSectionIndex',
+			'getCurrentFieldValue'
+		]),
+
+		value: {
+			get() {
+				return this.getCurrentFieldValue(this.path);
 			},
-
-			...mapState([
-				'page',
-				'preview'
-			])
-		},
-
-		methods: {
-
-			...mapActions([
-				'updateValue'
-			]),
-
-			handleRemove(file, fileList) {
-				this.fileList = null;
-			},
-
-			handlePreview(file) {
-				this.$store.dispatch('changePreview', {
-					visible: true,
-					url: this.fileList[0].url
+			set(value) {
+				this.updateFieldValue({
+					name: this.path,
+					index: this.currentBlockIndex,
+					region: this.currentRegionName,
+					section: this.currentSectionIndex,
+					value: { ...value, type: 'image' }
 				});
-			},
 
-			handleSuccess(file) {
-				console.log(file);
-			},
-
-			handleError(res, file) {
-				this.fileList = {
-					name: file.name,
-					url: URL.createObjectURL(file.raw)
-				};
+				this.updateBlockMedia({
+					index: this.currentBlockIndex,
+					region: this.currentRegionName,
+					section: this.currentSectionIndex,
+					value: {
+						...value,
+						/* eslint-disable camelcase */
+						associated_field: this.path
+  						/* eslint-enable camelcase */
+					}
+				});
 			}
+		},
 
+		item() {
+			return { ...this.value, type: 'image' };
+		}
+	},
+
+	methods: {
+		...mapMutations([
+			'updateFieldValue',
+			'updateBlockMedia',
+			'setMediaType',
+			'updateMediafieldPath',
+			'showMediaPicker',
+		]),
+
+		...mapActions([
+			'showMediaOverlay'
+		]),
+
+		showPicker() {
+			this.setMediaType('image');
+			this.updateMediafieldPath(this.path);
+			this.showMediaPicker();
 		}
 	}
+};
 </script>

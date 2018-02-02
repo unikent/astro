@@ -23,15 +23,41 @@ class Layout extends BaseDefinition
 	 *
 	 * @return void
 	 */
-	protected function loadRegionDefinitions(){
-		foreach($this->regions as $name){
-			$path = Region::locateDefinition($name);
-
+	public function loadRegionDefinitions(){
+		foreach($this->regions as $region_id){
+			$path = Region::locateDefinition($region_id);
 			if(!is_null($path)){
 				$region = Region::fromDefinitionFile($path);
 				$this->regionDefinitions->push($region);
 			}
 		}
+	}
+
+	/**
+	 * Get the data structure that defines the regions and sections for a page using this layout.
+	 * @return array Array of [region-name => [section1, ...], ... ]
+	 */
+	public function getDataStructure()
+	{
+		$data = [];
+		foreach($this->getRegionDefinitions() as $region_definition){
+			$region_id = Region::idFromNameAndVersion($region_definition->name, $region_definition->version);
+			$data[$region_id] = $region_definition->getDataStructure();
+		}
+		return $data;
+	}
+
+	/**
+	 * Get the default page content (regions, sections and blocks) for this layout.
+	 * @return array - [ region-name => [ [ 'name' => 'section-1-name', 'blocks' => [ ... block data ... ], ... ] ], ... ]
+	 */
+	public function getDefaultPageContent()
+	{
+		$regions = [];
+		foreach($this->getRegionDefinitions() as $region_definition) {
+			$regions[Region::idFromNameAndVersion($region_definition->name, $region_definition->version)] = $region_definition->getDefaultBlocks();
+		}
+		return $regions;
 	}
 
 	/**
@@ -46,5 +72,4 @@ class Layout extends BaseDefinition
 
 		return $this->regionDefinitions;
 	}
-
 }

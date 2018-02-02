@@ -1,235 +1,70 @@
-<style lang="scss">
-	.page-list {
-		list-style: none;
-		padding: 0;
-		user-select: none;
-		font-size: 14px;
-		width: 100%;
-		margin: 0;
-
-		.option-button {
-			padding: 6px;
-		}
-
-		.parent-page {
-			padding: 0;
-		}
-
-		.parent-page > div {
-			color: #03a9f4;
-		}
-
-		.is-site > div  {
-			color: #41b883;
-		}
-
-		.parent-page > div,
-		li {
-			padding: 10px;
-			transition: background 300ms ease;
-			cursor: default;
-		}
-
-		ul {
-			list-style: none;
-			padding-left: 0;
-		}
-
-		li:not(.parent-page):hover,
-		.parent-page > div:hover {
-			background-color: #e5e9f1;
-		}
-
-		li.add:hover {
-			background: none;
-		}
-
-		.chevron {
-			cursor: pointer;
-			width: 12px;
-			margin-right: 2px;
-			transition: transform .2s ease-out;
-			vertical-align: middle;
-		}
-
-		.chevron.open {
-			transform: rotate(90deg);
-		}
-
-		.children {
-			transition: max-height .2s ease-out;
-		}
-
-		.collapsed {
-			display: none;
-		}
-
-		.name {
-			display: inline-block;
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			vertical-align: middle;
-		}
-
-		input {
-			font-size: 14px;
-		}
-
-		.name,
-		.edit-input {
-			max-width: calc(100% - 85px);
-		}
-
-		.item span:first-child {
-			padding: 2px;
-		}
-
-		.options {
-			opacity: 0;
-			display: inline-block;
-			vertical-align: middle;
-			margin-left: 4px;
-		}
-
-		.cog {
-			width: 12px;
-			display: inline-block;
-			vertical-align: middle;
-		}
-
-		.options:hover path {
-			fill: #555;
-		}
-
-		.move {
-			cursor: move;
-			width: 10px;
-			opacity: 0;
-			vertical-align: middle;
-		}
-
-		.page-list .btn-group {
-			cursor: move;
-			opacity: 0;
-		}
-
-		.item:hover > div .move,
-		.item:hover > div .options {
-			opacity: 1;
-		}
-
-		.dropdown-menu {
-			font-size: .9rem;
-		}
-	}
-
-	.kkjdhgs {
-		background-color: rgba(238, 241, 246, .85);
-	}
-
-	.js-app {
-		min-height: 200px;
-	}
-</style>
-
 <template>
-	<div id="js-app">
-		<!-- <div class="row">
-			<div class="col-5 offset-7">
-				<label class="">Sort by</label>
-				<select class="form-control form-control-sm">
-					<option>Title</option>
-					<option>Date modified</option>
-					<option>Date created</option>
-				</select>
-			</div>
-		</div>
+<div>
+	<back-bar :title="title" />
 
-		<div class="form-group search">
-			<label for="search" class="sr-only">Search</label>
-			<div class="input-group input-group-md">
-				<input type="search" class="form-control" placeholder="Search... " autocomplete="off" value="">
-				<span class="input-group-btn">
-					<button type="submit" class="btn btn-accent btn-icon kf-search active" aria-label="Search"><span class="sr-only">Search</span></button>
-				</span>
-			</div>
-		</div> -->
-
-		<ul class="page-list">
-			<PageListItem class="item" :site="site" :page="orderedHierarchy" :editing="edit"></PageListItem>
-		</ul>
+	<div v-if="pages" v-for="page in pages" class="page-list">
+		<page-list-item
+			:key="page.id"
+			:page="page"
+			:flatten="true"
+			:open-modal="showPageModal"
+			:open-edit-modal="showEditPageModal"
+			path="0"
+			:depth="0"
+		/>
 	</div>
+
+	<div class="b-bottom-bar">
+
+		<el-button v-if="canUser('page.add')" class="u-mla" @click="() => { this.showPageModal(pages[0]) }">+ Add Page</el-button>
+	</div>
+</div>
 </template>
 
 <script>
-	import PageListItem from './PageListItem.vue';
-	import { Loading } from 'element-ui';
+import { mapState, mapActions, mapGetters } from 'vuex';
+import Draggable from 'vuedraggable';
 
-	const order = {
+import PageListItem from './PageListItem';
+import BackBar from './BackBar';
 
-		title(hierarchy) {
-			return hierarchy;
-		},
+export default {
 
-		modified(hierarchy) {
-			return null;
-		},
+	name: 'page-list',
 
-		created(hierarchy) {
-			return null;
-		}
+	props: ['title'],
+
+	components: {
+		PageListItem,
+		BackBar,
+		Draggable
+	},
+
+	data() {
+		return {
+
+			loading: true
+
+		};
+	},
+
+	computed: {
+		...mapState('site', {
+			pages: state => state.pages
+		}),
+
+		...mapGetters([
+			'canUser'
+		])
+	},
+
+	methods: {
+		...mapActions({
+
+			showPageModal: 'site/showPageModal',
+			showEditPageModal: 'site/showEditPageModal'
+		})
+
 	}
-
-	export default {
-
-		data() {
-			return {
-				site: 1,
-				hierarchy: null,
-				edit: null,
-				order: 'title',
-				loading: true
-			};
-		},
-
-		components: {
-			PageListItem
-		},
-
-		computed: {
-			orderedHierarchy() {
-				return order[this.order](this.hierarchy)
-			}
-		},
-
-		methods: {
-			fetchData() {
-				this.$api
-					.get(`sites/structure/${this.site}`)
-					.then((response) => {
-						this.hierarchy = response.data;
-						this.loading = false;
-						if(this.loadingInstance) {
-							this.loadingInstance.close();
-						}
-					});
-			}
-		},
-
-		created() {
-			this.fetchData();
-			this.$bus.$on('rename-page', (id) => this.edit = id);
-		},
-
-		mounted() {
-			if(this.loading) {
-				this.loadingInstance = Loading.service({
-					target: this.$el,
-					text: 'Loading...',
-					customClass: 'kkjdhgs'
-				});
-			}
-		}
-	}
+};
 </script>

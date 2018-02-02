@@ -1,0 +1,147 @@
+<template>
+<div class="page"  v-if="canUser('site.view')">
+
+	<div class="editor-body">
+		<div class="editor-wrapper" ref="editor">
+			<iframe :src="getPreviewUrl" id="editor-content" class="editor-content" :style="dimensions" frameborder="0" />
+			<div
+				class="iframe-overlay"
+				:style="{ 'position' : displayIframeOverlay ? 'absolute' : null }"
+			/>
+		</div>
+		<sidebar />
+	</div>
+
+	<modal-container />
+</div>
+<div class="page" v-else v-show="showPermissionsError">
+	<el-alert
+		title="You don't have access to this site"
+		type="error"
+		description="You don't have permission to access this site. Please contact the site owner."
+		:closable="false"
+		show-icon
+	>
+  </el-alert>
+</div>
+</template>
+
+<script>
+import { mapState, mapGetters } from 'vuex';
+import { Loading } from 'element-ui';
+
+import Config from 'classes/Config';
+import Sidebar from 'components/sidebar';
+import ModalContainer from 'components/ModalContainer';
+import Icon from 'components/Icon';
+
+export default {
+	name: 'editor',
+
+	components: {
+		Sidebar,
+		ModalContainer,
+		Icon
+	},
+
+	data() {
+		return {
+			showPermissionsError: false
+		}
+	},
+
+	created() {
+		this.$store.commit('site/updateCurrentSiteID', this.$route.params.site_id);
+		this.$store.dispatch('loadSiteRole', { siteId: this.$route.params.site_id, username: Config.get('username') })
+		.then(() => {
+			if (this.canUser('site.view')) {
+				this.showLoader();
+			}
+			else {
+				this.showPermissionsError = true;
+			}
+		});
+
+		this.views = {
+			desktop: {
+				icon: 'desktop',
+				label: 'Desktop',
+				width: '100%',
+				height: '100vh'
+			},
+			tablet: {
+				icon: 'tablet',
+				label: 'Tablet',
+				width: '768px',
+				height: '1024px'
+			},
+			mobile: {
+				icon: 'mobile',
+				label: 'Mobile',
+				width: '320px',
+				height: '568px'
+			}
+		};
+	},
+
+	destroyed() {
+		// we have left the page editor so remove the snapeshot of the latest saved content
+		this.$store.commit('resetCurrentSavedState');
+	},
+
+	methods: {
+
+		showLoader() {
+			this.loader = Loading.service({
+				target: this.$refs.editor,
+				text: 'Loading preview...',
+				customClass: 'loading-overlay'
+			});
+		},
+	},
+	computed: {
+
+		...mapState([
+			'displayIframeOverlay',
+			'currentView'
+		]),
+
+		...mapState({
+			page: state => state.page.pageData,
+			pageLoaded: state => state.page.loaded
+		}),
+
+		...mapGetters([
+			'canUser'
+		]),
+
+		getPreviewUrl() {
+			// TODO: Don't reload page when page_id changes, use state instead
+			return `${Config.get('base_url', '')}/preview/${this.$route.params.page_id}`;
+		},
+
+		dimensions() {
+			return {
+				width: this.views[this.currentView].width,
+				height: this.views[this.currentView].height
+			};
+		}
+
+	},
+
+	watch: {
+		pageLoaded(hideLoader) {
+			// update/set the current snapshot of the saved page content
+			this.$store.commit('updateCurrentSavedState');
+			if(hideLoader) {
+				if(this.loader) {
+					this.loader.close();
+				}
+			}
+			else {
+				this.showLoader();
+			}
+		}
+	}
+};
+</script>

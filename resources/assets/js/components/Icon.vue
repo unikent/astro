@@ -5,17 +5,30 @@
 </template>
 
 <script>
+import * as icons from './icons';
+
 export default {
 	props: {
-		glyph: {},
+		name: {
+			default: 'unknown'
+		},
+
 		width: {
 			default: 17
 		},
+
 		height: {
 			default: 17
 		},
+
 		className: {
 			default: 'icon'
+		}
+	},
+
+	computed: {
+		glyph() {
+			return icons[this.name.replace(/[^a-z]/g, '')] || icons.unknown;
 		}
 	}
 };

@@ -1,0 +1,57 @@
+.panel__header .el-alert {
+	width: 85%;
+	margin: 2rem auto;
+	background-color: #ececec;
+}
+
+.empty-region {
+	height: auto;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	background-color: #f3f4f5;
+	padding: 1rem;
+	line-height: 1.5;
+	width: 100%;
+	margin: 0 auto;
+	padding: 1rem 0 2rem;
+
+	.el-button {
+		flex: 0 1 auto;
+	}
+
+	.el-alert__title {
+		font-size: 15px;
+	}
+
+	.el-alert__description {
+		font-size: 14px;
+		padding: 0 0 1rem 0;
+	}
+}
+
+@media (min-width: 768px) {
+	.content--aside .empty-region {
+
+		.el-alert {
+			padding-bottom: 1rem;
+		}
+
+		.el-alert__title {
+			font-size: 13px;
+		}
+
+		.el-alert__description {
+			font-size: 13px;
+			padding-bottom: 1rem;
+		}
+		.el-alert .el-alert--info {
+			width: 100%;
+		}
+
+		.el-alert__icon {
+			display: none;
+		}
+	}
+}

@@ -1,0 +1,54 @@
+.el-table tr {
+	transition: background-color .2s ease-out;
+
+	&:hover {
+		background-color: #eef1f6;
+	}
+}
+
+.el-table--astro tr.el-table__row--selected {
+	background-color: lighten(#03a9f4, 50%);
+
+	table {
+		width: 100%;
+	}
+
+	td {
+		border-top: 1px solid #03a9f4;
+		border-bottom: 1px solid #03a9f4;
+	}
+
+	td:first-child {
+		border-left: 1px solid #03a9f4;
+	}
+
+	td:last-child {
+		border-right: 1px solid #03a9f4;
+	}
+
+}
+
+.media-item__icon {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	fill: #8391a5;
+	padding: 20%;
+}
+
+.media-item__download-link {
+	display: block;
+	color: #48576a;
+	text-decoration: none;
+}
+
+.o-media__switch {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	justify-content: flex-end;
+	align-items: center;
+	margin-bottom: 20px;
+}

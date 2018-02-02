@@ -2,118 +2,75 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Api\ApiController;
-
+use App\Models\LocalAPIClient;
 use App\Models\Page;
-use App\Models\Block;
-use App\Models\Route;
-use Illuminate\Http\Request;
+use Astro\Renderer\AstroRenderer;
+use Astro\Renderer\Base\SingleDefinitionsFolderLocator;
+use Astro\Renderer\Engines\TwigEngine;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Config;
 
-class PageController extends ApiController
+/**
+ * Renders pages in draft of published mode for previewing in the editor.
+ * @package App\Http\Controllers
+ */
+class PageController extends Controller
 {
+	use AuthorizesRequests, DispatchesJobs;
 
-	public function index() {
-		//
+	public function __construct()
+	{
+		parent::__construct();
+		$this->middleware('auth');
 	}
 
 	/**
-	 * Show the form for creating a new resource.
-	 *
-	 * @return \Illuminate\Http\Response
+	 * Render a draft page.
+	 * GET /path/to/editor/draft/{host}/{path}
+	 * @param string $host - The "real" domain name for the site
+	 * @param string $path - The full path to the current page.
+	 * @return string - Rendered page HTML with "preview bar" injected.
 	 */
-	public function create(Page $site)
+	public function draft($host, $path = '')
 	{
-		if(!$site->is_site) die("no access"); // TODO: Move to Middleware?
-
-		// Get site details
-		$route = $site->route;
-		$pagesInSite = $route->descendants()->get();
-
-		return view('sites.create')->with(['route'=>$route, 'site'=> $site, 'pages'=> $pagesInSite]);
+		$original_html = $this->renderRoute($host, $path, Page::STATE_DRAFT);
+		$preview_bar = file_get_contents(resource_path('views/components/preview-bar.html'));
+		return preg_replace('/(<body[^>]*>)/is', '$1' . $preview_bar, $original_html, 1);
 	}
 
 	/**
-	 * Store a newly created resource in storage.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @return \Illuminate\Http\Response
+	 * Render a published page.
+	 * GET /path/to/editor/published/{host}/{path}
+	 * @param string $host - The "real" domain name for the site
+	 * @param string $path - The full path to the current page.
+	 * @return string - Rendered page HTML
 	 */
-	public function store(Request $request) // TODO: There is no validation on this?
+	public function published($host, $path = '')
 	{
-
-		$page = new Page;
-
-		$page->fill($request->all());
-
-		if($request->parent)
-		{
-			$page->parent = $request->parent;
-		}
-		else
-		{
-			$page->root = true;
-		}
-
-		$page->options = '{}';
-
-		try
-		{
-			$page->save();
-		}
-		catch(Exception $e)
-		{
-			return $this->returnError(500, 'Could not save page');
-		}
-
-		return $this->success($page);
+		return $this->renderRoute($host, $path, Page::STATE_PUBLISHED);
 	}
 
 	/**
-	 * Display the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return \Illuminate\Http\Response
+	 * Use the Renderer to render the Page at a url for a version (draft, published) of a site.
+	 * @param string $host - The "real" domain name for the site
+	 * @param string $path - The full path to the current page.
+	 * @param string $version -  The version of the site to render ('draft', 'published')
+	 * @return string - The rendered HTML output.
 	 */
-	public function show($page_id)
+	public function renderRoute($host, $path, $version)
 	{
-		return $this->success(Page::find($page_id));
-	}
+		$path = '/' . $path;
+		$locator = new SingleDefinitionsFolderLocator(
+			Config::get('app.definitions_path') ,
+			'Astro\Renderer\Base\Block',
+			'Astro\Renderer\Base\Layout'
+		);
+		$api = new LocalAPIClient();
+		$engine = new TwigEngine(Config::get('app.definitions_path'));
 
-
-
-	/**
-	 * Show the form for editing the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return \Illuminate\Http\Response
-	 */
-	public function edit(Page $site, Page $page)
-	{
-		//
-	}
-
-	/**
-	 * Update the specified resource in storage.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @param  int  $id
-	 * @return \Illuminate\Http\Response
-	 */
-	public function update($page_id, Request $request)
-	{
-		$page = Page::find($page_id);
-		// update
-		$page->saveBlocks(json_decode($request->getContent(), true));
-	}
-
-	/**
-	 * Remove the specified resource from storage.
-	 *
-	 * @param  int  $id
-	 * @return \Illuminate\Http\Response
-	 */
-	public function destroy($id)
-	{
-		//
+		// controller
+		$astro = new AstroRenderer();
+		return $astro->renderRoute($host, $path, $api, $engine, $locator, $version);
 	}
 }

@@ -1,5 +1,7 @@
 <?php namespace App\Models\Traits;
 
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 
 /**
@@ -62,5 +64,42 @@ trait Tracked {
 	{
 		return $query->where('updated_by',$userId);
 	}
+
+    /**
+     * Intercepts bulk inserts which would normally be sent straight to the query builder
+     * and adds timestamps and ...by values
+     * @param array $inserts
+     */
+	public static function __callStatic($func, $args)
+    {
+        if($func == 'insert' && is_array($args[0])) {
+            $inserts =& $args[0];
+            $n_inserts = count($inserts);
+            $by = null;
+            if (Auth::check()) {
+                $user = Auth::user();
+                $primaryKeyName = $user->getKeyName();
+                $by = $user->$primaryKeyName;
+            }
+            $created = Carbon::now();
+            for ($i = 0; $i < $n_inserts; ++$i) {
+                if (is_array($inserts[$i])) {
+                    if (!isset($inserts[$i]['created_at'])) {
+                        $inserts[$i]['created_at'] = $created;
+                    }
+                    if (!isset($inserts[$i]['updated_at'])) {
+                        $inserts[$i]['updated_at'] = $created;
+                    }
+                    if (!isset($inserts[$i]['created_by'])) {
+                        $inserts[$i]['created_by'] = $by;
+                    }
+                    if (!isset($inserts[$i]['updated_by'])) {
+                        $inserts[$i]['updated_by'] = $by;
+                    }
+                }
+            }
+        }
+        return parent::__callStatic($func,$args);
+    }
 
 }

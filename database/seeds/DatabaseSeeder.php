@@ -1,5 +1,9 @@
 <?php
 
+use App\Models\LocalAPIClient;
+use App\Models\User;
+use App\Models\Role;
+use App\Models\Page;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -8,12 +12,16 @@ class DatabaseSeeder extends Seeder
 	 * @var array
 	 */
 	private $tables = [
+	    'revisions',
+        'redirects',
+	    'deleted_pages',
+        'revision_sets',
+	    'pages',
+        'sites',
 		'users',
-		'pages',
-		'routes',
-		'blocks',
-		'media'
+		'blocks'
 	];
+
 
 	/**
 	 * Run the database seeds.
@@ -24,82 +32,56 @@ class DatabaseSeeder extends Seeder
 	{
 		if(App::environment() === 'production')
 		{
-			exit('Oh no you ditten\'! The seeder should only be run in dev mode.');
+			exit('The seeder should only be run in dev mode.');
 		}
 
 		$this->cleanDatabase();
 
-		// TODO: separate out seeders and clean up code left from prototype
+		$user = factory(User::class)->create([
+			'username' => 'admin',
+			'name'=> 'Admin',
+			'password'=> Hash::make('admin'),
+			'role' => 'admin',
+            'api_token' => 'test'
+		]);
 
-		$a = factory('App\Models\User')->create([ 'username' => 'admin', 'name'=> 'Admin']);
-		$p = factory('App\Models\Page')->create([ 'title' => 'Test Site', 'is_site'=> 1]);
-		$r = factory('App\Models\Route')->make([ 'page_id' => $p->id, 'slug' => '']);
-		$r->root = true;
-		$r->save();
+		// create some users to test with...
+		$editor = factory(User::class)->create([
+			'username' => 'editor',
+			'name' => 'Editor',
+			'password' => Hash::make('editor'),
+			'role' => 'user',
+			'api_token' => 'editor-test'
+		]);
 
-		for($i = 0; $i < 5; $i++)
-		{
-			if($i == 0)
-			{
-				factory('App\Models\Block')
-					->create([
-						'page_id' => $p->id,
-						'order'   => $i,
-						'type'    => '97a2e1b5-4804-46dc-9857-4235bf76a058',
-						'fields'  => [
-							'image' => 'http://lorempixel.com/1200/700/cats/',
-							'block_heading'=> 'Title block',
-							'block_description' => 'Sub title',
-							'block_link' => '',
-							'image_alignment'=>'top'
-						]
-					]);
-			}
-			else
-			{
-				factory('App\Models\Block')->create([ 'page_id' => $p->id, 'order' => $i]);
-			}
-		}
+		$owner = factory(User::class)->create([
+			'username' => 'owner',
+			'name' => 'Owner',
+			'password' => Hash::make('owner'),
+			'role' => 'user',
+			'api_token' => 'owner-test'
+		]);
 
-		for($i = 0; $i < 5; $i++)
-		{
-			$p2 = factory('App\Models\Page')->create([ 'title' => 'Test Page '. $i]);
-			$r2 = factory('App\Models\Route')->make([ 'page_id' => $p2->id ]);
-			$r2->parent = $r;
-			$r2->save();
+		$contributor = factory(User::class)->create([
+			'username' => 'contributor',
+			'name' => 'Contributor',
+			'password' => Hash::make('contributor'),
+			'role' => 'user',
+			'api_token' => 'contributor-test'
+		]);
 
-			for($x = 0; $x < 5; $x++)
-			{
-				if($x == 0)
-				{
-					factory('App\Models\Block')
-						->create([
-							'page_id' => $p2->id,
-							'order'   => $x,
-							'type'    => '97a2e1b5-4804-46dc-9857-4235bf76a058',
-							'fields'  => [
-								'image'             => 'http://lorempixel.com/1200/700/cats/',
-								'block_heading'     => 'Title block',
-								'block_description' => 'Sub title',
-								'block_link'        => '',
-								'image_alignment'   =>'top'
-							]
-						]);
-				}
-				else
-				{
-					factory('App\Models\Block')->create([ 'page_id' => $p2->id, 'order' => $x]);
-				}
-			}
-		}
 
-		$p3 = factory('App\Models\Page')->create([ 'title' => 'Nested Page']);
-		$r = factory('App\Models\Route')->make([ 'page_id' => $p3->id, 'slug' => 'nested-page']);
-		$r->parent = $r2;
-		$r->save();
 
-		$this->call(MediaSeeder::class);
-	}
+		$client = new LocalAPIClient($user);
+        $site = $client->createSite(
+            'Test Site', 'example.com', '', ['name'=>'school-site','version'=>1]
+        );
+        $client->publishPage(Page::forSiteAndPath($site->id, '/')->first()->id);
+
+		$client->updateSiteUserRole($site->id,'editor', Role::EDITOR);
+		$client->updateSiteUserRole($site->id,'owner', Role::OWNER);
+		$client->updateSiteUserRole($site->id,'contributor', Role::CONTRIBUTOR);
+    }
 
 	/**
 	 * Empty the database

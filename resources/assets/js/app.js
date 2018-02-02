@@ -1,16 +1,21 @@
-import './bootstrap';
-
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import ElementUI from 'element-ui';
 
-import httpPlugin from './plugins/http'
+import './bootstrap';
+import locale from './locale';
+import store from './store';
+import { router } from './routes';
+import httpPlugin from './plugins/http';
 import eventBusPlugin from './plugins/eventbus';
 import snackBarPlugin from './plugins/snackbar';
-import locale from './libs/locale';
-import store from './store';
-import App from './app/App.vue';
-import { router } from './routes';
+
+import './directives/inline-edit';
+import './directives/field';
+
+import App from './views/App';
+
+/* global document */
 
 Vue.use(VueRouter);
 Vue.use(ElementUI, { locale });
@@ -30,7 +35,7 @@ const vueIfExists = (selector, options) => {
 	return null;
 };
 
-const inlineEditor = vueIfExists('#editor', {
+vueIfExists('#editor', {
 	render: h => h(App),
 	router
 });

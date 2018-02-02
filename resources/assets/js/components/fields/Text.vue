@@ -1,32 +1,12 @@
 <template>
-	<el-input v-model="content"></el-input>
+	<el-input v-model="value"></el-input>
 </template>
 
 <script>
-	import { mapActions } from 'vuex';
+import baseFieldMixin from '../../mixins/baseFieldMixin';
 
-	export default {
-
-		name: 'TextField',
-
-		props: ['name'],
-
-		computed: {
-			content: {
-				get () {
-					return this.$store.getters.getCurrentFieldValue(this.name);
-				},
-				set(value) {
-					this.updateValue({ name: this.name, value });
-				}
-			}
-		},
-
-		methods: {
-			...mapActions([
-				'updateValue'
-			])
-		}
-
-	}
+export default {
+	name: 'text-field',
+	mixins: [baseFieldMixin]
+};
 </script>

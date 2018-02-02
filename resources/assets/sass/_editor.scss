@@ -1,22 +1,4 @@
-html {
-	box-sizing: border-box;
-	line-height: 1.15;
-	-ms-text-size-adjust: 100%;
-	-webkit-text-size-adjust: 100%;
-	-ms-overflow-style: scrollbar;
-	-webkit-tap-highlight-color: rgba(0,0,0,0);
-}
-
-*,
-*::before,
-*::after {
-	box-sizing: inherit;
-}
-
 .editor {
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-	letter-spacing: .06em;
-	line-height: 1.8em;
 	min-height: 100vh;
 
 	button,
@@ -28,22 +10,14 @@ html {
 		letter-spacing: .06em;
 	}
 
-	padding-top: 50px;
+	padding-top: get-height(top-bar);
 }
 
 .editor-body {
 	display: flex;
 	flex: 1;
-	height: calc(100vh - 50px);
+	height: calc(100vh - #{get-height(top-bar)});
 	overflow: hidden;
-}
-
-.editor-sidebar {
-	width: 250px;
-	background-color: #f5f7fa;
-	z-index: 0;
-	min-width: 210px;
-	font-size: 14px;
 }
 
 .editor-wrapper {
@@ -51,7 +25,7 @@ html {
 	width: 100%;
 	min-width: 320px; // HVGA upwards
 	position: relative;
-	background-color: #f7f7f7;
+	background-color: #f7f9fb;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -59,8 +33,7 @@ html {
 
 .editor-content {
 	transition: width .3s ease-out, height .3s ease-out;
-	max-height: calc(100vh - 106px);
-	margin-bottom: 56px;
+	max-height: calc(100vh - #{get-height(top-bar)});
 }
 
 .editor-nav,
@@ -72,29 +45,54 @@ html {
 .editor-nav {
 	order: -1;
 	box-shadow: 2px 0px 3px rgba(0, 0, 0, 0.05);
-	border-right: 1px solid #bcc8dc;
+	border-right: 1px solid #b7c2d4;
+}
+
+.empty-page {
+	min-height: 100vh;
+	font-size: 1.8rem;
+	text-align: center;
+	padding: 30px 0;
 }
 
 .editor-component-list {
 	box-shadow: -2px 0px 3px rgba(0, 0, 0, 0.05);
-	border-left: 1px solid #bcc8dc;
+	border-left: 1px solid #b7c2d4;
 	position: relative;
 	width: 380px;
 }
 #main_content {
-	background-color: #f7f7f7;
+	background-color: #f7f9fb;
 }
 
-.b-bar {
-	position: absolute;
-	width: 100%;
-	left: 0;
-	bottom: 0;
+.toolbar {
 	background-color: #fff;
-	border-top: 1px solid #eee;
 	padding: 10px;
-	box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.05);
 	user-select: none;
+	display: flex;
+	align-items: center;
+
+	// makes text in the the device selector dropdown appear ok
+	.el-input__icon + .el-input__inner {
+		padding-right: 25px;
+	}
+}
+
+.page-status {
+	background-color: #b7c2d4;
+	color: #fff;
+	font-size: .8em;
+	text-align: right;
+	padding: 0 10px;
+	display: inline-block;
+	border-radius: 4px;
+	float: right;
+	margin: 4px 10px 0;
+	line-height: 1.8em;
+}
+
+.page-status--is-published {
+	background-color: #65c38f;
 }
 
 .b-button {
@@ -102,157 +100,20 @@ html {
 	clear: both;
 }
 
-#b-wrapper {
+.b-bottom-bar {
+	padding: 0 10px;
+	height: 56px;
+	border-top: 1px solid #dadde2;
 	background-color: #fff;
-	transform-origin: top center;
-	backface-visibility: hidden;
-	outline: 2px solid #ddd;
-}
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-content: flex-start;
+	align-items: center;
 
-#b-overlay {
-	position: fixed;
-	transform: translateZ(0);
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	background-color: rgba(255, 255, 255, 0);
-	z-index: 1;
-	pointer-events: none;
-	cursor: move;
-}
-
-.b-editable,
-.b-block {
-	border: 2px solid #2196f3;
-	position: absolute;
-	transition: border-color .3s ease-out, opacity .3s ease-out;
-	border-radius: 3px;
-	pointer-events: none;
-}
-
-.b-block {
-	top: 0;
-	opacity: 0;
-	border-width: 4px;
-}
-
-.b-block-options,
-.b-block-move {
-	transition: background-color .3s ease-out;
-	position: absolute;
-	background-color: #2196f3;
-	color: #fff;
-	line-height: 44px;
-	height: 44px;
-	width: 44px;
-	font-size: 20px;
-	pointer-events: auto;
-	text-align: center;
-}
-
-.b-block-move {
-	top: 50%;
-	transform: translateY(-50%);
-	left: -4px;
-	cursor: move;
-}
-
-.b-block-options {
-	top: -4px;
-	right: -4px;
-	cursor: pointer;
-	font-size: 25px;
-}
-
-.b-block-move {
-	transition: background-color .3s ease-out;
-	position: absolute;
-	top: 50%;
-	transform: translateY(-50%);
-	left: -4px;
-	background-color: #2196f3;
-	color: #fff;
-	line-height: 44px;
-	height: 44px;
-	width: 44px;
-	font-size: 20px;
-	pointer-events: auto;
-	cursor: move;
-	text-align: center;
-}
-
-.hide-drag .b-block-options,
-.hide-drag .b-block-move {
-	opacity: 0;
-}
-
-// .b-editable:after {
-// 	transition: background-color .3s ease-out;
-// 	content: '⚙';
-// 	position: absolute;
-// 	top: -1px;
-// 	right: -1px;
-// 	background-color: #2196f3;
-// 	color: #fff;
-// 	line-height: 22px;
-// 	height: 22px;
-// 	width: 22px;
-// 	pointer-events: auto;
-// 	cursor: pointer;
-// 	text-align: center;
-// 	z-index: 1;
-// }
-
-.b-editable:hover {
-	border-color: #1b73b9;
-}
-
-.b-editable:before:hover {
-	background-color: #1b73b9;
-	color: #fff;
-}
-
-.b-block-container {
-	position: relative;
-	will-change: transform;
-}
-
-.block {
-	background-color: #fff;
-	border: 1px solid #eee;
-	border-left-width: 0;
-	border-right-width: 0;
-	will-change: transform, box-shadow;
-}
-
-.b-handle {
-	position: absolute;
-	top: 0;
-	transform: translateY(0);
-	left: 0;
-	background-color: #2196f3;
-	color: #fff;
-	line-height: 44px;
-	height: 44px;
-	width: 44px;
-	font-size: 20px;
-	pointer-events: none;
-	user-select: none;
-	text-align: center;
-	opacity: 0;
-}
-
-.b-back-button {
-	padding: 0 16px;
-	height: 42px;
-	line-height: 42px;
-	border-bottom: 1px solid #d1dbe5;
-	background-color: #fff;
-	cursor: pointer;
-
-	i {
-		margin-right: 10px;
+	.button {
+		flex: 0 1 auto;
+		align-self: auto;
 	}
 }
 
@@ -266,7 +127,7 @@ html {
 
 .main-header {
 	text-transform: uppercase;
-	color: #888;
+	color: #71787f;
 }
 
 
@@ -275,15 +136,14 @@ html {
 	align-items: center;
 }
 
-@each $breakpoint in map-keys($grid-breakpoints) {
-	@include media-breakpoint-up($breakpoint) {
-		$infix: breakpoint-infix($breakpoint, $grid-breakpoints);
-
-		.d#{$infix}-none  { display: none; }
-		.d#{$infix}-block { display: block; }
-	}
+.missing-definition-warning {
+	margin: 30px;
+	padding: 10px;
+	background-color: lighten(#d65757, 33%);
+	border-radius: 5px
 }
 
-.u-mla {
-	margin-left: auto;
+.placeholder-block {
+	height: 100px;
+	background-color: #b7c2d4;
 }

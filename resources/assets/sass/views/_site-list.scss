@@ -1,0 +1,18 @@
+.site-list {
+	background-color: #f5f7fa;
+	min-height: calc(100vh - #{get-height(top-bar)});
+	padding: 20px;
+}
+
+.site-list-pagination {
+	float: right;
+	margin-top: 20px;
+}
+
+.manage-table__add-button {
+	margin-left: auto;
+}
+
+.w100 {
+	width: 100%;
+}

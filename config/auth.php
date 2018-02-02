@@ -37,8 +37,8 @@ return [
 
 	'guards' => [
 		'web' => [
-			'driver' => 'session',
-			'provider' => 'users',
+			'driver' => 'kentauth',
+			'provider' => 'kentauth',
 		],
 
 		'api' => [
@@ -70,12 +70,17 @@ return [
 			'model' => App\Models\User::class,
 		],
 
+		'kentauth' => [
+			'driver' => 'kentauth',
+			'model' => App\Models\User::class,
+		],
+
 		// 'users' => [
 		//     'driver' => 'database',
 		//     'table' => 'users',
 		// ],
 	],
-
+    'model' => App\Models\User::class,
 	/*
 	|--------------------------------------------------------------------------
 	| Resetting Passwords

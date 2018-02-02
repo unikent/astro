@@ -1,47 +1,48 @@
 import Vue from 'vue';
+import { unflatten } from 'flat';
 
 const vue = new Vue();
 
+/* global Promise */
+
 export default (http, store, router) => {
-	// http.interceptors.request.use(
-	// 	config => {
-	// 		console.log(config);
-	// 		return config;
-	// 	},
-	// 	error => {
-	// 		return Promise.reject(error);
-	// 	}
-	// );
 	http.interceptors.response.use(
 		response => response,
 		error => {
 			const { response } = error
 
-			if([401, 400].indexOf(response.status) > -1) {
-				window.location = '/auth/login';
-			}
-
-			// TODO: hook up to snackbar
 			if(Array.isArray(response.data.errors)) {
-				// store.dispatch('setMessage', {
-				// 	type: 'error',
-				// 	message: response.data.errors
-				// })
 
 				switch(response.status) {
 					case 422:
-						response.data.errors.forEach(error => {
-							vue.$snackbar.open({
-								message: `
-									${error.type}.\nCheck validation errors for more details.
-								`
+						if(response.data.errors) {
+							response.data.errors.forEach(error => {
+
+								// notification to the user
+								// vue.$notify({
+								// 	title: 'Error',
+								// 	message: 'There are some problems on your page.' + error,
+								// 	type: 'error'
+								// });
+
+								if(error.details && typeof error.details === 'object') {
+
+									Object.keys(error.details).forEach(field => {
+										error.details[field] = error.details[field].join(' | ');
+									});
+
+									const errors = unflatten(error.details, { safe: true });
+
+									store.commit('updateErrors', errors);
+								}
+
 							});
-						});
+						}
 						break;
 				}
 			}
 
-			return Promise.reject(error)
+			return Promise.reject(error);
 		}
 	)
 };

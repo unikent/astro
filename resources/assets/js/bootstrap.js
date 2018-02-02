@@ -1,10 +1,8 @@
-import './redactor';
-import 'bootstrap';
-import Vue from 'vue';
+import Config from './classes/Config';
+import { win } from './classes/helpers';
 
-window.eventBus = (window.self === window.top ? new Vue() : window.top.eventBus);
-
-window.axios.defaults.headers.common = {
-	'X-Requested-With': 'XMLHttpRequest',
-	'Accept': 'application/json'
-};
+Config.init(win.astro);
+Config.set(
+	'api_base_url',
+	Config.get('base_url', '') + Config.get('api_url', '/api/')
+);

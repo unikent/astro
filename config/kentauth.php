@@ -1,7 +1,7 @@
 <?php
 
 return [
-	'createOnAuth' => false,
+	'createOnAuth' => true,
 	'defaultRole' => 'user',
 	'authcontroller' => '\App\Http\Controllers\Auth\AuthController'
 ];

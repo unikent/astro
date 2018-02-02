@@ -134,7 +134,7 @@ return [
 	| include trailing slash.
 	|
 	*/
-	'definitions_path' => env('BLOCKS_PATH', base_path('vendor/unikent/cms-prototype-blocks')),
+	'definitions_path' => env('DEFINITIONS_PATH', base_path('vendor/unikent/cms-prototype-blocks')),
 
 	/*
 	|--------------------------------------------------------------------------
@@ -144,8 +144,17 @@ return [
 	| Where to locate uploaded media.
 	|
 	*/
-	'media_path' => env('MEDIA_PATH', 'uploads/media'),
+	'media_path' => env('MEDIA_PATH', base_path('storage/app/public/uploads/media')),
 
+	/*
+	|--------------------------------------------------------------------------
+	| Astro: Media URL
+	|--------------------------------------------------------------------------
+	|
+	| Where to locate uploaded media, from front-end.
+	|
+	*/
+	'media_url' => env('MEDIA_URL', '/uploads/media'),
 
 	/*
 	|--------------------------------------------------------------------------
@@ -193,21 +202,22 @@ return [
 
 		KentAuth\AuthServiceProvider::class,
 		Baum\Providers\BaumServiceProvider::class,
-		Conner\Tagging\Providers\TaggingServiceProvider::class,
+		Spatie\Fractal\FractalServiceProvider::class,
 		Intervention\Image\ImageServiceProvider::class,
 		// Barryvdh\Debugbar\ServiceProvider::class,
 		Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
+		Conner\Tagging\Providers\TaggingServiceProvider::class,
 
 		/*
 		 * Application Service Providers...
 		 */
 		App\Providers\AppServiceProvider::class,
-		// App\Providers\AuthServiceProvider::class,
+		App\Providers\AuthServiceProvider::class,
 		// App\Providers\BroadcastServiceProvider::class,
 		App\Providers\EventServiceProvider::class,
 		App\Providers\RouteServiceProvider::class,
 		// App\Providers\ComposerServiceProvider::class,
-
+        Fideloper\Proxy\TrustedProxyServiceProvider::class,
 	],
 
 	/*
@@ -257,8 +267,9 @@ return [
 		'Validator' => Illuminate\Support\Facades\Validator::class,
 		'View' => Illuminate\Support\Facades\View::class,
 
+		'Fractal' => Spatie\Fractal\FractalFacade::class,
+		'Image' => Intervention\Image\Facades\Image::class,
 		'SSO' => KentAuth\Facades\SSO::class,
-		'Image' => Intervention\Image\Facades\Image::class
 	],
 
 ];
