@@ -6,8 +6,10 @@
 	:before-close="promptToSave"
 >
 	<el-form :model="formData">
-		<el-form-item v-for="(value, key, index) in schema" :label="schema[key].label" :key="key">
-
+		<el-form-item v-for="(value, key, index) in schema"
+			:label="schema[key].label"
+			:key="key" 
+			:class="{ 'is-required': schema[key].validation && schema[key].validation.rules[key][0].required === true }">
 			<el-input
 				v-if="schema[key].type === 'textarea'"
 				v-model="formData[key]"
