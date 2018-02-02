@@ -2,15 +2,10 @@
 
 namespace App\Models;
 
-use App\Exceptions\UnpublishedParentException;
-use App\Models\Definitions\Region;
 use DB;
-use Doctrine\DBAL\Version;
 use Exception;
 use App\Models\Definitions\Layout as LayoutDefinition;
 use Baum\Node as BaumNode;
-use Illuminate\Database\Eloquent\Collection;
-use League\Fractal\TransformerAbstract;
 use App\Models\Definitions\Layout;
 /**
  * A Page represents a path in a hierarchical site structure.
@@ -151,6 +146,7 @@ class Page extends BaumNode
 			return Page::STATE_NEW;
 		}
 	}
+
 
 	/************************************************************************
 	 * Relations
@@ -469,5 +465,41 @@ class Page extends BaumNode
 				}
 			}
 		}
+	}
+
+	/**
+	 * Get the revisions to this page.
+	 * @return mixed
+	 */
+	public function getRevisions()
+	{
+		return $this->revision->history;
+	}
+
+	/**
+	 * Get the page's siblings (including the page) together with their revisions.
+	 * @return \Illuminate\Database\Eloquent\Collection|static[]
+	 */
+	public function getSiblingsWithRevision()
+	{
+		return $this->siblingsAndSelf()->with('revision')->orderBy('lft')->get();
+	}
+
+	/**
+	 * Get the page's ancestors with revision data to use with fractal transformer
+	 * @return \Illuminate\Database\Eloquent\Collection|static[]
+	 */
+	public function getAncestorsWithRevision()
+	{
+		return $this->ancestors()->with('revision')->orderBy('lft')->get();
+	}
+
+	/**
+	 * Get the page's children with revision data to use with fractal transformer
+	 * @return \Illuminate\Database\Eloquent\Collection|static[]
+	 */
+	public function getChildrenWithRevision()
+	{
+		return $this->children()->with('revision')->orderBy('lft')->get();
 	}
 }

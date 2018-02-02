@@ -42,7 +42,6 @@ class PageController extends ApiController
 		$include = $request->get('include');
 		$version = $request->get('version', Page::STATE_DRAFT);
 		return $this->resolveRoute($host, $path, $version, $include);
-
 	}
 
 	/**

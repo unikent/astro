@@ -28,7 +28,6 @@ class Revision extends Model
 	];
 
 	protected $fillable = [
-		'site_id',
 		'title',
 		'created_by',
 		'updated_by',
@@ -36,7 +35,7 @@ class Revision extends Model
 		'layout_version',
 		'revision_set_id',
 		'options',
-		'bake',
+		'blocks',
 		'valid'
 	];
 
@@ -111,11 +110,13 @@ class Revision extends Model
 	 */
 	public function history()
 	{
-		return $this->hasManyThrough(Revision::class, RevisionSet::class, 'id', 'revision_set_id', 'revision_set_id')
+		$res = $this->hasManyThrough(Revision::class, RevisionSet::class, 'id', 'revision_set_id', 'revision_set_id')
 			->where(
 				function ($query) {
-					return $query->where('created_at', '<', $this->created_at);
-				});
+					return $query->where('revisions.created_at', '<', $this->created_at);
+				})
+			->select('revisions.id', 'revisions.title', 'revisions.created_at', 'revisions.layout_name', 'revisions.layout_version');
+		return $res;
 	}
 
 }

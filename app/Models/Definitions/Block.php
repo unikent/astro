@@ -1,7 +1,6 @@
 <?php
 namespace App\Models\Definitions;
 
-
 class Block extends BaseDefinition
 {
 
@@ -10,6 +9,35 @@ class Block extends BaseDefinition
 	protected $casts = [
         'fields' => 'array',
 	];
+
+	/**
+	 * Optionally filter the data for this block.
+	 * @param array $block_data - Array of data with values for this block.
+	 * @param string $section_name - The name of the section this block is in.
+	 * @param string $region_name - The name of the region this block is in.
+	 * @param array $page_data - The page data (as structured to be sent as json) that this block is part of.
+	 * @return mixed Array of data.
+	 */
+	public function filterData($block_data, $section_name, $region_name, $page_data){ return $block_data; }
+
+	/**
+	 * Provide dynamic routing.
+	 * This must be implemented by a custom block class.
+	 * @param $path - Path to route
+	 * @param $block - Reference to the block data that is being returned as part of the page.
+	 * @param $page - The Page object.
+	 * @return bool
+	 */
+	public function route($path, &$block, $page) {return false;}
+
+	/**
+	 * Are blocks of this type dynamic?
+	 * @return mixed
+	 */
+	public function isDynamic()
+	{
+		return $this->dynamic;
+	}
 
 	/**
 	 * Get default data and fields to represent an instance of this block.
