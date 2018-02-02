@@ -67,7 +67,8 @@ export default {
 		...mapState({
 			mediaPicker: state => state.media.mediaPicker,
 			currentBlockIndex: state => state.contenteditor.currentBlockIndex,
-			currentRegionName: state => state.contenteditor.currentRegionName
+			currentRegionName: state => state.contenteditor.currentRegionName,
+			siteId: state => state.site.site
 		}),
 
 		...mapGetters([
@@ -143,7 +144,7 @@ export default {
 		fetchMedia() {
 			this.$api
 				// TODO: if unmodified since
-				.get('media?order=id.desc', {})
+				.get(`media?order=id.desc&site_ids[]=${this.siteId}`)
 				.then(({ headers, data: json }) => {
 					this.lastUpdated = headers.date;
 					this.media = json.data;
