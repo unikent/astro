@@ -147,7 +147,7 @@ import Icon from 'components/Icon';
 import { notify } from 'classes/helpers';
 import filterableMixin from 'mixins/filterableMixin';
 import paginatableMixin from 'mixins/paginatableMixin';
-import CreateSiteProfileModal from 'components/CreateSiteProfileModal';
+import CreateSiteProfileModal from '@profiles/components/CreateSiteProfileModal';
 
 export default {
 
@@ -221,12 +221,12 @@ export default {
 		 */
 		findProfileLocation(profile_id) {
 			var profileLocation = null;
-				for (let index = 0; index < this.profiles.length; index++) {
-					if (this.profiles[index].id === profile_id) {
-						profileLocation = index;
-						break;
-					}
+			for (let index = 0; index < this.profiles.length; index++) {
+				if (this.profiles[index].id === profile_id) {
+					profileLocation = index;
+					break;
 				}
+			}
 			return profileLocation;
 		},
 
@@ -239,11 +239,14 @@ export default {
 
 			if (profile.first_name && profile.last_name) {
 				return `${title} ${profile.first_name} ${profile.last_name}`
-			} else if (profile.first_name) {
+			}
+			else if (profile.first_name) {
 				return `${title} ${profile.first_name}`;
-			} else if (profile.last_name) {
+			}
+			else if (profile.last_name) {
 				return `${title} ${profile.last_name}`;
-			} else {
+			}
+			else {
 				return 'Unnamed Profile';
 			}
 		},
@@ -274,7 +277,7 @@ export default {
 
 		/**
 		publishes a profile
-		@param {int} id - the profile id 
+		@param {int} id - the profile id
 		**/
 		publish(id) {
 			let site_id = this.$route.params.site_id;
@@ -283,9 +286,9 @@ export default {
 					// find location of published profile in our loaded data
 
 					var profileLocation = this.findProfileLocation(id);
-					var returnedProfileData = response.data.data; 
+					var returnedProfileData = response.data.data;
 					this.profiles.splice(profileLocation, 1, returnedProfileData);
-					
+
 					notify({
 						title: 'Profile published',
 						message: `
@@ -301,7 +304,7 @@ export default {
 					for (var field in error.response.data.errors[0].details) {
 						errorList += '<li>' + error.response.data.errors[0].details[field] + '</li>';
 					}
-				
+
 					this.$confirm(`
 						You must fix the following issues before publishing it.
 						<ul>
@@ -313,23 +316,23 @@ export default {
 						dangerouslyUseHTMLString: true,
 						type: 'error'
 					})
-					.then(() => {
-						this.showCreateProfileModal('edit', id)
-					});
+						.then(() => {
+							this.showCreateProfileModal('edit', id)
+						});
 				});
 		},
 
 
 		/**
 		unpublishes a profile
-		@param {int} id - the profile id 
+		@param {int} id - the profile id
 		**/
 		unpublish(id) {
 			let site_id = this.$route.params.site_id;
 			this.$api.put(`sites/${site_id}/profiles/${id}/unpublish`)
 				.then((response) => {
 					var profileLocation = this.findProfileLocation(id);
-					var returnedProfileData = response.data.data; 
+					var returnedProfileData = response.data.data;
 					this.profiles.splice(profileLocation, 1, returnedProfileData);
 
 					notify({
@@ -355,13 +358,13 @@ export default {
 
 		/**
 		removes/deletes a profile
-		@param {int} id - the profile id 
+		@param {int} id - the profile id
 		**/
 		remove(id) {
 			let site_id = this.$route.params.site_id;
-			
+
 			var profileLocation = this.findProfileLocation(id);
-			
+
 			// we allow saving of unfinished profiles so those might have unfinished names...
 			var profileName = this.profileName(this.profiles[profileLocation]);
 
@@ -378,7 +381,7 @@ export default {
 					.then((response) => {
 						// find location of published profile in our loaded data and remove it
 						this.profiles.splice(profileLocation, 1);
-	
+
 						notify({
 							title: 'Profile deleted',
 							message: `
@@ -400,7 +403,7 @@ export default {
 								Not deleted profile. Try again later.
 							`,
 							type: 'error'
-						});		
+						});
 					});
 				});
 		},
@@ -408,7 +411,7 @@ export default {
 
 		/**
 		displays the create/edit site profile modal
-		
+
 		if editing an existing profile then retrieves the data for that profile from the API
 		@param {string} type - the 'mode' of the modal either 'edit' or 'create'
 		@param {int} id - the id of a siteProfile
@@ -421,7 +424,7 @@ export default {
 						let profileData = json.data;
 						// flatten categories to just ids
 						profileData.categories = profileData.categories.map(category => category.id);
-						this.$bus.$emit('site-profile:showCreateProfileModal', {type, profileData});		
+						this.$bus.$emit('site-profile:showCreateProfileModal', {type, profileData});
 					})
 					.catch((errors) => {
 						console.log(errors);
