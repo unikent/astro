@@ -5,7 +5,6 @@ import SvgStorePlugin from 'external-svg-sprite-loader/lib/SvgStorePlugin';
 import WebpackNotifierPlugin from 'webpack-notifier';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import FriendlyErrorsPlugin from 'friendly-errors-webpack-plugin';
-import CircularDependencyPlugin from 'circular-dependency-plugin';
 
 /* global __dirname, process */
 
@@ -160,11 +159,6 @@ export default {
 
 		new FriendlyErrorsPlugin(),
 
-		new CircularDependencyPlugin({
-			exclude: /node_modules/,
-			failOnError: true
-		}),
-
 		...(
 			isProduction ?
 				[
@@ -196,7 +190,7 @@ export default {
 		extensions: ['*', '.js', '.vue', '.json'],
 		alias: {
 			// necessary for vue
-			'vue$'      : 'vue/dist/vue.common.js',
+			'vue$' : 'vue/dist/vue.common.js',
 
 			// Astro aliases
 			'classes'   : resolve('js/classes'),
