@@ -196,6 +196,7 @@ export default {
 			'classes'   : resolve('js/classes'),
 			'components': resolve('js/components'),
 			'directives': resolve('js/directives'),
+			'helpers'   : resolve('js/helpers'),
 			'mixins'    : resolve('js/mixins'),
 			'plugins'   : resolve('js/plugins'),
 			'store'     : resolve('js/store'),
