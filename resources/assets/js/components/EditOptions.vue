@@ -80,7 +80,7 @@
 import { mapState } from 'vuex';
 import { Definition } from 'classes/helpers';
 import BackBar from './BackBar';
-import fields from 'components/fields';
+import fields from 'components/fields/base';
 import containers from 'components/fields/containers';
 import Icon from './Icon';
 import BlockForm from './BlockForm';
