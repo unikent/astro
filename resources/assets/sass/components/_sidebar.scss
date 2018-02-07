@@ -22,7 +22,7 @@ to the right of the sidebar is another sidebar (sidebar__switcher) which contain
 	}
 
 	.sidebar-wrapper {
-		height: 100vh;
+		height: calc(100vh - #{get-height(top-bar)});
 		background-color: #f5f7fa;
 	}
 
