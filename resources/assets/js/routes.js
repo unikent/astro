@@ -6,7 +6,6 @@ import Dashboard from './views/Dashboard';
 import SiteList from './views/SiteList';
 import Media from './views/Media';
 import Settings from './views/Settings';
-import SiteProfiles from './views/SiteProfiles';
 
 import Editor from './views/Editor';
 import MenuEditor from './views/MenuEditor';
@@ -14,6 +13,10 @@ import SiteUsers from './views/SiteUsers';
 import Preview from './views/Preview';
 import NotFound from './views/NotFound';
 import Config from './classes/Config';
+
+import SiteProfiles from '@profiles/views/SiteProfiles';
+import ProfileEditor from '@profiles/views/ProfileEditor';
+import ProfilePreview from '@profiles/views/ProfilePreview';
 
 const routes = [
 	{
@@ -24,6 +27,7 @@ const routes = [
 	{
 		path: '/site/:site_id',
 		component: Admin,
+		name: 'admin',
 		props: true,
 		children: [
 			{
@@ -61,6 +65,18 @@ const routes = [
 		path: '/site/:site_id/page/:page_id',
 		component: Editor,
 		name: 'page'
+	},
+	{
+		path: '/site/:siteId/profile/:profileId',
+		component: ProfileEditor,
+		name: 'profile-editor',
+		props: true
+	},
+	{
+		path: '/site/:siteId/preview/profile/:profileId',
+		component: ProfilePreview,
+		name: 'profile-preview',
+		props: true
 	},
 	{
 		path: '/preview/:page_id',
