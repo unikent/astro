@@ -66,7 +66,7 @@
 
 			<div v-else-if="schema[key].type === 'social-media'" style="clear: left;">
 				
-				<el-row :gutter="4" v-for="(data, index) in formData[key]">
+				<el-row :gutter="4" v-for="(data, index) in formData[key]" :key="index">
 					<el-col :span="6">
 						<el-select v-model="data.id" placeholder="Social media platform">
 							<el-option
