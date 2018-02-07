@@ -167,21 +167,21 @@ export default {
 
 		...(
 			isProduction ?
-			[
-				new webpack.DefinePlugin({
-					'process.env': {
-						NODE_ENV: '"production"'
-					}
-				}),
+				[
+					new webpack.DefinePlugin({
+						'process.env': {
+							NODE_ENV: '"production"'
+						}
+					}),
 
-				new webpack.optimize.UglifyJsPlugin({
-					sourceMap: true,
-					compress: {
-						warnings: false
-					}
-				})
-			] :
-			[]
+					new webpack.optimize.UglifyJsPlugin({
+						sourceMap: true,
+						compress: {
+							warnings: false
+						}
+					})
+				] :
+				[]
 		)
 
 		// TODO: set up hmr + dev server, stats (to be compatible with Laravel's
@@ -206,7 +206,10 @@ export default {
 			'plugins'   : resolve('js/plugins'),
 			'store'     : resolve('js/store'),
 			'views'     : resolve('js/views'),
-			'IconPath'  : resolve('icons')
+			'IconPath'  : resolve('icons'),
+
+			// temporary "package" alias
+			'@profiles': resolve('js/profiles')
 		}
 	},
 
