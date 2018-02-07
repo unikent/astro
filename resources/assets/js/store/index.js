@@ -10,6 +10,7 @@ import media from './modules/media';
 import permissions from './modules/permissions';
 import definition from './modules/definition';
 import contenteditor from './modules/contenteditor';
+import profile from '@profiles/store/profile';
 
 import Config from 'classes/Config';
 
@@ -46,7 +47,7 @@ let store = new Vuex.Store({
 			insertRegion: null,
 			insertSection: null,
 			allowedBlocks: null,	// the constraints on what blocks can be added
-			maxSelectableBlocks: null, // the maximum number of blocks that can be selected 
+			maxSelectableBlocks: null, // the maximum number of blocks that can be selected
 			replaceBlocks: false //whether or not to replace the blocks in the current section
 		},
 		currentView: 'desktop',
@@ -230,7 +231,8 @@ let store = new Vuex.Store({
 		contenteditor,
 		site,
 		media,
-		permissions
+		permissions,
+		profile
 	},
 
 	plugins: [
