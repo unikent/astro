@@ -53,7 +53,7 @@ import Icon from 'components/Icon';
 import SideMenuItem from 'components/sidebar/SideMenuItem';
 import SideMenuPages from 'components/sidebar/SideMenuPages';
 import PageList from 'components/PageList';
-import BlockSidebar from 'components/sidebar/BlockSidebar';
+import EditBlock from 'components/EditBlock';
 import ErrorSidebar from 'components/sidebar/Errors';
 import { eventBus } from 'plugins/eventbus';
 
@@ -82,7 +82,7 @@ export default {
 					icon: 'layers',
 					title: 'Blocks on current page',
 					id: 'blocks',
-					component: BlockSidebar
+					component: EditBlock
 				},
 				{
 					link: '/errors',
