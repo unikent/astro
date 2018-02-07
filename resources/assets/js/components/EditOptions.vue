@@ -84,6 +84,7 @@ import fields from 'components/fields';
 import Icon from './Icon';
 import BlockForm from './BlockForm';
 import { eventBus } from 'plugins/eventbus';
+import swapParentField from 'helpers/swapParentField';
 
 export default {
 
@@ -96,6 +97,8 @@ export default {
 		BackBar,
 		BlockForm
 	},
+
+	inject: ['fieldType'],
 
 	computed: {
 
@@ -137,12 +140,20 @@ export default {
 	methods: {
 
 		getField(type) {
-			const field = fields[type];
+			const field = swapParentField(fields[type], this.fieldType);
 
 			return (
 				field || {
-					name: type,
-					template: '<div>This field type does not exist</div>'
+					name: 'missing-field-type',
+					inheritAttrs: false,
+					template: `
+						 <el-alert
+							title="This field type does not exist"
+							type="warning"
+							show-icon
+							:closable="false"
+						/>
+					`
 				}
 			);
 		},

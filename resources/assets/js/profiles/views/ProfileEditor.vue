@@ -21,7 +21,7 @@
 import { mapState } from 'vuex';
 
 import Config from 'classes/Config';
-import ResizableSidebar from 'components/sidebar/ResizableSidebar';
+import Sidebar from 'components/sidebar/ResizableSidebar';
 import EditProfile from '@profiles/components/EditProfile';
 
 export default {
@@ -30,8 +30,12 @@ export default {
 	props: ['site-id', 'profile-id'],
 
 	components: {
-		ResizableSidebar,
+		Sidebar,
 		EditProfile
+	},
+
+	provide: {
+		fieldType: 'profile'
 	},
 
 	created() {
