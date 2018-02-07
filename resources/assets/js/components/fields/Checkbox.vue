@@ -11,10 +11,10 @@
 </template>
 
 <script>
-import baseFieldMixin from '../../mixins/baseFieldMixin';
+import BlockField from 'components/BlockField';
 
 export default {
 	name: 'checkbox-field',
-	mixins: [baseFieldMixin]
+	extends: BlockField
 };
 </script>

@@ -57,7 +57,7 @@
 import _ from 'lodash';
 import Vue from 'vue';
 import { mapState, mapGetters } from 'vuex';
-import baseFieldMixin from 'mixins/baseFieldMixin';
+import BlockField from 'components/BlockField';
 import getFieldMixin from 'mixins/getFieldMixin';
 import { Definition } from 'classes/helpers';
 
@@ -66,7 +66,10 @@ import Icon from '../Icon';
 export default {
 
 	name: 'collection-field',
-	mixins: [baseFieldMixin, getFieldMixin],
+
+	extends: BlockField,
+
+	mixins: [getFieldMixin],
 
 	components: {
 		Icon
