@@ -9,7 +9,9 @@
 				:style="{ 'position' : displayIframeOverlay ? 'absolute' : null }"
 			/>
 		</div>
-		<resizable-sidebar />
+		<sidebar>
+			<edit-profile />
+		</sidebar>
 	</div>
 
 </div>
@@ -20,6 +22,7 @@ import { mapState } from 'vuex';
 
 import Config from 'classes/Config';
 import ResizableSidebar from 'components/sidebar/ResizableSidebar';
+import EditProfile from '@profiles/components/EditProfile';
 
 export default {
 	name: 'profile-editor',
@@ -27,7 +30,8 @@ export default {
 	props: ['site-id', 'profile-id'],
 
 	components: {
-		ResizableSidebar
+		ResizableSidebar,
+		EditProfile
 	},
 
 	created() {

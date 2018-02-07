@@ -1,5 +1,5 @@
 <template>
-<div>
+<div v-loading.fullscreen.lock="loading">
 	<div v-for="(value, key) in profileData"
 		style="border-radius: 4px; background-color: #fff; padding: 30px; margin: 20px;"
 	>
@@ -10,15 +10,35 @@
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex';
+
 export default {
 	name: 'profile-preview',
 
 	props: ['site-id', 'profile-id'],
 
-	data() {
-		return {
-			profileData: {}
-		};
+	created() {
+		this.loadProfileData();
+	},
+
+	computed: {
+		...mapState({
+			loading: state => state.profile.loading,
+			profileData: state => state.profile.profileData
+		})
+	},
+
+	methods: {
+		...mapActions({
+			fetchProfileData: 'profile/fetchProfileData'
+		}),
+
+		loadProfileData() {
+			this.fetchProfileData({
+				siteId: this.siteId,
+				profileId: this.profileId
+			})
+		}
 	}
 
 };
