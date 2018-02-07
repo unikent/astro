@@ -1,4 +1,4 @@
-import { mapGetters, mapState } from 'vuex';
+import { debug } from 'classes/helpers';
 
 export default {
 
@@ -9,43 +9,24 @@ export default {
 	},
 
 	computed: {
-		...mapGetters([
-			'getCurrentFieldValue'
-		]),
-		...mapState({
-			currentBlockIndex: state => state.contenteditor.currentBlockIndex,
-			currentRegionName: state => state.contenteditor.currentRegionName,
-		}),
-
 		value: {
 			get() {
-				const value = this.getCurrentFieldValue(this.path);
-				return value !== void 0 ? value : this.default;
+				return this.getFieldValue(this.path);
 			},
 			set(value) {
-				this.updateFieldValue({
-					name: this.path,
-					value: this.transformValue(value)
-				});
+				this.updateFieldValue(this.path, this.transformValue(value));
 			}
 		}
 	},
 
-
-
 	methods: {
-		...mapGetters([
-			'currentSectionIndex'
-		]),
+		getFieldValue(path) {
+			debug(path);
+			return null;
+		},
 
-		updateFieldValue({ name, value }) {
-			this.$store.commit('updateFieldValue', {
-				name: name,
-				value: value,
-				index: this.currentBlockIndex,
-				region: this.currentRegionName,
-				section: this.currentSectionIndex()
-			})
+		updateFieldValue(path, value) {
+			debug(path, value);
 		},
 
 		// Here so we can override this at some point
