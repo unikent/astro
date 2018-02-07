@@ -23,7 +23,7 @@ export default {
 			'wrapperStyles'
 		]),
 		isEditor() {
-			return ['preview', '404'].indexOf(this.$route.name) === -1;
+			return ['preview', 'profile-preview', '404'].indexOf(this.$route.name) === -1;
 		}
 	}
 };
