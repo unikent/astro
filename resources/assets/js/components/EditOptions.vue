@@ -80,8 +80,7 @@
 import { mapState } from 'vuex';
 import { Definition } from 'classes/helpers';
 import BackBar from './BackBar';
-import fields from 'components/fields/base';
-import containers from 'components/fields/containers';
+import fields from 'components/fields';
 import Icon from './Icon';
 import BlockForm from './BlockForm';
 import { eventBus } from 'plugins/eventbus';
@@ -138,7 +137,7 @@ export default {
 	methods: {
 
 		getField(type) {
-			const field = fields[type] || containers[type];
+			const field = fields[type];
 
 			return (
 				field || {

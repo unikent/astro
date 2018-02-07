@@ -1,12 +1,12 @@
-import fields from 'components/fields';
+import baseFields from 'components/fields/base';
 
 export default {
 
 	methods: {
 		getField(type) {
 			return (
-				fields[type] ?
-					fields[type] :  {
+				baseFields[type] ?
+					baseFields[type] :  {
 						name: type,
 						template: '<div>This field type does not exist</div>'
 					}
