@@ -68,19 +68,25 @@ class PageTransformer extends FractalTransformer
 	}
 
 	/**
-	 * Find any dynamic blocks and give them the option to filter their data
+	 * Find any dynamic blocks and give them the option to inject dynamic attributes into the block data.
 	 * @param $blocks
 	 * @param array $page_data Array of data about the page (as returned by the transform() method)
 	 * @return mixed
+	 * @throws \InvalidArgumentException if any attributes are returned which are not defined in the block definition.
 	 */
 	public function transformDynamicBlocks($blocks, $page_data)
 	{
 		// boot all block definitions...
-		foreach((array)$blocks as $region => &$sections){
-			foreach($sections as &$section) {
-				foreach( $section['blocks'] as &$block) {
+		foreach((array)$blocks as $region_name => $sections){
+			foreach($sections as $section_index => $section) {
+				foreach( $section['blocks'] as $block_index => $block) {
 					$definition = Block::fromDefinitionFile(Block::locateDefinition(Block::idFromNameAndVersion($block['definition_name'], $block['definition_version'])));
-					$block = $definition->filterData($block, $section['name'], $region, $page_data);
+					$dynamic = $definition->getDynamicAttributes($block, $section['name'], $region_name, $page_data);
+					$not_allowed = array_diff(array_keys($dynamic), $definition->getDynamicAttributeNames() ?? []);
+					if($not_allowed) {
+						throw new \InvalidArgumentException('Dynamic attribute(s): "' . join('", "', array_keys($not_allowed)) . '" are not defined for block "' . $block['definition_name'] . '-v' . $block['definition_version'] . '"');
+					}
+					$blocks[$region_name][$section_index]['blocks'][$block_index]['dynamic'] = $dynamic;
 				}
 			}
 		}

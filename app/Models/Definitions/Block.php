@@ -11,14 +11,14 @@ class Block extends BaseDefinition
 	];
 
 	/**
-	 * Optionally filter the data for this block.
+	 * Get any dynamically generated attributes for this block
 	 * @param array $block_data - Array of data with values for this block.
 	 * @param string $section_name - The name of the section this block is in.
 	 * @param string $region_name - The name of the region this block is in.
 	 * @param array $page_data - The page data (as structured to be sent as json) that this block is part of.
 	 * @return mixed Array of data.
 	 */
-	public function filterData($block_data, $section_name, $region_name, $page_data){ return $block_data; }
+	public function getDynamicAttributes($block_data, $section_name, $region_name, $page_data){ return []; }
 
 	/**
 	 * Provide dynamic routing.
