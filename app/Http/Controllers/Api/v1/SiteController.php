@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Models\APICommands\UpdateSite;
+use App\Models\Definitions\SiteDefinition;
 use App\Models\LocalAPIClient;
 use App\Models\Page;
 use App\Models\Permission;
@@ -12,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Http\Transformers\Api\v1\SiteTransformer;
 use App\Http\Transformers\Api\v1\PageTransformer;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -50,7 +52,7 @@ class SiteController extends ApiController
 			$request->get('name'),
 			$request->get('host'),
 			$request->get('path'),
-			$request->get('homepage_layout', []),
+			$request->get('site_definition', []),
 			$request->get('options')
 		);
 		if ($site instanceof Site) {
@@ -186,4 +188,34 @@ class SiteController extends ApiController
 		return $map[null]['children'];
 	}
 
+	/**
+	 * GET /sites/definitions
+	 * Get a list of available site definitions.
+	 */
+	public function definitions()
+	{
+		$this->authorize('index', SiteDefinition::class);
+		$path = sprintf('%s/%s/', Config::get('app.definitions_path'), SiteDefinition::$defDir);
+		$sites = glob($path . '*/v*/definition.json');
+		$path_length = strlen($path);
+		foreach($sites as &$site){
+			$site = preg_replace('/\/(v[0-9]+)\/definition\.json$/', '-$1', substr($site, $path_length));
+		}
+		$site_definitions = $this->getSiteDefinitions($sites);
+		return response()->json([ 'data' => $site_definitions ]);
+	}
+
+		/**
+		 * Get site definitions, indexed by {name}-v{version}
+		 * @param array $site_ids - Array of site ids to retrieve definitions for [ {name}-v{version}, ...]
+		 * @return array - Array of site definitions, indexed by site id
+		 */
+	public function getSiteDefinitions($site_ids)
+	{
+		$sites = [];
+		foreach($site_ids as $site_id) {
+			$sites[$site_id] = SiteDefinition::fromDefinitionFile(SiteDefinition::locateDefinition($site_id));
+		}
+		return $sites;
+	}
 }

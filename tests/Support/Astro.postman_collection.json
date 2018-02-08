@@ -196,7 +196,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Test site\",\n\t\"host\": \"astro.test\",\n\t\"path\": \"/sam/sayys\",\n\t\"homepage_layout\": {\n\t\t\"name\": \"kent-homepage\",\n\t\t\"version\": \"1\"\n\t}\n}"
+					"raw": "{\n\t\"name\": \"Latest Site\",\n\t\"host\": \"astro.test\",\n\t\"path\": \"/sam/says/i\",\n\t\"site_definition\": {\n\t\t\"name\": \"school-site\",\n\t\t\"version\": \"1\"\n\t}\n}"
 				},
 				"description": "Create a new Site."
 			},
@@ -339,7 +339,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"parent_id\": \"1\",\n\t\"slug\": \"feeinfo\",\n\t\"layout_name\": \"kent-homepage\",\n\t\"layout_version\": \"1\",\n\t\"title\": \"Undergraduate Fees\"\n}"
+					"raw": "{\n\t\"parent_id\": \"1\",\n\t\"slug\": \"feeinfo\",\n\t\"layout\": {\n\t\t\"name\": \"kent-homepage\",\n\t\t\"version\": \"1\"\n\t},\n\t\"title\": \"Undergraduate Fees\"\n}"
 				},
 				"description": "Create a new Site."
 			},
@@ -408,29 +408,7 @@
 		{
 			"name": "Layouts List",
 			"request": {
-				"url": {
-					"raw": "http://astro.test:8080/api/v1/sites?include=publishing_group,homepage.draft,drafts",
-					"protocol": "http",
-					"host": [
-						"astro",
-						"test"
-					],
-					"port": "8080",
-					"path": [
-						"api",
-						"v1",
-						"sites"
-					],
-					"query": [
-						{
-							"key": "include",
-							"value": "publishing_group,homepage.draft,drafts",
-							"equals": true,
-							"description": ""
-						}
-					],
-					"variable": []
-				},
+				"url": "http://astro.test:8080/api/v1/layouts/definitions",
 				"method": "GET",
 				"header": [
 					{
@@ -703,6 +681,36 @@
 					},
 					{
 						"key": "Accepts",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"description": "Retrieve a list of Sites."
+			},
+			"response": []
+		},
+		{
+			"name": "Site Definitions List - GET",
+			"request": {
+				"url": "http://astro.test:8080/api/v1/sites/definitions",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer test",
+						"description": ""
+					},
+					{
+						"key": "accepts",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "content-type",
 						"value": "application/json",
 						"description": ""
 					}

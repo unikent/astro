@@ -12,6 +12,7 @@ use App\Models\Page;
 /**
  * Updates the slug for a page.
  * Updates the path for the page and all of its descendants.
+ * Also does this for the published version(s) of the page and its descendants.
  * @package App\Models\APICommands
  */
 class UpdatePageSlug implements APICommand
@@ -29,6 +30,13 @@ class UpdatePageSlug implements APICommand
 			if ($input['slug'] == $page->slug) {
 				return $page;
 			}
+			// update published version of page if there is one
+			// need to do this BEFORE updating the draft page, as we can only find the published version
+			// by looking for a page with the same path / slug
+			$published = $page->publishedVersion();
+			if($published){
+				$this->updateSlugAndPaths($published, $input['slug']);
+			}
 			$this->updateSlugAndPaths($page, $input['slug']);
 			$page->refresh();
 			return $page;
@@ -38,13 +46,13 @@ class UpdatePageSlug implements APICommand
 
 
 	/**
-	 * Update the paths in the database for a Page and its descendants when it moves to a new parent.
+	 * Update the paths in the database for a Page and its descendants when its slug changes.
 	 * @param Page $page The Page which is moving
-	 * @param Page $parent The Page which will be the new parent.
+	 * @param string $slug The new slug for the Page.
 	 */
 	public function updateSlugAndPaths($page, $slug)
 	{
-		$replace_length = strlen($page->path); // get length to replace
+		$replace_length = strlen($page->path) + 1; // get length to replace
 		$replace_with = (strlen($page->parent->path) == 1 ? '' : $page->parent->path) . '/' . $slug;
 		$binds = [
 			// handle root parent with path of '/' as a special case
@@ -57,14 +65,13 @@ class UpdatePageSlug implements APICommand
 		];
 
 		DB::update("
-          UPDATE pages 
-          SET 
-            path = CONCAT(:prefix, SUBSTRING(path, :replace_length) )
-          WHERE lft >= :lft
-          AND lft < :rgt
-          AND site_id = :site_id
-          AND version = :version
-        ",
+			UPDATE pages
+			SET path = CONCAT(:prefix, SUBSTRING(path, :replace_length))
+			WHERE lft >= :lft
+			AND lft < :rgt
+			AND site_id = :site_id
+			AND version = :version
+			",
 			$binds
 		);
 		$page->slug = $slug;
@@ -79,7 +86,8 @@ class UpdatePageSlug implements APICommand
 	public function messages(Collection $data, Authenticatable $user)
 	{
 		return [
-			'id.page_is_a_subpage' => 'You cannot change the slug of the homepage.',
+			'id.required' => 'Cannot update a page\'s slug without knowing its id.',
+			'id.page_is_a_subpage' => 'Cannot update the slug of a page that doesn\'t exist or is a homepage.',
 			'slug.regex' => 'Slug can only contain lowercase letters, numbers and hyphens.',
 			'slug_unchanged_or_unique' => 'A page with the slug "' . $data->get('slug') . '" already exists at this level.'
 		];
@@ -92,10 +100,9 @@ class UpdatePageSlug implements APICommand
 	 */
 	public function rules(Collection $data, Authenticatable $user)
 	{
-		$page = Page::find($data->get('id'));
-		$parent_id = $page ? $page->parent_id : null;
 		$rules = [
 			'id' => [
+				'required',
 				'page_is_a_subpage',
 				'page_is_draft:' . $data->get('id')
 			],

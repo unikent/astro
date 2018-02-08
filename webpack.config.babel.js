@@ -4,10 +4,10 @@ import SvgStorePlugin from 'external-svg-sprite-loader/lib/SvgStorePlugin';
 import WebpackNotifierPlugin from 'webpack-notifier';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import FriendlyErrorsPlugin from 'friendly-errors-webpack-plugin';
-import CircularDependencyPlugin from 'circular-dependency-plugin';
 import dotenv from 'dotenv';
+
 // load from .env into process.env
-dotenv.config()
+dotenv.config();
 
 /* global __dirname, process */
 
@@ -170,28 +170,23 @@ export default {
 
 		new FriendlyErrorsPlugin(),
 
-		new CircularDependencyPlugin({
-			exclude: /node_modules/,
-			failOnError: true
-		}),
-
 		...(
 			isProduction ?
-			[
-				new webpack.DefinePlugin({
-					'process.env': {
-						NODE_ENV: '"production"'
-					}
-				}),
+				[
+					new webpack.DefinePlugin({
+						'process.env': {
+							NODE_ENV: '"production"'
+						}
+					}),
 
-				new webpack.optimize.UglifyJsPlugin({
-					sourceMap: true,
-					compress: {
-						warnings: false
-					}
-				})
-			] :
-			[]
+					new webpack.optimize.UglifyJsPlugin({
+						sourceMap: true,
+						compress: {
+							warnings: false
+						}
+					})
+				] :
+				[]
 		)
 
 		// TODO: set up hmr + dev server, stats (to be compatible with Laravel's
@@ -206,18 +201,23 @@ export default {
 		extensions: ['*', '.js', '.vue', '.json'],
 		alias: {
 			// necessary for vue
-			'vue$'      : 'vue/dist/vue.common.js',
+			'vue$' : 'vue/dist/vue.common.js',
 
 			// Astro aliases
 			'classes'   : resolve('js/classes'),
 			'components': resolve('js/components'),
 			'directives': resolve('js/directives'),
+			'helpers'   : resolve('js/helpers'),
 			'mixins'    : resolve('js/mixins'),
 			'plugins'   : resolve('js/plugins'),
 			'store'     : resolve('js/store'),
 			'views'     : resolve('js/views'),
 			'IconPath'  : resolve('icons'),
-			'theme'		: process.env.DEFINITIONS_PATH  // "theme" replaces "cms-prototype-blocks"
+       // "@theme" replaces "cms-prototype-blocks"
+			'@theme'		: process.env.DEFINITIONS_PATH 
+
+			// temporary "package" alias
+			'@profiles': resolve('js/profiles')
 		}
 	},
 	resolveLoader: { // required for absolute theme / blocks directory path

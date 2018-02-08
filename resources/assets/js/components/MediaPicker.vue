@@ -65,8 +65,16 @@ export default {
 
 	computed: {
 		...mapState({
-			mediaPicker: state => state.media.mediaPicker
+			mediaPicker: state => state.media.mediaPicker,
+			currentBlockIndex: state => state.contenteditor.currentBlockIndex,
+			currentRegionName: state => state.contenteditor.currentRegionName,
+			siteId: state => state.site.site
 		}),
+
+		...mapGetters([
+			'canUser',
+			'currentSectionIndex'
+		]),
 
 		visible: {
 			get() {
@@ -84,11 +92,7 @@ export default {
 
 		fieldPath() {
 			return this.mediaPicker.fieldPath;
-		},
-
-		...mapGetters([
-			'canUser'
-		])
+		}
 	},
 
 	watch: {
@@ -116,13 +120,21 @@ export default {
 		setFieldMedia(media) {
 			this.updateFieldValue({
 				name: this.fieldPath,
-				value: { ...media, type: 'image' }
+				value: { ...media, type: 'image' },
+				index: this.currentBlockIndex,
+				region: this.currentRegionName,
+				section: this.currentSectionIndex
 			});
 
 			this.updateBlockMedia({
+				region: this.currentRegionName,
+				section: this.currentSectionIndex,
+				index: this.currentBlockIndex,
 				value: {
 					...media,
+					/* eslint-disable camelcase */
 					associated_field: this.fieldPath
+					/* eslint-enable camelcase */
 				}
 			});
 
@@ -132,7 +144,7 @@ export default {
 		fetchMedia() {
 			this.$api
 				// TODO: if unmodified since
-				.get('media', {})
+				.get(`media?order=id.desc&site_ids[]=${this.siteId}`)
 				.then(({ headers, data: json }) => {
 					this.lastUpdated = headers.date;
 					this.media = json.data;

@@ -48,11 +48,10 @@ interface Definition {
      * Locates a Definition file on disk; when no version is specified
      * it will return the latest.
      *
-     * @param  string $name
-     * @param  int $version
+	 * @param  string $definition_id - The {name}-v{version} string identifying the definition.
      * @return string|null
      */
-    public static function locateDefinition($name, $version = null);
+    public static function locateDefinition($definition_id);
 
     /**
      * Locates a Definition file on disk; throws an exception if no Definition is found.
@@ -62,6 +61,6 @@ interface Definition {
      * @throws App\Exceptions\DefinitionNotFoundException
      * @return string
      */
-    public static function locateDefinitionOrFail($name, $version = null);
+    public static function locateDefinitionOrFail($definition_id);
 
 }

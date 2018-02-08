@@ -4,7 +4,8 @@ import Admin from './views/Admin';
 
 import Dashboard from './views/Dashboard';
 import SiteList from './views/SiteList';
-import Settings from './views/Settings'
+import Media from './views/Media';
+import Settings from './views/Settings';
 
 import Editor from './views/Editor';
 import MenuEditor from './views/MenuEditor';
@@ -13,28 +14,50 @@ import Preview from './views/Preview';
 import NotFound from './views/NotFound';
 import Config from './classes/Config';
 
+import SiteProfiles from '@profiles/views/SiteProfiles';
+import ProfileEditor from '@profiles/views/ProfileEditor';
+import ProfilePreview from '@profiles/views/ProfilePreview';
+
 const routes = [
 	{
 		path: '/',
+		component: SiteList,
+		name: 'site-list'
+	},
+	{
+		path: '/site/:site_id',
 		component: Admin,
-		redirect: '/home',
+		name: 'admin',
+		props: true,
 		children: [
 			{
-				path: 'home',
+				path: '',
 				component: Dashboard
 			},
 			{
-				path: 'sites',
-				component: SiteList
+				path: 'menu',
+				component: MenuEditor,
+				name: 'menu-editor'
 			},
 			{
-				path: 'settings',
-				component: Settings
+				path: 'media',
+				component: Media,
+				name: 'media-manager'
+			},
+			{
+				path: 'users',
+				component: SiteUsers,
+				name: 'site-users'
+			},
+			{
+				path: 'profiles',
+				component: SiteProfiles,
+				name: 'site-profiles'
 			}
 		]
 	},
 	{
-		path: '/site/:site_id',
+		path: '/site/:site_id/page',
 		component: Editor,
 		name: 'site'
 	},
@@ -44,19 +67,26 @@ const routes = [
 		name: 'page'
 	},
 	{
-		path: '/site/:site_id/menu',
-		component: MenuEditor,
-		name: 'menu-editor'
+		path: '/site/:siteId/profile/:profileId',
+		component: ProfileEditor,
+		name: 'profile-editor',
+		props: true
 	},
 	{
-		path: '/site/:site_id/users',
-		component: SiteUsers,
-		name: 'site-users'
+		path: '/site/:siteId/preview/profile/:profileId',
+		component: ProfilePreview,
+		name: 'profile-preview',
+		props: true
 	},
 	{
 		path: '/preview/:page_id',
 		component: Preview,
 		name: 'preview'
+	},
+	{
+		path: '/user/:user_id/settings',
+		component: Settings,
+		name: 'settings'
 	},
 	{
 		path: '*',

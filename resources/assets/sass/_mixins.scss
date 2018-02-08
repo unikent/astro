@@ -9,6 +9,8 @@
 @mixin button-variant(
 	$background,
 	$border: darken($background, 10%),
+	$focus-background: lighten($background, 8%),
+	$focus-border: lighten($border, 10%),
 	$active-background: darken($background, 8%),
 	$active-border: darken($border, 10%)
 ) {
@@ -17,6 +19,11 @@
 
 	&:focus,
 	&:hover {
+		background-color: $focus-background;
+		border-color: $focus-border;
+	}
+
+	&:active {
 		background-color: $active-background;
 		border-color: $active-border;
 	}

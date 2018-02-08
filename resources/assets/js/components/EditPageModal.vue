@@ -1,5 +1,5 @@
 <template>
-	<el-dialog title="Edit page settings" v-model="visible" :modal-append-to-body="false">
+	<el-dialog title="Edit page settings" :visible.sync="visible" :modal-append-to-body="false">
 		<el-form :model="editForm">
 			<el-form-item label="Page title">
 				<el-input name="title" v-model="editForm.title" auto-complete="off"></el-input>
@@ -62,19 +62,22 @@
 
 			visible: {
 				get() {
-					return this.editPageModal.visible;
-				},
-				set(show) {
-					if(!show) {
-						this.hideEditPageModal();
-					}
-					else {
+					const visible = this.editPageModal.visible;
+
+					if(visible) {
 						this.editForm.title = this.editPageModal.title;
 						this.editForm.slug = this.editPageModal.slug;
 						this.editForm.id = this.editPageModal.id;
 						this.editForm.editSlug = this.editPageModal.editSlug;
 						this.editForm.errorMessage = '';
 						this.editForm.editDetails = [];
+					}
+
+					return visible;
+				},
+				set(show) {
+					if(!show) {
+						this.hideEditPageModal();
 					}
 				}
 			}
@@ -94,7 +97,7 @@
 			 */
 			saveEdit() {
 				this.updatePageMeta(this.editForm)
-					.then((response) => {
+					.then(() => {
 						this.hideEditPageModal();
 					})
 					.catch((error) => {

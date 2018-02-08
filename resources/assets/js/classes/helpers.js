@@ -150,10 +150,12 @@ export const prettyDate = (date) => {
 
 	diff = Math.round(diff);
 
-	return `${i > 0 ? 'about ' : ''}${diff} ${unit[i]}${diff == 1 ? '' : 's'} ago`;
+	return `${i > 0 ? 'about ' : ''}${diff} ${unit[i]}${diff === 1 ? '' : 's'} ago`;
 };
 
 export const notify = ({ title, message, type }) => {
+	// TODO:is notify is overkill for some scenarios?
+	// Element UI's $message seems more suited to success messages
 	vue.$notify({
 		title,
 		message,
@@ -164,3 +166,55 @@ export const notify = ({ title, message, type }) => {
 		}
 	});
 };
+
+// Does the given string start with a vowel? If so return "an", otherwise "a".
+// Doesn't cover all cases, but is good enough for now.
+export const aOrAn = (str) => str.match(/^[aeiou]/i) ? 'an' : 'a';
+
+export const pageHasBeenPublished = (page) => {
+	return page.status !== 'new';
+};
+
+
+/**
+ * Get the URL at which the current page can be previewed in the editor.
+
+ * @param {string} url - The page URL to mutate into a draft preview URL
+
+ * @returns {string} Full URL (with any trailing slash removed)
+ */
+export const getDraftPreviewURL = (url) => {
+	return `${Config.get('base_url', '')}/draft/${url ? url.replace(/\/$/, '') : ''}`;
+};
+
+/**
+ * Get the URL at which the published version of the current page can be previewed in the editor.
+
+ * @param {string} url - The page URL to mutate into a published preview URL.
+
+ * @returns {string} Full URL (with any trailing slash removed)
+ */
+export const getPublishedPreviewURL = (url) => {
+	return `${Config.get('base_url', '')}/published/${url ? url.replace(/\/$/, '') : ''}`;
+};
+
+/**
+* prevents users from submitting forms in el
+* while still allowing the user to interact with them
+*/
+export const disableForms = (el) => {
+	// disable buttons
+	const buttonElements = el.querySelectorAll('button, submit');
+	buttonElements.forEach((buttonElement) => {
+		if(!buttonElement.classList.contains('el-button')) {
+			buttonElement.setAttribute('disabled', '');
+		}
+	});
+
+	// remove any form actions and methods
+	const formElements = el.querySelectorAll('form');
+	formElements.forEach((formElement) => {
+		formElement.removeAttribute('action');
+		formElement.removeAttribute('method');
+	});
+}

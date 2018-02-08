@@ -25,26 +25,22 @@
 
 .el-select-dropdown__item {
 	.view-icon {
+		margin-right: 15px;
 		width: 22px;
 		text-align: center;
 		float: left;
 
 		svg {
-			vertical-align: top;
-			fill: #555;
+			fill: #5a5e66;
 		}
 	}
 	.view-label {
 		float: right;
-		color: #8391a5;
 		font-size: 13px;
 	}
 	&.selected {
-		.view-label {
-			color: #fff;
-		}
 		svg {
-			fill: #fff;
+			fill: #409EFF;
 		}
 	}
 }

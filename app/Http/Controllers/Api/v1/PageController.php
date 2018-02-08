@@ -42,7 +42,6 @@ class PageController extends ApiController
 		$include = $request->get('include');
 		$version = $request->get('version', Page::STATE_DRAFT);
 		return $this->resolveRoute($host, $path, $version, $include);
-
 	}
 
 	/**
@@ -138,6 +137,21 @@ class PageController extends ApiController
 		$api = new LocalAPIClient(Auth::user());
 		$published = $api->publishPage($page->id);
 		return fractal($published, new PageTransformer(true))->respond();
+	}
+
+	/**
+	 * POST /api/v1/page/{page}/unpublish
+	 *
+	 * @param  Request $request
+	 * @param  Page $page
+	 * @return Response
+	 */
+	public function unpublish(Request $request, Page $page)
+	{
+		$this->authorize('unpublish', $page);
+		$api = new LocalAPIClient(Auth::user());
+		$result = $api->unpublishPage($page->id);
+		return fractal($result, new PageTransformer(true))->respond();
 	}
 
 	/**

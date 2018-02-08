@@ -10,6 +10,7 @@
 					:rules="rules[name].fields[f.name]"
 					:error="getError(f.name)"
 				>
+
 					<template slot="label">
 						<span>{{ f.label }}</span>
 
@@ -45,7 +46,7 @@
 <script>
 import _ from 'lodash';
 import { mapState } from 'vuex';
-import baseFieldMixin from 'mixins/baseFieldMixin';
+import BlockField from 'components/BlockField';
 import getFieldMixin from 'mixins/getFieldMixin';
 import { Definition } from 'classes/helpers';
 import Icon from '../Icon';
@@ -53,7 +54,10 @@ import Icon from '../Icon';
 export default {
 
 	name: 'group-field',
-	mixins: [baseFieldMixin, getFieldMixin],
+
+	extends: BlockField,
+
+	mixins: [getFieldMixin],
 
 	components: {
 		Icon
@@ -61,8 +65,7 @@ export default {
 
 	computed: {
 		...mapState({
-			currentIndex: state => state.page.currentBlockIndex,
-			currentDefinition: state => state.definition.currentBlockDefinition
+			currentIndex: state => state.page.currentBlockIndex
 		}),
 
 		rules() {

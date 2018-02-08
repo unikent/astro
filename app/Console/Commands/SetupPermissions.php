@@ -46,6 +46,7 @@ class SetupPermissions extends Command
 		Permission::ADD_PAGE => 'Add Pages',
 		Permission::EDIT_PAGE => 'Edit Pages',
 		Permission::DELETE_PAGE => 'Delete Pages',
+		Permission::UNPUBLISH_PAGE => 'Unpublish Pages',
 		Permission::MOVE_PAGE => 'Move Pages',
 		Permission::ADD_IMAGE => 'Add Images',
 		Permission::EDIT_IMAGE => 'Edit Images',
@@ -88,6 +89,7 @@ class SetupPermissions extends Command
 			Permission::EDIT_IMAGE,
 			Permission::USE_IMAGE,
 			Permission::PUBLISH_PAGE,
+			Permission::UNPUBLISH_PAGE,
 			Permission::PREVIEW_PAGE,
 			Permission::APPROVAL,
 			Permission::ASSIGN_SITE_PERMISSIONS,
@@ -109,6 +111,7 @@ class SetupPermissions extends Command
 			Permission::EDIT_IMAGE,
 			Permission::USE_IMAGE,
 			Permission::PUBLISH_PAGE,
+			Permission::UNPUBLISH_PAGE,
 			Permission::PREVIEW_PAGE,
 			Permission::APPROVAL
 		],

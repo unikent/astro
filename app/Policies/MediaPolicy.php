@@ -2,43 +2,28 @@
 
 namespace App\Policies;
 
-use Gate;
-use App\Models\Site;
+use App\Policies\BasePolicy;
 use App\Models\User;
+use App\Models\Site;
 use App\Models\Media;
-use Illuminate\Auth\Access\HandlesAuthorization;
+use App\Models\Permission;
 
-class MediaPolicy
+class MediaPolicy extends BasePolicy
 {
-    use HandlesAuthorization;
-
-    public function before($user, $ability)
-    {
-        if($user->isAdmin())
-        {
-            return true;
-        }else{
-            return true;
-        }
-    }
-
     /**
      * Determine whether the user can index Media.
      *
-     * Accepts a string or an array (containing a Media class string and a Site
-     * instance) as the ACO.
-     *
      * @param User  $user
-     * @param string|array $aco
+     * @param Site|null Site
+     *
      * @return boolean
      */
-    public function index(User $user, $aco = null)
+    public function index(User $user, $site = null)
     {
-        if(is_array($aco) && isset($aco[1])){
-            if(is_a($aco[1], Site::class)){
-                return (new SitePolicy)->update($user, $aco[1]);
-            }
+        if(is_a($site, Site::class)) {
+            return (new SitePolicy)->view($user, $site);
         }
+
         return false;
     }
 
@@ -65,11 +50,12 @@ class MediaPolicy
      * @param Site|null Site
      * @return boolean
      */
-    public function create(User $user, $media, $site_or_pubgroup)
+    public function create(User $user, $media, $site)
     {
-        if( is_a($site_or_pubgroup, Site::class)){
-            return (new SitePolicy)->update($user, $site_or_pubgroup);
+        if(is_a($site, Site::class)) {
+            return $user->hasPermissionForSite(Permission::ADD_IMAGE, $site->id);
         }
+
         return false;
     }
 
@@ -93,6 +79,8 @@ class MediaPolicy
      *
      * Accepts a Media item or an array (a Media instance and a Site
      * instance) as the ACO.
+     *
+     * TODO: Remove this aco business.
      *
      * @param  User  $user
      * @param  Media|array  $aco

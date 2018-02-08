@@ -2,22 +2,12 @@
 
 namespace App\Policies;
 
+use App\Policies\BasePolicy;
 use App\Models\User;
 use App\Models\Page;
-use Illuminate\Auth\Access\HandlesAuthorization;
 
-class RoutePolicy
+class RoutePolicy extends BasePolicy
 {
-    use HandlesAuthorization;
-
-    public function before($user, $ability)
-    {
-        if($user->isAdmin())
-        {
-            return true;
-        }
-    }
-
     /**
      * Determine whether the user can index definition.
      *

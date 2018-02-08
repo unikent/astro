@@ -18,6 +18,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'v1'], function () {
 	Route::put('pages/{page}/slug', 'PageController@changeSlug');
 	Route::post('pages/{page}/publish', 'PageController@publish');
 	Route::post('pages/{page}/publish-tree', 'PageController@publishTree');
+	Route::post('pages/{page}/unpublish', 'PageController@unpublish');
 	Route::post('pages/{page}/revert', 'PageController@revert');
 	Route::delete('pages/{page}/force', 'PageController@forceDestroy');
 
@@ -27,6 +28,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'v1'], function () {
 	Route::get('routes/resolve', 'PageController@resolve');
 
 	Route::resource('sites', 'SiteController', ['only' => ['index', 'show', 'store', 'update', 'destroy']]);
+	Route::get('sitedefinitions', 'SiteController@definitions');
 	Route::get('sites/{site}/tree', 'SiteController@tree');
 	Route::patch('sites/{site}/tree', 'SiteController@move');
 

@@ -20,7 +20,7 @@ class MediaController extends ApiController
 	 * GET /api/v1/media
 	 *
 	 * Returns an index of Media objects.
-	 * Supports querying with site_ids, pubishing_group_ids, types and mime_types.
+	 * Supports querying with site_ids, types and mime_types.
 	 *
 	 * @param  Request $request
 	 * @return Response
@@ -29,12 +29,13 @@ class MediaController extends ApiController
 		$query = Media::query();
 
 		if(!$request->has('site_ids')){
+			// this doesn't occur currently and always throws an auth exception
 			$this->authorize('index', Media::class);
-		}
-
-		if($request->has('site_ids')){
+		} else {
 			$sites = Site::whereIn('id', $request->get('site_ids'))->get();
 
+			// TODO: think about allowing user to view some results if
+			// they have access to one of the sites requested
 			foreach($sites as $site){
 				$this->authorize('index', [ Media::class, $site ]);
 			}
@@ -50,7 +51,11 @@ class MediaController extends ApiController
 			$query->mimeTypes($request->get('mime_types'));
 		}
 
-		return fractal($query->orderBy('id', 'desc')->get(), new MediaTransformer)->respond(200);
+		if($request->has('order') && $request->get('order') === 'id.desc') {
+			$query->orderBy('id', 'desc');
+		}
+
+		return fractal($query->get(), new MediaTransformer)->respond(200);
 	}
 
 
@@ -83,13 +88,14 @@ class MediaController extends ApiController
 			$media->sites()->sync($site_ids);
 
 			DB::commit();
+
+			// TODO: implement job for processing media based on content type
+			dispatch(new ProcessMedia($media));
+
 		} catch(Exception $e){
 			DB::rollBack();
 			throw $e;
 		}
-
-		// TODO: implement job for processing media based on content type
-		dispatch(new ProcessMedia($media));
 
 		return fractal($media, new MediaTransformer)->respond(201);
 	}

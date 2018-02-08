@@ -1,3 +1,5 @@
+import Validation from './Validation';
+
 export default class Definition {
 
 	static typeMap = {
@@ -23,17 +25,36 @@ export default class Definition {
 		group      : 'object'
 	};
 
-	static messages = {
-		'min':        (val) => `This field needs at least ${val} items.`,
-		'max':        (val) => `This field can't have more than ${val} items.`,
-		'min_value':  (val) => `This number must be more than ${val}.`,
-		'max_value':  (val) => `This number must be less than ${val}.`,
-		'min_length': (val) => `This field must be at least ${val} characters long.`,
-		'max_length': (val) => `This field can't be more than ${val} characters long.`
-	};
-
 	static definitions = {};
 	static rules = {};
+
+	/**
+	 * @type {{string}} Map region definition by name
+	 */
+	static regionDefinitions = {};
+
+	/**
+	 * Add a region definition indexed by name
+	 * @param {Object} regionDefinition - The Region definition to add.
+	 */
+	static addRegionDefinition(regionDefinition) {
+		Definition.regionDefinitions[Definition.getType(regionDefinition)] = regionDefinition;
+	}
+
+	/**
+	 * Get a section definition by region name and index.
+	 * @param {string} regionId - The name and version (type) of the region containing the section.
+	 * @param {number} sectionIndex - The index of the section in the region.
+	 * @returns {null|Object} - Section definition if found, otherwise null.
+	 */
+	static getRegionSectionDefinition(regionId, sectionIndex) {
+		if(Definition.regionDefinitions[regionId] !== void 0) {
+			if(sectionIndex < Definition.regionDefinitions[regionId].sections.length) {
+				return Definition.regionDefinitions[regionId].sections[sectionIndex];
+			}
+		}
+		return null;
+	}
 
 	static set(definition) {
 		const type = Definition.getType(definition);
@@ -185,91 +206,11 @@ export default class Definition {
 	}
 
 	static transformValidationRule(validationRule, { type }) {
-		let tranformedRule = {};
+		let
+			tranformedRule = {},
+			[rule, value] = validationRule.split(':');
 
-		let [rule, value] = validationRule.split(':');
-
-		if(
-			[
-				'min_value', 'max_value',
-				'min_length', 'max_length',
-				'min', 'max', 'length'
-			].indexOf(rule) !== -1
-		) {
-			value = parseFloat(value, 2);
-		}
-
-		switch(rule) {
-			case 'string':
-				tranformedRule = { type: 'string' };
-				break;
-
-			case 'integer':
-				tranformedRule = { type: 'integer' };
-				break;
-
-			case 'in':
-				tranformedRule = {
-					type: 'enum',
-					enum: value.split(',')
-				};
-				break;
-
-			case 'required':
-			case 'present':
-				tranformedRule = {
-					required: true,
-					message: 'This field is required.'
-				};
-				break;
-
-			// These are possible client-side but don't currently
-			// have a corresponding implementation server-side.
-
-			// case 'number':
-			// 	tranformedRule = { type: 'number' };
-			// 	break;
-
-			// case 'boolean':
-			// 	tranformedRule = { type: 'boolean' };
-			// 	break;
-
-			// case 'float':
-			// 	tranformedRule = { type: 'float' };
-			// 	break;
-
-			// case 'array':
-			// 	tranformedRule = { type: 'array' };
-			// 	break;
-
-			// case 'object':
-			// 	tranformedRule = { type: 'object' };
-			// 	break;
-
-			case 'min':
-			case 'min_value':
-			case 'min_length':
-				tranformedRule = { min: value };
-				break;
-
-			case 'max':
-			case 'max_value':
-			case 'max_length':
-				tranformedRule = { max: value };
-				break;
-
-			case 'length':
-				tranformedRule = { len: value };
-				break;
-
-			case 'regex':
-				tranformedRule = { regexp: value };
-				break;
-		}
-
-		if(Definition.messages[rule]) {
-			tranformedRule.message = Definition.messages[rule](value);
-		}
+		tranformedRule = Validation.transform(rule, value);
 
 		// only infer type validation if it's not explicitly defined
 		if(tranformedRule.type === void 0) {

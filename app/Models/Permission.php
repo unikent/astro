@@ -24,6 +24,7 @@ class Permission extends Model
 	const EDIT_IMAGE = 'image.edit';
 	const USE_IMAGE = 'image.use';
 	const PUBLISH_PAGE = 'page.publish';
+	const UNPUBLISH_PAGE = 'page.unpublish';
 	const PREVIEW_PAGE = 'page.preview';
 	const APPROVAL = 'page.approve';
 	const ASSIGN_SITE_PERMISSIONS = 'permissions.site.assign';

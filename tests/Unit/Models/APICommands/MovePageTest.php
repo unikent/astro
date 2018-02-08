@@ -18,7 +18,7 @@ class MovePageTest extends APICommandTestCase
     public function getValidData()
     {
         $this->site = $this->site ? $this->site : $this->api()->createSite('Test Site', 'example.org', null, [
-            'name' => 'test-layout',
+            'name' => 'one-page-site',
             'version' => 1
         ]);
         $page = $this->api()->addPage($this->site->draftHomepage->id, null, 'foo', $this->test_layout, 'Foo');

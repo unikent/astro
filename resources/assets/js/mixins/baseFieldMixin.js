@@ -1,36 +1,33 @@
-import { mapGetters, mapMutations } from 'vuex';
+import { debug } from 'classes/helpers';
 
 export default {
 
-	props: ['field', 'path', 'errors'],
+	props: ['field', 'path', 'errors', 'currentDefinition'],
 
 	data() {
 		return this.field;
 	},
 
 	computed: {
-		...mapGetters([
-			'getCurrentFieldValue'
-		]),
-
 		value: {
 			get() {
-				const value = this.getCurrentFieldValue(this.path);
-				return value !== void 0 ? value : this.default;
+				return this.getFieldValue(this.path);
 			},
 			set(value) {
-				this.updateFieldValue({
-					name: this.path,
-					value: this.transformValue(value)
-				});
+				this.updateFieldValue(this.path, this.transformValue(value));
 			}
 		}
 	},
 
 	methods: {
-		...mapMutations([
-			'updateFieldValue'
-		]),
+		getFieldValue(path) {
+			debug(path);
+			return null;
+		},
+
+		updateFieldValue(path, value) {
+			debug(path, value);
+		},
 
 		// Here so we can override this at some point
 		transformValue(value) {

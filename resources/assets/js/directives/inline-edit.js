@@ -1,5 +1,8 @@
 import Vue from 'vue';
 
+/* global console */
+/* eslint-disable no-console */
+
 Vue.directive('inline-edit', {
 	bind(el, { expression, value }, { context: block }) {
 		console.log(value);

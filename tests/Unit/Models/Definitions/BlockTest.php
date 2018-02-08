@@ -18,7 +18,7 @@ class BlockTest extends TestCase
 	 * @test
 	 */
 	public function locateDefinition_WhenDefinitionIsFound_ReturnsPath(){
-		$path = Block::locateDefinition('test-block');
+		$path = Block::locateDefinition('test-block-v1');
 		$this->assertEquals(base_path('tests/Support/Fixtures/definitions/blocks/test-block/v1/definition.json'), $path);
 	}
 
@@ -33,7 +33,7 @@ class BlockTest extends TestCase
 	 * @test
 	 */
 	public function locateDefinitionOrFail_WhenDefinitionIsFound_ReturnsPath(){
-		$path = Block::locateDefinitionOrFail('test-block');
+		$path = Block::locateDefinitionOrFail('test-block-v1');
 		$this->assertEquals(base_path('tests/Support/Fixtures/definitions/blocks/test-block/v1/definition.json'), $path);
 	}
 

@@ -3,11 +3,15 @@ import Vuex from 'vuex';
 import undoRedo from '../plugins/undo-redo';
 import shareMutations from '../plugins/share-mutations';
 import shareTimeTravel from '../plugins/share-time-travel';
+
 import page from './modules/page';
 import site from './modules/site';
 import media from './modules/media';
 import permissions from './modules/permissions';
 import definition from './modules/definition';
+import contenteditor from './modules/contenteditor';
+import profile from '@profiles/store/profile';
+
 import Config from 'classes/Config';
 
 /* global process */
@@ -40,10 +44,19 @@ let store = new Vuex.Store({
 		blockPicker: {
 			visible: false,
 			insertIndex: 0,
-			insertRegion: 'main'
+			insertRegion: null,
+			insertSection: null,
+			allowedBlocks: null,	// the constraints on what blocks can be added
+			maxSelectableBlocks: null, // the maximum number of blocks that can be selected
+			replaceBlocks: false //whether or not to replace the blocks in the current section
 		},
 		currentView: 'desktop',
 		publishModal: {
+			pagePath: null,
+			visible: false
+		},
+		unpublishModal: {
+			pagePath: null,
 			visible: false
 		},
 		publishValidationWarningModal: {
@@ -58,40 +71,6 @@ let store = new Vuex.Store({
 	getters: {},
 
 	mutations: {
-
-		/**
-		 * Mutates a page title, both in the pages list and in the editor if it is the page being edited.
-		 * @param state
-		 * @param {string} title - The new title.
-		 */
-		setPageTitle: function(state, { id, title }) {
-			if(state.page.pageData && state.page.pageData.id === id) {
-				state.page.pageData.title = title;
-			}
-
-			const pg = state.site.findPageById(state.site.pages, id);
-
-			if(pg) {
-				pg.title = title;
-			}
-		},
-
-		/**
-		 * Mutates a page slug, both in the pages list and in the editor if it is the page being edited.
-		 * As a side-effect of this, path must also be updated.
-		 * @todo Cascade the updated path to all the subpages (this is done in the API, but we haven't reloaded the data).
-		 * @param state
-		 * @param {string} slug - The new slug.
-		 */
-		setPageSlug: function(state, { id, slug }) {
-			const pg = state.site.findPageById(state.site.pages, id);
-			if(pg) {
-				state.site.setSlugAndPath(slug, pg);
-			}
-			if(state.page.pageData && state.page.pageData.id === id) {
-				state.site.setSlugAndPath(slug, state.page.pageData);
-			}
-		},
 
 		changeView(state, currentView) {
 			state.currentView = currentView;
@@ -125,7 +104,23 @@ let store = new Vuex.Store({
 			state.sidebarCollapsed = false;
 		},
 
-		showBlockPicker(state) {
+		/**
+		 * Display the block picker.
+		 * @param state
+		 * @param {string} regionName - The name of the region to add any blocks to.
+		 * @param {number} sectionIndex - The index of the section within the region to add any blocks to.
+		 * @param {number} insertIndex - The index within the section to add any blocks to.
+		 * @param {Object} blocks - List of allowed block names.
+		 * @param {number} maxSelectableBlocks - the maximum number of blocks that can be selected
+		 * @param {boolean} replaceBlocks - Replace the blocks in the section with the new one
+		 */
+		showBlockPicker(state, { regionName, sectionIndex, insertIndex, blocks, maxSelectableBlocks, replaceBlocks }) {
+			state.blockPicker.insertRegion = regionName;
+			state.blockPicker.insertIndex = insertIndex;
+			state.blockPicker.insertSection = sectionIndex;
+			state.blockPicker.allowedBlocks = blocks;
+			state.blockPicker.maxSelectableBlocks = maxSelectableBlocks;
+			state.blockPicker.replaceBlocks = replaceBlocks
 			state.blockPicker.visible = true;
 		},
 
@@ -141,12 +136,32 @@ let store = new Vuex.Store({
 			state.blockPicker.insertRegion = val;
 		},
 
-		showPublishModal(state) {
+		showPublishModal(state, arrayPath) {
+			if(arrayPath) {
+				// update the page path in the store
+				state.publishModal.pagePath = arrayPath;
+			}
 			state.publishModal.visible = true;
 		},
 
 		hidePublishModal(state) {
+			// remove the page path in the store here
+			state.publishModal.pagePath = null;
 			state.publishModal.visible = false;
+		},
+
+		showUnpublishModal(state, arrayPath) {
+			if(arrayPath) {
+				// update the page path in the store
+				state.unpublishModal.pagePath = arrayPath;
+			}
+			state.unpublishModal.visible = true;
+		},
+
+		hideUnpublishModal(state) {
+			// remove the page path in the store here
+			state.unpublishModal.pagePath = null;
+			state.unpublishModal.visible = false;
 		},
 
 		showPublishValidationWarningModal(state) {
@@ -166,14 +181,58 @@ let store = new Vuex.Store({
 		}
 	},
 
-	actions: {},
+	actions: {
+
+		/**
+		 * Mutates a page title, both in the pages list and in the editor if it is the page being edited.
+		 *
+		 * @param context
+		 * @param {string} id - The page id.
+		 * @param {string} title - The new title.
+		 */
+		setPageTitleGlobally({ commit }, { id, title }) {
+			commit('setPageTitle', { id, title }, { root: true });
+			commit('site/setPageTitleInPagesList', { id, title });
+		},
+
+		/**
+		 * Mutates a page slug, both in the pages list and in the editor if it is the page being edited.
+		 * As a side-effect of this, path must also be updated.
+		 *
+		 * @param context
+		 * @param {string} id - The page id.
+		 * @param {string} slug - The new slug.
+		 */
+		setPageSlugAndPathGlobally({ commit }, { id, slug }) {
+			commit('setPageSlugAndPath', { id, slug }, { root: true });
+			commit('site/setPageSlugAndPathsInPagesList', { id, slug });
+		},
+
+		/**
+		 * Mutates a page's status, both in the pages list and
+		 * in the editor if it is the page being edited.
+		 *
+		 * @param context
+		 * @param {string} id - The page id.
+		 * @param {string} arrayPath - The array path to the page in the page list
+		 * eg. "0.0.1" for pagelist[0][0][1]
+		 * @param {string} status - The new status.
+		 */
+		setPageStatusGlobally({ commit, dispatch }, { id, arrayPath, status }) {
+			// uses action as we need access to the getPage getter
+			dispatch('setPageStatus', { id, arrayPath, status }, { root: true });
+			commit('site/setPageStatusInPagesList', { id, arrayPath, status });
+		}
+	},
 
 	modules: {
 		page,
 		definition,
+		contenteditor,
 		site,
 		media,
-		permissions
+		permissions,
+		profile
 	},
 
 	plugins: [

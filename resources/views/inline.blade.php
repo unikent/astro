@@ -30,8 +30,17 @@
 		'debug' => config('app.debug')
 	]); ?>;
 	</script>
+
+	@if (env('ENABLE_HEAP'))
+		@include('components.heap-analytics')
+	@endif
+
+	@if (env('ENABLE_HOTJAR'))
+		@include('components.hotjar-analytics')
+	@endif
+
 </head>
-<body class="custom-scrollbar">
+<body class="custom-scrollbar{{ $is_preview ? '' : ' vue-context' }}">
 	<div id="editor">
 
 	</div>

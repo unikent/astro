@@ -22,9 +22,38 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
 
     use HasAttributes, HidesAttributes, GuardsAttributes;
 
-
     protected static $defDir = '';
 
+	/**
+	 * Extract the name and version number from a definition identifier
+
+	 * @param string $id - Definition identifier in the form {name}-v{version}
+
+	 * @return array|null [ 'name' => {name}, 'version' => {version} ] or null if no match.
+	 */
+    public static function idToNameAndVersion($id)
+	{
+		if(preg_match('/^(.+)-v([0-9]+)$/', $id, $matches)){
+			return [
+				'name' => $matches[1],
+				'version' => $matches[2]
+			];
+		}
+		return null;
+	}
+
+	/**
+	 * Get a version identifier string based on its name and version.
+
+	 * @param string $name - The definition name.
+	 * @param integer $version - The definition version.
+
+	 * @return string {name}-v{version}
+	 */
+	public static function idFromNameAndVersion($name, $version)
+	{
+		return $name . '-v' . $version;
+	}
 
     /**
      * Dynamically retrieve attributes on the model.
@@ -293,13 +322,39 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
         if(JSON_ERROR_NONE !== json_last_error()){
             throw new JsonDecodeException(json_last_error_msg());
         }
-
-    	$instance = new static();
+		if(!empty($definition['dynamic'])){
+        	// dynamic definitions have a definition class that can do things
+        	$defn_id = static::idFromNameAndVersion($definition['name'], $definition['version']);
+        	$class_path = static::definitionPath($defn_id);
+			$class_name = static::getDynamicClassName($defn_id);
+			$file_path = $class_path . '/' . $class_name. '.php';
+			require_once $file_path;
+			$instance = new $class_name();
+		}
+		else {
+			$instance = new static();
+		}
     	$instance->forceFill($definition);
-
-    	return $instance;
+		return $instance;
     }
 
+	/**
+	 * Gets the name of the dynamic definition class.
+	 * Dynamic definition classes are the definition name (first character uppercased),
+	 * with any non-alpha-numeric characters removed (and the first following character uppercased)
+	 * @param string $definition_id {name}-v{version}
+	 * @return string - Class (and file, minus .php extension) name for the class that handles dynamic actions for this definition.
+	 */
+    public static function getDynamicClassName($definition_id)
+	{
+		$def = static::idToNameAndVersion($definition_id);
+		$parts = preg_split('/[^a-z0-9]/i', $def['name'], -1, PREG_SPLIT_NO_EMPTY);
+		$class_name = '';
+		foreach($parts as $part) {
+			$class_name .= ucfirst($part);
+		}
+		return $class_name . 'V' . $def['version'];
+	}
 
     /**
      * Returns a new model instance based on a definition file.
@@ -316,39 +371,47 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
     	return static::fromDefinition(file_get_contents($path));
     }
 
+	/**
+	 * Get the path to the folder containing the specified definition.
+	 * @param string $definition_id - The {name}-v{version} string identifying the definition.
+	 * @return null|string - The path or null if $definition_id is invalid.
+	 */
+    public static function definitionPath($definition_id)
+	{
+		$parts = static::idToNameAndVersion($definition_id);
+		if($parts) {
+			return sprintf('%s/%s/%s/v%d', Config::get('app.definitions_path'), static::$defDir, $parts['name'], $parts['version']);
+		}
+		return null;
+	}
 
     /**
      * Locates a Definition file on disk; when no version is specified
      * it will return the latest.
      *
-     * @param  string $name
-     * @param  int $version
+	 * @param  string $definition_id - The {name}-v{version} string identifying the definition.
      * @return string|null
      */
-    public static function locateDefinition($name, $version = null){
-        if(is_null($version)){
-            $path = sprintf('%s/%s/%s/*', Config::get('app.definitions_path'), static::$defDir, $name);
-            $glob = glob($path, GLOB_ONLYDIR);
-            $path = array_pop($glob);
-        } else {
-            $path = sprintf('%s/%s/%s/v%d', Config::get('app.definitions_path'), static::$defDir, $name, $version);
-        }
-
-        $path .= '/definition.json';
-        return file_exists($path) ? $path : null;
+    public static function locateDefinition($definition_id){
+    	$path = static::definitionPath($definition_id);
+    	if($path) {
+			$path .= '/definition.json';
+			return file_exists($path) ? $path : null;
+		}
+		return null;
     }
 
 
     /**
      * Locates a Definition file on disk; throws an exception if no Definition is found.
      *
-     * @param  string $name
+     * @param  string $definition_id - The {name}-v{version} string identifying the definition.
      * @param  int $version
-     * @throws App\Exceptions\DefinitionNotFoundException
+     * @throws DefinitionNotFoundException
      * @return string
      */
-    public static function locateDefinitionOrFail($name, $version = null){
-        $path = static::locateDefinition($name, $version);
+    public static function locateDefinitionOrFail($definition_id){
+        $path = static::locateDefinition($definition_id);
         if(is_null($path)) throw new DefinitionNotFoundException;
 
         return $path;
