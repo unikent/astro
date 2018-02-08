@@ -27,12 +27,12 @@ const routes = [
 	{
 		path: '/site/:site_id',
 		component: Admin,
-		name: 'admin',
 		props: true,
 		children: [
 			{
 				path: '',
-				component: Dashboard
+				component: Dashboard,
+				name: 'dashboard',
 			},
 			{
 				path: 'menu',
