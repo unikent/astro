@@ -1,7 +1,7 @@
 {
   "private": true,
-  "name": "Prototype",
-  "description": "Super slick prototype",
+  "name": "Astro",
+  "description": "Super slick site editor",
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack --progress --colors --hide-modules --display-error-details",
     "watch": "cross-env NODE_ENV=development webpack --progress --watch --colors --hide-modules",
@@ -19,6 +19,7 @@
     "chart.js": "^2.7.1",
     "cms-prototype-blocks": "git+ssh://git@github.com/unikent/cms-prototype-blocks.git#develop",
     "color-thief-standalone": "^1.0.3",
+    "dotenv": "^4.0.0",
     "element-ui": "^2.0.5",
     "flat": "^4.0.0",
     "imagesloaded": "^4.1.2",
