@@ -4,7 +4,7 @@
 
 Dynamic blocks do one or both of:
  * Dynamic routing (creating dynamic pages) for URLs below that of the page in which they are included.
- * Inject custom data into the block field data dynamically (via API calls, database access, calculations)
+ * Inject custom data into the block data dynamically (via API calls, database access, calculations)
  
 A dynamic block's definition.json MUST include the attribute "dynamic" with a value of 1 or true
 with a php block class extending ```App\Models\Definitions\Block```.
@@ -29,8 +29,11 @@ named
 
 ### Dynamic Content ###
 
-To modify the data returned in the 'fields' attribute for this block, the block class must implement the
-Block::filterData() method.
+Implement Block::getDynamicAttributes() to generate dynamic block data which will be included as
+part of the block data under a "dynamicAttributes" key when retrieving page json from the API.
+
+Any attributes returned by this method MUST also be defined in the "dynamicAttributes" property of
+the block's definition.json.
 
 ### Dynamic Routing ###
 

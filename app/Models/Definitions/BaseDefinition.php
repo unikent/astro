@@ -339,6 +339,19 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
     }
 
 	/**
+	 * Get the names of all available dynamic attributes for this definition.
+	 * @return array
+	 */
+    public function getDynamicAttributeNames()
+	{
+		$names = [];
+		foreach($this->dynamicAttributes ?? [] as $attribute) {
+			$names[] = $attribute['name'];
+		}
+		return $names;
+	}
+
+	/**
 	 * Gets the name of the dynamic definition class.
 	 * Dynamic definition classes are the definition name (first character uppercased),
 	 * with any non-alpha-numeric characters removed (and the first following character uppercased)
