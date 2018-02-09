@@ -9,11 +9,25 @@ import dotenv from 'dotenv';
 // load from .env into process.env
 dotenv.config();
 
-/* global __dirname, process */
+/* global __dirname, process, require */
 
 const
 	resolve = (dir) => path.resolve(__dirname, `resources/assets/${dir}`),
-	isProduction = process.env.NODE_ENV === 'production';
+	isProduction = process.env.NODE_ENV === 'production',
+	babelLoader = {
+		loader: 'babel-loader',
+		options: {
+			presets: [
+				['babel-preset-env'].map(require.resolve)
+			],
+			plugins: [
+				'babel-plugin-transform-class-properties',
+				'babel-plugin-transform-object-rest-spread',
+				'babel-plugin-transform-object-assign',
+				'babel-plugin-array-includes'
+			].map(require.resolve)
+		}
+	};
 
 export default {
 	entry: [
@@ -35,15 +49,7 @@ export default {
 				loader: 'vue-loader',
 				options: {
 					loaders: {
-						js: {
-							loader: 'babel-loader',
-							options: {
-								presets: [ // copied and pasted to make this still work with absolute theme / blocks directory
-									require.resolve('babel-preset-es2015'),
-									require.resolve('babel-preset-stage-2')
-								]
-							}
-						},
+						js: babelLoader,
 						scss: ExtractTextPlugin.extract({
 							use: ['css-loader', 'sass-loader'],
 							fallback: 'vue-style-loader'
@@ -59,7 +65,7 @@ export default {
 			{
 				test: /\.jsx?$/,
 				exclude: /node_modules/,
-				loader: 'babel-loader'
+				loader: babelLoader
 			},
 
 			{
@@ -135,7 +141,6 @@ export default {
 		]
 
 	},
-
 
 	plugins: [
 		new webpack.ProvidePlugin({
@@ -213,19 +218,19 @@ export default {
 			'store'     : resolve('js/store'),
 			'views'     : resolve('js/views'),
 			'IconPath'  : resolve('icons'),
-       // "@theme" replaces "cms-prototype-blocks"
-			'@theme'		: process.env.DEFINITIONS_PATH 
-
-			// temporary "package" alias
-			'@profiles': resolve('js/profiles')
-		}
-	},
-	resolveLoader: { // required for absolute theme / blocks directory path
+			// "@theme" points to the folder of the theme we're using
+			'@theme'    : process.env.DEFINITIONS_PATH
+		},
 		modules: [
-			path.resolve(__dirname, 'node_modules'),
-			'node_modules'
-		],
+			path.resolve(__dirname, 'node_modules')
+		]
+	},
+
+	resolveLoader: { // required for absolute theme / blocks directory path
 		extensions: ['.js', '.json'],
+		modules: [
+			path.resolve(__dirname, 'node_modules')
+		],
 		mainFields: ['loader', 'main']
 	},
 
