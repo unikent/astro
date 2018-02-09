@@ -14,9 +14,9 @@ import Preview from './views/Preview';
 import NotFound from './views/NotFound';
 import Config from './classes/Config';
 
-import SiteProfiles from '@profiles/views/SiteProfiles';
-import ProfileEditor from '@profiles/views/ProfileEditor';
-import ProfilePreview from '@profiles/views/ProfilePreview';
+import SiteProfiles from '@theme/profiles/views/SiteProfiles';
+import ProfileEditor from '@theme/profiles/views/ProfileEditor';
+import ProfilePreview from '@theme/profiles/views/ProfilePreview';
 
 const routes = [
 	{
