@@ -1,5 +1,5 @@
 <template>
-<div class="block-options options-visible">
+<div class="block-options options-visible" v-loading.lock="loading">
 	<back-bar
 		:title="definition && definition.label ? definition.label : title"
 	/>
@@ -105,6 +105,10 @@ export default {
 		...mapState({
 			globalErrors: state => state.errors
 		}),
+
+		loading() {
+			return this.currentItem === null;
+		},
 
 		definition() {
 			return null;
