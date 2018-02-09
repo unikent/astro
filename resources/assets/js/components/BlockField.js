@@ -4,6 +4,8 @@ import baseFieldMixin from 'mixins/baseFieldMixin';
 
 export default {
 
+	name: 'block-field',
+
 	mixins: [baseFieldMixin],
 
 	computed: {

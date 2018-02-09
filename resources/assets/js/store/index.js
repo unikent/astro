@@ -10,9 +10,9 @@ import media from './modules/media';
 import permissions from './modules/permissions';
 import definition from './modules/definition';
 import contenteditor from './modules/contenteditor';
-import profile from '@profiles/store/profile';
 
 import Config from 'classes/Config';
+import { addThemeStoreModules } from 'helpers/themeExports';
 
 /* global process */
 
@@ -225,15 +225,14 @@ let store = new Vuex.Store({
 		}
 	},
 
-	modules: {
+	modules: addThemeStoreModules({
 		page,
 		definition,
 		contenteditor,
 		site,
 		media,
-		permissions,
-		profile
-	},
+		permissions
+	}),
 
 	plugins: [
 		shareMutations,

@@ -1,10 +1,9 @@
 import BlockField from 'components/BlockField';
-import ProfileField from '@profiles/components/ProfileField';
+import { addThemeFieldParentTypes } from 'helpers/themeExports';
 
-const availableFields = {
-	block: BlockField,
-	profile: ProfileField
-};
+const availableFields = addThemeFieldParentTypes({
+	block: BlockField
+});
 
 export default (field, type) => {
 	if(!field) {
