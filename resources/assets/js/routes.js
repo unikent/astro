@@ -18,6 +18,8 @@ import SiteProfiles from '@theme/profiles/views/SiteProfiles';
 import ProfileEditor from '@theme/profiles/views/ProfileEditor';
 import ProfilePreview from '@theme/profiles/views/ProfilePreview';
 
+import TopBar from 'components/TopBar';
+
 const routes = [
 	{
 		path: '/',
@@ -26,8 +28,14 @@ const routes = [
 	},
 	{
 		path: '/site/:site_id',
-		component: Admin,
-		props: true,
+		components: {
+			default: Admin,
+			topbar: TopBar
+		},
+		props: {
+			default: true,
+			topbar: false
+		},
 		children: [
 			{
 				path: '',
@@ -58,19 +66,30 @@ const routes = [
 	},
 	{
 		path: '/site/:site_id/page',
-		component: Editor,
+		components: {
+			default: Editor,
+			topbar: TopBar
+		},
 		name: 'site'
 	},
 	{
 		path: '/site/:site_id/page/:page_id',
-		component: Editor,
+		components: {
+			default: Editor,
+			topbar: TopBar
+		},
 		name: 'page'
 	},
 	{
 		path: '/site/:siteId/profile/:profileId',
-		component: ProfileEditor,
+		components: {
+			default: ProfileEditor,
+			topbar: TopBar
+		},
 		name: 'profile-editor',
-		props: true
+		props: {
+			default: true
+		}
 	},
 	{
 		path: '/site/:siteId/preview/profile/:profileId',
