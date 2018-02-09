@@ -174,7 +174,7 @@ const mutations = {
 		}
 
 		if(block) {
-			Definition.fillBlockFields(block);
+			Definition.fillFields(block);
 		}
 
 		state.blockMeta.blocks[region][sectionIndex].blocks.splice(index, (replace ? 1 : 0), {
@@ -284,7 +284,7 @@ const actions = {
 							page.blocks[region].forEach((section, sindex) => {
 								blockMeta.blocks[region].push({ blocks: [] });
 								page.blocks[region][sindex].blocks.forEach((block) => {
-									Definition.fillBlockFields(block);
+									Definition.fillFields(block);
 									blockMeta.blocks[region][sindex].blocks.push({ size: 0, offset: 0 });
 									if( typeof block.errors !== void 0 && block.errors !== null) {
 										commit('addBlockValidationIssue', block.id);

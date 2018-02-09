@@ -120,17 +120,23 @@ export default class Definition {
 		return null;
 	}
 
-	static fillBlockFields(block, definition = null) {
+	static addFieldType(name, type) {
+		if(type && !Definition.typeMap[type]) {
+			Definition.typeMap[name] =  type;
+		}
+	}
+
+	static fillFields(item, definition = null) {
 		const type = Definition.getType({
-			name   : block.definition_name,
-			version: block.definition_version
+			name   : item.definition_name,
+			version: item.definition_version
 		});
 
 		if(type && (Definition.get(type) || definition)) {
 
 			(Definition.get(type) || definition).fields.forEach(field => {
 
-				if(block.fields[field.name] === void 0) {
+				if(item.fields[field.name] === void 0) {
 					let value;
 
 					if(field.type === 'collection') {
@@ -175,7 +181,7 @@ export default class Definition {
 						);
 					}
 
-					block.fields[field.name] = value;
+					item.fields[field.name] = value;
 				}
 
 			});

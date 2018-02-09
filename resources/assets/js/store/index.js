@@ -12,6 +12,7 @@ import definition from './modules/definition';
 import contenteditor from './modules/contenteditor';
 
 import Config from 'classes/Config';
+import { addThemeStoreModules } from 'helpers/themeExports';
 
 /* global process */
 
@@ -46,7 +47,7 @@ let store = new Vuex.Store({
 			insertRegion: null,
 			insertSection: null,
 			allowedBlocks: null,	// the constraints on what blocks can be added
-			maxSelectableBlocks: null, // the maximum number of blocks that can be selected 
+			maxSelectableBlocks: null, // the maximum number of blocks that can be selected
 			replaceBlocks: false //whether or not to replace the blocks in the current section
 		},
 		currentView: 'desktop',
@@ -224,14 +225,14 @@ let store = new Vuex.Store({
 		}
 	},
 
-	modules: {
+	modules: addThemeStoreModules({
 		page,
 		definition,
 		contenteditor,
 		site,
 		media,
 		permissions
-	},
+	}),
 
 	plugins: [
 		shareMutations,

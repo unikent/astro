@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import blocks from 'cms-prototype-blocks';
+import { blocks } from 'helpers/themeExports';
 import { mapState, mapGetters, mapMutations } from 'vuex';
 import imagesLoaded from 'imagesloaded';
 import { disableForms } from 'classes/helpers';
@@ -151,7 +151,6 @@ export default {
 
 		disableForms(this.$el);
 	},
-
 
 	methods: {
 		...mapMutations([

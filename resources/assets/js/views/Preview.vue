@@ -107,7 +107,7 @@ import ResizeShim from 'components/ResizeShim';
 import { win, findParent } from 'classes/helpers';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
-import { layouts } from 'cms-prototype-blocks/layouts';
+import { layouts } from 'helpers/themeExports';
 import { allowedOperations } from 'classes/SectionConstraints';
 import { Definition } from 'classes/helpers';
 
