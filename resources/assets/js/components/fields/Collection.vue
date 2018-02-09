@@ -41,7 +41,7 @@
 				</div>
 			</template>
 
-			<div class="collection__modify-buttons">
+			<div class="collection__modify-buttons" >
 				<el-button-group>
 					<el-tooltip :content="`Move this ${friendlyLabel} up`" :open-delay="400">
 						<el-button
@@ -89,7 +89,7 @@
 <script>
 import _ from 'lodash';
 import Vue from 'vue';
-import { mapState, mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import BlockField from 'components/BlockField';
 import getFieldMixin from 'mixins/getFieldMixin';
 import { Definition } from 'classes/helpers';
@@ -128,16 +128,12 @@ export default {
 			currentIndex: state => state.page.currentBlockIndex
 		}),
 
-		...mapGetters([
-			'getCurrentFieldValue'
-		]),
-
 		rules() {
 			return Definition.getRules(this.currentDefinition);
 		},
 
 		currentValue() {
-			return this.getCurrentFieldValue(this.name);
+			return this.getFieldValue(this.name);
 		},
 
 		friendlyLabel() {
@@ -162,7 +158,7 @@ export default {
 		addItem() {
 			const
 				item = {},
-				value = _.cloneDeep(this.getCurrentFieldValue(this.name));
+				value = _.cloneDeep(this.getFieldValue(this.name));
 
 			this.fields.forEach(field => {
 				item[field.name] = Definition.initialiseField(
@@ -177,7 +173,7 @@ export default {
 		},
 
 		moveItem(index, num) {
-			const value = _.cloneDeep(this.getCurrentFieldValue(this.name));
+			const value = _.cloneDeep(this.getFieldValue(this.name));
 
 			value.splice(index + num, 0, value.splice(index, 1)[0]);
 			this.keys.splice(index + num, 0, this.keys.splice(index, 1)[0]);
@@ -186,7 +182,7 @@ export default {
 		},
 
 		removeItem(index) {
-			const value = _.cloneDeep(this.getCurrentFieldValue(this.name));
+			const value = _.cloneDeep(this.getFieldValue(this.name));
 
 			value.splice(index, 1);
 			this.keys.splice(index, 1);
