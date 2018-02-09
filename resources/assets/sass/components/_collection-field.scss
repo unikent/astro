@@ -12,7 +12,7 @@ _collection-field.scss
 .collection-field__field-list {
 	border: 1px solid #e8e8e8;
 	background-color: #fff;
-	padding: 20px 20px 40px;
+	padding: 20px;
 	border-radius: 4px;
 	position: relative;
 }
@@ -44,4 +44,14 @@ _collection-field.scss
 
 .collection-add__button {
 	float: right;
+}
+
+.collection__modify-buttons {
+	margin-top: 40px;
+	display: flex;
+	justify-content: space-between;
+}
+
+.flip-list-move {
+	transition: transform .3s ease-out;
 }

@@ -1,12 +1,15 @@
-import fields from 'components/fields';
+import baseFields from 'components/fields/base';
+import swapParentField from 'helpers/swapParentField';
 
 export default {
+
+	inject: ['fieldType'],
 
 	methods: {
 		getField(type) {
 			return (
-				fields[type] ?
-					fields[type] :  {
+				baseFields[type] ?
+					swapParentField(baseFields[type], this.fieldType) :  {
 						name: type,
 						template: '<div>This field type does not exist</div>'
 					}

@@ -1,17 +1,33 @@
 import path from 'path';
 import webpack from 'webpack';
-
 import SvgStorePlugin from 'external-svg-sprite-loader/lib/SvgStorePlugin';
 import WebpackNotifierPlugin from 'webpack-notifier';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import FriendlyErrorsPlugin from 'friendly-errors-webpack-plugin';
-import CircularDependencyPlugin from 'circular-dependency-plugin';
+import dotenv from 'dotenv';
 
-/* global __dirname, process */
+// load from .env into process.env
+dotenv.config();
+
+/* global __dirname, process, require */
 
 const
 	resolve = (dir) => path.resolve(__dirname, `resources/assets/${dir}`),
-	isProduction = process.env.NODE_ENV === 'production';
+	isProduction = process.env.NODE_ENV === 'production',
+	babelLoader = {
+		loader: 'babel-loader',
+		options: {
+			presets: [
+				['babel-preset-env'].map(require.resolve)
+			],
+			plugins: [
+				'babel-plugin-transform-class-properties',
+				'babel-plugin-transform-object-rest-spread',
+				'babel-plugin-transform-object-assign',
+				'babel-plugin-array-includes'
+			].map(require.resolve)
+		}
+	};
 
 export default {
 	entry: [
@@ -33,7 +49,7 @@ export default {
 				loader: 'vue-loader',
 				options: {
 					loaders: {
-						js: 'babel-loader',
+						js: babelLoader,
 						scss: ExtractTextPlugin.extract({
 							use: ['css-loader', 'sass-loader'],
 							fallback: 'vue-style-loader'
@@ -49,7 +65,7 @@ export default {
 			{
 				test: /\.jsx?$/,
 				exclude: /node_modules/,
-				loader: 'babel-loader'
+				loader: babelLoader
 			},
 
 			{
@@ -126,7 +142,6 @@ export default {
 
 	},
 
-
 	plugins: [
 		new webpack.ProvidePlugin({
 			'window.axios': 'axios'
@@ -160,28 +175,23 @@ export default {
 
 		new FriendlyErrorsPlugin(),
 
-		new CircularDependencyPlugin({
-			exclude: /node_modules/,
-			failOnError: true
-		}),
-
 		...(
 			isProduction ?
-			[
-				new webpack.DefinePlugin({
-					'process.env': {
-						NODE_ENV: '"production"'
-					}
-				}),
+				[
+					new webpack.DefinePlugin({
+						'process.env': {
+							NODE_ENV: '"production"'
+						}
+					}),
 
-				new webpack.optimize.UglifyJsPlugin({
-					sourceMap: true,
-					compress: {
-						warnings: false
-					}
-				})
-			] :
-			[]
+					new webpack.optimize.UglifyJsPlugin({
+						sourceMap: true,
+						compress: {
+							warnings: false
+						}
+					})
+				] :
+				[]
 		)
 
 		// TODO: set up hmr + dev server, stats (to be compatible with Laravel's
@@ -196,18 +206,32 @@ export default {
 		extensions: ['*', '.js', '.vue', '.json'],
 		alias: {
 			// necessary for vue
-			'vue$'      : 'vue/dist/vue.common.js',
+			'vue$' : 'vue/dist/vue.common.js',
 
 			// Astro aliases
 			'classes'   : resolve('js/classes'),
 			'components': resolve('js/components'),
 			'directives': resolve('js/directives'),
+			'helpers'   : resolve('js/helpers'),
 			'mixins'    : resolve('js/mixins'),
 			'plugins'   : resolve('js/plugins'),
 			'store'     : resolve('js/store'),
 			'views'     : resolve('js/views'),
-			'IconPath'  : resolve('icons')
-		}
+			'IconPath'  : resolve('icons'),
+			// "@theme" points to the folder of the theme we're using
+			'@theme'    : process.env.DEFINITIONS_PATH
+		},
+		modules: [
+			path.resolve(__dirname, 'node_modules')
+		]
+	},
+
+	resolveLoader: { // required for absolute theme / blocks directory path
+		extensions: ['.js', '.json'],
+		modules: [
+			path.resolve(__dirname, 'node_modules')
+		],
+		mainFields: ['loader', 'main']
 	},
 
 	devtool: isProduction ? false : 'source-map',

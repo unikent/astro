@@ -3,10 +3,10 @@
 </template>
 
 <script>
-import baseFieldMixin from '../../mixins/baseFieldMixin';
+import BlockField from 'components/BlockField';
 
 export default {
 	name: 'nested-options-field',
-	mixins: [baseFieldMixin]
+	extends: BlockField
 };
 </script>

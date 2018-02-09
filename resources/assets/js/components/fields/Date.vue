@@ -3,10 +3,10 @@
 </template>
 
 <script>
-import baseFieldMixin from '../../mixins/baseFieldMixin';
+import BlockField from 'components/BlockField';
 
 export default {
 	name: 'date-field',
-	mixins: [baseFieldMixin]
+	extends: BlockField
 };
 </script>

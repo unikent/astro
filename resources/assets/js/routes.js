@@ -6,7 +6,6 @@ import Dashboard from './views/Dashboard';
 import SiteList from './views/SiteList';
 import Media from './views/Media';
 import Settings from './views/Settings';
-import SiteProfiles from './views/SiteProfiles';
 
 import Editor from './views/Editor';
 import MenuEditor from './views/MenuEditor';
@@ -14,6 +13,12 @@ import SiteUsers from './views/SiteUsers';
 import Preview from './views/Preview';
 import NotFound from './views/NotFound';
 import Config from './classes/Config';
+
+import SiteProfiles from '@theme/profiles/views/SiteProfiles';
+import ProfileEditor from '@theme/profiles/views/ProfileEditor';
+import ProfilePreview from '@theme/profiles/views/ProfilePreview';
+
+import TopBar from 'components/TopBar';
 
 const routes = [
 	{
@@ -23,12 +28,19 @@ const routes = [
 	},
 	{
 		path: '/site/:site_id',
-		component: Admin,
-		props: true,
+		components: {
+			default: Admin,
+			topbar: TopBar
+		},
+		props: {
+			default: true,
+			topbar: false
+		},
 		children: [
 			{
 				path: '',
-				component: Dashboard
+				component: Dashboard,
+				name: 'dashboard',
 			},
 			{
 				path: 'menu',
@@ -54,13 +66,36 @@ const routes = [
 	},
 	{
 		path: '/site/:site_id/page',
-		component: Editor,
+		components: {
+			default: Editor,
+			topbar: TopBar
+		},
 		name: 'site'
 	},
 	{
 		path: '/site/:site_id/page/:page_id',
-		component: Editor,
+		components: {
+			default: Editor,
+			topbar: TopBar
+		},
 		name: 'page'
+	},
+	{
+		path: '/site/:siteId/profile/:profileId',
+		components: {
+			default: ProfileEditor,
+			topbar: TopBar
+		},
+		name: 'profile-editor',
+		props: {
+			default: true
+		}
+	},
+	{
+		path: '/site/:siteId/preview/profile/:profileId',
+		component: ProfilePreview,
+		name: 'profile-preview',
+		props: true
 	},
 	{
 		path: '/preview/:page_id',

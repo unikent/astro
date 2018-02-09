@@ -1,30 +1,26 @@
 <template>
-	<div :class="{ editor: isEditor }" :style="wrapperStyles">
-		<router-view></router-view>
-		<top-bar v-if="isEditor" />
+	<div :class="{ editor: addStyles }" :style="wrapperStyles">
+		<router-view name="topbar" />
+		<router-view />
 	</div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
-import TopBar from 'components/TopBar';
-import SnackBar from 'components/SnackBar';
 
 export default {
 	name: 'App',
 
-	components: {
-		TopBar,
-		SnackBar
+	data() {
+		return {
+			addStyles: true
+		}
 	},
 
 	computed: {
 		...mapState([
 			'wrapperStyles'
-		]),
-		isEditor() {
-			return ['preview', '404'].indexOf(this.$route.name) === -1;
-		}
+		])
 	}
 };
 </script>

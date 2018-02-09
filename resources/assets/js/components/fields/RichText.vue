@@ -5,14 +5,14 @@
 </template>
 
 <script>
-import baseFieldMixin from '../../mixins/baseFieldMixin';
+import BlockField from 'components/BlockField';
 import RichText from 'components/richtext';
 
 export default {
 
 	name: 'rich-text-field',
 
-	mixins: [baseFieldMixin],
+	extends: BlockField,
 
 	components: {
 		RichText
