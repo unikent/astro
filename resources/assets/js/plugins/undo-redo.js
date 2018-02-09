@@ -18,7 +18,7 @@ const undoRedo = store => {
 
 	undoStack.setUndoRedo((pageData) => {
 		store.commit('setPage', JSON.parse(pageData));
-		eventBus.$emit('block:hideOverlay', null);
+		eventBus.$emit('block:hideHoverOverlay', null);
 	});
 
 	undoStack.setCallback(({ canUndo, canRedo }) => {

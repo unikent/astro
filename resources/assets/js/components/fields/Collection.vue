@@ -39,7 +39,7 @@
 			</div>
 		</template>
 
-		<div @click="removeItem(index)" class="block-overlay__delete block-overlay__delete--sidebar">
+		<div @click="removeItem(index)" class="block-overlay-hovered__delete block-overlay-hovered__delete--sidebar">
 			<icon name="delete" width="20" height="20" />
 		</div>
 	</div>

@@ -3,8 +3,8 @@
 		class="b-block-container"
 		:style="stylesOuter"
 		:id="blockIdentifier"
-		@mouseenter="showOverlay"
-		@mouseleave="hideOverlay"
+		@mouseenter="showHoverOverlay"
+		@mouseleave="hideHoverOverlay"
 		@click="editBlock"
 	>
 		<div
@@ -169,13 +169,15 @@ export default {
 				sectionName: this.sectionName,
 				blockIndex: this.index
 			});
+
+			this.showSelectedOverlay()
 		},
 
-		showOverlay() {
-			this.$bus.$emit('block:showOverlay', this);
+		showHoverOverlay() {
+			this.$bus.$emit('block:showHoverOverlay', this);
 		},
 
-		hideOverlay(e) {
+		hideHoverOverlay(e) {
 			if(
 				e.relatedTarget !== null ||
 				(
@@ -185,8 +187,12 @@ export default {
 					)
 				)
 			) {
-				this.$bus.$emit('block:hideOverlay', this);
+				this.$bus.$emit('block:hideHoverOverlay', this);
 			}
+		},
+
+		showSelectedOverlay() {
+			this.$bus.$emit('block:showSelectedOverlay', this);
 		}
 	}
 };
