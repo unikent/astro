@@ -47,37 +47,12 @@
 				<i class="el-icon-arrow-left backbutton-icon"></i>Back
 			</div>
 
-			<div v-if="showTools && publishStatus === 'new'" class="top-bar__page-title">
-				<div class="top-bar__title">
-					{{ pageTitle }}
-					<el-tag type="primary">Unpublished</el-tag>
-				</div>
-				<span class="top-bar__url">{{ renderedURL }}</span>
-			</div>
-
-			<div v-else-if="showTools && publishStatus === 'draft'" class="top-bar__page-title">
-				<div class="top-bar__title">
-					{{ pageTitle }}
-					<el-tag type="warning">Draft</el-tag>
-				</div>
-				<span v-if="!pageHasLayoutErrors" class="top-bar__url">
-					<a :href="draftPreviewURL" target="_blank">{{ renderedURL }}</a> <icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" /></span>
-			</div>
-
-			<div v-else-if="showTools && publishStatus === 'published'" class="top-bar__page-title">
-				<div class="top-bar__title">{{ pageTitle }}<el-tag type="success">Published</el-tag></div>
-				<span class="top-bar__url"><a :href="publishedPreviewURL" target="_blank">{{ renderedURL }}</a> <icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" /></span>
-			</div>
-
-			<div v-else-if="showTools" class="top-bar__page-title">
-				<div class="top-bar__title">{{ pageTitle }}</div>
-				<span class="top-bar__url">{{ renderedURL }}</span>
-			</div>
+			<slot name="title" />
 
 		</div>
 
 		<div class="top-bar__tools">
-			<toolbar v-if="showTools" />
+			<slot name="tools" v-if="showTools" />
 
 			<el-popover
 				ref="user-dropdown"
@@ -108,9 +83,8 @@
 </template>
 
 <script>
-	import { mapState, mapGetters, mapActions } from 'vuex';
+	import { mapActions } from 'vuex';
 	import Icon from 'components/Icon';
-	import Toolbar from 'components/Toolbar';
 	import promptToSave from 'mixins/promptToSave';
 	import Config from 'classes/Config.js';
 
@@ -120,9 +94,10 @@
 
 		name: 'top-bar',
 
+		props: ['site-id'],
+
 		components: {
-			Icon,
-			Toolbar
+			Icon
 		},
 
 		mixins: [promptToSave],
@@ -156,21 +131,6 @@
 
 		computed: {
 
-			...mapGetters([
-				'publishStatus',
-				'pageTitle',
-				'pageSlug',
-				'pagePath',
-				'sitePath',
-				'siteDomain',
-				'publishedPreviewURL',
-				'draftPreviewURL'
-			]),
-
-			...mapState({
-				layoutErrors: state => state.page.layoutErrors
-			}),
-
 			// works out if we should show a back button or not (ie whether we're editing a page or on the homepage)
 			showBack() {
 				return ['page', 'profile-editor'].indexOf(this.$route.name) !== -1;
@@ -185,11 +145,6 @@
 				return window.astro.username;
 			},
 
-			// lets us output a calculated url for the current page in the top bar
-			renderedURL() {
-				return this.siteDomain + this.sitePath + this.pagePath;
-			},
-
 			config() {
 				return Config;
 			},
@@ -197,10 +152,6 @@
 			siteTitle() {
 				const site = this.sites.find(site => site.id === Number(this.$route.params.site_id));
 				return site ? site.name : '';
-			},
-
-			pageHasLayoutErrors() {
-				return this.layoutErrors.length !== 0;
 			}
 		},
 
@@ -245,7 +196,7 @@
 				this.promptToSave(() => {
 					this.$store.commit('setLoaded', false);
 					this.$store.commit('setPage', {});
-					this.$router.push(`/site/${this.$route.params.site_id}`);
+					this.$router.push(`/site/${this.siteId || this.$route.params.site_id}`);
 				})
 			}
 		}
