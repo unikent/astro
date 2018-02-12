@@ -17,13 +17,17 @@ import Config from './classes/Config';
 import SiteProfiles from '@theme/profiles/views/SiteProfiles';
 import ProfileEditor from '@theme/profiles/views/ProfileEditor';
 import ProfilePreview from '@theme/profiles/views/ProfilePreview';
+import ProfileTopBar from '@theme/profiles/components/topbar';
 
-import TopBar from 'components/TopBar';
+import TopBar from 'components/topbar';
 
 const routes = [
 	{
 		path: '/',
-		component: SiteList,
+		components: {
+			default: SiteList,
+			topbar: TopBar
+		},
 		name: 'site-list'
 	},
 	{
@@ -33,8 +37,7 @@ const routes = [
 			topbar: TopBar
 		},
 		props: {
-			default: true,
-			topbar: false
+			default: true
 		},
 		children: [
 			{
@@ -84,11 +87,12 @@ const routes = [
 		path: '/site/:siteId/profile/:profileId',
 		components: {
 			default: ProfileEditor,
-			topbar: TopBar
+			topbar: ProfileTopBar
 		},
 		name: 'profile-editor',
 		props: {
-			default: true
+			default: true,
+			topbar: true
 		}
 	},
 	{

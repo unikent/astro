@@ -34,7 +34,10 @@ export default class Validation {
 			case 'in':
 				tranformedRule = {
 					type: 'enum',
-					enum: value.split(',')
+					enum: value.split(',').map(value => {
+						const number = Number(value);
+						return isNaN(number) ? value : number;
+					})
 				};
 				break;
 

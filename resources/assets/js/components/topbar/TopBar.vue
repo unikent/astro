@@ -1,20 +1,3 @@
-/**
-TopBar.vue
-
-The top bar is the container for the main actions across the site and within pages.
-
-The top bar is split into two flavours:
-
-1. homepage. A very minimal top bar shown only on the homepage. It's made up of just a logout dropdown and other key site information.
-
-2. page editing. The page editing top bar is made up of three sections:
-a. back button to the site list/homepage
-b. page title, publish status, and url
-c. toolbar with device view, save, preview, publish actions, as well as the logout dropdown.
-
-Note that the page editing toolbar is a separate component found in `components/Toolbar.vue`
-
-*/
 <template>
 	<div class="top-bar">
 		<div>
@@ -64,37 +47,12 @@ Note that the page editing toolbar is a separate component found in `components/
 				<i class="el-icon-arrow-left backbutton-icon"></i>Back
 			</div>
 
-			<div v-if="showTools && publishStatus === 'new'" class="top-bar__page-title">
-				<div class="top-bar__title">
-					{{ pageTitle }}
-					<el-tag type="primary">Unpublished</el-tag>
-				</div>
-				<span class="top-bar__url">{{ renderedURL }}</span>
-			</div>
-
-			<div v-else-if="showTools && publishStatus === 'draft'" class="top-bar__page-title">
-				<div class="top-bar__title">
-					{{ pageTitle }}
-					<el-tag type="warning">Draft</el-tag>
-				</div>
-				<span v-if="!pageHasLayoutErrors" class="top-bar__url">
-					<a :href="draftPreviewURL" target="_blank">{{ renderedURL }}</a> <icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" /></span>
-			</div>
-
-			<div v-else-if="showTools && publishStatus === 'published'" class="top-bar__page-title">
-				<div class="top-bar__title">{{ pageTitle }}<el-tag type="success">Published</el-tag></div>
-				<span class="top-bar__url"><a :href="publishedPreviewURL" target="_blank">{{ renderedURL }}</a> <icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" /></span>
-			</div>
-
-			<div v-else-if="showTools" class="top-bar__page-title">
-				<div class="top-bar__title">{{ pageTitle }}</div>
-				<span class="top-bar__url">{{ renderedURL }}</span>
-			</div>
+			<slot name="title" />
 
 		</div>
 
 		<div class="top-bar__tools">
-			<toolbar v-if="showTools" />
+			<slot name="tools" v-if="showTools" />
 
 			<el-popover
 				ref="user-dropdown"
@@ -125,11 +83,10 @@ Note that the page editing toolbar is a separate component found in `components/
 </template>
 
 <script>
-	import { mapState, mapGetters, mapActions, mapMutations } from 'vuex';
+	import { mapActions } from 'vuex';
 	import Icon from 'components/Icon';
-	import Toolbar from 'components/Toolbar';
-	import promptToSave from '../mixins/promptToSave';
-	import Config from '../classes/Config.js';
+	import promptToSave from 'mixins/promptToSave';
+	import Config from 'classes/Config.js';
 
 	/* global window */
 
@@ -137,9 +94,10 @@ Note that the page editing toolbar is a separate component found in `components/
 
 		name: 'top-bar',
 
+		props: ['site-id'],
+
 		components: {
-			Icon,
-			Toolbar
+			Icon
 		},
 
 		mixins: [promptToSave],
@@ -173,21 +131,6 @@ Note that the page editing toolbar is a separate component found in `components/
 
 		computed: {
 
-			...mapGetters([
-				'publishStatus',
-				'pageTitle',
-				'pageSlug',
-				'pagePath',
-				'sitePath',
-				'siteDomain',
-				'publishedPreviewURL',
-				'draftPreviewURL'
-			]),
-
-			...mapState({
-				layoutErrors: state => state.page.layoutErrors
-			}),
-
 			// works out if we should show a back button or not (ie whether we're editing a page or on the homepage)
 			showBack() {
 				return ['page', 'profile-editor'].indexOf(this.$route.name) !== -1;
@@ -202,11 +145,6 @@ Note that the page editing toolbar is a separate component found in `components/
 				return window.astro.username;
 			},
 
-			// lets us output a calculated url for the current page in the top bar
-			renderedURL() {
-				return this.siteDomain + this.sitePath + this.pagePath;
-			},
-
 			config() {
 				return Config;
 			},
@@ -214,10 +152,6 @@ Note that the page editing toolbar is a separate component found in `components/
 			siteTitle() {
 				const site = this.sites.find(site => site.id === Number(this.$route.params.site_id));
 				return site ? site.name : '';
-			},
-
-			pageHasLayoutErrors() {
-				return this.layoutErrors.length !== 0;
 			}
 		},
 
@@ -236,13 +170,8 @@ Note that the page editing toolbar is a separate component found in `components/
 			},
 
 			...mapActions([
-				'handleSavePage',
 				'loadPermissions',
 				'loadGlobalRole'
-			]),
-
-			...mapMutations([
-				'updateMenuActive'
 			]),
 
 			fetchSiteData() {
@@ -267,7 +196,7 @@ Note that the page editing toolbar is a separate component found in `components/
 				this.promptToSave(() => {
 					this.$store.commit('setLoaded', false);
 					this.$store.commit('setPage', {});
-					this.$router.push(`/site/${this.$route.params.site_id}`);
+					this.$router.push(`/site/${this.siteId || this.$route.params.site_id}`);
 				})
 			}
 		}
