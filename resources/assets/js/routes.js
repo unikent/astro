@@ -84,7 +84,7 @@ const routes = [
 		name: 'page'
 	},
 	{
-		path: '/site/:siteId/profile/:profileId',
+		path: '/site/:site_id/profile/:profileId',
 		components: {
 			default: ProfileEditor,
 			topbar: ProfileTopBar
@@ -96,7 +96,7 @@ const routes = [
 		}
 	},
 	{
-		path: '/site/:siteId/preview/profile/:profileId',
+		path: '/site/:site_id/preview/profile/:profileId',
 		component: ProfilePreview,
 		name: 'profile-preview',
 		props: true
