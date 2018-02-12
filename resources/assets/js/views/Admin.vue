@@ -108,6 +108,11 @@ export default {
 					link: `${this.url}/users`,
 					icon: 'user',
 					title: 'Users'
+				},
+				{
+					link: `${this.url}/profiles`,
+					icon: 'write',
+					title: 'Profiles'
 				}
 			];
 		}

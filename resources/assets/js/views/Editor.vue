@@ -22,7 +22,7 @@
 		:closable="false"
 		show-icon
 	>
-  </el-alert>
+	</el-alert>
 </div>
 </template>
 
@@ -44,6 +44,10 @@ export default {
 		Icon
 	},
 
+	provide: {
+		fieldType: 'block'
+	},
+
 	data() {
 		return {
 			showPermissionsError: false
@@ -53,14 +57,14 @@ export default {
 	created() {
 		this.$store.commit('site/updateCurrentSiteID', this.$route.params.site_id);
 		this.$store.dispatch('loadSiteRole', { siteId: this.$route.params.site_id, username: Config.get('username') })
-		.then(() => {
-			if (this.canUser('site.view')) {
-				this.showLoader();
-			}
-			else {
-				this.showPermissionsError = true;
-			}
-		});
+			.then(() => {
+				if (this.canUser('site.view')) {
+					this.showLoader();
+				}
+				else {
+					this.showPermissionsError = true;
+				}
+			});
 
 		this.views = {
 			desktop: {
@@ -107,7 +111,6 @@ export default {
 		]),
 
 		...mapState({
-			page: state => state.page.pageData,
 			pageLoaded: state => state.page.loaded
 		}),
 

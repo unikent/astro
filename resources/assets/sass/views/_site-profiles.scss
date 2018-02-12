@@ -1,0 +1,39 @@
+.filter-site-profiles {
+	display: flex;
+	margin-bottom: 20px;
+
+	&__searchbox {
+		width: 200px;
+	}
+}
+
+.site-profiles__published-date {
+	color: #b8adb5;
+	font-size: 12px;
+	text-transform: none;
+	margin-top: 14px;
+}
+
+.site-profiles__status {
+	display: block;
+	height: 14px;
+	width: 14px;
+	margin-top: 7px;
+	margin-right: 4px;
+	border-radius: 50%;
+
+	&--new {
+		border: 1px solid #0b63a5;
+		background-color: rgba(64, 158, 255, .5);
+	}
+
+	&--published {
+		border: 1px solid #0a5f30;
+		background-color: rgba(103, 194, 58, .5);
+	}
+
+	&--draft {
+		border: 1px solid #946902;
+		background-color: rgba(235, 158, 5, .5);
+	}
+}
