@@ -17,7 +17,7 @@ import Config from './classes/Config';
 import SiteProfiles from '@theme/profiles/views/SiteProfiles';
 import ProfileEditor from '@theme/profiles/views/ProfileEditor';
 import ProfilePreview from '@theme/profiles/views/ProfilePreview';
-import ProfileTopBar from '@theme/profiles/components/TopBar';
+import ProfileTopBar from '@theme/profiles/components/topbar';
 
 import TopBar from 'components/topbar';
 
@@ -37,8 +37,7 @@ const routes = [
 			topbar: TopBar
 		},
 		props: {
-			default: true,
-			topbar: false
+			default: true
 		},
 		children: [
 			{
@@ -92,7 +91,8 @@ const routes = [
 		},
 		name: 'profile-editor',
 		props: {
-			default: true
+			default: true,
+			topbar: true
 		}
 	},
 	{
