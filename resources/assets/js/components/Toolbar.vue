@@ -2,9 +2,9 @@
 <div class="toolbar">
 
 	<el-tooltip v-if="canUser('page.edit')" class="item" effect="dark" content="Switch edit mode" placement="top">
-		<el-select 
-			placeholder="view" 
-			v-model="view" 
+		<el-select
+			placeholder="view"
+			v-model="view"
 			class="switch-view"
 			:disabled="pageHasLayoutErrors"
 		>
@@ -17,19 +17,19 @@
 		</el-select>
 	</el-tooltip>
 
-	<el-button 
-		v-if="canUser('page.edit')" 
-		class="toolbar__button-save" 
-		type="primary" 
-		@click="savePage" 
+	<el-button
+		v-if="canUser('page.edit')"
+		class="toolbar__button-save"
+		type="primary"
+		@click="savePage"
 		v-loading.fullscreen.lock="fullscreenLoading"
 		:disabled="pageHasLayoutErrors"
 	>Save</el-button>
 
-	<el-button 
-		v-if="canUser('page.preview')" 
-		class="toolbar__button-preview" 
-		plain 
+	<el-button
+		v-if="canUser('page.preview')"
+		class="toolbar__button-preview"
+		plain
 		@click="previewPage"
 		:disabled="pageHasLayoutErrors"
 	>Preview <icon name="newwindow" aria-hidden="true" width="14" height="14" class="ico" /></el-button>
@@ -52,8 +52,6 @@
 	</template>
 
 </div>
-
-
 </template>
 
 
@@ -167,17 +165,17 @@ export default {
 			// we want a user notification
 			// also wait till handleSavePage has finished to hide the loading spinner
 			this.handleSavePage({ notify: true })
-			.then(() => {
-				this.fullscreenLoading = false;
+				.then(() => {
+					this.fullscreenLoading = false;
 
-				// we only need to update the status if it isn't "new" or "draft"
-				if(this.page.status === 'published') {
-					this.setPageStatusGlobally({
-						id: this.page.id,
-						status: 'draft'
-					});
-				}
-			});
+					// we only need to update the status if it isn't "new" or "draft"
+					if(this.page.status === 'published') {
+						this.setPageStatusGlobally({
+							id: this.page.id,
+							status: 'draft'
+						});
+					}
+				});
 		},
 
 		/* autosave the page and open a preview window */

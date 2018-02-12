@@ -1,20 +1,3 @@
-/**
-TopBar.vue
-
-The top bar is the container for the main actions across the site and within pages.
-
-The top bar is split into two flavours:
-
-1. homepage. A very minimal top bar shown only on the homepage. It's made up of just a logout dropdown and other key site information.
-
-2. page editing. The page editing top bar is made up of three sections:
-a. back button to the site list/homepage
-b. page title, publish status, and url
-c. toolbar with device view, save, preview, publish actions, as well as the logout dropdown.
-
-Note that the page editing toolbar is a separate component found in `components/Toolbar.vue`
-
-*/
 <template>
 	<div class="top-bar">
 		<div>
@@ -125,11 +108,11 @@ Note that the page editing toolbar is a separate component found in `components/
 </template>
 
 <script>
-	import { mapState, mapGetters, mapActions, mapMutations } from 'vuex';
+	import { mapState, mapGetters, mapActions } from 'vuex';
 	import Icon from 'components/Icon';
 	import Toolbar from 'components/Toolbar';
-	import promptToSave from '../mixins/promptToSave';
-	import Config from '../classes/Config.js';
+	import promptToSave from 'mixins/promptToSave';
+	import Config from 'classes/Config.js';
 
 	/* global window */
 
@@ -236,13 +219,8 @@ Note that the page editing toolbar is a separate component found in `components/
 			},
 
 			...mapActions([
-				'handleSavePage',
 				'loadPermissions',
 				'loadGlobalRole'
-			]),
-
-			...mapMutations([
-				'updateMenuActive'
 			]),
 
 			fetchSiteData() {
