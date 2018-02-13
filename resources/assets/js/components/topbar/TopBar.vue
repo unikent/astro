@@ -1,7 +1,7 @@
 <template>
 	<div class="top-bar">
 		<div>
-
+			<slot name="back">
 			<div
 				v-if="(!showBack && this.$route.name !== 'site-list') && sites.length > 1"
 			>
@@ -46,6 +46,8 @@
 			<div v-show="showBack" @click="backToAdmin" class="top-bar-backbutton">
 				<i class="el-icon-arrow-left backbutton-icon"></i>Back
 			</div>
+
+			</slot>
 
 			<slot name="title" />
 
