@@ -16,7 +16,6 @@ export default {
 
 	created() {
 		eventBus.$on('block:setValidation', this.setValidation);
-		eventBus.$on('block:setValidation', this.setValidation);
 	},
 
 	computed: {
