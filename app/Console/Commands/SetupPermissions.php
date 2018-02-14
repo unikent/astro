@@ -119,11 +119,11 @@ class SetupPermissions extends Command
 			Permission::VIEW_SITE,
 			Permission::LIST_SITES,
 			Permission::EDIT_SUBSITE,
+			Permission::ADD_PAGE,
 			Permission::EDIT_PAGE,
 			Permission::ADD_IMAGE,
 			Permission::EDIT_IMAGE,
 			Permission::USE_IMAGE,
-			Permission::PUBLISH_PAGE,
 			Permission::PREVIEW_PAGE,
 			Permission::APPROVAL
 		]
