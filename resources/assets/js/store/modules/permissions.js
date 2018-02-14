@@ -105,27 +105,29 @@ const actions = {
 		if(payload.siteId !== state.currentSiteId) { // don't change if we already have users role on this site
 			commit('setCurrentRole', '');
 			commit('setCurrentSiteId', null);
-			return api
-				.get(`sites/${payload.siteId}?include=users`)
-				.then(({data}) => {
-					const userList = data.data.users;
-					if (userList) {
-						const currentUser = userList.find((element) => element.username === payload.username);
-						commit('setCurrentSiteId', payload.siteId);
-						if (currentUser) {
-							commit('setCurrentRole', currentUser.role);
+			if(payload.siteId) {
+				return api
+					.get(`sites/${payload.siteId}?include=users`)
+					.then(({data}) => {
+						const userList = data.data.users;
+						if (userList) {
+							const currentUser = userList.find((element) => element.username === payload.username);
+							commit('setCurrentSiteId', payload.siteId);
+							if (currentUser) {
+								commit('setCurrentRole', currentUser.role);
+							}
+							else {
+								commit('setCurrentRole', '');
+							}
 						}
 						else {
 							commit('setCurrentRole', '');
 						}
-					}
-					else {
-						commit('setCurrentRole', '');
-					}
-				})
-				.catch(error => {
-					debug(`[Error loading site roles] ${error}`);
-				});
+					})
+					.catch(error => {
+						debug(`[Error loading site roles] ${error}`);
+					});
+			}
 		}
 	},
 
