@@ -1,5 +1,5 @@
 <template>
-<div class="admin-wrapper">
+<div class="admin-wrapper" v-if="userSitePermissionsReady">
 	<aside class="left-side">
 		<section class="sidebar">
 			<ul v-if="homepageID" class="admin-sidebar" role="navigation">
@@ -20,9 +20,12 @@
 <script>
 import { mapState } from 'vuex';
 import Icon from 'components/Icon';
+import requiresSitePermissions from 'mixins/requiresSitePermissionsMixin';
 
 export default {
 	name: 'Admin',
+
+	mixins: [requiresSitePermissions],
 
 	props: ['site_id'],
 
