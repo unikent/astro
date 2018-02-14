@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-use App\Policies\BasePolicy;
 use App\Models\Page;
 use App\Models\Permission;
 use App\Models\User;
