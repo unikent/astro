@@ -84,7 +84,7 @@
 									Users
 								</el-button>
 							</router-link>
-							<router-link :to="`/site/${site.id}/profiles`" v-if="canUserOnSite('profiles.create', site.currentRole)">
+							<router-link :to="`/site/${site.id}/profiles`" v-if="canUserOnSite('site.view', site.currentRole)">
 								<el-button type="default" size="small">
 									Profiles
 								</el-button>

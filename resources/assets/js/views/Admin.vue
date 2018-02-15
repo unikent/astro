@@ -7,6 +7,7 @@
 					v-for="item in menu"
 					:item="item"
 					:key="item.link"
+					v-if="canUser(item.permission)"
 				/>
 			</ul>
 		</section>
@@ -18,7 +19,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import Icon from 'components/Icon';
 import requiresSitePermissions from 'mixins/requiresSitePermissionsMixin';
 
@@ -76,6 +77,10 @@ export default {
 
 	computed: {
 
+		...mapGetters([
+			'canUser'
+		]),
+
 		...mapState({
 			currentSite: state => state.site
 		}),
@@ -89,33 +94,39 @@ export default {
 				{
 					link: `${this.url}`,
 					icon: 'pie-chart',
-					title: 'Dashboard'
+					title: 'Dashboard',
+					permission: 'site.view',
 				},
 				{
 					link: `${this.url}/page/${this.homepageID}`,
 					icon: 'layout',
 					title: 'Editor',
-					leave: true
+					leave: true,
+					permission: 'site.view',
 				},
 				{
 					link: `${this.url}/menu`,
 					icon: 'menu-alt',
-					title: 'Menu'
+					title: 'Menu',
+					permission: 'site.options.edit',
 				},
 				{
 					link: `${this.url}/media`,
 					icon: 'gallery',
-					title: 'Media'
+					title: 'Media',
+					permission: 'image.use',
 				},
 				{
 					link: `${this.url}/users`,
 					icon: 'user',
-					title: 'Users'
+					title: 'Users',
+					permission: 'permissions.site.assign',
 				},
 				{
 					link: `${this.url}/profiles`,
 					icon: 'write',
-					title: 'Profiles'
+					title: 'Profiles',
+					permission: 'site.view'
 				}
 			];
 		}
