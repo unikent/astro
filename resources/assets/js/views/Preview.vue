@@ -104,12 +104,12 @@ import imagesLoaded from 'imagesloaded';
 
 import Icon from 'components/Icon';
 import ResizeShim from 'components/ResizeShim';
-import { win, findParent } from 'classes/helpers';
+import { win, Definition } from 'classes/helpers';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
 import { layouts } from 'helpers/themeExports';
 import { allowedOperations } from 'classes/SectionConstraints';
-import { Definition } from 'classes/helpers';
+import { disableLinks } from 'helpers/dom';
 
 /* global document, window, console */
 /* eslint-disable no-console */
@@ -203,7 +203,6 @@ export default {
 	},
 
 	created() {
-
 		this.fetchPage(this.$route.params.page_id)
 			.then(() => {
 
@@ -213,12 +212,6 @@ export default {
 
 		this.onKeyDown = onKeyDown(undoStackInstance);
 		this.onKeyUp = onKeyUp(undoStackInstance);
-
-		this.cancelClicks = (e) => {
-			if(!e.ctrlKey && findParent('a', e.target, false)) {
-				e.preventDefault();
-			}
-		};
 
 		this.onResize = _.throttle(() => {
 			if(this.current) {
@@ -230,7 +223,7 @@ export default {
 	destroyed() {
 		document.removeEventListener('keydown', this.onKeyDown);
 		document.removeEventListener('keyup', this.onKeyUp);
-		document.removeEventListener('click', this.cancelClicks);
+		document.removeEventListener('click', disableLinks);
 		win.removeEventListener('resize', this.onResize);
 	},
 
@@ -335,7 +328,7 @@ export default {
 		initEvents() {
 			document.addEventListener('keydown', this.onKeyDown);
 			document.addEventListener('keyup', this.onKeyUp);
-			document.addEventListener('click', this.cancelClicks);
+			document.addEventListener('click', disableLinks);
 			document.addEventListener('mousedown', this.mouseDown);
 			document.addEventListener('mouseup', this.mouseUp);
 			win.addEventListener('resize', this.onResize);

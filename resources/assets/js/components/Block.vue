@@ -15,7 +15,6 @@
 				v-if="type !== 'placeholder'"
 				:is="currentView"
 				:fields="blockData.fields"
-				:index="this.index"
 			/>
 			<!-- placeholder element -->
 			<div v-else class="placeholder-block" />
@@ -27,7 +26,7 @@
 import { blocks } from 'helpers/themeExports';
 import { mapState, mapGetters, mapMutations } from 'vuex';
 import imagesLoaded from 'imagesloaded';
-import { disableForms } from 'classes/helpers';
+import { disableForms } from 'helpers/dom';
 
 export default {
 
