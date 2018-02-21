@@ -4,7 +4,6 @@
     "license": "MIT",
 	"type": "project",
 	"repositories": [
-
 		{
 			"url": "git@github.com:unikent/astro-renderer.git",
 			"type": "git"
