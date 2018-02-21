@@ -7,6 +7,8 @@
 <script>
 import * as icons from './icons';
 
+/* global __HMR__, process */
+
 export default {
 	props: {
 		name: {
@@ -28,7 +30,13 @@ export default {
 
 	computed: {
 		glyph() {
-			return icons[this.name.replace(/[^a-z]/g, '')] || icons.unknown;
+			const icon = icons[this.name.replace(/[^a-z]/g, '')] || icons.unknown;
+
+			if(__HMR__) {
+				icon.symbol = icon.symbol.replace(__HMR_URL__, '');
+			}
+
+			return icon;
 		}
 	}
 };

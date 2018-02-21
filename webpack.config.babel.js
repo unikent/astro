@@ -175,6 +175,11 @@ export default {
 
 		new FriendlyErrorsPlugin(),
 
+		new webpack.DefinePlugin({
+			__HMR__: JSON.stringify(hmrEnabled),
+			__HMR_URL__: JSON.stringify(hmrURL)
+		}),
+
 		...(
 			isProduction ?
 				[
