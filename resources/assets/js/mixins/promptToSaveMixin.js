@@ -27,6 +27,10 @@ export default {
 		window.addEventListener('beforeunload', this.promptToSaveWindow);
 	},
 
+	destroyed() {
+		window.removeEventListener('beforeunload', this.promptToSaveWindow);
+	},
+
 	data() {
 		return {
 			// override any of these in the component using this mixin's data() to modify the prompt messages
