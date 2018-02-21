@@ -10,7 +10,7 @@
 
 	<title>Astro</title>
 
-	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/build/css/main.css') }}" />
+	<link rel="stylesheet" href="{{ mix('/build/css/main.css') }}" />
 	@if ($is_preview)
 		<style>
 		html {
@@ -45,8 +45,8 @@
 
 	</div>
 
-	<script src="{{ url('/') }}{{ mix('/build/js/manifest.js') }}"></script>
-	<script src="{{ url('/') }}{{ mix('/build/js/vendor.js') }}"></script>
-	<script src="{{ url('/') }}{{ mix('/build/js/main.js') }}"></script>
+	<script src="{{ mix('/build/js/manifest.js') }}"></script>
+	<script src="{{ mix('/build/js/vendor.js') }}"></script>
+	<script src="{{ mix('/build/js/main.js') }}"></script>
 </body>
 </html>
