@@ -23,6 +23,10 @@ export default {
 		this.promptToSave(next);
 	},
 
+	created() {
+		window.addEventListener('beforeunload', this.promptToSaveWindow);
+	},
+
 	data() {
 		return {
 			// override any of these in the component using this mixin's data() to modify the prompt messages
@@ -46,6 +50,18 @@ export default {
 	},
 
 	methods: {
+
+		promptToSaveWindow(e) {
+			/* we are very limited as to what we can do when someone tries to leave
+			 https://developer.mozilla.org/en/docs/Web/Events/beforeunload
+			 */
+			if (this.isUnsaved) {
+				const confirmationMessage = this.savePromptTitle + "\n\n" + this.savePromptMessage;
+				e.returnValue = confirmationMessage;     // Gecko, Trident, Chrome 34+
+				return confirmationMessage;              // Gecko, WebKit, Chrome <34
+			}
+		},
+
 		promptToSave(callback) {
 			if(this.isUnsaved) {
 				return this.$confirm(
