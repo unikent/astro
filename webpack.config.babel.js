@@ -143,10 +143,6 @@ export default {
 	},
 
 	plugins: [
-		new webpack.ProvidePlugin({
-			'window.axios': 'axios'
-		}),
-
 		new SvgStorePlugin(),
 
 		new WebpackNotifierPlugin({
@@ -218,6 +214,7 @@ export default {
 			'store'     : resolve('js/store'),
 			'views'     : resolve('js/views'),
 			'IconPath'  : resolve('icons'),
+
 			// "@theme" points to the folder of the theme we're using
 			'@theme'    : process.env.DEFINITIONS_PATH
 		},
@@ -234,5 +231,5 @@ export default {
 		mainFields: ['loader', 'main']
 	},
 
-	devtool: isProduction ? false : 'source-map',
+	devtool: isProduction ? false : 'cheap-module-eval-source-map',
 };
