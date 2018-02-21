@@ -1,3 +1,8 @@
+/**
+ * This webpack plugin adds support for HMR (hot module replacement) and cache
+ * busting that's compatible with Laravel's mix manifest file.
+ */
+
 import fs from 'fs';
 
 /* global process */
@@ -7,24 +12,20 @@ class MixManifestPlugin {
 	static url;
 
 	constructor({ filename, path, url, options = {} }) {
-		this.output = filename;
-		this.options = options;
+		this.filename = filename;
 		MixManifestPlugin.url = url;
 		this.manifest = {};
 		this.distPath = path;
+		this.options = options;
 		this.manifestCache = null;
 	}
 
 	apply(compiler) {
-		const
-			{ output, options } = this,
-			hmrEnabled = this.isHMR(),
-			ctx = this;
 
 		compiler.plugin('emit', (compilation, done) => {
-
-			const { publicPath, assetsByChunkName: assets } =
-				compilation.getStats().toJson({
+			// grab webpack stats from this compilation run
+			const { publicPath, assetsByChunkName: assets } = compilation
+				.getStats().toJson({
 					hash: true,
 					publicPath: true,
 					assets: true,
@@ -34,12 +35,14 @@ class MixManifestPlugin {
 					errorDetails: false,
 					timings: false,
 
-					...options
+					...this.options
 				});
 
 			let cache;
 
-			if(hmrEnabled) {
+			// If HMR is enabled, create a "hot" file compatible with Laravel's
+			// "mix" helper that changes our asset URLs.
+			if(this.hmrIsEnabled()) {
 				const hotPath = `${this.distPath}/hot`;
 
 				if(MixManifestPlugin.url) {
@@ -49,44 +52,51 @@ class MixManifestPlugin {
 					fs.openSync(hotPath, 'w');
 				}
 			}
+			// Otherwise delete the "hot" file
 			else {
 				if(fs.existsSync(`${this.distPath}/hot`)) {
 					fs.unlinkSync(`${this.distPath}/hot`);
 				}
 			}
 
+			// Loop over the assets webpack has output, removing any
+			// special HMR files (ending in "hot-update.js") and adding
+			// others to our manifest file in the correct format.
 			Object.keys(assets).forEach(chunkName => {
 				if(Array.isArray(assets[chunkName])) {
 					assets[chunkName].forEach(path => {
 						if(!path.endsWith('hot-update.js')) {
-							ctx.add(publicPath, path);
+							this.add(publicPath, path);
 						}
 					});
 				}
 				else if(!assets[chunkName].endsWith('hot-update.js')) {
-					ctx.add(publicPath, assets[chunkName])
+					this.add(publicPath, assets[chunkName])
 				}
 			});
 
-			cache = JSON.stringify(ctx.manifest, null, '	');
+			cache = JSON.stringify(this.manifest, null, '	');
 
+			// Write the mix manifest file if this run created different JSON to the last.
 			if(cache !== this.manifestCache) {
-				fs.writeFileSync(`${this.distPath}/${output}`, cache);
+				fs.writeFileSync(`${this.distPath}/${this.filename}`, cache);
 				this.manifestCache = cache;
 			}
 
 			done();
 		});
+
 	}
 
 	add(publicPath, path) {
 		this.manifest['/build/' + path.replace(/\?.+$/, '')] = publicPath + path;
 	}
 
-	isHMR() {
+	hmrIsEnabled() {
 		return process.argv.includes('--hot');
 	}
 
+	// Config for webpack dev server, that uses the URL supplied to this class.
 	static devServerConfig({ url, options = {} } = {}) {
 		const
 			urlParts = (url || MixManifestPlugin.url).match(
