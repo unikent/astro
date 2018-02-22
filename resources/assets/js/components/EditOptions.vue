@@ -3,7 +3,7 @@
 	<back-bar
 		:title="definition && definition.label ? definition.label : title"
 	/>
-	<div class="block-options-list custom-scrollbar">
+	<div class="block-options-list custom-scrollbar" ref="options-list">
 		<block-form
 			v-if="definition"
 			label-position="top"
