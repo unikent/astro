@@ -30,6 +30,10 @@ export default {
 			currentIndex: state => state.contenteditor.currentBlockIndex
 		}),
 
+		loading() {
+			return false;
+		},
+
 		definition() {
 			return this.currentDefinition;
 		},
