@@ -25,11 +25,11 @@
 @import './components/rich-text';
 @import './components/media-upload';
 @import './components/empty-region';
-@import './components/group-field';
-@import './components/collection-field';
 @import './components/media';
 @import './components/media-picker';
 @import './components/publish';
 
 // fields
+@import './components/fields/group-field';
+@import './components/fields/collection-field';
 @import './components/fields/image';
