@@ -21,7 +21,7 @@
 				"
 				:key="fieldDefinition.name"
 			>
-				<template slot="label">
+				<template slot="label" v-if="fieldDefinition.label">
 					<span>{{ fieldDefinition.label }}</span>
 
 					<el-tooltip

@@ -46,58 +46,20 @@ export const Definition = (
 	isIframe ? win.top.astroDefinition : (win.astroDefinition = DefinitionClass)
 );
 
-const matchByNodeName = (node, search) => {
-	return node.nodeName.toLowerCase() === search;
-};
-
-const matchExactly = (node, search) => {
-	return node === search;
-};
-
-export const findParent = (searchFor, el, exact = false) => {
-	const match = exact ? matchExactly : matchByNodeName;
-
-	if(match(el, searchFor)) {
-		return el;
-	}
-
-	while(el) {
-		if(match(el, searchFor)) {
-			return el;
-		}
-		el = el.parentNode;
-	}
-
-	return null;
-};
-
-export const getTopOffset = (el) => {
-	let pos = 0;
-
-	while(el) {
-		pos += (el.offsetTop - el.scrollTop + el.clientTop);
-		el = el.offsetParent;
-	}
-
-	return pos;
-};
-
 export const clamp = ({ val, min, max }) => {
 	return Math.max(Math.min(val, max), min);
 };
 
 // Adapted from https://gist.github.com/desandro/4206095
 export const smoothScrollTo = (options) => {
-	const { element: el, y, x, duration, easing } = Object.assign(
-		{
-			element: document.body,
-			x: 0,
-			y: 0,
-			duration: '0.3s',
-			easing: 'ease-out'
-		},
-		options
-	);
+	const { element: el, y, x, duration, easing } = {
+		element: document.body,
+		x: 0,
+		y: 0,
+		duration: '0.3s',
+		easing: 'ease-out',
+		...options
+	};
 
 	// clamp values to min & max scroll
 	// then remove the current scroll position
@@ -197,24 +159,3 @@ export const getDraftPreviewURL = (url) => {
 export const getPublishedPreviewURL = (url) => {
 	return `${Config.get('base_url', '')}/published/${url ? url.replace(/\/$/, '') : ''}`;
 };
-
-/**
-* prevents users from submitting forms in el
-* while still allowing the user to interact with them
-*/
-export const disableForms = (el) => {
-	// disable buttons
-	const buttonElements = el.querySelectorAll('button, submit');
-	buttonElements.forEach((buttonElement) => {
-		if(!buttonElement.classList.contains('el-button')) {
-			buttonElement.setAttribute('disabled', '');
-		}
-	});
-
-	// remove any form actions and methods
-	const formElements = el.querySelectorAll('form');
-	formElements.forEach((formElement) => {
-		formElement.removeAttribute('action');
-		formElement.removeAttribute('method');
-	});
-}
