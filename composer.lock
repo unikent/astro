@@ -1385,7 +1385,7 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:theninja/framework.git",
-                "reference": "48dd1dc51344eb12f13c9fdf93fa94d60796e535"
+                "reference": "ff82c55bf413aa12ee933d47bdf90aa2848ce412"
             },
             "require": {
                 "doctrine/inflector": "~1.0",
@@ -1511,7 +1511,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2017-05-28T14:07:21+00:00"
+            "time": "2018-02-21T11:00:09+00:00"
         },
         {
             "name": "laravel/tinker",

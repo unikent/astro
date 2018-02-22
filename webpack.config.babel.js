@@ -4,6 +4,7 @@ import SvgStorePlugin from 'external-svg-sprite-loader/lib/SvgStorePlugin';
 import WebpackNotifierPlugin from 'webpack-notifier';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import FriendlyErrorsPlugin from 'friendly-errors-webpack-plugin';
+import MixManifestPlugin from './resources/assets/js/console/webpack/MixManifestPlugin';
 import dotenv from 'dotenv';
 
 // load from .env into process.env
@@ -14,6 +15,8 @@ dotenv.config();
 const
 	resolve = (dir) => path.resolve(__dirname, `resources/assets/${dir}`),
 	isProduction = process.env.NODE_ENV === 'production',
+	hmrEnabled = process.argv.includes('--hot'),
+	hmrURL = process.env.APP_HMR_URL || 'http://localhost:8080',
 	babelLoader = {
 		loader: 'babel-loader',
 		options: {
@@ -38,8 +41,10 @@ export default {
 
 	output: {
 		path: path.resolve(__dirname, 'public/build'),
-		filename: 'js/[name].js',
-		publicPath: isProduction ? '/site-editor/build/' : '/build/'
+		filename: isProduction ? 'js/[name].js?[chunkhash]' : 'js/[name].js',
+		publicPath: isProduction ? '/site-editor/build/' : (
+			hmrEnabled ? `${hmrURL}/build/` : '/build/'
+		)
 	},
 
 	module: {
@@ -143,16 +148,11 @@ export default {
 	},
 
 	plugins: [
-		new webpack.ProvidePlugin({
-			'window.axios': 'axios'
-		}),
-
 		new SvgStorePlugin(),
 
 		new WebpackNotifierPlugin({
 			title: `Astro (${isProduction ? 'prod' : 'dev'})`,
-			contentImage: path.resolve(__dirname, 'public/img/logo.png'),
-			alwaysNotify: true
+			contentImage: path.resolve(__dirname, 'public/img/logo.png')
 		}),
 
 		new webpack.optimize.CommonsChunkPlugin({
@@ -175,6 +175,11 @@ export default {
 
 		new FriendlyErrorsPlugin(),
 
+		new webpack.DefinePlugin({
+			__HMR__: JSON.stringify(hmrEnabled),
+			__HMR_URL__: JSON.stringify(hmrURL)
+		}),
+
 		...(
 			isProduction ?
 				[
@@ -191,14 +196,14 @@ export default {
 						}
 					})
 				] :
-				[]
-		)
+				hmrEnabled ? [new webpack.NamedModulesPlugin()] : []
+		),
 
-		// TODO: set up hmr + dev server, stats (to be compatible with Laravel's
-		// mix-manifest file), and copy plugin in case we need it later
-		// new webpack.HotModuleReplacementPlugin(),
-		// webpack-stats-plugin
-		// copy-webpack-plugin
+		new MixManifestPlugin({
+			filename: 'mix-manifest.json',
+			path: path.resolve(__dirname, 'public'),
+			url: hmrURL
+		})
 	],
 
 	resolve: {
@@ -218,6 +223,7 @@ export default {
 			'store'     : resolve('js/store'),
 			'views'     : resolve('js/views'),
 			'IconPath'  : resolve('icons'),
+
 			// "@theme" points to the folder of the theme we're using
 			'@theme'    : process.env.DEFINITIONS_PATH
 		},
@@ -234,5 +240,7 @@ export default {
 		mainFields: ['loader', 'main']
 	},
 
-	devtool: isProduction ? false : 'source-map',
+	devServer: MixManifestPlugin.devServerConfig(),
+
+	devtool: isProduction ? false : 'cheap-module-eval-source-map',
 };
