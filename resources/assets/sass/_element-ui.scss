@@ -78,12 +78,6 @@
 		color: #ff4949;
 	}
 
-	.el-form-item.is-error .collection-field .el-input__inner,
-	.el-form-item.is-error .collection-field .el-textarea__inner,
-	.el-form-item.is-error .collection-field .el-upload-dragger {
-		border-color: #b7c2d4;
-	}
-
 	.el-form-item.is-success {
 		.el-input__inner,
 		.el-textarea__inner {
@@ -226,7 +220,7 @@
 // error cards
 .box-card.error-card {
 	background-color: #fee;
-	
+
 	.el-card__header {
     	color: #fa5555;
     	font-size: 2rem;
