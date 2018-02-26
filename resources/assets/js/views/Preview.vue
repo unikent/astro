@@ -64,7 +64,7 @@
 				@click="showBlockList()"
 				v-if="sectionConstraints && sectionConstraints.canAddBlocks"
 			>
-				<icon name="plus" width="16" height="16" viewBox="0 0 16 16" />
+				<icon name="plus" :width="16" :height="16" viewBox="0 0 16 16" />
 			</div>
 			<div
 				class="add-after"
@@ -72,12 +72,12 @@
 				@click="showBlockList(1)"
 				v-if="sectionConstraints && sectionConstraints.canAddBlocks"
 			>
-				<icon name="plus" width="16" height="16" viewBox="0 0 16 16" />
+				<icon name="plus" :width="16" :height="16" viewBox="0 0 16 16" />
 			</div>
 		</div>
 	</div>
 	<div class="b-handle" :style="handleStyles">
-		<icon name="move" width="20" height="20" />
+		<icon name="move" :width="20" :height="20" />
 	</div>
 	<div id="b-overlay" :style="overlayStyles"></div>
 	<resize-shim :onResize="onResize" />

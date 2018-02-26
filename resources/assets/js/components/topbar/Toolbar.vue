@@ -18,7 +18,7 @@
 		plain
 		@click="previewPage"
 		:disabled="pageHasLayoutErrors"
-	>Preview <icon name="newwindow" aria-hidden="true" width="14" height="14" class="ico" /></el-button>
+	>Preview <icon name="newwindow" aria-hidden="true" :width="14" :height="14" class="ico" /></el-button>
 
 	<template v-if="canUser('page.publish')">
 		<el-button

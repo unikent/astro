@@ -24,8 +24,8 @@
 								<icon
 									class="el-form-item__icon-help"
 									name="help-circle"
-									width="15"
-									height="15"
+									:width="15"
+									:height="15"
 									viewBox="0 0 15 15"
 								/>
 							</el-tooltip>
@@ -70,7 +70,7 @@
 						size="small"
 						@click="removeItem(index)"
 					>
-						<icon name="delete" width="15" height="15" />
+						<icon name="delete" :width="15" :height="15" />
 					</el-button>
 				</el-tooltip>
 			</div>
