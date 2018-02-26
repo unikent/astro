@@ -9,8 +9,8 @@
 >
 	<!-- Expand tree icon -->
 	<div v-if="!root && hasChildren" class="page-list__item__expand" @click="toggle">
-		<icon v-show="open" name="minus" width="10" height="10" />
-		<icon v-show="!open" name="plus" width="10" height="10" />
+		<icon v-show="open" name="minus" :width="10" :height="10" />
+		<icon v-show="!open" name="plus" :width="10" :height="10" />
 	</div>
 	<!-- End expand tree icon -->
 
@@ -19,7 +19,7 @@
 		:class="{ 'page-list__title--selected': pageData.id === this.page.id }"
 	>
 		<span class="page-list__item__drag-handle">
-			<icon v-if="!root && canUser('page.move')" name="arrow" width="14" height="14" />
+			<icon v-if="!root && canUser('page.move')" name="arrow" :width="14" :height="14" />
 		</span>
 
 		<el-tooltip
@@ -39,7 +39,7 @@
 		<!-- Page options dropdown -->
 		<el-dropdown trigger="click" @command="handleCommand" size="small" class="page-list__options">
 			<el-button type="text" style="padding: 0;">
-				<icon name="more-alt" width="14" height="14" class="page-list__option-icon" />
+				<icon name="more-alt" :width="14" :height="14" class="page-list__option-icon" />
 			</el-button>
 
 			<el-dropdown-menu slot="dropdown">

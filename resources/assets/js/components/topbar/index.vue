@@ -8,11 +8,11 @@
 			<span class="top-bar__url">
 				<span v-if="publishStatus === 'draft' && !pageHasLayoutErrors">
 					<a :href="draftPreviewURL" target="_blank">{{ renderedURL }}</a>
-					<icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" />
+					<icon name="newwindow" aria-hidden="true" :width="12" :height="12" class="ico" />
 				</span>
 				<span v-else-if="publishStatus === 'published'">
 					<a :href="publishedPreviewURL" target="_blank">{{ renderedURL }}</a>
-					<icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" />
+					<icon name="newwindow" aria-hidden="true" :width="12" :height="12" class="ico" />
 				</span>
 				<span v-else>{{ renderedURL }}</span>
 			</span>

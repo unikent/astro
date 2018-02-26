@@ -33,8 +33,8 @@
 						<icon
 							class="el-form-item__icon-help"
 							name="help-circle"
-							width="15"
-							height="15"
+							:width="15"
+							:height="15"
 							viewBox="0 0 15 15"
 						/>
 					</el-tooltip>
@@ -46,8 +46,8 @@
 						>
 							<icon
 								name="eye"
-								width="14"
-								height="14"
+								:width="14"
+								:height="14"
 								viewBox="0 0 14 14"
 							/>
 						</span>

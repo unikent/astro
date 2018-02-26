@@ -8,7 +8,7 @@
 		>
 			<el-option v-for="(view, key) in views" :label="view.label" :value="key" :key="view.label">
 				<div class="view-icon">
-					<icon :name="view.icon" aria-hidden="true" width="20" height="20" />
+					<icon :name="view.icon" aria-hidden="true" :width="20" :height="20" />
 				</div>
 				<span class="view-label">{{ view.label }}</span>
 			</el-option>

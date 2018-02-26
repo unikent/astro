@@ -174,7 +174,7 @@
 										type="default"
 										size="small"
 									>
-										<icon name="delete" width="14" height="14" />
+										<icon name="delete" :width="14" :height="14" />
 									</el-button>
 									</div>
 								</td>

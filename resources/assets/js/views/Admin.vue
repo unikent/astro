@@ -46,8 +46,8 @@ export default {
 						<icon
 							v-if="item.leave"
 							name="new-window"
-							width="14"
-							height="14"
+							:width="14"
+							:height="14"
 							class="admin-sidebar__external-link"
 						/>
 					</router-link>

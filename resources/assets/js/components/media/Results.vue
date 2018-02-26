@@ -12,8 +12,8 @@
 				<div v-if="pickerMode" class="media-picker__overlay" @click="pickMedia(items[index - 1])">
 					<icon
 						name="plus"
-						width="20"
-						height="20"
+						:width="20"
+						:height="20"
 						viewBox="0 0 20 20"
 						style="fill: #fff; z-index: 1;"
 					/>
