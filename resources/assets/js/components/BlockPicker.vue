@@ -55,7 +55,8 @@ export default {
 			allowedBlocks: state => state.blockPicker.allowedBlocks,
 			maxSelectableBlocks: state => state.blockPicker.maxSelectableBlocks,
 			replaceBlocks: state => state.blockPicker.replaceBlocks,
-			allBlocks: state => state.definition.blockDefinitions
+			allBlocks: state => state.definition.blockDefinitions,
+			blocks: state => state.page.pageData.blocks
 		}),
 
 		/**
@@ -98,11 +99,11 @@ export default {
 		...mapMutations([
 			'showBlockPicker',
 			'hideBlockPicker',
-			'addBlock'
+			'addBlock',
+			'deleteBlockValidationIssue'
 		]),
 
 		addBlocks() {
-
 			this.selected.forEach((blockKey, i) => {
 				const { name, version } = this.availableBlocks[blockKey];
 				this.addThisBlockType({
@@ -122,9 +123,17 @@ export default {
 					Vue.nextTick(() => this.$bus.$emit('block:updateOverlay'))
 				);
 			}
+
+
 		},
 
 		addThisBlockType({ name, version = 1, index, replace = false }) {
+			
+			// if we are replacing a block then remove any validation issues it has first
+			if (replace) {
+				let blockId = this.blocks[this.blockPicker.insertRegion][this.blockPicker.insertSection].blocks[index].id;
+				this.deleteBlockValidationIssue(blockId);
+			}
 
 			const block = {
 				/* eslint-disable camelcase */
