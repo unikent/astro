@@ -10,35 +10,40 @@ export default (http, store, router) => {
 		response => response,
 		error => {
 			const { response } = error
+			// network error (eg no connection) has no response
+			if(response === void 0) {
+				return Promise.reject(error);
+			}
+			else {
+				if (Array.isArray(response.data.errors)) {
 
-			if(Array.isArray(response.data.errors)) {
+					switch (response.status) {
+						case 422:
+							if (response.data.errors) {
+								response.data.errors.forEach(error => {
 
-				switch(response.status) {
-					case 422:
-						if(response.data.errors) {
-							response.data.errors.forEach(error => {
+									// notification to the user
+									// vue.$notify({
+									// 	title: 'Error',
+									// 	message: 'There are some problems on your page.' + error,
+									// 	type: 'error'
+									// });
 
-								// notification to the user
-								// vue.$notify({
-								// 	title: 'Error',
-								// 	message: 'There are some problems on your page.' + error,
-								// 	type: 'error'
-								// });
+									if (error.details && typeof error.details === 'object') {
 
-								if(error.details && typeof error.details === 'object') {
+										Object.keys(error.details).forEach(field => {
+											error.details[field] = error.details[field].join(' | ');
+										});
 
-									Object.keys(error.details).forEach(field => {
-										error.details[field] = error.details[field].join(' | ');
-									});
+										const errors = unflatten(error.details, {safe: true});
 
-									const errors = unflatten(error.details, { safe: true });
+										store.commit('updateErrors', errors);
+									}
 
-									store.commit('updateErrors', errors);
-								}
-
-							});
-						}
-						break;
+								});
+							}
+							break;
+					}
 				}
 			}
 
