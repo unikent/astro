@@ -57,7 +57,7 @@ trait ResolvesRoutes
 		$path = rtrim($path, '/');
 		// if we are already at the root then there won't be any ancestral pages to check
 		while($path) {
-			$path = preg_replace('/\/?[a-z0-9_-]*\/?$/i', '', $path);
+			$path = preg_replace('/\/?[^\/]*\/?$/i', '', $path);
 			$page = Page::findByHostAndPath($host,$path,$version);
 			if($page) {
 				$blocks = $page->revision->blocks;
