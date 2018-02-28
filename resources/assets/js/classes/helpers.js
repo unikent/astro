@@ -145,8 +145,10 @@ export const pageHasBeenPublished = (page) => {
 
  * @returns {string} Full URL (with any trailing slash removed)
  */
-export const getDraftPreviewURL = (url) => {
-	return `${Config.get('base_url', '')}/draft/${url ? url.replace(/\/$/, '') : ''}`;
+export const getDraftPreviewURL = (domain, path) => {
+	let pattern = Config.get('draft_url_pattern') || '{domain}{path}';
+	return pattern.replace(/{domain}/ig, domain).replace(/{path}/ig, path);
+//	return `${Config.get('base_url', '')}/draft/${url ? url.replace(/\/$/, '') : ''}`;
 };
 
 /**
@@ -156,6 +158,9 @@ export const getDraftPreviewURL = (url) => {
 
  * @returns {string} Full URL (with any trailing slash removed)
  */
-export const getPublishedPreviewURL = (url) => {
-	return `${Config.get('base_url', '')}/published/${url ? url.replace(/\/$/, '') : ''}`;
+export const getPublishedPreviewURL = (domain, path) => {
+	let pattern = Config.get('published_url_pattern') || '{domain}{path}';
+	return pattern.replace(/{domain}/ig, domain).replace(/{path}/ig, path);
+
+//	return `${Config.get('base_url', '')}/published/${url ? url.replace(/\/$/, '') : ''}`;
 };

@@ -137,8 +137,9 @@ export default {
 			}
 		},
 
+		// the actual URL to display the rendered published page (can be different from the "real" site+page URL)
 		previewURL() {
-			return getPublishedPreviewURL(this.renderedURL);
+			return getPublishedPreviewURL(this.siteDomain, this.sitePath + (this.getSelectedPage.path === '/' ? '' : this.getSelectedPage.path));
 		},
 
 		// frontend URL - so the user can view the page's url
