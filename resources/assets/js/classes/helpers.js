@@ -140,22 +140,29 @@ export const pageHasBeenPublished = (page) => {
 
 /**
  * Get the URL at which the current page can be previewed in the editor.
-
- * @param {string} url - The page URL to mutate into a draft preview URL
-
+ *
+ * @param {string} domain - The domain name for the site.
+ * @param {string} path - The full path of the page to generate the URL for.
+ *
  * @returns {string} Full URL (with any trailing slash removed)
  */
-export const getDraftPreviewURL = (url) => {
-	return `${Config.get('base_url', '')}/draft/${url ? url.replace(/\/$/, '') : ''}`;
+export const getDraftPreviewURL = (domain, path) => {
+	let pattern = Config.get('draft_url_pattern') || '{domain}{path}';
+	return pattern.replace(/{domain}/ig, domain).replace(/{path}/ig, path);
+//	return `${Config.get('base_url', '')}/draft/${url ? url.replace(/\/$/, '') : ''}`;
 };
 
 /**
  * Get the URL at which the published version of the current page can be previewed in the editor.
-
- * @param {string} url - The page URL to mutate into a published preview URL.
-
+ *
+ * @param {string} domain - The domain name for the site.
+ * @param {string} path - The full path of the page to generate the URL for.
+ *
  * @returns {string} Full URL (with any trailing slash removed)
  */
-export const getPublishedPreviewURL = (url) => {
-	return `${Config.get('base_url', '')}/published/${url ? url.replace(/\/$/, '') : ''}`;
+export const getPublishedPreviewURL = (domain, path) => {
+	let pattern = Config.get('published_url_pattern') || '{domain}{path}';
+	return pattern.replace(/{domain}/ig, domain).replace(/{path}/ig, path);
+
+//	return `${Config.get('base_url', '')}/published/${url ? url.replace(/\/$/, '') : ''}`;
 };

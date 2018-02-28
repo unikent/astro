@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import Vue from 'vue';
-import { Definition } from 'classes/helpers';
+import { getPublishedPreviewURL, getDraftPreviewURL, Definition } from 'classes/helpers';
 import api from 'plugins/http/api';
 import { eventBus } from 'plugins/eventbus';
 import Config from 'classes/Config';
@@ -553,12 +553,7 @@ const getters = {
 	 * @returns {string} Full URL
 	 */
 	draftPreviewURL: (state, getters) => {
-		return (
-			Config.get('base_url', '') + '/draft/' +
-			getters.siteDomain +
-			getters.sitePath +
-			(getters.pagePath === '/' ? '' : getters.pagePath)
-		);
+		return getDraftPreviewURL(getters.siteDomain, getters.sitePath + (getters.pagePage === '/' ? '' : getters.pagePath));
 	},
 
 	/**
@@ -568,12 +563,7 @@ const getters = {
 	 * @returns {string} Full URL
 	 */
 	publishedPreviewURL: (state, getters) => {
-		return (
-			Config.get('base_url', '') + '/published/' +
-			getters.siteDomain +
-			getters.sitePath +
-			(getters.pagePath === '/' ? '' : getters.pagePath)
-		);
+		return getPublishedPreviewURL(getters.siteDomain, getters.sitePath + (getters.pagePage === '/' ? '' : getters.pagePath));
 	},
 
 	unsavedChangesExist: (state) => () => {
