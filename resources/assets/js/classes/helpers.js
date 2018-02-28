@@ -140,9 +140,10 @@ export const pageHasBeenPublished = (page) => {
 
 /**
  * Get the URL at which the current page can be previewed in the editor.
-
- * @param {string} url - The page URL to mutate into a draft preview URL
-
+ *
+ * @param {string} domain - The domain name for the site.
+ * @param {string} path - The full path of the page to generate the URL for.
+ *
  * @returns {string} Full URL (with any trailing slash removed)
  */
 export const getDraftPreviewURL = (domain, path) => {
@@ -153,9 +154,10 @@ export const getDraftPreviewURL = (domain, path) => {
 
 /**
  * Get the URL at which the published version of the current page can be previewed in the editor.
-
- * @param {string} url - The page URL to mutate into a published preview URL.
-
+ *
+ * @param {string} domain - The domain name for the site.
+ * @param {string} path - The full path of the page to generate the URL for.
+ *
  * @returns {string} Full URL (with any trailing slash removed)
  */
 export const getPublishedPreviewURL = (domain, path) => {
