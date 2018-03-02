@@ -29,7 +29,8 @@
 		'api_token' => $api_token,
 		'debug' => config('app.debug'),
 		'published_url_pattern' => env('APP_LIVE_URL_PATTERN'),
-		'draft_url_pattern' => env('APP_PREVIEW_URL_PATTERN')
+		'draft_url_pattern' => env('APP_PREVIEW_URL_PATTERN'),
+		'machform_url' => env('MACHFORM_URL')
 	]); ?>;
 	</script>
 
