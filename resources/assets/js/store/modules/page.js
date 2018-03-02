@@ -553,7 +553,7 @@ const getters = {
 	 * @returns {string} Full URL
 	 */
 	draftPreviewURL: (state, getters) => {
-		return getDraftPreviewURL(getters.siteDomain, getters.sitePath + (getters.pagePage === '/' ? '' : getters.pagePath));
+		return getDraftPreviewURL(getters.siteDomain, getters.sitePath + (getters.pagePath === '/' ? '' : getters.pagePath));
 	},
 
 	/**
@@ -563,7 +563,7 @@ const getters = {
 	 * @returns {string} Full URL
 	 */
 	publishedPreviewURL: (state, getters) => {
-		return getPublishedPreviewURL(getters.siteDomain, getters.sitePath + (getters.pagePage === '/' ? '' : getters.pagePath));
+		return getPublishedPreviewURL(getters.siteDomain, getters.sitePath + (getters.pagePath === '/' ? '' : getters.pagePath));
 	},
 
 	unsavedChangesExist: (state) => () => {
