@@ -1,6 +1,6 @@
 <template>
 	<div class="richtext-editor">
-		<richtext-toolbar ref="toolbar" />
+		<richtext-toolbar ref="toolbar" :allowed-tags="options.allowedTags || defaultConfig.allowedTags" />
 		<div ref="editor" class="richtext-content" />
 	</div>
 </template>
@@ -8,7 +8,7 @@
 <script>
 import Scribe from 'scribe-editor';
 
-import { addScribePlugins } from 'plugins/scribe';
+import { defaultConfig, addScribePlugins } from 'plugins/scribe';
 import RichtextToolbar from './Toolbar';
 
 export default {
@@ -24,6 +24,7 @@ export default {
 
 	created() {
 		this.content = '';
+		this.defaultConfig = defaultConfig;
 	},
 
 	// watch: {
