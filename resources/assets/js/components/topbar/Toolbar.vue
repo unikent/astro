@@ -1,6 +1,15 @@
 <template>
 <div class="toolbar">
 
+	<el-button-group class="undo-redo">
+		<el-button :disabled="!undoRedo.canUndo" @click="undo">
+			<Icon name="undo" aria-hidden="true" width="14" height="14" class="ico" />
+		</el-button>
+		<el-button :disabled="!undoRedo.canRedo" @click="redo">
+			<Icon name="redo" aria-hidden="true" width="14" height="14" class="ico" />
+		</el-button>
+	</el-button-group>
+
 	<switch-mode />
 
 	<el-button

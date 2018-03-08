@@ -1,6 +1,6 @@
 <template>
 	<div class="richtext-wrapper">
-		<rich-text v-model="value" />
+		<rich-text v-model="value" :options="opts" />
 	</div>
 </template>
 
@@ -16,6 +16,12 @@ export default {
 
 	components: {
 		RichText
+	},
+
+	computed: {
+		opts() {
+			return this.options || {};
+		}
 	}
 };
 </script>

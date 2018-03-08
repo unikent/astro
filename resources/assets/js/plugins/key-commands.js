@@ -20,12 +20,22 @@ const getKey = (e) => {
 	}
 };
 
-export const onKeyDown = () => {
+export const onKeyDown = (ctx) => {
 	return (e) => {
 		const key = getKey(e);
 
 		if(key) {
 			keys[key] = true;
+		}
+
+		if((e.ctrlKey || e.metaKey) && keys.z) {
+			e.preventDefault();
+			ctx.undo();
+		}
+
+		if((e.ctrlKey || e.metaKey) && keys.y) {
+			e.preventDefault();
+			ctx.redo();
 		}
 	};
 };

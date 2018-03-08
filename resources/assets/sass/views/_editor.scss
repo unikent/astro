@@ -67,11 +67,15 @@
 }
 
 .undo-redo {
-	margin-left: 10px;
+	margin-right: 30px;
 	color: #48576a;
 
 	.ico {
 		fill: #555;
+	}
+
+	button:disabled .ico {
+		fill: #bbb;
 	}
 }
 

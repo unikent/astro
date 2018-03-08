@@ -4,6 +4,7 @@ import { getPublishedPreviewURL, getDraftPreviewURL, Definition } from 'classes/
 import api from 'plugins/http/api';
 import { eventBus } from 'plugins/eventbus';
 import Config from 'classes/Config';
+import { undoStackInstance } from 'plugins/undo-redo';
 
 const vue = new Vue();
 
@@ -252,7 +253,7 @@ const mutations = {
 
 const actions = {
 
-	fetchPage({ commit }, id) {
+	fetchPage({ state, commit }, id) {
 		commit('setPage', null);
 		// TODO: refactor into smaller methods
 		return api
@@ -273,6 +274,7 @@ const actions = {
 
 						commit('setBlockDefinitions', Definition.definitions, { root: true });
 						commit('setPage', _.cloneDeep(page));
+						undoStackInstance.init(state.pageData)
 						commit('clearBlockValidationIssues');
 
 						const blockMeta = {

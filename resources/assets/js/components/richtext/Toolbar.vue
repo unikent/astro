@@ -1,6 +1,11 @@
 <template>
 <div class="richtext-toolbar flex-container">
-	<span v-for="item in toolbarItems" class="richtext-toolbar__button">
+
+	<span
+		v-for="item in toolbarItems"
+		v-if="item.tag === '*' || allowedTags.includes(item.tag)"
+		class="richtext-toolbar__button"
+	>
 		<button
 			type="button"
 			class="richtext-toolbar__tooltip"
@@ -40,9 +45,13 @@ import Icon from '../Icon';
 /* global document, console */
 /* eslint-disable no-console */
 
+// TODO: add table creation/editig and finish UI
+
 export default {
 
 	name: 'richtext-toolbar',
+
+	props: ['allowedTags'],
 
 	components: {
 		Icon
@@ -51,91 +60,36 @@ export default {
 	created() {
 		this.toolbarItems = [
 			{
-				label: 'Format',
-				icon: 'text',
-
-				menu: [
-					{
-						command: 'removeFormat',
-						label: 'Remove Formatting'
-					},
-					{
-						command: 'h1',
-						label: '<h1>Heading 1</h1>'
-					},
-					{
-						command: 'h2',
-						label: '<h2>Heading 2</h2>'
-					},
-					{
-						command: 'h3',
-						label: '<h3>Heading 3</h3>'
-					},
-					{
-						command: 'h4',
-						label: '<h4>Heading 4</h4>'
-					},
-					{
-						command: 'h5',
-						label: '<h5>Heading 5</h5>'
-					},
-					{
-						command: 'h6',
-						label: '<h6>Heading 6</h6>'
-					},
-					{
-						command: 'superscript',
-						label: 'Superscript <sup>sup</sup>'
-					},
-					{
-						command: 'subscript',
-						label: 'Subscript <sub>sub</sub>'
-					},
-					{
-						command: 'strikeThrough',
-						label: 'Strike<strike>through</strike>'
-					}
-				]
-			},
-			{
+				tag: 'b',
 				command: 'bold',
 				label: 'Bold',
 				icon: 'bold'
 			},
 			{
+				tag: 'i',
 				command: 'italic',
 				label: 'Italicise',
 				icon: 'italic'
 			},
 			{
-				command: 'underline',
-				label: 'Underline',
-				icon: 'underline'
+				tag: 'h3',
+				command: 'h3',
+				label: 'Sub-heading'
 			},
 			{
-				label: 'List',
-				icon: 'list',
-
-				menu: [
-					{
-						command: 'insertUnorderedList',
-						label: 'Unordered list'
-					},
-					{
-						command: 'insertOrderedList',
-						label: 'Ordered list'
-					},
-					{
-						command: 'indent',
-						label: 'Indent'
-					},
-					{
-						command: 'outdent',
-						label: 'Outdent'
-					}
-				]
+				tag: 'ul',
+				command: 'insertUnorderedList',
+				label: 'Unordered list',
+				icon: 'list'
 			},
 			{
+				tag: 'ol',
+				command: 'insertOrderedList',
+				label: 'Ordered list',
+				icon: 'list-ol'
+			},
+			{
+				tag: 'a',
 				label: 'Link',
 				icon: 'link',
 
@@ -150,6 +104,12 @@ export default {
 						label: 'Remove link'
 					}
 				]
+			},
+			{
+				tag: '*',
+				command: 'removeFormat',
+				label: 'Remove Formatting',
+				icon: 'cleartext'
 			},
 			// {
 			// 	label: 'Table',

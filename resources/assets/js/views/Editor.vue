@@ -34,6 +34,8 @@ import Config from 'classes/Config';
 import Sidebar from 'components/sidebar';
 import ModalContainer from 'components/ModalContainer';
 import Icon from 'components/Icon';
+import { undoStackInstance } from 'plugins/undo-redo';
+import { onKeyDown, onKeyUp } from 'plugins/key-commands';
 
 export default {
 	name: 'editor',
@@ -86,11 +88,20 @@ export default {
 				height: '568px'
 			}
 		};
+
+		this.onKeyDown = onKeyDown(undoStackInstance);
+		this.onKeyUp = onKeyUp(undoStackInstance);
+
+		document.addEventListener('keydown', this.onKeyDown);
+		document.addEventListener('keyup', this.onKeyUp);
 	},
 
 	destroyed() {
 		// we have left the page editor so remove the snapeshot of the latest saved content
 		this.$store.commit('resetCurrentSavedState');
+
+		document.removeEventListener('keydown', this.onKeyDown);
+		document.removeEventListener('keyup', this.onKeyUp);
 	},
 
 	methods: {

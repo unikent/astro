@@ -18,12 +18,12 @@ export default {
 		},
 
 		width: {
-			type: Number,
+			type: [String, Number],
 			default: 17
 		},
 
 		height: {
-			type: Number,
+			type: [String, Number],
 			default: 17
 		},
 

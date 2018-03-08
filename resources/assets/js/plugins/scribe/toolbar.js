@@ -43,12 +43,8 @@ function getClosestWord(str, pos) {
 		left = str.slice(0, pos + 1).search('[^' + delimiters + ']+$'),
 		right = str.slice(pos).search('[' + delimiters + ']');
 
-	if(left < 0) {
-		left = 0;
-	}
-
-	if(right < 0) {
-		return { start: left, end: str.length };
+	if(left === -1 || right === -1) {
+		return {};
 	}
 
 	return { start: left, end: pos + right };
@@ -95,20 +91,19 @@ export default (toolbarNode) => {
 					if(selection.range && selection.range.collapsed) {
 
 						let
-							tag = false,
+							tag = null,
 							start = 0,
 							end = null,
-							n;
+							node,
+							range = selection.range;
 
 						if(tagMap[button.dataset.commandName]) {
 							tag = tagMap[button.dataset.commandName];
 						}
 
-						let range = selection.range;
-
-						if(tag && (n = selection.getContaining(node => tag.indexOf(node.nodeName) > -1))) {
+						if(tag && (node = selection.getContaining(node => tag.includes(node.nodeName)))) {
 							// selection.placeMarkers();
-							range.selectNode(n);
+							range.selectNode(node);
 						}
 						else {
 							const selectOffset = selection.range.endOffset;
@@ -120,8 +115,10 @@ export default (toolbarNode) => {
 								)
 							);
 
-							range.setStart(selection.range.endContainer, start);
-							range.setEnd(selection.range.endContainer, end);
+							if(start !== void 0 || end !== void 0) {
+								range.setStart(selection.range.endContainer, start);
+								range.setEnd(selection.range.endContainer, end);
+							}
 
 							// selection.placeMarkers();
 							// let marker = scribe.el.querySelector('em.scribe-marker');
