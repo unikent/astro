@@ -16,13 +16,14 @@ const undoRedo = store => {
 		return;
 	}
 
-	undoStack.setUndoRedo((pageData) => {
+	undoStack.setUndoRedo(pageData => {
 		store.commit('setPage', JSON.parse(pageData));
 		eventBus.$emit('block:hideOverlay', null);
 	});
 
-	undoStack.setCallback(({ canUndo, canRedo }) => {
-		store.commit('updateUndoRedo', { canUndo, canRedo });
+	undoStack.setCallback((test, ctx) => {
+		console.log(test, ctx)
+		store.commit('updateUndoRedo', { canUndo: test.canUndo, canRedo: test.canRedo });
 	});
 
 	store.subscribe((mutation, state) => {
