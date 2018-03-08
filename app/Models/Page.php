@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Events\PageEvent;
 use DB;
 use Exception;
 use App\Models\Definitions\Layout as LayoutDefinition;
 use Baum\Node as BaumNode;
 use App\Models\Definitions\Layout;
+use Illuminate\Support\Facades\Event;
+
 /**
  * A Page represents a path in a hierarchical site structure.
  * Each page has a current revision, and each "tree" of pages is scoped by its site_id and version (draft, published, etc).
@@ -70,10 +73,18 @@ class Page extends BaumNode
 	protected static function boot()
 	{
 		parent::boot();
-
+		Event::listen(PageEvent::PAGE_EVENT_WILDCARD, [static::class, 'handlePageEvent'] );
 		static::saving(function ($node) {
 			$node->path = $node->generatePath();
 		});
+	}
+
+	/**
+	 * @param string $event_name
+	 * @param PageEvent $data
+	 */
+	protected static function handlePageEvent($event) {
+		// do something
 	}
 
 	/**
