@@ -21,9 +21,8 @@ const undoRedo = store => {
 		eventBus.$emit('block:hideOverlay', null);
 	});
 
-	undoStack.setCallback((test, ctx) => {
-		console.log(test, ctx)
-		store.commit('updateUndoRedo', { canUndo: test.canUndo, canRedo: test.canRedo });
+	undoStack.setCallback(({ canUndo, canRedo }) => {
+		store.commit('updateUndoRedo', { canUndo, canRedo });
 	});
 
 	store.subscribe((mutation, state) => {
