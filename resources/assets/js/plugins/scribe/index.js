@@ -8,6 +8,7 @@ import scribePluginToolbar from 'plugins/scribe/toolbar';
 import scribePluginUnderlineCommand from 'plugins/scribe/ux/underline';
 import scribePluginBoldCommand from 'plugins/scribe/ux/bold';
 import scribePluginUnlinkCommand from 'plugins/scribe/ux/unlink';
+import scribePluginIndentCommand from 'plugins/scribe/ux/indent';
 
 export const defaultConfig = {
 	allowedTags: ['h3', 'b', 'i', 'ul', 'ol', 'li', 'a'],
@@ -44,6 +45,10 @@ export const addScribePlugins = (options) => {
 
 	if(config.allowedTags.includes('b')) {
 		scribe.use(scribePluginBoldCommand());
+	}
+
+	if(config.allowedTags.includes('li')) {
+		scribe.use(scribePluginIndentCommand());
 	}
 
 	if(config.allowedTags.includes('a')) {
