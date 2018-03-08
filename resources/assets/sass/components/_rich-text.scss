@@ -26,11 +26,12 @@
 	}
 
 	button {
+		display: inline-flex;
 		border: 1px solid transparent;
 		background-color: transparent;
 		padding: 0;
 		width: 100%;
-		height: calc(100% + 1px);
+		height: 100%;
 		transition: border .2s ease-out, background-color .2s ease-out;
 	}
 
