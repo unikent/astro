@@ -77,18 +77,6 @@ export default {
 				label: 'Sub-heading'
 			},
 			{
-				tag: 'ul',
-				command: 'insertUnorderedList',
-				label: 'Unordered list',
-				icon: 'list'
-			},
-			{
-				tag: 'ol',
-				command: 'insertOrderedList',
-				label: 'Ordered list',
-				icon: 'list-ol'
-			},
-			{
 				tag: 'a',
 				label: 'Link',
 				icon: 'link',
@@ -104,6 +92,18 @@ export default {
 						label: 'Remove link'
 					}
 				]
+			},
+			{
+				tag: 'ul',
+				command: 'insertUnorderedList',
+				label: 'Unordered list',
+				icon: 'list'
+			},
+			{
+				tag: 'ol',
+				command: 'insertOrderedList',
+				label: 'Ordered list',
+				icon: 'list-ol'
 			},
 			{
 				tag: '*',
