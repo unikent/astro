@@ -9,6 +9,9 @@
 .richtext-toolbar {
 	background-color: #fff;
 	border: 1px solid #dadde2;
+	position: sticky;
+	top: 0;
+	transform: translateZ(0);
 }
 
 .richtext-toolbar__button {
