@@ -104,13 +104,7 @@ export default {
 				command: 'insertOrderedList',
 				label: 'Ordered list',
 				icon: 'list-ol'
-			},
-			{
-				tag: '*',
-				command: 'removeFormat',
-				label: 'Remove Formatting',
-				icon: 'cleartext'
-			},
+			}
 			// {
 			// 	label: 'Table',
 			// 	icon: 'table',
