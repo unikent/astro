@@ -2,6 +2,7 @@
 
 namespace App\Models\APICommands;
 
+use App\Events\PageEvent;
 use App\Models\Contracts\APICommand;
 use App\Models\Revision;
 use DB;
@@ -53,6 +54,7 @@ class UpdatePage implements APICommand
 				}
 			}
 			if ($changed || (!empty($input['title']) && $input['title'] != $previous_revision->title)) {
+				event( new PageEvent(PageEvent::OPTIONS_UPDATING, $page, array_merge($options, ['title' => !empty($input['title']) ? $input['title'] : $previous_revision->title])));
 				$revision = Revision::create([
 					'revision_set_id' => $previous_revision->revision_set_id,
 					'title' => !empty($input['title']) ? $input['title'] : $previous_revision->title,
@@ -65,6 +67,7 @@ class UpdatePage implements APICommand
 					]);
 					$page->setRevision($revision);
 				}
+				event(new PageEvent(PageEvent::OPTIONS_UPDATED, $page, array_merge($previous_revision->options, ['title' => $previous_revision->title])));
 				return $page;
 			});
 			return $result;

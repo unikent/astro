@@ -2,6 +2,7 @@
 
 namespace App\Models\APICommands;
 
+use App\Events\PageEvent;
 use App\Models\Revision;
 use DB;
 use App\Models\Page;
@@ -28,17 +29,15 @@ class AddPage implements APICommand
     {
         return DB::transaction(function() use($input, $user){
             $parent = Page::find($input['parent_id']);
-            $page = $this->addPage($parent,
+			$page = $this->addPage($parent,
                 $input['slug'],
                 $input['title'],
                 $user,
                 $input['layout']['name'],
-                $input['layout']['version']
+                $input['layout']['version'],
+				!empty($input['next_id']) ? $input['next_id'] : null
             );
-            if(!empty($input['next_id'])){
-                $page->makePreviousSiblingOf(Page::find($input['next_id']));
-            }
-            return $page;
+			return $page;
         });
     }
 

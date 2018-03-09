@@ -2,6 +2,7 @@
 
 namespace App\Models\APICommands;
 
+use App\Events\PageEvent;
 use App\Models\Contracts\APICommand;
 use App\Models\Page;
 use DB;
@@ -27,7 +28,8 @@ class DeletePage implements APICommand
         return DB::transaction(function() use($input) {
             $id = $input['id'];
             $page = Page::find($id);
-            DeletedPage::insert($this->createDeletedPages($page->getDescendantsAndSelf()));
+			event(new PageEvent(PageEvent::DELETING, $page, null));
+			DeletedPage::insert($this->createDeletedPages($page->getDescendantsAndSelf()));
             // if we have a published version, delete that too
 			$published_version = $page->publishedVersion();
 			if($published_version){
@@ -35,6 +37,7 @@ class DeletePage implements APICommand
 			}
 			// baum deletes all descendants when deleting a page.
             $page->delete();
+			event(new PageEvent(PageEvent::DELETED, $page, ['id' => $id]));
             return true;
         });
     }

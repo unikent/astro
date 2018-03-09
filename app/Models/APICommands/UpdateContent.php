@@ -2,6 +2,7 @@
 
 namespace App\Models\APICommands;
 
+use App\Events\PageEvent;
 use App\Models\Contracts\APICommand;
 use App\Models\Definitions\Layout;
 use App\Models\Definitions\Region;
@@ -32,6 +33,8 @@ class UpdateContent implements APICommand
 		$result = DB::transaction(function () use ($input, $user) {
 			$page = Page::find($input['id']);
 
+			event(new PageEvent(PageEvent::UPDATING, $page, $input['blocks']));
+
 			// Update with new content.
 			$errors = $this->processBlocks($page, $input['blocks']);
 
@@ -50,6 +53,7 @@ class UpdateContent implements APICommand
 			]);
 			$page->setRevision($revision);
 			$page->fresh();
+			event(new PageEvent(PageEvent::UPDATED, $page, ['previous_revision' => $previous_revision]));
 			return $page;
 		});
 		return $result;

@@ -1,6 +1,9 @@
 <?php
 namespace App\Models\Definitions;
 
+use App\Events\PageEvent;
+use App\Models\Page;
+
 class Block extends BaseDefinition
 {
 
@@ -29,6 +32,17 @@ class Block extends BaseDefinition
 	 * @return bool
 	 */
 	public function route($path, &$block, $page) {return false;}
+
+	/**
+	 * Called whenever a page containing this block is changed, created, deleted, moved, etc
+	 * @param PageEvent $page_event - The object with information about this event.
+	 * @param array $block_data - The data defining this block
+	 * @param string $region_name - Name of the region containing this block.
+	 * @param int $section_index - Index within its region of the section containing this block.
+	 * @param array $section_def - Definition of the section containing this block ( ['name' => ..., 'blocks' => [...] ] )
+	 * @param int $block_index - The index of this block inside its section
+	 */
+	public function onPageStatusChange(PageEvent $page_event, array $block_data, $region_name, $section_index, $section_def, $block_index ) { }
 
 	/**
 	 * Are blocks of this type dynamic?
