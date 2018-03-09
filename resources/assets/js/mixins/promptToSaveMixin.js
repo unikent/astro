@@ -91,10 +91,6 @@ export default {
 					.catch(() => {
 						next(false);
 						onCancel();
-
-						if(this.promptToSaveOnCancel) {
-							this.promptToSaveOnCancel();
-						}
 					});
 			}
 			else {
