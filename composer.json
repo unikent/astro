@@ -19,6 +19,10 @@
 		{
 			"url": "git@github.com:theninja/framework.git",
 			"type": "git"
+		},
+		{
+			"url": "git@github.com:unikent/cms-prototype-blocks.git",
+			"type": "git"
 		}
 	],
 	"require": {
@@ -38,7 +42,8 @@
 		"spatie/laravel-fractal": "^3.5",
 		"unikent/astro-renderer": "dev-develop",
 		"unikent/kentauth": "dev-laravel/5.3",
-		"unikent/kent-profiles": "dev-master"
+		"unikent/kent-profiles": "dev-master",
+		"unikent/cms-prototype-blocks": "dev-develop"
 	},
 	"require-dev": {
 		"fzaninotto/faker": "~1.4",
