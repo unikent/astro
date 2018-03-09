@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "99c9bea218d9941ec74251efe4bc8505",
+    "content-hash": "b7bcb043af1be60bc58cb4cb24644e00",
     "packages": [
         {
             "name": "barryvdh/laravel-debugbar",
@@ -3652,6 +3652,21 @@
             "time": "2018-02-08T14:12:06+00:00"
         },
         {
+            "name": "unikent/cms-prototype-blocks",
+            "version": "dev-develop",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:unikent/cms-prototype-blocks.git",
+                "reference": "7786bb5873dbdf995625d98ca79aa7beeafbc82e"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "5.0"
+            },
+            "type": "library",
+            "description": "Our block views",
+            "time": "2018-03-09T10:08:52+00:00"
+        },
+        {
             "name": "unikent/kent-profiles",
             "version": "dev-master",
             "source": {
@@ -5373,7 +5388,8 @@
         "laravel/framework": 20,
         "unikent/astro-renderer": 20,
         "unikent/kentauth": 20,
-        "unikent/kent-profiles": 20
+        "unikent/kent-profiles": 20,
+        "unikent/cms-prototype-blocks": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
