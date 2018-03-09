@@ -14,7 +14,7 @@ export default {
 
 		this.defaultSortMethod = (a, b) => {
 			const prop = this.sorting.prop;
-			return a[prop] === b[prop] ? 0 : (a[prop] < b[prop] ? -1 : 1);
+			return a[prop] < b[prop] ? -1 : (a[prop] > b[prop] ? 1 : 0);
 		};
 	},
 
@@ -34,7 +34,7 @@ export default {
 
 			if(this.sorting.prop) {
 				return (
-					// concat is so the array isn't sorted in-place
+					// shallow copy array so it isn't sorted in-place
 					this.sorting.order === 'descending' ?
 						[...items].sort(this.sortMethod).reverse() :
 						[...items].sort(this.sortMethod)
