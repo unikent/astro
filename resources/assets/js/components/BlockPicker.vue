@@ -120,7 +120,7 @@ export default {
 				// wait for next tick to sync mutation
 				// then another tick for position update
 				Vue.nextTick(() =>
-					Vue.nextTick(() => this.$bus.$emit('block:updateOverlay'))
+					Vue.nextTick(() => this.$bus.$emit('block:updateBlockOverlays'))
 				);
 			}
 

@@ -81,7 +81,7 @@ const mutations = {
 		state.blockMeta.blocks[region][section].blocks.splice(to, 0, blockMeta);
 
 		// TODO: use state for this
-		Vue.nextTick(() => eventBus.$emit('block:updateOverlay', to));
+		Vue.nextTick(() => eventBus.$emit('block:updateBlockOverlays', to));
 	},
 
 	/**
@@ -199,7 +199,7 @@ const mutations = {
 		state.blockMeta.blocks[region][section].blocks.splice(index, 1);
 
 		// TODO: use state for this
-		Vue.nextTick(() => eventBus.$emit('block:updateOverlay', index));
+		Vue.nextTick(() => eventBus.$emit('block:updateBlockOverlays', index));
 	},
 
 	updateCurrentSavedState(state) {

@@ -44,7 +44,7 @@ export default {
 
 						// TODO: use state for this?
 						imagesLoaded(this.$el, () => {
-							eventBus.$emit('block:updateOverlay');
+							eventBus.$emit('block:updateBlockOverlays');
 						});
 					}, {
 						deep: true
