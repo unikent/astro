@@ -6,6 +6,7 @@ use App\Events\PageEvent;
 use DB;
 use Exception;
 use App\Models\Definitions\Layout as LayoutDefinition;
+use \App\Models\Definitions\Block as BlockDefinition;
 use Baum\Node as BaumNode;
 use App\Models\Definitions\Layout;
 use Illuminate\Support\Facades\Event;
@@ -80,11 +81,20 @@ class Page extends BaumNode
 	}
 
 	/**
-	 * @param string $event_name
-	 * @param PageEvent $data
+	 * Give dynamic blocks on a page the option to react to any page change events.
+	 * @param PageEvent $page_event
 	 */
-	protected static function handlePageEvent($event) {
-		// do something
+	protected static function handlePageEvent($page_event) {
+		if($page_event->page) {
+			foreach($page_event->page->revision->blocks as $region_name => $sections) {
+				foreach($sections as $section_index => $section_def) {
+					foreach($section_def['blocks'] as $block_index => $block_data) {
+						$definition = BlockDefinition::fromDefinitionFile(BlockDefinition::locateDefinition(BlockDefinition::idFromNameAndVersion($block_data['definition_name'], $block_data['definition_version'])));
+						$definition->onPageStatusChange($page_event, $block_data, $region_name, $section_index, $section_def, $block_index);
+					}
+				}
+			}
+		}
 	}
 
 	/**

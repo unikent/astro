@@ -9,6 +9,7 @@ use App\Models\Page;
  * The type of event can be determined from the $type attribute.
  * The Page in its current state can be retrieved from the $page attribute. This will be the previous state of the
  * page for ...ing events (e.g. creating) and the modified state of the page for '...ed' events (e.g. created).
+ * For Creating events, it will be null.
  * @package App\Events
  */
 class PageEvent
@@ -42,20 +43,20 @@ class PageEvent
 	public $page;
 
 	/**
-	 * @var array The changed data
+	 * @var array Additional, event-specific data
 	 */
-	public $changes;
+	public $data;
 
 	/**
 	 * PageEvent constructor.
 	 * @param string $type - The type of page
 	 * @param Page $page - The Page that has changed (in its current state)
-	 * @param array $changes - The data that has been changed (varies depending on event type)
+	 * @param array $data - Event-specific data
 	 */
-	public function __construct($type, $page, $changes)
+	public function __construct($type, $page, $data)
 	{
 		$this->type = $type;
 		$this->page = $page;
-		$this->changes = $changes;
+		$this->data = $data;
 	}
 }
