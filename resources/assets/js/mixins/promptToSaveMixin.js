@@ -12,15 +12,18 @@
  *   - Ensure the component isn't in its initialisation / loading state
  *   - JSON.stringify() the relevant data on initial load and on saving
  *   - Compare this with the JSON.stringify() version of the current version of the data
+ *
+ * TODO: turn into a function we can pass options to that returns a mixin.
+ * As this might need to work in a few different scenarios (not just in top level routes).
  */
 export default {
 
 	beforeRouteLeave(to, from, next) {
-		this.promptToSave(next);
+		this.promptToSave({ next });
 	},
 
 	beforeRouteUpdate(to, from, next) {
-		this.promptToSave(next);
+		this.promptToSave({ next });
 	},
 
 	created() {
@@ -35,8 +38,8 @@ export default {
 		return {
 			// override any of these in the component using this mixin's data() to modify the prompt messages
 			// vue only does a shallow merge https://vuejs.org/v2/guide/mixins.html#Option-Merging
-			savePromptTitle: 'Are you sure you want to leave?',
-			savePromptMessage: 'There are unsaved changes',
+			savePromptTitle: 'There are unsaved changes',
+			savePromptMessage: 'Are you sure you want to leave?',
 			savePromptConfirmButtonText: 'OK',
 			savePromptCancelButtonText: 'Cancel',
 			savePromptType: 'warning'
@@ -59,14 +62,18 @@ export default {
 			/* we are very limited as to what we can do when someone tries to leave
 			 https://developer.mozilla.org/en/docs/Web/Events/beforeunload
 			 */
-			if (this.isUnsaved) {
+			if(this.isUnsaved) {
 				const confirmationMessage = this.savePromptTitle + "\n\n" + this.savePromptMessage;
-				e.returnValue = confirmationMessage;     // Gecko, Trident, Chrome 34+
-				return confirmationMessage;              // Gecko, WebKit, Chrome <34
+				e.returnValue = confirmationMessage; // Gecko, Trident, Chrome 34+
+				return confirmationMessage; // Gecko, WebKit, Chrome <34
 			}
 		},
 
-		promptToSave(callback) {
+		promptToSave({
+			next = () => {},
+			onConfirm = () => {},
+			onCancel = () => {}
+		}) {
 			if(this.isUnsaved) {
 				return this.$confirm(
 					this.savePromptMessage,
@@ -76,19 +83,20 @@ export default {
 						cancelButtonText: this.savePromptCancelButtonText,
 						type: this.savePromptType
 					}
-				).then(() => {
-					if(callback) {
-						callback(true);
-					}
-				}).catch(() => {
-					if(callback) {
-						callback(false);
-					}
-				});
+				)
+					.then(() => {
+						next();
+						onConfirm();
+					})
+					.catch(() => {
+						next(false);
+						onCancel();
+					});
 			}
-
-			callback(true);
-			return true;
+			else {
+				next();
+				onConfirm();
+			}
 		}
 	}
 };

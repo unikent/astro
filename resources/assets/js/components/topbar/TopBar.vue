@@ -85,122 +85,127 @@
 </template>
 
 <script>
-	import { mapActions } from 'vuex';
-	import Icon from 'components/Icon';
-	import promptToSave from 'mixins/promptToSave';
-	import Config from 'classes/Config.js';
+import { mapActions, mapGetters } from 'vuex';
+import Icon from 'components/Icon';
+import promptToSave from 'mixins/promptToSaveMixin';
+import Config from 'classes/Config.js';
 
-	/* global window */
+/* global window */
 
-	export default {
+export default {
 
-		name: 'top-bar',
+	name: 'top-bar',
 
-		props: ['site-id'],
+	props: ['site-id'],
 
-		components: {
-			Icon
-		},
+	components: {
+		Icon
+	},
 
-		mixins: [promptToSave],
+	mixins: [promptToSave],
 
-		created() {
-			this.fetchSiteData();
-			// refresh our site list dropdown when a new site is added
-			// TODO: replace with more structured state, rather than an event
-			this.$bus.$on('top-bar:fetchSitData', this.fetchSiteData);
-			window.addEventListener('beforeunload', this.leaveAstro);
-		},
+	created() {
+		this.fetchSiteData();
+		// refresh our site list dropdown when a new site is added
+		// TODO: replace with more structured state, rather than an event
+		this.$bus.$on('top-bar:fetchSitData', this.fetchSiteData);
+	},
 
-		mounted() {
-			this.loadPermissions();
-			this.loadGlobalRole(window.astro.username);
-			this.$store.dispatch('site/fetchLayouts');
-			this.$store.dispatch('site/fetchSiteDefinitions');
-		},
+	mounted() {
+		this.loadPermissions();
+		this.loadGlobalRole(window.astro.username);
+		this.$store.dispatch('site/fetchLayouts');
+		this.$store.dispatch('site/fetchSiteDefinitions');
+	},
 
-		destroyed() {
-			this.$bus.$off('top-bar:fetchSitData');
-		},
+	destroyed() {
+		this.$bus.$off('top-bar:fetchSitData');
+	},
 
-		data() {
-			return {
-				siteDropdownVisible: false,
-				accountDropdownVisible: false,
-				sites: []
-			};
-		},
-
-		computed: {
-
-			// works out if we should show a back button or not (ie whether we're editing a page or on the homepage)
-			showBack() {
-				return ['page', 'profile-editor'].indexOf(this.$route.name) !== -1;
-			},
-
-			showTools() {
-				return ['site', 'page', 'profile-editor'].indexOf(this.$route.name) !== -1;
-			},
-
-			// lets us output the current user's username in the top bar
-			username() {
-				return window.astro.username;
-			},
-
-			config() {
-				return Config;
-			},
-
-			siteTitle() {
-				const site = this.sites.find(site => site.id === Number(this.$route.params.site_id));
-				return site ? site.name : '';
-			}
-		},
-
-		methods: {
-
-			leaveAstro(e) {
-				/* we are very limited as to what we can do when someone tries to leave
-				 https://developer.mozilla.org/en/docs/Web/Events/beforeunload
-				 */
-				const unsavedChangesExist = this.unsavedChangesExist();
-				if (unsavedChangesExist) {
-					var confirmationMessage = 'You may lose changes if you leave without saving';
-					e.returnValue = confirmationMessage;     // Gecko, Trident, Chrome 34+
-					return confirmationMessage;              // Gecko, WebKit, Chrome <34
-				}
-			},
-
-			...mapActions([
-				'loadPermissions',
-				'loadGlobalRole'
-			]),
-
-			fetchSiteData() {
-				this.$api
-					.get('sites')
-					.then(({ data: json }) => {
-						this.sites = json.data;
-					});
-			},
-
-			signOut() {
-				this.promptToSave(() => {
-					this.$refs['submit-form'].submit();
-				});
-			},
-
-			/**
-			 gets the user back to the main admin area
-			 */
-			backToAdmin() {
-				// another prompt to save the page when going back to the site listing
-				this.promptToSave(() => {
-					this.$store.commit('setLoaded', false);
-					this.$store.commit('setPage', {});
-					this.$router.push(`/site/${this.siteId || this.$route.params.site_id}`);
-				})
-			}
+	watch: {
+		'$route'() {
+			this.$store.commit('resetCurrentSavedState');
+			this.$store.commit('setLoaded', false);
+			this.$store.commit('setPage', {});
+			// TODO: prompt to save?
 		}
-	};
+	},
+
+	data() {
+		return {
+			siteDropdownVisible: false,
+			accountDropdownVisible: false,
+			sites: []
+		};
+	},
+
+	computed: {
+		...mapGetters([
+			'unsavedChangesExist'
+		]),
+
+		// works out if we should show a back button or not (ie whether we're editing a page or on the homepage)
+		showBack() {
+			return ['page', 'profile-editor'].indexOf(this.$route.name) !== -1;
+		},
+
+		showTools() {
+			return ['site', 'page', 'profile-editor'].indexOf(this.$route.name) !== -1;
+		},
+
+		// lets us output the current user's username in the top bar
+		username() {
+			return window.astro.username;
+		},
+
+		config() {
+			return Config;
+		},
+
+		siteTitle() {
+			const site = this.sites.find(site => site.id === Number(this.$route.params.site_id));
+			return site ? site.name : '';
+		},
+
+		isUnsaved() {
+			return this.unsavedChangesExist();
+		}
+	},
+
+	methods: {
+
+		...mapActions([
+			'loadPermissions',
+			'loadGlobalRole'
+		]),
+
+		fetchSiteData() {
+			this.$api
+				.get('sites')
+				.then(({ data: json }) => {
+					this.sites = json.data;
+				});
+		},
+
+		signOut() {
+			this.promptToSave({
+				onConfirm: () => {
+					this.$refs['submit-form'].submit();
+				}
+			});
+		},
+
+		/**
+		 gets the user back to the main admin area
+		 */
+		backToAdmin() {
+			this.promptToSave({
+				onConfirm: () => {
+					this.$router.push(`/site/${this.siteId || this.$route.params.site_id}`);
+				}
+			});
+		}
+
+	}
+};
 </script>
