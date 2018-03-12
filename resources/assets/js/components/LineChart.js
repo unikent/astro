@@ -33,6 +33,11 @@ export default {
 						gridLines: {
 							display: true
 						}
+					}],
+					xAxes: [{
+						gridLines: {
+							display: false
+						}
 					}]
 				}
 			}
