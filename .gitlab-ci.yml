@@ -29,9 +29,3 @@ test-php71:
   script:
     - vendor/bin/phpunit
     - yarn run validate
-
-test-php56:
-  image: "gitlab.kent.ac.uk:4567/jna/astro/php5.6:dev"
-  script:
-    - vendor/bin/phpunit
-    - yarn run validate
