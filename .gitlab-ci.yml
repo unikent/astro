@@ -19,6 +19,7 @@ before_script:
   - composer config -g http-basic.gitlab.kent.ac.uk gitlabciuser ${GITLAB_CI_Key}
   - sed -i -e "s/git@gitlab\.kent\.ac\.uk/https:\/\/gitlabciuser:${GITLAB_CI_Key}@gitlab\.kent\.ac\.uk/g" composer.json 
   - composer validate --no-check-all --ansi
+  - composer update unikent/* --prefer-dist
   - composer install --prefer-dist
   - php artisan key:generate
   - php artisan migrate --database=mysql_test
