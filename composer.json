@@ -21,7 +21,7 @@
 			"type": "git"
 		},
 		{
-			"url": "git@gitlab.kent.ac.uk:webdev/cms-prototype-blocks.git",
+			"url": "git@gitlab.kent.ac.uk:webdev/astro-kent-theme.git",
 			"type": "git"
 		}
 	],
@@ -43,7 +43,7 @@
 		"unikent/astro-renderer": "dev-develop",
 		"unikent/kentauth": "dev-laravel/5.3",
 		"unikent/kent-profiles": "dev-master",
-		"unikent/cms-prototype-blocks": "dev-develop"
+		"unikent/astro-kent-theme": "dev-develop"
 	},
 	"require-dev": {
 		"fzaninotto/faker": "~1.4",
