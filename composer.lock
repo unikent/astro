@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "e2b9e62a88029b60ed622e98ee0a0c7c",
+    "content-hash": "074543f884161855f24d00b2a09ea2c7",
     "packages": [
         {
             "name": "barryvdh/laravel-debugbar",
@@ -3616,6 +3616,21 @@
             "time": "2017-09-27T18:06:46+00:00"
         },
         {
+            "name": "unikent/astro-kent-theme",
+            "version": "dev-develop",
+            "source": {
+                "type": "git",
+                "url": "git@gitlab.kent.ac.uk:webdev/astro-kent-theme.git",
+                "reference": "acdf2e3394f4fb5f0c235895ac30597d9c0d35f2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "5.0"
+            },
+            "type": "library",
+            "description": "Our block views",
+            "time": "2018-03-13T14:24:41+00:00"
+        },
+        {
             "name": "unikent/astro-renderer",
             "version": "dev-develop",
             "source": {
@@ -3650,21 +3665,6 @@
             ],
             "description": "A simple renderer for Astro",
             "time": "2018-03-13T11:32:24+00:00"
-        },
-        {
-            "name": "unikent/cms-prototype-blocks",
-            "version": "dev-develop",
-            "source": {
-                "type": "git",
-                "url": "git@gitlab.kent.ac.uk:webdev/cms-prototype-blocks.git",
-                "reference": "917dda1c0c9222f28029ad390d44dd872d89cdc5"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "5.0"
-            },
-            "type": "library",
-            "description": "Our block views",
-            "time": "2018-03-12T11:02:28+00:00"
         },
         {
             "name": "unikent/kent-profiles",
@@ -5389,7 +5389,7 @@
         "unikent/astro-renderer": 20,
         "unikent/kentauth": 20,
         "unikent/kent-profiles": 20,
-        "unikent/cms-prototype-blocks": 20
+        "unikent/astro-kent-theme": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
