@@ -17,6 +17,7 @@ before_script:
   - mv .env.gitlab .env
   - composer config -g github-oauth.github.com ${GITHUB_TOKEN}
   - composer config -g http-basic.gitlab.kent.ac.uk gitlabciuser ${GITLAB_CI_Key}
+  - composer config -g gitlab-oauth.gitlab.kent.ac.uk ${GITLAB_CI_Key}
   - composer validate --no-check-all --ansi
   - composer install --prefer-dist
   - php artisan key:generate
