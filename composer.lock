@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "b7bcb043af1be60bc58cb4cb24644e00",
+    "content-hash": "e2b9e62a88029b60ed622e98ee0a0c7c",
     "packages": [
         {
             "name": "barryvdh/laravel-debugbar",
@@ -3620,8 +3620,8 @@
             "version": "dev-develop",
             "source": {
                 "type": "git",
-                "url": "git@github.com:unikent/astro-renderer.git",
-                "reference": "e8fa3c88ae02db2b98c67ad45547a2e694f56dac"
+                "url": "git@gitlab.kent.ac.uk:webdev/astro-renderer.git",
+                "reference": "3431e83fe848a3f40952a479bbdc139250a3d7c1"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.2",
@@ -3649,22 +3649,22 @@
                 }
             ],
             "description": "A simple renderer for Astro",
-            "time": "2018-02-08T14:12:06+00:00"
+            "time": "2018-03-13T11:32:24+00:00"
         },
         {
             "name": "unikent/cms-prototype-blocks",
             "version": "dev-develop",
             "source": {
                 "type": "git",
-                "url": "git@github.com:unikent/cms-prototype-blocks.git",
-                "reference": "7786bb5873dbdf995625d98ca79aa7beeafbc82e"
+                "url": "git@gitlab.kent.ac.uk:webdev/cms-prototype-blocks.git",
+                "reference": "917dda1c0c9222f28029ad390d44dd872d89cdc5"
             },
             "require-dev": {
                 "phpunit/phpunit": "5.0"
             },
             "type": "library",
             "description": "Our block views",
-            "time": "2018-03-09T10:08:52+00:00"
+            "time": "2018-03-12T11:02:28+00:00"
         },
         {
             "name": "unikent/kent-profiles",

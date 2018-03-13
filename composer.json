@@ -5,7 +5,7 @@
 	"type": "project",
 	"repositories": [
 		{
-			"url": "git@github.com:unikent/astro-renderer.git",
+			"url": "git@gitlab.kent.ac.uk:webdev/astro-renderer.git",
 			"type": "git"
 		},
 		{
@@ -21,7 +21,7 @@
 			"type": "git"
 		},
 		{
-			"url": "git@github.com:unikent/cms-prototype-blocks.git",
+			"url": "git@gitlab.kent.ac.uk:webdev/cms-prototype-blocks.git",
 			"type": "git"
 		}
 	],
