@@ -15,14 +15,18 @@ before_script:
   - composer --version
   - yarn --version
   - mv .env.gitlab .env
-  - composer config -g github-oauth.github.com ${GITHUB_TOKEN}
+  - mkdir -p ~/.ssh
+  - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+  - eval $(ssh-agent -s)
+  - ssh-add <(echo "$CI_SSH_KEY")
+  # - composer config -g github-oauth.github.com ${GITHUB_TOKEN}
   # - composer config -g http-basic.gitlab.kent.ac.uk gitlabciuser ${GITLAB_CI_Key}
-  - composer config -g gitlab-oauth.gitlab.kent.ac.uk ${GITLAB_CI_Key}
   - composer validate --no-check-all --ansi
   - composer install --prefer-dist
   - php artisan key:generate
   - php artisan migrate --database=mysql_test
-  - sed -i -e "s/ssh:\/\/git@gitlab\.kent\.ac\.uk/https:\/\/gitlabciuser:${GITLAB_CI_Key}@gitlab\.kent\.ac\.uk/g" package.json 
+  # - sed -i -e "s/ssh:\/\/git@gitlab\.kent\.ac\.uk/https:\/\/gitlabciuser:${GITLAB_CI_Key}@gitlab\.kent\.ac\.uk/g" package.json 
   - yarn install
 
 test-php71:
