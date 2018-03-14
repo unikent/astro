@@ -27,6 +27,9 @@ before_script:
   - php artisan migrate --database=mysql_test
   - yarn install
 
+after_script:
+  - rm -rf node_modles .git
+
 test-php71:
   image: "gitlab.kent.ac.uk:4567/jna/astro/php7.1:dev"
   script:
@@ -34,4 +37,4 @@ test-php71:
     - yarn run validate
   artifacts:
     paths:
-      - composer.json
+      - ./
