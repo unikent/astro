@@ -3,7 +3,7 @@ cache:
   paths:
     - $HOME/.composer/cache
     - vendor/
-    - node_modles/
+    - node_modules/
 
 services:
   - mysql:latest
@@ -29,7 +29,7 @@ before_script:
   - yarn install
 
 after_script:
-  - rm -rf node_modles .git
+  - rm -rf node_modules .git
 
 test-php71:
   image: "gitlab.kent.ac.uk:4567/jna/astro/php7.1:dev"
