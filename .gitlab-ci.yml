@@ -21,12 +21,10 @@ before_script:
   - eval $(ssh-agent -s)
   - ssh-add <(echo "$CI_SSH_KEY")
   - composer config -g github-oauth.github.com ${GITHUB_TOKEN}
-  # - composer config -g http-basic.gitlab.kent.ac.uk gitlabciuser ${GITLAB_CI_Key}
   - composer validate --no-check-all --ansi
   - composer install --prefer-dist
   - php artisan key:generate
   - php artisan migrate --database=mysql_test
-  # - sed -i -e "s/ssh:\/\/git@gitlab\.kent\.ac\.uk/https:\/\/gitlabciuser:${GITLAB_CI_Key}@gitlab\.kent\.ac\.uk/g" package.json 
   - yarn install
 
 test-php71:
@@ -34,3 +32,6 @@ test-php71:
   script:
     - vendor/bin/phpunit
     - yarn run validate
+  artifacts:
+    paths:
+      - ./*
