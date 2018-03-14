@@ -74,9 +74,9 @@ class PublishPage implements APICommand
 					$published_page = Page::create($fields);
 				}
 			}
-
 			$published_page->setRevision($page->revision);
-			event(new PageEvent(PageEvent::PUBLISHED, $published_page, null));
+			$page->refresh();
+			event(new PageEvent(PageEvent::PUBLISHED, $page, null));
 			return $published_page;
 		});
 	}
