@@ -69,7 +69,7 @@
 					</div>
 					<div class="user-account-dropdown__item user-account-dropdown__item--divided">Settings</div>
 					<div @click="signOut" class="user-account-dropdown__item user-account-dropdown__item--clickable">
-						<form ref="submit-form" method="post" :action="`${config.get('base_url', '')}/auth/logout`">
+						<form ref="submit-form" method="post" :action="`${config.get('logout_url', '?logout=1')}`">
 							<input type="hidden" name="_token" :value="config.get('csrf_token')" />
 						</form>
 						<span>Sign out</span>
