@@ -34,4 +34,4 @@ test-php71:
     - yarn run validate
   artifacts:
     paths:
-      - ./*
+      - composer.json
