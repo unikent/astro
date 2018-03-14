@@ -3,6 +3,7 @@ cache:
   paths:
     - $HOME/.composer/cache
     - vendor/
+    - node_modles/
 
 services:
   - mysql:latest
