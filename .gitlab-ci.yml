@@ -43,7 +43,7 @@ artifacts-experimental:
   artifacts:
     paths:
       - ./
-      expire_in: 1 week
+    expire_in: 1 week
   except:
     - develop
     - master
@@ -55,7 +55,7 @@ artifacts-develop:
   artifacts:
     paths:
       - ./
-      expire_in: 3 months
+    expire_in: 3 months
   only:
     - develop
 
@@ -66,6 +66,6 @@ artifacts-master:
   artifacts:
     paths:
       - ./
-      expire_in: 6 months
+    expire_in: 6 months
   only:
     - master
