@@ -37,6 +37,7 @@ stages:
   - build
 
 artifacts-experimental:
+  stage: build
   script:
     - vendor/bin/phpunit
     - yarn run validate
@@ -49,6 +50,7 @@ artifacts-experimental:
     - master
 
 artifacts-develop:
+  stage: build
   script:
     - vendor/bin/phpunit
     - yarn run validate
@@ -60,6 +62,7 @@ artifacts-develop:
     - develop
 
 artifacts-master:
+  stage: build
   script:
     - vendor/bin/phpunit
     - yarn run validate
