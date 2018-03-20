@@ -1,3 +1,5 @@
+image: "gitlab.kent.ac.uk:4567/jna/astro/php7.1:dev"
+
 cache:
   key: "$CI_BUILD_REF_NAME-assets"
   paths:
@@ -31,11 +33,39 @@ before_script:
 after_script:
   - rm -rf node_modules .git
 
-test-php71:
-  image: "gitlab.kent.ac.uk:4567/jna/astro/php7.1:dev"
+stages:
+  - build
+
+artifacts-experimental:
   script:
     - vendor/bin/phpunit
     - yarn run validate
   artifacts:
     paths:
       - ./
+      expire_in: 1 week
+  except:
+    - develop
+    - master
+
+artifacts-develop:
+  script:
+    - vendor/bin/phpunit
+    - yarn run validate
+  artifacts:
+    paths:
+      - ./
+      expire_in: 3 months
+  only:
+    - develop
+
+artifacts-master:
+  script:
+    - vendor/bin/phpunit
+    - yarn run validate
+  artifacts:
+    paths:
+      - ./
+      expire_in: 6 months
+  only:
+    - master
