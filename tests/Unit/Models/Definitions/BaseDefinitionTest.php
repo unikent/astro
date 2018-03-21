@@ -1,8 +1,9 @@
 <?php
 namespace Tests\Unit\Models\Definitions;
 
-use App\Models\Definitions\BaseDefinition;
+use Config;
 use Tests\TestCase;
+use App\Models\Definitions\BaseDefinition;
 use Illuminate\Support\Facades\Redis;
 use App\Exceptions\JsonDecodeException;
 use Tests\Support\Doubles\Models\Definitions\Double as DefinitionDouble;
@@ -16,7 +17,6 @@ class BaseDefinitionTest extends TestCase
 	public function setUp(){
 		parent::setUp();
 		$this->definition = base_path('tests/Support/Fixtures/definitions/double-definition.json');
-		Redis::flushDB();
 	}
 
 	public function tearDown(){
@@ -153,11 +153,17 @@ class BaseDefinitionTest extends TestCase
 	 * @group wip
 	 */
 	public function fromDefinitionFile_WhenNotCachedInRedis_LoadsFromFile(){
-		$definition_from_redis = Redis::get($this->definition);
-		$this->assertNull($definition_from_redis);
-		$definition = DefinitionDouble::fromDefinitionFile($this->definition);
-		$definition_from_redis = Redis::get($this->definition);
-		$this->assertNotNull($definition_from_redis);
+		if (Config::get('database.redis.active')) {
+			Redis::flushDB();
+			$definition_from_redis = Redis::get($this->definition);
+			$this->assertNull($definition_from_redis);
+			$definition = DefinitionDouble::fromDefinitionFile($this->definition);
+			$definition_from_redis = Redis::get($this->definition);
+			$this->assertNotNull($definition_from_redis);
+		}
+		else {
+			$this->markTestSkipped('Redis not configured');
+		}
 	}
 
 	/**
@@ -165,9 +171,15 @@ class BaseDefinitionTest extends TestCase
 	 * @group wip
 	 */
 	public function fromDefinitionFile_WhenCachedInRedis_LoadsFromRedis(){
-		Redis::set($this->definition, file_get_contents($this->definition));
-		$definition = DefinitionDouble::fromDefinitionFile($this->definition);
-		$this->assertNotNull($definition);
+		if (Config::get('database.redis.active')) {
+			Redis::flushDB();
+			Redis::set($this->definition, file_get_contents($this->definition));
+			$definition = DefinitionDouble::fromDefinitionFile($this->definition);
+			$this->assertNotNull($definition);
+		}
+		else {
+			$this->markTestSkipped('Redis not configured');
+		}
 	}
 
 }
