@@ -90,6 +90,7 @@ return [
 	'redis' => [
 
 		'client' => env('REDIS_LIB', 'predis'),
+		'active' => env('REDIS_ACTIVE', false),
 
 		'default' => [
 			'host' => env('REDIS_HOST', '127.0.0.1'),

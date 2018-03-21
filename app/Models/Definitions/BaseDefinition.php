@@ -378,14 +378,20 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
      */
     public static function fromDefinitionFile($path)
     {
-        $definition = Redis::get($path);
+        $definition = null;
+
+        if (Config::get('database.redis.active')) {
+            $definition = Redis::get($path);
+        }
 
         if (empty($definition)) {
             if(!file_exists($path)){
                 throw new FileNotFoundException($path);
             }
             $definition = file_get_contents($path);
-            Redis::set($path, $definition);
+            if (Config::get('database.redis.active')) {
+                Redis::set($path, $definition);
+            }
         }
 
     	return static::fromDefinition($definition);
