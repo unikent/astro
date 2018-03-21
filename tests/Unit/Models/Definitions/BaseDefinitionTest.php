@@ -3,6 +3,7 @@ namespace Tests\Unit\Models\Definitions;
 
 use App\Models\Definitions\BaseDefinition;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Redis;
 use App\Exceptions\JsonDecodeException;
 use Tests\Support\Doubles\Models\Definitions\Double as DefinitionDouble;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
@@ -15,6 +16,7 @@ class BaseDefinitionTest extends TestCase
 	public function setUp(){
 		parent::setUp();
 		$this->definition = base_path('tests/Support/Fixtures/definitions/double-definition.json');
+		Redis::flushDB();
 	}
 
 	public function tearDown(){
@@ -144,6 +146,28 @@ class BaseDefinitionTest extends TestCase
 	public function fromDefinitionFile_WhenFileIsNotFound_ThrowsException(){
         $this->expectException(FileNotFoundException::class);
 		DefinitionDouble::fromDefinitionFile(sys_get_temp_dir() . '/foobar');
+	}
+
+	/**
+	 * @test
+	 * @group wip
+	 */
+	public function fromDefinitionFile_WhenNotCachedInRedis_LoadsFromFile(){
+		$definition_from_redis = Redis::get($this->definition);
+		$this->assertNull($definition_from_redis);
+		$definition = DefinitionDouble::fromDefinitionFile($this->definition);
+		$definition_from_redis = Redis::get($this->definition);
+		$this->assertNotNull($definition_from_redis);
+	}
+
+	/**
+	 * @test
+	 * @group wip
+	 */
+	public function fromDefinitionFile_WhenCachedInRedis_LoadsFromRedis(){
+		Redis::set($this->definition, file_get_contents($this->definition));
+		$definition = DefinitionDouble::fromDefinitionFile($this->definition);
+		$this->assertNotNull($definition);
 	}
 
 }
