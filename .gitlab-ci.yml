@@ -9,6 +9,7 @@ cache:
 
 services:
   - mysql:latest
+  - redis:latest
 variables:
   MYSQL_DATABASE: test
   MYSQL_ROOT_PASSWORD: test
