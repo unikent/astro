@@ -13,8 +13,6 @@ services:
 variables:
   MYSQL_DATABASE: test
   MYSQL_ROOT_PASSWORD: test
-  REDIS_LIB: predis
-  REDIS_HOST: redis
 
 before_script:
   - php --version
