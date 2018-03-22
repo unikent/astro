@@ -5,7 +5,7 @@ cache:
   paths:
     - $HOME/.composer/cache
     - vendor/
-    - node_modules/
+    # - node_modules/
 
 services:
   - mysql:latest
@@ -18,7 +18,7 @@ variables:
 before_script:
   - php --version
   - composer --version
-  - yarn --version
+  # - yarn --version
   - mv .env.gitlab .env
   - mkdir -p ~/.ssh
   - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
@@ -43,7 +43,7 @@ test:
     - php artisan key:generate
     - php artisan migrate --database=mysql_test
     - vendor/bin/phpunit
-    - yarn run validate
+    # - yarn run validate
 
 artifacts-experimental:
   stage: build
