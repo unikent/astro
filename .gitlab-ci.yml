@@ -29,6 +29,7 @@ before_script:
   - php artisan key:generate
   - php artisan migrate --database=mysql_test
   - yarn install
+  - yarn run production
 
 after_script:
   - rm -rf node_modules .git
