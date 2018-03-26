@@ -9,11 +9,22 @@ import scribePluginUnderlineCommand from 'plugins/scribe/ux/underline';
 import scribePluginBoldCommand from 'plugins/scribe/ux/bold';
 import scribePluginUnlinkCommand from 'plugins/scribe/ux/unlink';
 import scribePluginIndentCommand from 'plugins/scribe/ux/indent';
+import scribePluginAddClasses from 'plugins/scribe/ux/add-classes';
 
 export const defaultConfig = {
 	allowedTags: ['h3', 'b', 'i', 'ul', 'ol', 'li', 'a'],
 	attributes: {
-		a: ['href']
+		a: {
+			href: true,
+			target: '_blank',
+			rel: true
+		},
+		ul: {
+			class: 'bullet-list'
+		},
+		ol: {
+			class: 'numbered-list'
+		}
 	}
 };
 
@@ -35,6 +46,7 @@ export const addScribePlugins = (options) => {
 	scribe.use(scribePluginToolbar(options.toolbar));
 	scribe.use(scribePluginInlineStyles());
 	scribe.use(scribePluginFormatterPlainTextConvertNewLinesToHtml());
+	scribe.use(scribePluginAddClasses());
 
 	// add commands for each heading tag enabled
 	config.allowedTags
@@ -65,8 +77,11 @@ export const addScribePlugins = (options) => {
 			attributes = defaultConfig.attributes[tag],
 			obj = {};
 
-		if(attributes) {
+		if(Array.isArray(attributes)) {
 			attributes.forEach(attr => obj[attr] = true);
+		}
+		else if(attributes) {
+			return attributes;
 		}
 
 		return obj;
@@ -76,7 +91,9 @@ export const addScribePlugins = (options) => {
 		p: {},
 		strong: {},
 		em: {},
-		table: {},
+		table: {
+			class: 'table'
+		},
 		tbody: {},
 		tr: {},
 		td: {},
