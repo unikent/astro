@@ -72,11 +72,6 @@ export default {
 				icon: 'italic'
 			},
 			{
-				tag: 'h3',
-				command: 'h3',
-				label: 'Sub-heading'
-			},
-			{
 				tag: 'a',
 				label: 'Link',
 				icon: 'link',
@@ -104,6 +99,12 @@ export default {
 				command: 'insertOrderedList',
 				label: 'Ordered list',
 				icon: 'list-ol'
+			},
+			{
+				tag: 'h3',
+				command: 'h3',
+				label: 'Sub-heading',
+				icon: 'h3'
 			}
 			// {
 			// 	label: 'Table',
