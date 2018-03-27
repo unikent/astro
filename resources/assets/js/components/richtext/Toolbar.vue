@@ -11,6 +11,7 @@
 			class="richtext-toolbar__tooltip"
 			:aria-label="item.label"
 			:data-command-name="item.command || null"
+			:data-command-ignore="!!item.menu"
 		>
 			<icon
 				:name="item.icon"
@@ -75,6 +76,7 @@ export default {
 				tag: 'a',
 				label: 'Link',
 				icon: 'link',
+				command: 'linkPrompt',
 
 				menu: [
 					{

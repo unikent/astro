@@ -11,8 +11,9 @@ export default (toolbarNode) => {
 
 		const
 			updateToolbar = button => {
-				const command = scribe.getCommand(button.dataset.commandName);
-				let selection = new scribe.api.Selection();
+				const
+					command = scribe.getCommand(button.dataset.commandName),
+					selection = new scribe.api.Selection();
 
 				if(selection.range && command.queryState(button.dataset.commandValue)) {
 					button.classList.add('active');
@@ -21,10 +22,7 @@ export default (toolbarNode) => {
 					button.classList.remove('active');
 				}
 
-				if(!selection.range) {
-					button.removeAttribute('disabled');
-				}
-				else if(command.queryEnabled()) {
+				if(!selection.range || command.queryEnabled()) {
 					button.removeAttribute('disabled');
 				}
 				else {
@@ -35,17 +33,18 @@ export default (toolbarNode) => {
 
 		[...buttons].forEach(button => {
 
-			button.addEventListener('mousedown', (e) => {
-				scribe.el.focus();
+			if(!button.dataset.commandIgnore) {
+				button.addEventListener('mousedown', (e) => {
 
-				selectClosestWord(scribe, button.dataset.commandName);
+					selectClosestWord(scribe, button.dataset.commandName);
 
-				scribe
-					.getCommand(button.dataset.commandName)
-					.execute(button.dataset.commandValue);
+					scribe
+						.getCommand(button.dataset.commandName)
+						.execute(button.dataset.commandValue);
 
-				e.preventDefault();
-			});
+					e.preventDefault();
+				});
+			}
 
 			const update = () => updateToolbar(button);
 
