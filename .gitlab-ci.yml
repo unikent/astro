@@ -29,6 +29,7 @@ before_script:
   - php artisan key:generate
   - php artisan migrate --database=mysql_test
   - yarn install
+  - ls -la ./vendor/unikent/astro-kent-theme
   - yarn run production
 
 after_script:
