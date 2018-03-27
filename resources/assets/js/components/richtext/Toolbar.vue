@@ -12,6 +12,7 @@
 			:aria-label="item.label"
 			:data-command-name="item.command || null"
 			:data-command-ignore="!!item.menu"
+			tabindex="0"
 		>
 			<icon
 				:name="item.icon"
