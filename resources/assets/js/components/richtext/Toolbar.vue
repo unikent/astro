@@ -14,9 +14,9 @@
 		>
 			<icon
 				:name="item.icon"
-				:width="14"
-				:height="14"
-				viewBox="0 0 14 14"
+				:width="item.size || 14"
+				:height="item.size || 14"
+				:viewBox="`0 0 ${item.size || 14} ${item.size || 14}`"
 			/>
 		</button>
 
@@ -104,7 +104,8 @@ export default {
 				tag: 'h3',
 				command: 'h3',
 				label: 'Sub-heading',
-				icon: 'h3'
+				icon: 'h3',
+				size: 20
 			}
 			// {
 			// 	label: 'Table',

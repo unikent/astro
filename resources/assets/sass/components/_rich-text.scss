@@ -24,12 +24,10 @@
 	z-index: 1;
 	border-bottom: 1px solid #dadde2;
 
-	.icon {
-		margin: 11px;
-	}
-
 	button {
-		display: inline-flex;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		border: 1px solid transparent;
 		background-color: transparent;
 		padding: 0;
