@@ -49,7 +49,7 @@
 
 	button.active {
 		border-color: #03a9f4;
-		background-color: #f7f9fb;
+		background-color: #dcedff;
 		color: #03a9f4;
 		fill: #03a9f4;
 		z-index: 2;
@@ -115,6 +115,18 @@
 	overflow: auto;
 	padding: 0 10px;
 	margin-top: -2px;
+	line-height: 1.8;
+
+	h3 {
+		font-weight: 500;
+		color: #05345c;
+		line-height: 1.1;
+		font-size: 1.05rem;
+	}
+
+	a {
+		color: #005689;
+	}
 
 	&:focus {
 		outline: 0;
@@ -168,7 +180,7 @@
 .richtext-toolbar__tooltip:after {
 	background: #383838;
 	border-radius: 4px;
-	bottom: 100%;
+	top: 100%;
 	color: #fff;
 	font-size: 13px;
 	left: 50%;
@@ -184,7 +196,7 @@
 
 .richtext-toolbar__tooltip:hover:after {
 	opacity: 1;
-	transform: translate(-50%, -30%);
+	transform: translate(-50%, 15%);
 	transition-delay: 200ms;
 }
 
