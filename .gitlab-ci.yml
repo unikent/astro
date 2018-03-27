@@ -28,7 +28,10 @@ before_script:
   - composer install --prefer-dist
   - php artisan key:generate
   - php artisan migrate --database=mysql_test
-  - ls -la ./vendor/unikent/astro-kent-theme
+  - cd ./vendor/unikent/astro-kent-theme
+  - yarn link
+  - cd
+  - yarn link "astro-kent-theme"
   - yarn install
   - yarn run production
 
