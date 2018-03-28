@@ -197,7 +197,6 @@ class BaseDefinitionTest extends TestCase
 
 	/**
 	 * @test
-	 @group wip
 	 */
 	public function fromDefinitionFile_WhenRedisNotAvailable_LoadsFromFile(){
 		if (Config::get('database.redis.active')) {
