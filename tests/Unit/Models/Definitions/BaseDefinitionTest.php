@@ -2,6 +2,7 @@
 namespace Tests\Unit\Models\Definitions;
 
 use Config;
+use Exception;
 use Tests\TestCase;
 use App\Models\Definitions\BaseDefinition;
 use Illuminate\Support\Facades\Redis;
@@ -150,7 +151,6 @@ class BaseDefinitionTest extends TestCase
 
 	/**
 	 * @test
-	 * @group wip
 	 */
 	public function fromDefinitionFile_WhenNotCachedInRedis_LoadsFromFile(){
 		if (Config::get('database.redis.active')) {
@@ -168,7 +168,6 @@ class BaseDefinitionTest extends TestCase
 
 	/**
 	 * @test
-	 * @group wip
 	 */
 	public function fromDefinitionFile_WhenCachedInRedis_LoadsFromRedis(){
 		if (Config::get('database.redis.active')) {
@@ -182,4 +181,32 @@ class BaseDefinitionTest extends TestCase
 		}
 	}
 
+	/**
+	 * @test
+	 */
+	public function fromDefinitionFile_WhenRedisNotAvailable_ThrowsException(){
+		$this->expectException(Exception::class);
+		if (Config::get('database.redis.active')) {
+			Config::set('database.redis.default.port', -1);
+			Redis::flushDB();
+		}
+		else {
+			$this->markTestSkipped('Redis not configured');
+		}
+	}
+
+	/**
+	 * @test
+	 @group wip
+	 */
+	public function fromDefinitionFile_WhenRedisNotAvailable_LoadsFromFile(){
+		if (Config::get('database.redis.active')) {
+			Config::set('database.redis.default.port', -1);
+			$definition = DefinitionDouble::fromDefinitionFile($this->definition);
+			$this->assertNotNull($definition);
+		}
+		else {
+			$this->markTestSkipped('Redis not configured');
+		}
+	}
 }

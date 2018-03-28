@@ -381,7 +381,9 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
         $definition = null;
 
         if (Config::get('database.redis.active')) {
-            $definition = Redis::get($path);
+            try {
+                $definition = Redis::get($path);
+            } catch (Exception $e) {}
         }
 
         if (empty($definition)) {
@@ -390,7 +392,9 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
             }
             $definition = file_get_contents($path);
             if (Config::get('database.redis.active')) {
-                Redis::set($path, $definition);
+                try {
+                    Redis::set($path, $definition);
+                } catch (Exception $e) {}
             }
         }
 
