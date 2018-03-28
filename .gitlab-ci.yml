@@ -28,7 +28,9 @@ before_script:
   - composer install --prefer-dist
   - php artisan key:generate
   - php artisan migrate --database=mysql_test
+  - export DEFINITIONS_PATH=`pwd`/vendor/unikent/astro-kent-theme
   - yarn install
+  - yarn run production
 
 after_script:
   - rm -rf node_modules .git
