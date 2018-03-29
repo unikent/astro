@@ -12,31 +12,12 @@
 */
 
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Config;
-use Astro\Renderer\Base\SingleDefinitionsFolderLocator;
-use Astro\Renderer\Engines\TwigEngine;
-use Astro\Renderer\AstroRenderer;
-use App\Models\LocalAPIClient;
-use Illuminate\Http\Request;
-use App\Models\Page;
-use App\Http\Controllers\PageController;
 
 // Authentication routes
 $this->get('auth/login', 'Auth\AuthController@login')->name('auth.login');
 $this->post('auth/login', 'Auth\AuthController@loginLocal');
 $this->get('auth/sso/respond', 'Auth\AuthController@loginSSO')->name('auth.sso.respond');
 $this->post('auth/logout', 'Auth\AuthController@logout')->name('auth.logout');
-
-// Preview draft pages in editor.
-Route::get('/draft/{host}/{path?}', 'PageController@draft')
-	->where('host', '([^/]+)')
-	->where('path', '(.*?)/?')
-	->middleware('auth');
-
-// "Preview" published pages in editor.
-Route::get('/published/{host}/{path?}', 'PageController@published')
-	->where('host', '([^/]+)')
-	->where('path', '(.*?)/?');
 
 // SPA wrapper
 Route::get('/{catchall?}', function($route = '') {
