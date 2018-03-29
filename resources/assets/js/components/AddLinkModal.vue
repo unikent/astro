@@ -101,7 +101,7 @@
 			</el-tab-pane>
 		</el-tabs>
 		<span slot="footer" class="dialog-footer">
-			<el-button @click="visible = false">Cancel</el-button>
+			<el-button @click="reset">Cancel</el-button>
 			<el-button @click="addLink" type="primary">Insert</el-button>
 		</span>
 	</el-dialog>
@@ -125,7 +125,6 @@ export default {
 		return {
 			activeTab: 'internal',
 			visible: false,
-			type: 'richtext',
 			links: {
 				internal: {
 					text: '',
@@ -172,11 +171,12 @@ export default {
 	watch: {
 		visible(value) {
 			if(value) {
-				this.fetchMedia();
+				this.fetchData();
 			}
 		}
 	},
 
+	// TODO: replace these events with a single event and associated methods
 	created() {
 		this.$bus.$on('richtext:showAddLinkModal', this.showModalRichtext);
 		this.$bus.$on('block:showAddLinkModal', this.showModalBlock);
@@ -190,14 +190,12 @@ export default {
 	methods: {
 		showModalBlock({ callback, hideTextInputs }) {
 			this.visible = true;
-			this.type = 'block';
 			this.callback = callback;
 			this.hideTextInputs = hideTextInputs;
 		},
 
 		showModalRichtext({ callback, hideTextInputs }) {
 			this.visible = true;
-			this.type = 'richtext';
 			this.callback = callback;
 			this.hideTextInputs = hideTextInputs;
 		},
@@ -208,7 +206,7 @@ export default {
 			switch(this.activeTab) {
 				case 'internal':
 					tmp = this.sitePages.find(page => page.value === link);
-
+					// TODO: this logic doesn't work for homepages (depth 0), needs fixing.
 					for(let i = 0; i < this.currentPage.depth - 1; i++) {
 						val += '../';
 					}
@@ -258,7 +256,7 @@ export default {
 			this.reset();
 		},
 
-		fetchMedia() {
+		fetchData() {
 			this.$api
 				.get(`media?order=id.desc&site_ids[]=${this.siteId}`)
 				.then(({ data: json }) => {
