@@ -3636,7 +3636,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/astro-renderer.git",
-                "reference": "3431e83fe848a3f40952a479bbdc139250a3d7c1"
+                "reference": "49e1b61cde5295e93b8ff62245ba70644df798f5"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.2",
@@ -3664,7 +3664,7 @@
                 }
             ],
             "description": "A simple renderer for Astro",
-            "time": "2018-03-13T11:32:24+00:00"
+            "time": "2018-03-28T09:17:45+00:00"
         },
         {
             "name": "unikent/kent-profiles",
