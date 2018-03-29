@@ -22,6 +22,7 @@ const
 			case 'h4':
 			case 'h5':
 			case 'h6':
+			case 'linkPrompt':
 				return false;
 			default:
 				return true;
