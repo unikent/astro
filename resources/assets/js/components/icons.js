@@ -43,4 +43,4 @@ export { default as site }      from 'IconPath/site.svg';
 export { default as angleup }   from 'IconPath/angle-up.svg';
 export { default as angledown } from 'IconPath/angle-down.svg';
 export { default as write }     from 'IconPath/write.svg';
-export { default as cleartext } from 'IconPath/clear.svg';
+export { default as h3 }        from 'IconPath/h3.svg';

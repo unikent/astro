@@ -9,6 +9,7 @@ import scribePluginUnderlineCommand from 'plugins/scribe/ux/underline';
 import scribePluginBoldCommand from 'plugins/scribe/ux/bold';
 import scribePluginUnlinkCommand from 'plugins/scribe/ux/unlink';
 import scribePluginIndentCommand from 'plugins/scribe/ux/indent';
+import scribePluginKeyboardShortcuts from 'plugins/scribe/ux/keyboard-shortcuts';
 
 export const defaultConfig = {
 	allowedTags: ['h3', 'b', 'i', 'ul', 'ol', 'li', 'a'],
@@ -35,6 +36,8 @@ export const addScribePlugins = (options) => {
 	scribe.use(scribePluginToolbar(options.toolbar));
 	scribe.use(scribePluginInlineStyles());
 	scribe.use(scribePluginFormatterPlainTextConvertNewLinesToHtml());
+
+	scribe.use(scribePluginKeyboardShortcuts());
 
 	// add commands for each heading tag enabled
 	config.allowedTags

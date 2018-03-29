@@ -35,7 +35,7 @@ export default {
 
 	computed: {
 		glyph() {
-			const icon = icons[this.name.replace(/[^a-z]/g, '')] || icons.unknown;
+			const icon = icons[this.name.replace(/[^a-z0-9]/g, '')] || icons.unknown;
 
 			// In production mode the global "__HMR__" is set to false,
 			// and after minification this if condition is removed entirely.
