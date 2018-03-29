@@ -1,12 +1,12 @@
 import scribePluginInlineStyles from 'scribe-plugin-inline-styles-to-elements';
 import scribePluginFormatterPlainTextConvertNewLinesToHtml from 'scribe-plugin-formatter-plain-text-convert-new-lines-to-html';
 import scribePluginHeadingCommand from 'scribe-plugin-heading-command';
-import scribePluginLinkPromptCommand from 'scribe-plugin-link-prompt-command';
 import scribePluginSanitizer from 'scribe-plugin-sanitizer';
 
 import scribePluginToolbar from 'plugins/scribe/toolbar';
 import scribePluginUnderlineCommand from 'plugins/scribe/ux/underline';
 import scribePluginBoldCommand from 'plugins/scribe/ux/bold';
+import scribePluginLinkCommand from 'plugins/scribe/ux/link';
 import scribePluginUnlinkCommand from 'plugins/scribe/ux/unlink';
 import scribePluginIndentCommand from 'plugins/scribe/ux/indent';
 import scribePluginAddClasses from 'plugins/scribe/ux/add-classes';
@@ -67,7 +67,7 @@ export const addScribePlugins = (options) => {
 	}
 
 	if(config.allowedTags.includes('a')) {
-		scribe.use(scribePluginLinkPromptCommand());
+		scribe.use(scribePluginLinkCommand());
 		scribe.use(scribePluginUnlinkCommand());
 	}
 
