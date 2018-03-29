@@ -18,7 +18,8 @@ class Kernel extends ConsoleKernel
         Commands\AddSite::class,
         Commands\AddUser::class,
         Commands\SetupPermissions::class,
-		Commands\ManageAdmins::class
+		Commands\ManageAdmins::class,
+		Commands\ClearCache::class,
 	];
 
 	/**

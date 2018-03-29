@@ -1,8 +1,11 @@
 <?php
 namespace Tests\Unit\Models\Definitions;
 
-use App\Models\Definitions\BaseDefinition;
+use Config;
+use Exception;
 use Tests\TestCase;
+use App\Models\Definitions\BaseDefinition;
+use Illuminate\Support\Facades\Redis;
 use App\Exceptions\JsonDecodeException;
 use Tests\Support\Doubles\Models\Definitions\Double as DefinitionDouble;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
@@ -146,4 +149,63 @@ class BaseDefinitionTest extends TestCase
 		DefinitionDouble::fromDefinitionFile(sys_get_temp_dir() . '/foobar');
 	}
 
+	/**
+	 * @test
+	 */
+	public function fromDefinitionFile_WhenNotCachedInRedis_LoadsFromFile(){
+		if (Config::get('database.redis.active')) {
+			Redis::flushDB();
+			$definition_from_redis = Redis::get($this->definition);
+			$this->assertNull($definition_from_redis);
+			$definition = DefinitionDouble::fromDefinitionFile($this->definition);
+			$definition_from_redis = Redis::get($this->definition);
+			$this->assertNotNull($definition_from_redis);
+		}
+		else {
+			$this->markTestSkipped('Redis not configured');
+		}
+	}
+
+	/**
+	 * @test
+	 */
+	public function fromDefinitionFile_WhenCachedInRedis_LoadsFromRedis(){
+		if (Config::get('database.redis.active')) {
+			Redis::flushDB();
+			Redis::set($this->definition, file_get_contents($this->definition));
+			$definition = DefinitionDouble::fromDefinitionFile($this->definition);
+			$this->assertNotNull($definition);
+		}
+		else {
+			$this->markTestSkipped('Redis not configured');
+		}
+	}
+
+	/**
+	 * @test
+	 */
+	public function fromDefinitionFile_WhenRedisNotAvailable_ThrowsException(){
+		$this->expectException(Exception::class);
+		if (Config::get('database.redis.active')) {
+			Config::set('database.redis.default.port', -1);
+			Redis::flushDB();
+		}
+		else {
+			$this->markTestSkipped('Redis not configured');
+		}
+	}
+
+	/**
+	 * @test
+	 */
+	public function fromDefinitionFile_WhenRedisNotAvailable_LoadsFromFile(){
+		if (Config::get('database.redis.active')) {
+			Config::set('database.redis.default.port', -1);
+			$definition = DefinitionDouble::fromDefinitionFile($this->definition);
+			$this->assertNotNull($definition);
+		}
+		else {
+			$this->markTestSkipped('Redis not configured');
+		}
+	}
 }
