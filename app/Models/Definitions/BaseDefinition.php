@@ -4,6 +4,7 @@ namespace App\Models\Definitions;
 use Config;
 use Exception;
 use JsonSerializable;
+use Illuminate\Support\Facades\Redis;
 use App\Exceptions\JsonDecodeException;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
@@ -377,11 +378,27 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
      */
     public static function fromDefinitionFile($path)
     {
-    	if(!file_exists($path)){
-    		throw new FileNotFoundException($path);
-    	}
+        $definition = null;
 
-    	return static::fromDefinition(file_get_contents($path));
+        if (Config::get('database.redis.active')) {
+            try {
+                $definition = Redis::get($path);
+            } catch (Exception $e) {}
+        }
+
+        if (empty($definition)) {
+            if(!file_exists($path)){
+                throw new FileNotFoundException($path);
+            }
+            $definition = file_get_contents($path);
+            if (Config::get('database.redis.active')) {
+                try {
+                    Redis::set($path, $definition);
+                } catch (Exception $e) {}
+            }
+        }
+
+    	return static::fromDefinition($definition);
     }
 
 	/**
