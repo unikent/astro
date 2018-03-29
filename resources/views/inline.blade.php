@@ -24,6 +24,7 @@
 		'csrf_token' => csrf_token(),
 		'base_url' => Request::getBaseUrl(),
 		'api_url' => env('ASTRO_API_URL'),
+		'logout_url' => env('ASTRO_LOGOUT_URL'),
 		'username' => $username,
 		'user'     => $user,
 		'api_token' => $api_token,

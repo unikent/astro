@@ -42,9 +42,7 @@ export default {
 	output: {
 		path: path.resolve(__dirname, 'public/build'),
 		filename: isProduction ? 'js/[name].js?[chunkhash]' : 'js/[name].js',
-		publicPath: isProduction ? '/site-editor/build/' : (
-			hmrEnabled ? `${hmrURL}/build/` : '/build/'
-		)
+		publicPath:  process.env.PUBLIC_PATH + (hmrEnabled ? `${hmrURL}/build/` : '/build/')
 	},
 
 	module: {
