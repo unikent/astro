@@ -3,75 +3,77 @@
 	<back-bar
 		:title="definition && definition.label ? definition.label : title"
 	/>
-	<div class="block-options-list custom-scrollbar" ref="options-list">
-		<block-form
-			v-if="definition"
-			label-position="top"
-			:model="fields"
-			:rules="rules"
-		>
-			<el-form-item
-				v-for="fieldDefinition in definition.fields"
-				:label="fieldDefinition.label"
-				:prop="fieldDefinition.name"
-				:error="
-					typeof errors[fieldDefinition.name] === 'string' ?
-						errors[fieldDefinition.name] :
-						null
-				"
-				:key="fieldDefinition.name"
+	<div class="block-options-list-scroll custom-scrollbar" ref="options-list">
+		<div class="block-options-list" ref="options-list">
+			<block-form
+				v-if="definition"
+				label-position="top"
+				:model="fields"
+				:rules="rules"
 			>
-				<template slot="label" v-if="fieldDefinition.label">
-					<span>{{ fieldDefinition.label }}</span>
-
-					<el-tooltip
-						v-if="fieldDefinition.info"
-						popper-class="el-tooltip__popper--narrow"
-						:content="fieldDefinition.info"
-						placement="top"
-					>
-						<icon
-							class="el-form-item__icon-help"
-							name="help-circle"
-							:width="15"
-							:height="15"
-							viewBox="0 0 15 15"
-						/>
-					</el-tooltip>
-
-					<!-- <el-tooltip content="Highlight field" placement="top">
-						<span
-							class="el-form-item__icon-view"
-							@click="viewField(fieldDefinition.name)"
-						>
-							<icon
-								name="eye"
-								:width="14"
-								:height="14"
-								viewBox="0 0 14 14"
-							/>
-						</span>
-					</el-tooltip> -->
-
-				</template>
-				<component
-					:is="getField(fieldDefinition.type)"
-					:field="fieldDefinition"
-					:path="fieldDefinition.name"
-					:index="currentIndex"
-					:key="`${definition.name}-${currentIndex}`"
-					:currentDefinition="definition"
-					:errors="
-						typeof errors[fieldDefinition.name] !== 'string' ?
+				<el-form-item
+					v-for="fieldDefinition in definition.fields"
+					:label="fieldDefinition.label"
+					:prop="fieldDefinition.name"
+					:error="
+						typeof errors[fieldDefinition.name] === 'string' ?
 							errors[fieldDefinition.name] :
 							null
 					"
-				/>
-			</el-form-item>
+					:key="fieldDefinition.name"
+				>
+					<template slot="label" v-if="fieldDefinition.label">
+						<span>{{ fieldDefinition.label }}</span>
 
-		</block-form>
+						<el-tooltip
+							v-if="fieldDefinition.info"
+							popper-class="el-tooltip__popper--narrow"
+							:content="fieldDefinition.info"
+							placement="top"
+						>
+							<icon
+								class="el-form-item__icon-help"
+								name="help-circle"
+								:width="15"
+								:height="15"
+								viewBox="0 0 15 15"
+							/>
+						</el-tooltip>
 
-		<slot v-else />
+						<!-- <el-tooltip content="Highlight field" placement="top">
+							<span
+								class="el-form-item__icon-view"
+								@click="viewField(fieldDefinition.name)"
+							>
+								<icon
+									name="eye"
+									:width="14"
+									:height="14"
+									viewBox="0 0 14 14"
+								/>
+							</span>
+						</el-tooltip> -->
+
+					</template>
+					<component
+						:is="getField(fieldDefinition.type)"
+						:field="fieldDefinition"
+						:path="fieldDefinition.name"
+						:index="currentIndex"
+						:key="`${definition.name}-${currentIndex}`"
+						:currentDefinition="definition"
+						:errors="
+							typeof errors[fieldDefinition.name] !== 'string' ?
+								errors[fieldDefinition.name] :
+								null
+						"
+					/>
+				</el-form-item>
+
+			</block-form>
+
+			<slot v-else />
+		</div>
 	</div>
 </div>
 

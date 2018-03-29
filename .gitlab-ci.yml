@@ -5,18 +5,20 @@ cache:
   paths:
     - $HOME/.composer/cache
     - vendor/
-    - node_modules/
+    # - node_modules/
 
 services:
   - mysql:latest
+  - redis:latest
 variables:
   MYSQL_DATABASE: test
   MYSQL_ROOT_PASSWORD: test
+  REDIS_PORT: 6379
 
 before_script:
   - php --version
   - composer --version
-  - yarn --version
+  # - yarn --version
   - mv .env.gitlab .env
   - mkdir -p ~/.ssh
   - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
@@ -28,7 +30,11 @@ before_script:
   - composer install --prefer-dist
   - php artisan key:generate
   - php artisan migrate --database=mysql_test
+  - export DEFINITIONS_PATH=`pwd`/vendor/unikent/astro-kent-theme
+  - export PUBLIC_PATH=/site-editor-new
+  - export ASTRO_LOGOUT_URL=/site-editor-new/auth/logout
   - yarn install
+  - yarn run production
 
 after_script:
   - rm -rf node_modules .git
@@ -40,8 +46,10 @@ stages:
 test:
   stage: test
   script:
+    - php artisan key:generate
+    - php artisan migrate --database=mysql_test
     - vendor/bin/phpunit
-    - yarn run validate
+    # - yarn run validate
 
 artifacts-experimental:
   stage: build

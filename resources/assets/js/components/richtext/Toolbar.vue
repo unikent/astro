@@ -11,12 +11,14 @@
 			class="richtext-toolbar__tooltip"
 			:aria-label="item.label"
 			:data-command-name="item.command || null"
+			:data-command-ignore="!!item.menu"
+			tabindex="0"
 		>
 			<icon
 				:name="item.icon"
-				:width="14"
-				:height="14"
-				viewBox="0 0 14 14"
+				:width="item.size || 14"
+				:height="item.size || 14"
+				:viewBox="`0 0 ${item.size || 14} ${item.size || 14}`"
 			/>
 		</button>
 
@@ -72,26 +74,10 @@ export default {
 				icon: 'italic'
 			},
 			{
-				tag: 'h3',
-				command: 'h3',
-				label: 'Sub-heading'
-			},
-			{
-				tag: 'ul',
-				command: 'insertUnorderedList',
-				label: 'Unordered list',
-				icon: 'list'
-			},
-			{
-				tag: 'ol',
-				command: 'insertOrderedList',
-				label: 'Ordered list',
-				icon: 'list-ol'
-			},
-			{
 				tag: 'a',
 				label: 'Link',
 				icon: 'link',
+				command: 'linkPrompt',
 
 				menu: [
 					{
@@ -106,11 +92,24 @@ export default {
 				]
 			},
 			{
-				tag: '*',
-				command: 'removeFormat',
-				label: 'Remove Formatting',
-				icon: 'cleartext'
+				tag: 'ul',
+				command: 'insertUnorderedList',
+				label: 'Unordered list',
+				icon: 'list'
 			},
+			{
+				tag: 'ol',
+				command: 'insertOrderedList',
+				label: 'Ordered list',
+				icon: 'list-ol'
+			},
+			{
+				tag: 'h3',
+				command: 'h3',
+				label: 'Sub-heading',
+				icon: 'h3',
+				size: 20
+			}
 			// {
 			// 	label: 'Table',
 			// 	icon: 'table',
