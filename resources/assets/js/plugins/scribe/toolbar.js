@@ -35,6 +35,7 @@ export default (toolbarNode) => {
 
 			if(!button.dataset.commandIgnore) {
 				button.addEventListener('mousedown', (e) => {
+					scribe.el.focus();
 
 					selectClosestWord(scribe, button.dataset.commandName);
 
