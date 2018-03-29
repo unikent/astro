@@ -15,6 +15,7 @@ import Date          from './Date';
 import Time          from './Time';
 import DateTime      from './DateTime';
 import NestedOptions from './NestedOptions';
+import Link          from './Link';
 
 export default {
 	text:        Text,
@@ -33,5 +34,6 @@ export default {
 	date:        Date,
 	time:        Time,
 	datetime:    DateTime,
-	nested:      NestedOptions
+	nested:      NestedOptions,
+	link:        Link
 };
