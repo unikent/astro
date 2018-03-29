@@ -121,5 +121,5 @@ const routes = [
 export const router = new VueRouter({
 	mode: 'history',
 	routes,
-	base: `${Config.get('base_url', '')}/`
+	base: `${Config.get('base_url', '')}`
 });

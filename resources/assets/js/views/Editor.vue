@@ -129,6 +129,7 @@ export default {
 			'canUser'
 		]),
 
+		// get the URL for the route to show the editor preview page (not the external page preview)
 		getPreviewUrl() {
 			// TODO: Don't reload page when page_id changes, use state instead
 			return `${Config.get('base_url', '')}/preview/${this.$route.params.page_id}`;

@@ -28,7 +28,13 @@ before_script:
   - composer config -g github-oauth.github.com ${GITHUB_TOKEN}
   - composer validate --no-check-all --ansi
   - composer install --prefer-dist
-  # - yarn install
+  - php artisan key:generate
+  - php artisan migrate --database=mysql_test
+  - export DEFINITIONS_PATH=`pwd`/vendor/unikent/astro-kent-theme
+  - export PUBLIC_PATH=/site-editor-new
+  - export ASTRO_LOGOUT_URL=/site-editor-new/auth/logout
+  - yarn install
+  - yarn run production
 
 after_script:
   - rm -rf node_modules .git

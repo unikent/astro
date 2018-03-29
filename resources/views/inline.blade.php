@@ -23,7 +23,8 @@
 	window.astro = <?php echo json_encode([
 		'csrf_token' => csrf_token(),
 		'base_url' => Request::getBaseUrl(),
-		'api_url' => '/api/v1/',
+		'api_url' => env('ASTRO_API_URL'),
+		'logout_url' => env('ASTRO_LOGOUT_URL'),
 		'username' => $username,
 		'user'     => $user,
 		'api_token' => $api_token,
