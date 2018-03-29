@@ -25,7 +25,7 @@
 						:label="item.label"
 						:value="item.value"
 					>
-						<spanclass="add-link-modal__page-select-label">
+						<span class="add-link-modal__page-select-label">
 							{{ item.label }}
 						</span>
 						<span class="add-link-modal__page-select-value">
