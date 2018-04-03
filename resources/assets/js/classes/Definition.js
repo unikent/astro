@@ -12,7 +12,7 @@ export default class Definition {
 		multiselect: 'array',
 		radio      : '*',
 		buttongroup: '*',
-		link       : '*',
+		link       : 'string',
 		image      : 'object',
 		file       : 'object',
 		number     : 'number',
