@@ -157,8 +157,8 @@ export default {
 		}),
 
 		currentPage() {
-			const { id, path, depth } = this.$store.state.page.pageData;
-			return { id, path, depth };
+			const { id, path, depth, site } = this.$store.state.page.pageData;
+			return { id, path, depth, site };
 		},
 
 		sitePages() {
@@ -192,19 +192,15 @@ export default {
 		},
 
 		setLink(link) {
-			let tmp, val = './';
+			let tmp;
 
 			switch(this.activeTab) {
 				case 'internal':
 					tmp = this.sitePages.find(page => page.value === link);
-					// TODO: this logic doesn't work for homepages (depth 0), needs fixing.
-					for(let i = 0; i < this.currentPage.depth - 1; i++) {
-						val += '../';
-					}
 
 					link = {
 						text: tmp.label,
-						value: val + tmp.value.replace('/', '')
+						value: `https://${this.currentPage.site.host}${tmp.value}`
 					};
 					break;
 				case 'document':
@@ -231,8 +227,10 @@ export default {
 
 			switch(this.activeTab) {
 				case 'external':
-					// replace all protocols with HTTPS ¯\_(ツ)_/¯
-					value = 'https://' + value.replace(/^([A-Za-z]{3,9})?:(?:\/\/)?/, '');
+					// add HTTPS if no protocol is given
+					if(!value.match(/^([A-Za-z]{3,9})?:(?:\/\/)?/)) {
+						value = 'https://' + value;
+					}
 					break;
 				case 'email':
 					value = 'mailto:' + value;
