@@ -68,11 +68,15 @@ class RouteServiceProvider extends ServiceProvider
 	 */
 	public function map()
 	{
-		$this->mapApiRoutes();
-
-		$this->mapWebRoutes();
-
-		//
+		if(!env('DISABLE_API_ROUTES') || strtolower(env('DISABLE_API_ROUTES')) == 'false' ) {
+			$this->mapApiRoutes();
+		}
+		if(!env('DISABLE_PREVIEW_ROUTES') || strtolower(env('DISABLE_PREVIEW_ROUTES')) == 'false') {
+			$this->mapPreviewRoutes();
+		}
+		if(!env('DISABLE_WEB_ROUTES') || strtolower(env('DISABLE_WEB_ROUTES')) == 'false' ) {
+			$this->mapWebRoutes();
+		}
 	}
 
 	/**
@@ -87,6 +91,20 @@ class RouteServiceProvider extends ServiceProvider
 		Route::middleware('web')
 			->namespace($this->namespace)
 			->group(base_path('routes/web.php'));
+	}
+
+	/**
+	 * Define the "preview" routes for the application.
+	 *
+	 * These routes are used to preview draft and published versions of pages and all receive session state, CSRF protection, etc.
+	 *
+	 * @return void
+	 */
+	protected function mapPreviewRoutes()
+	{
+		Route::middleware('web')
+			->namespace($this->namespace)
+			->group(base_path('routes/preview.php'));
 	}
 
 	/**

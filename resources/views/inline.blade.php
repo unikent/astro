@@ -8,7 +8,7 @@
 
 	<link rel="icon" href="../../favicon.ico">
 
-	<title>Astro</title>
+	<title>Site Editor - University of Kent</title>
 
 	<link rel="stylesheet" href="{{ mix('/build/css/main.css') }}" />
 	@if ($is_preview)

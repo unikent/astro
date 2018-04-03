@@ -8,7 +8,7 @@
 
 	<link rel="icon" href="{{ url("/") }}/favicon.ico">
 
-	<title>Kent CMS</title>
+	<title>Site Editor - University of Kent</title>
 
 
 	<link rel="stylesheet" href="{{ mix('/build/css/main.css') }}" />

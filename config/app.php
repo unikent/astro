@@ -1,6 +1,6 @@
 <?php
 
-return [
+$config = [
 
 	/*
 	|--------------------------------------------------------------------------
@@ -210,7 +210,6 @@ return [
 		 */
 		Laravel\Tinker\TinkerServiceProvider::class,
 
-		KentAuth\AuthServiceProvider::class,
 		Baum\Providers\BaumServiceProvider::class,
 		Spatie\Fractal\FractalServiceProvider::class,
 		Intervention\Image\ImageServiceProvider::class,
@@ -286,3 +285,11 @@ return [
 	],
 
 ];
+
+$disable_kentauth = strtolower(env('DISABLE_KENTAUTH'));
+// don't add kentauth if we have disabled it
+if( !$disable_kentauth || $disable_kentauthenv == 'false' ) {
+	$config['providers'][] = KentAuth\AuthServiceProvider::class;
+}
+
+return $config;
