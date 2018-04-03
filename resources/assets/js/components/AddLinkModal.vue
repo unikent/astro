@@ -77,7 +77,7 @@
 				</div>
 			</el-tab-pane>
 			<el-tab-pane
-				name="doc"
+				name="document"
 				label="Document"
 			>
 				<paged-results
@@ -94,7 +94,7 @@
 						class="el-form-item__label add-link-modal__doc-link-text"
 					>Link text</label>
 					<el-input
-						v-model="links.doc.text"
+						v-model="links.document.text"
 						placeholder="Document name"
 					/>
 				</template>
@@ -138,7 +138,7 @@ export default {
 					text: '',
 					value: ''
 				},
-				doc: {
+				document: {
 					text: '',
 					value: '',
 					fileInfo: ''
@@ -175,6 +175,7 @@ export default {
 			}
 		}
 	},
+
 
 	// TODO: replace these events with a single event and associated methods
 	created() {
@@ -216,7 +217,7 @@ export default {
 						value: val + tmp.value.replace('/', '')
 					};
 					break;
-				case 'doc':
+				case 'document':
 					tmp = ` (${
 						link.filename.split('.').pop().toUpperCase()
 					} ${
@@ -246,7 +247,7 @@ export default {
 				case 'email':
 					value = 'mailto:' + value;
 					break;
-				case 'doc':
+				case 'document':
 					// TODO: prepend media URL
 					text += link.fileInfo;
 					break;
@@ -272,7 +273,8 @@ export default {
 
 		reset() {
 			Object.keys(this.links).forEach(tab => {
-				if(tab !== 'doc') {
+				// document links don't need to be reset
+				if(tab !== 'document') {
 					this.links[tab] = {
 						text: '',
 						value: ''
