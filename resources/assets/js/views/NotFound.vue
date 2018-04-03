@@ -6,6 +6,17 @@
 			<p>Let the support team know what page this happened on, and what you were trying to do at the time.</p>
 			<p>Thanks!</p>
 		</div>
-		<a class="el-button el-button--primary not-found__link" href="/site-editor">Back home</a>
+		<a class="el-button el-button--primary not-found__link" :href="baseUrl">Back home</a>
 	</div>
 </template>
+<script>
+	import Config from 'classes/Config';
+
+	export default {
+		computed: {
+			baseUrl() {
+				return Config.get('base_url') + '/';
+			}
+		}
+	}
+</script>
