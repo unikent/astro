@@ -200,7 +200,7 @@ export default {
 
 					link = {
 						text: tmp.label,
-						value: `https://${this.currentPage.site.host}${tmp.value}`
+						value: `https://${this.currentPage.site.host}${this.currentPage.site.path}${tmp.value}`
 					};
 					break;
 				case 'document':
