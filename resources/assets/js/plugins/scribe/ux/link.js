@@ -49,7 +49,7 @@ export default () => scribe => {
 			isCollapsed = selection.range.collapsed,
 			hideTextInputs = anchorNode || !isCollapsed;
 
-		eventBus.$emit('richtext:showAddLinkModal', {
+		eventBus.$emit('add-link-modal:show', {
 			callback: execute(selection, anchorNode, isCollapsed),
 			hideTextInputs
 		});

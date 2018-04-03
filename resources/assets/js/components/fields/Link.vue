@@ -17,7 +17,7 @@ export default {
 
 	methods: {
 		displayLinkPicker() {
-			this.$bus.$emit('block:showAddLinkModal', {
+			this.$bus.$emit('add-link-modal:show', {
 				callback: ({ value }) => this.updateFieldValue(this.path, value),
 				hideTextInputs: true
 			});

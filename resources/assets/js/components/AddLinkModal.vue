@@ -176,26 +176,16 @@ export default {
 		}
 	},
 
-
-	// TODO: replace these events with a single event and associated methods
 	created() {
-		this.$bus.$on('richtext:showAddLinkModal', this.showModalRichtext);
-		this.$bus.$on('block:showAddLinkModal', this.showModalBlock);
+		this.$bus.$on('add-link-modal:show', this.showModal);
 	},
 
 	beforeDestroy() {
-		this.$bus.$off('richtext:showAddLinkModal', this.showModalRichtext);
-		this.$bus.$off('block:showAddLinkModal', this.showModalBlock);
+		this.$bus.$off('add-link-modal:show', this.showModal);
 	},
 
 	methods: {
-		showModalBlock({ callback, hideTextInputs }) {
-			this.visible = true;
-			this.callback = callback;
-			this.hideTextInputs = hideTextInputs;
-		},
-
-		showModalRichtext({ callback, hideTextInputs }) {
+		showModal({ callback, hideTextInputs }) {
 			this.visible = true;
 			this.callback = callback;
 			this.hideTextInputs = hideTextInputs;
