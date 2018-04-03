@@ -4,9 +4,9 @@
 		:title="definition && definition.label ? definition.label : title"
 	/>
 	<div class="block-options-list-scroll custom-scrollbar" ref="options-list">
-		<div class="block-options-list" ref="options-list">
+		<div class="block-options-list">
 			<block-form
-				v-if="definition"
+				v-if="definition && definition.fields.length"
 				label-position="top"
 				:model="fields"
 				:rules="rules"
@@ -72,7 +72,9 @@
 
 			</block-form>
 
-			<slot v-else />
+			<slot v-else>
+				There are currently no options available.
+			</slot>
 		</div>
 	</div>
 </div>

@@ -82,7 +82,7 @@ export default {
 				var errorFields = document.getElementsByClassName('is-error');
 
 				// ...and get the block options list containing div
-				var optionsList = document.getElementById('block-options-list');
+				var optionsList = document.querySelector('.block-options-list-scroll');
 
 				// Now get the top/bottom of the first error
 				// we need to add on the top position of the scroll to make sure the next time we're not going to go back to the top of the div
