@@ -241,7 +241,7 @@ export default {
 					break;
 			}
 
-			this.callback({ text, value });
+			this.callback({ text, value, type: this.activeTab });
 			this.reset();
 		},
 

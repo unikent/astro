@@ -18,7 +18,8 @@ export const defaultConfig = {
 		a: {
 			href: true,
 			target: '_blank',
-			rel: true
+			rel: true,
+			'data-link-type':  true
 		},
 		ul: {
 			class: 'bullet-list'

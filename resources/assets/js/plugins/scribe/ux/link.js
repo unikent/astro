@@ -3,9 +3,10 @@ import { eventBus } from 'plugins/eventbus';
 export default () => scribe => {
 	var linkPromptCommand = new scribe.api.Command('createLink');
 
-	const execute = (selection, anchorNode, isCollapsed) => ({ text, value }) => {
+	const execute = (selection, anchorNode, isCollapsed) => ({ text, value, type }) => {
 		const
-			range = selection.range;
+			range = selection.range,
+			placeholderHref = 'http://__replace__.me';
 
 		if(anchorNode) {
 			range.selectNode(anchorNode);
@@ -14,12 +15,13 @@ export default () => scribe => {
 
 			scribe.api.Command.prototype.execute.call(
 				linkPromptCommand,
-				value
+				placeholderHref
 			);
 		}
 		else if(isCollapsed) {
 			const a = document.createElement('a');
 			a.setAttribute('href', value);
+			a.setAttribute('data-link-type', type);
 			a.textContent = text;
 
 			range.insertNode(a);
@@ -37,8 +39,16 @@ export default () => scribe => {
 
 			scribe.api.Command.prototype.execute.call(
 				linkPromptCommand,
-				value
+				placeholderHref
 			);
+		}
+
+		// this is gross but there isn't a good alternative
+		const link = scribe.el.querySelector(`a[href="${placeholderHref}"]`);
+
+		if(link) {
+			link.setAttribute('href', value);
+			link.setAttribute('data-link-type', type);
 		}
 	};
 
