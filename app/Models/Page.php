@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Events\PageEvent;
+use App\Validation\Brokers\BlockBroker;
 use DB;
 use Exception;
 use App\Models\Definitions\Layout as LayoutDefinition;
@@ -10,6 +11,7 @@ use \App\Models\Definitions\Block as BlockDefinition;
 use Baum\Node as BaumNode;
 use App\Models\Definitions\Layout;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Validator;
 
 /**
  * A Page represents a path in a hierarchical site structure.
@@ -482,11 +484,40 @@ class Page extends BaumNode
 					$block->order = $i;
 					$block->region_name = $region_name;
 					$block->section_name = $section['name'];
+					$block->errors = $this->validateBlock($block);
 					$block->save();
 				}
 			}
 		}
 	}
+
+	public function validateBlock($block)
+	{
+		$rules = [];
+		// ...load the Block definition...
+		$file = BlockDefinition::locateDefinition(
+			BlockDefinition::idFromNameAndVersion(
+				$block['definition_name'],
+				$block['definition_version']
+			)
+		);
+		$blockDefinition = BlockDefinition::fromDefinitionFile($file);
+
+		// ...load the validation rules from the definition...
+		$bb = new BlockBroker($blockDefinition);
+
+		// ...and then merge the block field validation rules.
+		foreach ($bb->getRules() as $field => $ruleset) {
+			$rules[$field] = $ruleset;
+		}
+		$validator = Validator::make($block->fields, $rules);
+		if ($validator->fails()) {
+			$errors = $validator->errors();
+			return $errors;
+		}
+		return null;
+	}
+
 
 	/**
 	 * Get the revisions to this page.
