@@ -31,6 +31,7 @@
 		'debug' => config('app.debug'),
 		'published_url_pattern' => env('APP_LIVE_URL_PATTERN'),
 		'draft_url_pattern' => env('APP_PREVIEW_URL_PATTERN'),
+		'assets_base_url' => env('ASSETS_BASE_URL'),
 		'machform_url' => env('MACHFORM_URL')
 	]); ?>;
 	</script>
