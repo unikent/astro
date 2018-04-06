@@ -25,9 +25,12 @@
 	<!-- @include('components.menu') -->
 	@yield('content')
 
+	@if (Auth::check()) 
+	<!-- don't include these in the login page -->
 	<script src="{{ mix('/build/js/manifest.js') }}"></script>
 	<script src="{{ mix('/build/js/vendor.js') }}"></script>
 	<script src="{{ mix('/build/js/main.js') }}"></script>
+	@endif
 	<!-- TODO: move kent bar JS into bundled dependencies -->
 
 </body>
