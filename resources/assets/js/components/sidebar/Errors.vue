@@ -70,9 +70,11 @@ export default {
 			el.contentWindow.scrollTo(0, pos.top + el.contentWindow.scrollY);
 
 			this.$store.dispatch('changeBlock', {
-				regionName: regionName,
+				regionName,
+				sectionIndex,
 				sectionName: this.$store.getters.getSection(regionName, sectionIndex).name,
-				blockIndex: blockIndex
+				blockIndex,
+				blockId
 			});
 
 			// scroll to the right bit of the block options side panel

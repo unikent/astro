@@ -132,8 +132,10 @@ export default {
 		editBlock() {
 			this.$store.dispatch('changeBlock', {
 				regionName: this.region,
+				sectionIndex: this.section,
 				sectionName: this.sectionName,
-				blockIndex: this.index
+				blockIndex: this.index,
+				blockId: this.uuid
 			});
 
 			this.$bus.$emit('block:showSelectedOverlay', this);
