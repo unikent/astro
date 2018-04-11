@@ -101,8 +101,7 @@ const mutations = {
 	},
 
 	updateFieldValue(state, { index, name, value, region, section }) {
-		let	idx = index;
-		let fields = state.pageData.blocks[region][section].blocks[idx].fields;
+		let fields = state.pageData.blocks[region][section].blocks[index].fields;
 
 		// if field exists just update it
 		if(_.has(fields, name)) {
@@ -184,16 +183,20 @@ const mutations = {
 		});
 
 		state.pageData.blocks[region][sectionIndex].blocks.splice(index, (replace ? 1 : 0), block || {});
+
+		// TODO: use state for this
+		Vue.nextTick(() => eventBus.$emit('block:updateBlockOverlays', index));
 	},
 
 	/**
 	 * Delete the specified block from the page.
+	 *
 	 * @param state
 	 * @param {string} region - The name of the region containing the block.
-	 * @param {number} index - The index of the block in its section.
 	 * @param {number} section - The index in the region of the section containing the block.
+	 * @param {number} index - The index of the block in its section.
 	 */
-	deleteBlock(state,  { region, index, section } ) {
+	deleteBlock(state,  { region, section, index }) {
 
 		state.pageData.blocks[region][section].blocks.splice(index, 1);
 		state.blockMeta.blocks[region][section].blocks.splice(index, 1);
