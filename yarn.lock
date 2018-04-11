@@ -3975,6 +3975,10 @@ just-extend@^1.1.27:
   dependencies:
     grunt "*"
 
+"kent-theme-assets@git+ssh://git@gitlab.kent.ac.uk:webdev/kent-theme-assets":
+  version "0.0.1"
+  resolved "git+ssh://git@gitlab.kent.ac.uk:webdev/kent-theme-assets#625d7ddbe4bb9824f2aeffa225640d01c1df3bcb"
+
 killable@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/killable/-/killable-1.0.0.tgz#da8b84bd47de5395878f95d64d02f2449fe05e6b"
