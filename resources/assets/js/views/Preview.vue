@@ -34,7 +34,7 @@
 							@click="moveBlock(-1)"
 							size="mini"
 						>
-						<i class="el-icon-arrow-up el-icon--left"></i>Move up
+							<i class="el-icon-arrow-up el-icon--left"></i>Move up
 						</el-button>
 
 						<el-button
@@ -43,7 +43,7 @@
 							@click="moveBlock(1)"
 							size="mini"
 						>
-						Move down<i class="el-icon-arrow-down el-icon--right"></i>
+							Move down<i class="el-icon-arrow-down el-icon--right"></i>
 						</el-button>
 					</el-button-group>
 
@@ -113,7 +113,7 @@ import { layouts } from 'helpers/themeExports';
 import { allowedOperations } from 'classes/SectionConstraints';
 import { disableLinks } from 'helpers/dom';
 
-/* global document, window, console */
+/* global document, console */
 /* eslint-disable no-console */
 
 export default {
@@ -266,7 +266,7 @@ export default {
 			this.$bus.$on('block:hideSelectedOverlay', this.hideSelectedOverlay);
 		},
 
-		validateLayout(){
+		validateLayout() {
 
 			let layoutName = `${this.currentLayout}-v${this.layoutVersion}`;
 			let layoutErrors = [];
@@ -343,15 +343,6 @@ export default {
 			this.$store.commit('setLayoutErrors', layoutErrors);
 		},
 
-		removeDialog(done) {
-			this
-				.$confirm('Are you sure you want to remove this block?')
-				.then(() => {
-					done();
-				})
-				.catch(() => {});
-		},
-
 		removeBlock() {
 			// remove block but before we do so remove any validation issues it owns
 			const { index, region, section } = this.hoveredBlock;
@@ -369,6 +360,7 @@ export default {
 
 		moveBlock(num) {
 			const { index, region, section } = this.hoveredBlock;
+
 			this.reorderBlocks({
 				from: index,
 				to: index + num,
@@ -412,7 +404,7 @@ export default {
 				if(this.hoveredBlock.index !== index) {
 					this.positionOverlay(this.hoveredBlock);
 				}
-				else if(this.hoveredBlock && this.hoveredBlock.index === index) {
+				else {
 					this.hideOverlay();
 					this.hoveredBlock = null;
 				}
@@ -434,11 +426,12 @@ export default {
 				return;
 			}
 
-			var
+			const
 				pos = block.$el.getBoundingClientRect(),
 				heightDiff = Math.round(pos.height - 30),
-				widthDiff = Math.round(pos.width - 30),
-				minusTop = 0,
+				widthDiff = Math.round(pos.width - 30);
+
+			let minusTop = 0,
 				minusLeft = 0,
 				addHeight = 0,
 				addWidth = 0;
@@ -461,8 +454,8 @@ export default {
 			}
 
 			this.updateStyles(type === 'hover' ? 'blockOverlay' : 'selectedOverlay', {
-				transform: `translateY(${(pos.top + window.scrollY - minusTop)}px)`,
-				left     : `${(pos.left + window.scrollX - minusLeft)}px`,
+				transform: `translateY(${(pos.top + win.scrollY - minusTop)}px)`,
+				left     : `${(pos.left + win.scrollX - minusLeft)}px`,
 				width    : `${(pos.width + addWidth)}px`,
 				height   : `${(pos.height + addHeight)}px`
 			});
@@ -474,7 +467,6 @@ export default {
 				this.currentSectionBlocks = section.blocks;
 				this.sectionConstraints = section ? allowedOperations(section.blocks, this.sectionDefinition) : null;
 			}
-
 		},
 
 		updateStyles(dataName, prop, value) {
