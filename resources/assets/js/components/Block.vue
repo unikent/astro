@@ -23,7 +23,7 @@ import { mapState, mapGetters, mapMutations } from 'vuex';
 import imagesLoaded from 'imagesloaded';
 
 import { blocks } from 'helpers/themeExports';
-import { disableForms } from 'helpers/dom';
+import { disableForms, findParent } from 'helpers/dom';
 
 export default {
 
@@ -145,13 +145,17 @@ export default {
 
 		hideHoverOverlay(e) {
 			if(
-				e.relatedTarget !== null ||
-				(
-					e.relatedTarget && (
-						!e.relatedTarget.hasAttribute('class') ||
-						e.relatedTarget.getAttribute('class').indexOf('b-block') === -1
-					)
-				)
+				e.relatedTarget &&
+				!findParent({
+					el: e.relatedTarget,
+					match: 'class',
+					search: [
+						'block-overlay',
+						'b-block-container',
+						'el-tooltip__popper',
+						'el-dropdown-menu'
+					]
+				})
 			) {
 				this.$bus.$emit('block:hideHoverOverlay', this);
 			}

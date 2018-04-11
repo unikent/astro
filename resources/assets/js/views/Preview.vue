@@ -68,6 +68,7 @@
 				:class="{ 'add-before--first' : hoveredBlockIsFirst }"
 				@click="showBlockList()"
 				v-if="sectionConstraints && sectionConstraints.canAddBlocks"
+				@mouseleave="possiblyHideOverlay"
 			>
 				<icon name="plus" :width="16" :height="16" viewBox="0 0 16 16" />
 			</div>
@@ -76,6 +77,7 @@
 				:class="{ 'add-after--last' : hoveredBlockIsLast }"
 				@click="showBlockList(1)"
 				v-if="sectionConstraints && sectionConstraints.canAddBlocks"
+				@mouseleave="possiblyHideOverlay"
 			>
 				<icon name="plus" :width="16" :height="16" viewBox="0 0 16 16" />
 			</div>
@@ -111,7 +113,7 @@ import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
 import { layouts } from 'helpers/themeExports';
 import { allowedOperations } from 'classes/SectionConstraints';
-import { disableLinks } from 'helpers/dom';
+import { disableLinks, findParent } from 'helpers/dom';
 
 /* global document, console */
 /* eslint-disable no-console */
@@ -389,6 +391,20 @@ export default {
 				imagesLoaded(block.$el, () => {
 					this.positionOverlay(block);
 				});
+			}
+		},
+
+		possiblyHideOverlay(e) {
+			// only hide overlay if the related target isn't a block
+			if(
+				e.relatedTarget &&
+				!findParent({
+					el: e.relatedTarget,
+					match: 'class',
+					search: 'b-block-container'
+				})
+			) {
+				this.hideOverlay();
 			}
 		},
 
