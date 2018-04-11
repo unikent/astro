@@ -1,16 +1,12 @@
 <template>
 	<div
 		class="b-block-container"
-		:style="stylesOuter"
 		:id="blockIdentifier"
 		@mouseenter="showHoverOverlay"
 		@mouseleave="hideHoverOverlay"
 		@click="editBlock"
 	>
-		<div
-			class="block"
-			:style="stylesInner"
-		>
+		<div class="block">
 			<component
 				v-if="type !== 'placeholder'"
 				:is="currentView"
@@ -70,23 +66,10 @@ export default {
 		}
 
 	},
+
 	data() {
-
-		let startValues = {
-			y: 0,
-			z: 0,
-			scale: 1,
-			pointer: 'auto',
-			shadow: 0,
-			transition: 'transform 0.2s ease-out',
-			scroll: 0
-		};
-
 		return {
-			start: { ...startValues },
-			current: { ...startValues },
 			size: null,
-			prevOver: null,
 			currentView: blocks[this.type] ? blocks[this.type] : {
 				template: `
 					<div class="missing-definition-warning">
@@ -107,28 +90,6 @@ export default {
 			'getBlockMeta'
 		]),
 
-		stylesOuter() {
-			return {
-				transform: this.offset === 0 ?
-					'' : `translate3d(0, ${ this.offset + this.current.y }px, 0)`,
-				zIndex: this.current.z,
-				transition: 'none',
-				pointerEvents: this.current.pointer
-			}
-		},
-
-		stylesInner() {
-			// TODO: animate opacity, not box-shadow, for buttery smooth animation
-			return {
-				transform: `scale(${this.current.scale})`,
-				boxShadow: `rgba(0, 0, 0, 0.2) 0px ${this.current.shadow}px ${this.current.shadow * 2}px 0px`,
-				transition: this.current.transition
-			}
-		},
-
-		offset() {
-			return 0;
-		},
 
 		blockIdentifier() {
 			return 'block_' + this.index;
