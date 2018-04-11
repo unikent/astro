@@ -19,13 +19,17 @@ const state = {
 	 */
 	currentSectionName: null,
 	/**
+	 * @type {string} The index of the currently selected block's section, within its region.
+	 */
+	currentSectionIndex: null,
+	/**
 	 * @type {number} The index of the currently selected block in its section.
 	 */
 	currentBlockIndex: null,
 	/**
-	 * @type {components/Block} - The currently selected block in the editor.
+	 * @type {components/Block} - The id of the currently selected block in the editor.
 	 */
-	selectedBlock: null
+	currentBlockId: null
 };
 
 const getters = {
@@ -130,21 +134,26 @@ const mutations = {
 	 * @param state
 	 * @param {string} regionName
 	 * @param {string} sectionName
+	 * @param {string} sectionIndex
 	 * @param {number} blockIndex
+	 * @param {number} blockId
 	 */
-	setCurrentBlock( state, { regionName, sectionName, blockIndex }) {
+	setCurrentBlock(state, {
+		regionName,
+		sectionName,
+		sectionIndex,
+		blockIndex,
+		blockId
+	}) {
 		state.currentBlockIndex = blockIndex;
 		state.currentRegionName = regionName;
 		state.currentSectionName = sectionName;
+		state.currentSectionIndex = sectionIndex;
+		state.currentBlockId = blockId;
 	},
 
-	/**
-	 * Sets the currently selected Block component.
-	 *
-	 * @param {components/Block} block - The Block.vue component which is currently selected in the block editor.
-	 */
-	setSelectedBlock(block) {
-		state.selectedBlock = block;
+	setCurrentBlockIndex(state, index) {
+		state.currentBlockIndex = index;
 	}
 };
 
@@ -158,14 +167,17 @@ const actions = {
 	 * @param {Object} payload
 	 *    @param {string} regionName
 	 *    @param {string} sectionName
+	 *    @param {string} sectionIndex
 	 *    @param {string} blockIndex
+	 *    @param {string} blockId
 	 */
 	changeBlock({ commit, state, rootState }, payload) {
 		// have we actually selected a different block?
-		if(state.currentBlockIndex !== payload.blockIndex || state.currentRegionName !== payload.regionName || state.currentSectionName !== payload.sectionName) {
+		if(state.currentBlockId !== payload.blockId) {
 			commit('setCurrentBlock', payload);
 			commit('collapseSidebar');
 		}
+
 		// make sure we get to see the block menu if we're currently seeing the pages or other sidebar and a user clicks on any block
 		if(rootState.menu.active !== 'blocks') {
 			commit('updateMenuActive', 'blocks');
