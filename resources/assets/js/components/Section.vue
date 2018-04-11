@@ -10,14 +10,16 @@
 			:key="`block-${blockData.id}`"
 			:type="getBlockType(blockData)"
 			:index="index"
+			:uuid="blockData.id"
 			:blockData="blockData"
 		/>
 	</template>
 	<empty-section
-			:region="region"
-			:section="section"
-			:sectionData="sectionData"
-			v-else />
+		v-else
+		:region="region"
+		:section="section"
+		:sectionData="sectionData"
+	/>
 </div>
 </template>
 
@@ -27,7 +29,7 @@ import EmptySection from 'components/EmptySection';
 
 export default {
 
-	name: 'section',
+	name: 'region-section',
 
 	props: {
 

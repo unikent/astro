@@ -19,9 +19,10 @@
 </template>
 
 <script>
-import { blocks } from 'helpers/themeExports';
 import { mapState, mapGetters, mapMutations } from 'vuex';
 import imagesLoaded from 'imagesloaded';
+
+import { blocks } from 'helpers/themeExports';
 import { disableForms } from 'helpers/dom';
 
 export default {
@@ -63,6 +64,12 @@ export default {
 		sectionName: {
 			type: String,
 			required: true
+		},
+
+		// unique identifier for this block
+		uuid: {
+			type: [Number, String],
+			required: true
 		}
 
 	},
@@ -92,7 +99,7 @@ export default {
 
 
 		blockIdentifier() {
-			return 'block_' + this.index;
+			return `block_${this.uuid}`;
 		}
 	},
 
