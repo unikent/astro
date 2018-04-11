@@ -8,40 +8,45 @@ use Illuminate\Support\Facades\Redis;
 
 class ClearCache extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'astro:clearcache';
+	/**
+	 * The name and signature of the console command.
+	 *
+	 * @var string
+	 */
+	protected $signature = 'astro:clearcache';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'A tool to crear the redis caches';
+	/**
+	 * The console command description.
+	 *
+	 * @var string
+	 */
+	protected $description = 'A tool to crear the redis caches';
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
+	/**
+	 * Create a new command instance.
+	 *
+	 * @return void
+	 */
+	public function __construct()
+	{
+		parent::__construct();
+	}
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle()
-    {
-        // chear the redis cache if its being used
-        if (Config::get('database.redis.active')) {
-            Redis::flushDB();
-        }
-    }
+	/**
+	 * Execute the console command.
+	 *
+	 * @return mixed
+	 */
+	public function handle()
+	{
+		// chear the redis cache if its being used
+		if (Config::get('database.redis.active')) {
+			try {
+				Redis::flushDB();
+				$this->info('Redis cache cleared');
+			} catch (\Exception $e) {
+				$this->warn("Redis cache flush failed:\n\n" . $e->getMessage());
+			}
+		}
+	}
 }
