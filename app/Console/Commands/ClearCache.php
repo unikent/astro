@@ -41,7 +41,12 @@ class ClearCache extends Command
     {
         // chear the redis cache if its being used
         if (Config::get('database.redis.active')) {
-            Redis::flushDB();
+        	try {
+				Redis::flushDB();
+				$this->info('Redis cache cleared');
+			}catch(\Exception $e) {
+        		$this->warn("Redis cache flush failed:\n\n" . $e->getMessage());
+			}
         }
     }
 }
