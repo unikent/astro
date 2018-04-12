@@ -146,6 +146,7 @@ export default {
 			},
 			selectValue: null,
 			media: [],
+			site: null,
 			pages: [],
 			hideTextInputs: false
 		};
@@ -155,11 +156,6 @@ export default {
 		...mapState({
 			siteId: state => state.site.site
 		}),
-
-		currentPage() {
-			const { id, path, depth, site } = this.$store.state.page.pageData;
-			return { id, path, depth, site };
-		},
 
 		sitePages() {
 			return this.pages.map(
@@ -200,7 +196,7 @@ export default {
 
 					link = {
 						text: tmp.label,
-						value: `https://${this.currentPage.site.host}${this.currentPage.site.path}${tmp.value}`
+						value: `https://${this.site.host}${this.site.path}${tmp.value}`
 					};
 					break;
 				case 'document':
@@ -255,6 +251,10 @@ export default {
 			this.$api
 				.get(`sites/${this.siteId}?include=pages`)
 				.then(({ data: json }) => {
+					this.site = {
+						host: json.data.host,
+						path: json.data.path
+					};
 					this.pages = json.data.pages;
 				});
 		},
