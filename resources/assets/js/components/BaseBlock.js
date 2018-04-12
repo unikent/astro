@@ -42,6 +42,8 @@ export default {
 
 						this[name] = newVal;
 
+						eventBus.$emit('block:hideHoverOverlay');
+
 						// TODO: use state for this?
 						imagesLoaded(this.$el, () => {
 							eventBus.$emit('block:updateBlockOverlays');
