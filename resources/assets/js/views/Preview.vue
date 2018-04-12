@@ -49,7 +49,7 @@
 
 					<el-dropdown
 						v-if="sectionConstraints && sectionConstraints.canRemoveBlocks"
-						class="block-overlay__-button"
+						class="block-overlay__delete-button"
 						@command="removeBlock"
 						size="mini"
 					>
@@ -68,7 +68,7 @@
 				:class="{ 'add-before--first' : hoveredBlockIsFirst }"
 				@click="showBlockList()"
 				v-if="sectionConstraints && sectionConstraints.canAddBlocks"
-				@mouseleave="possiblyHideOverlay"
+				@mouseleave="possiblyHideHoverOverlay"
 			>
 				<icon name="plus" :width="16" :height="16" viewBox="0 0 16 16" />
 			</div>
@@ -77,7 +77,7 @@
 				:class="{ 'add-after--last' : hoveredBlockIsLast }"
 				@click="showBlockList(1)"
 				v-if="sectionConstraints && sectionConstraints.canAddBlocks"
-				@mouseleave="possiblyHideOverlay"
+				@mouseleave="possiblyHideHoverOverlay"
 			>
 				<icon name="plus" :width="16" :height="16" viewBox="0 0 16 16" />
 			</div>
@@ -134,9 +134,6 @@ export default {
 			blockOverlayStyles: {},
 			selectedOverlayHidden: true,
 			selectedOverlayStyles: {},
-			sectionDefinition: null,
-			sectionConstraints: null,
-			currentSectionBlocks: null,
 			layoutDefinition: null,
 			selectedBlock: null,
 			hoveredBlock: null
@@ -160,11 +157,6 @@ export default {
 			layoutErrors: state => state.page.layoutErrors
 		}),
 
-		...mapGetters([
-			'getBlocks',
-			'blocks'
-		]),
-
 		...mapMutations([
 			'setLayoutErrors'
 		]),
@@ -185,16 +177,49 @@ export default {
 			return layout || null;
 		},
 
+		hoveredBlockSection() {
+			return (
+				this.hoveredBlock ?
+					this.$store.getters.getSection(
+						this.hoveredBlock.regionName,
+						this.hoveredBlock.sectionIndex
+					) :
+					null
+			);
+		},
+
+		hoveredBlockSectionLength() {
+			return this.hoveredBlockSection ? this.hoveredBlockSection.blocks.length : 0;
+		},
+
 		hoveredBlockIsFirst() {
-			return this.hoveredBlock && this.hoveredBlock.index === 0;
+			return this.hoveredBlock && this.hoveredBlock.blockIndex === 0;
 		},
 
 		hoveredBlockIsLast() {
-			return this.hoveredBlock && this.hoveredBlock.index === this.blocks.length - 1;
+			return this.hoveredBlock && this.hoveredBlock.blockIndex === this.hoveredBlockSectionLength - 1;
+		},
+
+		sectionDefinition() {
+			return (
+				this.hoveredBlock ?
+					Definition.getRegionSectionDefinition(
+						this.hoveredBlock.regionName,
+						this.hoveredBlock.sectionIndex
+					) : null
+			);
+		},
+
+		sectionConstraints() {
+			return (
+				this.hoveredBlockSection ?
+					allowedOperations(this.hoveredBlockSection.blocks, this.sectionDefinition) :
+					null
+			);
 		},
 
 		canMove() {
-			return this.currentSectionBlocks.length > 1;
+			return this.hoveredBlockSectionLength > 1;
 		},
 
 		pageHasLayoutErrors() {
@@ -209,10 +234,22 @@ export default {
 		this.onKeyDown = onKeyDown(undoStackInstance);
 		this.onKeyUp = onKeyUp(undoStackInstance);
 
+		this.windowWidth = win.innerWidth;
+
 		this.onResize = _.throttle(() => {
-			this.positionOverlay(this.hoveredBlock);
-			this.positionOverlay(this.selectedBlock, 'selected');
+			if(this.windowWidth !== win.innerWidth) {
+				this.updateOverlays(
+					this.hoveredBlock ? this.hoveredBlock.blockIndex : null
+				);
+				this.windowWidth = win.innerWidth;
+			}
 		}, 16, { trailing: true });
+	},
+
+	mounted() {
+		this.wrapper = this.$refs.wrapper;
+		this.moveEl = this.$refs.move;
+		this.initEvents();
 	},
 
 	destroyed() {
@@ -223,17 +260,11 @@ export default {
 
 		this.$bus.$off('block:updateBlockOverlays', this.updateOverlays);
 
-		this.$bus.$on('block:showHoverOverlay', this.showOverlay);
-		this.$bus.$off('block:hideHoverOverlay', this.hideOverlay);
+		this.$bus.$on('block:showHoverOverlay', this.showHoverOverlay);
+		this.$bus.$off('block:hideHoverOverlay', this.hideHoverOverlay);
 
 		this.$bus.$off('block:showSelectedOverlay', this.showSelectedOverlay);
 		this.$bus.$off('block:hideSelectedOverlay', this.hideSelectedOverlay);
-	},
-
-	mounted() {
-		this.wrapper = this.$refs.wrapper;
-		this.moveEl = this.$refs.move;
-		this.initEvents();
 	},
 
 	methods: {
@@ -261,8 +292,8 @@ export default {
 
 			this.$bus.$on('block:updateBlockOverlays', this.updateOverlays);
 
-			this.$bus.$on('block:showHoverOverlay', this.showOverlay);
-			this.$bus.$on('block:hideHoverOverlay', this.hideOverlay);
+			this.$bus.$on('block:showHoverOverlay', this.showHoverOverlay);
+			this.$bus.$on('block:hideHoverOverlay', this.hideHoverOverlay);
 
 			this.$bus.$on('block:showSelectedOverlay', this.showSelectedOverlay);
 			this.$bus.$on('block:hideSelectedOverlay', this.hideSelectedOverlay);
@@ -347,54 +378,60 @@ export default {
 
 		removeBlock() {
 			// remove block but before we do so remove any validation issues it owns
-			const { index, region, section } = this.hoveredBlock;
-			const blockToBeDeleted = this.$store.getters.getBlock(region, section, index);
-			this.deleteBlockValidationIssue(blockToBeDeleted.id);
-			this.deleteBlock({ index, region, section });
-			this.hideOverlay();
-			this.hideSelectedOverlay();
-			this.hoveredBlock = null;
-			this.$message({
-				message: 'Block removed',
-				type: 'success'
-			});
+			const {
+				blockIndex: index,
+				regionName: region,
+				sectionIndex: section,
+				blockId
+			} = this.hoveredBlock;
+
+			this.deleteBlockValidationIssue(blockId);
+			this.deleteBlock({region, section, index });
+
+			this.hideHoverOverlay();
+
+			if(this.selectedBlock && this.selectedBlock.id === blockId) {
+				this.hideSelectedOverlay();
+			}
 		},
 
 		moveBlock(num) {
-			const { index, region, section } = this.hoveredBlock;
+			const { blockIndex, regionName, sectionIndex } = this.hoveredBlock;
 
 			this.reorderBlocks({
-				from: index,
-				to: index + num,
-				region,
-				section
+				from: blockIndex,
+				to: blockIndex + num,
+				region: regionName,
+				section: sectionIndex
 			});
 		},
 
-		showSelectedOverlay(block) {
-			this.selectedBlock = block;
-			// wait for images to load before displaying overlay
-			imagesLoaded(block.$el, () => {
-				this.positionOverlay(block, 'selected');
-			});
-		},
+		showHoverOverlay(blockInfo) {
+			if(
+				this.hoveredBlock === null ||
+				blockInfo.blockId !== this.hoveredBlock.blockId
+			) {
+				this.hoveredBlock = blockInfo;
+				this.hoveredBlockEl = this.$el.querySelector(`#block_${this.hoveredBlock.blockId}`);
 
-		hideSelectedOverlay() {
-			this.selectedOverlayHidden = true;
-			this.updateStyles('selectedOverlay', 'transform', 'translateY(0)');
-		},
-
-		showOverlay(block) {
-			if(block !== this.hoveredBlock) {
-				this.hoveredBlock = block;
 				// wait for images to load before displaying overlay
-				imagesLoaded(block.$el, () => {
-					this.positionOverlay(block);
+				imagesLoaded(this.hoveredBlockEl, () => {
+					this.positionOverlay('hover');
 				});
 			}
 		},
 
-		possiblyHideOverlay(e) {
+		showSelectedOverlay(blockInfo) {
+			this.selectedBlock = blockInfo;
+			this.selectedBlockEl = this.$el.querySelector(`#block_${this.selectedBlock.id}`);
+
+			// wait for images to load before displaying overlay
+			imagesLoaded(this.selectedBlockEl, () => {
+				this.positionOverlay('select');
+			});
+		},
+
+		possiblyHideHoverOverlay(e) {
 			// only hide overlay if the related target isn't a block
 			if(
 				e.relatedTarget &&
@@ -404,46 +441,53 @@ export default {
 					search: 'b-block-container'
 				})
 			) {
-				this.hideOverlay();
+				this.hideHoverOverlay();
 			}
 		},
 
-		hideOverlay(block) {
-			if(block !== this.hoveredBlock) {
-				this.overlayHidden = true;
-				this.updateStyles('blockOverlay', 'transform', 'translateY(0)');
-			}
+		hideHoverOverlay() {
+			this.overlayHidden = true;
+			this.updateStyles('blockOverlay', 'transform', 'translateY(0)');
+			this.hoveredBlock = null;
+		},
+
+		hideSelectedOverlay() {
+			this.selectedOverlayHidden = true;
+			this.updateStyles('selectedOverlay', 'transform', 'translateY(0)');
+			this.selectedBlock = null;
 		},
 
 		updateOverlays(index = null) {
 			if(this.hoveredBlock) {
-				if(this.hoveredBlock.index !== index) {
-					this.positionOverlay(this.hoveredBlock);
+				if(index) {
+					this.hoveredBlock = {
+						...this.hoveredBlock,
+						blockIndex: index
+					};
+					this.positionOverlay('hover');
 				}
 				else {
-					this.hideOverlay();
-					this.hoveredBlock = null;
+					this.hideHoverOverlay();
 				}
-			}
-			else {
-				this.hideOverlay();
 			}
 
 			if(this.selectedBlock) {
-				this.positionOverlay(this.selectedBlock, 'selected');
+				this.positionOverlay('select');
 			}
 			else {
 				this.hideSelectedOverlay();
 			}
 		},
 
-		positionOverlay(block, type = 'hover') {
-			if(!block) {
+		positionOverlay(type = 'hover') {
+			const blockElement = this[`${type}edBlockEl`];
+
+			if(!blockElement) {
 				return;
 			}
 
 			const
-				pos = block.$el.getBoundingClientRect(),
+				pos = blockElement.getBoundingClientRect(),
 				heightDiff = Math.round(pos.height - 30),
 				widthDiff = Math.round(pos.width - 30);
 
@@ -475,14 +519,6 @@ export default {
 				width    : `${(pos.width + addWidth)}px`,
 				height   : `${(pos.height + addHeight)}px`
 			});
-
-			// this is for the currently hovered block
-			if(this.hoveredBlock) {
-				const section = this.$store.getters.getSection(this.hoveredBlock.region, this.hoveredBlock.section);
-				this.sectionDefinition = section ? Definition.getRegionSectionDefinition(this.hoveredBlock.region, this.hoveredBlock.section) : null
-				this.currentSectionBlocks = section.blocks;
-				this.sectionConstraints = section ? allowedOperations(section.blocks, this.sectionDefinition) : null;
-			}
 		},
 
 		updateStyles(dataName, prop, value) {
@@ -499,13 +535,13 @@ export default {
 			const maxBlocks = this.sectionDefinition.max || this.sectionDefinition.size;
 
 			this.showBlockPicker({
-				insertIndex: this.hoveredBlock.index + offset,
-				sectionIndex: this.hoveredBlock.section,
-				regionName: this.hoveredBlock.region,
+				insertIndex: this.hoveredBlock.blockIndex + offset,
+				sectionIndex: this.hoveredBlock.sectionIndex,
+				regionName: this.hoveredBlock.regionName,
 				blocks: this.sectionConstraints ?
 					this.sectionConstraints.allowedBlocks : [],
 				maxSelectableBlocks: this.sectionConstraints.canSwapBlocks ?
-					1 : (maxBlocks ? maxBlocks - this.blocks.length : null),
+					1 : (maxBlocks ? maxBlocks - this.hoveredBlockSectionLength : null),
 				replaceBlocks: replaceBlocks
 			});
 		}
