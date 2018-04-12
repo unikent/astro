@@ -1,20 +1,36 @@
-const matchByNodeName = (node, search) => {
-	return node.nodeName.toLowerCase() === search;
+const matchByNodeName = (node, tag) => {
+	return node.nodeName && node.nodeName.toLowerCase() === tag.toLowerCase();
 };
 
 const matchExactly = (node, search) => {
 	return node === search;
 };
 
-export const findParent = (searchFor, el, exact = false) => {
-	const match = exact ? matchExactly : matchByNodeName;
+const hasClass = (node, className) => {
+	return node.classList && (
+		Array.isArray(className) ?
+			className.some(cls => node.classList.contains(cls)) :
+			node.classList.contains(className)
+	);
+};
 
-	if(match(el, searchFor)) {
+export const findParent = ({ el, match = 'node', search } = {}) => {
+
+	switch(match) {
+		case 'tag':
+			match = matchByNodeName;
+			break;
+		case 'class':
+			match = hasClass;
+			break;
+	}
+
+	if(match(el, search)) {
 		return el;
 	}
 
 	while(el) {
-		if(match(el, searchFor)) {
+		if(match(el, search)) {
 			return el;
 		}
 		el = el.parentNode;
@@ -41,7 +57,7 @@ export const getTopOffset = (el) => {
  * @return     void
  */
 export const disableLinks = (e) => {
-	if(!e.ctrlKey && findParent('a', e.target, false)) {
+	if(!e.ctrlKey && findParent({ el: e.target, match: 'tag', search: 'a'})) {
 		e.preventDefault();
 	}
 };

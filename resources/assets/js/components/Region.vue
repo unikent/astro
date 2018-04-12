@@ -6,7 +6,6 @@
 			:region="regionID"
 			:section="index"
 			:key="`section-${sectionData.name}`"
-			:index="index"
 			:sectionData="sectionData"
 		/>
 	</template>

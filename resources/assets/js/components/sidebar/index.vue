@@ -80,7 +80,7 @@ export default {
 				{
 					link: '/media',
 					icon: 'layers',
-					title: 'Blocks on current page',
+					title: 'Selected block options',
 					id: 'blocks',
 					component: EditBlock
 				},
