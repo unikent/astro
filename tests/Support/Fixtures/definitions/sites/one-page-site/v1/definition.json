@@ -4,7 +4,7 @@
 	"label": "A single page site template for testing",
 	"defaultPages": {
 		"slug": "",
-		"title": "Home Page",
+		"title": "Home",
 		"layout": "test-layout-v1",
 		"children": []
 	}
