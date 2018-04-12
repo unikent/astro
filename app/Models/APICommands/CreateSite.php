@@ -48,7 +48,7 @@ class CreateSite implements APICommand
             if(!is_array($layout)){
             	$layout = SiteDefinition::idToNameAndVersion($layout);
 			}
-            $homepage = $this->createHomePage($site, 'Home Page', $layout, $user);
+            $homepage = $this->createHomePage($site, 'Home', $layout, $user);
             if(!empty($template->defaultPages['children'])){
 				$this->addPages($homepage, $template->defaultPages['children'], $user);
 			}
