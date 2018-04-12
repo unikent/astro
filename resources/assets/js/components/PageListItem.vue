@@ -176,6 +176,12 @@ export default {
 			if(id === this.page.id) {
 				this.$store.commit('setCurrentPageArrayPath', this.path);
 			}
+		},
+
+		'pageData.path'(path) {
+			if(path === this.page.path) {
+				this.$store.commit('setCurrentPageArrayPath', this.path);
+			}
 		}
 	},
 

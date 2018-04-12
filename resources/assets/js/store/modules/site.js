@@ -351,6 +351,7 @@ const actions = {
 			commit('removePage', oldLocation);
 			// update current and child page depths
 			updateDepths(page, newLocation.parent.depth + 1);
+			// TODO 2018-04-12 update paths here
 			// splice page in if a page already exists in new location otherwise add it
 			commit('addPage', { ...newLocation, page, push: !newLocation.page });
 
