@@ -80,13 +80,12 @@
 	position: absolute;
 	top: 15px;
 	right: 15px;
-	pointer-events: auto;
 }
 
+.move-up,
+.move-down,
 .block-overlay__delete-button {
-	margin-left: 20px;
 	pointer-events: auto;
-	fill: #c74d4d;
 }
 
 .block-overlay__delete--sidebar {
