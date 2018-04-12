@@ -16,7 +16,7 @@
 
 	<div
 		class="page-list__title"
-		:class="{ 'page-list__title--selected': pageData.id === this.page.id }"
+		:class="{ 'page-list__title--selected': pageData.id === page.id }"
 	>
 		<span class="page-list__item__drag-handle">
 			<icon v-if="!root && canUser('page.move')" name="arrow" :width="14" :height="14" />
@@ -171,6 +171,14 @@ export default {
 		}
 	},
 
+	watch: {
+		'pageData.id'(id) {
+			if(id === this.page.id) {
+				this.$store.commit('setCurrentPageArrayPath', this.path);
+			}
+		}
+	},
+
 	computed: {
 
 		...mapState('site', {
@@ -268,10 +276,6 @@ export default {
 					done();
 				})
 				.catch(() => {});
-		},
-
-		openPage() {
-			this.open = true;
 		},
 
 		toggle() {
