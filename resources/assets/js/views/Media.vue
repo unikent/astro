@@ -134,6 +134,14 @@ export default {
 		this.fetchMedia();
 	},
 
+	watch: {
+		showUploadForm(show) {
+			if(!show) {
+				this.fetchMedia();
+			}
+		}
+	},
+
 	computed: {
 		...mapState({
 			siteId: state => state.site.site
