@@ -72,7 +72,7 @@ class LocalAPIClientTest extends TestCase
         $this->assertInstanceOf(Page::class, $site->draftHomepage);
         $this->assertNull($site->draftHomepage->slug);
         $this->assertInstanceOf(Revision::class, $site->draftHomepage->revision);
-		$this->assertEquals('Home Page', $site->draftHomepage->revision->title); // as defined in the one-page-site-v1 site template
+		$this->assertEquals('Home', $site->draftHomepage->revision->title); // as defined in the one-page-site-v1 site template
     }
 
     /**
