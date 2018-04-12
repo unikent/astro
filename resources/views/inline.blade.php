@@ -32,6 +32,7 @@
 		'published_url_pattern' => env('APP_LIVE_URL_PATTERN'),
 		'draft_url_pattern' => env('APP_PREVIEW_URL_PATTERN'),
 		'assets_base_url' => env('ASSETS_BASE_URL'),
+		'placeholder_image_url' => env('PLACEHOLDER_IMAGE_URL'),
 		'machform_url' => env('MACHFORM_URL')
 	]); ?>;
 	</script>

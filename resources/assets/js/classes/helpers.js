@@ -163,3 +163,25 @@ export const getPublishedPreviewURL = (domain, path) => {
 	let pattern = Config.get('published_url_pattern') || '{domain}{path}';
 	return pattern.replace(/{domain}/ig, domain).replace(/{path}/ig, path);
 };
+
+/**
+ * Get a url for an image or a default.
+ * @param {String|Object|null} url - URL to the image OR object with url attribute OR null to use default.
+ * @param {string|null} defaultUrl - Alternative placeholder image to use (relative to Config.get('assets_base_url') )
+ * @returns {string} - url, or Config.get('assets_base_url') + defaultUrl or Config.get('assets_base_url') + Config.get('default_placeholder_image')
+ */
+export const imageUrl = (src_or_url, defaultUrl) => {
+	let result = src_or_url && src_or_url.url ? src_or_url.url: src_or_url;
+	if(!result) {
+		result = Config.get('assets_base_url');
+		if(defaultUrl) {
+			result += defaultUrl;
+		}
+		else {
+			result += Config.get('placeholder_image_url');
+		}
+	}
+	return result;
+//	return url !== void 0 ? url :
+//		Config.get('assets_base_url') + (defaultUrl !== void 0 ? defaultUrl : Config.get('default_placeholder_url'));
+};
