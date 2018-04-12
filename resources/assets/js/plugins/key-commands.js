@@ -27,12 +27,15 @@ export const onKeyDown = (ctx) => (e) => {
 		keys[key] = true;
 	}
 
-	if((e.ctrlKey || e.metaKey) && keys.z) {
+	if((e.ctrlKey || e.metaKey) && keys.z && !e.shiftKey) {
 		e.preventDefault();
 		ctx.undo();
 	}
 
-	if((e.ctrlKey || e.metaKey) && keys.y) {
+	if(
+		((e.ctrlKey || e.metaKey) && keys.y) ||
+		((e.ctrlKey || e.metaKey) && e.shiftKey && keys.z)
+	) {
 		e.preventDefault();
 		ctx.redo();
 	}
