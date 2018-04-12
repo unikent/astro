@@ -653,10 +653,12 @@ const getters = {
 
 		for(var i = 0, length = path.length; page !== void 0 && i < length; i++) {
 			page = i > 0 ? page.children[path[i]] : page[path[i]];
-			breadcrumbs.push({
-				title: page.title,
-				path: page.path
-			});
+			if(page) {
+				breadcrumbs.push({
+					title: page.title,
+					path: page.path
+				});
+			}
 		}
 
 		return breadcrumbs;
