@@ -184,8 +184,16 @@ const mutations = {
 
 		state.pageData.blocks[region][sectionIndex].blocks.splice(index, (replace ? 1 : 0), block || {});
 
+		if(replace) {
+			Vue.nextTick(
+				() => eventBus.$emit('block:showSelectedOverlay', {
+					id: block.id
+				})
+			);
+		}
+
 		// TODO: use state for this
-		Vue.nextTick(() => eventBus.$emit('block:updateBlockOverlays', index));
+		Vue.nextTick(() => eventBus.$emit('block:updateBlockOverlays'));
 	},
 
 	/**
@@ -202,7 +210,7 @@ const mutations = {
 		state.blockMeta.blocks[region][section].blocks.splice(index, 1);
 
 		// TODO: use state for this
-		Vue.nextTick(() => eventBus.$emit('block:updateBlockOverlays', index));
+		Vue.nextTick(() => eventBus.$emit('block:updateBlockOverlays'));
 	},
 
 	updateCurrentSavedState(state) {
@@ -338,7 +346,7 @@ const actions = {
 							{},
 							[
 								vue.$createElement('p', { class:'el-message__content', style:'padding-bottom:1rem' }, 'The page saved ok, but there are some validation errors.'),
-								vue.$createElement('p', { class:'el-message__content', style:'padding-bottom:1rem' }, 'You won\'t be able to publish till these are fixed.'),
+								vue.$createElement('p', { class:'el-message__content', style:'padding-bottom:1rem' }, 'You won\'t be able to publish until these are fixed.'),
 								vue.$createElement('a', {
 									attrs: {
 										href: '#'

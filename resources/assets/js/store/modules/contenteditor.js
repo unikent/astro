@@ -1,5 +1,7 @@
 import _ from 'lodash';
 
+import { eventBus } from 'plugins/eventbus';
+
 /**
  * Represents the state of the page content (blocks) editor and provides actions, getters and mutations for components
  * to interact with it.
@@ -171,11 +173,15 @@ const actions = {
 	 *    @param {string} blockIndex
 	 *    @param {string} blockId
 	 */
-	changeBlock({ commit, state, rootState }, payload) {
+	changeBlock({ commit, state, rootState }, blockInfo) {
 		// have we actually selected a different block?
-		if(state.currentBlockId !== payload.blockId) {
-			commit('setCurrentBlock', payload);
+		if(state.currentBlockId !== blockInfo.blockId) {
+			commit('setCurrentBlock', blockInfo);
 			commit('collapseSidebar');
+
+			eventBus.$emit('block:showSelectedOverlay', {
+				id: blockInfo.blockId
+			});
 		}
 
 		// make sure we get to see the block menu if we're currently seeing the pages or other sidebar and a user clicks on any block
