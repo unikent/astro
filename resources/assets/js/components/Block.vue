@@ -73,7 +73,6 @@ export default {
 		}
 
 	},
-
 	data() {
 		return {
 			size: null,
@@ -88,16 +87,6 @@ export default {
 	},
 
 	computed: {
-
-		...mapState({
-			activeMenuItem: state => state.menu.active
-		}),
-
-		...mapGetters([
-			'getBlockMeta'
-		]),
-
-
 		blockIdentifier() {
 			return `block_${this.uuid}`;
 		}
@@ -122,10 +111,6 @@ export default {
 	methods: {
 		...mapMutations([
 			'updateBlockMeta',
-			'setBlock',
-			'collapseSidebar',
-			'revealSidebar',
-			'updateMenuActive',
 			'changeBlock'
 		]),
 
