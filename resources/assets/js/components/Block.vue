@@ -74,6 +74,17 @@ export default {
 
 	},
 
+	watch: {
+		index(index, oldIndex) {
+			// set the selected block index when the currently selected block moves
+			if(this.$store.state.contenteditor.currentBlockId === this.uuid) {
+				// TODO: do this as part of an action when block is added/moved/removed
+				// right now there is a brief moment when a different block is selected
+				this.$store.commit('setCurrentBlockIndex', index);
+			}
+		}
+	},
+
 	data() {
 		return {
 			size: null,
