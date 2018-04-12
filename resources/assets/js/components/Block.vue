@@ -73,6 +73,7 @@ export default {
 		}
 
 	},
+
 	data() {
 		return {
 			size: null,
@@ -89,6 +90,16 @@ export default {
 	computed: {
 		blockIdentifier() {
 			return `block_${this.uuid}`;
+		},
+
+		blockInfo() {
+			return {
+				regionName: this.region,
+				sectionIndex: this.section,
+				sectionName: this.sectionName,
+				blockIndex: this.index,
+				blockId: this.uuid
+			};
 		}
 	},
 
@@ -115,19 +126,11 @@ export default {
 		]),
 
 		editBlock() {
-			this.$store.dispatch('changeBlock', {
-				regionName: this.region,
-				sectionIndex: this.section,
-				sectionName: this.sectionName,
-				blockIndex: this.index,
-				blockId: this.uuid
-			});
-
-			this.$bus.$emit('block:showSelectedOverlay', this);
+			this.$store.dispatch('changeBlock', this.blockInfo);
 		},
 
 		showHoverOverlay() {
-			this.$bus.$emit('block:showHoverOverlay', this);
+			this.$bus.$emit('block:showHoverOverlay', this.blockInfo);
 		},
 
 		hideHoverOverlay(e) {
@@ -144,7 +147,7 @@ export default {
 					]
 				})
 			) {
-				this.$bus.$emit('block:hideHoverOverlay', this);
+				this.$bus.$emit('block:hideHoverOverlay');
 			}
 		}
 	}
