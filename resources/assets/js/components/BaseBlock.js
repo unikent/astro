@@ -1,6 +1,7 @@
 import inlineFieldMixin from 'mixins/inlineFieldMixin';
 import imagesLoaded from 'imagesloaded';
 import { eventBus } from 'plugins/eventbus';
+import { imageUrl } from 'classes/helpers';
 
 export default {
 
@@ -29,6 +30,10 @@ export default {
 	},
 
 	methods: {
+		imageUrl(url, defaultUrl) {
+			return imageUrl(url, defaultUrl);
+		},
+
 		watchFields(fields) {
 			Object.keys(fields).map((name) => {
 				if(!this.watching[name]) {
