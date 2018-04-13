@@ -28,7 +28,7 @@
 				"oneOf": [
 					{
 						"properties": {
-							"type": { "enum": ["text", "textarea", "richtext"] },
+							"type": { "enum": ["text", "textarea", "richtext", "link"] },
 							"default": { "type": "string" }
 						}
 					},
