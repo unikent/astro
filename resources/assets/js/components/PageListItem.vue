@@ -178,8 +178,8 @@ export default {
 			}
 		},
 
-		'pageData.path'(path) {
-			if(path === this.page.path) {
+		page(page) {
+			if(this.pageData.id === page.id) {
 				this.$store.commit('setCurrentPageArrayPath', this.path);
 			}
 		}
