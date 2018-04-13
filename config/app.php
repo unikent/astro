@@ -288,7 +288,7 @@ $config = [
 
 $disable_kentauth = strtolower(env('DISABLE_KENTAUTH'));
 // don't add kentauth if we have disabled it
-if( !$disable_kentauth || $disable_kentauthenv == 'false' ) {
+if( !$disable_kentauth || $disable_kentauth == 'false' ) {
 	$config['providers'][] = KentAuth\AuthServiceProvider::class;
 }
 
