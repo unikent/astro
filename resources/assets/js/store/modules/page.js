@@ -233,6 +233,12 @@ const mutations = {
 		}
 	},
 
+	setPagePath(state, { id, path }) {
+		if(state.pageData && state.pageData.id === Number(id)) {
+			state.pageData.path = path
+		}
+	},
+
 	setPageSlugAndPath(state, { id, slug }) {
 		if(state.pageData && state.pageData.id === Number(id)) {
 			state.pageData.slug = slug;
