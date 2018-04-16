@@ -3621,7 +3621,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/astro-kent-theme.git",
-                "reference": "bfdf3dde0e064f2a826fe39ee6dceeddf03ec9fc"
+                "reference": "362c8c82eae258f58e95ef0c555a2800921e66f6"
             },
             "require-dev": {
                 "phpunit/phpunit": "5.0"
