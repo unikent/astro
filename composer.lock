@@ -3621,14 +3621,14 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/astro-kent-theme.git",
-                "reference": "362c8c82eae258f58e95ef0c555a2800921e66f6"
+                "reference": "c4cbcb4897a551c883dcdfcf0646e5278c867bd8"
             },
             "require-dev": {
                 "phpunit/phpunit": "5.0"
             },
             "type": "library",
             "description": "Our block views",
-            "time": "2018-04-11T12:32:48+00:00"
+            "time": "2018-04-18T12:04:02+00:00"
         },
         {
             "name": "unikent/astro-renderer",
