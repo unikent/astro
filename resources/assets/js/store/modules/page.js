@@ -34,7 +34,8 @@ const state = {
 	},
 	loaded: false,
 	currentSavedState: '',
-	invalidBlocks: []
+	invalidBlocks: [],
+	currentPageArrayPath: null
 };
 
 const mutations = {
@@ -244,6 +245,12 @@ const mutations = {
 		}
 	},
 
+	setPagePath(state, { id, path }) {
+		if(state.pageData && state.pageData.id === Number(id)) {
+			state.pageData.path = path
+		}
+	},
+
 	setPageSlugAndPath(state, { id, slug }) {
 		if(state.pageData && state.pageData.id === Number(id)) {
 			state.pageData.slug = slug;
@@ -258,6 +265,10 @@ const mutations = {
 		if(state.pageData && state.pageData.id === Number(id)) {
 			state.pageData.status = status;
 		}
+	},
+
+	setCurrentPageArrayPath(state, arrayPath) {
+		state.currentPageArrayPath = arrayPath;
 	}
 
 };
@@ -502,7 +513,7 @@ const getters = {
 	 * @returns {string}
 	 */
 	siteTitle: (state) => {
-		return (state.loaded ? state.pageData.site.title : '');
+		return (state.loaded ? state.pageData.site.name : '');
 	},
 
 	/**
@@ -645,6 +656,30 @@ const getters = {
 				state.pageData.blocks[regionName] :
 				null
 		);
+	},
+
+	currentPageBreadcrumbs: (state, getters, rootState) => {
+		if(!rootState.page.currentPageArrayPath) {
+			return [];
+		}
+
+		const path = rootState.page.currentPageArrayPath.split('.');
+
+		let
+			breadcrumbs = [],
+			page = rootState.site.pages;
+
+		for(var i = 0, length = path.length; page !== void 0 && i < length; i++) {
+			page = i > 0 ? page.children[path[i]] : page[path[i]];
+			if(page) {
+				breadcrumbs.push({
+					title: page.title,
+					path: page.path
+				});
+			}
+		}
+
+		return breadcrumbs;
 	}
 
 };
