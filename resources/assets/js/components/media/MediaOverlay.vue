@@ -58,7 +58,7 @@ export default {
 			if(show) {
 				if(this.mediaItem.type === 'image') {
 					const img = new Image();
-
+					img.crossOrigin = 'Anonymous';
 					img.addEventListener('load', () => {
 						const colorThief = new ColorThief();
 						this.colourPalette = colorThief.getPalette(img, 6)
