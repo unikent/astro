@@ -8,7 +8,7 @@ cache:
     # - node_modules/
 
 services:
-  - mysql:latest
+  - mysql:5.7
   - redis:latest
 variables:
   MYSQL_DATABASE: test
