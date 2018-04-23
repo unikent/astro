@@ -12,8 +12,7 @@
 // Preview draft pages in editor.
 Route::get('/draft/{host}/{path?}', 'PageController@draft')
 	->where('host', '([^/]+)')
-	->where('path', '(.*?)/?')
-	->middleware('auth');
+	->where('path', '(.*?)/?');
 
 // "Preview" published pages in editor.
 Route::get('/published/{host}/{path?}', 'PageController@published')
