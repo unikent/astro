@@ -48,6 +48,7 @@ test:
 
 artifacts-experimental:
   stage: build
+  when: manual
   script:
     - rm -rf node_modules .git
   artifacts:
