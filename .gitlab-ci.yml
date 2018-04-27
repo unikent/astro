@@ -34,9 +34,6 @@ before_script:
   - yarn install
   - yarn run production
 
-after_script:
-  - rm -rf node_modules .git
-
 stages:
   - test
   - build
@@ -52,7 +49,7 @@ test:
 artifacts-experimental:
   stage: build
   script:
-    - echo "Ready to 'artifact!'"
+    - rm -rf node_modules .git
   artifacts:
     paths:
       - ./
@@ -64,7 +61,7 @@ artifacts-experimental:
 artifacts-develop:
   stage: build
   script:
-    - echo "Ready to 'artifact!'"
+    - rm -rf node_modules .git
   artifacts:
     paths:
       - ./
@@ -75,7 +72,7 @@ artifacts-develop:
 artifacts-master:
   stage: build
   script:
-    - echo "Ready to 'artifact!'"
+    - rm -rf node_modules .git
   artifacts:
     paths:
       - ./
