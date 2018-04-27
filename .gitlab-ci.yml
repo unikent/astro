@@ -44,7 +44,7 @@ test:
     - php artisan key:generate
     - php artisan migrate --database=mysql_test
     - vendor/bin/phpunit
-    # - yarn run validate
+    - yarn run validate
 
 artifacts-experimental:
   stage: build
