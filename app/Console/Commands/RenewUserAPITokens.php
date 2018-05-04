@@ -51,6 +51,11 @@ class RenewUserAPITokens extends Command
 		foreach ($users as $user) {
 			$user->generateAPIToken(true);
 			$user->save();
+			$this->info("Renewed API token for user: '$user->name' ");
+		}
+
+		if(count($users) === 0){
+			$this->warn("No matching users found");
 		}
 	}
 }
