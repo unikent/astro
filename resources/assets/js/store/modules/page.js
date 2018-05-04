@@ -398,8 +398,8 @@ const actions = {
 
 					// there seems to be a possibility to return multiple groups of error messages,
 					// so we will cater for that
-					let technicalMessages = []
-
+					let technicalMessages = [];
+					console.log(errorResponse.response.data.errors);
 					// for each error message group...
 					errorResponse.response.data.errors.forEach(error => {
 						let messageLines = [];
@@ -409,9 +409,14 @@ const actions = {
 
 						// add detailed error messages
 						let errorsDetails = [];
-						for (var key in error.details) {
-							if (error.details.hasOwnProperty(key)) {
-								errorsDetails.push(vue.$createElement('li', error.details[key]));
+						if (typeof error.details === 'string') {
+							errorsDetails.push(vue.$createElement('li', error.details));
+						}
+						else{
+							for (var key in error.details) {
+								if (error.details.hasOwnProperty(key)) {
+									errorsDetails.push(vue.$createElement('li', error.details[key]));
+								}
 							}
 						}
 

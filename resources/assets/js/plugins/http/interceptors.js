@@ -39,6 +39,36 @@ export default (http, store, router) => {
 							});
 						}
 						break;
+
+					case 401:
+						if(response.data.errors) {
+								//notification to the user
+								// vue.$notify({
+								// 	title: 'Authentication error',
+								// 	message: 'There are some problems on your page.',
+								// 	type: 'error'
+								// });
+
+								async function everythingIsTerrible() {
+									await vue.$confirm('This will permanently delete the file. Continue?', 'Warning', {
+										confirmButtonText: 'OK',
+										cancelButtonText: 'Cancel',
+										type: 'warning'
+									}).then(() => {
+										vue.$message({
+											type: 'success',
+											message: 'Delete completed'
+										});
+									}).catch(() => {
+										vue.$message({
+											type: 'info',
+											message: 'Delete canceled'
+										});
+									});
+								}
+								everythingIsTerrible();
+							}
+						break;
 				}
 			}
 
