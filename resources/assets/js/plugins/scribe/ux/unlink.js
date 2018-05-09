@@ -5,9 +5,9 @@ export default () => {
 		unlinkCommand.queryEnabled = function() {
 			const
 				selection = new scribe.api.Selection(),
-				insideElem = selection.getContaining(node => {
-					return node.nodeName === 'A';
-				});
+				insideElem = selection.getContaining(
+					node => node.nodeName === 'A'
+				);
 
 			return scribe.api.CommandPatch.prototype.queryEnabled.apply(this, arguments) || insideElem;
 		};

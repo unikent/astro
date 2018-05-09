@@ -1,0 +1,33 @@
+.add-link-modal {
+	&__internal {
+		text-align: center;
+	}
+
+	&__page-select {
+		margin: 3rem auto 0;
+		width: 400px;
+
+		&-label {
+			float: left;
+		}
+
+		&-value {
+			float: right;
+			color: #8492a6;
+			font-size: 13px;
+			margin-left: 2rem;
+		}
+	}
+
+	&__doc-link-text {
+		margin-top: 2rem;
+	}
+
+}
+
+.hide-url-column {
+	th:nth-child(3),
+	td:nth-child(3) {
+		display: none;
+	}
+}

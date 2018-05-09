@@ -2,6 +2,7 @@
 
 namespace App\Models\APICommands;
 
+use App\Events\PageEvent;
 use DB;
 use App\Models\Page;
 use App\Models\Redirect;
@@ -28,6 +29,9 @@ class MovePage implements APICommand
 			$page = Page::find($input['id']);
 			$new_parent = Page::find($input['parent_id']);
 			$next_sibling = Page::find(!empty($input['next_id']) ? $input['next_id'] : null);
+			$old_path = $page->path;
+
+			event(new PageEvent(PageEvent::MOVING, $page, ['new_parent' => $new_parent, 'next_sibling' => $next_sibling]));
 
 			// if we need to move published version, then we should get it before updating paths
 			// as the only way we can identify published version is by shared paths.
@@ -78,8 +82,8 @@ class MovePage implements APICommand
 				}
 			}
 
-
 			$page->refresh();
+			event(new PageEvent(PageEvent::MOVED, $page, ['old_path' => $old_path]));
 			return $page;
 		});
 	}

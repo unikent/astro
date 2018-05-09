@@ -140,7 +140,9 @@ class MediaController extends ApiController
 		if($request->has('site_ids')){
 			$acos = $acos->merge(Site::whereIn('id', $request->get('site_ids'))->get());
 		}
-
+		if(count($acos) == 0) {
+			throw new \InvalidArgumentException('A site id is required.');
+		}
 		foreach($acos as $model){
 			$this->authorize($action, [ $media, $model ]);
 		}

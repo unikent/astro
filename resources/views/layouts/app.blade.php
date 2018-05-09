@@ -8,10 +8,10 @@
 
 	<link rel="icon" href="{{ url("/") }}/favicon.ico">
 
-	<title>Kent CMS</title>
+	<title>Site Editor - University of Kent</title>
 
 
-	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/build/css/main.css') }}" />
+	<link rel="stylesheet" href="{{ mix('/build/css/main.css') }}" />
 
 	<script>
 		window.Laravel = <?php echo json_encode([
@@ -25,9 +25,12 @@
 	<!-- @include('components.menu') -->
 	@yield('content')
 
-	<script src="{{ url('/') }}{{ mix('/build/js/manifest.js') }}"></script>
-	<script src="{{ url('/') }}{{ mix('/build/js/vendor.js') }}"></script>
-	<script src="{{ url('/') }}{{ mix('/build/js/main.js') }}"></script>
+	@if (Auth::check()) 
+	<!-- don't include these in the login page -->
+	<script src="{{ mix('/build/js/manifest.js') }}"></script>
+	<script src="{{ mix('/build/js/vendor.js') }}"></script>
+	<script src="{{ mix('/build/js/main.js') }}"></script>
+	@endif
 	<!-- TODO: move kent bar JS into bundled dependencies -->
 
 </body>

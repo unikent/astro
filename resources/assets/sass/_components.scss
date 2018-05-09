@@ -8,6 +8,7 @@
 @import './views/site-list';
 @import './views/menu-editor';
 @import './views/site-users';
+@import './views/site-profiles';
 
 // components
 @import './components/block-list';
@@ -24,11 +25,17 @@
 @import './components/rich-text';
 @import './components/media-upload';
 @import './components/empty-region';
-@import './components/group-field';
-@import './components/collection-field';
 @import './components/media';
 @import './components/media-picker';
 @import './components/publish';
+@import './components/paged-results';
+@import './components/add-link-modal';
+@import './components/not-found';
 
 // fields
+@import './components/fields/group-field';
+@import './components/fields/collection-field';
 @import './components/fields/image';
+@import './components/fields/header';
+@import './components/fields/paragraph';
+@import './components/fields/link';

@@ -1,6 +1,7 @@
 import inlineFieldMixin from 'mixins/inlineFieldMixin';
 import imagesLoaded from 'imagesloaded';
 import { eventBus } from 'plugins/eventbus';
+import { imageUrl } from 'classes/helpers';
 
 export default {
 
@@ -29,6 +30,10 @@ export default {
 	},
 
 	methods: {
+		imageUrl(url, defaultUrl) {
+			return imageUrl(url, defaultUrl);
+		},
+
 		watchFields(fields) {
 			Object.keys(fields).map((name) => {
 				if(!this.watching[name]) {
@@ -42,9 +47,11 @@ export default {
 
 						this[name] = newVal;
 
+						eventBus.$emit('block:hideHoverOverlay');
+
 						// TODO: use state for this?
 						imagesLoaded(this.$el, () => {
-							eventBus.$emit('block:updateOverlay');
+							eventBus.$emit('block:updateBlockOverlays');
 						});
 					}, {
 						deep: true

@@ -46,58 +46,20 @@ export const Definition = (
 	isIframe ? win.top.astroDefinition : (win.astroDefinition = DefinitionClass)
 );
 
-const matchByNodeName = (node, search) => {
-	return node.nodeName.toLowerCase() === search;
-};
-
-const matchExactly = (node, search) => {
-	return node === search;
-};
-
-export const findParent = (searchFor, el, exact = false) => {
-	const match = exact ? matchExactly : matchByNodeName;
-
-	if(match(el, searchFor)) {
-		return el;
-	}
-
-	while(el) {
-		if(match(el, searchFor)) {
-			return el;
-		}
-		el = el.parentNode;
-	}
-
-	return null;
-};
-
-export const getTopOffset = (el) => {
-	let pos = 0;
-
-	while(el) {
-		pos += (el.offsetTop - el.scrollTop + el.clientTop);
-		el = el.offsetParent;
-	}
-
-	return pos;
-};
-
 export const clamp = ({ val, min, max }) => {
 	return Math.max(Math.min(val, max), min);
 };
 
 // Adapted from https://gist.github.com/desandro/4206095
 export const smoothScrollTo = (options) => {
-	const { element: el, y, x, duration, easing } = Object.assign(
-		{
-			element: document.body,
-			x: 0,
-			y: 0,
-			duration: '0.3s',
-			easing: 'ease-out'
-		},
-		options
-	);
+	const { element: el, y, x, duration, easing } = {
+		element: document.body,
+		x: 0,
+		y: 0,
+		duration: '0.3s',
+		easing: 'ease-out',
+		...options
+	};
 
 	// clamp values to min & max scroll
 	// then remove the current scroll position
@@ -178,43 +140,48 @@ export const pageHasBeenPublished = (page) => {
 
 /**
  * Get the URL at which the current page can be previewed in the editor.
-
- * @param {string} url - The page URL to mutate into a draft preview URL
-
- * @returns {string} Full URL (with any trailing slash removed)
+ *
+ * @param {string} domain - The domain name for the site.
+ * @param {string} path - The full path of the page to generate the URL for.
+ *
+ * @returns {string} URL
  */
-export const getDraftPreviewURL = (url) => {
-	return `${Config.get('base_url', '')}/draft/${url ? url.replace(/\/$/, '') : ''}`;
+export const getDraftPreviewURL = (domain, path) => {
+	let pattern = Config.get('draft_url_pattern') || '{domain}{path}';
+	return pattern.replace(/{domain}/ig, domain).replace(/{path}/ig, path);
 };
 
 /**
  * Get the URL at which the published version of the current page can be previewed in the editor.
-
- * @param {string} url - The page URL to mutate into a published preview URL.
-
- * @returns {string} Full URL (with any trailing slash removed)
+ *
+ * @param {string} domain - The domain name for the site.
+ * @param {string} path - The full path of the page to generate the URL for.
+ *
+ * @returns {string} URL
  */
-export const getPublishedPreviewURL = (url) => {
-	return `${Config.get('base_url', '')}/published/${url ? url.replace(/\/$/, '') : ''}`;
+export const getPublishedPreviewURL = (domain, path) => {
+	let pattern = Config.get('published_url_pattern') || '{domain}{path}';
+	return pattern.replace(/{domain}/ig, domain).replace(/{path}/ig, path);
 };
 
 /**
-* prevents users from submitting forms in el
-* while still allowing the user to interact with them
-*/
-export const disableForms = (el) => {
-	// disable buttons
-	const buttonElements = el.querySelectorAll('button, submit');
-	buttonElements.forEach((buttonElement) => {
-		if(!buttonElement.classList.contains('el-button')) {
-			buttonElement.setAttribute('disabled', '');
+ * Get a url for an image or a default.
+ * @param {String|Object|null} url - URL to the image OR object with url attribute OR null to use default.
+ * @param {string|null} defaultUrl - Alternative placeholder image to use (relative to Config.get('assets_base_url') )
+ * @returns {string} - url, or Config.get('assets_base_url') + defaultUrl or Config.get('assets_base_url') + Config.get('default_placeholder_image')
+ */
+export const imageUrl = (src_or_url, defaultUrl) => {
+	let result = src_or_url && src_or_url.url ? src_or_url.url: src_or_url;
+	if(!result) {
+		result = Config.get('assets_base_url');
+		if(defaultUrl) {
+			result += defaultUrl;
 		}
-	});
-
-	// remove any form actions and methods
-	const formElements = el.querySelectorAll('form');
-	formElements.forEach((formElement) => {
-		formElement.removeAttribute('action');
-		formElement.removeAttribute('method');
-	});
-}
+		else {
+			result += Config.get('placeholder_image_url');
+		}
+	}
+	return result;
+//	return url !== void 0 ? url :
+//		Config.get('assets_base_url') + (defaultUrl !== void 0 ? defaultUrl : Config.get('default_placeholder_url'));
+};

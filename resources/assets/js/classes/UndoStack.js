@@ -95,7 +95,7 @@ export default class UndoStack {
 	 * Shortcut to add initial data and unlock undo/redo.
 	 */
 	init(data) {
-		return this.add(data).unlock();
+		return this.clear().add(data).unlock();
 	}
 
 	/**

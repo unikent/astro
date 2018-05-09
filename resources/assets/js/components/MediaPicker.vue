@@ -97,9 +97,7 @@ export default {
 
 	watch: {
 		visible(show) {
-			// update media if it's not been fetched before or
-			// if 10 minutes have elapsed since the last fetch
-			if(show && (new Date() - this.lastUpdated) / 60000 > 10) {
+			if(show) {
 				this.fetchMedia();
 			}
 		}

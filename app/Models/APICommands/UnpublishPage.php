@@ -2,6 +2,7 @@
 
 namespace App\Models\APICommands;
 
+use App\Events\PageEvent;
 use App\Exceptions\UnpublishedPageException;
 use App\Models\Contracts\APICommand;
 use App\Models\Page;
@@ -25,9 +26,9 @@ class UnpublishPage implements APICommand
 	{
 		return DB::transaction(function () use ($input) {
 			$page = Page::find($input['id']);
-
+			event(new PageEvent(PageEvent::UNPUBLISHING, $page, null));
 			$page->publishedVersion()->delete();
-
+			event(new PageEvent(PageEvent::UNPUBLISHED, $page, null));
 			return $page;
 		});
 	}

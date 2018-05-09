@@ -9,17 +9,17 @@
 >
 	<!-- Expand tree icon -->
 	<div v-if="!root && hasChildren" class="page-list__item__expand" @click="toggle">
-		<icon v-show="open" name="minus" width="10" height="10" />
-		<icon v-show="!open" name="plus" width="10" height="10" />
+		<icon v-show="open" name="minus" :width="10" :height="10" />
+		<icon v-show="!open" name="plus" :width="10" :height="10" />
 	</div>
 	<!-- End expand tree icon -->
 
 	<div
 		class="page-list__title"
-		:class="{ 'page-list__title--selected': pageData.id === this.page.id }"
+		:class="{ 'page-list__title--selected': pageData.id === page.id }"
 	>
 		<span class="page-list__item__drag-handle">
-			<icon v-if="!root && canUser('page.move')" name="arrow" width="14" height="14" />
+			<icon v-if="!root && canUser('page.move')" name="arrow" :width="14" :height="14" />
 		</span>
 
 		<el-tooltip
@@ -33,13 +33,13 @@
 		</el-tooltip>
 
 		<span ref="name" class="page-list__text" @click="edit">
-			{{ page.path === '/' ? 'Home page' : (page.title || page.slug) }}
+			{{ page.title || page.slug }}
 		</span>
 
 		<!-- Page options dropdown -->
 		<el-dropdown trigger="click" @command="handleCommand" size="small" class="page-list__options">
 			<el-button type="text" style="padding: 0;">
-				<icon name="more-alt" width="14" height="14" class="page-list__option-icon" />
+				<icon name="more-alt" :width="14" :height="14" class="page-list__option-icon" />
 			</el-button>
 
 			<el-dropdown-menu slot="dropdown">
@@ -171,6 +171,20 @@ export default {
 		}
 	},
 
+	watch: {
+		'pageData.id'(id) {
+			if(id === this.page.id) {
+				this.$store.commit('setCurrentPageArrayPath', this.path);
+			}
+		},
+
+		page(page) {
+			if(this.pageData.id === page.id) {
+				this.$store.commit('setCurrentPageArrayPath', this.path);
+			}
+		}
+	},
+
 	computed: {
 
 		...mapState('site', {
@@ -268,10 +282,6 @@ export default {
 					done();
 				})
 				.catch(() => {});
-		},
-
-		openPage() {
-			this.open = true;
 		},
 
 		toggle() {

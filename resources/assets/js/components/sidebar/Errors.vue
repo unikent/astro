@@ -9,7 +9,7 @@
 						<template v-if="errors.indexOf(block.id) !== -1">
 							<li class="validation-errors__item warning">
 								<i class="el-icon-warning"></i>
-								<a href="#" @click="scrollTo(blockIndex, sectionIndex, regionName)" class="validation-errors__link">{{ label(block.definition_name + "-v" + block.definition_version) }}</a>
+								<a href="#" @click="scrollTo(blockIndex, sectionIndex, regionName, block.id)" class="validation-errors__link">{{ label(block.definition_name + "-v" + block.definition_version) }}</a>
 							</li>
 						</template>
 					</template>
@@ -61,18 +61,20 @@ export default {
 		 *
 		 * TODO: implement smooth scrolling?
 		 */
-		scrollTo(blockIndex, sectionIndex, regionName) {
+		scrollTo(blockIndex, sectionIndex, regionName, blockId) {
 			var el = document.getElementById('editor-content');
-			var block = el.contentWindow.document.getElementById('block_' + blockIndex);
+			var block = el.contentWindow.document.getElementById(`block_${blockId}`);
 			// position of the block in the iframe
 			var pos = block.getBoundingClientRect();
 			// add on Y scroll position to pos.top to make sure the position for the next jump is relative to the current scroll position
 			el.contentWindow.scrollTo(0, pos.top + el.contentWindow.scrollY);
 
 			this.$store.dispatch('changeBlock', {
-				regionName: regionName,
+				regionName,
+				sectionIndex,
 				sectionName: this.$store.getters.getSection(regionName, sectionIndex).name,
-				blockIndex: blockIndex
+				blockIndex,
+				blockId
 			});
 
 			// scroll to the right bit of the block options side panel
@@ -82,7 +84,7 @@ export default {
 				var errorFields = document.getElementsByClassName('is-error');
 
 				// ...and get the block options list containing div
-				var optionsList = document.getElementById('block-options-list');
+				var optionsList = document.querySelector('.block-options-list-scroll');
 
 				// Now get the top/bottom of the first error
 				// we need to add on the top position of the scroll to make sure the next time we're not going to go back to the top of the div

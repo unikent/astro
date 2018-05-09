@@ -19,3 +19,5 @@ storage/public
 /public/build
 .phpstorm.meta.php
 _ide_helper.php
+/public/hot
+/public/kent-theme-assets

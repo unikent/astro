@@ -25,7 +25,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'v1'], function () {
 	Route::get('regions/definitions', 'RegionController@definitions');
 	Route::get('regions/{region_definition}/definition', 'RegionController@definition');
 
-	Route::get('routes/resolve', 'PageController@resolve');
+	Route::get('route/resolve', 'PageController@resolve');
 
 	Route::resource('sites', 'SiteController', ['only' => ['index', 'show', 'store', 'update', 'destroy']]);
 	Route::get('sitedefinitions', 'SiteController@definitions');

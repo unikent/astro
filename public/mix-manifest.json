@@ -1,9 +1,7 @@
 {
-  "/build/js/manifest.js": "/build/js/manifest.js",
-  "/build/js/vendor.js": "/build/js/vendor.js",
-  "/build/js/main.js": "/build/js/main.js",
-  "/build/css/vendor.css": "/build/css/vendor.css",
-  "/build/css/main.css": "/build/css/main.css",
-  "/build/css/kentfont.css": "/build/css/kentfont.css",
-  "/build/img/sprite.svg": "/build/img/sprite.svg"
+	"/build/js/vendor.js": "/build/js/vendor.js",
+	"/build/js/main.js": "/build/js/main.js",
+	"/build/css/main.css": "/build/css/main.css",
+	"/build/js/manifest.js": "/build/js/manifest.js",
+	"/build/img/sprite.svg": "/build/img/sprite.svg"
 }

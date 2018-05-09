@@ -1,6 +1,6 @@
 <?php
 
-return [
+$config = [
 
 	/*
 	|--------------------------------------------------------------------------
@@ -158,6 +158,16 @@ return [
 
 	/*
 	|--------------------------------------------------------------------------
+	| Astro: URL for Kent API
+	|--------------------------------------------------------------------------
+	|
+	| Specifies where the Kent API is located
+	|
+	*/
+	'kent_api_url' => env('KENT_API_URL', 'https://api.kent.ac.uk/api'),
+
+	/*
+	|--------------------------------------------------------------------------
 	| Autoloaded Service Providers
 	|--------------------------------------------------------------------------
 	|
@@ -200,7 +210,6 @@ return [
 		 */
 		Laravel\Tinker\TinkerServiceProvider::class,
 
-		KentAuth\AuthServiceProvider::class,
 		Baum\Providers\BaumServiceProvider::class,
 		Spatie\Fractal\FractalServiceProvider::class,
 		Intervention\Image\ImageServiceProvider::class,
@@ -215,9 +224,12 @@ return [
 		App\Providers\AuthServiceProvider::class,
 		// App\Providers\BroadcastServiceProvider::class,
 		App\Providers\EventServiceProvider::class,
+
+        Unikent\KentProfiles\KentProfilesServiceProvider::class,
 		App\Providers\RouteServiceProvider::class,
 		// App\Providers\ComposerServiceProvider::class,
         Fideloper\Proxy\TrustedProxyServiceProvider::class,
+
 	],
 
 	/*
@@ -273,3 +285,11 @@ return [
 	],
 
 ];
+
+$disable_kentauth = strtolower(env('DISABLE_KENTAUTH'));
+// don't add kentauth if we have disabled it
+if( !$disable_kentauth || $disable_kentauth == 'false' ) {
+	$config['providers'][] = KentAuth\AuthServiceProvider::class;
+}
+
+return $config;

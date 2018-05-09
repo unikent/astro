@@ -22,7 +22,7 @@
 		:closable="false"
 		show-icon
 	>
-  </el-alert>
+	</el-alert>
 </div>
 </template>
 
@@ -34,6 +34,8 @@ import Config from 'classes/Config';
 import Sidebar from 'components/sidebar';
 import ModalContainer from 'components/ModalContainer';
 import Icon from 'components/Icon';
+import { undoStackInstance } from 'plugins/undo-redo';
+import { onKeyDown, onKeyUp } from 'plugins/key-commands';
 
 export default {
 	name: 'editor',
@@ -42,6 +44,10 @@ export default {
 		Sidebar,
 		ModalContainer,
 		Icon
+	},
+
+	provide: {
+		fieldType: 'block'
 	},
 
 	data() {
@@ -53,14 +59,14 @@ export default {
 	created() {
 		this.$store.commit('site/updateCurrentSiteID', this.$route.params.site_id);
 		this.$store.dispatch('loadSiteRole', { siteId: this.$route.params.site_id, username: Config.get('username') })
-		.then(() => {
-			if (this.canUser('site.view')) {
-				this.showLoader();
-			}
-			else {
-				this.showPermissionsError = true;
-			}
-		});
+			.then(() => {
+				if (this.canUser('site.view')) {
+					this.showLoader();
+				}
+				else {
+					this.showPermissionsError = true;
+				}
+			});
 
 		this.views = {
 			desktop: {
@@ -82,11 +88,20 @@ export default {
 				height: '568px'
 			}
 		};
+
+		this.onKeyDown = onKeyDown(undoStackInstance);
+		this.onKeyUp = onKeyUp(undoStackInstance);
+
+		document.addEventListener('keydown', this.onKeyDown);
+		document.addEventListener('keyup', this.onKeyUp);
 	},
 
 	destroyed() {
 		// we have left the page editor so remove the snapeshot of the latest saved content
 		this.$store.commit('resetCurrentSavedState');
+
+		document.removeEventListener('keydown', this.onKeyDown);
+		document.removeEventListener('keyup', this.onKeyUp);
 	},
 
 	methods: {
@@ -107,7 +122,6 @@ export default {
 		]),
 
 		...mapState({
-			page: state => state.page.pageData,
 			pageLoaded: state => state.page.loaded
 		}),
 
@@ -115,6 +129,7 @@ export default {
 			'canUser'
 		]),
 
+		// get the URL for the route to show the editor preview page (not the external page preview)
 		getPreviewUrl() {
 			// TODO: Don't reload page when page_id changes, use state instead
 			return `${Config.get('base_url', '')}/preview/${this.$route.params.page_id}`;

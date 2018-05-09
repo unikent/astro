@@ -345,12 +345,29 @@ const actions = {
 
 			const
 				page = _.cloneDeep(oldLocation.page),
-				pagesListClone = _.cloneDeep(state.pages);
+				pagesListClone = _.cloneDeep(state.pages),
+				newPagePath = (
+					newLocation.parent.path.replace(/\/$/, '') +
+					'/' +
+					page.slug
+				);
 
 			// remove old page
 			commit('removePage', oldLocation);
+
+			// if it's the currently selected page, update the its path
+			commit(
+				'setPagePath',
+				{ id: page.id, path: newPagePath },
+				{ root: true }
+			);
+
 			// update current and child page depths
 			updateDepths(page, newLocation.parent.depth + 1);
+
+			// update current and child page paths
+			updatePaths(page, newPagePath);
+
 			// splice page in if a page already exists in new location otherwise add it
 			commit('addPage', { ...newLocation, page, push: !newLocation.page });
 

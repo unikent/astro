@@ -1,21 +1,27 @@
 <template>
 	<div class="richtext-wrapper">
-		<rich-text v-model="value" />
+		<rich-text v-model="value" :options="opts" />
 	</div>
 </template>
 
 <script>
-import baseFieldMixin from '../../mixins/baseFieldMixin';
+import BlockField from 'components/BlockField';
 import RichText from 'components/richtext';
 
 export default {
 
 	name: 'rich-text-field',
 
-	mixins: [baseFieldMixin],
+	extends: BlockField,
 
 	components: {
 		RichText
+	},
+
+	computed: {
+		opts() {
+			return this.options || {};
+		}
 	}
 };
 </script>

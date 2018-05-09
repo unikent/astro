@@ -10,7 +10,7 @@ const isAlphaNumeric = (k) => {
 
 const getKey = (e) => {
 	if(e.key && isAlphaNumeric(e.key)) {
-		return e.key;
+		return e.key.toLowerCase();
 	}
 	else if(e.keyCode && isAlphaNumeric(e.keyCode)) {
 		return String.fromCharCode(e.keyCode).toLowerCase();
@@ -20,22 +20,35 @@ const getKey = (e) => {
 	}
 };
 
-export const onKeyDown = () => {
-	return (e) => {
-		const key = getKey(e);
+export const onKeyDown = (ctx) => (e) => {
+	const key = getKey(e);
 
-		if(key) {
-			keys[key] = true;
-		}
-	};
+	if(key) {
+		keys[key] = true;
+	}
+
+	if((e.ctrlKey || e.metaKey) && keys.z && !e.shiftKey) {
+		e.preventDefault();
+		ctx.undo();
+	}
+
+	if(
+		((e.ctrlKey || e.metaKey) && keys.y) ||
+		((e.ctrlKey || e.metaKey) && e.shiftKey && keys.z)
+	) {
+		e.preventDefault();
+		ctx.redo();
+	}
+
+	// there's a possibility the matching onkeyup event is never
+	// called so we set a timer as a fallback for now
+	setTimeout(() => keys[key] = false, 500);
 };
 
-export const onKeyUp = () => {
-	return (e) => {
-		const key = getKey(e);
+export const onKeyUp = () => (e) => {
+	const key = getKey(e);
 
-		if(key) {
-			keys[key] = false;
-		}
-	};
+	if(key) {
+		keys[key] = false;
+	}
 };

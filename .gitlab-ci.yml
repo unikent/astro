@@ -1,0 +1,84 @@
+image: "gitlab.kent.ac.uk:4567/webdev/astro/php7.1:dev"
+
+cache:
+  key: "$CI_BUILD_REF_NAME-assets"
+  paths:
+    - $HOME/.composer/cache
+    - vendor/
+    # - node_modules/
+
+services:
+  - mysql:5.7
+  - redis:latest
+variables:
+  MYSQL_DATABASE: test
+  MYSQL_ROOT_PASSWORD: test
+  REDIS_PORT: 6379
+
+before_script:
+  - php --version
+  - composer --version
+  # - yarn --version
+  - mv .env.gitlab .env
+  - mkdir -p ~/.ssh
+  - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+  - eval $(ssh-agent -s)
+  - ssh-add <(echo "$CI_SSH_KEY")
+  - composer config -g github-oauth.github.com ${GITHUB_TOKEN}
+  - composer validate --no-check-all --ansi
+  - composer install --prefer-dist
+  - export DEFINITIONS_PATH=`pwd`/vendor/unikent/astro-kent-theme
+  - export PUBLIC_PATH=/site-editor
+  - export ASTRO_LOGOUT_URL=/site-editor/auth/logout
+  - yarn install
+  - yarn run production
+
+after_script:
+  - rm -rf node_modules .git
+
+stages:
+  - test
+  - build
+
+test:
+  stage: test
+  script:
+    - php artisan key:generate
+    - php artisan migrate --database=mysql_test
+    - vendor/bin/phpunit
+    # - yarn run validate
+
+artifacts-experimental:
+  stage: build
+  script:
+    - echo "Ready to 'artifact!'"
+  artifacts:
+    paths:
+      - ./
+    expire_in: 1 week
+  except:
+    - develop
+    - master
+
+artifacts-develop:
+  stage: build
+  script:
+    - echo "Ready to 'artifact!'"
+  artifacts:
+    paths:
+      - ./
+    expire_in: 3 months
+  only:
+    - develop
+
+artifacts-master:
+  stage: build
+  script:
+    - echo "Ready to 'artifact!'"
+  artifacts:
+    paths:
+      - ./
+    expire_in: 6 months
+  only:
+    - master

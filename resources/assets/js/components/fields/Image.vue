@@ -16,14 +16,17 @@
 </template>
 
 <script>
-import { mapMutations, mapState, mapGetters, mapActions } from 'vuex';
+import { mapMutations, mapActions } from 'vuex';
 
+import BlockField from 'components/BlockField';
 import MediaPicker from 'components/MediaPicker';
 import ItemThumbnail from 'components/media/ItemThumbnail';
 
 export default {
 
 	name: 'image-field',
+
+	extends: BlockField,
 
 	components: {
 		MediaPicker,
@@ -38,43 +41,6 @@ export default {
 	],
 
 	computed: {
-		...mapState({
-			currentBlockIndex: state => state.contenteditor.currentBlockIndex,
-			currentRegionName: state => state.contenteditor.currentRegionName
-		}),
-
-		...mapGetters([
-			'currentSectionIndex',
-			'getCurrentFieldValue'
-		]),
-
-		value: {
-			get() {
-				return this.getCurrentFieldValue(this.path);
-			},
-			set(value) {
-				this.updateFieldValue({
-					name: this.path,
-					index: this.currentBlockIndex,
-					region: this.currentRegionName,
-					section: this.currentSectionIndex,
-					value: { ...value, type: 'image' }
-				});
-
-				this.updateBlockMedia({
-					index: this.currentBlockIndex,
-					region: this.currentRegionName,
-					section: this.currentSectionIndex,
-					value: {
-						...value,
-						/* eslint-disable camelcase */
-						associated_field: this.path
-  						/* eslint-enable camelcase */
-					}
-				});
-			}
-		},
-
 		item() {
 			return { ...this.value, type: 'image' };
 		}
@@ -82,7 +48,6 @@ export default {
 
 	methods: {
 		...mapMutations([
-			'updateFieldValue',
 			'updateBlockMedia',
 			'setMediaType',
 			'updateMediafieldPath',
@@ -92,6 +57,28 @@ export default {
 		...mapActions([
 			'showMediaOverlay'
 		]),
+
+		updateFieldValue(path, value) {
+			this.$store.commit('updateFieldValue', {
+				name: this.path,
+				index: this.currentBlockIndex,
+				region: this.currentRegionName,
+				section: this.currentSectionIndex,
+				value: { ...value, type: 'image' }
+			});
+
+			this.updateBlockMedia({
+				index: this.currentBlockIndex,
+				region: this.currentRegionName,
+				section: this.currentSectionIndex,
+				value: {
+					...value,
+					/* eslint-disable camelcase */
+					associated_field: this.path
+					/* eslint-enable camelcase */
+				}
+			});
+		},
 
 		showPicker() {
 			this.setMediaType('image');

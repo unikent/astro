@@ -8,9 +8,9 @@
 
 	<link rel="icon" href="../../favicon.ico">
 
-	<title>Astro</title>
+	<title>Site Editor - University of Kent</title>
 
-	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/build/css/main.css') }}" />
+	<link rel="stylesheet" href="{{ mix('/build/css/main.css') }}" />
 	@if ($is_preview)
 		<style>
 		html {
@@ -23,11 +23,17 @@
 	window.astro = <?php echo json_encode([
 		'csrf_token' => csrf_token(),
 		'base_url' => Request::getBaseUrl(),
-		'api_url' => '/api/v1/',
+		'api_url' => env('ASTRO_API_URL'),
+		'logout_url' => env('ASTRO_LOGOUT_URL'),
 		'username' => $username,
 		'user'     => $user,
 		'api_token' => $api_token,
-		'debug' => config('app.debug')
+		'debug' => config('app.debug'),
+		'published_url_pattern' => env('APP_LIVE_URL_PATTERN'),
+		'draft_url_pattern' => env('APP_PREVIEW_URL_PATTERN'),
+		'assets_base_url' => env('ASSETS_BASE_URL'),
+		'placeholder_image_url' => env('PLACEHOLDER_IMAGE_URL'),
+		'machform_url' => env('MACHFORM_URL')
 	]); ?>;
 	</script>
 
@@ -45,8 +51,8 @@
 
 	</div>
 
-	<script src="{{ url('/') }}{{ mix('/build/js/manifest.js') }}"></script>
-	<script src="{{ url('/') }}{{ mix('/build/js/vendor.js') }}"></script>
-	<script src="{{ url('/') }}{{ mix('/build/js/main.js') }}"></script>
+	<script src="{{ mix('/build/js/manifest.js') }}"></script>
+	<script src="{{ mix('/build/js/vendor.js') }}"></script>
+	<script src="{{ mix('/build/js/main.js') }}"></script>
 </body>
 </html>

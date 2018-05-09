@@ -30,8 +30,14 @@
 .block-overlay {
 	top: 0;
 	opacity: 1;
-	border-width: 4px;
+	border-width: 2px;
+	border-style: dotted;
 	max-width: 100%;
+}
+
+.block-overlay--selected {
+	border-width: 4px;
+	border-style: solid;
 }
 
 .block-overlay--hidden {
@@ -74,13 +80,12 @@
 	position: absolute;
 	top: 15px;
 	right: 15px;
-	pointer-events: auto;
 }
 
+.move-up,
+.move-down,
 .block-overlay__delete-button {
-	margin-left: 20px;
 	pointer-events: auto;
-	fill: #c74d4d;
 }
 
 .block-overlay__delete--sidebar {

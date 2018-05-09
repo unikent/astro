@@ -1,9 +1,10 @@
 import _ from 'lodash';
 import Vue from 'vue';
-import { Definition } from 'classes/helpers';
+import { getPublishedPreviewURL, getDraftPreviewURL, Definition } from 'classes/helpers';
 import api from 'plugins/http/api';
 import { eventBus } from 'plugins/eventbus';
 import Config from 'classes/Config';
+import { undoStackInstance } from 'plugins/undo-redo';
 
 const vue = new Vue();
 
@@ -33,7 +34,8 @@ const state = {
 	},
 	loaded: false,
 	currentSavedState: '',
-	invalidBlocks: []
+	invalidBlocks: [],
+	currentPageArrayPath: null
 };
 
 const mutations = {
@@ -80,7 +82,7 @@ const mutations = {
 		state.blockMeta.blocks[region][section].blocks.splice(to, 0, blockMeta);
 
 		// TODO: use state for this
-		Vue.nextTick(() => eventBus.$emit('block:updateOverlay', to));
+		Vue.nextTick(() => eventBus.$emit('block:updateBlockOverlays', to));
 	},
 
 	/**
@@ -100,8 +102,7 @@ const mutations = {
 	},
 
 	updateFieldValue(state, { index, name, value, region, section }) {
-		let	idx = index;
-		let fields = state.pageData.blocks[region][section].blocks[idx].fields;
+		let fields = state.pageData.blocks[region][section].blocks[index].fields;
 
 		// if field exists just update it
 		if(_.has(fields, name)) {
@@ -174,7 +175,7 @@ const mutations = {
 		}
 
 		if(block) {
-			Definition.fillBlockFields(block);
+			Definition.fillFields(block);
 		}
 
 		state.blockMeta.blocks[region][sectionIndex].blocks.splice(index, (replace ? 1 : 0), {
@@ -183,22 +184,34 @@ const mutations = {
 		});
 
 		state.pageData.blocks[region][sectionIndex].blocks.splice(index, (replace ? 1 : 0), block || {});
+
+		if(replace) {
+			Vue.nextTick(
+				() => eventBus.$emit('block:showSelectedOverlay', {
+					id: block.id
+				})
+			);
+		}
+
+		// TODO: use state for this
+		Vue.nextTick(() => eventBus.$emit('block:updateBlockOverlays'));
 	},
 
 	/**
 	 * Delete the specified block from the page.
+	 *
 	 * @param state
 	 * @param {string} region - The name of the region containing the block.
-	 * @param {number} index - The index of the block in its section.
 	 * @param {number} section - The index in the region of the section containing the block.
+	 * @param {number} index - The index of the block in its section.
 	 */
-	deleteBlock(state,  { region, index, section } ) {
+	deleteBlock(state,  { region, section, index }) {
 
 		state.pageData.blocks[region][section].blocks.splice(index, 1);
 		state.blockMeta.blocks[region][section].blocks.splice(index, 1);
 
 		// TODO: use state for this
-		Vue.nextTick(() => eventBus.$emit('block:updateOverlay', index));
+		Vue.nextTick(() => eventBus.$emit('block:updateBlockOverlays'));
 	},
 
 	updateCurrentSavedState(state) {
@@ -232,6 +245,12 @@ const mutations = {
 		}
 	},
 
+	setPagePath(state, { id, path }) {
+		if(state.pageData && state.pageData.id === Number(id)) {
+			state.pageData.path = path
+		}
+	},
+
 	setPageSlugAndPath(state, { id, slug }) {
 		if(state.pageData && state.pageData.id === Number(id)) {
 			state.pageData.slug = slug;
@@ -246,13 +265,17 @@ const mutations = {
 		if(state.pageData && state.pageData.id === Number(id)) {
 			state.pageData.status = status;
 		}
+	},
+
+	setCurrentPageArrayPath(state, arrayPath) {
+		state.currentPageArrayPath = arrayPath;
 	}
 
 };
 
 const actions = {
 
-	fetchPage({ commit }, id) {
+	fetchPage({ state, commit }, id) {
 		commit('setPage', null);
 		// TODO: refactor into smaller methods
 		return api
@@ -273,6 +296,7 @@ const actions = {
 
 						commit('setBlockDefinitions', Definition.definitions, { root: true });
 						commit('setPage', _.cloneDeep(page));
+						undoStackInstance.init(state.pageData)
 						commit('clearBlockValidationIssues');
 
 						const blockMeta = {
@@ -284,7 +308,7 @@ const actions = {
 							page.blocks[region].forEach((section, sindex) => {
 								blockMeta.blocks[region].push({ blocks: [] });
 								page.blocks[region][sindex].blocks.forEach((block) => {
-									Definition.fillBlockFields(block);
+									Definition.fillFields(block);
 									blockMeta.blocks[region][sindex].blocks.push({ size: 0, offset: 0 });
 									if( typeof block.errors !== void 0 && block.errors !== null) {
 										commit('addBlockValidationIssue', block.id);
@@ -333,7 +357,7 @@ const actions = {
 							{},
 							[
 								vue.$createElement('p', { class:'el-message__content', style:'padding-bottom:1rem' }, 'The page saved ok, but there are some validation errors.'),
-								vue.$createElement('p', { class:'el-message__content', style:'padding-bottom:1rem' }, 'You won\'t be able to publish till these are fixed.'),
+								vue.$createElement('p', { class:'el-message__content', style:'padding-bottom:1rem' }, 'You won\'t be able to publish until these are fixed.'),
 								vue.$createElement('a', {
 									attrs: {
 										href: '#'
@@ -489,7 +513,7 @@ const getters = {
 	 * @returns {string}
 	 */
 	siteTitle: (state) => {
-		return (state.loaded ? state.pageData.site.title : '');
+		return (state.loaded ? state.pageData.site.name : '');
 	},
 
 	/**
@@ -553,12 +577,7 @@ const getters = {
 	 * @returns {string} Full URL
 	 */
 	draftPreviewURL: (state, getters) => {
-		return (
-			Config.get('base_url', '') + '/draft/' +
-			getters.siteDomain +
-			getters.sitePath +
-			(getters.pagePath === '/' ? '' : getters.pagePath)
-		);
+		return getDraftPreviewURL(getters.siteDomain, getters.sitePath + (getters.pagePath === '/' ? '' : getters.pagePath));
 	},
 
 	/**
@@ -568,12 +587,7 @@ const getters = {
 	 * @returns {string} Full URL
 	 */
 	publishedPreviewURL: (state, getters) => {
-		return (
-			Config.get('base_url', '') + '/published/' +
-			getters.siteDomain +
-			getters.sitePath +
-			(getters.pagePath === '/' ? '' : getters.pagePath)
-		);
+		return getPublishedPreviewURL(getters.siteDomain, getters.sitePath + (getters.pagePath === '/' ? '' : getters.pagePath));
 	},
 
 	unsavedChangesExist: (state) => () => {
@@ -642,6 +656,30 @@ const getters = {
 				state.pageData.blocks[regionName] :
 				null
 		);
+	},
+
+	currentPageBreadcrumbs: (state, getters, rootState) => {
+		if(!rootState.page.currentPageArrayPath) {
+			return [];
+		}
+
+		const path = rootState.page.currentPageArrayPath.split('.');
+
+		let
+			breadcrumbs = [],
+			page = rootState.site.pages;
+
+		for(var i = 0, length = path.length; page !== void 0 && i < length; i++) {
+			page = i > 0 ? page.children[path[i]] : page[path[i]];
+			if(page) {
+				breadcrumbs.push({
+					title: page.title,
+					path: page.path
+				});
+			}
+		}
+
+		return breadcrumbs;
 	}
 
 };

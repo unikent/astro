@@ -1,7 +1,7 @@
 import axios from 'axios';
 import Config from '../../classes/Config';
 
-export const baseURL = Config.get('api_base_url');
+export const baseURL = Config.get('api_url');
 
 const api = {
 	...axios.create({

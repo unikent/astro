@@ -13,10 +13,10 @@
 </template>
 
 <script>
-import baseFieldMixin from '../../mixins/baseFieldMixin';
+import BlockField from 'components/BlockField';
 
 export default {
 	name: 'radio-field',
-	mixins: [baseFieldMixin]
+	extends: BlockField
 };
 </script>
