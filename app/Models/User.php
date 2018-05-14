@@ -11,7 +11,7 @@ class User extends KentUser
 		'settings' => 'json'
 	];
 
-	  protected $hidden = [ 'api_token', 'created_at', 'updated_at'];
+	protected $hidden = [ 'api_token', 'created_at', 'updated_at'];
 
 	protected $attributes = [
 		'settings' => '{}'
