@@ -34,6 +34,11 @@ trait CreatesFeatureFixtures
 	 * @var User - user with contributor privileges on the test site.
 	 */
 	public $contributor = null;
+	/**
+	 * @var User - user with no privileges on the test site.
+	 */
+	public $randomer = null;
+
 
 	/**
 	 * Runs before every test and sets up database fixtures including:
@@ -80,6 +85,14 @@ trait CreatesFeatureFixtures
 			'api_token' => 'contributor-test'
 		]);
 
+		$this->randomer = factory(User::class)->create([
+			'username' => 'randomer',
+			'name' => 'Random User',
+			'password' => $hasher->make('randomer'),
+			'role' => 'user',
+			'api_token' => 'randomer-test'
+		]);
+
 		$this->client = new LocalAPIClient($this->admin);
 		$this->site = $this->client->createSite(
 			'Test Site', 'example.com', '', ['name'=>'one-page-site','version'=>1]
@@ -92,17 +105,18 @@ trait CreatesFeatureFixtures
 	}
 
 	/**
-	 * Data provider providing the names of the properties of this object containing user objects to use in testing.
-	 * NOTE - this is a cludge as it can't return the actual user objects created in setup() as dataproviders are run
-	 * BEFORE setup happens, see note on https://phpunit.de/manual/current/en/writing-tests-for-phpunit.html#writing-tests-for-phpunit.data-providers
+	 * Converts an array like [ 'a' , 'b', 'c' ] to [ 'a' => ['a'], 'b' => ['b'], ...] for use with dataProviders
+	 * @param array $input Array of string values to pack into another array keyed by the value
 	 * @return array
 	 */
-	public function adminOwnerEditorProvider()
+	public function packArrayForProvider($input)
 	{
-		return [
-			'admin' => ['admin'],
-			'owner' => ['owner'],
-			'editor' => ['editor']
-		];
+		$result = [];
+		foreach($input as $item) {
+			$result[$item] = [$item];
+		}
+		return $result;
 	}
+
+
 }

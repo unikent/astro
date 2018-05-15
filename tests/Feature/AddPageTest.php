@@ -30,9 +30,27 @@ class AddPageTest extends TestCase
     }
 
 	/**
+	 * Provide names of properties for users who should be able to add pages.
+	 * @return array
+	 */
+    public function usersWhoCanAddPagesProvider()
+	{
+		return $this->packArrayForProvider(['admin', 'owner', 'editor']);
+	}
+
+	/**
+	 * Provide names of user objects who should not be able to add pages.
+	 * @return array
+	 */
+	public function usersWhoCannotAddPagesProvider()
+	{
+		return $this->packArrayForProvider(['contributor', 'randomer']);
+	}
+
+	/**
 	 * @test
 	 * @group api
-	 * @dataProvider adminOwnerEditorProvider
+	 * @dataProvider usersWhoCanAddPagesProvider
 	 */
     public function addPageToParentAddsAtEndOfSiblings($user)
 	{
