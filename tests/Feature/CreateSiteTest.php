@@ -11,7 +11,7 @@ use Tests\Feature\Traits\MakesAssertionsAboutPages;
 use Tests\Feature\Traits\ValidatesJsonSchema;
 
 /**
- * Feature tests for the add page api endpoint.
+ * Feature tests for the create site api endpoint.
  * See the traits used for additional information about how these tests work.
  * @package Tests\Feature
  */
@@ -40,6 +40,8 @@ class CreateSiteTest extends TestCase
 	 */
 	public function createSite_withValidData_createsASiteWithPagesBasedOnSiteDefinition($data)
 	{
+		// ensure site with this host and path does not already exist
+		$this->assertFalse($this->siteExistsWithHostAndPath($data['host'], $data['path']));
 		$response = $this->json(
 			'POST',
 			'/api/v1/sites',
@@ -47,15 +49,35 @@ class CreateSiteTest extends TestCase
 			['Authorization' => 'Bearer ' . $this->admin->api_token]
 		);
 		$response->assertStatus(201);
+		$this->assertTrue($this->siteExistsWithHostAndPath($data['host'], $data['path']));
+		$json = json_decode($response->getContent(), true);
+	}
+
+	/**
+	 * Data provider for users who should not be able to create sites
+	 * @return array
+	 */
+	public function usersWhoCannotCreateSitesProvider()
+	{
+		return $this->packArrayForProvider(['randomer','contributor','editor', 'owner']);
 	}
 
 	/**
 	 * @group api
 	 * @test
+	 * @dataProvider usersWhoCannotCreateSitesProvider
 	 */
-	public function createSite_withoutAdminPrivileges_failsWith401()
+	public function createSite_withoutPrivileges_failsWith403($user)
 	{
-
+		foreach($this->getValidFixtureData('CreateSite') as $fixture => $payload) {
+			$response = $this->json(
+				'POST',
+				'/api/v1/sites',
+				$payload,
+				['Authorization' => 'Bearer ' . $this->$user->api_token]
+			);
+			$response->assertStatus(403);
+		}
 	}
 
 	/**
@@ -64,7 +86,7 @@ class CreateSiteTest extends TestCase
 	 */
 	public function invalidSiteDataProvider()
 	{
-		return [];
+		return $this->getInvalidFixtureData('CreateSite');
 	}
 
 	/**
@@ -74,6 +96,14 @@ class CreateSiteTest extends TestCase
 	 */
 	public function createSite_withInvalidData_failsWith422($data)
 	{
-
+		$response = $this->json(
+			'POST',
+			'/api/v1/sites',
+			$data,
+			['Authorization' => 'Bearer ' . $this->admin->api_token]
+		);
+		$response->assertStatus(422);
+		$json = json_decode($response->getContent(), true);
+		print_r($json);
 	}
 }

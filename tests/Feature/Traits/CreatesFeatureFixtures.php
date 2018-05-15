@@ -39,10 +39,10 @@ trait CreatesFeatureFixtures
 	 */
 	public $randomer = null;
 
-
 	/**
 	 * Runs before every test and sets up database fixtures including:
 	 * - 4 users named 'admin', 'owner', 'editor and 'contributor'
+	 * - Another user called 'randomer' who has no privileges
 	 * - admin user has administrator privileges
 	 * - Creates a single site using a site template from the ../Support/Fixtures/definitions/sites folder.
 	 * - Adds the users 'owner', 'editor' and 'contributor' to this site with the role that they are named after.

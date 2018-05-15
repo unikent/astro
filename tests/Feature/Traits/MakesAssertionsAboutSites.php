@@ -12,6 +12,19 @@ use App\Models\Site;
 trait MakesAssertionsAboutSites
 {
 	/**
+	 * Check if a site exists with the given host and path
+	 * @param string $host - The domain name for the site
+	 * @param string $path - The path for the site.
+	 * @return bool True if the site exists in the database, otherwise false
+	 */
+	public function siteExistsWithHostAndPath($host, $path)
+	{
+		return !!(Site::where('host','=', $host)
+					->where('path', '=', $path)
+					->first());
+	}
+
+	/**
 	 * Check if a site with the given id exists.
 	 * @param int $site_id - The id of the site to check for.
 	 * @return bool - Returns true if the site exists in the database, otherwise false.

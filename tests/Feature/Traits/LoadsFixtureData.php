@@ -34,13 +34,18 @@ trait LoadsFixtureData
 			$results = [];
 			$pattern = $this->getFixturePath() . '/' . $match . '.json';
 			foreach (glob($pattern) as $filename) {
-				$data = json_decode(file_get_contents($filename), true);
+				$data = json_decode($this->stripComments(file_get_contents($filename)), true);
 				$id = preg_replace('/^.*?([a-z0-9_-]+)\.json$/i', '$1', $filename);
 				$results[$id] = [$data];
 			}
 			static::$fixtureCache[$match] = $results;
 		}
 		return static::$fixtureCache[$match];
+	}
+
+	public function stripComments($input)
+	{
+		return preg_replace('/^#.*$\r?\n?/m', '', preg_replace('/\/\*.*?\*\//s', '', $input));
 	}
 
 	/**

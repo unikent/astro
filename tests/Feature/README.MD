@@ -1,4 +1,4 @@
-# API Feature Tests
+# API Feature Tests Framework
 
 ## Introduction
 
@@ -26,6 +26,9 @@ Tests should also exist for conditions where the API is expected to return an er
 Most test classes will want to use one or more of the utility traits (especially the
 CreatesFeatureFixtures which sets up the test database to a known state before each test).
 
+### Test Definitions
+
+The Tests\TestCase base class sets the definitions path to the ``tests/Support/Fixtures/definitions`` folder.
 
 ## Writing Tests
 
@@ -79,6 +82,31 @@ an array suitable for a dataprovider to return, e.g.
     ]
 
 
+### Test Request Payloads
+
+The directory ``tests/Support/Fixtures/featuredata`` contains json files containing payloads
+to use for testing. Defining these payloads here keeps the test classes simpler.
+
+Files should follow the following naming convention:
+
+   "\<test-name>\_<valid|invalid>\_<short-description>.json"
+
+where
+ 
+ * \<test-name> is something like "createsite", "addpage", 
+ * \<short-description> is just something that describes this variation of the data.
+ 
+ 
+The trait ``LoadsFixtureData`` has two methods ``getValidFixtureData`` and ``getInvalidFixtureData``
+which take a parameter matching ``\<test-name>`` and returns the json contained
+in any fixture files matching that name with ``invalid`` or ``valid`` respectively.
+
+The data is returned in a form usable by a data provider.
+
+This command will also (clumsily) strip out any commentsections contained within /* ... */
+or lines beginning with zero or more white space characters followed by a #
+(comments are not allowed in json).
+
 ## Helper Traits
 
 ### CreatesFeatureFixtures
@@ -98,4 +126,6 @@ It creates:
   * The user objects are available as attributes of the test class, named:
     $this->admin, $this->editor, $this->owner, $this->contributor, $this->randomer
     
+
+### LoadsFixtureData
 
