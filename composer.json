@@ -43,7 +43,7 @@
 		"unikent/astro-renderer": "dev-develop",
 		"unikent/kentauth": "dev-laravel/5.3",
 		"unikent/kent-profiles": "dev-master",
-		"unikent/astro-kent-theme": "dev-feature/seo-region"
+		"unikent/astro-kent-theme": "dev-develop"
 	},
 	"require-dev": {
 		"fzaninotto/faker": "~1.4",

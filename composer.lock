@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "ba24f87ab71edc504ce4de947c77b135",
+    "content-hash": "453e6e63f99cacf2f42e95b2f6f68914",
     "packages": [
         {
             "name": "barryvdh/laravel-debugbar",
@@ -3617,18 +3617,18 @@
         },
         {
             "name": "unikent/astro-kent-theme",
-            "version": "dev-feature/seo-region",
+            "version": "dev-develop",
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/astro-kent-theme.git",
-                "reference": "114bf364f9fb9df0cea0ab844ea8185aa74465eb"
+                "reference": "cc5d5efbb9913658e2786bd4daa09ed3a9527f27"
             },
             "require-dev": {
                 "phpunit/phpunit": "5.0"
             },
             "type": "library",
             "description": "Our block views",
-            "time": "2018-05-15T10:25:04+00:00"
+            "time": "2018-05-15T11:14:07+00:00"
         },
         {
             "name": "unikent/astro-renderer",
