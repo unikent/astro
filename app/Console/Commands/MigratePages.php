@@ -54,7 +54,7 @@ class MigratePages extends Command
                     $this->addRegion($this->option('id'), $this->option('site-ids') ? $this->option('site-ids') : 'all');
                 }
                 else {
-                    $this->error("You need to specify the --name of the region you're attempting to add");
+                    $this->error("You need to specify the --id of the region you're attempting to add");
                 }
                 break;
             default:
