@@ -30,6 +30,7 @@ class CreateSiteTest extends TestCase
 	 */
 	public function validSiteDataProvider()
 	{
+		print_r($this->combineForProvider2(['admin', 'owner'], ['one' => 'one_1', 'two' => 'two_2', 'three' => 'three_3'], ['a', 'b']));
 		return $this->getValidFixtureData('CreateSite');
 	}
 
