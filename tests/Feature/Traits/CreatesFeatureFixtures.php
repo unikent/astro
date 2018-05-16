@@ -145,15 +145,6 @@ trait CreatesFeatureFixtures
 	 * @param array ...$params
 	 * @return array  [ [$params[0][0], $params[1][0] ], [$params[0][0], $params[1][1]], [$params[
 	 */
-	public function combineForProvider_old(...$params)
-	{
-		$result = [];
-		foreach($params[0] as $key => $value) {
-			$result[$key] = [$value];
-		}
-		return (1 == count($params)) ? $result :  $this->permute($result, $params[1], array_slice($params, 2));
-	}
-
 	public function combineForProvider(...$params)
 	{
 		$results = ['' => []]; // need this so our loop below works for $params[0] iteration
@@ -168,26 +159,5 @@ trait CreatesFeatureFixtures
 			$results = $new_results;
 		}
 		return $results;
-	}
-
-	/**
-	 * LOL ROFL
-	 * @param $one
-	 * @param $two
-	 * @param array $more
-	 * @return array
-	 */
-	private function permute($one, $two, $more = [])
-	{
-		$result = [];
-		foreach($one as $key1 => $value1) {
-			foreach($two as $key2 => $value2) {
-				$result["{$key1}_{$key2}"] = array_merge($value1, [$value2]);
-			}
-		}
-		if($more) {
-			$result = $this->permute($result, $more[0], array_slice($more, 1));
-		}
-		return $result;
 	}
 }

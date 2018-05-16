@@ -26,7 +26,7 @@ trait LoadsFixtureData
 	 * Finds fixture data in the fixture path with filenames matching the glob pattern in $match.
 	 * Caches lookups to avoid too much disk scanning during tests. Possibly pointless as I think phpunit may just run these once before tests.
 	 * @param string $match - Filename pattern for glob to match.
-	 * @return array - Fixture data suitable for phpunit dataproviders in form ['filename-without-dot-json' => [data], ... ]
+	 * @return array - Fixture data in array in form ['filename-without-dot-json' => data, ... ]
 	 */
 	public function getFixtureData($match)
 	{
@@ -36,7 +36,7 @@ trait LoadsFixtureData
 			foreach (glob($pattern) as $filename) {
 				$data = json_decode($this->stripComments(file_get_contents($filename)), true);
 				$id = preg_replace('/^.*?([a-z0-9_-]+)\.json$/i', '$1', $filename);
-				$results[$id] = [$data];
+				$results[$id] = $data;
 			}
 			static::$fixtureCache[$match] = $results;
 		}
@@ -51,7 +51,7 @@ trait LoadsFixtureData
 	/**
 	 * Gets fixture data for testing a command matching the valid filename pattern.
 	 * @param string $command - The command whose fixture data to load, e.g. CreateSite
-	 * @return array - Fixture data suitable for phpunit dataproviders in form ['filename-without-dot-json' => [data], ... ]
+	 * @return array - Fixture data in array in form ['filename-without-dot-json' => data, ... ]
 	 */
 	public function getValidFixtureData($command)
 	{
@@ -62,7 +62,7 @@ trait LoadsFixtureData
 	/**
 	 * Gets fixture data for testing a command matching the invalid filename pattern.
 	 * @param string $command - The command whose fixture data to load, e.g. CreateSite
-	 * @return array - Fixture data suitable for phpunit dataproviders in form ['filename-without-dot-json' => [data], ... ]
+	 * @return array - Fixture data in array in form ['filename-without-dot-json' => data, ... ]
 	 */
 	public function getInvalidFixtureData($command)
 	{
