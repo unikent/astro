@@ -18,6 +18,9 @@ class ProcessMedia implements ShouldQueue
 	use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
 	protected $media;
+	protected $transforms = [
+		 'base64', '400x400', '400w', '800w', '2000w'
+	];
 
 	/**
 	 * Create a new job instance.
@@ -28,6 +31,34 @@ class ProcessMedia implements ShouldQueue
 	public function __construct(Media $media)
 	{
 		$this->media = $media;
+	}
+
+	protected function transform($type, $img) {
+		switch($type) {
+			case '400x400':
+				return $img->fit(400);
+			case '400w':
+				return $img->resize(400, null, function($constraint) {
+					$constraint->aspectRatio();
+				});
+			case '800w':
+				return $img->resize(800, null, function($constraint) {
+					$constraint->aspectRatio();
+					// $constraint->upsize();
+				});
+			case '2000w':
+				return $img->resize(2000, null, function($constraint) {
+					$constraint->aspectRatio();
+					// $constraint->upsize();
+				});
+			case 'base64':
+				return (string) $img
+					->resize(50, null, function($constraint) {
+						$constraint->aspectRatio();
+					})
+					->blur(3)
+					->encode('data-url');
+		}
 	}
 
 	/**
@@ -60,7 +91,7 @@ class ProcessMedia implements ShouldQueue
 			$filepath = sprintf(
 				'%s/%s',
 				$dir,
-				$filename_no_ext . '_400x400.jpg'
+				$filename_no_ext
 			);
 
 			try {
@@ -69,23 +100,26 @@ class ProcessMedia implements ShouldQueue
 
 				$img->backup();
 
-				$img->fit(400)->save($filepath);
+				$variants = [];
 
-				$img->reset();
+				foreach($this->transforms as $type) {
+					if($type === 'base64') {
+						$media = $this->transform($type, $img);
+					}
+					else {
+						$append = '_' . $type . '.jpg';
+						$media = $filename_no_ext . $append;
+						$this
+							->transform($type, $img)
+							->interlace()
+							->save($filepath . $append);
+					}
 
-				$base64Img = (
-					(string) $img
-						->resize(50, null, function($constraint) {
-							$constraint->aspectRatio();
-						})
-						->blur(5)
-						->encode('data-url')
-				);
+					$variants[$type] = $media;
+					$img->reset();
+				}
 
-				$this->media->variants = [
-					'400x400' => $filename_no_ext . '_400x400.jpg',
-					'base64' => $base64Img
-				];
+				$this->media->variants = $variants;
 			}
 			catch(ImageException $e) {
 				$this->media->variants = new \ArrayObject();
