@@ -410,7 +410,7 @@ class Page extends BaumNode
 	 */
 	public function loadLayoutDefinition($includeRegions = false)
 	{
-		$file = LayoutDefinition::locateDefinition($this->revision->layout_name, $this->revision->layout_version);
+		$file = LayoutDefinition::locateDefinition(LayoutDefinition::idFromNameAndVersion($this->revision->layout_name, $this->revision->layout_version));
 		$definition = LayoutDefinition::fromDefinitionFile($file);
 
 		if ($includeRegions) $definition->loadRegionDefinitions();
