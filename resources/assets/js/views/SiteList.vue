@@ -64,7 +64,7 @@
 
 					<td>
 						<div class="cell">
-							<router-link :to="`/site/${site.id}/page/${site.homepage.id}`">
+							<router-link :to="`/site/${site.id}/page/${site.homepage.id}`" v-if="canUserOnSite('page.edit', site.currentRole)">
 								<el-button type="default" size="small">
 									Editor
 								</el-button>
@@ -84,7 +84,7 @@
 									Users
 								</el-button>
 							</router-link>
-							<router-link :to="`/site/${site.id}/profiles`" v-if="canUserOnSite('site.view', site.currentRole)">
+							<router-link :to="`/site/${site.id}/profiles`" v-if="canUserOnSite('profile.edit', site.currentRole)">
 								<el-button type="default" size="small">
 									Profiles
 								</el-button>
