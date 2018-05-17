@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
+use Tests\Feature\Traits\MakesAssertionsAboutErrors;
 use Tests\TestCase;
 use Tests\Feature\Traits\CreatesFeatureFixtures;
 use Tests\Feature\Traits\ExtractsPageAttributesFromPageJson;
@@ -22,15 +24,21 @@ class CreateSiteTest extends TestCase
 		MakesAssertionsAboutSites,
 		MakesAssertionsAboutPages,
 		ValidatesJsonSchema,
+		MakesAssertionsAboutErrors,
 		LoadsFixtureData;
 
 	/**
-	 * Provides valid data for creating a site with.
-	 * @return array
+	 * @test
+	 * @group api
+	 * @dataProvider validSiteDataProvider
 	 */
-	public function validSiteDataProvider()
+	public function createSite_withSameHostAndPathAsExistingSite_failsWith422($payload)
 	{
-		return $this->combineForProvider($this->getValidFixtureData('CreateSite'));
+		// attempt to create the same site twice
+		$this->createSiteAndTestStatusCode($this->admin, $payload, 201);
+		$response = $this->createSiteAndTestStatusCode($this->admin, $payload, 422);
+		$json = json_decode($response->getContent(), true);
+		$this->assertValidErrorResponseBody($json, ['host', 'path']);
 	}
 
 	/**
@@ -40,16 +48,9 @@ class CreateSiteTest extends TestCase
 	 */
 	public function createSite_withValidDataAndPermissions_createsASiteWithPagesBasedOnSiteDefinition($data)
 	{
-		// ensure site with this host and path does not already exist
-		$this->assertFalse($this->siteExistsWithHostAndPath($data['host'], $data['path']));
-		$response = $this->json(
-			'POST',
-			'/api/v1/sites',
-			$data,
-			['Authorization' => 'Bearer ' . $this->admin->api_token]
-		);
-		$response->assertStatus(201);
+		$response = $this->createSiteAndTestStatusCode($this->admin, $data, 201);
 		$this->assertTrue($this->siteExistsWithHostAndPath($data['host'], $data['path']));
+		// @todo - test that response json is valid
 		$json = json_decode($response->getContent(), true);
 	}
 
@@ -60,24 +61,8 @@ class CreateSiteTest extends TestCase
 	 */
 	public function createSite_withValidDataButInvalidPrivileges_failsWith403($payload, $user)
 	{
-		$response = $this->json(
-			'POST',
-			'/api/v1/sites',
-			$payload,
-			['Authorization' => 'Bearer ' . $this->$user->api_token]
-		);
-		$response->assertStatus(403);
+		$response = $this->createSiteAndTestStatusCode($this->$user, $payload, 403);
 		$this->assertFalse($this->siteExistsWithHostAndPath($payload['host'], $payload['path']));
-	}
-
-	/**
-	 * Data provider with valid data but users who should not be able to create sites
-	 * @return array [ [ $json_data, $username ], ... ]
-	 */
-	public function validDataUnauthorizedUsersProvider()
-	{
-		$users = ['randomer', 'contributor', 'editor', 'owner'];
-		return $this->combineForProvider($this->getValidFixtureData('CreateSite'), array_combine($users, $users));
 	}
 
 	/**
@@ -93,16 +78,6 @@ class CreateSiteTest extends TestCase
 	}
 
 	/**
-	 * Data provider providing data that is invalid to create a site.
-	 * @return array
-	 */
-	public function unauthorizedUsersInvalidSiteDataProvider()
-	{
-		$users = ['randomer', 'contributor', 'editor', 'owner'];
-		return $this->combineForProvider($this->getInvalidFixtureData('CreateSite'), array_combine($users, $users));
-	}
-
-	/**
 	 * @group api
 	 * @test
 	 * @dataProvider authorizedUsersInvalidSiteDataProvider
@@ -112,16 +87,32 @@ class CreateSiteTest extends TestCase
 		$response = $this->testCreateSiteWithInvalidData($payload, $user, 422);
 		// @todo - test that response json is valid
 		$json = json_decode($response->getContent(), true);
+		$this->assertValidErrorResponseBody($json, true);
 	}
 
+	/*****************************
+	 *
+	 * Utility Methods
+	 *
+	 *****************************/
+
 	/**
-	 * Data provider providing data that is invalid to create a site.
-	 * @return array
+	 * Utility method to send create site request and test response code
+	 * @param User $user - The user account whose api token to use.
+	 * @param array $payload - Array representation of the json data to use as the request payload.
+	 * @param int $expected_status - The expected http status code for the response.
+	 * @return \Illuminate\Foundation\Testing\TestResponse
 	 */
-	public function authorizedUsersInvalidSiteDataProvider()
+	private function createSiteAndTestStatusCode($user, $payload, $expected_status)
 	{
-		$users = ['admin'];
-		return $this->combineForProvider($this->getInvalidFixtureData('CreateSite'), array_combine($users, $users));
+		$response = $this->json(
+			'POST',
+			'/api/v1/sites',
+			$payload,
+			['Authorization' => 'Bearer ' . $user->api_token]
+		);
+		$response->assertStatus($expected_status);
+		return $response;
 	}
 
 	/**
@@ -133,16 +124,54 @@ class CreateSiteTest extends TestCase
 	 */
 	private function testCreateSiteWithInvalidData($payload, $user, $expected_status)
 	{
-		echo "$user $expected_status\n";
-		$response = $this->json(
-			'POST',
-			'/api/v1/sites',
-			$payload,
-			['Authorization' => 'Bearer ' . $this->$user->api_token]
-		);
-		$response->assertStatus($expected_status);
+		$response = $this->createSiteAndTestStatusCode($this->$user, $payload, $expected_status);
 		$this->assertFalse($this->siteExistsWithHostAndPath($payload['host'], $payload['path']));
 		return $response;
+	}
+
+	/*******************
+	 *
+	 * Data Providers
+	 *
+	 *******************/
+
+	/**
+	 * Provides valid data for creating a site with.
+	 * @return array
+	 */
+	public function validSiteDataProvider()
+	{
+		return $this->combineForProvider($this->getValidFixtureData('CreateSite'));
+	}
+
+	/**
+	 * Data provider with valid data but users who should not be able to create sites
+	 * @return array [ [ $json_data, $username ], ... ]
+	 */
+	public function validDataUnauthorizedUsersProvider()
+	{
+		$users = ['randomer', 'contributor', 'editor', 'owner'];
+		return $this->combineForProvider($this->getValidFixtureData('CreateSite'), array_combine($users, $users));
+	}
+
+	/**
+	 * Data provider providing data that is invalid to create a site.
+	 * @return array
+	 */
+	public function unauthorizedUsersInvalidSiteDataProvider()
+	{
+		$users = ['randomer', 'contributor', 'editor', 'owner'];
+		return $this->combineForProvider($this->getInvalidFixtureData('CreateSite'), array_combine($users, $users));
+	}
+
+	/**
+	 * Data provider providing data that is invalid to create a site.
+	 * @return array
+	 */
+	public function authorizedUsersInvalidSiteDataProvider()
+	{
+		$users = ['admin'];
+		return $this->combineForProvider($this->getInvalidFixtureData('CreateSite'), array_combine($users, $users));
 	}
 
 
