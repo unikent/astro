@@ -37,8 +37,7 @@ class CreateSiteTest extends TestCase
 		// attempt to create the same site twice
 		$this->createSiteAndTestStatusCode($this->admin, $payload, 201);
 		$response = $this->createSiteAndTestStatusCode($this->admin, $payload, 422);
-		$json = json_decode($response->getContent(), true);
-		$this->assertValidErrorResponseBody($json, ['host', 'path']);
+		$this->assertValidErrorResponseBody($response->getContent(), ['host', 'path']);
 	}
 
 	/**
@@ -63,6 +62,7 @@ class CreateSiteTest extends TestCase
 	{
 		$response = $this->createSiteAndTestStatusCode($this->$user, $payload, 403);
 		$this->assertFalse($this->siteExistsWithHostAndPath($payload['host'], $payload['path']));
+		$this->assertValidErrorResponseBody($response->getContent());
 	}
 
 	/**
