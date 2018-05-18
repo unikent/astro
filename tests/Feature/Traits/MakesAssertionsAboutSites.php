@@ -39,11 +39,11 @@ trait MakesAssertionsAboutSites
 	 * @param int $site_id - The Id of the site to check.
 	 * @param array $pages - Array, starting with homepage defining the pages that are expected to exist in the site.
 	 */
-	public function siteHasPageStructure($site_id, $pages)
+	public function assertSiteHasPageStructure($site_id, $structure)
 	{
 		$site = Site::find($site_id);
 		if($site) {
-
+			$pages = $site->draftPages()->toHierarchy()->toArray();
 		}
 		else {
 			return false;

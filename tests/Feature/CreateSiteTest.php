@@ -45,12 +45,13 @@ class CreateSiteTest extends TestCase
 	 * @group api
 	 * @dataProvider validSiteDataProvider
 	 */
-	public function createSite_withValidDataAndPermissions_createsASiteWithPagesBasedOnSiteDefinition($data)
+	public function createSite_withValidDataAndPermissions_createsASiteWithPagesBasedOnSiteDefinition($payload)
 	{
-		$response = $this->createSiteAndTestStatusCode($this->admin, $data, 201);
-		$this->assertTrue($this->siteExistsWithHostAndPath($data['host'], $data['path']));
-		// @todo - test that response json is valid
-		$json = json_decode($response->getContent(), true);
+		$response = $this->createSiteAndTestStatusCode($this->admin, $payload, 201);
+		$this->assertTrue($this->siteExistsWithHostAndPath($payload['host'], $payload['path']));
+		$json = json_decode($response->getContent(), false);
+		$this->assertValidJsonSchema($json, 'API/V1/CreateSite/201.json');
+//		$this->assertSiteHasPageStructure($json['data']['id'], )
 	}
 
 	/**
