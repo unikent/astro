@@ -399,7 +399,7 @@ const actions = {
 					// there seems to be a possibility to return multiple groups of error messages,
 					// so we will cater for that
 					let technicalMessages = [];
-					console.log(errorResponse.response.data.errors);
+					
 					// for each error message group...
 					errorResponse.response.data.errors.forEach(error => {
 						let messageLines = [];
@@ -442,15 +442,6 @@ const actions = {
 						type: 'error',
 						duration: 0,
 						width: '50%'
-					});
-				}
-				else{
-					// TODO: what message should we give here?
-					vue.$notify({
-						title: 'Not saved',
-						message: 'There was a problem and this page has not been saved. Please try again later.',
-						type: 'error',
-						duration: 0
 					});
 				}
 			});
