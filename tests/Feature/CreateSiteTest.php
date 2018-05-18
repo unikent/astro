@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Definitions\SiteDefinition;
 use App\Models\User;
 use Tests\Feature\Traits\MakesAssertionsAboutErrors;
 use Tests\TestCase;
@@ -51,7 +52,10 @@ class CreateSiteTest extends TestCase
 		$this->assertTrue($this->siteExistsWithHostAndPath($payload['host'], $payload['path']));
 		$json = json_decode($response->getContent(), false);
 		$this->assertValidJsonSchema($json, 'API/V1/CreateSite/201.json');
-//		$this->assertSiteHasPageStructure($json['data']['id'], )
+		$definition_id = $payload['site_definition']['name'] . '-v' . $payload['site_definition']['version'];
+		$definition_filename = SiteDefinition::locateDefinition($definition_id);
+		$definition = SiteDefinition::fromDefinitionFile($definition_filename);
+		$this->assertSiteHasPageStructure($json->data->id, [$definition->defaultPages]);
 	}
 
 	/**

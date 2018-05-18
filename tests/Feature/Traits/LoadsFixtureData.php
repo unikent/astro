@@ -68,4 +68,5 @@ trait LoadsFixtureData
 	{
 		return $this->getFixtureData(strtolower(str_replace(' ', '', $command)) . '_invalid*');
 	}
+
 }
