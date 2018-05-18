@@ -78,8 +78,7 @@ class CreateSiteTest extends TestCase
 	public function createSite_withInvalidData_failsWith403ForUnauthorizedUsers($payload, $user)
 	{
 		$response = $this->testCreateSiteWithInvalidData($payload, $user, 403);
-		// @todo - test that response json is valid
-		$json = json_decode($response->getContent(), true);
+		$this->assertValidErrorResponseBody($response->getContent());
 	}
 
 	/**
@@ -90,9 +89,7 @@ class CreateSiteTest extends TestCase
 	public function createSite_withInvalidData_failsWith422ForAuthorizedUsers($payload, $user)
 	{
 		$response = $this->testCreateSiteWithInvalidData($payload, $user, 422);
-		// @todo - test that response json is valid
-		$json = json_decode($response->getContent(), true);
-		$this->assertValidErrorResponseBody($json, true);
+		$this->assertValidErrorResponseBody($response->getContent(), true);
 	}
 
 	/*****************************
