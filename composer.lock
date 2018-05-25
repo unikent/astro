@@ -3672,7 +3672,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/kent-profiles.git",
-                "reference": "50534af2abdb8551454203ab342f11100d8086a9"
+                "reference": "c18928f25a45cd5e6bddf50560c5ee86aa16dd84"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.3"
@@ -3690,7 +3690,7 @@
                 }
             ],
             "description": "A laravel app to manage staff profiles at kent",
-            "time": "2018-04-23T12:29:19+00:00"
+            "time": "2018-05-16T16:14:32+00:00"
         },
         {
             "name": "unikent/kentauth",
