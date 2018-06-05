@@ -23,6 +23,7 @@ class Permission extends Model
 	const ADD_IMAGE = 'image.add';
 	const EDIT_IMAGE = 'image.edit';
 	const USE_IMAGE = 'image.use';
+	const UNLINK_IMAGE = 'image.unlink';
 	const PUBLISH_PAGE = 'page.publish';
 	const UNPUBLISH_PAGE = 'page.unpublish';
 	const PREVIEW_PAGE = 'page.preview';

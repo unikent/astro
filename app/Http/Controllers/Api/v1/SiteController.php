@@ -2,20 +2,25 @@
 
 namespace App\Http\Controllers\Api\v1;
 
+use App\Exceptions\DefinitionNotFoundException;
 use App\Models\APICommands\UpdateSite;
 use App\Models\Definitions\SiteDefinition;
 use App\Models\LocalAPIClient;
+use App\Models\Media;
 use App\Models\Page;
 use App\Models\Permission;
 use App\Models\Site;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Transformers\Api\v1\SiteTransformer;
 use App\Http\Transformers\Api\v1\PageTransformer;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Validation\UnauthorizedException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class SiteController extends ApiController
 {
@@ -217,5 +222,20 @@ class SiteController extends ApiController
 			$sites[$site_id] = SiteDefinition::fromDefinitionFile(SiteDefinition::locateDefinition($site_id));
 		}
 		return $sites;
+	}
+
+	/**
+	 * Delete (unlink) a media item from a site
+	 * @param Site $site
+	 * @param Media $media
+	 */
+	public function deleteMedia(Site $site, Media $media)
+	{
+		$this->authorize('deletemedia', $site);
+		if(!$media->sites()->pluck('sites.id')->contains($site->id)) {
+			throw new ModelNotFoundException();
+		}
+		$site->media()->detach($media->id, true);
+		return response('', 204);
 	}
 }
