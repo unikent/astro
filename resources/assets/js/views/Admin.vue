@@ -102,7 +102,7 @@ export default {
 					icon: 'layout',
 					title: 'Editor',
 					leave: true,
-					permission: 'site.view',
+					permission: 'page.edit',
 				},
 				{
 					link: `${this.url}/menu`,
@@ -126,7 +126,7 @@ export default {
 					link: `${this.url}/profiles`,
 					icon: 'write',
 					title: 'Profiles',
-					permission: 'site.view'
+					permission: 'profile.edit'
 				}
 			];
 		}
