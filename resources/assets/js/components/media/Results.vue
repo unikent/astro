@@ -8,6 +8,13 @@
 				:selected="selected && selected.indexOf(1) !== -1"
 				:enable-options="!pickerMode"
 				:on-edit="editAction"
+				:options="[
+					{
+						text: 'Delete',
+						action: (item) => $store.dispatch('detachMediaFromSite', item),
+						divided: true
+					}
+				]"
 			>
 				<div v-if="pickerMode" class="media-picker__overlay" @click="pickMedia(items[index - 1])">
 					<icon
