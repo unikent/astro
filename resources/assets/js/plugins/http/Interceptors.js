@@ -62,20 +62,9 @@ export default class Interceptors {
 	}
 
 	handleUnauthorized(response) {
-		this.vue.$confirm(
-			`Your authenticated session has expired.
-			Please click OK to reload the current page.
-			Note: all unsaved data will be lost.`,
-			'Sorry!', {
-				confirmButtonText: 'OK',
-				cancelButtonText: 'Cancel',
-				type: 'warning'
-			}
-		).then(() => {
-			// reload the current page
-			this.router.go();
-		}).catch(() => {
-			// do nothing, they have decided not to reload
+		return new Promise((resolve, reject) => {
+
+			// resolve or reject
 		});
 	}
 

@@ -1,5 +1,5 @@
 <template>
-<div class="page"  v-if="canUser('site.view')">
+<div class="page"  v-if="canUser('page.edit')">
 
 	<div class="editor-body">
 		<div class="editor-wrapper" ref="editor">
@@ -60,7 +60,7 @@ export default {
 		this.$store.commit('site/updateCurrentSiteID', this.$route.params.site_id);
 		this.$store.dispatch('loadSiteRole', { siteId: this.$route.params.site_id, username: Config.get('username') })
 			.then(() => {
-				if (this.canUser('site.view')) {
+				if (this.canUser('page.edit')) {
 					this.showLoader();
 				}
 				else {

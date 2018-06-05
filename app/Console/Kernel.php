@@ -20,6 +20,7 @@ class Kernel extends ConsoleKernel
         Commands\SetupPermissions::class,
 		Commands\ManageAdmins::class,
 		Commands\ClearCache::class,
+		Commands\MigratePages::class,
 		Commands\RenewUserAPITokens::class,
 	];
 

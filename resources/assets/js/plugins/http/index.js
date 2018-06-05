@@ -1,8 +1,9 @@
 import api from './api';
-import interceptors from './interceptors';
+import Interceptors from './Interceptors';
 
 export default (Vue, { store, router }) => {
-	interceptors(api, store, router);
+
+	const interceptors = new Interceptors(api, store, router);
 
 	Object.defineProperty(Vue.prototype, '$api', {
 		get() {
