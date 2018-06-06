@@ -7,11 +7,10 @@ use KentAuth\Http\Controllers\AuthController as KentAuthController;
 
 class AuthController extends KentAuthController {
 
-	protected $redirectTo = '';
-
+	protected $redirectTo = '/';
 
 	/**
-	 * Log the user out of the application. Overriden as the laravel default is to redirect to /
+	 * Log the user out of the application. Overridden as the laravel default is to redirect to /
 	 * @override AuthenticatesUsers@logout
 	 * @param  \Illuminate\Http\Request  $request
 	 * @return \Illuminate\Http\Response
