@@ -101,6 +101,18 @@ class SitePolicy extends BasePolicy
     }
 
 	/**
+	 * Determine whether the user can delete (unlink) media from the Site.
+	 *
+	 * @param  \App\Models\User  $user
+	 * @param  \App\Models\Site  $site
+	 * @return boolean
+	 */
+	public function deleteMedia(User $user, Site $site)
+	{
+		return $user->hasPermissionForSite(Permission::UNLINK_IMAGE, $site->id);
+	}
+
+	/**
 	 * Can the user move pages on this site?
 	 * @param User $user
 	 * @param Site $site

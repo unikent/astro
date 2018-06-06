@@ -20,9 +20,16 @@
 			<i class="el-icon-more"></i>
 			<el-dropdown-menu slot="dropdown">
 				<el-dropdown-item>
-				<a :href="item.url" target="_blank" class="media-item__download-link">Download</a>
-    			</el-dropdown-item>
-				<el-dropdown-item v-for="option in options" :key="option.text">{{ option.text }}</el-dropdown-item>
+					<a :href="item.url" target="_blank" class="media-item__download-link">Download</a>
+				</el-dropdown-item>
+				<el-dropdown-item
+					v-for="option in options"
+					:key="option.text"
+					:divided="option.divided"
+					@click.native="() => option.action(item)"
+				>
+					<div >{{ option.text }}</div>
+				</el-dropdown-item>
 			</el-dropdown-menu>
 		</el-dropdown>
 	</div>
@@ -35,6 +42,8 @@ import ItemIcon from './ItemIcon';
 import Icon from 'components/Icon';
 
 export default {
+	name: 'ItemThumbnail',
+
 	props: {
 		item: {
 			type: Object,
@@ -45,9 +54,11 @@ export default {
 			default: true
 		},
 		options: {
-			default: () => {}
+			default: () => []
 		},
-		onEdit: {}
+		onEdit: {
+			default: () => {}
+		}
 	},
 
 	components: {

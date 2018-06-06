@@ -38,6 +38,11 @@
 	width: 100%;
 }
 
+.el-upload__tip--link {
+    text-decoration: none;
+    color: #409EFF;
+}
+
 .block-options-list	{
 	.el-form-item__label {
 		padding: 0 0 10px;
@@ -226,7 +231,7 @@
 // error cards
 .box-card.error-card {
 	background-color: #fee;
-	
+
 	.el-card__header {
     	color: #fa5555;
     	font-size: 2rem;
