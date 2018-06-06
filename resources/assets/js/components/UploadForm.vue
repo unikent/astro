@@ -15,7 +15,7 @@
 		<div class="el-upload__tip" slot="tip">
 			Files must be less than 5MB. 
 			<template v-if="imageHelp">
-				<a :href="imageHelp" target="_blank">Need help? See our image guidelines ></a>
+				<a class="el-upload__tip--link" :href="imageHelp" target="_blank">Need help? See our image guidelines ></a>
 			</template>
 			<template v-else>
 			If this dialog is closed uploads will happen in the background.
