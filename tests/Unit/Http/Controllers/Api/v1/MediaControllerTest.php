@@ -43,8 +43,7 @@ class MediaControllerTest extends ApiControllerTestCase {
 	 * @group media
      * @group authentication
      */
-    public function index_WhenAuthenticatedAndRequestIsWithoutSiteIdsAndPublishingGroupIds_ChecksAuthorization(){
-    	return $this->markTestIncomplete();
+    public function index_WhenAuthenticatedAndRequestIsWithoutSiteIds_ChecksAuthorization(){
         Gate::shouldReceive('authorize')->with('index', Media::class)->once();
 
         $this->authenticated();
@@ -79,37 +78,6 @@ class MediaControllerTest extends ApiControllerTestCase {
 
         $response = $this->action('GET', MediaController::class . '@index', [
             'site_ids' => [ $sites[0]->getKey(), $sites[1]->getKey() ]
-        ]);
-    }
-
-    /**
-     * @test
-	 * @group media
-     * @group authentication
-     */
-    public function index_WhenAuthenticatedAndRequestHasPublishingGroupIds_ChecksAuthorization(){
-		return $this->markTestIncomplete();
-
-        $media = new Collection([
-            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
-            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
-            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
-        ]);
-
-        $media[0]->publishing_groups()->attach($pgs[0]);
-        $media[1]->publishing_groups()->attach($pgs[1]);
-        $media[2]->publishing_groups()->attach($pgs[2]);
-
-        Gate::shouldReceive('authorize')->with('index', Media::class)->times(0);
-
-        Gate::shouldReceive('authorize')->with('index', Mockery::on(function($args){
-            return (is_array($args) && ($args[0] == Media::class) && is_a($args[1], PublishingGroup::class));
-        }))->times(2);
-
-        $this->authenticated();
-
-        $response = $this->action('GET', MediaController::class . '@index', [
-            'publishing_group_ids' => [ $pgs[0]->getKey(), $pgs[1]->getKey() ]
         ]);
     }
 
@@ -161,37 +129,6 @@ class MediaControllerTest extends ApiControllerTestCase {
     /**
      * @test
 	 * @group media
-     * @group authentication
-     */
-    public function index_WhenAuthenticatedAndRequestHasPublishingGroupIdsAndUnauthorized_Returns403(){
-		return $this->markTestIncomplete();
-
-        $media = new Collection([
-            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
-            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
-            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
-        ]);
-
-        $media[0]->publishing_groups()->attach($pgs[0]);
-        $media[1]->publishing_groups()->attach($pgs[1]);
-        $media[2]->publishing_groups()->attach($pgs[2]);
-
-        $this->authenticated();
-
-        Gate::shouldReceive('authorize')->with('index', Mockery::on(function($args){
-            return (is_array($args) && ($args[0] == Media::class) && is_a($args[1], PublishingGroup::class));
-        }))->andThrow(AuthorizationException::class);
-
-        $response = $this->action('GET', MediaController::class . '@index', [
-            'publishing_group_ids' => [ $pgs[0]->getKey(), $pgs[1]->getKey() ]
-        ]);
-
-        $response->assertStatus(403);
-    }
-
-    /**
-     * @test
-	 * @group media
      */
     public function index_WhenAuthorizedAndRequestHasSiteIds_ReturnsJsonOfMediaAssociatedWithSiteIds(){
         $sites = factory(Site::class, 3)->create();
@@ -210,37 +147,6 @@ class MediaControllerTest extends ApiControllerTestCase {
 
         $response = $this->action('GET', MediaController::class . '@index', [
             'site_ids' => [ $sites[0]->getKey(), $sites[1]->getKey() ]
-        ]);
-
-        $json = $response->json();
-        $this->assertArrayHasKey('data', $json);
-
-        $this->assertCount(2, $json['data']);
-        $this->assertEquals($media[0]->getKey(), $json['data'][0]['id']);
-        $this->assertEquals($media[1]->getKey(), $json['data'][1]['id']);
-    }
-
-    /**
-     * @test
-	 * @group media
-     */
-    public function index_WhenAuthorizedRequestHasPublishingGroupIds_ReturnsJsonOfMediaAssociatedWithPublishingGroups(){
-		return $this->markTestIncomplete();
-
-        $media = new Collection([
-            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
-            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
-            factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]),
-        ]);
-
-        $media[0]->publishing_groups()->attach($pgs[0]);
-        $media[1]->publishing_groups()->attach($pgs[1]);
-        $media[2]->publishing_groups()->attach($pgs[2]);
-
-        $this->authenticatedAndAuthorized();
-
-        $response = $this->action('GET', MediaController::class . '@index', [
-            'publishing_group_ids' => [ $pgs[0]->getKey(), $pgs[1]->getKey() ]
         ]);
 
         $json = $response->json();
@@ -371,23 +277,6 @@ class MediaControllerTest extends ApiControllerTestCase {
 	 * @group media
      * @group authorization
      */
-    public function store_WhenAuthenticated_ChecksAuthorizationForPublishingGroup(){
-		return $this->markTestIncomplete();
-        Gate::shouldReceive('authorize')->with('create', Mockery::on(function($args){
-            return (is_array($args) && is_a($args[0], Media::class) && is_a($args[1], PublishingGroup::class));
-        }))->once();
-
-        Gate::shouldReceive('authorize')->with('create', Mockery::any())->andReturn(true);
-
-        $this->authenticated();
-        $response = $this->action('POST', MediaController::class . '@store', [], $this->getAttrs());
-    }
-
-    /**
-     * @test
-	 * @group media
-     * @group authorization
-     */
     public function store_WhenAuthenticatedAndUnauthorized_Returns403(){
         $this->authenticatedAndUnauthorized();
 
@@ -412,17 +301,14 @@ class MediaControllerTest extends ApiControllerTestCase {
      * @test
 	 * @group media
      */
-    public function store_WhenAuthorizedAndValidAndMediaDoesNotExist_AssociatesMediaWithSiteAndPublishingGroup(){
-		return $this->markTestIncomplete();
+    public function store_WhenAuthorizedAndValidAndMediaDoesNotExist_AssociatesMediaWithSite(){
         $this->authenticatedAndAuthorized();
 
-        $pg = factory(PublishingGroup::class)->create();
-        $site = factory(Site::class)->create([ 'publishing_group_id' => $pg->getKey() ]);
+        $site = factory(Site::class)->create();
 
-        $response = $this->action('POST', MediaController::class . '@store', [], $this->getAttrs($pg, $site));
+        $response = $this->action('POST', MediaController::class . '@store', [], $this->getAttrs(null,$site));
 
         $media = Media::all()->last();
-        $this->assertContains($pg->getKey(), $media->publishing_groups->pluck('id'));
         $this->assertContains($site->getKey(), $media->sites->pluck('id'));
     }
 
@@ -431,27 +317,22 @@ class MediaControllerTest extends ApiControllerTestCase {
 	 * @group media
      */
     public function store_WhenAuthorizedAndValidAndMediaAlreadyExists_DoesNotCreateNewMedia(){
-		return $this->markTestIncomplete();
         // Set up the existing Media item
-        $pg = factory(PublishingGroup::class)->create();
-        $site = factory(Site::class)->create([ 'publishing_group_id' => $pg->getKey() ]);
+        $site = factory(Site::class)->create();
 
         $media = factory(Media::class)->create([
             'file' => $this->setupFileUpload('media', 'image.jpg')
         ]);
 
         $media->sites()->sync([ $site->getKey() ]);
-        $media->publishing_groups()->sync([ $pg->getKey() ]);
 
         // And now set up our attributes, essentially a duplicate file
-        $pg2 = factory(PublishingGroup::class)->create();
-        $site2 = factory(Site::class)->create([ 'publishing_group_id' => $pg2->getKey() ]);
+        $site2 = factory(Site::class)->create();
 
         $attrs = [
             'upload' => $this->setupFile('media', 'image.jpg'),
 
             'site_ids' => [ $site2->getKey() ],
-            'publishing_group_ids' => [ $pg2->getKey() ],
         ];
 
         // Run the request, assert that the count does not increased
@@ -467,28 +348,23 @@ class MediaControllerTest extends ApiControllerTestCase {
      * @test
 	 * @group media
      */
-    public function store_WhenAuthorizedAndValidAndMediaAlreadyExists_AssociatesExisitngMediaWithSiteAndPublishingGroup(){
-		return $this->markTestIncomplete();
+    public function store_WhenAuthorizedAndValidAndMediaAlreadyExists_AssociatesExistingMediaWithSite(){
         // Set up the existing Media item
-        $pg = factory(PublishingGroup::class)->create();
-        $site = factory(Site::class)->create([ 'publishing_group_id' => $pg->getKey() ]);
+        $site = factory(Site::class)->create();
 
         $media = factory(Media::class)->create([
             'file' => $this->setupFileUpload('media', 'image.jpg')
         ]);
 
         $media->sites()->sync([ $site->getKey() ]);
-        $media->publishing_groups()->sync([ $pg->getKey() ]);
 
         // And now set up our attributes, essentially a duplicate file
-        $pg2 = factory(PublishingGroup::class)->create();
-        $site2 = factory(Site::class)->create([ 'publishing_group_id' => $pg2->getKey() ]);
+        $site2 = factory(Site::class)->create();
 
         $attrs = [
             'upload' => $this->setupFileUpload('media', 'image.jpg'),
 
             'site_ids' => [ $site2->getKey() ],
-            'publishing_group_ids' => [ $pg2->getKey() ],
         ];
 
         // Run the request, assert that the count does not increased
@@ -497,7 +373,6 @@ class MediaControllerTest extends ApiControllerTestCase {
 
         $media = $media->fresh();
         $this->assertCount(2, $media->sites);
-        $this->assertCount(2, $media->publishing_groups);
     }
 
     /**
@@ -574,43 +449,16 @@ class MediaControllerTest extends ApiControllerTestCase {
         $this->action('DELETE', MediaController::class . '@destroy', [ $media->getKey() ], $attrs);
     }
 
-    /**
-     * @test
-	 * @group media
-     * @group authorization
-     */
-    public function destroy_WhenAuthenticatedAndDeletingByPublishingGroup_ChecksAuthorizationForPublishingGroup(){
-		return $this->markTestIncomplete();
-        $pgs = factory(PublishingGroup::class, 2)->create();
-
-        $media = factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]);
-        $media->publishing_groups()->sync($pgs->pluck('id'));
-
-        Gate::shouldReceive('authorize')->with('delete', Mockery::on(function($args) use ($media){
-            return (is_array($args)
-                && is_a($args[0], Media::class) && ($args[0]->getKey() == $media->getKey())
-                && is_a($args[1], PublishingGroup::class)
-            );
-        }))->twice();
-
-        $this->authenticated();
-
-        $attrs = [ 'publishing_group_ids' => $pgs->pluck('id')->toArray() ];
-        $response = $this->action('DELETE', MediaController::class . '@destroy', [ $media->getKey() ], $attrs);
-    }
-
-    /**
+     /**
      * @test
 	 * @group media
      * @group authorization
      */
     public function destroy_WhenAuthenticatedAndUnauthorized_Returns403(){
-		return $this->markTestIncomplete();
-        $pg = factory(PublishingGroup::class)->create();
-        $site = factory(Site::class)->create([ 'publishing_group_id' => $pg->getKey() ]);
+        $site = factory(Site::class)->create([]);
         $media = factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]);
 
-        $attrs = [ 'site_ids' => [ $site->getKey() ], 'publishing_group_ids' => [ $pg->getKey() ] ];
+        $attrs = [ 'site_ids' => [ $site->getKey() ]];
 
         $this->authenticatedAndUnauthorized();
 
@@ -638,33 +486,11 @@ class MediaControllerTest extends ApiControllerTestCase {
         $this->assertContains($sites[2]->getKey(), $media->sites->pluck('id'));
     }
 
-    /**
-     * @test
-	 * @group media
-     */
-    public function destroy_WhenAuthenticatedAndDeletingByPublishingGroups_UnassociatesPublishingGroupsOnly(){
-		return $this->markTestIncomplete();
-        $pgs = factory(PublishingGroup::class, 3)->create();
-
-        $media = factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]);
-        $media->publishing_groups()->sync($pgs->pluck('id'));
-
-        $this->authenticatedAndAuthorized();
-
-        $attrs = [ 'publishing_group_ids' => [ $pgs[0]->getKey(), $pgs[1]->getKey() ]];
-        $this->action('DELETE', MediaController::class . '@destroy', [ $media->getKey() ], $attrs);
-
-        $media = $media->fresh();
-        $this->assertCount(1, $media->publishing_groups);
-        $this->assertContains($pgs[2]->getKey(), $media->publishing_groups->pluck('id'));
-    }
-
-    /**
+  /**
      * @test
 	 * @group media
      */
     public function destroy_WhenAuthorizedAndValid_Returns200(){
-		return $this->markTestIncomplete();
         $site = factory(Site::class)->create();
         $media = factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]);
 

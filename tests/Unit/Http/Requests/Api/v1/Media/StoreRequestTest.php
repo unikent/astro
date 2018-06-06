@@ -50,7 +50,7 @@ class StoreRequestTest extends RequestTestCase
     /**
      * @test
      */
-    public function validation_WhenSiteIdsArePresentButPublishingGroupIdsAreNot_IsValid()
+    public function validation_WhenSiteIdsArePresent_IsValid()
     {
         $attrs = $this->getAttrs();
 
@@ -64,7 +64,7 @@ class StoreRequestTest extends RequestTestCase
     /**
      * @test
      */
-    public function validation_WhenPublishingGroupIdsAndSiteIdsAreMissing_IsInvalid()
+    public function validation_WhenSiteIdsAreMissing_IsInvalid()
     {
         $request = $this->mockRequest('POST', []);
         $validator = $request->getValidatorInstance();
@@ -88,24 +88,6 @@ class StoreRequestTest extends RequestTestCase
         $validator->passes();
         $this->assertCount(1, $validator->errors('site_ids'));
     }
-
-
-    /**
-     * @test
-     */
-    public function validation_WhenPublishingGroupIdsIsNotArray_IsInvalid()
-    {
-    	return $this->markTestIncomplete();
-        $attrs = $this->getAttrs();
-        $attrs['publishing_group_ids'] = '1,2';
-
-        $request = $this->mockRequest('POST', $attrs);
-        $validator = $request->getValidatorInstance();
-
-        $validator->passes();
-        $this->assertCount(1, $validator->errors('publishing_group_ids'));
-    }
-
 
 
     /**
