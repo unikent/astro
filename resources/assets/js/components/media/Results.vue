@@ -8,13 +8,7 @@
 				:selected="selected && selected.indexOf(1) !== -1"
 				:enable-options="!pickerMode"
 				:on-edit="editAction"
-				:options="[
-					{
-						text: 'Delete',
-						action: (item) => $store.dispatch('detachMediaFromSite', item),
-						divided: true
-					}
-				]"
+				:options="mediaOptions"
 			>
 				<div v-if="pickerMode" class="media-picker__overlay" @click="pickMedia(items[index - 1])">
 					<icon
@@ -42,6 +36,7 @@
 import ItemThumbnail from './ItemThumbnail';
 import ItemDetails from './ItemDetails';
 import Icon from 'components/Icon';
+import { mapGetters } from 'vuex';
 
 export default {
 
@@ -81,6 +76,10 @@ export default {
 	},
 
 	computed: {
+		...mapGetters([
+			'canUser',
+		]),
+
 		resultsInRows() {
 			let items = [];
 
@@ -89,6 +88,16 @@ export default {
 			}
 
 			return items;
+		},
+
+		mediaOptions() {
+			return this.canUser('image.unlink') ? [
+				{
+					text: 'Delete',
+					action: (item) => this.$store.dispatch('detachMediaFromSite', item),
+					divided: true
+				}
+			] : [];
 		}
 	},
 
