@@ -1,10 +1,15 @@
 import Vue from 'vue';
 import { unflatten } from 'flat';
 import Config from 'classes/Config';
-import { eventBus } from 'plugins/eventbus';
+import { win, isIframe } from 'classes/helpers';
 
 /* global Promise, console */
 /* eslint-disable no-console */
+
+// we want to share some bits between the top window and iframe
+let shared = isIframe ?
+	win.top.astroInterceptorShared :
+	(win.astroInterceptorShared = { unauthorizedPromise: null });
 
 export default class Interceptors {
 
@@ -62,10 +67,29 @@ export default class Interceptors {
 	}
 
 	handleUnauthorized(response) {
-		return new Promise((resolve, reject) => {
 
-			// resolve or reject
-		});
+		if(!shared.unauthorizedPromise) {
+			shared.unauthorizedPromise = new Promise((resolve, reject) => {
+				this.vue.$confirm(
+					`Your authenticated session has expired.
+					Please click OK to reload the current page.
+					Note: all unsaved data will be lost.`,
+					'Session Expired', {
+						confirmButtonText: 'OK',
+						cancelButtonText: 'Cancel',
+						type: 'warning'
+					}
+				).then(() => {
+					// reload the current page
+					this.router.go();
+				}).catch(() => {
+					reject();
+					shared.unauthorizedPromise = null;
+				});
+			});
+		}
+
+		return shared.unauthorizedPromise;
 	}
 
 	handleTooManyRequests(reponse) {
