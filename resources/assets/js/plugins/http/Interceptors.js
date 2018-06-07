@@ -9,7 +9,7 @@ import { win, isIframe } from 'classes/helpers';
 // we want to share some bits between the top window and iframe
 let shared = isIframe ?
 	win.top.astroInterceptorShared :
-	(win.astroInterceptorShared = { unauthorizedPromise: null });
+	(win.astroInterceptorShared = { unauthorizedPromise: null, vue: new Vue() });
 
 export default class Interceptors {
 
@@ -19,10 +19,13 @@ export default class Interceptors {
 	constructor(http, store, router) {
 		this.http = http;
 		this.store = store;
-		this.router = router;
 		this.vue = new Vue();
 		this.addRequestInterceptor();
 		this.addResponseInterceptor();
+
+		if(!isIframe) {
+			shared.router = router;
+		}
 	}
 
 	addRequestInterceptor() {
@@ -70,7 +73,7 @@ export default class Interceptors {
 
 		if(!shared.unauthorizedPromise) {
 			shared.unauthorizedPromise = new Promise((resolve, reject) => {
-				this.vue.$confirm(
+				shared.vue.$confirm(
 					`Your authenticated session has expired.
 					Please click OK to reload the current page.
 					Note: all unsaved data will be lost.`,
@@ -81,7 +84,7 @@ export default class Interceptors {
 					}
 				).then(() => {
 					// reload the current page
-					this.router.go();
+					shared.router.go();
 				}).catch(() => {
 					reject();
 					shared.unauthorizedPromise = null;
