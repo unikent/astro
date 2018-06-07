@@ -319,8 +319,16 @@ const actions = {
 
 						commit('addBlockMeta', blockMeta);
 						commit('setLoaded');
-					});
+					})
+					.catch(() => {});
 
+			})
+			.catch(() => {
+				vue.$notify({
+					title: 'Error',
+					message: 'Unable to load page.'
+				});
+				commit('setLoaded');
 			});
 	},
 
@@ -399,7 +407,7 @@ const actions = {
 					// there seems to be a possibility to return multiple groups of error messages,
 					// so we will cater for that
 					let technicalMessages = [];
-					
+
 					// for each error message group...
 					errorResponse.response.data.errors.forEach(error => {
 						let messageLines = [];
@@ -470,7 +478,11 @@ const getters = {
 	 * @todo - implement once supported by the API.
 	 */
 	publishStatus: (state) =>  {
-		return (state.loaded ? state.pageData.status : '');
+		return (
+			state.loaded &&
+			state.pageData.status ?
+				state.pageData.status : ''
+		);
 	},
 
 	/**
@@ -480,7 +492,11 @@ const getters = {
 	 * @memberof state/page#
 	 */
 	pageTitle: (state) => {
-		return state.loaded ? state.pageData.title : '';
+		return (
+			state.loaded &&
+			state.pageData.title ?
+				state.pageData.title : ''
+		);
 	},
 
 	/**
@@ -490,7 +506,11 @@ const getters = {
 	 * @memberof state/page#
 	 */
 	pageSlug: (state) => {
-		return state.loaded ? state.pageData.slug : '';
+		return (
+			state.loaded &&
+			state.pageData.slug ?
+				state.pageData.slug : ''
+		);
 	},
 
 	/**
@@ -500,7 +520,11 @@ const getters = {
 	 * @memberof state/page#
 	 */
 	pagePath: (state) => {
-		return (state.loaded ? state.pageData.path : '');
+		return (
+			state.loaded &&
+			state.pageData.path ?
+				state.pageData.path : ''
+		);
 	},
 
 	/**
@@ -509,7 +533,12 @@ const getters = {
 	 * @returns {string}
 	 */
 	siteTitle: (state) => {
-		return (state.loaded ? state.pageData.site.name : '');
+		return (
+			state.loaded &&
+			state.pageData.site &&
+			state.pageData.site.name ?
+				state.pageData.site.name : ''
+		);
 	},
 
 	/**
@@ -520,7 +549,12 @@ const getters = {
 	 * @todo Site should be a separate object in store state.
 	 */
 	sitePath: (state) => {
-		return (state.loaded ? state.pageData.site.path : '');
+		return (
+			state.loaded &&
+			state.pageData.site &&
+			state.pageData.site.path ?
+				state.pageData.site.path : ''
+		);
 	},
 
 	/**
@@ -531,7 +565,12 @@ const getters = {
 	 * @todo Site should be a separate object in store state.
 	 */
 	siteDomain: (state) => {
-		return (state.loaded ? state.pageData.site.host : '');
+		return (
+			state.loaded &&
+			state.pageData.site &&
+			state.pageData.site.host ?
+				state.pageData.site.host : ''
+		);
 	},
 
 	/**
@@ -540,9 +579,14 @@ const getters = {
 	 * @returns {string|null} Site definition ID in the form {name}-v{version} or null if no current site.
 	 */
 	siteDefinitionId: (state) => {
-		return (state.loaded) ?
+		return (
+			state.loaded &&
+			state.pageData.site &&
+			state.pageData.site.site_definition_name &&
+			state.pageData.site.site_definition_version ?
 				(state.pageData.site.site_definition_name + '-v' + state.pageData.site.site_definition_version) :
-				null;
+				null
+		);
 	},
 
 	/**
