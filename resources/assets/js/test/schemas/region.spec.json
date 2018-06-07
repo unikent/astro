@@ -29,6 +29,11 @@
 					"items": { "$ref": "#/definitions/blockName" },
 					"minItems": 1
 				},
+				"deprecatedBlocks": {
+					"type": "array",
+					"items": { "$ref": "#/definitions/blockName" },
+					"minItems": 1
+				},
 				"defaultBlocks": {
 					"type": "array",
 					"items": { "$ref": "#/definitions/blockName" }
