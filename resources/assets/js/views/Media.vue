@@ -132,6 +132,11 @@ export default {
 
 	created() {
 		this.fetchMedia();
+		this.$bus.$on('media:refresh', this.fetchMedia);
+	},
+
+	destroyed() {
+		this.$bus.$off('media:refresh', this.fetchMedia);
 	},
 
 	watch: {

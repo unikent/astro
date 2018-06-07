@@ -31,6 +31,11 @@ Route::group(['prefix' => 'v1', 'namespace' => 'v1'], function () {
 	Route::get('sitedefinitions', 'SiteController@definitions');
 	Route::get('sites/{site}/tree', 'SiteController@tree');
 	Route::patch('sites/{site}/tree', 'SiteController@move');
+	Route::delete('sites/{site}/media/{media}', 'SiteController@deleteMedia')
+			->where([
+				'site' => '[0-9]+',
+				'media' => '[0-9]+'
+			]);
 
 	Route::get('users', 'UserController@index');
 	Route::get('users/{username}', 'UserController@view')->where('username', '([a-z0-9_-]+)');

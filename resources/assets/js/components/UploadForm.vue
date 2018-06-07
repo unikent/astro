@@ -13,7 +13,13 @@
 		<i class="el-icon-upload"></i>
 		<div class="el-upload__text">Drop {{ multiple ? 'one or more files' : 'a single file' }} here or <em>click to upload</em></div>
 		<div class="el-upload__tip" slot="tip">
-			Files must be less than 5MB. If this dialog is closed uploads will happen in the background.
+			Files must be less than 5MB. 
+			<template v-if="imageHelp">
+				<a class="el-upload__tip--link" :href="imageHelp" target="_blank">Need help? See our image guidelines ></a>
+			</template>
+			<template v-else>
+			If this dialog is closed uploads will happen in the background.
+			</template>
 			<upload-fail-list
 				listType="text"
 				:files="failedUploads"
@@ -25,6 +31,7 @@
 <script>
 import upload from '../plugins/http/upload';
 import UploadFailList from './UploadFailList';
+import Config from 'classes/Config.js';
 
 // TODO: while uploading show global upload progress.
 
@@ -47,6 +54,12 @@ export default {
 		return {
 			failedUploads: []
 		};
+	},
+
+	computed: {
+		imageHelp() {
+			return Config.get('help_media_url') || false
+		}
 	},
 
 	methods: {

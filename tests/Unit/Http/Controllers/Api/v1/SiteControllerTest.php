@@ -1,6 +1,7 @@
 <?php
 namespace Tests\Unit\Http\Controllers\Api\v1;
 
+use App\Models\Media;
 use Gate;
 use Mockery;
 use App\Models\Site;
@@ -8,9 +9,11 @@ use App\Models\User;
 use App\Models\Page;
 use App\Http\Controllers\Api\v1\SiteController;
 use App\Http\Transformers\Api\v1\PageTransformer;
+use Tests\FileCleanupTrait;
+use Tests\FileUploadTrait;
 
 class SiteControllerTest extends ApiControllerTestCase {
-
+	use FileUploadTrait, FileCleanupTrait;
     /**
      * @test
      * @group authentication
@@ -378,5 +381,83 @@ class SiteControllerTest extends ApiControllerTestCase {
         $this->assertEquals($l1[1]->slug, $json['data'][0]['children'][1]['slug']);
     }
 
+	/**
+	 * @test
+	 * @group media
+	 * @group authentication
+	 */
+	public function deletemedia_WhenUnauthenticated_Returns401(){
+		$media = factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]);
+		$site = factory(Site::class)->create([]);
+		$site->media()->attach($media);
 
+		$response = $this->action('DELETE', SiteController::class . '@deleteMedia', [ $site->getKey(), $media->getKey()]);
+
+		$this->assertInstanceOf(Media::class, Media::find($media->getKey()));
+		$response->assertStatus(401);
+	}
+
+	/**
+	 * @test
+	 * @group media
+	 */
+	public function deletemedia_WhenAuthorizedAndMediaNotFound_Returns404(){
+		$this->authenticatedAndAuthorized();
+		$site = factory(Site::class)->create([]);
+		$media = factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]);
+		$site->media()->attach($media);
+
+		$response = $this->action('DELETE', SiteController::class . '@deleteMedia', [ $site->getKey(), $media->getKey()+1 ]);
+		$response->assertStatus(404);
+	}
+
+	/**
+	 * @test
+	 * @group media
+	 * @group authorization
+	 */
+	public function deletemedia_WhenAuthenticatedAndUnauthorized_Returns403(){
+		$site = factory(Site::class)->create([]);
+		$media = factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]);
+		$site->media()->attach($media);
+
+		$this->authenticatedAndUnauthorized();
+
+		$response = $this->action('DELETE', SiteController::class . '@deleteMedia', [ $site->getKey(), $media->getKey() ]);
+		$response->assertStatus(403);
+	}
+
+	/**
+	 * @test
+	 */
+	public function deletemedia_WhenAuthenticated_UnassociatesSpecifiedSitesOnly(){
+		$sites = factory(Site::class, 3)->create();
+
+		$media = factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]);
+		$media->sites()->sync($sites->pluck('id'));
+
+		$this->authenticatedAndAuthorized();
+
+		$this->action('DELETE', SiteController::class . '@deleteMedia', [ $sites[0]->getKey(), $media->getKey() ]);
+
+		$media = $media->fresh();
+		$this->assertCount(2, $media->sites);
+		$this->assertContains($sites[1]->getKey(), $media->sites->pluck('id'));
+		$this->assertContains($sites[2]->getKey(), $media->sites->pluck('id'));
+	}
+
+	/**
+	 * @test
+	 */
+	public function deletemedia_WhenAuthorizedAndValid_Returns204(){
+		$site = factory(Site::class)->create();
+		$media = factory(Media::class)->create([ 'file' => $this->setupFile('media', 'image.jpg') ]);
+		$media->sites()->attach($site);
+		$attrs = [];// 'site_ids' => [ $site->getKey() ],];
+
+		$this->authenticatedAndAuthorized();
+
+		$response = $this->action('DELETE', SiteController::class . '@deleteMedia', [ $site->getKey(), $media->getKey() ], $attrs);
+		$response->assertStatus(204);
+	}
 }
