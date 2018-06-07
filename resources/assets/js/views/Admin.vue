@@ -137,6 +137,7 @@ export default {
 
 		fetchSiteData() {
 			this.$store.commit('site/updateCurrentSiteID', this.site_id);
+			// TODO: catch errors
 			this.$store.dispatch('site/fetchSite').then(() => {
 				this.homepageID = this.currentSite.pages[0].id;
 			});
