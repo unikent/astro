@@ -84,6 +84,7 @@ const actions = {
 	 * @param {object} state - the vuex state
 	 */
 	loadPermissions({ commit }) {
+		// TODO: catch errors
 		api
 			.get('permissions?include=roles')
 			.then((response) => {
@@ -143,7 +144,7 @@ const actions = {
 			.then(({ data }) => {
 				commit('setGlobalRole', data.data.global_role);
 			})
-			.catch(()=> {
+			.catch(() => {
 				commit('setGlobalRole', '');
 			})
 	}

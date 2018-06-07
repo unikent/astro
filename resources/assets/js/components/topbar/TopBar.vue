@@ -180,6 +180,7 @@ export default {
 		]),
 
 		fetchSiteData() {
+			// TODO: catch errors
 			this.$api
 				.get('sites')
 				.then(({ data: json }) => {

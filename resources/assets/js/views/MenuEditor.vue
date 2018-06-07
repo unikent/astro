@@ -278,6 +278,7 @@ export default {
 	methods: {
 
 		fetchSiteData() {
+			// TODO: catch errors
 			this.$api
 				.get(`sites/${this.$route.params.site_id}?include=pages,role,users`)
 				.then(({ data: json }) => {

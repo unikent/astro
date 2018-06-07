@@ -140,6 +140,7 @@ export default {
 		},
 
 		fetchMedia() {
+			// TODO: catch errors
 			this.$api
 				// TODO: if unmodified since
 				.get(`media?order=id.desc&site_ids[]=${this.siteId}`)

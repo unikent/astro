@@ -202,6 +202,10 @@ const mutations = {
 	}
 };
 
+const responseError = response => {
+	console.warn('request failed');
+};
+
 const actions = {
 
 	fetchSite({ commit, state }) {
@@ -209,7 +213,8 @@ const actions = {
 			.get(`sites/${state.site}/tree?include=revision`)
 			.then((response) => {
 				commit('setSite', [response.data.data]);
-			});
+			})
+			.catch(responseError);
 	},
 
 	/**
@@ -222,6 +227,7 @@ const actions = {
 			.then((response) => {
 				commit('setLayouts', response.data.data)
 			})
+			.catch(responseError);
 	},
 
 	/**
@@ -234,6 +240,7 @@ const actions = {
 			.then((response) => {
 				commit('setSiteDefinitions', response.data.data)
 			})
+			.catch(responseError);
 	},
 
 	deletePage({ dispatch }, page) {
@@ -241,7 +248,8 @@ const actions = {
 			.delete(`pages/${page.id}`)
 			.then(() => {
 				dispatch('fetchSite');
-			});
+			})
+			.catch(responseError);
 	},
 
 	createPage({ dispatch }, page) {
@@ -279,6 +287,7 @@ const actions = {
 			.then(() => {
 				dispatch('fetchSite');
 			})
+			.catch(responseError);
 	},
 
 	/**
@@ -309,6 +318,7 @@ const actions = {
 							{ root: true }
 						);
 					})
+					.catch(responseError);
 				}
 			}).catch((err) => {
 				throw(err.response);
@@ -321,7 +331,8 @@ const actions = {
 			.patch(`sites/${state.site}/tree`, move)
 			.then(() => {
 				dispatch('fetchSite');
-			});
+			})
+			.catch(responseError);
 	},
 
 	movePage({ dispatch, commit, state }, { toPath, fromPath }) {

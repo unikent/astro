@@ -130,6 +130,7 @@ export default {
 			// we want a user notification
 			// also wait till handleSavePage has finished to hide the loading spinner
 			this.handleSavePage({ notify: true })
+			// TODO: catch errors
 				.then(() => {
 					this.fullscreenLoading = false;
 
@@ -147,6 +148,7 @@ export default {
 		previewPage() {
 			/* handleSavePage returns a promise so we here we wait for it to complete before
 			opening the preview window */
+			// TODO: catch errors
 			this.handleSavePage()
 				.then(() => {
 					win.open(this.draftLink, '_blank');
@@ -155,6 +157,7 @@ export default {
 
 		/* save page and then open publish modal */
 		publishPage() {
+			// TODO: catch errors
 			this.handleSavePage()
 				.then(() => {
 					this.showPublishModal();

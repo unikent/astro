@@ -228,6 +228,7 @@ export default {
 	},
 
 	created() {
+		// TODO: catch errors
 		this.fetchPage(this.$route.params.page_id)
 			.then(() => this.validateLayout());
 

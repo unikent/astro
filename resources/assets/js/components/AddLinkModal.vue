@@ -242,6 +242,7 @@ export default {
 		},
 
 		fetchData() {
+			// TODO: catch errors
 			this.$api
 				.get(`media?order=id.desc&site_ids[]=${this.siteId}`)
 				.then(({ data: json }) => {
