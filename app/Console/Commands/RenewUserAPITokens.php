@@ -44,9 +44,16 @@ class RenewUserAPITokens extends Command
 		$this->renewTokens($this->option('user-ids') ? $this->option('user-ids') : 'all');
 	}
 
+	/**
+	 * Generate new tokens for the given users.
+	 * @param string $users A comma seperated list of user IDs' to generate new api tokents for. If 
+	 * user='all', leave out the astro-www user, since it is needed for the front end to funtion.
+	 * To renew astro-www's token, provide its ID explicitly.
+	 * @return mixed
+	 */
 	public function renewTokens($users = 'all')
 	{
-		$users = $users == 'all' ? User::all() : User::whereIn('id', array_map('trim', explode(',', $users)))->get();
+		$users = $users == 'all' ? User::where('username', '!=', 'astro-www')->get() : User::whereIn('id', array_map('trim', explode(',', $users)))->get();
 		
 		foreach ($users as $user) {
 			$user->generateAPIToken(true);
