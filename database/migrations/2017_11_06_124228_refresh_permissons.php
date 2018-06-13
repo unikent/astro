@@ -13,7 +13,7 @@ class RefreshPermissons extends Migration
      */
     public function up()
     {
-        Artisan::call('astro:permissions', ['action' => 'refresh']);
+        Artisan::call('astro:permissions', ['action' => 'install', '--yes-remove-non-default-permissions' => true]);
     }
 
     /**
