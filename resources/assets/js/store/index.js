@@ -47,6 +47,7 @@ let store = new Vuex.Store({
 			insertRegion: null,
 			insertSection: null,
 			allowedBlocks: null,	// the constraints on what blocks can be added
+			deprecatedBlocks: null, // blocks to hide the block picker
 			maxSelectableBlocks: null, // the maximum number of blocks that can be selected
 			replaceBlocks: false //whether or not to replace the blocks in the current section
 		},
@@ -111,14 +112,16 @@ let store = new Vuex.Store({
 		 * @param {number} sectionIndex - The index of the section within the region to add any blocks to.
 		 * @param {number} insertIndex - The index within the section to add any blocks to.
 		 * @param {Object} blocks - List of allowed block names.
+		 * @param {Object} deprecatedBlocks - List of blocks to hide from picker.
 		 * @param {number} maxSelectableBlocks - the maximum number of blocks that can be selected
 		 * @param {boolean} replaceBlocks - Replace the blocks in the section with the new one
 		 */
-		showBlockPicker(state, { regionName, sectionIndex, insertIndex, blocks, maxSelectableBlocks, replaceBlocks }) {
+		showBlockPicker(state, { regionName, sectionIndex, insertIndex, blocks, deprecatedBlocks, maxSelectableBlocks, replaceBlocks }) {
 			state.blockPicker.insertRegion = regionName;
 			state.blockPicker.insertIndex = insertIndex;
 			state.blockPicker.insertSection = sectionIndex;
 			state.blockPicker.allowedBlocks = blocks;
+			state.blockPicker.deprecatedBlocks = deprecatedBlocks;
 			state.blockPicker.maxSelectableBlocks = maxSelectableBlocks;
 			state.blockPicker.replaceBlocks = replaceBlocks
 			state.blockPicker.visible = true;

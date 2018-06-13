@@ -132,6 +132,11 @@ export default {
 
 	created() {
 		this.fetchMedia();
+		this.$bus.$on('media:refresh', this.fetchMedia);
+	},
+
+	destroyed() {
+		this.$bus.$off('media:refresh', this.fetchMedia);
 	},
 
 	watch: {
@@ -198,6 +203,13 @@ export default {
 				.get(`media?order=id.desc&site_ids[]=${this.siteId}`)
 				.then(({ data: json }) => {
 					this.images = json.data;
+				})
+				.catch(() => {
+					this.$message({
+						title: 'Error fetching media items',
+						message: 'Unable to to fetch media items at this time.',
+						type: 'error'
+					});
 				});
 		}
 

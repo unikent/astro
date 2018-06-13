@@ -53,6 +53,7 @@ export default {
 		...mapState({
 			blockPicker: state => state.blockPicker,
 			allowedBlocks: state => state.blockPicker.allowedBlocks,
+			deprecatedBlocks: state => state.blockPicker.deprecatedBlocks,
 			maxSelectableBlocks: state => state.blockPicker.maxSelectableBlocks,
 			replaceBlocks: state => state.blockPicker.replaceBlocks,
 			allBlocks: state => state.definition.blockDefinitions,
@@ -62,21 +63,25 @@ export default {
 		/**
 		 * Get the blocks currently available to be displayed in the block picker.
 		 * @returns {Array}
+		 * @todo - what is happening with the 'v1' here?
 		 */
 		availableBlocks() {
 			let blocks = {};
 			if(this.allowedBlocks) {
 				for(let i in this.allowedBlocks) {
 					let blockId = this.allowedBlocks[i];
-
-					if (this.allBlocks[blockId]) {
-						blocks[blockId] = this.allBlocks[blockId];
-					}
-					else if(this.allBlocks[blockId + '-v1']) {
-						blocks[blockId + '-v1'] = this.allBlocks[blockId + '-v1'];
+					if (this.deprecatedBlocks.indexOf(blockId)) {
+						if (this.allBlocks[blockId]) {
+							blocks[blockId] = this.allBlocks[blockId];
+						}
+						else if(this.allBlocks[blockId + '-v1']) {
+							blocks[blockId + '-v1'] = this.allBlocks[blockId + '-v1'];
+						}
 					}
 				}
 			}
+
+
 			return blocks;
 		},
 

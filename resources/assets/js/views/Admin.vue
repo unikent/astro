@@ -20,6 +20,7 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import Config from 'classes/Config.js';
 import Icon from 'components/Icon';
 import requiresSitePermissions from 'mixins/requiresSitePermissionsMixin';
 
@@ -39,8 +40,8 @@ export default {
 			},
 
 			template: `
-				<li>
-					<router-link :to="item.link" exact>
+				<li v-if="item.leave">
+					<a :href="item.link" target="_blank">
 						<icon :name="item.icon" className="menu-icon" />
 						<span>{{ item.title }}</span>
 						<icon
@@ -50,6 +51,12 @@ export default {
 							:height="14"
 							class="admin-sidebar__external-link"
 						/>
+					</a>
+				</li>
+				<li v-else>
+					<router-link :to="item.link" exact>
+						<icon :name="item.icon" className="menu-icon" />
+						<span>{{ item.title }}</span>
 					</router-link>
 				</li>
 			`
@@ -90,7 +97,8 @@ export default {
 		},
 
 		menu() {
-			return [
+
+			let menu = [
 				{
 					link: `${this.url}`,
 					icon: 'pie-chart',
@@ -101,7 +109,6 @@ export default {
 					link: `${this.url}/page/${this.homepageID}`,
 					icon: 'layout',
 					title: 'Editor',
-					leave: true,
 					permission: 'page.edit',
 				},
 				{
@@ -129,6 +136,18 @@ export default {
 					permission: 'profile.edit'
 				}
 			];
+
+			if (Config.get('help_url')) {
+				menu.push({
+					link: Config.get('help_url'),
+					icon: 'unknown',
+					title: 'Help and Guidelines',
+					leave: true,
+					permission: 'site.view'
+				})
+			}
+
+			return menu;
 		}
 
 	},
@@ -137,6 +156,7 @@ export default {
 
 		fetchSiteData() {
 			this.$store.commit('site/updateCurrentSiteID', this.site_id);
+			// TODO: catch errors
 			this.$store.dispatch('site/fetchSite').then(() => {
 				this.homepageID = this.currentSite.pages[0].id;
 			});

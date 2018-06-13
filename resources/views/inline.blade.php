@@ -33,7 +33,9 @@
 		'draft_url_pattern' => env('APP_PREVIEW_URL_PATTERN'),
 		'assets_base_url' => env('ASSETS_BASE_URL'),
 		'placeholder_image_url' => env('PLACEHOLDER_IMAGE_URL'),
-		'machform_url' => env('MACHFORM_URL')
+		'machform_url' => env('MACHFORM_URL'),
+		'help_url' => env('HELP_URL'),
+		'help_media_url' => env('HELP_MEDIA_URL'),
 	]); ?>;
 	</script>
 

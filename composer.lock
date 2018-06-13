@@ -3621,14 +3621,14 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/astro-kent-theme.git",
-                "reference": "49f24f164970b9504d1b81f75a4387ea6316fdff"
+                "reference": "d4f8e14443f8ddfd0c568cdd3b0762fbcc21135c"
             },
             "require-dev": {
                 "phpunit/phpunit": "5.0"
             },
             "type": "library",
             "description": "Our block views",
-            "time": "2018-06-04T16:12:06+00:00"
+            "time": "2018-06-11T09:00:18+00:00"
         },
         {
             "name": "unikent/astro-renderer",
@@ -3636,7 +3636,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/astro-renderer.git",
-                "reference": "7531626530726d7b38698185379c9c32c7d4ed53"
+                "reference": "e6afc442491ee2b28f95fc0ccad62bc8f401eeae"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.2",
@@ -3664,7 +3664,7 @@
                 }
             ],
             "description": "A simple renderer for Astro",
-            "time": "2018-05-03T08:47:00+00:00"
+            "time": "2018-06-08T14:36:22+00:00"
         },
         {
             "name": "unikent/kent-profiles",

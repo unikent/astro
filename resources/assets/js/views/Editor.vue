@@ -59,6 +59,7 @@ export default {
 	created() {
 		this.$store.commit('site/updateCurrentSiteID', this.$route.params.site_id);
 		this.$store.dispatch('loadSiteRole', { siteId: this.$route.params.site_id, username: Config.get('username') })
+		// TODO: catch errors
 			.then(() => {
 				if (this.canUser('page.edit')) {
 					this.showLoader();

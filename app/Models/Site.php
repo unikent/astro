@@ -132,4 +132,14 @@ class Site extends Model
 		$this->options = $options;
 		$this->save();
 	}
+
+	/**
+	 * Media attached to this site
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+	 */
+	public function media()
+	{
+		return $this->belongsToMany(Media::class, 'media_sites');
+	}
+
 }

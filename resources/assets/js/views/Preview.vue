@@ -228,6 +228,7 @@ export default {
 	},
 
 	created() {
+		// TODO: catch errors
 		this.fetchPage(this.$route.params.page_id)
 			.then(() => this.validateLayout());
 
@@ -532,7 +533,9 @@ export default {
 		},
 
 		showBlockList(offset = 0, replaceBlocks = false) {
-			const maxBlocks = this.sectionDefinition.max || this.sectionDefinition.size;
+			const 
+				deprecatedBlocks = this.sectionDefinition.deprecatedBlocks ? this.sectionDefinition.deprecatedBlocks : [],
+				maxBlocks = this.sectionDefinition.max || this.sectionDefinition.size;
 
 			this.showBlockPicker({
 				insertIndex: this.hoveredBlock.blockIndex + offset,
@@ -540,6 +543,7 @@ export default {
 				regionName: this.hoveredBlock.regionName,
 				blocks: this.sectionConstraints ?
 					this.sectionConstraints.allowedBlocks : [],
+				deprecatedBlocks: deprecatedBlocks,
 				maxSelectableBlocks: this.sectionConstraints.canSwapBlocks ?
 					1 : (maxBlocks ? maxBlocks - this.hoveredBlockSectionLength : null),
 				replaceBlocks: replaceBlocks
