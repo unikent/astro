@@ -1,5 +1,8 @@
 <template>
-	<el-input v-model="value"></el-input>
+	<el-input
+		v-model="value"
+		:placeholder="placeholder"
+	></el-input>
 </template>
 
 <script>

@@ -30,11 +30,5 @@
 }
 
 .block-options-list {
-	$height: (
-		#{get-height(top-bar)} -
-		#{get-height(block-back-bar)}
-	);
-
-	height: calc(100vh - #{$height});
 	padding: 30px 20px 80px;
 }
