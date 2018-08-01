@@ -7,6 +7,7 @@ export default {
 	data() {
 		return {
 			placeholder: null,
+			anchor_link: null,
 			...this.field
 		};
 	},
