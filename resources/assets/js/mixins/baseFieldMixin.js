@@ -5,7 +5,10 @@ export default {
 	props: ['field', 'path', 'errors', 'currentDefinition'],
 
 	data() {
-		return this.field;
+		return {
+			placeholder: null,
+			...this.field
+		};
 	},
 
 	computed: {
