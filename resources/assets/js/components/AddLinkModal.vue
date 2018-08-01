@@ -33,6 +33,38 @@
 						</span>
 					</el-option>
 				</el-select>
+
+				<el-select
+					v-if="selectPageAnchorLinks && selectPageAnchorLinks.length"
+					placeholder="Select a page section to link to"
+					class="add-link-modal__page-select"
+					v-model="anchor"
+					@change="() => setLink(selectValue)"
+				>
+					<el-option
+						key="empty-achor-link"
+						label="No anchor link"
+						:value="false"
+					>
+						<span class="add-link-modal__page-select-label">
+							No anchor link
+						</span>
+					</el-option>
+					<el-option
+						v-for="item in selectPageAnchorLinks"
+						:key="item.value"
+						:label="item.value"
+						:value="item.value"
+					>
+						<span class="add-link-modal__page-select-label">
+							{{ item.value }}
+						</span>
+						<span class="add-link-modal__page-select-value">
+							{{ item.label }}
+						</span>
+					</el-option>
+				</el-select>
+
 			</el-tab-pane>
 			<el-tab-pane
 				name="external"
@@ -112,6 +144,9 @@ import { mapState } from 'vuex';
 
 import PagedResults from 'components/media/PagedResults';
 import mediaFormatters from 'mixins/mediaFormatters';
+import { Definition } from 'classes/helpers';
+import { getPathsToItem } from 'helpers/collection';
+import _ from 'lodash';
 
 export default {
 
@@ -145,6 +180,7 @@ export default {
 				}
 			},
 			selectValue: null,
+			anchor: null,
 			media: [],
 			site: null,
 			pages: [],
@@ -158,9 +194,49 @@ export default {
 		}),
 
 		sitePages() {
-			return this.pages.map(
-				({ title, path, depth }) => ({ label: title, value: path, depth })
+			return this.pages.map(({ title, path, depth, blocks }) => {
+				const anchorPaths = getPathsToItem(
+					blocks,
+					el => el && el.anchor_link,
+					['errors']
+				);
+
+				return {
+					label: title,
+					value: path,
+					depth,
+					anchorPaths,
+					blocks
+				}
+			});
+		},
+
+		selectPageAnchorLinks() {
+			if(!this.selectValue) {
+				return null;
+			}
+
+			const selectedPage = this.sitePages.find(
+				page => page.value === this.selectValue
 			);
+
+			return selectedPage.anchorPaths.map(anchorPath => {
+				const
+					blockData = _.get(
+						selectedPage.blocks,
+						anchorPath.slice(0, 4)
+					),
+					blockDefinition = Definition.get(Definition.getType({
+						name   : blockData.definition_name,
+						version: blockData.definition_version
+					})),
+					field = _.get(selectedPage.blocks, anchorPath);
+
+				return {
+					label: field.title || `${blockDefinition.label} Block`,
+					value: field.anchor_link
+				};
+			});
 		}
 	},
 
@@ -168,6 +244,12 @@ export default {
 		visible(value) {
 			if(value) {
 				this.fetchData();
+			}
+		},
+
+		selectValue(value, oldValue) {
+			if(value !== oldValue) {
+				this.anchor = null;
 			}
 		}
 	},
@@ -196,7 +278,7 @@ export default {
 
 					link = {
 						text: tmp.label,
-						value: `https://${this.site.host}${this.site.path}${tmp.value}`
+						value: `https://${this.site.host}${this.site.path}${tmp.value}${this.anchor ? `#${this.anchor}` : ''}`
 					};
 					break;
 				case 'document':
@@ -250,7 +332,7 @@ export default {
 				});
 
 			this.$api
-				.get(`sites/${this.siteId}?include=pages`)
+				.get(`sites/${this.siteId}?include=pages:full`)
 				.then(({ data: json }) => {
 					this.site = {
 						host: json.data.host,
