@@ -13,57 +13,61 @@
 				label="Internal page"
 				class="add-link-modal__internal"
 			>
-				<el-select
-					v-model="selectValue"
-					@change="setLink"
-					placeholder="Select a page"
-					class="add-link-modal__page-select"
-				>
-					<el-option
-						v-for="item in sitePages"
-						:key="item.value"
-						:label="item.label"
-						:value="item.value"
+				<el-row>
+					<el-select
+						v-model="selectValue"
+						@change="setLink"
+						placeholder="Select a page"
+						class="add-link-modal__page-select"
 					>
-						<span class="add-link-modal__page-select-label">
-							{{ item.label }}
-						</span>
-						<span class="add-link-modal__page-select-value">
-							{{ item.value }}
-						</span>
-					</el-option>
-				</el-select>
+						<el-option
+							v-for="item in sitePages"
+							:key="item.value"
+							:label="item.label"
+							:value="item.value"
+						>
+							<span class="add-link-modal__page-select-label">
+								{{ item.label }}
+							</span>
+							<span class="add-link-modal__page-select-value">
+								{{ item.value }}
+							</span>
+						</el-option>
+					</el-select>
+				</el-row>
 
-				<el-select
-					v-if="selectPageAnchorLinks && selectPageAnchorLinks.length"
-					placeholder="Select a page section to link to"
-					class="add-link-modal__page-select"
-					v-model="anchor"
-					@change="() => setLink(selectValue)"
-				>
-					<el-option
-						key="empty-achor-link"
-						label="No anchor link"
-						:value="false"
+				<el-row>
+					<el-select
+						v-if="selectPageAnchorLinks && selectPageAnchorLinks.length"
+						placeholder="Select a page section to link to"
+						class="add-link-modal__page-select"
+						v-model="anchor"
+						@change="() => setLink(selectValue)"
 					>
-						<span class="add-link-modal__page-select-label">
-							No anchor link
-						</span>
-					</el-option>
-					<el-option
-						v-for="item in selectPageAnchorLinks"
-						:key="item.value"
-						:label="item.value"
-						:value="item.value"
-					>
-						<span class="add-link-modal__page-select-label">
-							{{ item.value }}
-						</span>
-						<span class="add-link-modal__page-select-value">
-							{{ item.label }}
-						</span>
-					</el-option>
-				</el-select>
+						<el-option
+							key="empty-anchor-link"
+							label="No anchor link"
+							:value="false"
+						>
+							<span class="add-link-modal__page-select-label">
+								No anchor link
+							</span>
+						</el-option>
+						<el-option
+							v-for="item in selectPageAnchorLinks"
+							:key="item.value"
+							:label="item.value"
+							:value="item.value"
+						>
+							<span class="add-link-modal__page-select-label">
+								{{ item.value }}
+							</span>
+							<span class="add-link-modal__page-select-value">
+								{{ item.label }}
+							</span>
+						</el-option>
+					</el-select>
+				</el-row>
 
 			</el-tab-pane>
 			<el-tab-pane
