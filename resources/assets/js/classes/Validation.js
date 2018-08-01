@@ -89,7 +89,18 @@ export default class Validation {
 				break;
 
 			case 'regex':
-				tranformedRule = { regexp: value };
+				tranformedRule = {
+					regex: value,
+					message: 'The format of this field is invalid.',
+
+					validator(rule, value, cb) {
+						if(value.length && !value.match(new RegExp(rule.regex))) {
+							return cb(rule.message);
+						}
+
+						return cb();
+					}
+				};
 				break;
 		}
 
