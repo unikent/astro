@@ -188,7 +188,8 @@ export default {
 			media: [],
 			site: null,
 			pages: [],
-			hideTextInputs: false
+			hideTextInputs: false,
+			currentValue: null
 		};
 	},
 
@@ -267,10 +268,24 @@ export default {
 	},
 
 	methods: {
-		showModal({ callback, hideTextInputs }) {
+		showModal({ callback, hideTextInputs, currentValue }) {
+			this.currentValue = currentValue;
 			this.visible = true;
 			this.callback = callback;
 			this.hideTextInputs = hideTextInputs;
+		},
+
+		setInitialLinkValue() {
+			let newValue = this.currentValue.replace(`https://${this.site.host}${this.site.path}`, '');
+			let [path, anchor] = newValue.split('#');
+
+			if (path.startsWith('https://')) { // path is an external link
+				this.links.external.value = this.currentValue;
+			}
+			else { // path is an internal link
+				this.selectValue = path;
+				this.anchor = anchor;
+			}
 		},
 
 		setLink(link) {
@@ -310,7 +325,7 @@ export default {
 			switch(this.activeTab) {
 				case 'external':
 					// add HTTPS if no protocol is given
-					if(!value.match(/^([A-Za-z]{3,9})?:(?:\/\/)?/)) {
+					if(value && !value.match(/^([A-Za-z]{3,9})?:(?:\/\/)?/)) {
 						value = 'https://' + value;
 					}
 					break;
@@ -343,6 +358,7 @@ export default {
 						path: json.data.path
 					};
 					this.pages = json.data.pages;
+					this.setInitialLinkValue();
 				});
 		},
 

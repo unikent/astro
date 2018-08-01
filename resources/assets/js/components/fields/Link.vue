@@ -19,7 +19,8 @@ export default {
 		displayLinkPicker() {
 			this.$bus.$emit('add-link-modal:show', {
 				callback: ({ value }) => this.updateFieldValue(this.path, value),
-				hideTextInputs: true
+				hideTextInputs: true,
+				currentValue: this.value
 			});
 		}
 	}
