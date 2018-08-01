@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
     "content-hash": "453e6e63f99cacf2f42e95b2f6f68914",
@@ -3668,7 +3668,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/astro-kent-theme.git",
-                "reference": "bcae6a896544b9914b9beab6e5563e62576c3b36"
+                "reference": "ea70748c6bc1fafd60b37a7d8f258a2b8416cc7b"
             },
             "require": {
                 "ezyang/htmlpurifier": "4.10.0"
@@ -3678,7 +3678,7 @@
             },
             "type": "library",
             "description": "Our block views",
-            "time": "2018-07-31T09:37:10+00:00"
+            "time": "2018-08-01T14:54:33+00:00"
         },
         {
             "name": "unikent/astro-renderer",
