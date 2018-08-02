@@ -225,7 +225,7 @@ export default {
 				page => page.value === this.selectValue
 			);
 
-			return selectedPage.anchorPaths.map(anchorPath => {
+			return selectedPage && selectedPage.anchorPaths.map(anchorPath => {
 				const
 					blockData = _.get(
 						selectedPage.blocks,
