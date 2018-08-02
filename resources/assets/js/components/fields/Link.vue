@@ -1,6 +1,14 @@
 <template>
 	<div>
-		<el-input v-model="value" readonly></el-input>
+		<el-tooltip
+			:disabled="!value"
+			:content="value"
+			placement="top"
+		>
+			<div class="link-field">
+				{{ value || 'No link set' }}
+			</div>
+		</el-tooltip>
 		<el-button
 			class="link-field__add-link-button"
 			@click="displayLinkPicker"
