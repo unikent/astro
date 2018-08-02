@@ -276,15 +276,24 @@ export default {
 		},
 
 		setInitialLinkValue() {
-			let newValue = this.currentValue.replace(`https://${this.site.host}${this.site.path}`, '');
-			let [path, anchor] = newValue.split('#');
+			const
+				[path, anchor] = (
+					this.currentValue
+						.replace(`https://${this.site.host}${this.site.path}`, '')
+						.split('#')
+				),
+				hashIndex = this.currentValue.indexOf('#'),
+				// grab the offset of the hash (or total length if no hash)
+				hashOffset = hashIndex === -1 ? this.currentValue.length : hashIndex;
 
-			if (path.startsWith('https://')) { // path is an external link
+			// the path is external if it matches the original URL up to the hash
+			if(path === this.currentValue.substr(0, hashOffset)) {
 				this.links.external.value = this.currentValue;
 			}
 			else { // path is an internal link
 				this.selectValue = path;
-				this.anchor = anchor;
+				// wait for our watcher to *possibly* set this.anchor to null first
+				this.$nextTick(() => this.anchor = anchor);
 			}
 		},
 
@@ -297,7 +306,7 @@ export default {
 
 					link = {
 						text: tmp.label,
-						value: `https://${this.site.host}${this.site.path}${tmp.value}${this.anchor ? `#${this.anchor}` : ''}`
+						value: `https://${this.site.host}${this.site.path}${tmp.value}`
 					};
 					break;
 				case 'document':
@@ -323,6 +332,12 @@ export default {
 			let { text, value } = link;
 
 			switch(this.activeTab) {
+				case 'internal':
+					// add anchor to URL if one is selected
+					if(value && this.anchor) {
+						value += `#${this.anchor}`;
+					}
+					break;
 				case 'external':
 					// add HTTPS if no protocol is given
 					if(value && !value.match(/^([A-Za-z]{3,9})?:(?:\/\/)?/)) {
