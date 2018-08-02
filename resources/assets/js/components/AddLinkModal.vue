@@ -188,7 +188,8 @@ export default {
 			media: [],
 			site: null,
 			pages: [],
-			hideTextInputs: false
+			hideTextInputs: false,
+			currentValue: null
 		};
 	},
 
@@ -224,7 +225,7 @@ export default {
 				page => page.value === this.selectValue
 			);
 
-			return selectedPage.anchorPaths.map(anchorPath => {
+			return selectedPage && selectedPage.anchorPaths.map(anchorPath => {
 				const
 					blockData = _.get(
 						selectedPage.blocks,
@@ -267,10 +268,33 @@ export default {
 	},
 
 	methods: {
-		showModal({ callback, hideTextInputs }) {
+		showModal({ callback, hideTextInputs, currentValue }) {
+			this.currentValue = currentValue;
 			this.visible = true;
 			this.callback = callback;
 			this.hideTextInputs = hideTextInputs;
+		},
+
+		setInitialLinkValue() {
+			const
+				[path, anchor] = (
+					this.currentValue
+						.replace(`https://${this.site.host}${this.site.path}`, '')
+						.split('#')
+				),
+				hashIndex = this.currentValue.indexOf('#'),
+				// grab the offset of the hash (or total length if no hash)
+				hashOffset = hashIndex === -1 ? this.currentValue.length : hashIndex;
+
+			// the path is external if it matches the original URL up to the hash
+			if(path === this.currentValue.substr(0, hashOffset)) {
+				this.links.external.value = this.currentValue;
+			}
+			else { // path is an internal link
+				this.selectValue = path;
+				// wait for our watcher to *possibly* set this.anchor to null first
+				this.$nextTick(() => this.anchor = anchor);
+			}
 		},
 
 		setLink(link) {
@@ -282,7 +306,7 @@ export default {
 
 					link = {
 						text: tmp.label,
-						value: `https://${this.site.host}${this.site.path}${tmp.value}${this.anchor ? `#${this.anchor}` : ''}`
+						value: `https://${this.site.host}${this.site.path}${tmp.value}`
 					};
 					break;
 				case 'document':
@@ -308,9 +332,15 @@ export default {
 			let { text, value } = link;
 
 			switch(this.activeTab) {
+				case 'internal':
+					// add anchor to URL if one is selected
+					if(value && this.anchor) {
+						value += `#${this.anchor}`;
+					}
+					break;
 				case 'external':
 					// add HTTPS if no protocol is given
-					if(!value.match(/^([A-Za-z]{3,9})?:(?:\/\/)?/)) {
+					if(value && !value.match(/^([A-Za-z]{3,9})?:(?:\/\/)?/)) {
 						value = 'https://' + value;
 					}
 					break;
@@ -343,6 +373,7 @@ export default {
 						path: json.data.path
 					};
 					this.pages = json.data.pages;
+					this.setInitialLinkValue();
 				});
 		},
 
