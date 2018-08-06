@@ -94,7 +94,29 @@ export default class Validation {
 					message: 'The format of this field is invalid.',
 
 					validator(rule, value, cb) {
-						if(value.length && !value.match(new RegExp(rule.regex))) {
+						if(
+							value &&
+							value.length &&
+							!value.match(new RegExp(rule.regex))
+						) {
+							return cb(rule.message);
+						}
+
+						return cb();
+					}
+				};
+				break;
+
+			case 'slug':
+				tranformedRule = {
+					message: 'This field should only have lowercase alphanumeric characters (a-z and 0-9). Separate keywords with dashes.',
+
+					validator(rule, value, cb) {
+						if(
+							value &&
+							value.length &&
+							!value.match(new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$'))
+						) {
 							return cb(rule.message);
 						}
 
