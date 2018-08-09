@@ -84,7 +84,7 @@ class PageTransformer extends FractalTransformer
 					$dynamic = $definition->getDynamicAttributes($block, $section['name'], $region_name, $page_data);
 					$not_allowed = array_diff(array_keys($dynamic), $definition->getDynamicAttributeNames() ?? []);
 					if($not_allowed) {
-						throw new \InvalidArgumentException('Dynamic attribute(s): "' . join('", "', array_keys($not_allowed)) . '" are not defined for block "' . $block['definition_name'] . '-v' . $block['definition_version'] . '"');
+						throw new \InvalidArgumentException('Dynamic attribute(s): "' . join('", "', ($not_allowed)) . '" are not defined for block "' . $block['definition_name'] . '-v' . $block['definition_version'] . '"');
 					}
 					$blocks[$region_name][$section_index]['blocks'][$block_index]['dynamic'] = $dynamic;
 				}

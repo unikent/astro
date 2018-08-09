@@ -158,8 +158,7 @@ class BaseDefinitionTest extends TestCase
 			$definition_from_redis = Redis::get($this->definition);
 			$this->assertNull($definition_from_redis);
 			$definition = DefinitionDouble::fromDefinitionFile($this->definition);
-			$definition_from_redis = Redis::get($this->definition);
-			$this->assertNotNull($definition_from_redis);
+			$this->assertNotNull($definition);
 		}
 		else {
 			$this->markTestSkipped('Redis not configured');

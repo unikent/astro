@@ -379,26 +379,33 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
     public static function fromDefinitionFile($path)
     {
         $definition = null;
+        static $definitionCache = [];
 
-        if (Config::get('database.redis.active')) {
-            try {
-                $definition = Redis::get($path);
-            } catch (Exception $e) {}
-        }
+        if(empty($definitionCache[$path])) {
 
-        if (empty($definition)) {
-            if(!file_exists($path)){
-                throw new FileNotFoundException($path);
-            }
-            $definition = file_get_contents($path);
-            if (Config::get('database.redis.active')) {
-                try {
-                    Redis::set($path, $definition);
-                } catch (Exception $e) {}
-            }
-        }
+			if (Config::get('database.redis.active')) {
+				try {
+					$definition = Redis::get($path);
+				} catch (Exception $e) {
+				}
+			}
 
-    	return static::fromDefinition($definition);
+			if (empty($definition)) {
+				if (!file_exists($path)) {
+					throw new FileNotFoundException($path);
+				}
+				$definition = file_get_contents($path);
+				if (Config::get('database.redis.active')) {
+					try {
+						Redis::set($path, $definition);
+					} catch (Exception $e) {
+					}
+				}
+			}
+			$definitionCache[$path] = static::fromDefinition($definition);
+		}
+		return $definitionCache[$path];
+
     }
 
 	/**

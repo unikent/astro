@@ -85,6 +85,10 @@ abstract class DefinitionBroker {
 						$transformed[$field][] = sprintf('regex:/%s/', $rule[1]);
 						break;
 
+					case 'slug':
+						$transformed[$field][] = sprintf('regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/');
+						break;
+
 					default:
 						$transformed[$field][] = isset($rule[1]) ? sprintf('%s:%s', $rule[0], $rule[1]) : $rule[0];
 						break;

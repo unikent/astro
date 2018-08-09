@@ -223,7 +223,7 @@ export default class Definition {
 			let fieldType = Definition.getFieldType(type);
 
 			if(fieldType && fieldType !== '*') {
-				tranformedRule = { ...tranformedRule, type: fieldType }
+				tranformedRule.type = fieldType;
 			}
 		}
 
