@@ -41,7 +41,6 @@ stages:
 
 artifacts-experimental:
   stage: build-and-test
-  when: manual
   script:
     - vendor/bin/phpunit
     - yarn run validate
