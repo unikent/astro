@@ -33,23 +33,18 @@ before_script:
   - export ASTRO_LOGOUT_URL=/site-editor/auth/logout
   - yarn install
   - yarn run production
+  - php artisan key:generate
+  - php artisan migrate --database=mysql_test
 
 stages:
-  - test
-  - build
-
-test:
-  stage: test
-  script:
-    - php artisan key:generate
-    - php artisan migrate --database=mysql_test
-    - vendor/bin/phpunit
-    - yarn run validate
+  - build-and-test
 
 artifacts-experimental:
-  stage: build
+  stage: build-and-test
   when: manual
   script:
+    - vendor/bin/phpunit
+    - yarn run validate
     - rm -rf node_modules .git
   artifacts:
     paths:
@@ -60,8 +55,10 @@ artifacts-experimental:
     - master
 
 artifacts-develop:
-  stage: build
+  stage: build-and-test
   script:
+    - vendor/bin/phpunit
+    - yarn run validate
     - rm -rf node_modules .git
   artifacts:
     paths:
@@ -71,8 +68,10 @@ artifacts-develop:
     - develop
 
 artifacts-master:
-  stage: build
+  stage: build-and-test
   script:
+    - vendor/bin/phpunit
+    - yarn run validate
     - rm -rf node_modules .git
   artifacts:
     paths:
