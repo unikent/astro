@@ -5,6 +5,7 @@ cache:
   paths:
     - $HOME/.composer/cache
     - vendor/
+    - $HOME/.cache
     # - node_modules/
 
 services:
