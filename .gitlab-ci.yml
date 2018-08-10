@@ -40,7 +40,7 @@ before_script:
 stages:
   - build-and-test
 
-artifacts-experimental:
+feature-branch:
   stage: build-and-test
   script:
     - vendor/bin/phpunit
@@ -54,7 +54,7 @@ artifacts-experimental:
     - develop
     - master
 
-artifacts-develop:
+develop:
   stage: build-and-test
   script:
     - vendor/bin/phpunit
@@ -67,7 +67,7 @@ artifacts-develop:
   only:
     - develop
 
-artifacts-master:
+master:
   stage: build-and-test
   script:
     - vendor/bin/phpunit
