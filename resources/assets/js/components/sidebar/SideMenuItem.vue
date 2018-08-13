@@ -1,7 +1,7 @@
 <template>
 <li v-if="id !== 'pages'" :class="id === active ? 'active' : ''">
 	<el-tooltip :content="title" placement="left" :disabled="!showTooltip">
-		<a v-if="id === 'errors'" href="#" @click.prevent="handleClick">
+		<a v-if="id === 'errors' && errorCount > 0" href="#" @click.prevent="handleClick">
 			<el-badge value="!" class="item">
 				<icon :name="icon" className="menu-icon" />
 			</el-badge>

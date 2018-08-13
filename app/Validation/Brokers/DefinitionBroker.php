@@ -86,6 +86,7 @@ abstract class DefinitionBroker {
 						break;
 
 					case 'slug':
+						$transformed[$field][] = 'nullable';
 						$transformed[$field][] = sprintf('regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/');
 						break;
 
