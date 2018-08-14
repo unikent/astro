@@ -11,7 +11,7 @@
     "unit": "mocha-webpack --webpack-config resources/assets/js/test/webpack.config-test.babel.js \"resources/assets/js/test/unit/*.js\"",
     "validate": "cross-env node resources/assets/js/console",
     "eslint": "node_modules/.bin/eslint resources/assets/js/**/*.{js,vue} --format codeframe",
-    "postinstall": "cd node_modules/kent-theme-assets && yarn install && grunt production && mkdir -p ../../public/kent-theme-assets && cp -R public/assets ../../public/kent-theme-assets/"
+    "postinstall": "cd node_modules/kent-theme-assets && yarn install && grunt production && mkdir -p ../../public/kent-theme-assets && cp -R public/assets ../../public/kent-theme-assets/ && cd ../../"
   },
   "dependencies": {
     "async-validator": "^1.8.1",
