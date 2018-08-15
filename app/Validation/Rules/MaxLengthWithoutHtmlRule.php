@@ -41,8 +41,16 @@ class MaxLengthWithoutHtmlRule
 	 */
 	public function passes($attribute, $value)
 	{
-		// We decode html entities so things like &nbsp; don't count as several chars
-		return mb_strlen(strip_tags(html_entity_decode($value))) <= $this->max_length;
+		// Our length has to be multibyte "safe" to be consistent with the client-side
+		return mb_strlen(
+			// We decode html entities so things like &nbsp; don't count as several chars
+			html_entity_decode(
+				// Strip all HTML before decoding the HTML entities
+				strip_tags($value),
+				ENT_QUOTES | ENT_HTML5,
+				'UTF-8'
+			)
+		) <= $this->max_length;
 	}
 
 	/**
