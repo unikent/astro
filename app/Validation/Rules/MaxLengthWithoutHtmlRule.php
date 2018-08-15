@@ -29,7 +29,20 @@ class MaxLengthWithoutHtmlRule
 			);
 		}
 
-		$this->max_length = is_null($parameters[0]) ? 0 : (int) $parameters[0];
+		$length = is_null($parameters) ? 0 : $parameters[0];
+
+		if(
+			filter_var($length, FILTER_VALIDATE_INT) === false ||
+			// FILTER_VALIDATE_INT has stupid result if var is true
+			$length === true ||
+			$length < 0
+		) {
+			throw new \InvalidArgumentException(
+				'"max_length_plaintext" validation rule parameter must be a positive integer.' . " ($length supplied)"
+			);
+		}
+
+		$this->max_length = (int) $length;
 	}
 
 	/**
