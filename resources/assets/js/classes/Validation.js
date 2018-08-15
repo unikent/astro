@@ -1,3 +1,5 @@
+/* global DOMParser */
+
 export default class Validation {
 
 	static messages = {
@@ -9,8 +11,10 @@ export default class Validation {
 		'max_length': (val) => `This field can't be more than ${val} characters long.`
 	};
 
-	static transform(rule, value, message = null) {
-		let tranformedRule = {};
+	static transform(validationRule, message = null) {
+		let
+			[rule, value] = validationRule.split(/:(.*)/, 2),
+			tranformedRule = {};
 
 		if(
 			[
