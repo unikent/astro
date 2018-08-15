@@ -33,12 +33,14 @@ Schema:
 | `region_name` | What region this block appears in (they don't have a version so they can be ported to different themes). |
 | `fields` | The field data (JSON). |
 
+
 ### Fields
 Fields are inputs that allow end-users to modify blocks on a page.  Blocks are made up of zero or more fields.
 
 ## Definition files
 
 A block's structure is represented via definition files. These also contain the embedded field definitions which define what field types are contained within these blocks and any validation rules. The definition files are stored as JSON and are simple enough to put together manually quickly.
+
 
 ### Block definitions
 Block definitions contain the label, name, version and fields that belong to a block.
@@ -61,6 +63,7 @@ Block definitions contain the label, name, version and fields that belong to a b
 	]
 }
 ```
+
 
 ### Fields types
 
@@ -222,6 +225,7 @@ Input fields share some attributes:
 ```
 > Screenshot here
 
+
 ### Validation rules
 
 Each field can have a set of validation rules.
@@ -240,7 +244,8 @@ If none are supplied, only the type of a field is validated.
 | multiselect | `array` |
 | radio | `*` |
 | buttongroup | `*` |
-| media | `object` |
+| link | `string` |
+| image | `object` |
 | number | `number` |
 | slider | `integer` |
 | date | `date` |
@@ -262,10 +267,12 @@ If none are supplied, only the type of a field is validated.
 | max_value | `len` | max_value:`len` | Maximum integer value. |
 | min_length | `len` | min_length:`len` | Minimum string length. |
 | max_length | `len` | max_length:`len` | Maximum string length. |
+| max_length_without_html | `len` | max_length_without_html:`len` | Maximum string length once all HTML is removed. |
 | min | `len` | min:`len` | Minimum array length. |
 | max | `len` | max:`len` | Maximum array length. |
 | length | `len` | length:`len` | Ensure item is this length. |
 | regex | `regex` | regex:`regex` | Validate this field based on a regular expression. |
+| slug | none | slug | Ensures this field matches `/^[a-z0-9]+(?:-[a-z0-9]+)*$/`. |
 
 Validation rules are defined as an array like so:
 
@@ -283,6 +290,7 @@ Validation rules are defined as an array like so:
 ```
 
 In this instance, if the field was left empty or wasn't one of the predefined options (list, of or word) then a validation  would be shown to the user.
+
 
 ### Special field types
 
@@ -366,7 +374,6 @@ All display fields share some attributes:
 | --- | --- | --- |
 | `type` | yes | The field type (header or paragraph). |
 | `content` | yes | Textual content. |
-| `info` | no | Additional information about the field, displayed as a tooltip. |
 
 #### Display field definitions
 
@@ -374,8 +381,7 @@ All display fields share some attributes:
 ```json
 {
 	"type":    "header|paragraph",
-	"content": "content",
-	"info":    "Info here"
+	"content": "content"
 }
 ```
 > Screenshots here
@@ -393,6 +399,7 @@ Dynamic fields pull their data from a specific source and display it in a user-f
 }
 ```
 > Screenshot here
+
 
 ### Adding custom fields
 
