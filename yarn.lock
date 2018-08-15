@@ -7377,10 +7377,6 @@ webpack-dev-server@^2.3.0:
     webpack-dev-middleware "1.12.2"
     yargs "6.6.0"
 
-webpack-node-externals@^1.7.2:
-  version "1.7.2"
-  resolved "https://registry.yarnpkg.com/webpack-node-externals/-/webpack-node-externals-1.7.2.tgz#6e1ee79ac67c070402ba700ef033a9b8d52ac4e3"
-
 webpack-notifier@^1.5.0:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/webpack-notifier/-/webpack-notifier-1.5.1.tgz#cf5f6b9a1711f80969bbc4f7bd15d40ea7b18761"
