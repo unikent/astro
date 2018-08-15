@@ -128,6 +128,25 @@ export default class Validation {
 					}
 				};
 				break;
+
+			case 'max_length_without_html': {
+				const maxLength = parseFloat(value, 2);
+
+				tranformedRule = {
+					message: `This field should not be more than ${maxLength} characters.`,
+
+					validator(rule, value, cb) {
+						const html = new DOMParser().parseFromString(value || '', 'text/html');
+
+						if(value && html.body.textContent.length > maxLength) {
+							return cb(rule.message);
+						}
+
+						return cb();
+					}
+				};
+				break;
+			}
 		}
 
 		if(message) {
