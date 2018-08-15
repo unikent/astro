@@ -60,8 +60,8 @@ class MaxLengthWithoutHtmlRule
 	 */
 	public static function register()
 	{
-		Validator::extend('max_length_without_html', [static::class, 'extension']);
-		Validator::replacer('max_length_without_html', [static::class, 'replacer']);
+		Validator::extend('max_length_without_html', static::class . '@extension');
+		Validator::replacer('max_length_without_html', static::class . '@replacer');
 	}
 
 	/**
