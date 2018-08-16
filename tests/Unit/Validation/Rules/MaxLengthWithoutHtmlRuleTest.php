@@ -89,11 +89,59 @@ class MaxLengthWithoutHtmlRuleTest extends TestCase
 		$this->assertAttributeSame(56, 'max_length', $ruleFour);
 	}
 
-	public function testValidationRuleWorks()
+    /**
+     * @dataProvider providerTestValidationRuleWorks
+     */
+    public function testValidationRuleWorks($text, $limit, $expectedResult)
 	{
-		// TODO: try a bunch of valid and invalid input and see if the rule passes
-		// different lengths, with different amounts of HMTL etc.
-	}
+        $validator = Validator::make(
+				['test' => $text],
+				['test' => ['max_length_without_html:' . $limit]]
+        );
+
+        $this->assertEquals($expectedResult, $validator->passes());
+    }
+
+    public function providerTestValidationRuleWorks()
+    {
+        return [
+            'text under char limit' => [
+                $text = 'this is less than the char limit',
+                $limit = 40,
+                $expectedResult = true
+            ],
+            'html under char limit' => [
+                $text = '<p>hello</p>',
+                $limit = 10,
+                $expectedResult = true
+            ],
+            'html over char limit which if unformatted would be under char limit' => [
+                $text = '<p>woooooo</p>',
+                $limit = 10,
+                $expectedResult = true
+            ],
+            'text equal to the char limit' => [
+                $text = '1234567890',
+                $limit = 10,
+                $expectedResult = true
+            ],
+            'text equal to the char limit with added formatting' => [
+                $text = '<p>1234567890<p>',
+                $limit = 10,
+                $expectedResult = true
+            ],
+            'empty string' => [
+                $text = '',
+                $limit = 10,
+                $expectedResult = true
+            ],
+             'null string' => [
+                $text = null,
+                $limit = 10,
+                $expectedResult = true
+            ],
+        ];
+    }
 
 	public function testHtmlEntitiesAreTreatedAsSingleCharacters()
 	{
