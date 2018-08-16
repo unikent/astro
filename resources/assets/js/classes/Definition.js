@@ -212,11 +212,7 @@ export default class Definition {
 	}
 
 	static transformValidationRule(validationRule, { type }) {
-		let
-			tranformedRule = {},
-			[rule, value] = validationRule.split(':');
-
-		tranformedRule = Validation.transform(rule, value);
+		const tranformedRule = Validation.transform(validationRule);
 
 		// only infer type validation if it's not explicitly defined
 		if(tranformedRule.type === void 0) {

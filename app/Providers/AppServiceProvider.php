@@ -8,6 +8,7 @@ use App\Models\Definitions\SiteDefinition;
 use App\Models\Page;
 use App\Validation\Rules\LayoutExistsRule;
 use App\Validation\Rules\UniqueSitePathRule;
+use App\Validation\Rules\MaxLengthWithoutHtmlRule;
 use DB;
 use Laravel\Dusk\DuskServiceProvider;
 use Illuminate\Support\Facades\Schema;
@@ -129,6 +130,9 @@ class AppServiceProvider extends ServiceProvider
 			 $is = !$page->descendantsAndSelf()->where('id', $value)->exists();
 			 return $is;
 		});
+
+		// Add a validation rule for checking the length of a string once all HTML is removed.
+		MaxLengthWithoutHtmlRule::register();
 	}
 
 	/**
