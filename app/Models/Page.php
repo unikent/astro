@@ -342,6 +342,7 @@ class Page extends BaumNode
 	 */
 	public static function findByHostAndPath($host, $path, $version = Page::STATE_PUBLISHED)
 	{
+		$path = rtrim($path, '/');
 		$query = Page::version($version)
 			->join('sites', 'site_id', '=', 'sites.id')
 			->where('sites.host', $host)
