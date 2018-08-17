@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
     "content-hash": "453e6e63f99cacf2f42e95b2f6f68914",
@@ -3722,7 +3722,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/kent-profiles.git",
-                "reference": "c18928f25a45cd5e6bddf50560c5ee86aa16dd84"
+                "reference": "9984d60d94aa0ca3646f2d4d0b865bb5425fcc34"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.3"
@@ -3740,7 +3740,7 @@
                 }
             ],
             "description": "A laravel app to manage staff profiles at kent",
-            "time": "2018-05-16T16:14:32+00:00"
+            "time": "2018-08-16T12:29:04+00:00"
         },
         {
             "name": "unikent/kentauth",
