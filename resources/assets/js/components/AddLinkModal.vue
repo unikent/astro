@@ -13,26 +13,62 @@
 				label="Internal page"
 				class="add-link-modal__internal"
 			>
-				<el-select
-					v-model="selectValue"
-					@change="setLink"
-					placeholder="Select a page"
-					class="add-link-modal__page-select"
-				>
-					<el-option
-						v-for="item in sitePages"
-						:key="item.value"
-						:label="item.label"
-						:value="item.value"
+				<el-row>
+					<el-select
+						v-model="selectValue"
+						@change="setLink"
+						placeholder="Select a page"
+						class="add-link-modal__page-select"
 					>
-						<span class="add-link-modal__page-select-label">
-							{{ item.label }}
-						</span>
-						<span class="add-link-modal__page-select-value">
-							{{ item.value }}
-						</span>
-					</el-option>
-				</el-select>
+						<el-option
+							v-for="item in sitePages"
+							:key="item.value"
+							:label="item.label"
+							:value="item.value"
+						>
+							<span class="add-link-modal__page-select-label">
+								{{ item.label }}
+							</span>
+							<span class="add-link-modal__page-select-value">
+								{{ item.value }}
+							</span>
+						</el-option>
+					</el-select>
+				</el-row>
+
+				<el-row>
+					<el-select
+						v-if="selectPageAnchorLinks && selectPageAnchorLinks.length"
+						placeholder="Select a page section to link to"
+						class="add-link-modal__page-select"
+						v-model="anchor"
+						@change="() => setLink(selectValue)"
+					>
+						<el-option
+							key="empty-anchor-link"
+							label="No anchor link"
+							:value="false"
+						>
+							<span class="add-link-modal__page-select-label">
+								No anchor link
+							</span>
+						</el-option>
+						<el-option
+							v-for="item in selectPageAnchorLinks"
+							:key="item.value"
+							:label="item.value"
+							:value="item.value"
+						>
+							<span class="add-link-modal__page-select-label">
+								{{ item.value }}
+							</span>
+							<span class="add-link-modal__page-select-value">
+								{{ item.label }}
+							</span>
+						</el-option>
+					</el-select>
+				</el-row>
+
 			</el-tab-pane>
 			<el-tab-pane
 				name="external"
@@ -112,6 +148,9 @@ import { mapState } from 'vuex';
 
 import PagedResults from 'components/media/PagedResults';
 import mediaFormatters from 'mixins/mediaFormatters';
+import { Definition } from 'classes/helpers';
+import { getPathsToItem } from 'helpers/collection';
+import _ from 'lodash';
 
 export default {
 
@@ -145,10 +184,12 @@ export default {
 				}
 			},
 			selectValue: null,
+			anchor: null,
 			media: [],
 			site: null,
 			pages: [],
-			hideTextInputs: false
+			hideTextInputs: false,
+			currentValue: null
 		};
 	},
 
@@ -158,9 +199,49 @@ export default {
 		}),
 
 		sitePages() {
-			return this.pages.map(
-				({ title, path, depth }) => ({ label: title, value: path, depth })
+			return this.pages.map(({ title, path, depth, blocks }) => {
+				const anchorPaths = getPathsToItem(
+					blocks,
+					el => el && el.anchor_link,
+					['errors']
+				);
+
+				return {
+					label: title,
+					value: path,
+					depth,
+					anchorPaths,
+					blocks
+				}
+			});
+		},
+
+		selectPageAnchorLinks() {
+			if(!this.selectValue) {
+				return null;
+			}
+
+			const selectedPage = this.sitePages.find(
+				page => page.value === this.selectValue
 			);
+
+			return selectedPage && selectedPage.anchorPaths.map(anchorPath => {
+				const
+					blockData = _.get(
+						selectedPage.blocks,
+						anchorPath.slice(0, 4)
+					),
+					blockDefinition = Definition.get(Definition.getType({
+						name   : blockData.definition_name,
+						version: blockData.definition_version
+					})),
+					field = _.get(selectedPage.blocks, anchorPath);
+
+				return {
+					label: field.title || `${blockDefinition.label} Block`,
+					value: field.anchor_link
+				};
+			});
 		}
 	},
 
@@ -168,6 +249,12 @@ export default {
 		visible(value) {
 			if(value) {
 				this.fetchData();
+			}
+		},
+
+		selectValue(value, oldValue) {
+			if(value !== oldValue) {
+				this.anchor = null;
 			}
 		}
 	},
@@ -181,10 +268,33 @@ export default {
 	},
 
 	methods: {
-		showModal({ callback, hideTextInputs }) {
+		showModal({ callback, hideTextInputs, currentValue }) {
+			this.currentValue = currentValue;
 			this.visible = true;
 			this.callback = callback;
 			this.hideTextInputs = hideTextInputs;
+		},
+
+		setInitialLinkValue() {
+			const
+				[path, anchor] = (
+					this.currentValue
+						.replace(`https://${this.site.host}${this.site.path}`, '')
+						.split('#')
+				),
+				hashIndex = this.currentValue.indexOf('#'),
+				// grab the offset of the hash (or total length if no hash)
+				hashOffset = hashIndex === -1 ? this.currentValue.length : hashIndex;
+
+			// the path is external if it matches the original URL up to the hash
+			if(path === this.currentValue.substr(0, hashOffset)) {
+				this.links.external.value = this.currentValue;
+			}
+			else { // path is an internal link
+				this.selectValue = path;
+				// wait for our watcher to *possibly* set this.anchor to null first
+				this.$nextTick(() => this.anchor = anchor);
+			}
 		},
 
 		setLink(link) {
@@ -222,9 +332,15 @@ export default {
 			let { text, value } = link;
 
 			switch(this.activeTab) {
+				case 'internal':
+					// add anchor to URL if one is selected
+					if(value && this.anchor) {
+						value += `#${this.anchor}`;
+					}
+					break;
 				case 'external':
 					// add HTTPS if no protocol is given
-					if(!value.match(/^([A-Za-z]{3,9})?:(?:\/\/)?/)) {
+					if(value && !value.match(/^([A-Za-z]{3,9})?:(?:\/\/)?/)) {
 						value = 'https://' + value;
 					}
 					break;
@@ -250,13 +366,14 @@ export default {
 				});
 
 			this.$api
-				.get(`sites/${this.siteId}?include=pages`)
+				.get(`sites/${this.siteId}?include=pages:full`)
 				.then(({ data: json }) => {
 					this.site = {
 						host: json.data.host,
 						path: json.data.path
 					};
 					this.pages = json.data.pages;
+					this.setInitialLinkValue();
 				});
 		},
 

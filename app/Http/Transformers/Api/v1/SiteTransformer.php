@@ -104,7 +104,7 @@ class SiteTransformer extends FractalTransformer
 			->orderBy('lft')
 			->get();
 		if($pages){
-			return new FractalCollection($pages, new PageTransformer(), false);
+			return new FractalCollection($pages, new PageTransformer($params->get('full')), false);
 		}
 	}
 
@@ -120,7 +120,7 @@ class SiteTransformer extends FractalTransformer
 			->orderBy('lft')
 			->get();
 		if($pages){
-			return new FractalCollection($pages, new PageTransformer(), false);
+			return new FractalCollection($pages, new PageTransformer($params->get('full')), false);
 		}
 	}
 
@@ -146,7 +146,7 @@ class SiteTransformer extends FractalTransformer
 			->orderBy('lft')
 			->get();
 		if($pages){
-			return new FractalCollection($pages, new PageTransformer(), false);
+			return new FractalCollection($pages, new PageTransformer($params->get('full')), false);
 		}
 	}
 

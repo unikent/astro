@@ -41,7 +41,7 @@ export default {
 		const scribe = new Scribe(
 			this.$refs.editor, {
 				undo: {
-					enabled: false
+					enabled: true
 				}
 			}
 		);

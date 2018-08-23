@@ -69,6 +69,12 @@ abstract class DefinitionBroker {
 						$transformed[$field][] = sprintf('max:%s', $rule[1]);
 						break;
 
+					case 'max_length_without_html':
+						$transformed[$field][] = 'nullable';
+						$transformed[$field][] = 'string';
+						$transformed[$field][] = sprintf($rule[0] . ':%s', $rule[1]);
+						break;
+
 					case 'min_value':
 						$transformed[$field][] = 'nullable';
 						$transformed[$field][] = 'integer';
@@ -83,6 +89,11 @@ abstract class DefinitionBroker {
 
 					case 'regex':
 						$transformed[$field][] = sprintf('regex:/%s/', $rule[1]);
+						break;
+
+					case 'slug':
+						$transformed[$field][] = 'nullable';
+						$transformed[$field][] = sprintf('regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/');
 						break;
 
 					default:

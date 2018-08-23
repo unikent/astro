@@ -295,8 +295,6 @@ const actions = {
 						});
 
 						commit('setBlockDefinitions', Definition.definitions, { root: true });
-						commit('setPage', _.cloneDeep(page));
-						undoStackInstance.init(state.pageData)
 						commit('clearBlockValidationIssues');
 
 						const blockMeta = {
@@ -307,8 +305,9 @@ const actions = {
 							blockMeta.blocks[region] = [];
 							page.blocks[region].forEach((section, sindex) => {
 								blockMeta.blocks[region].push({ blocks: [] });
-								page.blocks[region][sindex].blocks.forEach((block) => {
+								page.blocks[region][sindex].blocks.forEach((block, bindex) => {
 									Definition.fillFields(block);
+									page.blocks[region][sindex].blocks.splice(bindex, 1, block);
 									blockMeta.blocks[region][sindex].blocks.push({ size: 0, offset: 0 });
 									if( typeof block.errors !== void 0 && block.errors !== null) {
 										commit('addBlockValidationIssue', block.id);
@@ -316,6 +315,11 @@ const actions = {
 								});
 							});
 						});
+
+						commit('setPage', _.cloneDeep(page));
+						undoStackInstance.init(state.pageData)
+
+
 
 						commit('addBlockMeta', blockMeta);
 						commit('setLoaded');

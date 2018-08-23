@@ -5,6 +5,7 @@ cache:
   paths:
     - $HOME/.composer/cache
     - vendor/
+    - $HOME/.cache
     # - node_modules/
 
 services:
@@ -33,23 +34,18 @@ before_script:
   - export ASTRO_LOGOUT_URL=/site-editor/auth/logout
   - yarn install
   - yarn run production
+  - php artisan key:generate
+  - php artisan migrate --database=mysql_test
 
 stages:
-  - test
-  - build
+  - build-and-test
 
-test:
-  stage: test
+feature-branch:
+  stage: build-and-test
   script:
-    - php artisan key:generate
-    - php artisan migrate --database=mysql_test
     - vendor/bin/phpunit
     - yarn run validate
-
-artifacts-experimental:
-  stage: build
-  when: manual
-  script:
+    - yarn run unit
     - rm -rf node_modules .git
   artifacts:
     paths:
@@ -59,9 +55,12 @@ artifacts-experimental:
     - develop
     - master
 
-artifacts-develop:
-  stage: build
+develop:
+  stage: build-and-test
   script:
+    - vendor/bin/phpunit
+    - yarn run validate
+    - yarn run unit
     - rm -rf node_modules .git
   artifacts:
     paths:
@@ -70,9 +69,12 @@ artifacts-develop:
   only:
     - develop
 
-artifacts-master:
-  stage: build
+master:
+  stage: build-and-test
   script:
+    - vendor/bin/phpunit
+    - yarn run validate
+    - yarn run unit
     - rm -rf node_modules .git
   artifacts:
     paths:

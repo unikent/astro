@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "453e6e63f99cacf2f42e95b2f6f68914",
+    "content-hash": "ca87653e66b54288c97c075473fb7a99",
     "packages": [
         {
             "name": "barryvdh/laravel-debugbar",
@@ -787,6 +787,53 @@
             "time": "2017-11-14T20:44:03+00:00"
         },
         {
+            "name": "ezyang/htmlpurifier",
+            "version": "v4.10.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ezyang/htmlpurifier.git",
+                "reference": "d85d39da4576a6934b72480be6978fb10c860021"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/d85d39da4576a6934b72480be6978fb10c860021",
+                "reference": "d85d39da4576a6934b72480be6978fb10c860021",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2"
+            },
+            "require-dev": {
+                "simpletest/simpletest": "^1.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "HTMLPurifier": "library/"
+                },
+                "files": [
+                    "library/HTMLPurifier.composer.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL"
+            ],
+            "authors": [
+                {
+                    "name": "Edward Z. Yang",
+                    "email": "admin@htmlpurifier.org",
+                    "homepage": "http://ezyang.com"
+                }
+            ],
+            "description": "Standards compliant HTML filter written in PHP",
+            "homepage": "http://htmlpurifier.org/",
+            "keywords": [
+                "html"
+            ],
+            "time": "2018-02-23T01:58:20+00:00"
+        },
+        {
             "name": "fideloper/proxy",
             "version": "3.3.4",
             "source": {
@@ -1381,14 +1428,20 @@
         },
         {
             "name": "laravel/framework",
-            "version": "dev-feature/inline-size-rule-messages",
+            "version": "v5.4.36",
             "source": {
                 "type": "git",
-                "url": "git@github.com:theninja/framework.git",
-                "reference": "ff82c55bf413aa12ee933d47bdf90aa2848ce412"
+                "url": "https://github.com/laravel/framework.git",
+                "reference": "1062a22232071c3e8636487c86ec1ae75681bbf9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/1062a22232071c3e8636487c86ec1ae75681bbf9",
+                "reference": "1062a22232071c3e8636487c86ec1ae75681bbf9",
+                "shasum": ""
             },
             "require": {
-                "doctrine/inflector": "~1.0",
+                "doctrine/inflector": "~1.1",
                 "erusev/parsedown": "~1.6",
                 "ext-mbstring": "*",
                 "ext-openssl": "*",
@@ -1484,14 +1537,7 @@
                     "Illuminate\\": "src/Illuminate/"
                 }
             },
-            "autoload-dev": {
-                "files": [
-                    "tests/Database/stubs/MigrationCreatorFakeMigration.php"
-                ],
-                "psr-4": {
-                    "Illuminate\\Tests\\": "tests/"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -1507,11 +1553,7 @@
                 "framework",
                 "laravel"
             ],
-            "support": {
-                "issues": "https://github.com/laravel/framework/issues",
-                "source": "https://github.com/laravel/framework"
-            },
-            "time": "2018-02-21T11:00:09+00:00"
+            "time": "2017-08-30T09:26:16+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -3621,14 +3663,17 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/astro-kent-theme.git",
-                "reference": "aadcfd7c2cec0e22d18efa6824a10a5d68f2e201"
+                "reference": "66feee2711ebc8fd004a5c1f1c1ad4de30e78d72"
+            },
+            "require": {
+                "ezyang/htmlpurifier": "4.10.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "5.0"
             },
             "type": "library",
             "description": "Our block views",
-            "time": "2018-07-10T15:50:55+00:00"
+            "time": "2018-08-23T10:50:58+00:00"
         },
         {
             "name": "unikent/astro-renderer",
@@ -3636,7 +3681,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/astro-renderer.git",
-                "reference": "e6afc442491ee2b28f95fc0ccad62bc8f401eeae"
+                "reference": "360faa6aa7513c8dd4cfd5f6421a4e2e8f3ead09"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.2",
@@ -3664,7 +3709,7 @@
                 }
             ],
             "description": "A simple renderer for Astro",
-            "time": "2018-06-08T14:36:22+00:00"
+            "time": "2018-07-19T10:57:42+00:00"
         },
         {
             "name": "unikent/kent-profiles",
@@ -3672,7 +3717,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/kent-profiles.git",
-                "reference": "c18928f25a45cd5e6bddf50560c5ee86aa16dd84"
+                "reference": "0f3fccf38f365e112fabd0b5b197d262bdd4d90a"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.3"
@@ -3690,7 +3735,7 @@
                 }
             ],
             "description": "A laravel app to manage staff profiles at kent",
-            "time": "2018-05-16T16:14:32+00:00"
+            "time": "2018-08-17T12:47:14+00:00"
         },
         {
             "name": "unikent/kentauth",
@@ -5425,17 +5470,9 @@
             "time": "2018-01-29T19:49:41+00:00"
         }
     ],
-    "aliases": [
-        {
-            "alias": "5.4.23",
-            "alias_normalized": "5.4.23.0",
-            "version": "dev-feature/inline-size-rule-messages",
-            "package": "laravel/framework"
-        }
-    ],
+    "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "laravel/framework": 20,
         "unikent/astro-renderer": 20,
         "unikent/kentauth": 20,
         "unikent/kent-profiles": 20,
