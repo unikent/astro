@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "453e6e63f99cacf2f42e95b2f6f68914",
+    "content-hash": "ca87653e66b54288c97c075473fb7a99",
     "packages": [
         {
             "name": "barryvdh/laravel-debugbar",
@@ -1428,14 +1428,20 @@
         },
         {
             "name": "laravel/framework",
-            "version": "dev-feature/inline-size-rule-messages",
+            "version": "v5.4.36",
             "source": {
                 "type": "git",
-                "url": "git@github.com:theninja/framework.git",
-                "reference": "ff82c55bf413aa12ee933d47bdf90aa2848ce412"
+                "url": "https://github.com/laravel/framework.git",
+                "reference": "1062a22232071c3e8636487c86ec1ae75681bbf9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/1062a22232071c3e8636487c86ec1ae75681bbf9",
+                "reference": "1062a22232071c3e8636487c86ec1ae75681bbf9",
+                "shasum": ""
             },
             "require": {
-                "doctrine/inflector": "~1.0",
+                "doctrine/inflector": "~1.1",
                 "erusev/parsedown": "~1.6",
                 "ext-mbstring": "*",
                 "ext-openssl": "*",
@@ -1531,14 +1537,7 @@
                     "Illuminate\\": "src/Illuminate/"
                 }
             },
-            "autoload-dev": {
-                "files": [
-                    "tests/Database/stubs/MigrationCreatorFakeMigration.php"
-                ],
-                "psr-4": {
-                    "Illuminate\\Tests\\": "tests/"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -1554,11 +1553,7 @@
                 "framework",
                 "laravel"
             ],
-            "support": {
-                "issues": "https://github.com/laravel/framework/issues",
-                "source": "https://github.com/laravel/framework"
-            },
-            "time": "2018-02-21T11:00:09+00:00"
+            "time": "2017-08-30T09:26:16+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -5475,17 +5470,9 @@
             "time": "2018-01-29T19:49:41+00:00"
         }
     ],
-    "aliases": [
-        {
-            "alias": "5.4.23",
-            "alias_normalized": "5.4.23.0",
-            "version": "dev-feature/inline-size-rule-messages",
-            "package": "laravel/framework"
-        }
-    ],
+    "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "laravel/framework": 20,
         "unikent/astro-renderer": 20,
         "unikent/kentauth": 20,
         "unikent/kent-profiles": 20,
