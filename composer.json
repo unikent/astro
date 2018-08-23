@@ -17,10 +17,6 @@
 			"type": "git"
 		},
 		{
-			"url": "git@github.com:theninja/framework.git",
-			"type": "git"
-		},
-		{
 			"url": "git@gitlab.kent.ac.uk:webdev/astro-kent-theme.git",
 			"type": "git"
 		}
@@ -36,7 +32,7 @@
 		"intervention/imagecache": "^2.3",
 		"james-heinrich/getid3": "^1.9",
 		"kyslik/column-sortable": "^5.4",
-		"laravel/framework": "dev-feature/inline-size-rule-messages as 5.4.23",
+		"laravel/framework": "^5.4",
 		"laravel/tinker": "~1.0",
 		"rtconner/laravel-tagging": "^2.2",
 		"spatie/laravel-fractal": "^3.5",
