@@ -47,7 +47,7 @@ The user accesses the menu section of the site
     [Documentation]   Open Site and Edit Menu
     [Tags]  Test 1
     Click Link  css=a[href$="/site/${DEFAULT_SITE_ID}/menu"]
-    Wait Until Page Contains  Manage Menu
+    Wait Until Page Contains Element  ${SideMenu_1}
 
 The user should arrive on the menu manager for the site
     #URL should change to /site/site_id/menu
@@ -65,9 +65,10 @@ Delete link
     Sleep  2s
 
 
-Add side link 1
-    [Documentation]   Add side link 1
-    Click Element  ${SideMenu_1}
+Add side link
+    [Documentation]   Add side link
+    [Arguments]  ${SideMenuItemButton}
+    Click Element  ${SideMenuItemButton}
     Capture Page Screenshot
     # need to figure out how to check for new item
 
@@ -141,17 +142,16 @@ Delete all menu items
 
 Menu teardown
     [Documentation]  If the top delete button exists click it until there are no items
-    Wait Until Keyword Succeeds  40 sec  10 ms   Delete All Menu Items
-    Capture Page Screenshot
+    Wait Until Keyword Succeeds  10 sec  10 ms   Delete All Menu Items
     Save Menu
 
 Menu setup
     [Documentation]  Clears menu of any existing items
-    Wait Until Keyword Succeeds  40 sec  10 ms   Delete All Menu Items
+    Wait Until Keyword Succeeds  10 sec  10 ms   Delete All Menu Items
     Save Menu
 
 The user clicks on the ‘Add to menu’ button for the home page on the Site pages listing
-    Add side link 1
+    Add side link  ${SideMenu_1}
     ${site.home_page_name} =  Execute Javascript  return document.querySelector('.site-page-links__site-details span').textContent
 
 The new 'Home' menu item should appear in the menu items list
