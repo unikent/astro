@@ -17,5 +17,5 @@ If you have docker installed run the tests simple with:
 
 Otherwise, use: 
 
-`robot --outputdir results/ ./Tests`. 
+`robot --outputdir reports/ ./Tests/`. 
 
