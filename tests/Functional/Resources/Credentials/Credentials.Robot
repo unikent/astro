@@ -8,6 +8,6 @@ ${username} =  ${SITE_EDITOR_USER}
 
 *** Keywords ***
 
-Insert Credentials
+Insert credentials
     Input Text  id=username  ${SITE_EDITOR_USER}
     Input Text  id=password  ${SITE_EDITOR_PASSWORD}

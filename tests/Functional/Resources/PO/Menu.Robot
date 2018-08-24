@@ -44,24 +44,24 @@ ${NotificationClose} =  css=body > div.el-notification.right > div > div.el-noti
 
 *** Keywords ***
 
-the user clicks on the menu button on the left hand navigation
+The user clicks on the menu button on the left hand navigation
     click element  ${MenuButtonLeftHandNav}
 
 
 
-the user accesses the menu section of the site
+The user accesses the menu section of the site
     [Documentation]   Open Site and Edit Menu
     [Tags]  Test 1
     Click Link  Menu
     Wait Until Page Contains  Manage Menu
 
-the user should arrive on the menu manager for the site
+The user should arrive on the menu manager for the site
     #URL should change to /site/site_id/menu
     Location Should Be  ${MenuUrl}
     #There should be a sites pages section on the page
     Wait until Page contains  Site pages
 
-there are no menu items
+There are no menu items
     Menu Teardown
 
 Delete link
@@ -89,34 +89,32 @@ Add 5 side links
 
     # need to figure out how to check for new item
 
-Add Manual Link
+Add manual link
     [Documentation]  Add Manual Link
     Click Element   ${Manual_AddLink}
     # need to figure out how to check for new item
     sleep  1s
 
-Save Menu
+Save menu
     [Documentation]  Save Menu
     Click Element  ${SaveMenu}
     Wait Until Page Contains  ${SaveMenuSuccess}
     Wait Until Element is visible  ${NotificationClose}
     Click Element  ${NotificationClose}
 
-the user saves the menu
+The user saves the menu
     Save Menu
 
-
-the user saves the menu despite validation errors
+The user saves the menu despite validation errors
     Click Element  ${SaveMenu}
 
-
-there should be a validation error when saving the menu
+There should be a validation error when saving the menu
     Wait Until Page Contains  ${SaveMenuValidationError}
     Wait Until Element is visible  ${NotificationClose}
     Click Element  ${NotificationClose}
 
 
-Preview Menu
+Preview menu
     [Documentation]  Preview Menu and then focus back on the menu editor
     Click Element  ${PreviewMenu}
     Wait Until Keyword Succeeds  30s  2s  Select Window  NEW 
@@ -124,46 +122,43 @@ Preview Menu
 
 
 
-Back to Menu Window
+Back to menu window
     Select Window  ${SelectMenuWindow}
 
-Publish Menu
+Publish menu
     [Documentation]  Publish Menu
     Click Element  ${PublishMenu}
     Wait Until Page Contains  ${PublishMenuSuccess}
 
-
-the user publishes the menu despite validation errors
+The user publishes the menu despite validation errors
     Click Element  ${PublishMenu}
 
-there should be a validation error when publishing the menu
+There should be a validation error when publishing the menu
     Wait Until Page Contains  ${PublishMenuFailure}
 
-No Menu Items
+No menu items
     [Documentation]  No Menu Items
     Page Should Contain  ${NoMenuItems}
 
-Delete All Menu Items
+Delete all menu items
     [Documentation]  Delete All Menu Items
     Run Keyword And Ignore Error  Click Element  ${DeleteMenu_1}
     Page Should Contain  ${NoMenuItems}
 
-Menu Teardown
+Menu teardown
     [Documentation]  If the top delete button exists click it until there are no items
     Wait Until Keyword Succeeds  40 sec  10 ms   Delete All Menu Items
     Save Menu
 
-Menu Setup
+Menu setup
     [Documentation]  Clears menu of any existing items
     Wait Until Keyword Succeeds  40 sec  10 ms   Delete All Menu Items
     Save Menu
 
-
-
-the user clicks on the ‘Add to menu’ button for the home page on the Site pages listing
+The user clicks on the ‘Add to menu’ button for the home page on the Site pages listing
     Add side link 1
 
-the new 'Home' menu item should appear in the menu items list
+The new 'Home' menu item should appear in the menu items list
     # Home in text field for link text
     Textfield Value Should Be  ${FirstMenuItemLinkText}  ${HomePageName}
     #Item appears on the menu listing
@@ -172,24 +167,22 @@ the new 'Home' menu item should appear in the menu items list
     #The URL is static and needs to be made dynamic
     Textfield Value Should Be  ${FirstMenuItemLinkURL}  ${HomePageURL}
 
-the home menu item should appear in the preview of the page
+The home menu item should appear in the preview of the page
     Preview Menu
     Page should contain link  ${HomePageName}
     Page should contain element  ${PreviewFirstMenuItem}
 
 
-the user clicks on the ‘add link’ button
+The user clicks on the ‘add link’ button
     Click Element   ${Manual_AddLink}
 
-fills in the link text and url fields with valid data
+Fills in the link text and url fields with valid data
     Set test variable  ${LinkName}  Test
     Set test variable  ${LinkURL}  https://www.google.co.uk
     Input text  ${FirstMenuItemLinkText}  ${LinkName}
     Input text  ${FirstMenuItemLinkURL}  ${LinkURL}
 
-
-
-the new manual menu item should appear in the preview of the page
+The new manual menu item should appear in the preview of the page
     Preview Menu
     Page should contain link  ${LinkName}
     Page should contain link  ${LinkURL}

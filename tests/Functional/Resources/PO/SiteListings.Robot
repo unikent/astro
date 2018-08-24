@@ -6,10 +6,5 @@ Library  SeleniumLibrary
 
 *** Keywords ***
 
-
-
-
-
-
-Menu Page Verification
+Menu page verification
 
