@@ -1,8 +1,6 @@
 robot:
     image: ppodgorsek/robot-framework
     tty: true
-    env_file:
-      - docker.env
     volumes:
         - ./reports:/opt/robotframework/reports
         - ./Resources:/opt/robotframework/Resources

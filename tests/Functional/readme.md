@@ -14,7 +14,8 @@ Otherwise [follow the instaructions here to install robot framewok on your machi
  * Copy the `config.sample.py` file and save it as `config.py`, then...
    * Set the `START_URL` the the URL of the instance of the site editor to be tested.
    * Set the `SITE_EDITOR_USER` and `SITE_EDITOR_PASSWORD` to the username and password of the primary user with which the site will be tested.
- * Copy the `docker.env.sample` file and save it as `docker.env`.
+ * Copy the `.env.sample` file and save it as `.env`, then...
+   * If running the tests against a local env... Set the `IP_ADDRESS` to the IP address of the 
 
 ### Running tests
 
