@@ -35,7 +35,6 @@ ${FirstMenuItemLinkText} =  css=body > div.editor > div.admin-wrapper > div > di
 ${FirstMenuItemLinkURL} =  css=body > div.editor > div.admin-wrapper > div > div > div > div:nth-child(1) > div > div.el-card__body > div:nth-child(1) > div > span:nth-child(3) > div > input
 ${FirstMenuItem} =  css=body > div.editor > div.admin-wrapper > div > div > div > div:nth-child(1) > div > div.el-card__body > div:nth-child(1) > div
 
-${HomePageName} =  Home
 ${PreviewFirstMenuItem} =  css=#navbar-menu > li > a
 ${NotificationClose} =  css=body > div.el-notification.right > div > div.el-notification__closeBtn.el-icon-close
 
@@ -153,10 +152,11 @@ Menu setup
 
 The user clicks on the ‘Add to menu’ button for the home page on the Site pages listing
     Add side link 1
+    ${site.home_page_name} =  Execute Javascript  return document.querySelector('.site-page-links__site-details span').textContent
 
 The new 'Home' menu item should appear in the menu items list
     # Home in text field for link text
-    Textfield Value Should Be  ${FirstMenuItemLinkText}  ${HomePageName}
+    Textfield Value Should Be  ${FirstMenuItemLinkText}  ${site.home_page_name}
     #Item appears on the menu listing
     page should contain element  ${FirstMenuItem}
     #The URL should be the site’s host and path
@@ -165,7 +165,7 @@ The new 'Home' menu item should appear in the menu items list
 
 The home menu item should appear in the preview of the page
     Preview Menu
-    Page should contain link  ${HomePageName}
+    Page should contain link  ${site.home_page_name}
     Page should contain element  ${PreviewFirstMenuItem}
 
 
