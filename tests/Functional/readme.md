@@ -23,6 +23,8 @@ If you have docker installed run the tests simple with:
 
 `docker-compose run robot`.
 
+To pass specific robot specific option, do something like `docker-compose run -e ROBOT_OPTIONS="-T -i wip" robot`
+
 See [https://github.com/ppodgorsek/docker-robot-framework](https://github.com/ppodgorsek/docker-robot-framework) for more details of running the tests with docker.
 
 Otherwise (in the absense of docker), use: 

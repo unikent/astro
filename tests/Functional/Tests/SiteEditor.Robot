@@ -23,6 +23,7 @@ User can access a site’s menu manager from the site’s administration area
     Then the user should arrive on the menu manager for the site
 
 Menu items can be added via the Site Pages ‘Add to menu’ buttons
+    [Tags]  wip
     Given the user accesses the menu section of the site
     And there are no menu items
     When the user clicks on the ‘Add to menu’ button for the home page on the Site pages listing

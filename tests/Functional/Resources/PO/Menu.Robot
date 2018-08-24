@@ -24,9 +24,8 @@ ${PublishMenuSuccess} =  Successfully published menu.
 ${PublishMenuFailure} =  Menu not published
 
 ${PreviewMenu} =  css=body > div.editor > div.admin-wrapper > div > div > div > div:nth-child(1) > div > div.el-card__header > div > div > button.el-button.el-button--icon.el-button--default.is-plain
-${SelectPreviewWindow} =  url=https://webtools-test.kent.ac.uk/site-editor/draft/alpha.kent.ac.uk/harry
 ${CheckPreviewWindow} =  This is a preview version of the site and is for internal use only. This page can be shared with your colleagues.
-${SelectMenuWindow} =  url=https://webtools-test.kent.ac.uk/site-editor/site/35/menu
+${SelectMenuWindow} =  url=${START_URL}/site/${DEFAULT_SITE_ID}/menu
 ${NoMenuItems} =  No menu items
 
 ${AccountButton} =  css=body > div.editor > div.top-bar > div.top-bar__tools > span.user-account-button.el-popover__reference
@@ -37,7 +36,6 @@ ${FirstMenuItemLinkURL} =  css=body > div.editor > div.admin-wrapper > div > div
 ${FirstMenuItem} =  css=body > div.editor > div.admin-wrapper > div > div > div > div:nth-child(1) > div > div.el-card__body > div:nth-child(1) > div
 
 ${HomePageName} =  Home
-${HomePageURL} =  https://alpha.kent.ac.uk/harry/
 ${PreviewFirstMenuItem} =  css=#navbar-menu > li > a
 ${NotificationClose} =  css=body > div.el-notification.right > div > div.el-notification__closeBtn.el-icon-close
 
@@ -70,8 +68,8 @@ Delete link
 
 Add side link 1
     [Documentation]   Add side link 1
-
     Click Element  ${SideMenu_1}
+    Capture Page Screenshot
     # need to figure out how to check for new item
 
 
@@ -145,6 +143,7 @@ Delete all menu items
 Menu teardown
     [Documentation]  If the top delete button exists click it until there are no items
     Wait Until Keyword Succeeds  40 sec  10 ms   Delete All Menu Items
+    Capture Page Screenshot
     Save Menu
 
 Menu setup
@@ -162,7 +161,7 @@ The new 'Home' menu item should appear in the menu items list
     page should contain element  ${FirstMenuItem}
     #The URL should be the site’s host and path
     #The URL is static and needs to be made dynamic
-    Textfield Value Should Be  ${FirstMenuItemLinkURL}  ${HomePageURL}
+    Textfield Value Should Be  ${FirstMenuItemLinkURL}  https://${site.url}/
 
 The home menu item should appear in the preview of the page
     Preview Menu
@@ -176,8 +175,8 @@ The user clicks on the ‘add link’ button
 Fills in the link text and url fields with valid data
     Set test variable  ${LinkName}  Test
     Set test variable  ${LinkURL}  https://www.google.co.uk
-    Input text  ${FirstMenuItemLinkText}  ${LinkName}
-    Input text  ${FirstMenuItemLinkURL}  ${LinkURL}
+    Input Text  ${FirstMenuItemLinkText}  ${LinkName}
+    Input Text  ${FirstMenuItemLinkURL}  ${LinkURL}
 
 The new manual menu item should appear in the preview of the page
     Preview Menu

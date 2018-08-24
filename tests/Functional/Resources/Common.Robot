@@ -14,7 +14,7 @@ Begin web test
     Set site variable
 
 Set site variable
-    &{site_var} =   Execute Javascript  var el = document.querySelector("a[href$='/site/${DEFAULT_SITE_ID}']"); return el ? {id:${DEFAULT_SITE_ID}, url: el.href, name: el.text} : false;
+    &{site_var} =   Execute Javascript  var el = document.querySelector("a[href$='/site/${DEFAULT_SITE_ID}']"); return el ? {id:1, home: el.href, name: el.text, url: el.parentNode.parentNode.parentNode.querySelector("td:nth-child(2) span.el-tag").textContent} : false;
     Set Test Variable  &{site}  &{site_var}
 
 Log in
