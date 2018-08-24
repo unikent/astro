@@ -24,7 +24,7 @@ Log in
 
 End web test
     Capture Page Screenshot
-    Close Browser
+    Close All Browsers
 
 Insert testing data
     log  I am setting up the test data
