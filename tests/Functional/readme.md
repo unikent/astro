@@ -23,7 +23,9 @@ If you have docker installed run the tests simple with:
 
 `docker-compose run robot`.
 
-Otherwise, use: 
+See [https://github.com/ppodgorsek/docker-robot-framework](https://github.com/ppodgorsek/docker-robot-framework) for more details of running the tests with docker.
+
+Otherwise (in the absense of docker), use: 
 
 `robot --outputdir reports/ ./Tests/`. 
 

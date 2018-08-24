@@ -3,12 +3,9 @@ Library  SeleniumLibrary
 
 *** Variables ***
 
-${SchoolName} =  Harry's School Site
-${SchoolNameHeader} =  css=body > div.editor > div.top-bar > div:nth-child(1) > div.site-pick
-
 *** Keywords ***
 
 The user is in the site administration area
-    click link  ${SchoolName}
-    element should contain  ${SchoolNameHeader}  ${SchoolName}
-    wait until page contains  Dashboard
+    Click Link  css=a[href$="/site/${DEFAULT_SITE_ID}"]
+    Wait Until Page Contains  ${site.name}
+    Wait Until Page Contains  Dashboard

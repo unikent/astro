@@ -30,8 +30,7 @@ ${SelectMenuWindow} =  url=https://webtools-test.kent.ac.uk/site-editor/site/35/
 ${NoMenuItems} =  No menu items
 
 ${AccountButton} =  css=body > div.editor > div.top-bar > div.top-bar__tools > span.user-account-button.el-popover__reference
-${MenuUrl} =  https://webtools-test.kent.ac.uk/site-editor/site/35/menu
-${MenuButtonLeftHandNav} =  css=body > div.editor > div.admin-wrapper > aside > section > ul > li:nth-child(3) > a > span
+${MenuButtonLeftHandNav} =  css=.admin-sidebar a[href$="/site/${DEFAULT_SITE_ID}/menu"]
 
 ${FirstMenuItemLinkText} =  css=body > div.editor > div.admin-wrapper > div > div > div > div:nth-child(1) > div > div.el-card__body > div:nth-child(1) > div > span:nth-child(2) > div > input
 ${FirstMenuItemLinkURL} =  css=body > div.editor > div.admin-wrapper > div > div > div > div:nth-child(1) > div > div.el-card__body > div:nth-child(1) > div > span:nth-child(3) > div > input
@@ -45,19 +44,17 @@ ${NotificationClose} =  css=body > div.el-notification.right > div > div.el-noti
 *** Keywords ***
 
 The user clicks on the menu button on the left hand navigation
-    click element  ${MenuButtonLeftHandNav}
-
-
+    Click Element  ${MenuButtonLeftHandNav}
 
 The user accesses the menu section of the site
     [Documentation]   Open Site and Edit Menu
     [Tags]  Test 1
-    Click Link  Menu
+    Click Link  css=a[href$="/site/${DEFAULT_SITE_ID}/menu"]
     Wait Until Page Contains  Manage Menu
 
 The user should arrive on the menu manager for the site
     #URL should change to /site/site_id/menu
-    Location Should Be  ${MenuUrl}
+    Location Should Be  ${START_URL}/site/${DEFAULT_SITE_ID}/menu
     #There should be a sites pages section on the page
     Wait until Page contains  Site pages
 
