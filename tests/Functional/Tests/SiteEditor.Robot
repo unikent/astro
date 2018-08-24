@@ -10,16 +10,6 @@ Resource  ../Resources/PO/SiteAdministration.Robot
 Test Setup  Begin Web Test
 Test Teardown  End Web test
 
-*** Variables ***
-
-${BROWSER} =  chrome
-
-*** Keywords ***
-
-
-
-
-
 
 *** Test Cases ***
 User can access a site’s menu manager from the ‘Manage Sites’ listing
