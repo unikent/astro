@@ -5,6 +5,14 @@
  */
 
 return [
+	// URL patterns to use for generating URLs to view published pages,
+	// eg. http://{domain}{path}
+	'app_live_url_pattern' => env('APP_LIVE_URL_PATTERN', 'http://{domain}{path}'),
+
+	// URL patterns to use for generating URLs to view draft pages,
+	// eg. http://astro.test/draft/{domain}{path}
+	'app_preview_url_pattern' => env('APP_PREVIEW_URL_PATTERN', 'http://astro.test/draft/{domain}{path}'),
+
 	// URL to the Astro API
 	'astro_api_url' => env('ASTRO_API_URL'),
 
