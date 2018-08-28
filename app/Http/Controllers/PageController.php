@@ -21,11 +21,6 @@ class PageController extends Controller
 {
 	use AuthorizesRequests, DispatchesJobs;
 
-	public function __construct()
-	{
-
-	}
-
 	/**
 	 * Render a draft page.
 	 * GET /path/to/editor/draft/{host}/{path}
@@ -55,7 +50,8 @@ class PageController extends Controller
 
 	/**
 	 * Replace links to live site with links to the draft preview site.
-	 * Uses the env setting APP_PREVIEW_URL_PATTERN to determine what the replacements should look like.
+	 * Uses the env setting APP_PREVIEW_URL_PATTERN / config/definitions 'app_preview_url_pattern'
+	 * to determine what the replacements should look like.
 	 * @param string $input - The HTML version of the current page.
 	 * @param \Astro\Renderer\Contracts\Layout $layout - Layout object used by renderer to render the page.
 	 * @return string - The page HTML with any links to the live site replaced with links to the draft site.
@@ -64,7 +60,7 @@ class PageController extends Controller
 	{
 		$host = $layout->page->site->host;
 		$path = $layout->page->site->path;
-		$link = getenv('APP_PREVIEW_URL_PATTERN');
+		$link = config('definitions.app_preview_url_pattern');
 		$regex = '#(?P<html_to_keep><a\s[^>]*?href=")http[s]?://' . $host . $path . '(?P<page_path>[^"]+)"#i';
 		return preg_replace_callback($regex, function($matches) use($host, $path, $link) {
 				return $matches['html_to_keep'] . str_replace(['{domain}', '{path}'], [$host, $path . $matches['page_path']], $link) . '"';
@@ -103,7 +99,8 @@ class PageController extends Controller
 		);
 		$api = new LocalAPIClient();
 		$engine = new TwigEngine(Config::get('app.definitions_path'));
-
+		// set the global twig variables
+		$engine->addGlobal('config',config('definitions'));
 		// controller
 		$astro = new AstroRenderer();
 		return $astro->renderRoute($host, $path, $api, $engine, $locator, $version, $filters);
