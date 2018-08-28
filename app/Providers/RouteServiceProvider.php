@@ -68,13 +68,13 @@ class RouteServiceProvider extends ServiceProvider
 	 */
 	public function map()
 	{
-		if(!env('DISABLE_API_ROUTES') || strtolower(env('DISABLE_API_ROUTES')) == 'false' ) {
+		if(!config('app.disable_api_routes') || strtolower(config('app.disable_api_routes')) == 'false' ) {
 			$this->mapApiRoutes();
 		}
-		if(!env('DISABLE_PREVIEW_ROUTES') || strtolower(env('DISABLE_PREVIEW_ROUTES')) == 'false') {
+		if(!config('app.disable_preview_routes') || strtolower(config('app.disable_preview_routes')) == 'false') {
 			$this->mapPreviewRoutes();
 		}
-		if(!env('DISABLE_WEB_ROUTES') || strtolower(env('DISABLE_WEB_ROUTES')) == 'false' ) {
+		if(!config('app.disable_web_routes') || strtolower(config('app.disable_web_routes')) == 'false' ) {
 			$this->mapWebRoutes();
 		}
 	}
