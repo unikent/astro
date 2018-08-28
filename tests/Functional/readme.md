@@ -1,7 +1,7 @@
 Functional tests
 ================
 
-The functioal tests are writted with [Robotframework](http://robotframework.org).
+The functioal tests are written with [Robotframework](http://robotframework.org).
 
 ## Setup and running tests
 
