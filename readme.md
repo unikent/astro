@@ -18,10 +18,29 @@ Astro has three separate components:
 ## Setup
 ### Prerequisites
 
-* PHP 5.6.4+
+* PHP 7.1
 * MySQL 5.5+ (?)
 * Node.js and npm/yarn (latest)
 * Composer (latest)
+
+### Configuration Options
+
+There are a number of configuration options that can be set depending on whether you are installing
+to use as the editor, the api and / or the previewer.
+
+The three main config files are:
+
+- `config/app.php`
+- `config/editor.php`
+- `config/definitions.php`
+
+although other configuration files in the `config/` directory may also be relevant.
+
+Most of the configuration options for these can be defined in the .env file, but see the actual
+config/*.php files for definitive documentation.
+
+The `config/definitions.php` file should mirror the sample configuration file from whatever
+set of definitions is being used, with the addition of using .env variables if present.
 
 ### API Installation
 
@@ -30,14 +49,18 @@ Astro has three separate components:
 3. Install dependencies with `composer install`
 4. Copy `.env.example` to `.env` and configure your `DB_` variables.
 5. Set your `APP_KEY` variable within `.env`. Running `php artisan key:generate` makes this simple.
-6. Pull in your definitions, i.e. for UoK: `git clone git@github.com:unikent/cms-prototype-blocks.git`.
+6. Pull in your definitions, i.e. for UoK: `git clone git@gitlab.kent.ac.uk:webdev/astro-kent-theme.git`.
 7. Update `DEFINITIONS_PATH` in your .env to point to the newly-cloned definitions directory.
-8. Create a symlink in the `public` folder to link `uploads` to `storage/app/public/uploads`. Depending on your system this would be with something like `ln -s ../storage/app/public/uploads/ uploads`.
-9. Run `php artisan migrate --seed` and `DB_CONNECTION=mysql_test php artisan migrate`
-10. Run `php artisan astro:permissions refresh` to setup roles and permissions
-11. Ensure that everything is working properly, by running the test suite: `phpunit`
+8. Edit any other relevant variables in the .env file (see above configuration options section for details).
+9. Create a symlink in the `public` folder to link `uploads` to `storage/app/public/uploads`. Depending on your system this would be with something like `ln -s ../storage/app/public/uploads/ uploads`.
+10. Run `php artisan migrate --seed` and `DB_CONNECTION=mysql_test php artisan migrate`
+11. Run `php artisan astro:permissions refresh` to setup roles and permissions
+12. Ensure that everything is working properly, by running the test suite: `phpunit`
 
 ### Editor Installation
+
+See the above configuration options section on where to look for options to configure.
+
 yarn and npm should be interchangeable for these commands
 
 ```bash

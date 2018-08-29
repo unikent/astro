@@ -39,5 +39,7 @@ return [
 	// URL for the Kent API (api.kent.ac.uk/api/v1)
 	'kent_api_url' => env('KENT_API_URL', 'https://api.kent.ac.uk/api/v1'),
 
+	# proxy that guzzle may need to use when making requests to Kent API
+	'proxy_url' => env('PROXY_URL', ''),
 ];
 
