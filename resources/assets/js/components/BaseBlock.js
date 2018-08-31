@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import inlineFieldMixin from 'mixins/inlineFieldMixin';
 import imagesLoaded from 'imagesloaded';
 import { eventBus } from 'plugins/eventbus';
@@ -47,18 +48,26 @@ export default {
 
 						this[name] = newVal;
 
-						eventBus.$emit('block:hideHoverOverlay');
-
-						// TODO: use state for this?
-						imagesLoaded(this.$el, () => {
-							eventBus.$emit('block:updateBlockOverlays');
-						});
+						this.updateOverlays();
 					}, {
 						deep: true
 					});
 				}
 			});
-		}
+		},
+
+		updateOverlays: _.throttle(
+			function() {
+				eventBus.$emit('block:hideHoverOverlay');
+				eventBus.$emit('block:updateBlockOverlays');
+				const imgs = imagesLoaded(this.$el);
+				imgs.on('always', () => {
+					eventBus.$emit('block:updateBlockOverlays');
+				});
+			},
+			50,
+			{ trailing: true }
+		)
 	}
 
 };

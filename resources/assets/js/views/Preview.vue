@@ -1,6 +1,6 @@
 <template>
 <div v-if="!pageHasLayoutErrors">
-	<div id="b-wrapper" ref="wrapper" :style="wrapperStyles">
+	<div id="b-wrapper" :style="wrapperStyles">
 		<component :is="layout" />
 		<div
 			class="block-overlay block-overlay--selected" :class="{
@@ -10,9 +10,9 @@
 		></div>
 		<div
 			class="block-overlay" :class="{
-				'block-overlay--hidden': overlayHidden
+				'block-overlay--hidden': hoverOverlayHidden
 			}"
-			:style="blockOverlayStyles"
+			:style="hoverOverlayStyles"
 		>
 
 			<div class="block-overlay__buttons" v-if="sectionConstraints">
@@ -108,15 +108,14 @@ import imagesLoaded from 'imagesloaded';
 
 import Icon from 'components/Icon';
 import ResizeShim from 'components/ResizeShim';
-import { win, Definition } from 'classes/helpers';
+import { debug, win, Definition } from 'classes/helpers';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
 import { layouts } from 'helpers/themeExports';
 import { allowedOperations } from 'classes/SectionConstraints';
 import { disableLinks, findParent } from 'helpers/dom';
 
-/* global document, console */
-/* eslint-disable no-console */
+/* global document */
 
 export default {
 	name: 'preview-wrapper',
@@ -128,10 +127,10 @@ export default {
 
 	data() {
 		return {
-			overlayStyles: {},
 			wrapperStyles: {},
-			overlayHidden: true,
-			blockOverlayStyles: {},
+			overlayStyles: {},
+			hoverOverlayHidden: true,
+			hoverOverlayStyles: {},
 			selectedOverlayHidden: true,
 			selectedOverlayStyles: {},
 			layoutDefinition: null,
@@ -170,7 +169,7 @@ export default {
 				layout = layouts[layoutName];
 
 			if(!layout) {
-				console.warn(`"${layoutName}" layout not found.`)
+				debug(`"${layoutName}" layout not found.`, 'warn')
 			}
 
 			return layout || null;
@@ -291,8 +290,6 @@ export default {
 			'reorderBlocks',
 			'deleteBlock',
 			'showBlockPicker',
-			'updateInsertIndex',
-			'updateInsertRegion',
 			'deleteBlockValidationIssue'
 		]),
 
@@ -411,8 +408,13 @@ export default {
 				this.hoveredBlock = blockInfo;
 				this.hoveredBlockEl = this.$el.querySelector(`#block_${this.hoveredBlock.blockId}`);
 
-				// wait for images to load before displaying overlay
-				imagesLoaded(this.hoveredBlockEl, () => {
+				// we don't want the user to have to wait for any images to
+				// load before showing the overlay
+				this.positionOverlay('hover');
+
+				// wait for images to load before repositioning overlay
+				const imgs = imagesLoaded(this.hoveredBlockEl);
+				imgs.on('always', () => {
 					this.positionOverlay('hover');
 				});
 			}
@@ -422,8 +424,13 @@ export default {
 			this.selectedBlock = blockInfo;
 			this.selectedBlockEl = this.$el.querySelector(`#block_${this.selectedBlock.id}`);
 
-			// wait for images to load before displaying overlay
-			imagesLoaded(this.selectedBlockEl, () => {
+			// we don't want the user to have to wait for any images to
+			// load before showing the overlay
+			this.positionOverlay('select');
+
+			// wait for images to load before repositioning overlay
+			const imgs = imagesLoaded(this.selectedBlockEl);
+			imgs.on('always', () => {
 				this.positionOverlay('select');
 			});
 		},
@@ -443,15 +450,17 @@ export default {
 		},
 
 		hideHoverOverlay() {
-			this.overlayHidden = true;
-			this.updateStyles('blockOverlay', 'transform', 'translateY(0)');
+			this.hoverOverlayHidden = true;
+			this.updateStyles('hoverOverlay', 'transform', 'translateY(0)');
 			this.hoveredBlock = null;
+			this.hoveredBlockEl = null;
 		},
 
 		hideSelectedOverlay() {
 			this.selectedOverlayHidden = true;
 			this.updateStyles('selectedOverlay', 'transform', 'translateY(0)');
 			this.selectedBlock = null;
+			this.selectedBlockEl = null;
 		},
 
 		updateOverlays(index = null) {
@@ -486,13 +495,13 @@ export default {
 			const pos = blockElement.getBoundingClientRect();
 
 			if(type === 'hover') {
-				this.overlayHidden = false;
+				this.hoverOverlayHidden = false;
 			}
 			else {
 				this.selectedOverlayHidden = false;
 			}
 
-			this.updateStyles(type === 'hover' ? 'blockOverlay' : 'selectedOverlay', {
+			this.updateStyles(type === 'hover' ? 'hoverOverlay' : 'selectedOverlay', {
 				transform: `translateY(${pos.top + win.scrollY}px)`,
 				left     : `${pos.left + win.scrollX}px`,
 				width    : `${pos.width}px`,
