@@ -2,6 +2,9 @@ import Validation from './Validation';
 
 export default class Definition {
 
+	/**
+	 * Mappings between field "types" and underlying data types.
+	 */
 	static typeMap = {
 		text       : 'string',
 		textarea   : 'string',
@@ -27,6 +30,13 @@ export default class Definition {
 
 	static definitions = {};
 	static rules = {};
+
+	/**
+	 * Store/cache async-validator schemas for validating each block.
+	 *
+	 * @type {Schema}
+	 */
+	static validators = {};
 
 	/**
 	 * @type {{string}} Map region definition by name
@@ -66,11 +76,14 @@ export default class Definition {
 		if(Definition.definitions[type] === void 0) {
 			Definition.definitions[type] = definition;
 			Definition.rules[type] = this.getRules(definition);
+			Definition.validators[type] = Validation.createSchema(
+				Definition.rules[type]
+			);
 		}
 	}
 
 	static get(type) {
-		if(Definition.definitions[type]) {
+		if(type && Definition.definitions[type]) {
 			return Definition.definitions[type];
 		}
 
@@ -78,8 +91,7 @@ export default class Definition {
 	}
 
 	static getType(definition) {
-
-		if(definition.name && definition.version) {
+		if(definition && definition.name && definition.version) {
 			return `${definition.name}-v${definition.version}`;
 		}
 
@@ -127,14 +139,16 @@ export default class Definition {
 	}
 
 	static fillFields(item, definition = null) {
-		const type = Definition.getType({
-			name   : item.definition_name,
-			version: item.definition_version
-		});
+		const matchingDefinition = Definition.get(
+			Definition.getType({
+				name   : item.definition_name,
+				version: item.definition_version
+			})
+		) || definition;
 
-		if(type && (Definition.get(type) || definition)) {
+		if(matchingDefinition) {
 
-			(Definition.get(type) || definition).fields.forEach(field => {
+			matchingDefinition.fields.forEach(field => {
 
 				if(item.fields[field.name] === void 0) {
 					let value;
@@ -227,11 +241,16 @@ export default class Definition {
 	}
 
 	static getRules(definition, includeNestedRules = true) {
-		// const type = Definition.getType(definition);
+		const type = Definition.getType(definition);
 
-		// if(Definition.rules[type]) {
-		// 	return Definition.rules[type];
-		// }
+		if(!type) {
+			return {};
+		}
+
+		// return cached definition if it exists
+		if(Definition.rules[type]) {
+			return Definition.rules[type];
+		}
 
 		let rules = {};
 
@@ -243,18 +262,38 @@ export default class Definition {
 		return rules;
 	}
 
+	static getValidator(definition) {
+		const type = Definition.getType(definition);
+
+		if(Definition.validators[type]) {
+			return Definition.validators[type];
+		}
+
+		return null;
+	}
+
 	static addNestedRules(field, rules, includeNestedRules) {
 		if(field.fields !== void 0 && ['collection', 'group'].indexOf(field.type) > -1) {
 			let fields = {};
 
-			if(includeNestedRules) {
-				field.fields.forEach(nestedField => {
-					fields[nestedField.name] = Definition.transformValidation(nestedField);
-				});
-			}
+			field.fields.forEach(nestedField => {
+				fields[nestedField.name] = Definition.transformValidation(nestedField);
+			});
 
 			if(Array.isArray(rules[field.name])) {
-				rules[field.name].push({ type: rules[field.name][0].type, fields });
+				rules[field.name].push({
+					type: rules[field.name][0].type,
+					...(
+						includeNestedRules ?
+							{
+								defaultField: {
+									type: 'object',
+									fields
+								}
+							} :
+							{ fields }
+					)
+				});
 			}
 			else {
 				rules[field.name] = { ...rules[field.name], fields };

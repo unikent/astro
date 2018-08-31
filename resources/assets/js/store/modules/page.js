@@ -4,6 +4,7 @@ import { getPublishedPreviewURL, getDraftPreviewURL, Definition } from 'classes/
 import api from 'plugins/http/api';
 import { eventBus } from 'plugins/eventbus';
 import { undoStackInstance } from 'plugins/undo-redo';
+import { isIframe } from 'classes/helpers';
 
 const vue = new Vue();
 
@@ -72,7 +73,7 @@ const mutations = {
 		state.pageData.blocks[region][section].blocks.splice(to, 0, block);
 
 		// TODO: use state for this
-		Vue.nextTick(() => eventBus.$emit('block:updateBlockOverlays', to));
+		runInIframeAfterTick(() => eventBus.$emit('block:updateBlockOverlays', to));
 	},
 
 	updateFieldValue(state, { index, name, value, region, section }) {
@@ -147,7 +148,7 @@ const mutations = {
 		state.pageData.blocks[region][sectionIndex].blocks.splice(index, (replace ? 1 : 0), block || {});
 
 		if(replace) {
-			Vue.nextTick(
+			runInIframeAfterTick(
 				() => eventBus.$emit('block:showSelectedOverlay', {
 					id: block.id
 				})
@@ -155,7 +156,12 @@ const mutations = {
 		}
 
 		// TODO: use state for this
-		Vue.nextTick(() => eventBus.$emit('block:updateBlockOverlays'));
+		runInIframeAfterTick(() => eventBus.$emit('block:updateBlockOverlays'));
+	},
+
+	initialiseBlock(state, { regionName, sectionIndex, blockIndex, block }) {
+		Definition.fillFields(block);
+		state.pageData.blocks[regionName][sectionIndex].blocks.splice(blockIndex, 1, block);
 	},
 
 	/**
@@ -170,7 +176,7 @@ const mutations = {
 		state.pageData.blocks[region][section].blocks.splice(index, 1);
 
 		// TODO: use state for this
-		Vue.nextTick(() => eventBus.$emit('block:updateBlockOverlays'));
+		runInIframeAfterTick(() => eventBus.$emit('block:updateBlockOverlays'));
 	},
 
 	updateCurrentSavedState(state) {
@@ -192,10 +198,6 @@ const mutations = {
 		if (location !== -1) {
 			state.invalidBlocks.splice(location, 1);
 		}
-	},
-
-	clearBlockValidationIssues() {
-		state.invalidBlocks = [];
 	},
 
 	setPageTitle(state, { id, title }) {
@@ -234,9 +236,8 @@ const mutations = {
 
 const actions = {
 
-	fetchPage({ state, commit }, id) {
+	fetchPage({ state, commit, dispatch }, id) {
 		commit('setPage', null);
-		// TODO: refactor into smaller methods
 		return api
 			.get(`pages/${id}?include=blocks.media,site`)
 			.then(response => {
@@ -245,7 +246,6 @@ const actions = {
 				return api
 					.get(`layouts/${page.layout.name}-v${page.layout.version}/definition?include=region_definitions.block_definitions`)
 					.then(({ data: region }) => {
-
 						region.data.region_definitions.forEach(region => {
 							Definition.addRegionDefinition(region);
 							region.block_definitions.forEach(definition => {
@@ -254,36 +254,98 @@ const actions = {
 						});
 
 						commit('setBlockDefinitions', Definition.definitions, { root: true });
-						commit('clearBlockValidationIssues');
-
-
-						Object.keys(page.blocks).forEach(region => {
-							page.blocks[region].forEach((section, sindex) => {
-								page.blocks[region][sindex].blocks.forEach((block, bindex) => {
-									Definition.fillFields(block);
-									page.blocks[region][sindex].blocks.splice(bindex, 1, block);
-									if( typeof block.errors !== void 0 && block.errors !== null) {
-										commit('addBlockValidationIssue', block.id);
-									}
-								});
-							});
-						});
-
 						commit('setPage', _.cloneDeep(page));
-						undoStackInstance.init(state.pageData)
-
+						dispatch('initialiseBlocksAndValidate', state.pageData.blocks);
+						undoStackInstance.init(state.pageData);
 						commit('setLoaded');
-					})
-					.catch(() => {});
+					});
 
-			})
-			.catch(() => {
-				vue.$notify({
-					title: 'Error',
-					message: 'Unable to load page.'
-				});
-				commit('setLoaded');
 			});
+	},
+
+	initialiseBlocksAndValidate({ commit, dispatch }, blocks) {
+		commit('clearBlockErrors');
+
+		Object.keys(blocks).forEach(regionName => {
+			blocks[regionName].forEach((section, sectionIndex) => {
+				blocks[regionName][sectionIndex].blocks.forEach((block, blockIndex) => {
+					commit('initialiseBlock', {
+						regionName,
+						sectionIndex,
+						blockIndex,
+						block
+					});
+
+					dispatch('addBlockErrors', {
+						block,
+						regionName,
+						sectionName: section.name,
+						sectionIndex,
+						blockIndex
+					});
+				});
+			});
+		});
+	},
+
+	addBlockErrors(
+		{ commit },
+		{ block, regionName, sectionName, sectionIndex, blockIndex }
+	) {
+		const
+			definitionType = `${block.definition_name}-v${block.definition_version}`,
+			definition = Definition.get(definitionType),
+			validator = Definition.getValidator(definition),
+			fieldsWithValidation = flattenRules(
+				Definition.getRules(definition)
+			),
+			fieldsWithErrors = [];
+
+		if(fieldsWithValidation.length) {
+			commit('addBlockErrors', {
+				block,
+				blockInfo: {
+					regionName,
+					sectionName,
+					sectionIndex,
+					blockIndex,
+					blockId: block.id
+				},
+				definitionName: definitionType,
+				errors: {}
+			});
+		}
+
+		// If a validator exists for this definition, validate the block fields via it
+		if(validator) {
+			validator.validate(block.fields, errors => {
+				if(errors) {
+					// loop through errors and add them to the state
+					errors.forEach(({ field, message }) => {
+						fieldsWithErrors.push(field);
+
+						commit('addFieldError', {
+							blockId: `${block.id}`,
+							fieldName: field,
+							errors: [message]
+						});
+					});
+				}
+
+				// Add location to store potential errors for fields that don't
+				// currently have errors, so that the state remains reactive
+				fieldsWithValidation
+					.forEach(fieldPath => {
+						if(!fieldsWithErrors.includes(fieldPath)) {
+							commit('addFieldError', {
+								blockId: `${block.id}`,
+								fieldName: fieldPath,
+								errors: []
+							});
+						}
+					});
+			});
+		}
 	},
 
 	/**
@@ -327,7 +389,8 @@ const actions = {
 									style:'font-size:14px',
 									on: {
 										click(e) {
-											eventBus.$emit('sidebar:openErrors', e);
+											vue.$bus.$emit('sidebar:openErrors', e);
+											vue.$message.closeAll();
 										}
 									}
 								}, 'Check the error list for details.')
@@ -404,6 +467,15 @@ const actions = {
 						type: 'error',
 						duration: 0,
 						width: '50%'
+					});
+				}
+				else{
+					// TODO: what message should we give here?
+					vue.$notify({
+						title: 'Not saved',
+						message: 'There was a problem and this page has not been saved. Please try again later.',
+						type: 'error',
+						duration: 0
 					});
 				}
 			});
@@ -677,6 +749,32 @@ const getters = {
 	}
 
 };
+
+
+const
+	// helper for running stuff only in iframe
+	runInIframeAfterTick = (run) => {
+		if(isIframe) {
+			Vue.nextTick(run);
+		}
+	},
+	flattenRules = (rules, parent = '') => {
+		let fields = [];
+
+		Object.keys(rules).forEach(field => {
+			if(rules[field] && rules[field].fields) {
+				fields = [
+					...fields,
+					...flattenRules(rules[field].fields, `${field}.`)
+				];
+			}
+			else if(Array.isArray(rules[field])) {
+				fields.push(parent + field);
+			}
+		});
+
+		return fields;
+	};
 
 export default {
 	state,

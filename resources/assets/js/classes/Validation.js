@@ -1,3 +1,5 @@
+import Schema from 'async-validator';
+
 /* global DOMParser */
 
 export default class Validation {
@@ -23,7 +25,7 @@ export default class Validation {
 				'min', 'max', 'length'
 			].indexOf(rule) !== -1
 		) {
-			value = parseFloat(value, 2);
+			value = Number.parseFloat(value, 2);
 		}
 
 		switch(rule) {
@@ -130,7 +132,7 @@ export default class Validation {
 				break;
 
 			case 'max_length_without_html': {
-				const maxLength = parseFloat(value, 2);
+				const maxLength = Number.parseFloat(value, 2);
 
 				tranformedRule = {
 					message: `This field should not be more than ${maxLength} characters.`,
@@ -159,4 +161,7 @@ export default class Validation {
 		return tranformedRule;
 	}
 
+	static createSchema(rules) {
+		return new Schema(rules);
+	}
 }
