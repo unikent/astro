@@ -247,12 +247,25 @@ export default {
 	},
 
 	mounted() {
-		this.wrapper = this.$refs.wrapper;
-		this.moveEl = this.$refs.move;
-		this.initEvents();
+		document.addEventListener('keydown', this.onKeyDown);
+		document.addEventListener('keyup', this.onKeyUp);
+		document.addEventListener('click', disableLinks);
+		document.addEventListener('mousedown', this.mouseDown);
+		document.addEventListener('mouseup', this.mouseUp);
+		win.addEventListener('resize', this.onResize);
+
+		this.$bus.$on('block:updateBlockOverlays', this.updateOverlays);
+
+		this.$bus.$on('block:showHoverOverlay', this.showHoverOverlay);
+		this.$bus.$on('block:hideHoverOverlay', this.hideHoverOverlay);
+
+		this.$bus.$on('block:showSelectedOverlay', this.showSelectedOverlay);
+		this.$bus.$on('block:hideSelectedOverlay', this.hideSelectedOverlay);
+
+		this.$bus.$on('error-sidebar:scroll-to-error', this.scrollToBlock);
 	},
 
-	destroyed() {
+	beforeDestroy() {
 		document.removeEventListener('keydown', this.onKeyDown);
 		document.removeEventListener('keyup', this.onKeyUp);
 		document.removeEventListener('click', disableLinks);
@@ -265,6 +278,8 @@ export default {
 
 		this.$bus.$off('block:showSelectedOverlay', this.showSelectedOverlay);
 		this.$bus.$off('block:hideSelectedOverlay', this.hideSelectedOverlay);
+
+		this.$bus.$off('error-sidebar:scroll-to-error', this.scrollToBlock);
 	},
 
 	methods: {
@@ -280,23 +295,6 @@ export default {
 			'updateInsertRegion',
 			'deleteBlockValidationIssue'
 		]),
-
-		initEvents() {
-			document.addEventListener('keydown', this.onKeyDown);
-			document.addEventListener('keyup', this.onKeyUp);
-			document.addEventListener('click', disableLinks);
-			document.addEventListener('mousedown', this.mouseDown);
-			document.addEventListener('mouseup', this.mouseUp);
-			win.addEventListener('resize', this.onResize);
-
-			this.$bus.$on('block:updateBlockOverlays', this.updateOverlays);
-
-			this.$bus.$on('block:showHoverOverlay', this.showHoverOverlay);
-			this.$bus.$on('block:hideHoverOverlay', this.hideHoverOverlay);
-
-			this.$bus.$on('block:showSelectedOverlay', this.showSelectedOverlay);
-			this.$bus.$on('block:hideSelectedOverlay', this.hideSelectedOverlay);
-		},
 
 		validateLayout() {
 
@@ -528,6 +526,14 @@ export default {
 					1 : (maxBlocks ? maxBlocks - this.hoveredBlockSectionLength : null),
 				replaceBlocks: replaceBlocks
 			});
+		},
+
+		scrollToBlock({ blockId }) {
+			const el = this.$el.querySelector(`#block_${blockId}`);
+
+			if(el) {
+				win.scrollTo(0, el.getBoundingClientRect().top + win.scrollY);
+			}
 		}
 	}
 };

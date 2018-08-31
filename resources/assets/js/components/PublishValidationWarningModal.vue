@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapGetters } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 
 /* global setTimeout */
 
@@ -42,12 +42,6 @@ export default {
 	computed: {
 		...mapState([
 			'publishValidationWarningModal'
-		]),
-
-		...mapGetters([
-			'getInvalidBlocks',
-			'getBlocks',
-			'getCurrentRegion'
 		]),
 
 		// basically controls show/hide of the modal
@@ -63,18 +57,6 @@ export default {
 					this.hidePublishValidationWarningModal();
 				}
 			}
-		},
-
-		errors() {
-			return this.getInvalidBlocks();
-		},
-
-		blocks() {
-			return this.getBlocks();
-		},
-
-		region() {
-			return this.getCurrentRegion();
 		}
 	},
 
@@ -82,8 +64,6 @@ export default {
 		...mapMutations([
 			'showPublishValidationWarningModal',
 			'hidePublishValidationWarningModal',
-			'updateMenuActive',
-			'updateMenuFlash'
 		]),
 
 		/**
@@ -105,11 +85,7 @@ export default {
 		*/
 		openErrors() {
 			this.cancel();
-			this.updateMenuActive('errors');
-			this.updateMenuFlash('errors');
-			setTimeout(() => {
-				this.updateMenuFlash('');
-			}, 1000);
+			this.$bus.$emit('sidebar:openErrors');
 		}
 	}
 };
