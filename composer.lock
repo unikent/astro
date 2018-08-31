@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
     "content-hash": "ca87653e66b54288c97c075473fb7a99",
@@ -3681,7 +3681,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/astro-renderer.git",
-                "reference": "360faa6aa7513c8dd4cfd5f6421a4e2e8f3ead09"
+                "reference": "6a14a63c4c52812c3e4c304c1a84d1fe8ff2d409"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.2",
@@ -3709,7 +3709,7 @@
                 }
             ],
             "description": "A simple renderer for Astro",
-            "time": "2018-07-19T10:57:42+00:00"
+            "time": "2018-08-23T14:49:35+00:00"
         },
         {
             "name": "unikent/kent-profiles",
