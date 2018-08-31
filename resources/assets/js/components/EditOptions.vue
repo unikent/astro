@@ -145,6 +145,14 @@ export default {
 		}
 	},
 
+	mounted() {
+		this.$bus.$on('error-sidebar:scroll-to-error', this.scrollTo);
+	},
+
+	beforeDestroy() {
+		this.$bus.$off('error-sidebar:scroll-to-error', this.scrollTo);
+	},
+
 	methods: {
 
 		getField(type) {
@@ -173,6 +181,22 @@ export default {
 			});
 		}
 
+		scrollTo({ fieldPath }) {
+			if(!fieldPath) {
+				return;
+			}
+
+			const
+				optionsList = this.$refs['options-list'],
+				fieldOffset = (
+					optionsList
+						.querySelector(`#${fieldPath.replace(/\./g, '-')}`)
+						.getBoundingClientRect().top
+				),
+				offset = heights['top-bar'][0] + heights['block-back-bar'][0];
+
+			optionsList.scrollTop = optionsList.scrollTop + fieldOffset - offset;
+		}
 	}
 
 };
