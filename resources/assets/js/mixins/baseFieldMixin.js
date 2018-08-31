@@ -2,7 +2,7 @@ import { debug } from 'classes/helpers';
 
 export default {
 
-	props: ['field', 'path', 'errors', 'currentDefinition'],
+	props: ['field', 'path', 'errors'],
 
 	data() {
 		return {
@@ -36,6 +36,18 @@ export default {
 		// Here so we can override this at some point
 		transformValue(value) {
 			return value;
+		},
+
+		isRequiredField(definition) {
+			return definition.validation && definition.validation.includes('required');
+		},
+
+		getRules() {
+			return null;
+		},
+
+		getError() {
+			return null;
 		}
 	}
 

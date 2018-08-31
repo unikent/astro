@@ -136,6 +136,8 @@ export default {
 				}
 			});
 
+			this.$bus.$emit('global:validate');
+
 			this.hideMediaPicker();
 		},
 

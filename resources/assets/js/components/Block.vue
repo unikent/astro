@@ -82,6 +82,13 @@ export default {
 				// right now there is a brief moment when a different block is selected
 				this.$store.commit('setCurrentBlockIndex', index);
 			}
+
+			if(index !== oldIndex) {
+				this.$store.commit('updateBlockErrorIndex', {
+					blockId: this.uuid,
+					blockIndex: index
+				});
+			}
 		}
 	},
 

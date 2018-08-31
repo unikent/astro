@@ -32,7 +32,6 @@
  */
 
 import { mapState, mapMutations } from 'vuex';
-import Vue from 'vue';
 import { uuid } from 'classes/helpers';
 import PickerList from 'components/PickerList';
 
@@ -57,7 +56,8 @@ export default {
 			maxSelectableBlocks: state => state.blockPicker.maxSelectableBlocks,
 			replaceBlocks: state => state.blockPicker.replaceBlocks,
 			allBlocks: state => state.definition.blockDefinitions,
-			blocks: state => state.page.pageData.blocks
+			blocks: state => state.page.pageData.blocks,
+			currentBlockId: state => state.contenteditor.currentBlockId
 		}),
 
 		/**
@@ -119,24 +119,25 @@ export default {
 				});
 			});
 
+			this.$bus.$emit('global:validateAll');
+
 			if(this.selected.length) {
 				this.hideBlockPicker();
 				this.selected = [];
 				// wait for next tick to sync mutation
 				// then another tick for position update
-				Vue.nextTick(() =>
-					Vue.nextTick(() => this.$bus.$emit('block:updateBlockOverlays'))
+				this.$nextTick(() =>
+					this.$nextTick(() => this.$bus.$emit('block:updateBlockOverlays'))
 				);
 			}
-
 
 		},
 
 		addThisBlockType({ name, version = 1, index, replace = false }) {
-			
-			// if we are replacing a block then remove any validation issues it has first
-			if (replace) {
-				let blockId = this.blocks[this.blockPicker.insertRegion][this.blockPicker.insertSection].blocks[index].id;
+			let blockId;
+
+			if(replace) {
+				blockId = this.blocks[this.blockPicker.insertRegion][this.blockPicker.insertSection].blocks[index].id;
 				this.deleteBlockValidationIssue(blockId);
 			}
 
@@ -149,6 +150,14 @@ export default {
 				fields: {}
 			};
 
+			this.$store.dispatch('addBlockErrors', {
+				block,
+				regionName:  this.blockPicker.insertRegion,
+				sectionName: 'unknown',
+				sectionIndex: this.blockPicker.insertSection,
+				blockIndex: index
+			});
+
 			this.addBlock({
 				index,
 				block,
@@ -157,6 +166,12 @@ export default {
 				sectionName: 'unknown', // TODO addBlock should not need this, sections should be setup on loading page if missing.
 				replace: replace
 			});
+
+			if(replace) {
+				if(this.currentBlockId === blockId) {
+					this.$store.commit('setCurrentBlockId', block.id);
+				}
+			}
 		},
 
 		cancel() {

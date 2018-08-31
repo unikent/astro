@@ -5,22 +5,21 @@
 	/>
 	<div class="block-options-list-scroll custom-scrollbar" ref="options-list">
 		<div class="block-options-list">
-			<block-form
+			<el-form
 				v-if="definition && definition.fields.length"
 				label-position="top"
-				:model="fields"
+				:model="model"
 				:rules="rules"
 			>
 				<el-form-item
 					v-for="fieldDefinition in definition.fields"
-					:label="fieldDefinition.label"
+					:error="getErrors(fieldDefinition.name)"
+					:class="{
+						'is-required': isRequiredField(fieldDefinition)
+					}"
+					:id="fieldDefinition.name"
+					:key="`${fieldDefinition.name}_${identifier}`"
 					:prop="fieldDefinition.name"
-					:error="
-						typeof errors[fieldDefinition.name] === 'string' ?
-							errors[fieldDefinition.name] :
-							null
-					"
-					:key="fieldDefinition.name"
 				>
 					<template slot="label" v-if="fieldDefinition.label">
 						<span>{{ fieldDefinition.label }}</span>
@@ -53,24 +52,14 @@
 								/>
 							</span>
 						</el-tooltip> -->
-
 					</template>
 					<component
 						:is="getField(fieldDefinition.type)"
 						:field="fieldDefinition"
 						:path="fieldDefinition.name"
-						:index="currentIndex"
-						:key="`${definition.name}-${currentIndex}`"
-						:currentDefinition="definition"
-						:errors="
-							typeof errors[fieldDefinition.name] !== 'string' ?
-								errors[fieldDefinition.name] :
-								null
-						"
 					/>
 				</el-form-item>
-
-			</block-form>
+			</el-form>
 
 			<slot v-else>
 				There are currently no options available.
@@ -81,14 +70,13 @@
 
 </template>
 <script>
-import { mapState } from 'vuex';
-import { Definition } from 'classes/helpers';
+import { mapGetters } from 'vuex';
+
 import BackBar from './BackBar';
 import fields from 'components/fields';
 import Icon from './Icon';
-import BlockForm from './BlockForm';
-import { eventBus } from 'plugins/eventbus';
 import swapParentField from 'helpers/swapParentField';
+import { heights } from 'classes/sass';
 
 export default {
 
@@ -98,18 +86,12 @@ export default {
 
 	components: {
 		Icon,
-		BackBar,
-		BlockForm
+		BackBar
 	},
 
 	inject: ['fieldType'],
 
 	computed: {
-
-		...mapState({
-			globalErrors: state => state.errors
-		}),
-
 		loading() {
 			return this.currentItem === null;
 		},
@@ -122,26 +104,32 @@ export default {
 			return null;
 		},
 
-		fields: {
-			get() {
-				return this.currentItem || {};
-			},
-			set() {}
+		model() {
+			return null;
 		},
 
 		errors() {
-			return (
-				this.globalErrors.blocks ?
-					this.globalErrors.blocks[this.currentRegion][this.currentIndex].fields : {}
-			);
+			return {};
 		},
 
 		rules() {
-			return Definition.getRules(this.definition, false);
+			return null;
 		},
 
 		identifier() {
 			return null;
+		},
+
+		fields() {
+			let f = {};
+
+			Object
+				.keys(fields)
+				.forEach(
+					type => f[type] = swapParentField(fields[type], this.fieldType)
+				);
+
+			return f;
 		}
 	},
 
@@ -156,15 +144,13 @@ export default {
 	methods: {
 
 		getField(type) {
-			const field = swapParentField(fields[type], this.fieldType);
-
 			return (
-				field || {
+				this.fields[type] || {
 					name: 'missing-field-type',
 					inheritAttrs: false,
 					template: `
-						 <el-alert
-							title="This field type does not exist"
+						<el-alert
+							title="This field type does not exist (${type})"
 							type="warning"
 							show-icon
 							:closable="false"
@@ -175,11 +161,19 @@ export default {
 		},
 
 		viewField(fieldName) {
-			eventBus.$emit('global:showField', {
+			this.$bus.$emit('global:showField', {
 				id: this.identifier,
 				fieldName
 			});
-		}
+		},
+
+		getErrors(fieldName) {
+			return null;
+		},
+
+		isRequiredField(definition) {
+			return definition.validation && definition.validation.includes('required');
+		},
 
 		scrollTo({ fieldPath }) {
 			if(!fieldPath) {

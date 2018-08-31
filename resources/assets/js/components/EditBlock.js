@@ -6,6 +6,7 @@
  * within the the global vuex state
  */
 import { mapState, mapMutations, mapGetters } from 'vuex';
+
 import EditOptions from 'components/EditOptions';
 
 export default {
@@ -13,10 +14,6 @@ export default {
 	name: 'edit-block',
 
 	extends: EditOptions,
-
-	created() {
-		eventBus.$on('block:setValidation', this.setValidation);
-	},
 
 	computed: {
 		...mapGetters([
@@ -26,8 +23,9 @@ export default {
 
 		...mapState({
 			currentRegion: state => state.contenteditor.currentRegionName,
-			currentSectionName: state => state.contenteditor.currentSectionName,
-			currentIndex: state => state.contenteditor.currentBlockIndex
+			currentSectionIndex: state => state.contenteditor.currentSectionIndex,
+			currentIndex: state => state.contenteditor.currentBlockIndex,
+			blockId: state => state.contenteditor.currentBlockId
 		}),
 
 		loading() {
@@ -39,11 +37,15 @@ export default {
 		},
 
 		currentItem() {
-			return this.currentBlock && this.currentBlock.fields;
+			return this.currentBlock;
+		},
+
+		errors() {
+			return this.$store.state.errors.blocks;
 		},
 
 		identifier() {
-			return `${this.currentRegion}_${this.currentSectionName}_${this.currentIndex}`;
+			return `${this.currentRegion}_${this.currentSectionIndex}_${this.currentIndex}`;
 		}
 	},
 
@@ -53,6 +55,7 @@ export default {
 			if(val === void 0) {
 				this.setBlock();
 			}
+
 			// if block changes scroll to top
 			if(val && oldVal && val.id !== oldVal.id) {
 				this.$refs['options-list'].scrollTop = 0;
@@ -62,23 +65,18 @@ export default {
 
 	methods: {
 		...mapMutations([
-			'setBlock',
-			'addBlockValidationIssue',
-			'deleteBlockValidationIssue'
+			'setBlock'
 		]),
 
-		/**
-		 * toggles the validation of this current block in the vuex state
-		 * @param {bool} status
-		 */
-		setValidation(status) {
-			if (this.currentBlock) {
-				if (status) {
-					this.deleteBlockValidationIssue(this.currentBlock.id);
-				}
-				else {
-					this.addBlockValidationIssue(this.currentBlock.id);
-				}
+		getErrors(fieldPath) {
+			const blockId = this.currentItem.id
+
+			if(
+				this.errors[blockId] &&
+				this.errors[blockId].errors[fieldPath] &&
+				this.errors[blockId].errors[fieldPath].length
+			) {
+				return this.errors[blockId].errors[fieldPath].join(', ');
 			}
 		}
 	}

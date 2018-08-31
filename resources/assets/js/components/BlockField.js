@@ -11,10 +11,12 @@ export default {
 	computed: {
 		...mapGetters([
 			'getCurrentFieldValue',
-			'currentSectionIndex'
+			'currentSectionIndex',
+			'currentDefinition'
 		]),
 
 		...mapState({
+			currentBlockId: state => state.contenteditor.currentBlockId,
 			currentBlockIndex: state => state.contenteditor.currentBlockIndex,
 			currentRegionName: state => state.contenteditor.currentRegionName,
 		})
@@ -34,7 +36,24 @@ export default {
 				index: this.currentBlockIndex,
 				region: this.currentRegionName,
 				section: this.currentSectionIndex
-			})
+			});
+
+			this.$bus.$emit('global:validate');
+		},
+
+		getError(fieldPath) {
+			const
+				blockErrors = this.$store.state.errors.blocks,
+				blockId = this.currentBlockId;
+
+			if(
+				blockErrors[blockId] &&
+				blockErrors[blockId].errors[fieldPath] &&
+				blockErrors[blockId].errors[fieldPath].length
+			) {
+				return blockErrors[blockId].errors[fieldPath].join(', ');
+			}
+			return null;
 		}
 	}
 

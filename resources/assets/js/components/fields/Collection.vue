@@ -9,10 +9,13 @@
 			<template v-for="fieldDefinition in fields">
 				<div class="ci-field">
 					<el-form-item
-						:label="fieldDefinition.label"
 						:prop="`${name}.${index}.${fieldDefinition.name}`"
-						:rules="getRules(fieldDefinition.name)"
-						:error="getError(index, fieldDefinition.name)"
+						:rules="getRules(name, fieldDefinition.name)"
+						:error="getError(`${name}.${index}.${fieldDefinition.name}`)"
+						:class="{
+							'is-required': isRequiredField(fieldDefinition)
+						}"
+						:id="`${name}-${index}-${fieldDefinition.name}`"
 					>
 						<template slot="label">
 							<span>{{ fieldDefinition.label }}</span>
@@ -34,8 +37,6 @@
 							:is="getField(fieldDefinition.type)"
 							:field="childField(fieldDefinition)"
 							:path="`${name}.${index}.${fieldDefinition.name}`"
-							:index="currentIndex"
-							:key="`${name}-${fieldDefinition.name}-${currentIndex}`"
 						/>
 					</el-form-item>
 				</div>
@@ -88,8 +89,6 @@
 
 <script>
 import _ from 'lodash';
-import Vue from 'vue';
-import { mapState } from 'vuex';
 import BlockField from 'components/BlockField';
 import getFieldMixin from 'mixins/getFieldMixin';
 import { Definition } from 'classes/helpers';
@@ -100,13 +99,13 @@ export default {
 
 	name: 'collection-field',
 
-	extends: BlockField,
-
-	mixins: [getFieldMixin],
-
 	components: {
 		Icon
 	},
+
+	extends: BlockField,
+
+	mixins: [getFieldMixin],
 
 	created() {
 		let length = this.currentValue.length;
@@ -124,14 +123,6 @@ export default {
 	},
 
 	computed: {
-		...mapState({
-			currentIndex: state => state.page.currentBlockIndex
-		}),
-
-		rules() {
-			return Definition.getRules(this.currentDefinition);
-		},
-
 		currentValue() {
 			return this.getFieldValue(this.name);
 		},
@@ -145,14 +136,6 @@ export default {
 
 		childField(field) {
 			return _.pick(field, ['label', 'default', 'options']);
-		},
-
-		getRules(fieldName) {
-			let rules = Array.isArray(this.rules[this.name]) ?
-				this.rules[this.name][this.rules[this.name].length - 1] :
-				this.rules[this.name];
-
-			return rules.fields[fieldName];
 		},
 
 		addItem() {
@@ -169,7 +152,7 @@ export default {
 			value.push(item);
 			this.keys.push(this.incr++);
 
-			this.updateAndValidate(value);
+			this.updateField(value);
 		},
 
 		moveItem(index, num) {
@@ -178,7 +161,7 @@ export default {
 			value.splice(index + num, 0, value.splice(index, 1)[0]);
 			this.keys.splice(index + num, 0, this.keys.splice(index, 1)[0]);
 
-			this.updateAndValidate(value);
+			this.updateField(value);
 		},
 
 		removeItem(index) {
@@ -187,27 +170,13 @@ export default {
 			value.splice(index, 1);
 			this.keys.splice(index, 1);
 
-			this.updateAndValidate(value);
+			this.updateField(value);
 		},
 
-		updateAndValidate(value) {
+		updateField(value) {
 			this.updateFieldValue(this.name, value);
-
-			// TODO: change this...
-			// I don't like that I'm forced to use $parent here
-			Vue.nextTick(() => {
-				this.$parent.validate()
-			});
-		},
-
-		getError(fieldIndex, fieldName) {
-			return (
-				this.errors &&
-				this.errors[fieldIndex] &&
-				this.errors[fieldIndex][fieldName] ?
-					this.errors[fieldIndex][fieldName] : null
-			);
 		}
+
 	}
 };
 </script>

@@ -39,8 +39,8 @@
 }
 
 .el-upload__tip--link {
-    text-decoration: none;
-    color: #409EFF;
+	text-decoration: none;
+	color: #409EFF;
 }
 
 .block-options-list	{
@@ -78,7 +78,7 @@
 		content: none;
 	}
 
-	.el-form-item.is-required .el-form-item__label:after {
+	.el-form-item.is-required > .el-form-item__label:after {
 		content: '*';
 		color: #ff4949;
 	}
