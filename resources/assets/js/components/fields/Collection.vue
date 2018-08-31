@@ -107,15 +107,6 @@ export default {
 
 	mixins: [getFieldMixin],
 
-	created() {
-		let length = this.currentValue.length;
-		this.incr = 0;
-
-		while(length--) {
-			this.keys.push(this.incr++);
-		}
-	},
-
 	data() {
 		return {
 			keys: []
@@ -132,7 +123,26 @@ export default {
 		}
 	},
 
+	created() {
+		this.incr = 0;
+		this.addKeys();
+	},
+
+	// TODO: remember why we need this
+	beforeUpdate() {
+		this.addKeys();
+	},
+
 	methods: {
+		// this is so vue can keep track of the collection items, as they have
+		// no other unique attribute we can use
+		addKeys() {
+			// get the current collection length minus how many keys we have
+			let length = this.currentValue.length - this.keys.length;
+			while(length--) {
+				this.keys.push(this.incr++);
+			}
+		},
 
 		childField(field) {
 			return _.pick(field, ['label', 'default', 'options']);
@@ -159,7 +169,11 @@ export default {
 			const value = _.cloneDeep(this.getFieldValue(this.name));
 
 			value.splice(index + num, 0, value.splice(index, 1)[0]);
-			this.keys.splice(index + num, 0, this.keys.splice(index, 1)[0]);
+
+			// update keys at the same time as updating the field
+			this.$nextTick(() =>
+				this.keys.splice(index + num, 0, this.keys.splice(index, 1)[0])
+			);
 
 			this.updateField(value);
 		},
@@ -168,7 +182,9 @@ export default {
 			const value = _.cloneDeep(this.getFieldValue(this.name));
 
 			value.splice(index, 1);
-			this.keys.splice(index, 1);
+
+			// update keys at the same time as updating the field
+			this.$nextTick(() => this.keys.splice(index, 1));
 
 			this.updateField(value);
 		},
