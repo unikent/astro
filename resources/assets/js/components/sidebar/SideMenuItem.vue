@@ -37,29 +37,11 @@ export default {
 
 	computed: {
 		...mapState({
-			collapsed: state => state.sidebarCollapsed,
-			invalidBlocks: state => state.page.invalidBlocks,
+			invalidBlocks: state => state.page.invalidBlocks
 		}),
 
 		errorCount() {
 			return this.invalidBlocks.length;
-		}
-	},
-
-	watch: {
-		collapsed(isCollapsed) {
-			if(isCollapsed) {
-				this.timer = setTimeout(
-					() => {
-						this.showTooltip = true;
-					},
-					500
-				);
-			}
-			else {
-				this.showTooltip = false;
-				clearTimeout(this.timer);
-			}
 		}
 	},
 

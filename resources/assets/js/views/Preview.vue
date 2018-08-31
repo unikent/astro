@@ -151,7 +151,6 @@ export default {
 			currentLayout: state => state.page.currentLayout,
 			currentRegion: state => state.contenteditor.currentRegionName,
 			layoutVersion: state => state.page.currentLayoutVersion,
-			blockMeta: state => state.page.blockMeta.blocks[state.page.currentRegion],
 			siteLayoutDefinitions: state => state.site.layouts,
 			siteId: state => parseInt(state.site.site),
 			layoutErrors: state => state.page.layoutErrors
@@ -276,7 +275,6 @@ export default {
 		...mapMutations([
 			'reorderBlocks',
 			'deleteBlock',
-			'setScale',
 			'showBlockPicker',
 			'updateInsertIndex',
 			'updateInsertRegion',
@@ -487,25 +485,7 @@ export default {
 				return;
 			}
 
-			const
-				pos = blockElement.getBoundingClientRect(),
-				heightDiff = Math.round(pos.height - 30),
-				widthDiff = Math.round(pos.width - 30);
-
-			let minusTop = 0,
-				minusLeft = 0,
-				addHeight = 0,
-				addWidth = 0;
-
-			if(heightDiff < 0) {
-				addHeight = -heightDiff;
-				minusTop = addHeight / 2;
-			}
-
-			if(widthDiff < 0) {
-				addWidth = -widthDiff;
-				minusLeft = addWidth / 2;
-			}
+			const pos = blockElement.getBoundingClientRect();
 
 			if(type === 'hover') {
 				this.overlayHidden = false;
@@ -515,10 +495,10 @@ export default {
 			}
 
 			this.updateStyles(type === 'hover' ? 'blockOverlay' : 'selectedOverlay', {
-				transform: `translateY(${(pos.top + win.scrollY - minusTop)}px)`,
-				left     : `${(pos.left + win.scrollX - minusLeft)}px`,
-				width    : `${(pos.width + addWidth)}px`,
-				height   : `${(pos.height + addHeight)}px`
+				transform: `translateY(${pos.top + win.scrollY}px)`,
+				left     : `${pos.left + win.scrollX}px`,
+				width    : `${pos.width}px`,
+				height   : `${pos.height}px`
 			});
 		},
 
@@ -533,7 +513,7 @@ export default {
 		},
 
 		showBlockList(offset = 0, replaceBlocks = false) {
-			const 
+			const
 				deprecatedBlocks = this.sectionDefinition.deprecatedBlocks ? this.sectionDefinition.deprecatedBlocks : [],
 				maxBlocks = this.sectionDefinition.max || this.sectionDefinition.size;
 

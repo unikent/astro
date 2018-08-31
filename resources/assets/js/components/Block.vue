@@ -87,7 +87,6 @@ export default {
 
 	data() {
 		return {
-			size: null,
 			currentView: blocks[this.type] ? blocks[this.type] : {
 				template: `
 					<div class="missing-definition-warning">
@@ -115,24 +114,11 @@ export default {
 	},
 
 	mounted() {
-		imagesLoaded(this.$el, () => {
-			this.size = this.$el.getBoundingClientRect();
-
-			this.updateBlockMeta({
-				index: this.index,
-				region: this.region,
-				section: this.section,
-				type: 'size',
-				value: this.size.height
-			});
-		});
-
 		disableForms(this.$el);
 	},
 
 	methods: {
 		...mapMutations([
-			'updateBlockMeta',
 			'changeBlock'
 		]),
 

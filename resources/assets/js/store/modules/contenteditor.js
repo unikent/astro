@@ -106,16 +106,6 @@ const getters = {
 		return _.get(block.fields, name, null);
 	},
 
-	/*
-	 getCurrentBlock: (state) => () => {
-	 return state.pageData.blocks[state.currentRegion][state.currentBlockIndex];
-	 },
-	 */
-	getBlockMeta: (state) => (index, region, prop = false) => {
-		const blockMeta = state.blockMeta.blocks[region][index];
-		return prop ? blockMeta[prop] : blockMeta;
-	},
-
 	getInvalidBlocks: (state, getters, rootState) => () => {
 		return rootState.page.invalidBlocks;
 	},

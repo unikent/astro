@@ -3,7 +3,6 @@ import Vue from 'vue';
 import { getPublishedPreviewURL, getDraftPreviewURL, Definition } from 'classes/helpers';
 import api from 'plugins/http/api';
 import { eventBus } from 'plugins/eventbus';
-import Config from 'classes/Config';
 import { undoStackInstance } from 'plugins/undo-redo';
 
 const vue = new Vue();
@@ -15,8 +14,6 @@ const vue = new Vue();
  * @property {int} currentLayoutVersion - The version number of the layout in use for the current page.
  * @property {number|null} currentBlockIndex - The index of the currently selected block in the currently selected region.
  * @property {string} currentRegion - The name of the region containing the currently selected block.
- * @property {Object} blockMeta - Some meta about blocks???
- * @property {Object} blockMeta.blocks - Object with keys as region names and values as Arrays of blocks.
  * @property {Array} invalidBlocks - array of block ids of invalid blocks within the page
  * @property {boolean} loaded - has the page data been successfully loaded or not?
  */
@@ -26,9 +23,6 @@ const state = {
 	layoutErrors: [],
 	currentBlockIndex: null,
 	currentRegion: null,
-	blockMeta: {
-		blocks: {}
-	},
 	pageData: {
 		blocks: {}
 	},
@@ -69,7 +63,7 @@ const mutations = {
 		state.currentBlockIndex = index;
 	},
 
-	setLayoutErrors (state, layoutErrors) {
+	setLayoutErrors(state, layoutErrors) {
 		state.layoutErrors = layoutErrors;
 	},
 
@@ -77,28 +71,8 @@ const mutations = {
 		const block = state.pageData.blocks[region][section].blocks.splice(from, 1)[0];
 		state.pageData.blocks[region][section].blocks.splice(to, 0, block);
 
-		// update metadata order
-		const blockMeta = state.blockMeta.blocks[region][section].blocks.splice(from, 1)[0];
-		state.blockMeta.blocks[region][section].blocks.splice(to, 0, blockMeta);
-
 		// TODO: use state for this
 		Vue.nextTick(() => eventBus.$emit('block:updateBlockOverlays', to));
-	},
-
-	/**
-	 * @param {Object} blockMeta - The offsets and sizes of every block organised the same as pageData.blocks
-	 */
-	addBlockMeta(state, blockMeta) {
-		state.blockMeta = blockMeta;
-	},
-
-	updateBlockMeta(state, { type, region, section, index, value }) {
-		if(region === null) {
-			return;
-		}
-
-		let blockData = state.blockMeta.blocks[region][section].blocks;
-		blockData.splice(index, 1, { ...blockData[index], [type]: value })
 	},
 
 	updateFieldValue(state, { index, name, value, region, section }) {
@@ -146,26 +120,18 @@ const mutations = {
 
 		// if region is not yet defined in block data, add it
 		if(state.pageData.blocks[region] === void 0) {
-			state.blockMeta.blocks = { ... state.blockMeta.blocks, [region]: [] };
 			state.pageData.blocks = { ... state.pageData.blocks, [region]: [] };
 		}
 
 		// if section is not yet defined in region data, add it
 		// TODO refactor - is this necessary?  Should be more robust...
 		if(state.pageData.blocks[region][sectionIndex] === void 0) {
-			let
-				sections = state.pageData.blocks[region],
-				metaSections = state.blockMeta.blocks[region];
+			let sections = state.pageData.blocks[region];
 
 			for(let i = sections.length; i <= sectionIndex; ++i) {
 				sections.push({
 					name: (i === sectionIndex ? sectionName : 'unknown-section'),
 					blocks: []
-				});
-
-				metaSections.push({
-					size: 0,
-					offset: 0
 				});
 			}
 		}
@@ -177,11 +143,6 @@ const mutations = {
 		if(block) {
 			Definition.fillFields(block);
 		}
-
-		state.blockMeta.blocks[region][sectionIndex].blocks.splice(index, (replace ? 1 : 0), {
-			size: 0,
-			offset: 0
-		});
 
 		state.pageData.blocks[region][sectionIndex].blocks.splice(index, (replace ? 1 : 0), block || {});
 
@@ -206,9 +167,7 @@ const mutations = {
 	 * @param {number} index - The index of the block in its section.
 	 */
 	deleteBlock(state,  { region, section, index }) {
-
 		state.pageData.blocks[region][section].blocks.splice(index, 1);
-		state.blockMeta.blocks[region][section].blocks.splice(index, 1);
 
 		// TODO: use state for this
 		Vue.nextTick(() => eventBus.$emit('block:updateBlockOverlays'));
@@ -297,18 +256,12 @@ const actions = {
 						commit('setBlockDefinitions', Definition.definitions, { root: true });
 						commit('clearBlockValidationIssues');
 
-						const blockMeta = {
-							blocks: {}
-						};
 
 						Object.keys(page.blocks).forEach(region => {
-							blockMeta.blocks[region] = [];
 							page.blocks[region].forEach((section, sindex) => {
-								blockMeta.blocks[region].push({ blocks: [] });
 								page.blocks[region][sindex].blocks.forEach((block, bindex) => {
 									Definition.fillFields(block);
 									page.blocks[region][sindex].blocks.splice(bindex, 1, block);
-									blockMeta.blocks[region][sindex].blocks.push({ size: 0, offset: 0 });
 									if( typeof block.errors !== void 0 && block.errors !== null) {
 										commit('addBlockValidationIssue', block.id);
 									}
@@ -319,9 +272,6 @@ const actions = {
 						commit('setPage', _.cloneDeep(page));
 						undoStackInstance.init(state.pageData)
 
-
-
-						commit('addBlockMeta', blockMeta);
 						commit('setLoaded');
 					})
 					.catch(() => {});
