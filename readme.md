@@ -217,6 +217,9 @@ To simply rename a role, use `php artisan astro:permissions rename-role --old-na
 
 
 ### Testing
+
+#### Unit Tests
+
 PHPUnit has a good level of code coverage across the entire application.
 
 Controller tests (deliberately) act more as integration tests than unit tests as they test much of the stack by default. Mocks are used for authentication/authorization, which is the main exception to this rule. Policies should be unit tested to ensure that they will function as expected. At present, serializers are not unit tested - their output is assessed by the Controller tests.
@@ -225,6 +228,13 @@ Tests are intended to run on their own database connection and will not migrate 
 connection configured as `mysql_test`, migrations can be run with `DB_CONNECTION=mysql_test php artisan migrate`.
 
 The `mysql_test` connection falls back to use the standard `DB_` config variables by default. They can be overridden using `TEST_DB_` variables. The default connection for tests is set in `phpunit.xml`.
+
+#### Functional Tests
+
+Functional Testing is done with the [Robotframework](http://robotframework.org). 
+A limited set of tests is currently in place. The intention is for these tests to serve as an starter for writing more tests. 
+
+More details in the [readme](tests/Functional/readme.md)
 
 ## Acknowledgements
 
