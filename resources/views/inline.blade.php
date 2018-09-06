@@ -23,27 +23,26 @@
 	window.astro = <?php echo json_encode([
 		'csrf_token' => csrf_token(),
 		'base_url' => Request::getBaseUrl(),
-		'api_url' => env('ASTRO_API_URL'),
-		'logout_url' => env('ASTRO_LOGOUT_URL'),
+		'api_url' => config('editor.astro_api_url'),
+		'logout_url' => config('editor.astro_logout_url'),
 		'username' => $username,
 		'user'     => $user,
 		'api_token' => $api_token,
 		'debug' => config('app.debug'),
-		'published_url_pattern' => env('APP_LIVE_URL_PATTERN'),
-		'draft_url_pattern' => env('APP_PREVIEW_URL_PATTERN'),
-		'assets_base_url' => env('ASSETS_BASE_URL'),
-		'placeholder_image_url' => env('PLACEHOLDER_IMAGE_URL'),
-		'machform_url' => env('MACHFORM_URL'),
-		'help_url' => env('HELP_URL'),
-		'help_media_url' => env('HELP_MEDIA_URL'),
+		'published_url_pattern' => config('editor.app_live_url_pattern'),
+		'draft_url_pattern' => config('editor.app_preview_url_pattern'),
+		'assets_base_url' => config('definitions.assets_base_url'),
+		'placeholder_image_url' => config('definitions.placeholder_image_url'),
+		'help_url' => config('editor.help_url'),
+		'help_media_url' => config('editor.help_media_url'),
 	]); ?>;
 	</script>
 
-	@if (env('ENABLE_HEAP'))
+	@if (config('editor.enable_heap'))
 		@include('components.heap-analytics')
 	@endif
 
-	@if (env('ENABLE_HOTJAR'))
+	@if (config('editor.enable_hotjar'))
 		@include('components.hotjar-analytics')
 	@endif
 
