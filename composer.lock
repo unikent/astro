@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
     "content-hash": "ca87653e66b54288c97c075473fb7a99",
@@ -3663,7 +3663,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/astro-kent-theme.git",
-                "reference": "66feee2711ebc8fd004a5c1f1c1ad4de30e78d72"
+                "reference": "04d69fe5da7109b84253d24ea2c07cf6504f4450"
             },
             "require": {
                 "ezyang/htmlpurifier": "4.10.0"
@@ -3673,7 +3673,7 @@
             },
             "type": "library",
             "description": "Our block views",
-            "time": "2018-08-23T10:50:58+00:00"
+            "time": "2018-09-06T11:39:11+00:00"
         },
         {
             "name": "unikent/astro-renderer",
@@ -3717,7 +3717,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/kent-profiles.git",
-                "reference": "0f3fccf38f365e112fabd0b5b197d262bdd4d90a"
+                "reference": "9fa065aa74c6cc6a2d5b4faef3652aa1d86fc1b1"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.3"
@@ -3735,7 +3735,7 @@
                 }
             ],
             "description": "A laravel app to manage staff profiles at kent",
-            "time": "2018-08-17T12:47:14+00:00"
+            "time": "2018-09-06T10:31:18+00:00"
         },
         {
             "name": "unikent/kentauth",
