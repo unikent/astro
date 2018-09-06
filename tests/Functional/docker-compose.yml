@@ -10,3 +10,6 @@ robot:
     extra_hosts:
         - "astro.dev:${IP_ADDRESS}"
         - "astro.test:${IP_ADDRESS}"
+        - "api.astro.test:${IP_ADDRESS}"
+        - "media.test:${IP_ADDRESS}"
+        - "beta.test:${IP_ADDRESS}"
