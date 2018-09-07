@@ -2,11 +2,14 @@
 
 namespace App\Console\Commands;
 
+use Firebase\JWT\JWT;
 use Illuminate\Console\Command;
 
 use App\Models\User;
 use Lcobucci\JWT\Builder;
+use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
+use Lcobucci\JWT\ValidationData;
 
 /**
  * Creates and signs a JWT for one or more users.
@@ -67,12 +70,9 @@ class CreateJWT extends Command
 		
 		foreach ($users as $user) {
 			$token = $this->generateJWT($user, $lifetime);
-			$signer = new Sha256();
-			var_dump($token->verify($signer, config('auth.jwt_signature') . '1')); // false, because the key is different
-			var_dump($token->verify($signer, config('auth.jwt_signature'))); // true, because the key is the same
 			$user->api_token = $token;
-//			$user->save();
-			$this->info("JWT created for user: '$user->name': " . $user->api_token . ' with secret: ' . config('auth.jwt_signature'));
+			$user->save();
+			$this->info("{$user->name}\t{$user->api_token}");
 		}
 
 		if(count($users) === 0){
@@ -80,18 +80,38 @@ class CreateJWT extends Command
 		}
 	}
 
+	/**
+	 * Generate a signed jwt for the given user
+	 * @param $user
+	 * @param $lifetime
+	 * @return string
+	 */
 	public function generateJWT($user, $lifetime)
 	{
+		$key = config('auth.jwt_secret');
+		$payload = [
+			'iat' => time(),
+			'nbf' => time(),
+			'exp' => time() + $lifetime,
+		];
 		$signer = new Sha256();
 		$token = (new Builder())
-			->setIssuer('https://napi.kent.ac.uk') // Configures the issuer (iss claim)
-			->setId(time().$user->username.mt_rand(0,0xffff), true) // Configures the id (jti claim), replicating as a header item
-			->setIssuedAt(time()) // Configures the time that the token was issue (iat claim)
-			->setNotBefore(time()) // Configures the time that the token can be used (nbf claim)
-			->setExpiration(time() + $lifetime) // Configures the expiration time of the token (exp claim)
+			->setId($this->uniqueTokenID(), true) // Configures the id (jti claim), replicating as a header item
+			->setIssuedAt($payload['iat']) // Configures the time that the token was issue (iat claim)
+			->setNotBefore($payload['nbf']) // Configures the time that the token can be used (nbf claim)
+			->setExpiration($payload['exp']) // Configures the expiration time of the token (exp claim)
 			->set('uid', $user->username) // Configures a new claim, called "uid"
-			->sign($signer, config('auth.jwt_signature')) // creates a signature
-			->getToken(); // Retrieves the generated token
-		return $token;
+			->sign($signer, $key) // creates a signature
+			->getToken(); // Retrieves the generated token*/
+		return $token->__toString();
+	}
+
+	/**
+	 * Generate a more-or-less unique id for each token we generate
+	 * @return string
+	 */
+	public function uniqueTokenID()
+	{
+		return time() . mt_rand(0, 0xffff);
 	}
 }

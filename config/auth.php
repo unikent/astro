@@ -4,10 +4,10 @@ return [
 
 	/*
 	|--------------------------------------------------------------------------
-	| JWT Signature used for signing api tokens
+	| JWT secret used for signing api tokens
 	|--------------------------------------------------------------------------
 	*/
-	'jwt_signature' => env('AUTH_JWT_SIGNATURE'),
+	'jwt_secret' => env('AUTH_JWT_SECRET'),
 
 	/*
 	|--------------------------------------------------------------------------
