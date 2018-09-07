@@ -177,6 +177,15 @@ $config = [
 
 	/*
 	|--------------------------------------------------------------------------
+	| Astro: require manual enabling of jwt generator dev tool
+	|--------------------------------------------------------------------------
+	| Set to true to enable the routes that allow creation of arbitrary valid
+	| JWTs for testing purposes in dev (local) environment only.
+	*/
+	'enable_jwt_dev_routes' => env('ENABLE_JWT_DEV_ROUTES', false),
+
+	/*
+	|--------------------------------------------------------------------------
 	| Autoloaded Service Providers
 	|--------------------------------------------------------------------------
 	|
