@@ -2,14 +2,11 @@
 
 namespace App\Console\Commands;
 
-use Firebase\JWT\JWT;
 use Illuminate\Console\Command;
 
 use App\Models\User;
 use Lcobucci\JWT\Builder;
-use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
-use Lcobucci\JWT\ValidationData;
 
 /**
  * Creates and signs a JWT for one or more users.
