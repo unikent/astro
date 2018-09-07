@@ -19,8 +19,10 @@ $this->post('auth/login', 'Auth\AuthController@loginLocal');
 $this->get('auth/sso/respond', 'Auth\AuthController@loginSSO')->name('auth.sso.respond');
 $this->post('auth/logout', 'Auth\AuthController@logout')->name('auth.logout');
 
-$this->any('auth/jwt', 'Auth\JWTController@devAuthenticate')->name('auth.jwt.dev.authenticate');
-$this->get('auth/jwt/reset', 'Auth\JWTController@resetDevToken')->name('auth.jwt.dev.reset');
+if(config('app.debug')) {
+	$this->any('auth/jwt', 'Auth\JWTController@devAuthenticate')->name('auth.jwt.dev.authenticate');
+	$this->get('auth/jwt/reset', 'Auth\JWTController@resetDevToken')->name('auth.jwt.dev.reset');
+}
 
 // SPA wrapper
 Route::get('/{catchall?}', function($route = '') {
