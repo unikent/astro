@@ -66,12 +66,15 @@ let store = new Vuex.Store({
 		menu: {
 			active: 'pages',
 			flash: ''
-		}
+		},
+		apiToken: null, // the api token
 	},
 
-	getters: {},
-
 	mutations: {
+
+		setAPIToken(state, value) {
+			state.apiToken = value;
+		},
 
 		changeView(state, currentView) {
 			state.currentView = currentView;
