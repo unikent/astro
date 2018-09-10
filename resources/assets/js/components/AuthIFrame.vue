@@ -37,7 +37,7 @@ export default {
 			apiToken: state => state.apiToken
 		}),
 		testURL() {
-			return Config.get('base_url') + 'jwttest.php';
+			return Config.get('base_url') + '/jwttest.php';
 		},
 	},
 	data() {
