@@ -34,14 +34,10 @@ export default {
 	},
 	computed: {
 		...mapState({
-			apiToken: state => state.apiToken
+			apiToken: state => state.user.apiToken
 		}),
 		testURL() {
 			return Config.get('auth_url');
-		},
-		jwtData() {
-			if (this.apiToken) return JSON.parse(atob(this.apiToken.split('.')[1]));
-			return {};
 		}
 	},
 	data() {
@@ -52,16 +48,18 @@ export default {
 		}
 	},
 	methods: {
-		...mapMutations([
-			'setAPIToken',
-		]),
+		// @TODO find the way to specify the namespace here to make things look nice
+		// ...mapMutations([
+		// 	'user/setAPIToken',
+		// ]),
 		receiveMessage(e) {
 			if(e.data.jwt !== void 0) {
 				console.log(e);
 				clearTimeout(this.waiting);
 				this.waiting = null;
 				this.showIFrame = false;
-				this.setAPIToken(e.data.jwt);
+				this.$store.commit('auth/setAPIToken', e.data.jwt);
+				// this.setAPIToken(e.data.jwt);
 			}
 		}
 	},

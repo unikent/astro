@@ -8,7 +8,7 @@
 	// self executing function here
 	(function() {
 		console.log('sending message');
-		parent.postMessage(<?php echo json_encode(['jwt' => $token])?>, 'http://astro.test');
+		parent.postMessage(<?php echo json_encode(['jwt' => $token])?>, 'https://siteeditor.test');
 		console.log('message sent');
 	})();
 </script>
