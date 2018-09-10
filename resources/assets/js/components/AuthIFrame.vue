@@ -37,8 +37,12 @@ export default {
 			apiToken: state => state.apiToken
 		}),
 		testURL() {
-			return Config.get('base_url') + '/jwttest.php';
+			return Config.get('auth_url');
 		},
+		jwtData() {
+			if (this.apiToken) return JSON.parse(atob(this.apiToken.split('.')[1]));
+			return {};
+		}
 	},
 	data() {
 		return {
