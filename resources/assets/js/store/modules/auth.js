@@ -7,20 +7,7 @@
 
 inspired by https://alligator.io/vuejs/vue-jwt-patterns/
 
-
-hold the jwt
-
-functionality:
-
-	- view user data in the jwt
-	- set the jwt
-	- reset the jwt
 */
-
-
-// import Vue from 'vue';
-
-// const vue = new Vue();
 
 
 const state = {
@@ -30,6 +17,10 @@ const state = {
 const mutations =  {
 	setAPIToken(state, value) {
 		state.apiToken = value;
+	},
+
+	invalidateAPIToken(state) {
+		state.apiToken = null;
 	}
 }
 
@@ -41,6 +32,10 @@ const getters = {
 			return JSON.parse(atob(state.apiToken.split('.')[1]))
 		}
 		return {};
+	},
+
+	hasAPIToken(state) {
+		return null !== state.apiToken;
 	}
 };
 
