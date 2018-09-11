@@ -1,22 +1,25 @@
 <template>
-	<div id="authiframe">
-		<iframe v-if="!hasAPIToken" :src="testURL"></iframe>
+	<div v-if="!hasAPIToken" id="authiframe">
+		<iframe :src="testURL"></iframe>
 	</div>	
 </template>
 <style scoped>
 	#authiframe {
 		background-color: transparent;
-		display: none;
+		/*display: none;*/
 		position: absolute;
 		z-index: 99999;
 		top: 0px;
 		left: 0px;
 		right: 0px;
 		bottom: 0px;
+		background:rgba(0,0,0,0.5);
 	}
-	iframe {
-		background:rgba(0,0,0,0.5); width: 100%; height: 100%;
+	#authiframe iframe {
+		width: 100%; 
+		height: 100%;
 	}
+
 </style>
 <script>
 import 'store'
@@ -26,9 +29,10 @@ export default {
 
 	name: 'AuthIFrame',
 	created() {
-		this.waiting = setTimeout(function() {
-			document.getElementById('authiframe').style.display = 'block';
-		}, this.waitFor);
+		// TODO: implement waiting properly (or not)
+		// this.waiting = setTimeout(function() {
+		// 	document.getElementById('authiframe').style.display = 'block';
+		// }, this.waitFor);
 		window.addEventListener("message",this.receiveMessage, true);
 	},
 
@@ -47,8 +51,8 @@ export default {
 
 	data() {
 		return {
-			waiting: null,
-			waitFor: 3000,
+			// waiting: null,
+			// waitFor: 3000,
 		}
 	},
 	methods: {
@@ -58,9 +62,9 @@ export default {
 
 		receiveMessage(e) {
 			if(e.data.jwt !== void 0) {
-				console.log(e);
-				clearTimeout(this.waiting);
-				this.waiting = null;
+				// console.log(e);
+				// clearTimeout(this.waiting);
+				// this.waiting = null;
 				this.setAPIToken(e.data.jwt);
 			}
 		}
