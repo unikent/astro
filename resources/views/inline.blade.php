@@ -35,6 +35,7 @@
 		'placeholder_image_url' => config('definitions.placeholder_image_url'),
 		'help_url' => config('editor.help_url'),
 		'help_media_url' => config('editor.help_media_url'),
+		'auth_url' => config('editor.auth_url'),
 	]); ?>;
 	</script>
 

@@ -53,6 +53,11 @@
 
 		</div>
 
+		<el-button type="warning"
+			@click="invalidateAPIToken"
+		> Invalidate Token
+		</el-button>
+
 		<div class="top-bar__tools">
 			<slot name="tools" v-if="showTools" />
 
@@ -85,7 +90,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters, mapMutations } from 'vuex';
 import Icon from 'components/Icon';
 import promptToSave from 'mixins/promptToSaveMixin';
 import Config from 'classes/Config.js';
@@ -178,6 +183,11 @@ export default {
 			'loadPermissions',
 			'loadGlobalRole'
 		]),
+
+		...mapMutations('auth', [
+			'invalidateAPIToken'
+		]),
+
 
 		fetchSiteData() {
 			// TODO: catch errors

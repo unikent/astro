@@ -35,5 +35,8 @@ return [
 	'enable_hotjar' => env('ENABLE_HOTJAR', false),
 
 	// hotjar ID
-	'hotjar_id' => env('HOTJAR_ID'),
+    'hotjar_id' => env('HOTJAR_ID'),
+
+    // URL for the JWT provider
+    'auth_url' => env('AUTH_URL'),
 ];
