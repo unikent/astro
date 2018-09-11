@@ -5,7 +5,6 @@
 </template>
 <style scoped>
 	#authiframe {
-		background-color: transparent;
 		/*display: none;*/
 		position: absolute;
 		z-index: 99999;
@@ -13,7 +12,7 @@
 		left: 0px;
 		right: 0px;
 		bottom: 0px;
-		background:rgba(0,0,0,0.5);
+		background: white;
 	}
 	#authiframe iframe {
 		width: 100%; 
