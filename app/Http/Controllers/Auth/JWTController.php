@@ -1,7 +1,9 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
+
 use Config;
+use Validator;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Lcobucci\JWT\Builder;
@@ -86,6 +88,20 @@ class JWTController extends Controller
 			->sign($signer, $key) // creates a signature
 			->getToken(); // Retrieves the generated token*/
 		return $token->__toString();
+	}
+
+	/**
+	* Validates login form input
+	* @param Request $request http request
+	* @param array $rules rule set
+	* @return true | false
+	*/
+	public function validate($request, $rules)
+	{
+		return Validator::make(
+			$request->all(),
+			$rules
+		)->validate();
 	}
 
 	/**
