@@ -13,12 +13,6 @@
 
 use Illuminate\Support\Facades\Auth;
 
-// Authentication routes
-// $this->get('auth/login', 'Auth\AuthController@login')->name('auth.login');
-// $this->post('auth/login', 'Auth\AuthController@loginLocal');
-// $this->post('auth/logout', 'Auth\AuthController@logout')->name('auth.logout');
-$this->get('auth/sso/respond', 'Auth\AuthController@loginSSO')->name('auth.sso.respond');
-
 if(config('app.debug') && config('app.enable_jwt_dev_routes')) {
 	$this->any('auth/jwt', 'Auth\JWTController@devAuthenticate')->name('auth.jwt.dev.authenticate');
 	$this->get('auth/jwt/reset', 'Auth\JWTController@resetDevToken')->name('auth.jwt.dev.reset');

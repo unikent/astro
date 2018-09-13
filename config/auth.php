@@ -44,8 +44,8 @@ return [
 
 	'guards' => [
 		'web' => [
-			'driver' => 'kentauth',
-			'provider' => 'kentauth',
+			'driver' => 'session',
+			'provider' => 'users',
 		],
 
 		'api' => [
@@ -74,11 +74,6 @@ return [
 	'providers' => [
 		'users' => [
 			'driver' => 'eloquent',
-			'model' => App\Models\User::class,
-		],
-
-		'kentauth' => [
-			'driver' => 'kentauth',
 			'model' => App\Models\User::class,
 		],
 
