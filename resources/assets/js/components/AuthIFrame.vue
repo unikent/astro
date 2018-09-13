@@ -11,7 +11,7 @@
 		left: 0px;
 		right: 0px;
 		bottom: 0px;
-		background: yellow; /*TODO change to transparent:*/
+		background: rgba(0,0,0,0.5);
 	}
 	#authiframe iframe {
 		width: 100%; 
