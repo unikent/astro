@@ -299,15 +299,9 @@ $config = [
 
 		'Fractal' => Spatie\Fractal\FractalFacade::class,
 		'Image' => Intervention\Image\Facades\Image::class,
-		'SSO' => KentAuth\Facades\SSO::class,
+		// 'SSO' => ,
 	],
 
 ];
-
-$disable_kentauth = strtolower(env('DISABLE_KENTAUTH'));
-// don't add kentauth if we have disabled it
-if( !$disable_kentauth || $disable_kentauth == 'false' ) {
-	$config['providers'][] = KentAuth\AuthServiceProvider::class;
-}
 
 return $config;

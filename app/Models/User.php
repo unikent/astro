@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use KentAuth\Models\User as KentUser;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends KentUser
+class User extends Authenticatable
 {
 
 	protected $casts = [

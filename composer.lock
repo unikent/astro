@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f2be11e87dc7858e97ab127cb9b2ddf7",
+    "content-hash": "0131154a2ae57017eaa52445b8559de4",
     "packages": [
         {
             "name": "barryvdh/laravel-debugbar",
@@ -3721,7 +3721,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/astro-kent-theme.git",
-                "reference": "8cb4f8064b4776f041746a94ecfe428f817822ff"
+                "reference": "0a1b11b150711824a2081eaa67b92f4101e301af"
             },
             "require": {
                 "ezyang/htmlpurifier": "4.10.0"
@@ -3731,7 +3731,7 @@
             },
             "type": "library",
             "description": "Our block views",
-            "time": "2018-09-06T15:56:53+00:00"
+            "time": "2018-09-13T08:49:36+00:00"
         },
         {
             "name": "unikent/astro-renderer",
@@ -3794,39 +3794,6 @@
             ],
             "description": "A laravel app to manage staff profiles at kent",
             "time": "2018-09-06T15:57:02+00:00"
-        },
-        {
-            "name": "unikent/kentauth",
-            "version": "dev-laravel/5.3",
-            "source": {
-                "type": "git",
-                "url": "git@gitlab.kent.ac.uk:webdev/kentauth.git",
-                "reference": "29fa4b43cdc0059d8a5b0cb410b9c3588245a40c"
-            },
-            "require-dev": {
-                "mockery/mockery": "0.9.*",
-                "orchestra/database": "~3.1",
-                "orchestra/testbench": "~3.4"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "KentAuth\\": "src/",
-                    "KentAuthTests\\": "tests/"
-                }
-            },
-            "authors": [
-                {
-                    "name": "cs462",
-                    "email": "cs462@kent.ac.uk"
-                },
-                {
-                    "name": "T.Gillett",
-                    "email": "T.Gillett@kent.ac.uk"
-                }
-            ],
-            "description": "Kent Authentiction for Laravel",
-            "time": "2017-05-23T11:17:04+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -5533,8 +5500,7 @@
     "stability-flags": {
         "unikent/astro-kent-theme": 20,
         "unikent/astro-renderer": 20,
-        "unikent/kent-profiles": 20,
-        "unikent/kentauth": 20
+        "unikent/kent-profiles": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

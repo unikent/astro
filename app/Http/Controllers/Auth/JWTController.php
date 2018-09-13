@@ -1,14 +1,36 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
+
 use Config;
+use Validator;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Support\Facades\Auth;
 
 class JWTController extends Controller
 {
+
+	private $JWT_LIFETIME = 120;
+
+	use AuthenticatesUsers {
+		login as public loginLocal; 
+	}
+
+	/**
+	 * Get the login username to be used by the controller.
+	 * This overrides Illuminate\Foundation\Auth\AuthenticatesUsers.
+	 *
+	 * @return string
+	 */
+	public function username()
+	{
+		return 'username';
+	}
+
 	/**
 	 * Create valid JWTs for development purposes
 	 * @param Request $request
@@ -17,14 +39,14 @@ class JWTController extends Controller
 	public function devAuthenticate(Request $request)
 	{
 		$session = $request->session();
-		if ($request->has('jwt_username') && $request->has('jwt_lifetime')) {
-			$session->put('jwt_username', $request->get('jwt_username'));
-			$session->put('jwt_lifetime', $request->get('jwt_lifetime'));
+		if ($request->has('username') && $request->has('password')) {
+			$this->loginLocal($request); //TODO: fix commented validation
 		}
-		if ($session->has('jwt_username') && $session->has('jwt_lifetime')) {
+
+		if (Auth::check()) {
 			return view('auth.jwt.dev.jwt')->with('jwt', $this->generateJWT(
-				$session->get('jwt_username'),
-				$session->get('jwt_lifetime')
+				Auth::user()->username,
+				$this->JWT_LIFETIME
 			));
 		} else {
 			return view('auth.jwt.dev.form');
@@ -38,9 +60,7 @@ class JWTController extends Controller
 	 */
 	public function resetDevToken(Request $request)
 	{
-		$session = $request->session();
-		$session->forget('jwt_username');
-		$session->forget('jwt_lifetime');
+		Auth::logout();
 		return redirect()->route('auth.jwt.dev.authenticate');
 	}
 
@@ -68,6 +88,20 @@ class JWTController extends Controller
 			->sign($signer, $key) // creates a signature
 			->getToken(); // Retrieves the generated token*/
 		return $token->__toString();
+	}
+
+	/**
+	* Validates login form input
+	* @param Request $request http request
+	* @param array $rules rule set
+	* @return true | false
+	*/
+	public function validate($request, $rules)
+	{
+		return Validator::make(
+			$request->all(),
+			$rules
+		)->validate();
 	}
 
 	/**
