@@ -8,7 +8,7 @@ $factory->define(App\Models\User::class, function (Faker\Generator $faker) {
 		'name' => $faker->name,
 		'password' => $faker->password,
 		'email' => $faker->email,
-		'role' => 'admin',
+		'role' => 'user',
 		'settings' => new ArrayObject()
 	];
 });
