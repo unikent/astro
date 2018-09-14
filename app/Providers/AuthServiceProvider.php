@@ -34,7 +34,7 @@ class AuthServiceProvider extends ServiceProvider
 	 * @var array
 	 */
 	protected $policies = [
-        Page::class => PagePolicy::class,
+		Page::class => PagePolicy::class,
 		Site::class => SitePolicy::class,
 		Media::class => MediaPolicy::class,
 		BlockDefinition::class => BlockDefinitionPolicy::class,
@@ -53,10 +53,10 @@ class AuthServiceProvider extends ServiceProvider
 	 */
 	public function boot()
 	{
-        $this->registerPolicies();
+		$this->registerPolicies();
 
-        Auth::extend('jwt', function ($app, $name, array $config) {
-            return new JwtGuard(Auth::createUserProvider($config['provider']), $app->make('request'));
-        });
+		Auth::extend('jwt', function ($app, $name, array $config) {
+			return new JwtGuard(Auth::createUserProvider($config['provider']), $app->make('request'));
+		});
 	}
 }
