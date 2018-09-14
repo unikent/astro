@@ -38,7 +38,7 @@ export default {
 				section: this.currentSectionIndex
 			});
 
-			this.$bus.$emit('global:validate');
+			this.$bus.$emit('block:validate');
 		},
 
 		getError(fieldPath) {

@@ -119,7 +119,7 @@ export default {
 				});
 			});
 
-			this.$bus.$emit('global:validateAll');
+			this.$bus.$emit('block:validateAll');
 
 			if(this.selected.length) {
 				this.hideBlockPicker();

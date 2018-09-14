@@ -136,7 +136,7 @@ export default {
 				}
 			});
 
-			this.$bus.$emit('global:validate');
+			this.$bus.$emit('block:validate');
 
 			this.hideMediaPicker();
 		},

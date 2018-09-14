@@ -97,8 +97,8 @@ export default {
 		document.addEventListener('keydown', this.onKeyDown);
 		document.addEventListener('keyup', this.onKeyUp);
 
-		this.$bus.$on('global:validate', this.validate);
-		this.$bus.$on('global:validateAll', this.validateAll);
+		this.$bus.$on('block:validate', this.validate);
+		this.$bus.$on('block:validateAll', this.validateAll);
 	},
 
 	destroyed() {
@@ -108,8 +108,8 @@ export default {
 		document.removeEventListener('keydown', this.onKeyDown);
 		document.removeEventListener('keyup', this.onKeyUp);
 
-		this.$bus.$off('global:validate', this.validate);
-		this.$bus.$off('global:validateAll', this.validateAll);
+		this.$bus.$off('block:validate', this.validate);
+		this.$bus.$off('block:validateAll', this.validateAll);
 	},
 
 	computed: {

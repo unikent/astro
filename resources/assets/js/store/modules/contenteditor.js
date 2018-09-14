@@ -173,7 +173,7 @@ const actions = {
 		// have we actually selected a different block?
 		if(state.currentBlockId !== blockInfo.blockId) {
 			commit('setCurrentBlock', blockInfo);
-			eventBus.$emit('global:validate');
+			eventBus.$emit('block:validate');
 		}
 
 		eventBus.$emit('block:showSelectedOverlay', {
