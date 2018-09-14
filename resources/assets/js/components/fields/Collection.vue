@@ -11,7 +11,7 @@
 					<el-form-item
 						:prop="`${name}.${index}.${fieldDefinition.name}`"
 						:rules="getRules(name, fieldDefinition.name)"
-						:error="getError(`${name}.${index}.${fieldDefinition.name}`)"
+						:error="getErrors(`${name}.${index}.${fieldDefinition.name}`)"
 						:class="{
 							'is-required': isRequiredField(fieldDefinition)
 						}"

@@ -8,7 +8,7 @@
 					:label="f.label"
 					:prop="`${name}.${f.name}`"
 					:rules="getRules(f.name)"
-					:error="getError(`${field.name}.${f.name}`)"
+					:error="getErrors(`${field.name}.${f.name}`)"
 					:class="{
 						'is-required': isRequiredField(f)
 					}"

@@ -8,12 +8,15 @@
 import { mapState, mapMutations, mapGetters } from 'vuex';
 
 import EditOptions from 'components/EditOptions';
+import blockErrorsMixin from 'mixins/blockErrorsMixin';
 
 export default {
 
 	name: 'edit-block',
 
 	extends: EditOptions,
+
+	mixins: [blockErrorsMixin],
 
 	computed: {
 		...mapGetters([
@@ -66,18 +69,6 @@ export default {
 	methods: {
 		...mapMutations([
 			'setBlock'
-		]),
-
-		getErrors(fieldPath) {
-			const blockId = this.currentItem.id
-
-			if(
-				this.errors[blockId] &&
-				this.errors[blockId].errors[fieldPath] &&
-				this.errors[blockId].errors[fieldPath].length
-			) {
-				return this.errors[blockId].errors[fieldPath].join(', ');
-			}
-		}
+		])
 	}
 };

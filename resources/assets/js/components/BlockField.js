@@ -1,12 +1,13 @@
 import { mapGetters, mapState } from 'vuex';
 
 import baseFieldMixin from 'mixins/baseFieldMixin';
+import blockErrorsMixin from 'mixins/blockErrorsMixin';
 
 export default {
 
 	name: 'block-field',
 
-	mixins: [baseFieldMixin],
+	mixins: [baseFieldMixin, blockErrorsMixin],
 
 	computed: {
 		...mapGetters([
@@ -16,14 +17,12 @@ export default {
 		]),
 
 		...mapState({
-			currentBlockId: state => state.contenteditor.currentBlockId,
 			currentBlockIndex: state => state.contenteditor.currentBlockIndex,
 			currentRegionName: state => state.contenteditor.currentRegionName,
 		})
 	},
 
 	methods: {
-
 		getFieldValue(path) {
 			const value = this.getCurrentFieldValue(path);
 			return value !== void 0 ? value : (this.default || null);
@@ -39,21 +38,6 @@ export default {
 			});
 
 			this.$bus.$emit('block:validate');
-		},
-
-		getError(fieldPath) {
-			const
-				blockErrors = this.$store.state.errors.blocks,
-				blockId = this.currentBlockId;
-
-			if(
-				blockErrors[blockId] &&
-				blockErrors[blockId].errors[fieldPath] &&
-				blockErrors[blockId].errors[fieldPath].length
-			) {
-				return blockErrors[blockId].errors[fieldPath].join(', ');
-			}
-			return null;
 		}
 	}
 

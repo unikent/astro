@@ -46,7 +46,7 @@ export default {
 			return null;
 		},
 
-		getError() {
+		getErrors() {
 			return null;
 		}
 	}
