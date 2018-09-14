@@ -149,6 +149,10 @@ export default {
 			'unsavedChangesExist'
 		]),
 
+		...mapGetters('auth', [
+			'username'
+		]),
+		
 		// works out if we should show a back button or not (ie whether we're editing a page or on the homepage)
 		showBack() {
 			return ['page', 'profile-editor'].indexOf(this.$route.name) !== -1;
@@ -156,11 +160,6 @@ export default {
 
 		showTools() {
 			return ['site', 'page', 'profile-editor'].indexOf(this.$route.name) !== -1;
-		},
-
-		// lets us output the current user's username in the top bar
-		username() {
-			return window.astro.username;
 		},
 
 		config() {
