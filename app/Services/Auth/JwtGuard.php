@@ -34,20 +34,6 @@ class JwtGuard implements Guard
     protected $request;
 
     /**
-     * The name of the query string item from the request containing the API token.
-     *
-     * @var string
-     */
-    protected $inputKey;
-
-    /**
-     * The name of the token "column" in persistent storage.
-     *
-     * @var string
-     */
-    protected $storageKey;
-
-    /**
      * Create a new authentication guard.
      *
      * @param  \Illuminate\Contracts\Auth\UserProvider  $provider
@@ -56,13 +42,9 @@ class JwtGuard implements Guard
      */
     public function __construct(UserProvider $provider, Request $request)
     {
-        // TODO review these values and remove if not used
         $this->secretKey = Config::get('auth.jwt_secret');
         $this->request = $request;
         $this->provider = $provider;
-        $this->inputKey = 'api_token';
-        $this->storageKey = 'api_token';
-
     }
 
 
@@ -81,14 +63,14 @@ class JwtGuard implements Guard
         $data = new ValidationData();
 
         if (!$token->validate($data)) {
-            throw new Exception("JWT is invalid", 1);
+            return null;
         }
 
         if (!$token->verify(new Sha256(), $secret)) {
-            throw new Exception("JWT has invalid signature", 1);
+            return null;
         };
 
-        return User::where('username', '=', $token->getClaim('uid'))->firstOrFail();
+        return $this->provider->retrieveByCredentials(['username' => $token->getClaim('uid')]);
     }
 
 
@@ -141,17 +123,22 @@ class JwtGuard implements Guard
      */
     public function validate(array $credentials = [])
     {
-        if (empty($credentials[$this->inputKey])) {
+
+        if (empty($credentials['jwt'])) {
             return false;
         }
 
-        $credentials = [$this->storageKey => $credentials[$this->inputKey]];
+        $token = $credentials['jwt'];
 
-        if ($this->provider->retrieveByCredentials($credentials)) {
+        if (!empty($token)) {
+            $user = $this->retrieveByJWT($this->secretKey, $token);
+        }
+
+        if (!$user) {
             return true;
         }
 
-        return false;
+        return true;
     }
 
     /**
