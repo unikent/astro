@@ -53,7 +53,7 @@ class RenewUserAPITokens extends Command
 	 */
 	public function renewTokens($users = 'all')
 	{
-		$users = $users == 'all' ? User::where('username', '!=', 'astro-www')->get() : User::whereIn('id', array_map('trim', explode(',', $users)))->get();
+		$users = $users == 'all' ? User::where('role', '!=', 'viewer')->get() : User::whereIn('id', array_map('trim', explode(',', $users)))->get();
 		
 		foreach ($users as $user) {
 			$user->generateAPIToken(true);

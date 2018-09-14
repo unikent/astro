@@ -17,6 +17,8 @@ class User extends KentUser
 		'settings' => '{}'
 	];
 
+	public static $global_roles = ['admin', 'user', 'viewer'];
+
 	/**
 	 * Create a new Eloquent model instance.
 	 *

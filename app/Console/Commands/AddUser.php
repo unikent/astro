@@ -18,6 +18,7 @@ class AddUser extends Command
                                 {username}
                                 {name? : The users name (only required if the user account does not already exist).}
                                 {email? : The users email (only required if the user account does not already exist).}
+                                {role? : The users role ("admin", "user", or "viewer". only required if the user account does not already exist).}
                             ';
 
     /**
@@ -47,6 +48,7 @@ class AddUser extends Command
         $name = $this->argument('name');
         $username = $this->argument('username');
         $email = $this->argument('email');
+        $role = $this->argument('role');
         if(preg_match('/^[a-z0-9_-]{1,30}$/i', $username)){
             $user = User::where('username', $username)->first();
             if(!$user){
@@ -56,6 +58,11 @@ class AddUser extends Command
                 while(!filter_var($email, FILTER_VALIDATE_EMAIL)){
                     $email = $this->ask('Please enter the email address for this user account: ');
                 }
+
+                while (!in_array($role, User::$global_roles)) {
+                    $role = $this->ask('Please enter a role for this user, could be one of: ' . implode(',', User::$global_roles));
+                }
+
                 $password = '';
                 while(!$password) {
                     $password = $this->secret('Password');
@@ -65,10 +72,11 @@ class AddUser extends Command
                         $this->error('Passwords do not match. Please try again.');
                     }
                 }
+
                 $user = new User();
                 $user->username = $username;
                 $user->password = Hash::make($password);
-                $user->role = 'user';
+                $user->role = $role;
                 $user->name = $name;
                 $user->email = $email;
                 $user->settings =new ArrayObject();
