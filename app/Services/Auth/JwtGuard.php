@@ -106,13 +106,7 @@ class JwtGuard implements Guard
      */
     public function getTokenForRequest()
     {
-        $token = null;
-
-        if (empty($token)) {
-            $token = $this->request->bearerToken();
-        }
-
-        return $token;
+        return $this->request->bearerToken();
     }
 
     /**
