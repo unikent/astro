@@ -168,6 +168,15 @@ $config = [
 
 	/*
 	|--------------------------------------------------------------------------
+	| Astro: disable parts of the app (api, previewer, editor)
+	|--------------------------------------------------------------------------
+	*/
+	'disable_api_routes' => env('DISABLE_API_ROUTES', false),
+	'disable_preview_routes' => env('DISABLE_PREVIEW_ROUTES', false),
+	'disable_web_routes' => env('DISABLE_WEB_ROUTES', false),
+
+	/*
+	|--------------------------------------------------------------------------
 	| Autoloaded Service Providers
 	|--------------------------------------------------------------------------
 	|

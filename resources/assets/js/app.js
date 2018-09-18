@@ -12,6 +12,7 @@ import snackBarPlugin from './plugins/snackbar';
 
 import './directives/inline-edit';
 import './directives/field';
+import './directives/focus';
 
 import App from './views/App';
 

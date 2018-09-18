@@ -1,0 +1,15 @@
+robot:
+    image: ppodgorsek/robot-framework
+    tty: true
+    shm_size: '2gb'
+    volumes:
+        - ./reports:/opt/robotframework/reports
+        - ./Resources:/opt/robotframework/Resources
+        - ./Tests:/opt/robotframework/tests
+        - ./config.py:/opt/robotframework/config.py
+    extra_hosts:
+        - "astro.dev:${IP_ADDRESS}"
+        - "astro.test:${IP_ADDRESS}"
+        - "api.astro.test:${IP_ADDRESS}"
+        - "media.test:${IP_ADDRESS}"
+        - "beta.test:${IP_ADDRESS}"

@@ -145,7 +145,9 @@ if(definitionsPath) {
 	}
 
 	console.log(chalk.whiteBright(`\nValidated ${definitionCount} definition files. ${invalidDefinitionCount} are invalid.\n`));
+	process.exit(invalidDefinitionCount ? 1 : 0)
 }
 else {
 	console.log(chalk.redBright(`DEFINITIONS_PATH not set in ${envPath}`));
+	process.exit(1);
 }
