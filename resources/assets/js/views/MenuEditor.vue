@@ -242,6 +242,10 @@ export default {
 			'getGlobalRole'
 		]),
 
+		...mapGetters('auth', [
+			'username'
+		]),
+
 		/**
 		 * checks to see if the current user has the permissions to edit menus for this site
 		 * @returns {boolean}
@@ -307,7 +311,7 @@ export default {
 					// store the current user's role for this site if they have one
 					let siteUsers = json.data.users;
 					if (siteUsers) {
-						const currentRole = siteUsers.find((element) => element.username === Config.get('username'));
+						const currentRole = siteUsers.find((element) => element.username === this.username);
 						if (currentRole) {
 							this.currentRole = currentRole.role;
 						}
