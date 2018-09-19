@@ -67,7 +67,7 @@ class MigratePages extends Command
     {
         $sites = $sites == 'all' ? Site::all() : Site::whereIn('id', array_map('trim', explode(',', $sites)))->get();
 
-        $user = User::where('role', 'admin')->first();
+        $user = User::where('role', User::ROLE_ADMIN)->first();
         $api = new LocalAPIClient($user);
 
         foreach ($sites as $site) {

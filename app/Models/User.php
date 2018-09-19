@@ -17,7 +17,11 @@ class User extends KentUser
 		'settings' => '{}'
 	];
 
-	public static $global_roles = ['admin', 'user', 'viewer'];
+	const ROLE_ADMIN = 'admin';
+	const ROLE_USER = 'user';
+	const ROLE_VIEWER = 'viewer';
+
+	public static $global_roles = [self::ROLE_ADMIN, self::ROLE_USER, self::ROLE_VIEWER];
 
 	/**
 	 * Create a new Eloquent model instance.
@@ -59,7 +63,7 @@ class User extends KentUser
 	 */
 	public function isViewer()
 	{
-		return ($this->role == 'viewer');
+		return ($this->role == self::ROLE_VIEWER);
 	}
 
 	/**
@@ -69,7 +73,7 @@ class User extends KentUser
 	 */
 	public function isAdmin()
 	{
-		return ($this->role == 'admin');
+		return ($this->role == self::ROLE_ADMIN);
 	}
 
 	public function setRememberToken($value)
