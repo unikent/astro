@@ -106,11 +106,14 @@ export default {
 
 		receiveMessage(e) {
 			if(e.data.jwt !== void 0) {
+				let lastUsername = this.username;
 				this.setAPIToken(e.data.jwt);
 				this.resetTick();
-				// we have a new token, refresh global role 
-				// Sam had an idea in sprint planning 2018-09-19 to limit to this when the user has changed
-				this.refreshGlobalRoleAndPermissions();
+				let newUsername = this.username;
+				// refrest token is new or different user
+				if (lastUsername !== newUsername) {
+					this.refreshGlobalRoleAndPermissions();
+				}
 			}
 		},
 
