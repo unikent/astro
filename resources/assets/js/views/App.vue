@@ -27,6 +27,7 @@ export default {
 	created() {
 		if( !this.globalRole) {
 			this.loadPermissions();
+			// TODO should this be in the authiframe?
 			// this.loadGlobalRole(Config.get('username')); - jwt moved to authiframe
 		}
 	},
