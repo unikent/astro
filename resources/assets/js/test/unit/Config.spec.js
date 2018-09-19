@@ -8,7 +8,6 @@ describe('Config class', () => {
 		csrf_token: 'CSRF_TOKEN',
 		base_url  : '',
 		api_url   : '/api/v1/',
-		username  : 'Test User',
 		api_token : 'API_TOKEN',
 		debug     : false
 	};
@@ -54,7 +53,6 @@ describe('Config class', () => {
 			expect(Config.get('csrf_token')).to.equal('CSRF_TOKEN');
 			expect(Config.get('base_url')).to.equal('');
 			expect(Config.get('api_url')).to.equal('/api/v1/');
-			expect(Config.get('username')).to.equal('Test User');
 			expect(Config.get('api_token')).to.equal('API_TOKEN');
 			expect(Config.get('debug')).to.equal(false);
 		});
@@ -102,7 +100,6 @@ describe('Config class', () => {
 			expect(Config.set('csrf_token', 'test1')).to.equal( 'test1');
 			expect(Config.set('base_url', '/base')).to.equal('/base');
 			expect(Config.set('api_url', '/api/')).to.equal('/api/');
-			expect(Config.set('username', 'user')).to.equal('user');
 			expect(Config.set('api_token', 'none')).to.equal('none');
 			expect(Config.set('debug', true)).to.equal(true);
 		});
@@ -116,7 +113,6 @@ describe('Config class', () => {
 				'csrf_token',
 				'base_url',
 				'api_url',
-				'username',
 				'api_token',
 				'debug',
 			]
