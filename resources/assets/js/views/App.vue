@@ -27,7 +27,7 @@ export default {
 	created() {
 		if( !this.globalRole) {
 			this.loadPermissions();
-			this.loadGlobalRole(Config.get('username'));
+			// this.loadGlobalRole(Config.get('username')); - jwt moved to authiframe
 		}
 	},
 
@@ -41,8 +41,8 @@ export default {
 
 	methods: {
 		...mapActions([
-			'loadPermissions',
-			'loadGlobalRole'
+			'loadPermissions'
+			// 'loadGlobalRole'
 		]),
 	}
 };

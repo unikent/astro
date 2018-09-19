@@ -118,7 +118,7 @@ export default {
 
 	mounted() {
 		this.loadPermissions();
-		this.loadGlobalRole(window.astro.username);
+		// this.loadGlobalRole(window.astro.username); jtw - moved to authiframe
 		this.$store.dispatch('site/fetchLayouts');
 		this.$store.dispatch('site/fetchSiteDefinitions');
 	},
@@ -179,8 +179,8 @@ export default {
 	methods: {
 
 		...mapActions([
-			'loadPermissions',
-			'loadGlobalRole'
+			'loadPermissions'
+			// 'loadGlobalRole' jtw moved to authiframe
 		]),
 
 		...mapMutations('auth', [
