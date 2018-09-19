@@ -53,6 +53,16 @@ class User extends KentUser
 	}
 
 	/**
+	 * Returns true if users' role is set to 'viewer'
+	 *
+	 * @return boolean
+	 */
+	public function isViewer()
+	{
+		return ($this->role == 'viewer');
+	}
+
+	/**
 	 * Returns true if users' role is set to 'admin'
 	 *
 	 * @return boolean
