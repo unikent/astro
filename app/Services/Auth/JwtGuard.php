@@ -58,19 +58,20 @@ class JwtGuard implements Guard
      */
     public function retrieveByJWT($secret, $jwt)
     {
+		try {
+			$token = (new Parser())->parse((string)$jwt);
+			$data = new ValidationData();
+			if (!$token->validate($data)) {
+				return null;
+			}
 
-        $token = (new Parser())->parse((string) $jwt);
-        $data = new ValidationData();
-
-        if (!$token->validate($data)) {
-            return null;
-        }
-
-        if (!$token->verify(new Sha256(), $secret)) {
-            return null;
-        };
-
-        return $this->provider->retrieveByCredentials(['username' => $token->getClaim('uid')]);
+			if (!$token->verify(new Sha256(), $secret)) {
+				return null;
+			};
+		}catch(\InvalidArgumentException $e) {
+			return null;
+		}
+		return $this->provider->retrieveByCredentials(['username' => $token->getClaim('uid')]);
     }
 
 
