@@ -1,7 +1,7 @@
 <template>
 	<div style="position:relative">
 		<AuthIFrame ></AuthIFrame>
-		<div :class="{ editor: addStyles }" :style="wrapperStyles" :v-if="globalRole && permissions">
+		<div :class="{ editor: addStyles }" :style="wrapperStyles" :v-if="permissions.globalRole && permissions">
 			<router-view name="topbar" />
 			<router-view />
 		</div>
@@ -25,26 +25,14 @@ export default {
 	},
 
 	created() {
-		if( !this.globalRole) {
-			this.loadPermissions();
-			// TODO should this be in the authiframe?
-			// this.loadGlobalRole(Config.get('username')); - jwt moved to authiframe
-		}
+		// moved this logic to when we receive the jwt in the authiframe
 	},
 
 	computed: {
 		...mapState([
 			'wrapperStyles',
-			'globalRole',
 			'permissions'
 		])
-	},
-
-	methods: {
-		...mapActions([
-			'loadPermissions'
-			// 'loadGlobalRole'
-		]),
 	}
 };
 </script>
