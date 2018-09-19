@@ -98,13 +98,19 @@ export default {
 		]),
 	
 
+		// refresh the stored permissions and global role
+		refreshGlobalRoleAndPermissions() {
+			this.loadGlobalRole(this.username);
+			this.loadPermissions();
+		},
+
 		receiveMessage(e) {
 			if(e.data.jwt !== void 0) {
 				this.setAPIToken(e.data.jwt);
 				this.resetTick();
 				// we have a new token, refresh global role 
-				// TODO what else should we refresh here?
-				this.loadGlobalRole(this.username);
+				// Sam had an idea in sprint planning 2018-09-19 to limit to this when the user has changed
+				this.refreshGlobalRoleAndPermissions();
 			}
 		},
 
