@@ -1,6 +1,6 @@
 /**
- * Provides logic to help ensure necessary site permissions are ready before this component does anything.
- * When created it calls the permissions state's loadSiteRole with the site id from the route.
+ * Provides logic to help ensure necessary site permissions are set.
+ * When the username or site changes it calls the permissions state's loadSiteRole with the site id from the route.
  * It make's the permission state's userSitePermissionsReady property available.
  *
  * Components using this mixin should use a :v-if="userSitePermissionsReady" to determine whether or not they can
@@ -8,19 +8,33 @@
  */
 
 import { mapGetters, mapActions } from 'vuex';
-import Config from 'classes/Config';
 
 export default {
+	watch: {
+		username: function(newUsername) {
+			// when username changes fetch site permissions
+			this.loadSiteRole({
+				siteId: this.siteId,
+				username: newUsername
+			});
+		},
 
-	created() {
-		this.loadSiteRole({
-			siteId: this.$route.params.site_id || this.$route.params.siteId,
-			username: Config.get('username')
-		});
+		siteId: function(newSiteId) {
+			// when site changes fetch site permissions
+			this.loadSiteRole({
+				siteId: newSiteId,
+				username: this.username
+			});
+		}
 	},
 
 	computed: {
-		...mapGetters(['userSitePermissionsReady'])
+		...mapGetters(['userSitePermissionsReady']),
+		...mapGetters('auth', ['username']),
+
+		siteId() {
+			return this.$route.params.site_id || this.$route.params.siteId
+		},
 	},
 
 	methods: {
