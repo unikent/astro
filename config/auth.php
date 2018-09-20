@@ -9,6 +9,13 @@ return [
 	*/
 	'jwt_secret' => env('AUTH_JWT_SECRET'),
 
+    /*
+	|--------------------------------------------------------------------------
+	| JWT the length of time a generated jwt is valid for in seconds
+	|--------------------------------------------------------------------------
+	*/
+	'jwt_lifetime' => env('AUTH_JWT_LIFETIME', 120),
+
 	/*
 	|--------------------------------------------------------------------------
 	| Authentication Defaults
@@ -49,9 +56,9 @@ return [
 		],
 
 		'api' => [
-			'driver' => 'token',
+			'driver' => 'jwt',
 			'provider' => 'users',
-		],
+        ],
 	],
 
 	/*

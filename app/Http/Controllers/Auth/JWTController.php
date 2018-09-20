@@ -13,11 +13,8 @@ use Illuminate\Support\Facades\Auth;
 
 class JWTController extends Controller
 {
-
-	private $JWT_LIFETIME = 120;
-
 	use AuthenticatesUsers {
-		login as public loginLocal; 
+		login as public loginLocal;
 	}
 
 	/**
@@ -46,7 +43,7 @@ class JWTController extends Controller
 		if (Auth::check()) {
 			return view('auth.jwt.dev.jwt')->with('jwt', $this->generateJWT(
 				Auth::user()->username,
-				$this->JWT_LIFETIME
+				config('auth.jwt_lifetime')
 			));
 		} else {
 			return view('auth.jwt.dev.form');

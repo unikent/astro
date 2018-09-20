@@ -43,6 +43,10 @@ const getters = {
 			return null
 		}
 		return JSON.parse(atob(state.apiToken.split('.')[1])).uid
+	},
+	
+	getAPIToken(state) {
+		return state.apiToken;
 	}
 };
 
