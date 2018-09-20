@@ -226,14 +226,14 @@ export default class Definition {
 	}
 
 	static transformValidationRule(validationRule, { type }) {
-		const tranformedRule = Validation.transform(validationRule);
+		let tranformedRule = Validation.transform(validationRule);
 
 		// only infer type validation if it's not explicitly defined
 		if(tranformedRule.type === void 0) {
 			let fieldType = Definition.getFieldType(type);
 
 			if(fieldType && fieldType !== '*') {
-				tranformedRule.type = fieldType;
+				tranformedRule = { ...tranformedRule, type: fieldType };
 			}
 		}
 
@@ -273,7 +273,7 @@ export default class Definition {
 	}
 
 	static addNestedRules(field, rules, includeNestedRules) {
-		if(field.fields !== void 0 && ['collection', 'group'].indexOf(field.type) > -1) {
+		if(field.fields !== void 0 && ['collection', 'group'].includes(field.type)) {
 			let fields = {};
 
 			field.fields.forEach(nestedField => {
@@ -296,7 +296,19 @@ export default class Definition {
 				});
 			}
 			else {
-				rules[field.name] = { ...rules[field.name], fields };
+				rules[field.name] = {
+					...rules[field.name],
+					...(
+						includeNestedRules && field.type === 'collection' ?
+							{
+								defaultField: {
+									type: 'object',
+									fields
+								}
+							} :
+							{ fields }
+					)
+				};
 			}
 		}
 	}
