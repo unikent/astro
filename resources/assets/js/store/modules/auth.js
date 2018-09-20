@@ -36,6 +36,10 @@ const getters = {
 
 	hasAPIToken(state) {
 		return null !== state.apiToken;
+	},
+
+	getAPIToken(state) {
+		return state.apiToken;
 	}
 };
 
