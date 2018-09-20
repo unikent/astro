@@ -58,7 +58,7 @@ export default {
 
 	created() {
 		this.$store.commit('site/updateCurrentSiteID', this.$route.params.site_id);
-		this.$store.dispatch('loadSiteRole', { siteId: this.$route.params.site_id, username: Config.get('username') })
+		this.$store.dispatch('loadSiteRole', { siteId: this.$route.params.site_id, username: this.username })
 		// TODO: catch errors
 			.then(() => {
 				if (this.canUser('page.edit')) {
@@ -128,6 +128,10 @@ export default {
 
 		...mapGetters([
 			'canUser'
+		]),
+
+		...mapGetters('auth', [
+			'username'
 		]),
 
 		// get the URL for the route to show the editor preview page (not the external page preview)
