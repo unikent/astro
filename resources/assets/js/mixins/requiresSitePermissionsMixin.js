@@ -10,6 +10,16 @@
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
+
+	created() {
+		this.loadSiteRole({
+			// when component first loads try to get the site permissions
+			siteId: this.siteId,
+			username: this.username
+		});
+	},
+
+
 	watch: {
 		username: function(newUsername) {
 			// when username changes fetch site permissions
