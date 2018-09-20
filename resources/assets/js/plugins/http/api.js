@@ -9,7 +9,6 @@ export default {
 		headers: {
 			'X-Requested-With': 'XMLHttpRequest',
 			'Accept': 'application/json',
-			'Authorization': `Bearer ${Config.get('api_token', 'unknown')}`
 		}
 	}),
 	all: axios.all,

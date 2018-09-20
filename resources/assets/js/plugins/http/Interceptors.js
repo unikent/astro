@@ -28,12 +28,22 @@ export default class Interceptors {
 		}
 	}
 
+	setAuthToken(request) {
+		let token = this.store.getters['auth/getAPIToken'];
+		request.headers['Authorization'] = `Bearer ${token}`;
+		return request;
+	}
+
 	addRequestInterceptor() {
 		this.requestInterceptor = this.http.interceptors.request.use(
-			request => request,
+			request => {
+				return this.setAuthToken(request)
+			},
 			error => Promise.reject(error)
 		);
 	}
+
+
 
 	addResponseInterceptor() {
 		this.responseInterceptor = this.http.interceptors.response.use(
