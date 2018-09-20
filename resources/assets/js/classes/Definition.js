@@ -212,14 +212,11 @@ export default class Definition {
 		});
 
 		if(!rules.length) {
-			let ret = {};
-			let fieldType = Definition.getFieldType(field.type);
+			const type = Definition.getFieldType(field.type);
 
-			if(fieldType && fieldType !== '*') {
-				ret.type = fieldType;
+			if(type && type !== '*') {
+				return { type };
 			}
-
-			return ret;
 		}
 
 		return rules;
