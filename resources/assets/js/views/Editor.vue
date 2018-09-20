@@ -14,7 +14,7 @@
 
 	<modal-container />
 </div>
-<div class="page" v-else v-show="showPermissionsError">
+<div class="page" v-else>
 	<el-alert
 		title="You don't have access to this site"
 		type="error"
@@ -36,9 +36,12 @@ import ModalContainer from 'components/ModalContainer';
 import Icon from 'components/Icon';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
+import requiresSitePermissions from 'mixins/requiresSitePermissionsMixin';
 
 export default {
 	name: 'editor',
+
+	mixins: [requiresSitePermissions],
 
 	components: {
 		Sidebar,
@@ -50,24 +53,18 @@ export default {
 		fieldType: 'block'
 	},
 
-	data() {
-		return {
-			showPermissionsError: false
-		}
-	},
-
 	created() {
-		this.$store.commit('site/updateCurrentSiteID', this.$route.params.site_id);
-		this.$store.dispatch('loadSiteRole', { siteId: this.$route.params.site_id, username: this.username })
-		// TODO: catch errors
-			.then(() => {
-				if (this.canUser('page.edit')) {
-					this.showLoader();
-				}
-				else {
-					this.showPermissionsError = true;
-				}
-			});
+		// this.$store.commit('site/updateCurrentSiteID', this.$route.params.site_id);
+		// this.$store.dispatch('loadSiteRole', { siteId: this.$route.params.site_id, username: this.username })
+		// // TODO: catch errors
+		// 	.then(() => {
+		// 		if (this.canUser('page.edit')) {
+		// 			this.showLoader();
+		// 		}
+		// 		else {
+		// 			this.showPermissionsError = true;
+		// 		}
+		// 	});
 
 		this.views = {
 			desktop: {
