@@ -164,4 +164,23 @@ export default class Validation {
 	static createSchema(rules) {
 		return new Schema(rules);
 	}
+
+	static flattenRules(rules, parent = '') {
+		let fields = [];
+
+		Object.keys(rules).forEach(field => {
+			if(rules[field] && rules[field].fields) {
+				fields = [
+					...fields,
+					...Validation.flattenRules(rules[field].fields, `${field}.`)
+				];
+			}
+			else if(Array.isArray(rules[field])) {
+				fields.push(parent + field);
+			}
+		});
+
+		return fields;
+	}
+
 }

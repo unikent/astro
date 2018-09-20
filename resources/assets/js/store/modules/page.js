@@ -5,6 +5,7 @@ import api from 'plugins/http/api';
 import { eventBus } from 'plugins/eventbus';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { isIframe } from 'classes/helpers';
+import Validation from 'classes/Validation';
 
 const vue = new Vue();
 
@@ -296,7 +297,7 @@ const actions = {
 			definitionType = `${block.definition_name}-v${block.definition_version}`,
 			definition = Definition.get(definitionType),
 			validator = Definition.getValidator(definition),
-			fieldsWithValidation = flattenRules(
+			fieldsWithValidation = Validation.flattenRules(
 				Definition.getRules(definition)
 			),
 			fieldsWithErrors = [];
@@ -757,23 +758,6 @@ const
 		if(isIframe) {
 			Vue.nextTick(run);
 		}
-	},
-	flattenRules = (rules, parent = '') => {
-		let fields = [];
-
-		Object.keys(rules).forEach(field => {
-			if(rules[field] && rules[field].fields) {
-				fields = [
-					...fields,
-					...flattenRules(rules[field].fields, `${field}.`)
-				];
-			}
-			else if(Array.isArray(rules[field])) {
-				fields.push(parent + field);
-			}
-		});
-
-		return fields;
 	};
 
 export default {
