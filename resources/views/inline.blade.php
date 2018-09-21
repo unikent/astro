@@ -25,8 +25,6 @@
 		'base_url' => Request::getBaseUrl(),
 		'api_url' => config('editor.astro_api_url'),
 		'logout_url' => config('editor.astro_logout_url'),
-		'username' => $username,
-		'user'     => $user,
 		'api_token' => $api_token,
 		'debug' => config('app.debug'),
 		'published_url_pattern' => config('editor.app_live_url_pattern'),

@@ -38,6 +38,13 @@ const getters = {
 		return null !== state.apiToken;
 	},
 
+	username(state) {
+		if (!state.apiToken) {
+			return null
+		}
+		return JSON.parse(atob(state.apiToken.split('.')[1])).uid
+	},
+	
 	getAPIToken(state) {
 		return state.apiToken;
 	}

@@ -211,6 +211,8 @@ export default {
 			'getGlobalRole'
 		]),
 
+		...mapGetters('auth', ['username']),
+
 		disableSubmit() {
 			return this.form.siteDefinitionId === ''	 ||
 					this.form.name === '' ||
@@ -225,7 +227,7 @@ export default {
 				let currentSite = this.sites[i];
 				currentSite['currentRole'] = ''; // set a default
 				if (currentSite.users) {
-					let result = currentSite.users.find((element) => element.username === Config.get('username'));
+					let result = currentSite.users.find((element) => element.username === this.username);
 					if (result) {
 						currentSite['currentRole'] = result.role;
 					}

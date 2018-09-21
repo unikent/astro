@@ -20,13 +20,9 @@ if(config('app.debug') && config('app.enable_jwt_dev_routes')) {
 
 // SPA wrapper
 Route::get('/{catchall?}', function($route = '') {
-	// $user = Auth::user();
-	// TODO: grab user info from endpoint, rather than inline js
 	return response()->view('inline', [
 		'route'      => $route,
-		'is_preview' => starts_with($route, 'preview/'),
-		'user'       => 'Admin',
-		'username'   => 'admin',
+        'is_preview' => starts_with($route, 'preview/'),
 		'api_token'  => 'test'
 	]);
 })

@@ -300,6 +300,10 @@ export default {
 			'getGlobalRole'
 		]),
 
+		...mapGetters('auth', [
+			'username'
+		]),
+
 		canUserManageUsers() {
 
 			let siteState = {};
@@ -369,7 +373,7 @@ export default {
 					this.roles = roles.data.data || [];
 
 					const currentRole = this.users.find(
-						(user) => user.username === Config.get('username')
+						(user) => user.username === this.username
 					);
 
 					if(currentRole) {

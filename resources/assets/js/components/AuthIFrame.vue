@@ -24,7 +24,7 @@
 <script>
 import 'store'
 import Config from 'classes/Config.js';
-import {mapState, mapMutations, mapGetters} from 'vuex';
+import {mapState, mapMutations, mapGetters, mapActions} from 'vuex';
 export default {
 
 	name: 'AuthIFrame',
@@ -52,7 +52,8 @@ export default {
 		},
 
 		...mapGetters('auth', [
-			'hasAPIToken'
+			'hasAPIToken',
+			'username'
 		]),
 
 		loginFormShown() {
@@ -90,10 +91,29 @@ export default {
 			'setAPIToken'
 		]),
 
+		
+		...mapActions([
+			'loadPermissions',
+			'loadGlobalRole'
+		]),
+	
+
+		// refresh the stored permissions and global role
+		refreshGlobalRoleAndPermissions() {
+			this.loadGlobalRole(this.username);
+			this.loadPermissions();
+		},
+
 		receiveMessage(e) {
 			if(e.data.jwt !== void 0) {
+				let lastUsername = this.username;
 				this.setAPIToken(e.data.jwt);
 				this.resetTick();
+				let newUsername = this.username;
+				// refrest token is new or different user
+				if (lastUsername !== newUsername) {
+					this.refreshGlobalRoleAndPermissions();
+				}
 			}
 		},
 
