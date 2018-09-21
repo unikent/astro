@@ -9,7 +9,7 @@ import { win, isIframe } from 'classes/helpers';
 // we want to share some bits between the top window and iframe
 let shared = isIframe ?
 	win.top.astroInterceptorShared :
-	(win.astroInterceptorShared = { unauthorizedPromise: null, vue: new Vue() });
+	(win.astroInterceptorShared = { unauthorizedPromise: null, vue: new Vue() , forbiddenPromise: null});
 
 export default class Interceptors {
 
@@ -103,6 +103,38 @@ export default class Interceptors {
 		}
 
 		return shared.unauthorizedPromise;
+	}
+
+	/**
+	 * Handles 403 responses from the API.
+	 * @param response
+	 * @returns {Promise|null}
+	 */
+	handleForbidden(response) {
+
+		if(!shared.forbiddenPromise) {
+			shared.forbiddenPromise = new Promise((resolve, reject) => {
+				shared.vue.$confirm(
+					`You do not have permission to do something you are doing.
+					Please click OK to reload the current page.
+					Note: all unsaved data will be lost.
+					Alternatively click Cancel and navigate to another page or logout`,
+					'Action Forbidden', {
+						confirmButtonText: 'OK',
+						cancelButtonText: 'Cancel',
+						type: 'warning'
+					}
+				).then(() => {
+					// reload the current page
+					shared.router.go();
+				}).catch(() => {
+					reject();
+					shared.forbiddenPromise = null;
+				});
+			});
+		}
+
+		return shared.forbiddenPromise;
 	}
 
 	handleTooManyRequests(reponse) {
