@@ -29,7 +29,6 @@ class PageControllerTest extends ApiControllerTestCase {
     /**
      * @test
      * @group authorization
-     * @group wip
      */
     public function resolve_WhenRouteFoundAndUserIsAdmin_Returns200() {
         // GIVEN - we have an admin user and a page on a site
@@ -45,14 +44,24 @@ class PageControllerTest extends ApiControllerTestCase {
     }
 
 	/**
-	 * @test
-	 * @group authorization
+     * @test
+     * @group authorization
+     * @group wip
 	 */
 	public function resolve_WhenRouteFoundAndUserIsViewer_Returns200(){
-		$this->markTestIncomplete();
+		// GIVEN - we have a viewer user and a page on a site
+        $user = factory(User::class)->states(['viewer'])->create();
+        $page = factory(Page::class)->states([ 'withRevision' ])->create();
+        $this->authenticated($user);
+
+        // WHEN we resolve the route on that page as the user
+        $response = $this->action('GET', PageController::class . '@resolve', [ 'host' => $page->site->host, 'path' => $page->path ]);
+
+        // THEN we expect a 200 response
+        $response->assertStatus(200);
 	}
 
-		/**
+    /**
 	 * @test
 	 * @group authorization
 	 */

@@ -15,3 +15,9 @@ $factory->state(User::class, 'admin', function (Faker\Generator $faker){
         'role' => 'admin'
    ];
 });
+
+$factory->state(User::class, 'viewer', function (Faker\Generator $faker){
+   return [
+        'role' => 'viewer'
+   ];
+});
