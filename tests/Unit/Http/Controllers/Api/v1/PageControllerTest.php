@@ -27,7 +27,6 @@ class PageControllerTest extends ApiControllerTestCase {
         /**
      * @test
      * @group authorization
-     * @group wip
      */
     public function resolve_WhenRouteFoundAndUserIsAdmin_Returns200(){
         $this->markTestIncomplete();
@@ -36,7 +35,6 @@ class PageControllerTest extends ApiControllerTestCase {
     /**
      * @test
      * @group authorization
-     * @group wip
      */
     public function resolve_WhenRouteFoundAndUserIsViewer_Returns200(){
         $this->markTestIncomplete();
@@ -45,7 +43,6 @@ class PageControllerTest extends ApiControllerTestCase {
         /**
      * @test
      * @group authorization
-     * @group wip
      */
     public function resolve_WhenRouteFoundAndUserIsViewerAndIsNotMemberOfSite_Returns200(){
         $this->markTestIncomplete();
@@ -54,7 +51,6 @@ class PageControllerTest extends ApiControllerTestCase {
     /**
      * @test
      * @group authorization
-     * @group wip
      */
     public function resolve_WhenRouteFoundAndUserIsMemberOfSite_Returns200(){
         $this->markTestIncomplete();
@@ -63,7 +59,6 @@ class PageControllerTest extends ApiControllerTestCase {
     /**
      * @test
      * @group authorization
-     * @group wip
      */
     public function resolve_WhenRouteFoundAndUserIsNotMemberOfSite_Returns403(){
         $this->markTestIncomplete();
