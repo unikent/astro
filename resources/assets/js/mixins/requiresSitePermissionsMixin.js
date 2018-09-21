@@ -11,6 +11,14 @@ import { mapGetters, mapActions } from 'vuex';
 
 export default {
 
+	mounted() {
+		this.loadSiteRole({
+			siteId: this.siteId,
+			username: this.username
+		});
+		console.log('mounted: setting permissions');
+	},
+
 	watch: {
 		username: function(newUsername) {
 			// when username changes fetch site permissions
@@ -18,6 +26,7 @@ export default {
 				siteId: this.siteId,
 				username: newUsername
 			});
+			console.log('username change: setting permissions');
 		},
 
 		siteId: function(newSiteId) {
@@ -26,6 +35,7 @@ export default {
 				siteId: newSiteId,
 				username: this.username
 			});
+			console.log('site id change: setting permissions');
 		}
 	},
 
