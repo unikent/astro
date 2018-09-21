@@ -53,7 +53,7 @@ class AddSite extends Command
             $this->error('Layout name and version must be provided in the format {layout-name}-v{layout_version}.');
             return;
         }
-        $user = User::where('role', 'admin')->first();
+        $user = User::where('role', User::ROLE_ADMIN)->first();
         $api = new LocalAPIClient($user);
         try{
             $site = $api->createSite($name, $host, $path, [ 'name' => $matches[1], 'version' => $matches[2] ]);

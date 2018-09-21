@@ -24,6 +24,46 @@ class PageControllerTest extends ApiControllerTestCase {
         $response->assertStatus(401);
     }
 
+        /**
+     * @test
+     * @group authorization
+     */
+    public function resolve_WhenRouteFoundAndUserIsAdmin_Returns200(){
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group authorization
+     */
+    public function resolve_WhenRouteFoundAndUserIsViewer_Returns200(){
+        $this->markTestIncomplete();
+    }
+
+        /**
+     * @test
+     * @group authorization
+     */
+    public function resolve_WhenRouteFoundAndUserIsViewerAndIsNotMemberOfSite_Returns200(){
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group authorization
+     */
+    public function resolve_WhenRouteFoundAndUserIsMemberOfSite_Returns200(){
+        $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group authorization
+     */
+    public function resolve_WhenRouteFoundAndUserIsNotMemberOfSite_Returns403(){
+        $this->markTestIncomplete();
+    }
+
     /**
      * @test
      * @group authorization

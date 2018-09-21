@@ -11,7 +11,7 @@ class BlockControllerTest extends ApiControllerTestCase {
      * @test
      * @group authentication
      */
-    public function definitions_WhenUnauthenticated_Returns403(){
+    public function definitions_WhenUnauthenticated_Returns401(){
         $response = $this->action('GET', BlockController::class . '@definitions');
         $response->assertStatus(401);
     }
