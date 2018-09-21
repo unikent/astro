@@ -80,7 +80,17 @@ export default class Interceptors {
 	}
 
 	handleUnauthorized(response) {
-
+		let failedToken = response.config.headers.Authorization.substr(7);
+		if(failedToken === 'null') {
+			failedToken = null;
+		}
+		this.store.dispatch('auth/waitForReauthentication', failedToken)
+			.then((token) => {
+				return this.http.request(response.config);
+			}).catch((err) => {
+			console.log('Im trying...');
+			});
+		return;
 		if(!shared.unauthorizedPromise) {
 			shared.unauthorizedPromise = new Promise((resolve, reject) => {
 				shared.vue.$confirm(
