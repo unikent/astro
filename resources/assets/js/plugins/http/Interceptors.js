@@ -94,7 +94,7 @@ export default class Interceptors {
 					}
 				).then(() => {
 					// reload the current page
-					shared.router.go();
+					shared.router.push('/site/1');
 				}).catch(() => {
 					reject();
 					shared.unauthorizedPromise = null;
