@@ -1,6 +1,4 @@
 import Vue from 'vue';
-import { unflatten } from 'flat';
-import Config from 'classes/Config';
 import { win, isIframe } from 'classes/helpers';
 
 /* global Promise, console */
@@ -29,15 +27,16 @@ export default class Interceptors {
 	}
 
 	setAuthToken(request) {
-		let token = this.store.getters['auth/getAPIToken'];
-		request.headers['Authorization'] = `Bearer ${token}`;
-		return request;
+		return this.store.getters['auth/getAPIToken'].then( (token) => {
+			request.headers['Authorization'] = `Bearer ${token}`;
+			return request;
+		});
 	}
 
 	addRequestInterceptor() {
 		this.requestInterceptor = this.http.interceptors.request.use(
 			request => {
-				return this.setAuthToken(request)
+				return this.setAuthTokens(request)
 			},
 			error => Promise.reject(error)
 		);
@@ -84,42 +83,18 @@ export default class Interceptors {
 		if(failedToken === 'null') {
 			failedToken = null;
 		}
-		this.store.dispatch('auth/waitForReauthentication', failedToken)
+		return this.store.dispatch('auth/waitForReauthentication', failedToken)
 			.then((token) => {
 				return this.http.request(response.config);
 			}).catch((err) => {
 			console.log('Im trying...');
 			});
-		return;
-		if(!shared.unauthorizedPromise) {
-			shared.unauthorizedPromise = new Promise((resolve, reject) => {
-				shared.vue.$confirm(
-					`Your authenticated session has expired.
-					Please click OK to reload the current page.
-					Note: all unsaved data will be lost.`,
-					'Session Expired', {
-						confirmButtonText: 'OK',
-						cancelButtonText: 'Cancel',
-						type: 'warning'
-					}
-				).then(() => {
-					// reload the current page
-					shared.router.push('/site/1');
-				}).catch(() => {
-					reject();
-					shared.unauthorizedPromise = null;
-				});
-			});
-		}
-
-		return shared.unauthorizedPromise;
 	}
 
 	handleTooManyRequests(reponse) {
 		if(response.headers['x-ratelimit-reset']) {
 			console.log(new Date(response.headers['x-ratelimit-reset'] * 1000));
 		}
-
 		return Promise.reject(error);
 	}
 }
