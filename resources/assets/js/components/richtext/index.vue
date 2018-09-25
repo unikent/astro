@@ -2,6 +2,7 @@
 	<div class="richtext-editor">
 		<richtext-toolbar ref="toolbar" :allowed-tags="options.allowedTags || defaultConfig.allowedTags" />
 		<div ref="editor" class="richtext-content" />
+		<div v-if="options.enableWordCount" ref="wordCount" class="richtext-word-count">0</div>
 	</div>
 </template>
 
@@ -49,7 +50,8 @@ export default {
 		addScribePlugins({
 			...this.options,
 			scribe,
-			toolbar: this.$refs.toolbar.$el
+			toolbar: this.$refs.toolbar.$el,
+			wordCountEl: this.$refs.wordCount
 		});
 
 		this.content = this.value;
