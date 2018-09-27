@@ -1,6 +1,4 @@
 import Vue from 'vue';
-import { unflatten } from 'flat';
-import Config from 'classes/Config';
 import { win, isIframe } from 'classes/helpers';
 
 /* global Promise, console */
@@ -29,9 +27,10 @@ export default class Interceptors {
 	}
 
 	setAuthToken(request) {
-		let token = this.store.getters['auth/getAPIToken'];
-		request.headers['Authorization'] = `Bearer ${token}`;
-		return request;
+		return this.store.getters['auth/getAPIToken'].then( (token) => {
+			request.headers['Authorization'] = `Bearer ${token}`;
+			return request;
+		});
 	}
 
 	addRequestInterceptor() {
@@ -80,36 +79,22 @@ export default class Interceptors {
 	}
 
 	handleUnauthorized(response) {
-
-		if(!shared.unauthorizedPromise) {
-			shared.unauthorizedPromise = new Promise((resolve, reject) => {
-				shared.vue.$confirm(
-					`Your authenticated session has expired.
-					Please click OK to reload the current page.
-					Note: all unsaved data will be lost.`,
-					'Session Expired', {
-						confirmButtonText: 'OK',
-						cancelButtonText: 'Cancel',
-						type: 'warning'
-					}
-				).then(() => {
-					// reload the current page
-					shared.router.push('/site/1');
-				}).catch(() => {
-					reject();
-					shared.unauthorizedPromise = null;
-				});
-			});
+		let failedToken = response.config.headers.Authorization.substr(7);
+		if(failedToken === 'null') {
+			failedToken = null;
 		}
-
-		return shared.unauthorizedPromise;
+		return this.store.dispatch('auth/waitForReauthentication', failedToken)
+			.then((token) => {
+				return this.http.request(response.config);
+			}).catch((err) => {
+			console.log('Im trying...');
+			});
 	}
 
 	handleTooManyRequests(reponse) {
 		if(response.headers['x-ratelimit-reset']) {
 			console.log(new Date(response.headers['x-ratelimit-reset'] * 1000));
 		}
-
 		return Promise.reject(error);
 	}
 }

@@ -184,9 +184,12 @@ export default {
 		]),
 
 		...mapMutations('auth', [
-			'invalidateAPIToken'
+			'setAPIToken'
 		]),
 
+		invalidateAPIToken() {
+			this.setAPIToken(null);
+		},
 
 		fetchSiteData() {
 			// TODO: catch errors
