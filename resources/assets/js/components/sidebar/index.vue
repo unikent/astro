@@ -2,14 +2,12 @@
 <resizable-sidebar>
 
 	<div class="sidebar-component-wrapper">
-		<component
-			v-for="(item, index) in menu"
-			v-if="item.component"
-			v-show="item.id===activeMenuItem"
-			:is="item.component"
-			:key="`component-${item.link}`"
-			:title="item.title"
-		/>
+		<keep-alive>
+			<component
+				:is="activeMenuItem.component"
+				:title="activeMenuItem.title"
+			/>
+		</keep-alive>
 	</div>
 
 	<section class="sidebar">
@@ -22,11 +20,11 @@
 				:id="item.id"
 				:key="item.link"
 				:index="index"
-				:active="activeMenuItem"
+				:active="activeMenuItemId"
 				:onClick="openItem"
 			/>
 		</ul>
-		<ul :class="activeMenuItem==='pages'?'sidebar--deactivated':''" class="sidebar__switcher" role="navigation">
+		<ul :class="activeMenuItemId==='pages'?'sidebar--deactivated':''" class="sidebar__switcher" role="navigation">
 			<side-menu-item
 				v-for="(item, index) in menu"
 				:link="item.link"
@@ -35,7 +33,7 @@
 				:id="item.id"
 				:key="item.link"
 				:index="index"
-				:active="activeMenuItem"
+				:active="activeMenuItemId"
 				:onClick="openItem"
 			/>
 		</ul>
@@ -55,7 +53,6 @@ import SideMenuPages from 'components/sidebar/SideMenuPages';
 import PageList from 'components/PageList';
 import EditBlock from 'components/EditBlock';
 import ErrorSidebar from 'components/sidebar/Errors';
-import { eventBus } from 'plugins/eventbus';
 
 export default {
 	name: 'sidebar',
@@ -99,27 +96,38 @@ export default {
 		...mapState({
 			page: state => state.page.pageData,
 			pageLoaded: state => state.page.loaded,
-			activeMenuItem: state => state.menu.active
-		})
-	},
+			activeMenuItemId: state => state.menu.active
+		}),
 
-	methods: {
-		...mapMutations([
-			'updateMenuActive',
-			'collapseSidebar'
-		]),
-
-		openItem(e, index) {
-			this.collapseSidebar();
-			this.updateMenuActive(this.menu[index].id);
+		activeMenuItem() {
+			return this.menu.find(item => item.id === this.activeMenuItemId);
 		}
 	},
 
 	mounted() {
 		// to enable other components to open the errors sidebar when needed
-		eventBus.$on('sidebar:openErrors', () => {
+		this.$bus.$on('sidebar:openErrors', () => {
 			this.updateMenuActive('errors');
+			this.updateMenuFlash('errors');
+			setTimeout(() => {
+				this.updateMenuFlash('');
+			}, 700);
 		});
+	},
+
+	beforeDestroy() {
+		this.$bus.$off('sidebar:openErrors');
+	},
+
+	methods: {
+		...mapMutations([
+			'updateMenuActive',
+			'updateMenuFlash'
+		]),
+
+		openItem(e, index) {
+			this.updateMenuActive(this.menu[index].id);
+		}
 	}
 };
 </script>

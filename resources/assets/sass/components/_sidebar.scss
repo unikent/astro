@@ -155,7 +155,7 @@ to the right of the sidebar is another sidebar (sidebar__switcher) which contain
 	// gives a flash highlight to sidebar menus if needed (eg if we select the errors sidebar from a modal)
 	.sidebar--flash {
 		animation-name: flash;
-		animation-duration: 900ms;
+		animation-duration: .5s;
 		animation-timing-function: ease-in-out;
 	}
 }
@@ -163,15 +163,13 @@ to the right of the sidebar is another sidebar (sidebar__switcher) which contain
 
 @keyframes flash {
 	0% {
-		background-color: rgba(255, 0, 0, 0.16);
+		background-color: rgba(255, 0, 0, 0);
 	}
-	22% {
-		background-color: rgba(255, 0, 0, 0.8);
-	}
-	77% {
-		background-color: rgba(255, 0, 0, 0.16);
+	50% {
+		background-color: rgba(255, 0, 0, 0.3);
 	}
 	100% {
-		background-color: transparent;
+		background-color: rgba(255, 0, 0, 0);
 	}
 }
+
