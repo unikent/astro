@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Auth;
 
 if(config('app.debug') && config('app.enable_jwt_dev_routes')) {
 	$this->any('auth/jwt', 'Auth\JWTController@devAuthenticate')->name('auth.jwt.dev.authenticate');
-	$this->get('auth/jwt/reset', 'Auth\JWTController@resetDevToken')->name('auth.jwt.dev.reset');
+	$this->any('auth/jwt/reset', 'Auth\JWTController@resetDevToken')->name('auth.jwt.dev.reset');
 }
 
 // SPA wrapper
