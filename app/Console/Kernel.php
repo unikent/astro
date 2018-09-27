@@ -22,6 +22,7 @@ class Kernel extends ConsoleKernel
 		Commands\ClearCache::class,
 		Commands\MigratePages::class,
 		Commands\RenewUserAPITokens::class,
+		Commands\UpdateSiteURL::class,
 	];
 
 	/**
