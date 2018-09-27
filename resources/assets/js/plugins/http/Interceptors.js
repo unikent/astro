@@ -36,7 +36,7 @@ export default class Interceptors {
 	addRequestInterceptor() {
 		this.requestInterceptor = this.http.interceptors.request.use(
 			request => {
-				return this.setAuthTokens(request)
+				return this.setAuthToken(request)
 			},
 			error => Promise.reject(error)
 		);
