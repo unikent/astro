@@ -52,18 +52,21 @@ class UpdateSiteURL extends Command
 		$new_host = $this->option('new-host'); // TODO: remove http:// or https:// from the front and and trailing '/'
 		$new_path = $this->option('new-path'); // TODO ensure there is a begining '/' and remove trailing '/'
 
+		// check we have a site
 		if (!$site) {
 			$this->error("You need to specify the --site-id of the site whose URL you're attempting to update.");
 			return;
 		}
 
+		// check we have a new host
 		if (!$new_host) {
 			$this->error("You need to specify the --new-host for the site's URL to be set to.");
 			return;
 		}
 
+		// check we have a path, or set default
 		if (!$new_path) {
-			$this->info("No path specified. Will use an empty path.");
+			$this->warn("No path specified. We will set an empty path.");
 			$new_path = '';
 		}
 
@@ -75,11 +78,13 @@ class UpdateSiteURL extends Command
 		$this->old_site_url = $old_host . $old_path;
 		$this->new_site_url = $new_host . $new_path;
 
+		// check that we're not changing to the same URL
 		if ($this->old_site_url == $this->new_site_url) {
 			$this->warn('Attempting to change site url to its current url. Aborting.');
 			return;
 		}
 
+		// check that no other site exists with the new URL
 		if ($existing_site = Site::where('host', '=', $new_host)->where('path', '=', $new_path)->first()) {
 			$this->error("There is already a site with host '$new_host' and path '$new_path'. Its id is '$existing_site->id'.");
 			return;
@@ -89,6 +94,7 @@ class UpdateSiteURL extends Command
 		$this->old_site_url_escaped = str_replace('/', '\/', $this->old_site_url);
 		$this->new_site_url_escaped = str_replace('/', '\/', $this->new_site_url);
 
+		// get user confirmation to proceed
 		if (!$this->confirm("Changing site URL from '$this->old_site_url' to '$this->new_site_url'. Do you with to continue?")) {
 			$this->info('Aborting. Because you said to :-D.');
 			return;
