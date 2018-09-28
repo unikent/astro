@@ -13,131 +13,156 @@ use App\Models\Definitions\Region as RegionDefinition;
 
 class UpdateSiteURL extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'astro:updatesiteurl
-                                {--site-id=}
-                                {--new-host=}
-                                {--new-path=}
-                                ';
+	/**
+	 * The name and signature of the console command.
+	 *
+	 * @var string
+	 */
+	protected $signature = 'astro:updatesiteurl
+								{--site-id=}
+								{--new-host=}
+								{--new-path=}
+								';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Update a given site\'s host and path, includin all absolute links in pages';
+	/**
+	 * The console command description.
+	 *
+	 * @var string
+	 */
+	protected $description = 'Update a given site\'s host and path, includin all absolute links in pages';
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
+	/**
+	 * Create a new command instance.
+	 *
+	 * @return void
+	 */
+	public function __construct()
+	{
+		parent::__construct();
+	}
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle()
-    {
-        $site = Site::find(intval($this->option('site-id')));
-        $new_host = $this->option('new-host'); // TODO: remove http:// or https:// from the front and and trailing '/'
-        $new_path = $this->option('new-path'); // TODO ensure there is a begining '/' and remove trailing '/'
+	/**
+	 * Execute the console command.
+	 *
+	 * @return mixed
+	 */
+	public function handle()
+	{
+		$site = Site::find(intval($this->option('site-id')));
+		$new_host = $this->option('new-host'); // TODO: remove http:// or https:// from the front and and trailing '/'
+		$new_path = $this->option('new-path'); // TODO ensure there is a begining '/' and remove trailing '/'
 
-        if (!$site) {
-            $this->error("You need to specify the --site-id of the site whose URL you're attempting to update");
-            return;
-        }
+		if (!$site) {
+			$this->error("You need to specify the --site-id of the site whose URL you're attempting to update.");
+			return;
+		}
 
-        if (!$new_host) {
-            $this->error("You need to specify the --new-host for the site's URL to be set to");
-            return;
-        }
+		if (!$new_host) {
+			$this->error("You need to specify the --new-host for the site's URL to be set to.");
+			return;
+		}
 
-        if (!$new_path) {
-            $this->info("No path specified. Will use an empty path.");
-            $new_path = '';
-        }
+		if (!$new_path) {
+			$this->info("No path specified. Will use an empty path.");
+			$new_path = '';
+		}
 
-        // Keep old details for later
-        $old_host = $site->host;
-        $old_path = $site->path;
+		// Keep old details for later
+		$old_host = $site->host;
+		$old_path = $site->path;
 
-        // full site URLs
-        $this->old_site_url = $old_host . $old_path;
-        $this->new_site_url = $new_host . $new_path;
+		// full site URLs
+		$this->old_site_url = $old_host . $old_path;
+		$this->new_site_url = $new_host . $new_path;
 
-        // for findind and replacing URLs in json
-        $this->old_site_url_escaped = str_replace('/', '\/', $this->old_site_url);
-        $this->new_site_url_escaped = str_replace('/', '\/', $this->new_site_url);
+		if ($this->old_site_url == $this->new_site_url) {
+			$this->warn('Attempting to change site url to its current url. Aborting.');
+			return;
+		}
 
-        $this->updateSiteURL($site, $new_host, $new_path);
-    }
+		// for findind and replacing URLs in json
+		$this->old_site_url_escaped = str_replace('/', '\/', $this->old_site_url);
+		$this->new_site_url_escaped = str_replace('/', '\/', $this->new_site_url);
 
-    public function updateSiteURL($site , $new_host, $new_path)
-    {
+		if (!$this->confirm("Changing site URL from '$this->old_site_url' to '$this->new_site_url'. Do you with to continue?")) {
+			$this->info('Aborting. Because you said to :-D.');
+			return;
+		}
 
-        // Update site's host and path & site option links
-        $site->host = $new_host;
-        $site->path = $new_path;
-        $site->options = $this->replaceURLs($site->options);
+		$this->updateSiteURL($site, $new_host, $new_path);
+	}
 
-        $site->save();
-        $this->info("Updated site '$site->id' from '$this->old_site_url' to '$this->new_site_url', including site options");
+	public function updateSiteURL($site , $new_host, $new_path)
+	{
 
-        // replace any page links in latest revision with host + path prefix
-        $pages = $site->draftPages()->get();
+		// Update site's host and path & site option links
+		$site->host = $new_host;
+		$site->path = $new_path;
 
-        $user = User::where('role', User::ROLE_ADMIN)->first();
-        $api = new LocalAPIClient($user);
+		$new_options = false;
+		try {
+			$new_options = $this->replaceURLs($site->options);
+		} catch (Exception $e) {}
+		
+		$site->options =  $new_options ? $new_options : $site->options;
 
-        foreach ($pages as $page) {
-            $page_url = $site->host . $site->path . $page->generatePath();
-            $page_regions = json_encode($page->revision->blocks);
+		$site->save();
+		$this->info("Updated site '$site->id' host, path and options.");
 
-            // skip ahead if there is nothing to replace
-            if (!strpos($page_regions, $this->old_site_url_escaped)) {
-                $this->warn("Skipping page '$page->id' ($page_url). No urls to update. Old site url:" . $this->old_site_url);
-                continue;
-            }
+		// replace any page links in latest revision with host + path prefix
+		$pages = $site->draftPages()->get();
 
-            $new_page_regions = $this->replaceURLs($page_regions);
+		$user = User::where('role', User::ROLE_ADMIN)->first();
+		$api = new LocalAPIClient($user);
 
-            try {
+		foreach ($pages as $page) {
+			$page_url = $site->host . $site->path . $page->generatePath();
 
-                $api->updatePageContent($page->id, $new_page_regions);
-                $this->info("Updated page '$page->id' ($page_url), replaced old urls '$old_site_url' with new urls '$new_site_url'");
-            } catch (ValidationException $e) {
-                $this->error("Validation error occured whiles attempting to update '$page->id'");
-            } catch (Exception $e) {
-                $this->error("Error occured whiles attempting to update '$page->id' ($page_url)");
-            }
-        }
-    }
+			try {
+				$new_page_regions = $this->replaceURLs($page->revision->blocks);
+			} catch (Exception $e) {
+				$this->error("Skipping page '$page->id' ($page_url). Unable to replace URLs.");
+				continue;
+			}
+			
+			if (!$new_page_regions) {
+				$this->warn("Skipping page '$page->id' ($page_url). No urls to update.");
+				continue;
+			}
 
-    /**
-     *
-     *
-     */
-    public function replaceURLs($data)
-    {
-        if (!is_array($data)) {
-            // dd($data);
-            throw new Exception("Data must be an array");
-        }
+			try {
+				$api->updatePageContent($page->id, $new_page_regions);
+				$this->info("Updated page '$page->id' ($page_url).");
+			} catch (ValidationException $e) {
+				$this->error("Validation error occured whiles attempting to update page '$page->id' ($page_url).");
+			} catch (Exception $e) {
+				$this->error("Error occured whiles attempting to update page '$page->id' ($page_url).");
+			}
+		}
+	}
 
-        $data = json_encode($data);
-        $data = str_replace($this->old_site_url_escaped, $this->new_site_url_escaped, $data);
-        $data = json_decode($data, true);
+	/**
+	 * This function converts a data array to a json srting and performs a srting 
+	 * replace on the resulting array
+	 * @param array $data
+	 * @return array
+	 */
+	public function replaceURLs($data)
+	{
+		if (!is_array($data)) {
+			throw new Exception("Data for replacing urls must be an array");
+		}
 
-        return $data;
-    }
+		$data = json_encode($data);
+
+		// skip ahead if there is nothing to replace
+		if (!strpos($data, $this->old_site_url_escaped)) {
+			return false;
+		}
+
+		$data = str_replace($this->old_site_url_escaped, $this->new_site_url_escaped, $data);
+		$data = json_decode($data, true);
+
+		return $data;
+	}
 }
