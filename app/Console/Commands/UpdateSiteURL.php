@@ -29,7 +29,7 @@ class UpdateSiteURL extends Command
 	 *
 	 * @var string
 	 */
-	protected $description = 'Update a given site\'s host and path, includin all absolute links in pages';
+	protected $description = "Update a given site's host, path, and options, including all absolute links in pages";
 
 	/**
 	 * Create a new command instance.
