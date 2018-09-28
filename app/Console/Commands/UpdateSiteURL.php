@@ -80,6 +80,11 @@ class UpdateSiteURL extends Command
 			return;
 		}
 
+		if ($existing_site = Site::where('host', '=', $new_host)->where('path', '=', $new_path)->first()) {
+			$this->error("There is already a site with host '$new_host' and path '$new_path'. Its id is '$existing_site->id'.");
+			return;
+		}
+
 		// for findind and replacing URLs in json
 		$this->old_site_url_escaped = str_replace('/', '\/', $this->old_site_url);
 		$this->new_site_url_escaped = str_replace('/', '\/', $this->new_site_url);
@@ -94,7 +99,6 @@ class UpdateSiteURL extends Command
 
 	public function updateSiteURL($site , $new_host, $new_path)
 	{
-
 		// Update site's host and path & site option links
 		$site->host = $new_host;
 		$site->path = $new_path;
