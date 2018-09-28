@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-
+use Exception;
 use App\Models\Site;
 use App\Models\Page;
 use App\Models\User;
@@ -67,23 +67,33 @@ class UpdateSiteURL extends Command
             $new_path = '';
         }
 
+        // Keep old details for later
+        $old_host = $site->host;
+        $old_path = $site->path;
+
+        // full site URLs
+        $this->old_site_url = $old_host . $old_path;
+        $this->new_site_url = $new_host . $new_path;
+
+        // for findind and replacing URLs in json
+        $this->old_site_url_escaped = str_replace('/', '\/', $this->old_site_url);
+        $this->new_site_url_escaped = str_replace('/', '\/', $this->new_site_url);
+
         $this->updateSiteURL($site, $new_host, $new_path);
     }
 
     public function updateSiteURL($site , $new_host, $new_path)
     {
-        // keep old details for later
-        $old_host = $site->host;
-        $old_path = $site->path;
 
-        //Update site's host and path
+        // Update site's host and path & site option links
         $site->host = $new_host;
         $site->path = $new_path;
-        $site->save();
+        $site->options = $this->replaceURLs($site->options);
 
-        // replace any internal links in latest revision with host + path prefix
-        $old_site_url = $old_host . $old_path;
-        $new_site_url = $new_host . $new_path;
+        $site->save();
+        $this->info("Updated site '$site->id' from '$this->old_site_url' to '$this->new_site_url', including site options");
+
+        // replace any page links in latest revision with host + path prefix
         $pages = $site->draftPages()->get();
 
         $user = User::where('role', User::ROLE_ADMIN)->first();
@@ -94,12 +104,12 @@ class UpdateSiteURL extends Command
             $page_regions = json_encode($page->revision->blocks);
 
             // skip ahead if there is nothing to replace
-            if (strpos($page_regions, str_replace('/', '\/', $old_site_url)) === false) {
-                $this->warn("Skipping page '$page->id' ($page_url). No urls to update. Old site url:" . str_replace('/', '\/', $old_site_url));
+            if (!strpos($page_regions, $this->old_site_url_escaped)) {
+                $this->warn("Skipping page '$page->id' ($page_url). No urls to update. Old site url:" . $this->old_site_url);
                 continue;
             }
 
-            $new_page_regions = str_replace(str_replace('/', '\/', $old_site_url), str_replace('/', '\/', $new_site_url), $page_regions);
+            $new_page_regions = $this->replaceURLs($page_regions);
 
             try {
 
@@ -111,7 +121,23 @@ class UpdateSiteURL extends Command
                 $this->error("Error occured whiles attempting to update '$page->id' ($page_url)");
             }
         }
+    }
 
-        // replace and links in site options
+    /**
+     *
+     *
+     */
+    public function replaceURLs($data)
+    {
+        if (!is_array($data)) {
+            // dd($data);
+            throw new Exception("Data must be an array");
+        }
+
+        $data = json_encode($data);
+        $data = str_replace($this->old_site_url_escaped, $this->new_site_url_escaped, $data);
+        $data = json_decode($data, true);
+
+        return $data;
     }
 }
