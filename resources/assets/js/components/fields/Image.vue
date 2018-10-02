@@ -48,7 +48,6 @@ export default {
 
 	methods: {
 		...mapMutations([
-			'updateBlockMedia',
 			'setMediaType',
 			'updateMediafieldPath',
 			'showMediaPicker',
@@ -57,28 +56,6 @@ export default {
 		...mapActions([
 			'showMediaOverlay'
 		]),
-
-		updateFieldValue(path, value) {
-			this.$store.commit('updateFieldValue', {
-				name: this.path,
-				index: this.currentBlockIndex,
-				region: this.currentRegionName,
-				section: this.currentSectionIndex,
-				value: { ...value, type: 'image' }
-			});
-
-			this.updateBlockMedia({
-				index: this.currentBlockIndex,
-				region: this.currentRegionName,
-				section: this.currentSectionIndex,
-				value: {
-					...value,
-					/* eslint-disable camelcase */
-					associated_field: this.path
-					/* eslint-enable camelcase */
-				}
-			});
-		},
 
 		showPicker() {
 			this.setMediaType('image');

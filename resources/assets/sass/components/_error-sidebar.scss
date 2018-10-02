@@ -1,38 +1,39 @@
-ul.validation-errors {
-	list-style-type: none;
-	padding: 0 1rem;
-}
+$validation-errors-height: (
+	#{get-height(top-bar)} -
+	#{get-height(block-back-bar)}
+);
 
-li.validation-errors__item {
-	margin: 1rem 0;
-	background-color: #fff;
-	padding: 5px;
-	border: 1px solid;
-	border-radius: 4px;
-	line-height: 26px;
-	height: 38px;
-	transition: background-color .3s ease-out;
-	display: flex;
-	i {
-		line-height: 2;
-	}
-	&.warning {
-		background-color: rgba(255, 0, 0, 0.16);
-		border-color: #9a0000;
-		color: #9a0000;
-	}
-	&.success {
-		background-color: rgba(0, 255, 0, 0.16);
-		border-color: #076330;
-		color: #076330;
+.validation-errors {
+	list-style: none;
+	overflow: auto;
+	margin: 0;
+	padding: 14px;
+	height: calc(100vh - #{$validation-errors-height});
+
+	.block-errors + .block-errors {
+		margin-top: 14px;
 	}
 }
 
-.validation-errors__link {
-	color: inherit;
-	margin-left: 0.5rem;
+.error-list {
+	list-style: none;
+	padding: .5rem 1rem 0;
+
+	&__item {
+		margin-left: .2rem;
+
+		.el-button {
+			color: #f56d6d;
+			text-decoration: underline;
+		}
+	}
 }
 
-.el-tag--success {
-	color: #076330;
+.error-alert {
+	border: 1px solid #f56c6c;
+	padding: 8px;
+
+	.el-alert__content {
+		padding: 0;
+	}
 }

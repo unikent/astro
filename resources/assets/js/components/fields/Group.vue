@@ -7,10 +7,13 @@
 				<el-form-item
 					:label="f.label"
 					:prop="`${name}.${f.name}`"
-					:rules="rules[name].fields[f.name]"
-					:error="getError(f.name)"
+					:rules="getRules(f.name)"
+					:error="getErrors(`${field.name}.${f.name}`)"
+					:class="{
+						'is-required': isRequiredField(f)
+					}"
+					:id="`${name}-${f.name}`"
 				>
-
 					<template slot="label">
 						<span>{{ f.label }}</span>
 
@@ -66,33 +69,15 @@ export default {
 	computed: {
 		...mapState({
 			currentIndex: state => state.page.currentBlockIndex
-		}),
-
-		rules() {
-			return Definition.getRules(this.currentDefinition);
-		}
+		})
 	},
 
 	methods: {
 
 		childField(field) {
 			return _.pick(field, ['label', 'default', 'options']);
-		},
-
-		getRules(fieldName) {
-			let rules = Array.isArray(this.rules[this.name]) ?
-				this.rules[this.name][this.rules[this.name].length - 1] :
-				this.rules[this.name];
-
-			return rules.fields[fieldName];
-		},
-
-		getError(fieldName) {
-			return (
-				this.errors && this.errors[fieldName] ?
-					this.errors[fieldName] : null
-			);
 		}
+
 	}
 };
 </script>

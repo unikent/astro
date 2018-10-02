@@ -87,9 +87,9 @@ export default {
 		}),
 
 		...mapGetters([
-			'getInvalidBlocks',
 			'draftPreviewURL',
-			'canUser'
+			'canUser',
+			'getAllBlockErrorsCount'
 		]),
 
 		draftLink() {
@@ -97,7 +97,7 @@ export default {
 		},
 
 		invalidBlocks() {
-			return this.getInvalidBlocks().length === 0 ? true : false;
+			return this.getAllBlockErrorsCount === 0 ? true : false;
 		},
 
 		pageHasLayoutErrors() {
@@ -130,7 +130,7 @@ export default {
 			// we want a user notification
 			// also wait till handleSavePage has finished to hide the loading spinner
 			this.handleSavePage({ notify: true })
-			// TODO: catch errors
+				// TODO: catch errors
 				.then(() => {
 					this.fullscreenLoading = false;
 

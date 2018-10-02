@@ -123,6 +123,7 @@
 .b-block-container {
 	position: relative;
 	will-change: transform;
+	min-height: 60px;
 }
 
 .block {
