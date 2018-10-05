@@ -50,6 +50,25 @@ class JWTController extends Controller
 		}
 	}
 
+	public function ssoAuthenticate(Request $request)
+	{
+		require_once '/var/www/html/sso-sp/vendor/simplesamlphp/simplesamlphp/lib/_autoload.php';
+		$as = new \SimpleSAML\Auth\Simple('default-sp');
+		$as->requireAuth();
+		$attributes = $as->getAttributes();
+		return view('auth.jwt.dev.jwt')->with('jwt', $this->generateJWT(
+			$attributes['uid'][0],
+			config('auth.jwt_lifetime')
+		));
+	}
+
+	public function resetSSOToken()
+	{
+		require_once '/var/www/html/sso-sp/vendor/simplesamlphp/simplesamlphp/lib/_autoload.php';
+		$as = new \SimpleSAML\Auth\Simple('default-sp');
+		$as->logout(['ReturnTo' => config('app.url')]);
+	}
+
 	/**
 	 * Reset the dev token
 	 * @param Request $request

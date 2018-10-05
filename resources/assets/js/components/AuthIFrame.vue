@@ -1,6 +1,6 @@
 <template>
 	<div v-show="!hasAPIToken" id="authiframe">
-		<iframe v-show="loginFormShown" :src="testURL"></iframe>
+		<iframe v-show="showIFrame" :src="testURL"></iframe>
 	</div>	
 </template>
 <style scoped>
@@ -11,7 +11,7 @@
 		left: 0px;
 		right: 0px;
 		bottom: 0px;
-		background: rgba(0,0,0,0.5);
+		background: transparent;
 	}
 	#authiframe iframe {
 		width: 100%; 
@@ -31,17 +31,23 @@ export default {
 
 	data() {
 		return {
-			tickStart: null,
-			latestTick: null,
-			ticking: false
+			timer: null,
+			showIFrame: false,
 		}
 	},
 
 	created() {
 		window.addEventListener("message", this.receiveMessage, true);
-		this.initiateTick();
+		// because watched property won't be called when this component is created
+		if(!this.hasAPIToken) {
+			this.reloadIframe();
+			this.initiateTick();
+		}
 	},
 
+	destroyed() {
+		window.removeEventListener("message", this.receiveMessage);
+	},
 	computed: {
 		...mapState({
 			apiToken: state => state.user.apiToken
@@ -55,33 +61,17 @@ export default {
 			'hasAPIToken',
 			'username'
 		]),
-
-		loginFormShown() {
-			const age = this.latestTick - this.tickStart; // just so it is reactive to the tick
-			let iframe = this.getIframe();
-			if(iframe) {
-				let usernameInput = iframe.querySelector('input[name="username"]');
-				if(usernameInput){
-					return true;
-				}
-			}
-			return false;
-		}
 	},
 
 	watch: {
-		loginFormShown(newValue) {
-			console.log('loginFormShown changed to', newValue);
-			if (newValue) {
-				this.resetTick();
-			}
-		},
-
 		hasAPIToken(newValue) {
 			console.log('hasAPIToken changed to', newValue);
 			if (!newValue) {
 				this.reloadIframe();
 				this.initiateTick();
+			}
+			else {
+				this.resetTick();
 			}
 		}
 	},
@@ -106,9 +96,9 @@ export default {
 
 		receiveMessage(e) {
 			if(e.data.jwt !== void 0) {
+				this.resetTick();
 				let lastUsername = this.username;
 				this.setAPIToken(e.data.jwt);
-				this.resetTick();
 				let newUsername = this.username;
 				// refrest token is new or different user
 				if (lastUsername !== newUsername) {
@@ -118,41 +108,16 @@ export default {
 		},
 
 		initiateTick() {
-			this.tickStart = Date.now();
-			this.ticking = true;
-			this.tick();
+			this.showIFrame = false;
+			this.timer = setTimeout(() => {
+				this.showIFrame = true;
+				this.timer = null;
+			},1000);
 		},
 
 		resetTick() {
-			this.ticking = false;
-			this.tickStart = null;
-			this.latestTick = null;
-		},
-
-		tick() {
-			setTimeout(() => {
-				if (this.ticking) {
-					console.log('tick');
-					this.latestTick = Date.now();
-					this.tick();
-				}
-				else {
-					this.resetTick();
-				}
-			}, 500);
-		},
-
-		getIframe() {
-			let iframe = document.querySelector('#authiframe iframe');
-
-			if(iframe){
-				iframe = (iframe.contentWindow || iframe.contentDocument);
-				if (iframe.document) {
-					return iframe.document;
-				}
-			}
-
-			return null;
+			this.showIFrame = false;
+			this.timer = false;
 		},
 
 		reloadIframe() {
