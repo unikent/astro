@@ -108,7 +108,7 @@ export default {
 		},
 
 		initiateTick() {
-			this.showIFrame = false;
+			this.resetTick();
 			this.timer = setTimeout(() => {
 				this.showIFrame = true;
 				this.timer = null;
@@ -116,6 +116,9 @@ export default {
 		},
 
 		resetTick() {
+			if(this.timer) {
+				clearTimeout(this.timer);
+			}
 			this.showIFrame = false;
 			this.timer = false;
 		},

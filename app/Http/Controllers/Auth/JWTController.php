@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Models\Permission;
+use App\Models\User;
 use Config;
 use Validator;
 use Illuminate\Http\Request;
@@ -41,7 +43,7 @@ class JWTController extends Controller
 		}
 
 		if (Auth::check()) {
-			return view('auth.jwt.dev.jwt')->with('jwt', $this->generateJWT(
+			return view('auth.jwt.jwt')->with('jwt', $this->generateJWT(
 				Auth::user()->username,
 				config('auth.jwt_lifetime')
 			));
@@ -50,13 +52,64 @@ class JWTController extends Controller
 		}
 	}
 
+	/**
+	 * Check if the array contains the attribute that allows access to site editor
+	 * @param array $attributes - Array of sso attributes
+	 * @return bool - True if the user has access to site editor, otherwise false
+	 */
+	public function hasSiteEditorAttribute($attributes)
+	{
+		return isset($attributes['unikentadminresource'])
+			&& is_array($attributes['unikentadminresource'])
+			&& in_array('siteeditor', $attributes['unikentadminresource']);
+	}
+
+	/**
+	 * Adds or updates a user record in our database with the
+	 * given attributes. Sets the role to 'user' and also sets a random
+	 * (unused) password as the database table does not have a default and requires a value.
+	 * @param array $attributes - Attributes, which MUST include 'username'
+	 * @return User
+	 */
+	public function addOrUpdateUser($attributes)
+	{
+		$user = User::where('username', '=', $attributes['username'])->first();
+		if(!$user) {
+			$user = new User();
+			$user->role = 'user';
+			$user->username = $attributes['username'];
+			$user->password = md5(mt_rand(0,0xffff) . time());
+		}
+		foreach($attributes as $name => $value) {
+			$user->$name = $value;
+		}
+		$user->save();
+		return $user;
+	}
+
+	/**
+	 * Authenticates the user using SSO. Adds an entry for the user to
+	 * our database if the user does not already exist, or updates the existing
+	 * user details if it does exist.
+	 * @param Request $request
+	 * @return $this
+	 */
 	public function ssoAuthenticate(Request $request)
 	{
 		require_once '/var/www/html/sso-sp/vendor/simplesamlphp/simplesamlphp/lib/_autoload.php';
 		$as = new \SimpleSAML\Auth\Simple('default-sp');
 		$as->requireAuth();
 		$attributes = $as->getAttributes();
-		return view('auth.jwt.dev.jwt')->with('jwt', $this->generateJWT(
+		if(!$this->hasSiteEditorAttribute($attributes)) {
+			return view('auth.jwt.nosso')
+					->with('attributes', $attributes);
+		}
+		$this->addOrUpdateUser([
+			'username' => $attributes['uid'][0],
+			'name' => $attributes['displayName'][0],
+			'email' => $attributes['mail'][0],
+		]);
+		return view('auth.jwt.jwt')->with('jwt', $this->generateJWT(
 			$attributes['uid'][0],
 			config('auth.jwt_lifetime')
 		));
@@ -66,7 +119,9 @@ class JWTController extends Controller
 	{
 		require_once '/var/www/html/sso-sp/vendor/simplesamlphp/simplesamlphp/lib/_autoload.php';
 		$as = new \SimpleSAML\Auth\Simple('default-sp');
-		$as->logout(['ReturnTo' => config('app.url')]);
+		if($as->isAuthenticated()) {
+			$as->logout(['ReturnTo' => config('app.url')]);
+		}
 	}
 
 	/**
