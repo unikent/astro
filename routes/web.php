@@ -26,8 +26,7 @@ elseif(config('app.debug') && config('app.enable_jwt_dev_routes')) {
 Route::get('/{catchall?}', function($route = '') {
 	return response()->view('inline', [
 		'route'      => $route,
-        'is_preview' => starts_with($route, 'preview/'),
-		'api_token'  => 'test'
+        'is_preview' => starts_with($route, 'preview/')
 	]);
 })
 ->where('catchall', '(.*)');
