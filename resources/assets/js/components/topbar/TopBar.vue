@@ -53,7 +53,7 @@
 
 		</div>
 
-		<el-button type="warning"
+		<el-button v-if='showInvalidateTokenButton' type="warning"
 			@click="invalidateAPIToken"
 		> Invalidate Token
 		</el-button>
@@ -173,6 +173,10 @@ export default {
 
 		isUnsaved() {
 			return this.unsavedChangesExist();
+		}, 
+
+		showInvalidateTokenButton() {
+			return Config.get('debug');
 		}
 	},
 
