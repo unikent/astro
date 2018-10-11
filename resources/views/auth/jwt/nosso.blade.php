@@ -59,7 +59,7 @@
     <div class="site-list">
         <div class="el-card">
 
-            <div class="el-card__body">
+            <div class="el-card__body message">
                 {!! config('editor.sso_denied_message') !!}
             </div>
         </div>

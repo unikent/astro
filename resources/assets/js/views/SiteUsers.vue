@@ -65,7 +65,7 @@
 		</div>
 
 		<el-row v-if="add_user_note">
-			<el-col :xs="24" :sm="22" :md="20" :lg="16" :xl="16"><p class="add-user-note color-text-secondary" v-html="add_user_note"></p></el-col>
+			<el-col v-html="add_user_note" class="message" :xs="24" :sm="22" :md="20" :lg="16" :xl="16"></el-col>
 		</el-row>
 
 		<h3>Existing users</h3>
