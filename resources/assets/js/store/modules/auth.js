@@ -3,16 +3,18 @@
  */
 
 /**
- @TODO all the stuff with the jwt and accessing the user info held within goes here
-
  inspired by https://alligator.io/vuejs/vue-jwt-patterns/
-
+	NOTE: username is only ever updated when a valid jwt is set.
+ We don't invalidate the username just because jwt is invalid as
+ most of the time we are just refreshing the jwt and it is the same
+ user, and we don't want to lose all of the state in the editor.
  */
 
 const state = {
 	apiToken: null, // the api token
 	authenticatingPromise: null, // promise that completes when we are authenticated
 	authenticatedResolver: null,
+	username: null,
 };
 
 const mutations = {
@@ -21,6 +23,7 @@ const mutations = {
 		// if we have a token AND we had things waiting for authentication
 		// then resolve the waiting...
 		if (state.apiToken) {
+			state.username = JSON.parse(atob(state.apiToken.split('.')[1])).uid;
 			if (state.authenticatedResolver) {
 				state.authenticatedResolver();
 				state.authenticatedResolver = null;
@@ -67,10 +70,7 @@ const getters = {
 	},
 
 	username(state) {
-		if (!state.apiToken) {
-			return null
-		}
-		return JSON.parse(atob(state.apiToken.split('.')[1])).uid
+		return state.username;
 	},
 
 	getAPIToken(state) {
