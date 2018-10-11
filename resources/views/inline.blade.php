@@ -34,6 +34,7 @@
 		'help_url' => config('editor.help_url'),
 		'help_media_url' => config('editor.help_media_url'),
 		'auth_url' => config('editor.auth_url'),
+		'add_user_note' => config('editor.add_user_note'),
 	]); ?>;
 	</script>
 
