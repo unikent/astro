@@ -42,4 +42,8 @@ return [
 
 	// optional instructions displayed when asigning roles within sites
 	'add_user_note' => env('ADD_USER_NOTE'),
+
+	// optional instructions when a user logs in via sso but doesnt have required attribute
+	'sso_denied_message' => env('SSO_DENIED_MESSAGE'),
+
 ];

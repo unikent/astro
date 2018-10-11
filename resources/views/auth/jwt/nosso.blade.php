@@ -58,11 +58,9 @@
 
     <div class="site-list">
         <div class="el-card">
-            <div class="el-card__header">
-                Please provide the information below to the owner of the site you are trying to access:
-            </div>
+
             <div class="el-card__body">
-                {!! config('editor.add_user_note') !!}
+                {!! config('editor.sso_denied_message') !!}
             </div>
         </div>
     </div>
