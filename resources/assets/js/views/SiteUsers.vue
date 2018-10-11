@@ -64,9 +64,9 @@
 			</el-button>
 		</div>
 
-		<p class="add-user-note">
-			<strong>Note:</strong> Before you can add a user to this site, they need to have logged in at least once.
-		</p>
+		<el-row v-if="add_user_note">
+			<el-col v-html="add_user_note" class="message" :xs="24" :sm="22" :md="20" :lg="16" :xl="16"></el-col>
+		</el-row>
 
 		<h3>Existing users</h3>
 
@@ -353,6 +353,10 @@ export default {
 
 		total() {
 			return this.filteredUsers.length;
+		},
+
+		add_user_note() {
+			return Config.get('add_user_note');
 		}
 
 	},

@@ -35,8 +35,15 @@ return [
 	'enable_hotjar' => env('ENABLE_HOTJAR', false),
 
 	// hotjar ID
-    'hotjar_id' => env('HOTJAR_ID'),
+	'hotjar_id' => env('HOTJAR_ID'),
 
-    // URL for the JWT provider
-    'auth_url' => env('AUTH_URL'),
+	// URL for the JWT provider
+	'auth_url' => env('AUTH_URL'),
+
+	// optional instructions displayed when asigning roles within sites
+	'add_user_note' => env('ADD_USER_NOTE'),
+
+	// optional instructions when a user logs in via sso but doesnt have required attribute
+	'sso_denied_message' => env('SSO_DENIED_MESSAGE'),
+
 ];
