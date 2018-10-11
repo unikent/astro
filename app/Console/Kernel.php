@@ -22,7 +22,6 @@ class Kernel extends ConsoleKernel
 		Commands\ClearCache::class,
 		Commands\CreateJWT::class,
 		Commands\MigratePages::class,
-		Commands\RenewUserAPITokens::class,
 	];
 
 	/**
