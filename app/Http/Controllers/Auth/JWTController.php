@@ -97,7 +97,7 @@ class JWTController extends Controller
 	public function ssoAuthenticate(Request $request)
 	{
 		require_once config('sso.simplesaml_sp_path') . '/lib/_autoload.php';
-		$as = new \SimpleSAML\Auth\Simple('default-sp');
+		$as = new \SimpleSAML_Auth_Simple('default-sp');
 		$as->requireAuth();
 		$attributes = $as->getAttributes();
 		if(!$this->hasSiteEditorAttribute($attributes)) {
@@ -118,7 +118,7 @@ class JWTController extends Controller
 	public function resetSSOToken()
 	{
 		require_once config('sso.simplesaml_sp_path') . '/lib/_autoload.php';
-		$as = new \SimpleSAML\Auth\Simple('default-sp');
+		$as = new \SimpleSAML_Auth_Simple('default-sp');
 		if($as->isAuthenticated()) {
 			$as->logout(['ReturnTo' => config('app.url')]);
 		}
