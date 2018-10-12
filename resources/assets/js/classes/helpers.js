@@ -28,12 +28,12 @@ export const inIframeContext = () => {
 
 export const isIframe = inIframeContext();
 
-export const debug = (output) => {
+export const debug = (output, type = 'info') => {
 	if(!Config.get('debug', false)) {
 		return;
 	}
 
-	console.info(output);
+	console[type](output);
 };
 
 export const uuid = (a) => {

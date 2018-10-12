@@ -132,6 +132,8 @@ export default {
 			this.$store.commit('resetCurrentSavedState');
 			this.$store.commit('setLoaded', false);
 			this.$store.commit('setPage', {});
+			this.$store.commit('clearBlockErrors');
+			this.$store.commit('updateMenuActive', 'pages');
 			// TODO: prompt to save?
 		}
 	},

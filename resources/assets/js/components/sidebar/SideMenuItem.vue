@@ -2,7 +2,7 @@
 <li v-if="id !== 'pages'" :class="id === active ? 'active' : ''">
 	<el-tooltip :content="title" placement="left" :disabled="!showTooltip">
 		<a v-if="id === 'errors' && errorCount > 0" href="#" @click.prevent="handleClick">
-			<el-badge value="!" class="item">
+			<el-badge :value="errorCount" class="item">
 				<icon :name="icon" className="menu-icon" />
 			</el-badge>
 		</a>
@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex';
+import { mapState, mapGetters, mapMutations } from 'vuex';
 import Icon from 'components/Icon';
 
 /* global setTimeout, clearTimeout */
@@ -36,30 +36,12 @@ export default {
 	},
 
 	computed: {
-		...mapState({
-			collapsed: state => state.sidebarCollapsed,
-			invalidBlocks: state => state.page.invalidBlocks,
-		}),
+		...mapGetters([
+			'getAllBlockErrorsCount'
+		]),
 
 		errorCount() {
-			return this.invalidBlocks.length;
-		}
-	},
-
-	watch: {
-		collapsed(isCollapsed) {
-			if(isCollapsed) {
-				this.timer = setTimeout(
-					() => {
-						this.showTooltip = true;
-					},
-					500
-				);
-			}
-			else {
-				this.showTooltip = false;
-				clearTimeout(this.timer);
-			}
+			return this.getAllBlockErrorsCount;
 		}
 	},
 

@@ -37,6 +37,7 @@ import Icon from 'components/Icon';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
 import requiresSitePermissions from 'mixins/requiresSitePermissionsMixin';
+import { Definition } from 'classes/helpers';
 
 export default {
 	name: 'editor',
@@ -80,6 +81,9 @@ export default {
 
 		document.addEventListener('keydown', this.onKeyDown);
 		document.addEventListener('keyup', this.onKeyUp);
+
+		this.$bus.$on('block:validate', this.validate);
+		this.$bus.$on('block:validateAll', this.validateAll);
 	},
 
 	destroyed() {
@@ -88,18 +92,11 @@ export default {
 
 		document.removeEventListener('keydown', this.onKeyDown);
 		document.removeEventListener('keyup', this.onKeyUp);
+
+		this.$bus.$off('block:validate', this.validate);
+		this.$bus.$off('block:validateAll', this.validateAll);
 	},
 
-	methods: {
-
-		showLoader() {
-			this.loader = Loading.service({
-				target: this.$refs.editor,
-				text: 'Loading preview...',
-				customClass: 'loading-overlay'
-			});
-		},
-	},
 	computed: {
 
 		...mapState([
@@ -112,7 +109,9 @@ export default {
 		}),
 
 		...mapGetters([
-			'canUser'
+			'canUser',
+			'currentBlock',
+			'currentDefinition'
 		]),
 
 		...mapGetters('auth', [
@@ -146,6 +145,67 @@ export default {
 			else {
 				this.showLoader();
 			}
+		}
+	},
+
+	methods: {
+
+		showLoader() {
+			this.loader = Loading.service({
+				target: this.$refs.editor,
+				text: 'Loading preview...',
+				customClass: 'loading-overlay'
+			});
+		},
+
+		// TODO: turn this into an action
+		validate: _.debounce(
+			function(blockInfo) {
+				const
+					block = blockInfo ?
+						this.$store.getters.getBlock(
+							blockInfo.regionName,
+							blockInfo.sectionIndex,
+							blockInfo.blockIndex
+						) :
+						this.currentBlock,
+					definition = blockInfo ?
+						{
+							name: block.definition_name,
+							version: block.definition_version
+						} :
+						this.currentDefinition;
+
+				if(!block) {
+					return;
+				}
+
+				const validator = Definition.getValidator(definition);
+
+				if(validator) {
+					this.$store.commit('resetFieldErrors', {
+						blockId: `${block.id}`
+					});
+
+					validator.validate(block.fields, (errors, fields) => {
+						if(errors) {
+							errors.forEach(({ field, message }) => {
+								this.$store.commit('addFieldError', {
+									blockId: `${block.id}`,
+									fieldName: field,
+									errors: [message]
+								});
+							});
+						}
+					});
+				}
+			},
+			100,
+			{ trailing: true }
+		),
+
+		validateAll() {
+			this.$store.dispatch('initialiseBlocksAndValidate', this.$store.state.page.pageData.blocks);
 		}
 	}
 };

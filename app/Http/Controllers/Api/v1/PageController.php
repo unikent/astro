@@ -41,6 +41,14 @@ class PageController extends ApiController
 		$host = $request->get('host');
 		$include = $request->get('include');
 		$version = $request->get('version', Page::STATE_DRAFT);
+		// admins and 'viewers' can view every page anyway, so
+		// no need for additional db queries to determine the site
+		// when authorizing
+		if(!$request->user()->isAdmin() && !$request->user()->isViewer()) {
+			$page = Page::findByHostAndPath($host, $path, $version);
+			$site = $page ? $page->site : null;
+			$this->authorize('view', $site);
+		}
 		return $this->resolveRoute($host, $path, $version, $include);
 	}
 

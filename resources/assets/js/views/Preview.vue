@@ -1,6 +1,6 @@
 <template>
 <div v-if="!pageHasLayoutErrors">
-	<div id="b-wrapper" ref="wrapper" :style="wrapperStyles">
+	<div id="b-wrapper" :style="wrapperStyles">
 		<component :is="layout" />
 		<div
 			class="block-overlay block-overlay--selected" :class="{
@@ -10,9 +10,9 @@
 		></div>
 		<div
 			class="block-overlay" :class="{
-				'block-overlay--hidden': overlayHidden
+				'block-overlay--hidden': hoverOverlayHidden
 			}"
-			:style="blockOverlayStyles"
+			:style="hoverOverlayStyles"
 		>
 
 			<div class="block-overlay__buttons" v-if="sectionConstraints">
@@ -108,15 +108,14 @@ import imagesLoaded from 'imagesloaded';
 
 import Icon from 'components/Icon';
 import ResizeShim from 'components/ResizeShim';
-import { win, Definition } from 'classes/helpers';
+import { debug, win, Definition } from 'classes/helpers';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
 import { layouts } from 'helpers/themeExports';
 import { allowedOperations } from 'classes/SectionConstraints';
 import { disableLinks, findParent } from 'helpers/dom';
 
-/* global document, console */
-/* eslint-disable no-console */
+/* global document */
 
 export default {
 	name: 'preview-wrapper',
@@ -128,10 +127,10 @@ export default {
 
 	data() {
 		return {
-			overlayStyles: {},
 			wrapperStyles: {},
-			overlayHidden: true,
-			blockOverlayStyles: {},
+			overlayStyles: {},
+			hoverOverlayHidden: true,
+			hoverOverlayStyles: {},
 			selectedOverlayHidden: true,
 			selectedOverlayStyles: {},
 			layoutDefinition: null,
@@ -151,7 +150,6 @@ export default {
 			currentLayout: state => state.page.currentLayout,
 			currentRegion: state => state.contenteditor.currentRegionName,
 			layoutVersion: state => state.page.currentLayoutVersion,
-			blockMeta: state => state.page.blockMeta.blocks[state.page.currentRegion],
 			siteLayoutDefinitions: state => state.site.layouts,
 			siteId: state => parseInt(state.site.site),
 			layoutErrors: state => state.page.layoutErrors
@@ -171,7 +169,7 @@ export default {
 				layout = layouts[layoutName];
 
 			if(!layout) {
-				console.warn(`"${layoutName}" layout not found.`)
+				debug(`"${layoutName}" layout not found.`, 'warn')
 			}
 
 			return layout || null;
@@ -248,12 +246,25 @@ export default {
 	},
 
 	mounted() {
-		this.wrapper = this.$refs.wrapper;
-		this.moveEl = this.$refs.move;
-		this.initEvents();
+		document.addEventListener('keydown', this.onKeyDown);
+		document.addEventListener('keyup', this.onKeyUp);
+		document.addEventListener('click', disableLinks);
+		document.addEventListener('mousedown', this.mouseDown);
+		document.addEventListener('mouseup', this.mouseUp);
+		win.addEventListener('resize', this.onResize);
+
+		this.$bus.$on('block:updateBlockOverlays', this.updateOverlays);
+
+		this.$bus.$on('block:showHoverOverlay', this.showHoverOverlay);
+		this.$bus.$on('block:hideHoverOverlay', this.hideHoverOverlay);
+
+		this.$bus.$on('block:showSelectedOverlay', this.showSelectedOverlay);
+		this.$bus.$on('block:hideSelectedOverlay', this.hideSelectedOverlay);
+
+		this.$bus.$on('error-sidebar:scroll-to-error', this.scrollToBlock);
 	},
 
-	destroyed() {
+	beforeDestroy() {
 		document.removeEventListener('keydown', this.onKeyDown);
 		document.removeEventListener('keyup', this.onKeyUp);
 		document.removeEventListener('click', disableLinks);
@@ -266,6 +277,8 @@ export default {
 
 		this.$bus.$off('block:showSelectedOverlay', this.showSelectedOverlay);
 		this.$bus.$off('block:hideSelectedOverlay', this.hideSelectedOverlay);
+
+		this.$bus.$off('error-sidebar:scroll-to-error', this.scrollToBlock);
 	},
 
 	methods: {
@@ -276,29 +289,9 @@ export default {
 		...mapMutations([
 			'reorderBlocks',
 			'deleteBlock',
-			'setScale',
 			'showBlockPicker',
-			'updateInsertIndex',
-			'updateInsertRegion',
 			'deleteBlockValidationIssue'
 		]),
-
-		initEvents() {
-			document.addEventListener('keydown', this.onKeyDown);
-			document.addEventListener('keyup', this.onKeyUp);
-			document.addEventListener('click', disableLinks);
-			document.addEventListener('mousedown', this.mouseDown);
-			document.addEventListener('mouseup', this.mouseUp);
-			win.addEventListener('resize', this.onResize);
-
-			this.$bus.$on('block:updateBlockOverlays', this.updateOverlays);
-
-			this.$bus.$on('block:showHoverOverlay', this.showHoverOverlay);
-			this.$bus.$on('block:hideHoverOverlay', this.hideHoverOverlay);
-
-			this.$bus.$on('block:showSelectedOverlay', this.showSelectedOverlay);
-			this.$bus.$on('block:hideSelectedOverlay', this.hideSelectedOverlay);
-		},
 
 		validateLayout() {
 
@@ -415,8 +408,13 @@ export default {
 				this.hoveredBlock = blockInfo;
 				this.hoveredBlockEl = this.$el.querySelector(`#block_${this.hoveredBlock.blockId}`);
 
-				// wait for images to load before displaying overlay
-				imagesLoaded(this.hoveredBlockEl, () => {
+				// we don't want the user to have to wait for any images to
+				// load before showing the overlay
+				this.positionOverlay('hover');
+
+				// wait for images to load before repositioning overlay
+				const imgs = imagesLoaded(this.hoveredBlockEl);
+				imgs.on('always', () => {
 					this.positionOverlay('hover');
 				});
 			}
@@ -426,8 +424,13 @@ export default {
 			this.selectedBlock = blockInfo;
 			this.selectedBlockEl = this.$el.querySelector(`#block_${this.selectedBlock.id}`);
 
-			// wait for images to load before displaying overlay
-			imagesLoaded(this.selectedBlockEl, () => {
+			// we don't want the user to have to wait for any images to
+			// load before showing the overlay
+			this.positionOverlay('select');
+
+			// wait for images to load before repositioning overlay
+			const imgs = imagesLoaded(this.selectedBlockEl);
+			imgs.on('always', () => {
 				this.positionOverlay('select');
 			});
 		},
@@ -447,15 +450,17 @@ export default {
 		},
 
 		hideHoverOverlay() {
-			this.overlayHidden = true;
-			this.updateStyles('blockOverlay', 'transform', 'translateY(0)');
+			this.hoverOverlayHidden = true;
+			this.updateStyles('hoverOverlay', 'transform', 'translateY(0)');
 			this.hoveredBlock = null;
+			this.hoveredBlockEl = null;
 		},
 
 		hideSelectedOverlay() {
 			this.selectedOverlayHidden = true;
 			this.updateStyles('selectedOverlay', 'transform', 'translateY(0)');
 			this.selectedBlock = null;
+			this.selectedBlockEl = null;
 		},
 
 		updateOverlays(index = null) {
@@ -487,38 +492,20 @@ export default {
 				return;
 			}
 
-			const
-				pos = blockElement.getBoundingClientRect(),
-				heightDiff = Math.round(pos.height - 30),
-				widthDiff = Math.round(pos.width - 30);
-
-			let minusTop = 0,
-				minusLeft = 0,
-				addHeight = 0,
-				addWidth = 0;
-
-			if(heightDiff < 0) {
-				addHeight = -heightDiff;
-				minusTop = addHeight / 2;
-			}
-
-			if(widthDiff < 0) {
-				addWidth = -widthDiff;
-				minusLeft = addWidth / 2;
-			}
+			const pos = blockElement.getBoundingClientRect();
 
 			if(type === 'hover') {
-				this.overlayHidden = false;
+				this.hoverOverlayHidden = false;
 			}
 			else {
 				this.selectedOverlayHidden = false;
 			}
 
-			this.updateStyles(type === 'hover' ? 'blockOverlay' : 'selectedOverlay', {
-				transform: `translateY(${(pos.top + win.scrollY - minusTop)}px)`,
-				left     : `${(pos.left + win.scrollX - minusLeft)}px`,
-				width    : `${(pos.width + addWidth)}px`,
-				height   : `${(pos.height + addHeight)}px`
+			this.updateStyles(type === 'hover' ? 'hoverOverlay' : 'selectedOverlay', {
+				transform: `translateY(${pos.top + win.scrollY}px)`,
+				left     : `${pos.left + win.scrollX}px`,
+				width    : `${pos.width}px`,
+				height   : `${pos.height}px`
 			});
 		},
 
@@ -533,7 +520,7 @@ export default {
 		},
 
 		showBlockList(offset = 0, replaceBlocks = false) {
-			const 
+			const
 				deprecatedBlocks = this.sectionDefinition.deprecatedBlocks ? this.sectionDefinition.deprecatedBlocks : [],
 				maxBlocks = this.sectionDefinition.max || this.sectionDefinition.size;
 
@@ -548,6 +535,14 @@ export default {
 					1 : (maxBlocks ? maxBlocks - this.hoveredBlockSectionLength : null),
 				replaceBlocks: replaceBlocks
 			});
+		},
+
+		scrollToBlock({ blockId }) {
+			const el = this.$el.querySelector(`#block_${blockId}`);
+
+			if(el) {
+				win.scrollTo(0, el.getBoundingClientRect().top + win.scrollY);
+			}
 		}
 	}
 };
