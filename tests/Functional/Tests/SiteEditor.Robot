@@ -2,7 +2,6 @@
 Documentation   This suite of tests checks the front office page, the team link and copy on the team section
 
 Resource  ../Resources/Common.Robot
-Resource  ../Resources/Credentials/Credentials.Robot
 Resource  ../Resources/PO/SiteListings.Robot
 Resource  ../Resources/PO/Menu.Robot
 Resource  ../Resources/PO/SiteAdministration.Robot
@@ -23,6 +22,7 @@ User can access a site’s menu manager from the site’s administration area
     Then the user should arrive on the menu manager for the site
 
 Menu items can be added via the Site Pages ‘Add to menu’ buttons
+    [Tags]  wip
     Given the user accesses the menu section of the site
     And there are no menu items
     When the user clicks on the ‘Add to menu’ button for the home page on the Site pages listing

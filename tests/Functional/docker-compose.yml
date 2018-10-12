@@ -13,3 +13,4 @@ robot:
         - "api.astro.test:${IP_ADDRESS}"
         - "media.test:${IP_ADDRESS}"
         - "beta.test:${IP_ADDRESS}"
+        - "sso.test:${IP_ADDRESS}"

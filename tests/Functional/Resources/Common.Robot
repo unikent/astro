@@ -1,7 +1,10 @@
 *** Settings ***
 Library  SeleniumLibrary
+Variables    ../config.py
 
-Resource  ../Resources/Credentials/Credentials.Robot
+*** Variables ***
+
+${username} =  ${SITE_EDITOR_USER}
 
 *** Keywords ***
 Begin web test
@@ -18,8 +21,12 @@ Set site variable
     Set Test Variable  &{site}  &{site_var}
 
 Log in
-    Insert Credentials
+    Select Frame  css=#authiframe iframe
+    Wait Until Page Contains Element  css=[name="username"]
+    Input Text  name=username  ${SITE_EDITOR_USER}
+    Input Text  name=password  ${SITE_EDITOR_PASSWORD}
     Click Button  css=[type="submit"]
+    Unselect Frame
     Wait Until Page Contains  Menu
 
 End web test
