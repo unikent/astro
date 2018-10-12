@@ -68,7 +68,7 @@ export default class Interceptors {
 	 * @return     {Promise}  A promise that is either rejected or resolved.
 	 */
 	handleResponseError(error) {
-		const status = error.response.statusText.replace(/ /g, '');
+		const status = error.response.status;
 
 		// reject the promise if a handler doesn't exist
 		if(typeof this[`handle${status}`] !== 'function') {
@@ -78,7 +78,11 @@ export default class Interceptors {
 		return this[`handle${status}`](error.response);
 	}
 
-	handleUnauthorized(response) {
+	/**
+	 * Handle a 401 Unauthorized response
+	 * @param response
+	 */
+	handle401(response) {
 		let failedToken = response.config.headers.Authorization.substr(7);
 		if(failedToken === 'null') {
 			failedToken = null;
@@ -96,7 +100,7 @@ export default class Interceptors {
 	 * @param response
 	 * @returns {Promise|null}
 	 */
-	handleForbidden(response) {
+	handle403(response) {
 
 		if(!shared.forbiddenPromise) {
 			shared.forbiddenPromise = new Promise((resolve, reject) => {
