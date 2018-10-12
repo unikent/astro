@@ -127,7 +127,12 @@ export default class Interceptors {
 		return shared.forbiddenPromise;
 	}
 
-	handleTooManyRequests(reponse) {
+	/**
+	 * Handle too many requests status code
+	 * @param reponse
+	 * @returns {Promise.<*>}
+	 */
+	handle429(reponse) {
 		if(response.headers['x-ratelimit-reset']) {
 			console.log(new Date(response.headers['x-ratelimit-reset'] * 1000));
 		}
