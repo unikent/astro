@@ -20,9 +20,9 @@ class CreateJWT extends Command
 	 * @var string
 	 */
 	protected $signature = 'astro:createjwt
-                        {lifetime : number of seconds before the tokens expire}
-                        {usernames : the comma separated list of usernames of the users to create tokens for, or "all"}
-    ';
+						{lifetime : number of seconds before the tokens expire}
+						{usernames : the comma separated list of usernames of the users to create tokens for, or "all"}
+	';
 
 	/**
 	 * The console command description.
