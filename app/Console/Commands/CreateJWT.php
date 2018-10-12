@@ -20,9 +20,9 @@ class CreateJWT extends Command
 	 * @var string
 	 */
 	protected $signature = 'astro:createjwt
-								{lifetime : number of seconds before the tokens expire}
-								{usernames : the comma separated list of usernames of the users to create tokens for, or "all"}
-								';
+						{lifetime : number of seconds before the tokens expire}
+						{usernames : the comma separated list of usernames of the users to create tokens for, or "all"}
+	';
 
 	/**
 	 * The console command description.
@@ -64,15 +64,13 @@ class CreateJWT extends Command
 		$users = $usernames == 'all'
 			? User::where('username', '!=', 'astro-www')->get() :
 			User::whereIn('username', array_map('trim', explode(',', $usernames)))->get();
-		
+
 		foreach ($users as $user) {
 			$token = $this->generateJWT($user, $lifetime);
-			$user->api_token = $token;
-			$user->save();
-			$this->info("{$user->name}\t{$user->api_token}");
+			$this->info("{$user->name}\t{$token}");
 		}
 
-		if(count($users) === 0){
+		if (count($users) === 0) {
 			$this->warn("No matching users found");
 		}
 	}
