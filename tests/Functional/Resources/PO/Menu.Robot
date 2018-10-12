@@ -4,36 +4,36 @@ Library  SeleniumLibrary
 
 *** Variables ***
 
-${SideMenu_1} =  css=body > div.editor > div.admin-wrapper > div > div > div > div.column.is-one-third > div > div.el-card__body > ul > li:nth-child(1) > button
-${SideMenu_2} =  css=body > div.editor > div.admin-wrapper > div > div > div > div.column.is-one-third > div > div.el-card__body > ul > li:nth-child(2) > button
-${SideMenu_3} =  css=body > div.editor > div.admin-wrapper > div > div > div > div.column.is-one-third > div > div.el-card__body > ul > li:nth-child(3) > button
-${SideMenu_4} =  css=body > div.editor > div.admin-wrapper > div > div > div > div.column.is-one-third > div > div.el-card__body > ul > li:nth-child(4) > button
-${SideMenu_5} =  css=body > div.editor > div.admin-wrapper > div > div > div > div.column.is-one-third > div > div.el-card__body > ul > li:nth-child(5) > button
-${SideMenu_6} =  css=body > div.editor > div.admin-wrapper > div > div > div > div.column.is-one-third > div > div.el-card__body > ul > li:nth-child(6) > button
-${SideMenu_7} =  css=body > div.editor > div.admin-wrapper > div > div > div > div.column.is-one-third > div > div.el-card__body > ul > li:nth-child(7) > button
+${SideMenu_1} =  css=#site-page-link-0 .add-to-menu-button
+${SideMenu_2} =  css=#site-page-link-1 .add-to-menu-button
+${SideMenu_3} =  css=#site-page-link-2 .add-to-menu-button
+${SideMenu_4} =  css=#site-page-link-3 .add-to-menu-button
+${SideMenu_5} =  css=#site-page-link-4 .add-to-menu-button
+${SideMenu_6} =  css=#site-page-link-5 .add-to-menu-button
+${SideMenu_7} =  css=#site-page-link-6 .add-to-menu-button
 
-${DeleteMenu_1} =  css=body > div.editor > div.admin-wrapper > div > div > div > div:nth-child(1) > div > div.el-card__body > div:nth-child(1) > div:nth-child(1) > span.menu-item__cell.u-flex-auto-left.u-flex-grow-none > button
-${Manual_AddLink} =  css=body > div.editor > div.admin-wrapper > div > div > div > div:nth-child(1) > div > div.el-card__body > div.menu-editor__footer > button
+${DeleteMenu_1} =  css=#menu-editor-menu-item-0 .delete-menu-item-button
+${Manual_AddLink} =  id=add-menu-item
 
-${SaveMenu} =  css=body > div.editor > div.admin-wrapper > div > div > div > div:nth-child(1) > div > div.el-card__header > div > div > button.el-button.el-button--primary
+${SaveMenu} =  id=save-menu
 ${SaveMenuSuccess} =  Successfully saved menu.
 ${SaveMenuValidationError} =  The menu saved, but there are some validation errors.
 
-${PublishMenu} =  css=body > div.editor > div.admin-wrapper > div > div > div > div:nth-child(1) > div > div.el-card__header > div > div > button.el-button.el-button--success
+${PublishMenu} =  id=publish-menu
 ${PublishMenuSuccess} =  Successfully published menu.
 ${PublishMenuFailure} =  Menu not published
 
-${PreviewMenu} =  css=body > div.editor > div.admin-wrapper > div > div > div > div:nth-child(1) > div > div.el-card__header > div > div > button.el-button.el-button--icon.el-button--default.is-plain
+${PreviewMenu} =  id=preview-menu
 ${CheckPreviewWindow} =  This is a preview version of the site and is for internal use only. This page can be shared with your colleagues.
 ${SelectMenuWindow} =  url=${START_URL}/site/${DEFAULT_SITE_ID}/menu
 ${NoMenuItems} =  No menu items
 
-${AccountButton} =  css=body > div.editor > div.top-bar > div.top-bar__tools > span.user-account-button.el-popover__reference
+${AccountButton} =  css=.user-account-button
 ${MenuButtonLeftHandNav} =  css=.admin-sidebar a[href$="/site/${DEFAULT_SITE_ID}/menu"]
 
-${FirstMenuItemLinkText} =  css=body > div.editor > div.admin-wrapper > div > div > div > div:nth-child(1) > div > div.el-card__body > div:nth-child(1) > div > span:nth-child(2) > div > input
-${FirstMenuItemLinkURL} =  css=body > div.editor > div.admin-wrapper > div > div > div > div:nth-child(1) > div > div.el-card__body > div:nth-child(1) > div > span:nth-child(3) > div > input
-${FirstMenuItem} =  css=body > div.editor > div.admin-wrapper > div > div > div > div:nth-child(1) > div > div.el-card__body > div:nth-child(1) > div
+${MenuItemLinkText_1} =  css=#menu-editor-menu-item-0 .link-text input
+${MenuItemLinkURL_1} =  css=#menu-editor-menu-item-0 .link-url input
+${MenuItem_1} =  id=menu-editor-menu-item-0
 
 ${PreviewFirstMenuItem} =  css=#navbar-menu > li > a
 ${NotificationClose} =  css=body > div.el-notification.right > div > div.el-notification__closeBtn.el-icon-close
@@ -47,7 +47,7 @@ The user accesses the menu section of the site
     [Documentation]   Open Site and Edit Menu
     [Tags]  Test 1
     Click Link  css=a[href$="/site/${DEFAULT_SITE_ID}/menu"]
-    Wait Until Page Contains Element  ${SideMenu_1}
+    Wait Until Page Contains Element  ${MenuButtonLeftHandNav}
 
 The user should arrive on the menu manager for the site
     #URL should change to /site/site_id/menu
@@ -156,12 +156,12 @@ The user clicks on the ‘Add to menu’ button for the home page on the Site pa
 
 The new 'Home' menu item should appear in the menu items list
     # Home in text field for link text
-    Textfield Value Should Be  ${FirstMenuItemLinkText}  ${site.home_page_name}
+    Textfield Value Should Be  ${MenuItemLinkText_1}  ${site.home_page_name}
     #Item appears on the menu listing
-    page should contain element  ${FirstMenuItem}
+    page should contain element  ${MenuItem_1}
     #The URL should be the site’s host and path
     #The URL is static and needs to be made dynamic
-    Textfield Value Should Be  ${FirstMenuItemLinkURL}  https://${site.url}/
+    Textfield Value Should Be  ${MenuItemLinkURL_1}  https://${site.url}/
 
 The home menu item should appear in the preview of the page
     Preview Menu
@@ -175,8 +175,8 @@ The user clicks on the ‘add link’ button
 Fills in the link text and url fields with valid data
     Set test variable  ${LinkName}  Test
     Set test variable  ${LinkURL}  https://www.google.co.uk
-    Input Text  ${FirstMenuItemLinkText}  ${LinkName}
-    Input Text  ${FirstMenuItemLinkURL}  ${LinkURL}
+    Input Text  ${MenuItemLinkText_1}  ${LinkName}
+    Input Text  ${MenuItemLinkURL_1}  ${LinkURL}
 
 The new manual menu item should appear in the preview of the page
     Preview Menu
