@@ -70,7 +70,8 @@ let store = new Vuex.Store({
 			active: 'pages',
 			flash: ''
 		},
-
+	},
+	
 	getters: {
 
 		/**
