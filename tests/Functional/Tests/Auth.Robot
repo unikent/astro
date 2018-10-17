@@ -1,6 +1,7 @@
 *** Settings ***
 Documentation   This suite of tests checks that authentication and authorisation works as expected
 
+Resource  ../Resources/Common.Robot
 Resource  ../Resources/Auth.Robot
 
 Test Setup  Begin Web Test
@@ -8,9 +9,9 @@ Test Teardown  End Web test
 
 
 *** Test Cases ***
-User can access a site’s menu manager from the ‘Manage Sites’ listing
-    [Tags] wip
-    Give there are two different sites the user has access to
+Site pages are loaded correctly across different sites
+    [Tags]  wip
+    Give the user creates two different sites
     When the user visits site 1 via the 'Editor' button on the manage sites screen
     And the user takes note of the list of pages in the site
     And the user clicks the 'Back' link
