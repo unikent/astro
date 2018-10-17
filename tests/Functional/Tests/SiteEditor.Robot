@@ -2,9 +2,9 @@
 Documentation   This suite of tests checks the front office page, the team link and copy on the team section
 
 Resource  ../Resources/Common.Robot
-Resource  ../Resources/PO/SiteListings.Robot
-Resource  ../Resources/PO/Menu.Robot
-Resource  ../Resources/PO/SiteAdministration.Robot
+Resource  ../Resources/SiteListings.Robot
+Resource  ../Resources/Menu.Robot
+Resource  ../Resources/SiteAdministration.Robot
 
 Test Setup  Begin Web Test
 Test Teardown  End Web test
