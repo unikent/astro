@@ -4,6 +4,7 @@ Variables    ../config.py
 
 *** Variables ***
 
+${AccountButton} =  css=.user-account-button
 ${username} =  ${SITE_EDITOR_USER}
 
 *** Keywords ***
@@ -14,6 +15,7 @@ Begin web test
     Log in
     click element  ${AccountButton}
     page should contain  Signed in as ${username}
+	click element  ${AccountButton}
     Set site variable
 
 Set site variable
