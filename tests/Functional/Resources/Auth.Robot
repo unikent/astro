@@ -21,13 +21,16 @@ the user creates two different sites
 	${site1_name} =  FakerLibrary.Company
     ${site1_host} =  FakerLibrary.Domain Name
     ${site1_path} =  FakerLibrary.Uri Path
-	
+
 	${site2_name} =  FakerLibrary.Company
     ${site2_host} =  FakerLibrary.Domain Name
     ${site2_path} =  FakerLibrary.Uri Path
 
 	Create site  ${site1_name}  1  ${site1_host}  ${site1_path}
 	Create site  ${site2_name}  2  ${site2_host}  ${site2_path}
+
+the user visits site 1 via the 'Editor' button on the manage sites screen
+
 
 Create site
 	[Arguments]  ${name}  ${template}  ${host}  ${path}
@@ -42,6 +45,7 @@ Create site
     Wait Until Page Contains            ${name}
     Wait Until Page Contains            ${host}
     Wait Until Page Contains            ${path}
+    [Return]                            ${name}  ${host}  ${path}
 
 
 Select from dropdown by number
