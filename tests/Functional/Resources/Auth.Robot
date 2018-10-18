@@ -41,6 +41,15 @@ the user uses the 'Editor' button to edit site
 	[Arguments]  ${site}
 	Click Link  css=a[href*="/site/${site.id}/page"]
 
+the user takes note of the list of pages in site 1
+	${pages}=  get list of pages
+	${site1.pages}=  ${pages}
+
+get list of pages
+	Wait Until Page Contains Element  css=.page-list
+	${pages}=  Execute Javascript  var pages = []; document.querySelectorAll('.page-list__text').forEach((item) => { pages.push(item.innerText)}); return pages
+	[Return]   ${pages}
+	
 
 Create site
 	[Arguments]  ${name}  ${template}  ${host}  ${path}
