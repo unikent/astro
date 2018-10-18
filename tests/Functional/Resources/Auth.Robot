@@ -1,6 +1,7 @@
 *** Settings ***
 Library  SeleniumLibrary
 Library  FakerLibrary
+Library  String
 
 
 *** Variables ***
@@ -26,10 +27,19 @@ the user creates two different sites
     ${site2_host} =  FakerLibrary.Domain Name
     ${site2_path} =  FakerLibrary.Uri Path
 
-	Create site  ${site1_name}  1  ${site1_host}  ${site1_path}
-	Create site  ${site2_name}  2  ${site2_host}  ${site2_path}
+	
+	&{site1_details}=  Create site  ${site1_name}  1  ${site1_host}  ${site1_path}
+	&{site2_details}=  Create site  ${site2_name}  2  ${site2_host}  ${site2_path}
+	
+	Set Test Variable  &{site1}  &{site1_details}
+	Set Test Variable  &{site2}  &{site2_details}
 
-the user visits site 1 via the 'Editor' button on the manage sites screen
+When the user visits site 1 via the 'Editor' button on the manage sites screen
+	the user uses the 'Editor' button to edit site  ${site1}	
+
+the user uses the 'Editor' button to edit site
+	[Arguments]  ${site}
+	Click Link  css=a[href*="/site/${site.id}/page"]
 
 
 Create site
@@ -45,7 +55,10 @@ Create site
     Wait Until Page Contains            ${name}
     Wait Until Page Contains            ${host}
     Wait Until Page Contains            ${path}
-    [Return]                            ${name}  ${host}  ${path}
+	${url}=  get element attribute  css=.el-table tbody tr:last-of-type a  href
+	${junk}  ${id} =  Split String From Right  ${url}  /  1
+	&{site}=  Create Dictionary  name=${name}  host=${host}  path=${path}  url=${url}  id=${id}
+    [Return]                            ${site}
 
 
 Select from dropdown by number
