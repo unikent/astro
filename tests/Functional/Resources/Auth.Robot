@@ -2,6 +2,7 @@
 Library  SeleniumLibrary
 Library  FakerLibrary
 Library  String
+Library  Collections
 
 
 *** Variables ***
@@ -13,7 +14,11 @@ ${AddSiteFormTemplate} =  id=input-site-template
 ${AddSiteFormTemplateList} =  css=.input-site-template
 ${AddSiteFormHost} =  id=input-site-host
 ${AddSiteFormPath} =  id=input-site-path
-${AddSiteFormButton}=  id=input-add-site-button
+${AddSiteFormButton} =  id=input-add-site-button
+${TopBarBackButton} =  css=.top-bar-backbutton
+${SitePicker} =  css=.site-pick
+${SitePickerList} =  css=.site-picker
+${LoadingSpinner} =  css=.el-loading-spinner
 
 
 *** Keywords ***
@@ -40,13 +45,13 @@ When the user visits site one via the 'Editor' button on the manage sites screen
 the user uses the 'Editor' button to edit site
 	[Arguments]  ${site}
 	Click Link  css=a[href*="/site/${site.id}/page"]
+	Wait Until Page Contains Element  css=.page-list
 
 the user takes note of the list of pages in site one
 	${pages}=  get list of pages
-	${site1.pages}=  ${pages}
+	Set To Dictionary  ${site1}  pages= ${pages}
 
 get list of pages
-	Wait Until Page Contains Element  css=.page-list
 	${pages}=  Execute Javascript  var pages = []; document.querySelectorAll('.page-list__text').forEach((item) => { pages.push(item.innerText)}); return pages
 	[Return]   ${pages}
 
@@ -75,4 +80,29 @@ Select from dropdown by number
 	Click Element                       ${dropdown}
     Wait Until Element Is Visible       ${dropdown_list}
     Click Element                       ${dropdown_list} ul.el-select-dropdown__list li:nth-of-type(${number})
+
+The user clicks the 'Back' link in the top bar
+	Click Element                       ${TopBarBackButton}
+
+The user goes back to the manage sites screen via the 'Back to sites' link in the sites menu
+	Click Element                       ${SitePicker}
+	Wait Until Element Is Visible       ${SitePickerList}
+	Click Link                          ${SitePickerList} li:last-of-type a
+	Wait Until Element Is Visible       ${LoadingSpinner}
+	Wait Until Element Is Not Visible   ${LoadingSpinner}
+
+The user visits site two via the 'Editor' button on the manage sites screen
+	the user uses the 'Editor' button to edit site  ${site2}
+
+The list of pages in site two should be different from the list of pages in site one
+	${pages}=  get list of pages
+	Set To Dictionary                   ${site2}  pages= ${pages}
+	Should Not Be Equal                 ${site2.pages}  ${site1.pages}
+
+The user goes directly back to the manage sites screen
+	Go To                               ${START_URL}
+	Wait Until Element Is Visible       ${LoadingSpinner}
+	Wait Until Element Is Not Visible   ${LoadingSpinner}
+
+
 

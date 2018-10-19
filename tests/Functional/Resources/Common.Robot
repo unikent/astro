@@ -13,9 +13,9 @@ Begin web test
     Open Browser  ${START_URL}  ${BROWSER}
     # Maximize Browser Window  # TODO - ???
     Log in
-    click element  ${AccountButton}
+    Click Element  ${AccountButton}
     page should contain  Signed in as ${username}
-	click element  ${AccountButton}
+	Click Element  ${AccountButton}
     Set site variable
 
 Set site variable
