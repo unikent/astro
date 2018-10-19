@@ -1,11 +1,7 @@
 *** Settings ***
 Library  SeleniumLibrary
-Variables    ../config.py
 
-*** Variables ***
-
-${AccountButton} =  css=.user-account-button
-${username} =  ${SITE_EDITOR_USER}
+Resource  Variables.Robot
 
 *** Keywords ***
 Begin web test
@@ -31,12 +27,48 @@ Log in
     Unselect Frame
     Wait Until Page Contains  Menu
 
+The user is in the site administration area
+    Click Link  css=a[href$="/site/${DEFAULT_SITE_ID}"]
+    Wait Until Page Contains  ${site.name}
+    Wait Until Page Contains  Dashboard
+
 End web test
     Capture Page Screenshot
     Close All Browsers
 
-Insert testing data
-    log  I am setting up the test data
+The user uses the 'Editor' button to edit site
+    [Arguments]  ${site}
+    Click Link  css=a[href*="/site/${site.id}/page"]
+    Wait Until Page Contains Element  css=.page-list
 
-Cleanup testing data
-    log  I am cleaning up the test data
+get list of pages
+    ${pages}=  Execute Javascript  var pages = []; document.querySelectorAll('.page-list__text').forEach((item) => { pages.push(item.innerText)}); return pages
+    [Return]   ${pages}
+
+Create site
+    [Arguments]  ${name}  ${template}  ${host}  ${path}
+    Click Element                       ${AddSiteButton}
+    Wait Until Element is visible       ${AddSiteDialogue}
+    Input Text                          ${AddSiteFormName}  ${name}
+    Select from dropdown by number      ${AddSiteFormTemplate}  ${AddSiteFormTemplateList}  ${template}
+    Input Text                          ${AddSiteFormHost}  ${host}
+    Input Text                          ${AddSiteFormPath}  ${path}
+    Click Element                       ${AddSiteFormButton}
+    Wait Until Element Is Not Visible   ${AddSiteDialogue}
+    Wait Until Page Contains            ${name}
+    Wait Until Page Contains            ${host}
+    Wait Until Page Contains            ${path}
+    ${url}=  get element attribute  css=.el-table tbody tr:last-of-type a  href
+    ${junk}  ${id} =  Split String From Right  ${url}  /  1
+    &{site}=  Create Dictionary  name=${name}  host=${host}  path=${path}  url=${url}  id=${id}
+    [Return]                            ${site}
+
+The user clicks the 'Back' link in the top bar
+    Click Element                       ${TopBarBackButton}
+
+The user goes back to the manage sites screen via the 'Back to sites' link in the sites menu
+    Click Element                       ${SitePicker}
+    Wait Until Element Is Visible       ${SitePickerList}
+    Click Link                          ${SitePickerList} li:last-of-type a
+    Wait Until Element Is Visible       ${LoadingSpinner}
+    Wait Until Element Is Not Visible   ${LoadingSpinner}
