@@ -1,8 +1,7 @@
 *** Settings ***
-Documentation   This suite of tests checks the front office page, the team link and copy on the team section
+Documentation   This suite of tests checks that the menu functtions as it should
 
 Resource  ../Resources/Common.Robot
-Resource  ../Resources/SiteListings.Robot
 Resource  ../Resources/Menu.Robot
 Resource  ../Resources/SiteAdministration.Robot
 
