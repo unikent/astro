@@ -27,21 +27,21 @@ the user creates two different sites
     ${site2_host} =  FakerLibrary.Domain Name
     ${site2_path} =  FakerLibrary.Uri Path
 
-	
+
 	&{site1_details}=  Create site  ${site1_name}  1  ${site1_host}  ${site1_path}
 	&{site2_details}=  Create site  ${site2_name}  2  ${site2_host}  ${site2_path}
-	
+
 	Set Test Variable  &{site1}  &{site1_details}
 	Set Test Variable  &{site2}  &{site2_details}
 
-When the user visits site 1 via the 'Editor' button on the manage sites screen
-	the user uses the 'Editor' button to edit site  ${site1}	
+When the user visits site one via the 'Editor' button on the manage sites screen
+	the user uses the 'Editor' button to edit site  ${site1}
 
 the user uses the 'Editor' button to edit site
 	[Arguments]  ${site}
 	Click Link  css=a[href*="/site/${site.id}/page"]
 
-the user takes note of the list of pages in site 1
+the user takes note of the list of pages in site one
 	${pages}=  get list of pages
 	${site1.pages}=  ${pages}
 
@@ -49,7 +49,7 @@ get list of pages
 	Wait Until Page Contains Element  css=.page-list
 	${pages}=  Execute Javascript  var pages = []; document.querySelectorAll('.page-list__text').forEach((item) => { pages.push(item.innerText)}); return pages
 	[Return]   ${pages}
-	
+
 
 Create site
 	[Arguments]  ${name}  ${template}  ${host}  ${path}
