@@ -35,7 +35,7 @@ class AddPageTest extends TestCase
 	 */
     public function usersWhoCanAddPagesProvider()
 	{
-		return $this->packArrayForProvider(['admin', 'owner', 'editor']);
+		return $this->packArrayForProvider(['admin']);
 	}
 
 	/**
@@ -44,7 +44,7 @@ class AddPageTest extends TestCase
 	 */
 	public function usersWhoCannotAddPagesProvider()
 	{
-		return $this->packArrayForProvider(['contributor', 'randomer']);
+		return $this->packArrayForProvider(['contributor', 'randomer', 'owner', 'editor', 'viewer']);
 	}
 
 	/**

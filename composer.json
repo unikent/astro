@@ -36,11 +36,11 @@
 		"laravel/tinker": "~1.0",
 		"rtconner/laravel-tagging": "^2.2",
 		"spatie/laravel-fractal": "^3.5",
-		"swaggest/json-schema": "^0.12.0",
+		"swaggest/json-schema": "^0.12.4",
+		"unikent/astro-kent-theme": "dev-develop",
 		"unikent/astro-renderer": "dev-develop",
-		"unikent/kentauth": "dev-laravel/5.3",
 		"unikent/kent-profiles": "dev-master",
-		"unikent/astro-kent-theme": "dev-develop"
+		"unikent/kentauth": "dev-laravel/5.3"
 	},
 	"require-dev": {
 		"fzaninotto/faker": "~1.4",

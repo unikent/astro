@@ -77,7 +77,7 @@ class CreateSiteTest extends TestCase
 	 */
 	public function createSite_withInvalidData_failsWith403ForUnauthorizedUsers($payload, $user)
 	{
-		$response = $this->testCreateSiteWithInvalidData($payload, $user, 403);
+		$response = $this->doTestCreateSiteWithInvalidData($payload, $user, 403);
 		$this->assertValidErrorResponseBody($response->getContent());
 	}
 
@@ -88,7 +88,7 @@ class CreateSiteTest extends TestCase
 	 */
 	public function createSite_withInvalidData_failsWith422ForAuthorizedUsers($payload, $user)
 	{
-		$response = $this->testCreateSiteWithInvalidData($payload, $user, 422);
+		$response = $this->doTestCreateSiteWithInvalidData($payload, $user, 422);
 		$this->assertValidErrorResponseBody($response->getContent(), true);
 	}
 
@@ -124,7 +124,7 @@ class CreateSiteTest extends TestCase
 	 * @param $expected_status
 	 * @return \Illuminate\Foundation\Testing\TestResponse
 	 */
-	private function testCreateSiteWithInvalidData($payload, $user, $expected_status)
+	private function doTestCreateSiteWithInvalidData($payload, $user, $expected_status)
 	{
 		$response = $this->createSiteAndTestStatusCode($this->$user, $payload, $expected_status);
 		$this->assertFalse($this->siteExistsWithHostAndPath($payload['host'], $payload['path']));
