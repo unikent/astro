@@ -1,13 +1,18 @@
 <template>
 <div v-if="!pageHasLayoutErrors">
-	<div id="b-wrapper" ref="wrapper" :style="wrapperStyles">
+	<div id="b-wrapper" :style="wrapperStyles">
 		<component :is="layout" />
 		<div
-			class="block-overlay" :class="{
-				'hide-drag': hideBlockOverlayControls,
-				'block-overlay--hidden': overlayHidden
+			class="block-overlay block-overlay--selected" :class="{
+				'block-overlay--hidden': selectedOverlayHidden
 			}"
-			:style="blockOverlayStyles"
+			:style="selectedOverlayStyles"
+		></div>
+		<div
+			class="block-overlay" :class="{
+				'block-overlay--hidden': hoverOverlayHidden
+			}"
+			:style="hoverOverlayStyles"
 		>
 
 			<div class="block-overlay__buttons" v-if="sectionConstraints">
@@ -16,6 +21,7 @@
 					<el-button
 						class="move-up"
 						@click="showBlockList(0, true)"
+						size="mini"
 					>
 						Swap block
 					</el-button>
@@ -24,18 +30,20 @@
 					<el-button-group v-if="canMove">
 						<el-button
 							class="move-up"
-							:disabled="currentBlockIsFirst"
+							:disabled="hoveredBlockIsFirst"
 							@click="moveBlock(-1)"
+							size="mini"
 						>
-							<icon name="angle-up" width="15" height="15" viewBox="0 0 15 15" /> Move up
+							<i class="el-icon-arrow-up el-icon--left"></i>Move up
 						</el-button>
 
 						<el-button
 							class="move-down"
-							:disabled="currentBlockIsLast"
+							:disabled="hoveredBlockIsLast"
 							@click="moveBlock(1)"
+							size="mini"
 						>
-							Move down <icon name="angle-down" width="15" height="15" viewBox="0 0 15 15" />
+							Move down<i class="el-icon-arrow-down el-icon--right"></i>
 						</el-button>
 					</el-button-group>
 
@@ -43,9 +51,9 @@
 						v-if="sectionConstraints && sectionConstraints.canRemoveBlocks"
 						class="block-overlay__delete-button"
 						@command="removeBlock"
+						size="mini"
 					>
-						<el-button :plain="true" type="danger">
-							<icon name="delete" width="15" height="15" viewBox="0 0 15 15" /> Delete
+						<el-button :plain="true" type="danger" size="mini">Delete<i class="el-icon-caret-bottom el-icon--right"></i>
 						</el-button>
 						<el-dropdown-menu slot="dropdown">
 							<el-dropdown-item command="delete">Confirm</el-dropdown-item>
@@ -57,24 +65,23 @@
 
 			<div
 				class="add-before"
-				:class="{ 'add-before--first' : currentBlockIsFirst }"
+				:class="{ 'add-before--first' : hoveredBlockIsFirst }"
 				@click="showBlockList()"
 				v-if="sectionConstraints && sectionConstraints.canAddBlocks"
+				@mouseleave="possiblyHideHoverOverlay"
 			>
-				<icon name="plus" width="15" height="15" viewBox="0 0 15 15" />
+				<icon name="plus" :width="16" :height="16" viewBox="0 0 16 16" />
 			</div>
 			<div
 				class="add-after"
-				:class="{ 'add-after--last' : currentBlockIsLast }"
+				:class="{ 'add-after--last' : hoveredBlockIsLast }"
 				@click="showBlockList(1)"
 				v-if="sectionConstraints && sectionConstraints.canAddBlocks"
+				@mouseleave="possiblyHideHoverOverlay"
 			>
-				<icon name="plus" width="15" height="15" viewBox="0 0 15 15" />
+				<icon name="plus" :width="16" :height="16" viewBox="0 0 16 16" />
 			</div>
 		</div>
-	</div>
-	<div class="b-handle" :style="handleStyles">
-		<icon name="move" width="20" height="20" />
 	</div>
 	<div id="b-overlay" :style="overlayStyles"></div>
 	<resize-shim :onResize="onResize" />
@@ -101,15 +108,14 @@ import imagesLoaded from 'imagesloaded';
 
 import Icon from 'components/Icon';
 import ResizeShim from 'components/ResizeShim';
-import { win, findParent } from 'classes/helpers';
+import { debug, win, Definition } from 'classes/helpers';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
-import { layouts } from 'cms-prototype-blocks/layouts';
+import { layouts } from 'helpers/themeExports';
 import { allowedOperations } from 'classes/SectionConstraints';
-import { Definition } from 'classes/helpers';
+import { disableLinks, findParent } from 'helpers/dom';
 
-/* global document, window, console */
-/* eslint-disable no-console */
+/* global document */
 
 export default {
 	name: 'preview-wrapper',
@@ -121,22 +127,15 @@ export default {
 
 	data() {
 		return {
-			handleStyles: {
-				fill: '#fff'
-			},
-			blockOverlayStyles: {},
-			hideBlockOverlayControls: false,
-			overlayStyles: {},
 			wrapperStyles: {},
-			overlayHidden: true,
-			/**
-			 * @var {BlockComponent} - The Block.vue component which is currently hovered
-			 */
-			current: null,
-			sectionDefinition: null,
-			sectionConstraints: null,
-			currentSectionBlocks: null,
-			layoutDefinition: null
+			overlayStyles: {},
+			hoverOverlayHidden: true,
+			hoverOverlayStyles: {},
+			selectedOverlayHidden: true,
+			selectedOverlayStyles: {},
+			layoutDefinition: null,
+			selectedBlock: null,
+			hoveredBlock: null
 		};
 	},
 
@@ -151,16 +150,10 @@ export default {
 			currentLayout: state => state.page.currentLayout,
 			currentRegion: state => state.contenteditor.currentRegionName,
 			layoutVersion: state => state.page.currentLayoutVersion,
-			blockMeta: state => state.page.blockMeta.blocks[state.page.currentRegion],
 			siteLayoutDefinitions: state => state.site.layouts,
 			siteId: state => parseInt(state.site.site),
 			layoutErrors: state => state.page.layoutErrors
 		}),
-
-		...mapGetters([
-			'getBlocks',
-			'blocks'
-		]),
 
 		...mapMutations([
 			'setLayoutErrors'
@@ -176,22 +169,55 @@ export default {
 				layout = layouts[layoutName];
 
 			if(!layout) {
-				console.warn(`"${layoutName}" layout not found.`)
+				debug(`"${layoutName}" layout not found.`, 'warn')
 			}
 
 			return layout || null;
 		},
 
-		currentBlockIsFirst() {
-			return this.current && this.current.index === 0;
+		hoveredBlockSection() {
+			return (
+				this.hoveredBlock ?
+					this.$store.getters.getSection(
+						this.hoveredBlock.regionName,
+						this.hoveredBlock.sectionIndex
+					) :
+					null
+			);
 		},
 
-		currentBlockIsLast() {
-			return this.current && this.current.index === this.blocks.length - 1;
+		hoveredBlockSectionLength() {
+			return this.hoveredBlockSection ? this.hoveredBlockSection.blocks.length : 0;
+		},
+
+		hoveredBlockIsFirst() {
+			return this.hoveredBlock && this.hoveredBlock.blockIndex === 0;
+		},
+
+		hoveredBlockIsLast() {
+			return this.hoveredBlock && this.hoveredBlock.blockIndex === this.hoveredBlockSectionLength - 1;
+		},
+
+		sectionDefinition() {
+			return (
+				this.hoveredBlock ?
+					Definition.getRegionSectionDefinition(
+						this.hoveredBlock.regionName,
+						this.hoveredBlock.sectionIndex
+					) : null
+			);
+		},
+
+		sectionConstraints() {
+			return (
+				this.hoveredBlockSection ?
+					allowedOperations(this.hoveredBlockSection.blocks, this.sectionDefinition) :
+					null
+			);
 		},
 
 		canMove() {
-			return this.currentSectionBlocks.length > 1;
+			return this.hoveredBlockSectionLength > 1;
 		},
 
 		pageHasLayoutErrors() {
@@ -200,41 +226,59 @@ export default {
 	},
 
 	created() {
-
+		// TODO: catch errors
 		this.fetchPage(this.$route.params.page_id)
-			.then(() => {
-
-				this.validateLayout();
-
-			});
+			.then(() => this.validateLayout());
 
 		this.onKeyDown = onKeyDown(undoStackInstance);
 		this.onKeyUp = onKeyUp(undoStackInstance);
 
-		this.cancelClicks = (e) => {
-			if(!e.ctrlKey && findParent('a', e.target, false)) {
-				e.preventDefault();
-			}
-		};
+		this.windowWidth = win.innerWidth;
 
 		this.onResize = _.throttle(() => {
-			if(this.current) {
-				this.positionOverlay(this.current);
+			if(this.windowWidth !== win.innerWidth) {
+				this.updateOverlays(
+					this.hoveredBlock ? this.hoveredBlock.blockIndex : null
+				);
+				this.windowWidth = win.innerWidth;
 			}
 		}, 16, { trailing: true });
 	},
 
-	destroyed() {
-		document.removeEventListener('keydown', this.onKeyDown);
-		document.removeEventListener('keyup', this.onKeyUp);
-		document.removeEventListener('click', this.cancelClicks);
-		win.removeEventListener('resize', this.onResize);
+	mounted() {
+		document.addEventListener('keydown', this.onKeyDown);
+		document.addEventListener('keyup', this.onKeyUp);
+		document.addEventListener('click', disableLinks);
+		document.addEventListener('mousedown', this.mouseDown);
+		document.addEventListener('mouseup', this.mouseUp);
+		win.addEventListener('resize', this.onResize);
+
+		this.$bus.$on('block:updateBlockOverlays', this.updateOverlays);
+
+		this.$bus.$on('block:showHoverOverlay', this.showHoverOverlay);
+		this.$bus.$on('block:hideHoverOverlay', this.hideHoverOverlay);
+
+		this.$bus.$on('block:showSelectedOverlay', this.showSelectedOverlay);
+		this.$bus.$on('block:hideSelectedOverlay', this.hideSelectedOverlay);
+
+		this.$bus.$on('error-sidebar:scroll-to-error', this.scrollToBlock);
 	},
 
-	mounted() {
-		this.wrapper = this.$refs.wrapper;
-		this.moveEl = this.$refs.move;
-		this.initEvents();
+	beforeDestroy() {
+		document.removeEventListener('keydown', this.onKeyDown);
+		document.removeEventListener('keyup', this.onKeyUp);
+		document.removeEventListener('click', disableLinks);
+		win.removeEventListener('resize', this.onResize);
+
+		this.$bus.$off('block:updateBlockOverlays', this.updateOverlays);
+
+		this.$bus.$on('block:showHoverOverlay', this.showHoverOverlay);
+		this.$bus.$off('block:hideHoverOverlay', this.hideHoverOverlay);
+
+		this.$bus.$off('block:showSelectedOverlay', this.showSelectedOverlay);
+		this.$bus.$off('block:hideSelectedOverlay', this.hideSelectedOverlay);
+
+		this.$bus.$off('error-sidebar:scroll-to-error', this.scrollToBlock);
 	},
 
 	methods: {
@@ -245,14 +289,11 @@ export default {
 		...mapMutations([
 			'reorderBlocks',
 			'deleteBlock',
-			'setScale',
 			'showBlockPicker',
-			'updateInsertIndex',
-			'updateInsertRegion',
 			'deleteBlockValidationIssue'
 		]),
 
-		validateLayout(){
+		validateLayout() {
 
 			let layoutName = `${this.currentLayout}-v${this.layoutVersion}`;
 			let layoutErrors = [];
@@ -329,146 +370,143 @@ export default {
 			this.$store.commit('setLayoutErrors', layoutErrors);
 		},
 
-		initEvents() {
-			document.addEventListener('keydown', this.onKeyDown);
-			document.addEventListener('keyup', this.onKeyUp);
-			document.addEventListener('click', this.cancelClicks);
-			document.addEventListener('mousedown', this.mouseDown);
-			document.addEventListener('mouseup', this.mouseUp);
-			win.addEventListener('resize', this.onResize);
-
-			this.$bus.$on('block:showOverlay', this.showOverlay);
-			this.$bus.$on('block:hideOverlay', this.hideOverlay);
-			this.$bus.$on('block:updateOverlay', this.updateOverlay)
-		},
-
-		removeDialog(done) {
-			this
-				.$confirm('Are you sure you want to remove this block?')
-				.then(() => {
-					done();
-				})
-				.catch(() => {});
-		},
-
 		removeBlock() {
 			// remove block but before we do so remove any validation issues it owns
-			const { index, region, section } = this.current;
-			const blockToBeDeleted = this.$store.getters.getBlock(region, section, index);
-			this.deleteBlockValidationIssue(blockToBeDeleted.id);
-			this.deleteBlock({ index, region, section });
-			this.hideOverlay();
-			this.current = null;
-			this.$message({
-				message: 'Block removed',
-				type: 'success'
-			});
+			const {
+				blockIndex: index,
+				regionName: region,
+				sectionIndex: section,
+				blockId
+			} = this.hoveredBlock;
+
+			this.deleteBlockValidationIssue(blockId);
+			this.deleteBlock({region, section, index });
+
+			this.hideHoverOverlay();
+
+			if(this.selectedBlock && this.selectedBlock.id === blockId) {
+				this.hideSelectedOverlay();
+			}
 		},
 
 		moveBlock(num) {
-			const { index, region, section } = this.current;
+			const { blockIndex, regionName, sectionIndex } = this.hoveredBlock;
+
 			this.reorderBlocks({
-				from: index,
-				to: index + num,
-				region,
-				section
+				from: blockIndex,
+				to: blockIndex + num,
+				region: regionName,
+				section: sectionIndex
 			});
 		},
 
-		handlerMove(e) {
-			this.updateStyles(
-				'handle',
-				'transform',
-				`translateY(${e.pageY - 22}px)`
-			);
-		},
+		showHoverOverlay(blockInfo) {
+			if(
+				this.hoveredBlock === null ||
+				blockInfo.blockId !== this.hoveredBlock.blockId
+			) {
+				this.hoveredBlock = blockInfo;
+				this.hoveredBlockEl = this.$el.querySelector(`#block_${this.hoveredBlock.blockId}`);
 
-		showOverlay(block) {
-			if(block !== this.current) {
-				// wait for images to load before displaying overlay
-				imagesLoaded(block.$el, () => {
-					this.positionOverlay(block, true);
+				// we don't want the user to have to wait for any images to
+				// load before showing the overlay
+				this.positionOverlay('hover');
+
+				// wait for images to load before repositioning overlay
+				const imgs = imagesLoaded(this.hoveredBlockEl);
+				imgs.on('always', () => {
+					this.positionOverlay('hover');
 				});
 			}
 		},
 
-		hideOverlay(block) {
-			if(block !== this.current) {
-				this.overlayHidden = true;
-				this.updateStyles('blockOverlay', 'transform', 'translateY(0)');
+		showSelectedOverlay(blockInfo) {
+			this.selectedBlock = blockInfo;
+			this.selectedBlockEl = this.$el.querySelector(`#block_${this.selectedBlock.id}`);
+
+			// we don't want the user to have to wait for any images to
+			// load before showing the overlay
+			this.positionOverlay('select');
+
+			// wait for images to load before repositioning overlay
+			const imgs = imagesLoaded(this.selectedBlockEl);
+			imgs.on('always', () => {
+				this.positionOverlay('select');
+			});
+		},
+
+		possiblyHideHoverOverlay(e) {
+			// only hide overlay if the related target isn't a block
+			if(
+				e.relatedTarget &&
+				!findParent({
+					el: e.relatedTarget,
+					match: 'class',
+					search: 'b-block-container'
+				})
+			) {
+				this.hideHoverOverlay();
 			}
 		},
 
-		updateOverlay(index = null) {
-			// block is hovered and wasn't just deleted
-			if(this.current && this.current.index !== index) {
-				this.positionOverlay(this.current);
-			}
-			else if(this.current && this.current.index === index) {
-				this.hideOverlay();
-				this.current = null;
-			}
-			else {
-				this.hideOverlay();
-			}
+		hideHoverOverlay() {
+			this.hoverOverlayHidden = true;
+			this.updateStyles('hoverOverlay', 'transform', 'translateY(0)');
+			this.hoveredBlock = null;
+			this.hoveredBlockEl = null;
 		},
 
-		repositionOverlay(data) {
-			let
-				offset = 0,
-				to = data.to > data.from ? data.to : data.to - 1;
+		hideSelectedOverlay() {
+			this.selectedOverlayHidden = true;
+			this.updateStyles('selectedOverlay', 'transform', 'translateY(0)');
+			this.selectedBlock = null;
+			this.selectedBlockEl = null;
+		},
 
-			for(let i = 0; i <= to; i++) {
-				if(i !== data.from) {
-					offset += this.blockMeta[i].size;
+		updateOverlays(index = null) {
+			if(this.hoveredBlock) {
+				if(index) {
+					this.hoveredBlock = {
+						...this.hoveredBlock,
+						blockIndex: index
+					};
+					this.positionOverlay('hover');
+				}
+				else {
+					this.hideHoverOverlay();
 				}
 			}
 
-			this.overlayHidden = false;
-			this.updateStyles('blockOverlay', 'transform', `translateY(${offset}px)`);
+			if(this.selectedBlock) {
+				this.positionOverlay('select');
+			}
+			else {
+				this.hideSelectedOverlay();
+			}
 		},
 
-		positionOverlay(block, setCurrent) {
-			var
-				pos = block.$el.getBoundingClientRect(),
-				heightDiff = Math.round(pos.height - 30),
-				widthDiff = Math.round(pos.width - 30),
-				minusTop = 0,
-				minusLeft = 0,
-				addHeight = 0,
-				addWidth = 0;
+		positionOverlay(type = 'hover') {
+			const blockElement = this[`${type}edBlockEl`];
 
-			if(heightDiff < 0) {
-				addHeight = -heightDiff;
-				minusTop = addHeight / 2;
+			if(!blockElement) {
+				return;
 			}
 
-			if(widthDiff < 0) {
-				addWidth = -widthDiff;
-				minusLeft = addWidth / 2;
+			const pos = blockElement.getBoundingClientRect();
+
+			if(type === 'hover') {
+				this.hoverOverlayHidden = false;
+			}
+			else {
+				this.selectedOverlayHidden = false;
 			}
 
-			this.overlayHidden = false;
-
-			this.updateStyles('blockOverlay', {
-				transform: `translateY(${(pos.top + window.scrollY - minusTop)}px)`,
-				left     : `${(pos.left + window.scrollX - minusLeft)}px`,
-				width    : `${(pos.width + addWidth)}px`,
-				height   : `${(pos.height + addHeight)}px`
+			this.updateStyles(type === 'hover' ? 'hoverOverlay' : 'selectedOverlay', {
+				transform: `translateY(${pos.top + win.scrollY}px)`,
+				left     : `${pos.left + win.scrollX}px`,
+				width    : `${pos.width}px`,
+				height   : `${pos.height}px`
 			});
-
-
-			if(setCurrent) {
-				this.current = block;
-			}
-
-			if(this.current) {
-				const section = this.$store.getters.getSection(this.current.region, this.current.section);
-				this.sectionDefinition = section ? Definition.getRegionSectionDefinition(this.current.region, this.current.section) : null
-				this.currentSectionBlocks = section.blocks;
-				this.sectionConstraints = section ? allowedOperations(section.blocks, this.sectionDefinition) : null;
-			}
-
 		},
 
 		updateStyles(dataName, prop, value) {
@@ -482,19 +520,29 @@ export default {
 		},
 
 		showBlockList(offset = 0, replaceBlocks = false) {
-			const maxBlocks = this.sectionDefinition.max || this.sectionDefinition.size;
+			const
+				deprecatedBlocks = this.sectionDefinition.deprecatedBlocks ? this.sectionDefinition.deprecatedBlocks : [],
+				maxBlocks = this.sectionDefinition.max || this.sectionDefinition.size;
 
 			this.showBlockPicker({
-				insertIndex: this.current.index + offset,
-				sectionIndex: this.current.section,
-				regionName: this.current.region,
+				insertIndex: this.hoveredBlock.blockIndex + offset,
+				sectionIndex: this.hoveredBlock.sectionIndex,
+				regionName: this.hoveredBlock.regionName,
 				blocks: this.sectionConstraints ?
 					this.sectionConstraints.allowedBlocks : [],
+				deprecatedBlocks: deprecatedBlocks,
 				maxSelectableBlocks: this.sectionConstraints.canSwapBlocks ?
-					1 : (maxBlocks ? maxBlocks - this.blocks.length : null),
+					1 : (maxBlocks ? maxBlocks - this.hoveredBlockSectionLength : null),
 				replaceBlocks: replaceBlocks
 			});
+		},
 
+		scrollToBlock({ blockId }) {
+			const el = this.$el.querySelector(`#block_${blockId}`);
+
+			if(el) {
+				win.scrollTo(0, el.getBoundingClientRect().top + win.scrollY);
+			}
 		}
 	}
 };

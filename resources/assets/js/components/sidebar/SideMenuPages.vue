@@ -36,29 +36,6 @@ export default {
 		Icon
 	},
 
-	computed: {
-		...mapState({
-			collapsed: state => state.sidebarCollapsed
-		})
-	},
-
-	watch: {
-		collapsed(isCollapsed) {
-			if(isCollapsed) {
-				this.timer = setTimeout(
-					() => {
-						this.showTooltip = true;
-					},
-					500
-				);
-			}
-			else {
-				this.showTooltip = false;
-				clearTimeout(this.timer);
-			}
-		}
-	},
-
 	data() {
 		return {
 			showTooltip: false

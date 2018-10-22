@@ -11,19 +11,21 @@ import { debug } from 'classes/helpers';
 	 * @property {Array}	roles	list of role slugs which have this permission ie. ['site.ower','site.editor' etc etc]
 	 * @property {string}	slug	slug of the name of the permssion, ie. 'subsite.create'
 
- * @property {string}	currentRole		slug of the users' role within the site ie. 'site.ower' - set to empty string if they have no role
+ * @property {string}	currentRole		slug of the users' role within the site ie. 'site.owner' - set to empty string if they have no role
  * @property {string}	globalRole		slug of the users' global role within the syste ie. 'admin' or 'user' - set to empty string if they have no role
+ * @property {number} currentSiteId		id of the site that the user's role is loaded on
  */
 
 const state = {
 	permissions: [],
 	currentRole: '',
 	globalRole: '',
+	currentSiteId: null,
 };
 
 const getters = {
 	getCurrentRole(state) {
-		return state.currentSiteRole;
+		return state.currentRole;
 	},
 
 	getPermissions(state) {
@@ -32,6 +34,15 @@ const getters = {
 
 	getGlobalRole(state) {
 		return state.globalRole;
+	},
+
+	/**
+	 * Have we loaded the role for the user on this site?
+	 * @param state
+	 * @returns {boolean}
+	 */
+	userSitePermissionsReady(state) {
+		return (state.globalRole === 'admin' || state.currentSiteId !== null) && (state.permissions && state.globalRole) ? 1 : 0;
 	},
 
 	/**
@@ -73,6 +84,7 @@ const actions = {
 	 * @param {object} state - the vuex state
 	 */
 	loadPermissions({ commit }) {
+		// TODO: catch errors
 		api
 			.get('permissions?include=roles')
 			.then((response) => {
@@ -91,26 +103,33 @@ const actions = {
 	 * @param {string}	payload.username -  the name of the user
 	 */
 	loadSiteRole({ commit, state }, payload) {
-		return api
-			.get(`sites/${payload.siteId}?include=users`)
-			.then(({ data }) => {
-				const userList = data.data.users;
-				if (userList) {
-					const currentUser = userList.find((element) => element.username === payload.username);
-					if (currentUser) {
-						commit('setCurrentRole', currentUser.role);
-					}
-					else {
-						commit('setCurrentRole', '');
-					}
-				}
-				else {
-					commit('setCurrentRole', '');
-				}
-			})
-			.catch(error => {
-				debug(`[Error loading site roles] ${error}`);
-			});
+		if(payload.siteId !== state.currentSiteId) { // don't change if we already have users role on this site
+			commit('setCurrentRole', '');
+			commit('setCurrentSiteId', null);
+			if(payload.siteId) {
+				return api
+					.get(`sites/${payload.siteId}?include=users`)
+					.then(({data}) => {
+						const userList = data.data.users;
+						if (userList) {
+							const currentUser = userList.find((element) => element.username === payload.username);
+							commit('setCurrentSiteId', payload.siteId);
+							if (currentUser) {
+								commit('setCurrentRole', currentUser.role);
+							}
+							else {
+								commit('setCurrentRole', '');
+							}
+						}
+						else {
+							commit('setCurrentRole', '');
+						}
+					})
+					.catch(error => {
+						debug(`[Error loading site roles] ${error}`);
+					});
+			}
+		}
 	},
 
 	/**
@@ -125,12 +144,12 @@ const actions = {
 			.then(({ data }) => {
 				commit('setGlobalRole', data.data.global_role);
 			})
-			.catch(()=> {
+			.catch(() => {
 				commit('setGlobalRole', '');
 			})
 	}
 
-}
+};
 
 const mutations = {
 
@@ -162,6 +181,15 @@ const mutations = {
 	 */
 	setGlobalRole(state, globalRole) {
 		state.globalRole = globalRole;
+	},
+
+	/**
+	 * Sets the id of the site the current user role is for
+	 * @param {object} state - the vuex state
+	 * @param {number|null} siteId - The id of the site the user's role is currently loaded for.
+	 */
+	setCurrentSiteId(state, siteId) {
+		state.currentSiteId = siteId;
 	}
 };
 

@@ -8,9 +8,9 @@
 
 	<link rel="icon" href="../../favicon.ico">
 
-	<title>Astro</title>
+	<title>Site Editor - University of Kent</title>
 
-	<link rel="stylesheet" href="{{ url("/") }}{{ mix('/build/css/main.css') }}" />
+	<link rel="stylesheet" href="{{ mix('/build/css/main.css') }}" />
 	@if ($is_preview)
 		<style>
 		html {
@@ -23,19 +23,26 @@
 	window.astro = <?php echo json_encode([
 		'csrf_token' => csrf_token(),
 		'base_url' => Request::getBaseUrl(),
-		'api_url' => '/api/v1/',
+		'api_url' => config('editor.astro_api_url'),
+		'logout_url' => config('editor.astro_logout_url'),
 		'username' => $username,
 		'user'     => $user,
 		'api_token' => $api_token,
-		'debug' => config('app.debug')
+		'debug' => config('app.debug'),
+		'published_url_pattern' => config('editor.app_live_url_pattern'),
+		'draft_url_pattern' => config('editor.app_preview_url_pattern'),
+		'assets_base_url' => config('definitions.assets_base_url'),
+		'placeholder_image_url' => config('definitions.placeholder_image_url'),
+		'help_url' => config('editor.help_url'),
+		'help_media_url' => config('editor.help_media_url'),
 	]); ?>;
 	</script>
 
-	@if (env('ENABLE_HEAP'))
+	@if (config('editor.enable_heap'))
 		@include('components.heap-analytics')
 	@endif
 
-	@if (env('ENABLE_HOTJAR'))
+	@if (config('editor.enable_hotjar'))
 		@include('components.hotjar-analytics')
 	@endif
 
@@ -45,8 +52,8 @@
 
 	</div>
 
-	<script src="{{ url('/') }}{{ mix('/build/js/manifest.js') }}"></script>
-	<script src="{{ url('/') }}{{ mix('/build/js/vendor.js') }}"></script>
-	<script src="{{ url('/') }}{{ mix('/build/js/main.js') }}"></script>
+	<script src="{{ mix('/build/js/manifest.js') }}"></script>
+	<script src="{{ mix('/build/js/vendor.js') }}"></script>
+	<script src="{{ mix('/build/js/main.js') }}"></script>
 </body>
 </html>

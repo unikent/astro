@@ -2,6 +2,7 @@
 
 namespace App\Models\APICommands;
 
+use App\Events\PageEvent;
 use App\Exceptions\UnpublishedParentException;
 use App\Models\Contracts\APICommand;
 use App\Models\Page;
@@ -45,6 +46,7 @@ class PublishPage implements APICommand
 			// is there already a published page at this path?
 			$published_page = $page->publishedVersion();
 
+			event(new PageEvent(PageEvent::PUBLISHING, $page, null));
 			if (!$published_page) {
 				// does this page have a parent, and if so, has it been published?
 				$parent = $page->parent;
@@ -72,9 +74,9 @@ class PublishPage implements APICommand
 					$published_page = Page::create($fields);
 				}
 			}
-
 			$published_page->setRevision($page->revision);
-
+			$page->refresh();
+			event(new PageEvent(PageEvent::PUBLISHED, $page, null));
 			return $published_page;
 		});
 	}

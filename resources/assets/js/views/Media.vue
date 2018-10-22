@@ -102,7 +102,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { mapActions, mapState } from 'vuex';
 
 import Results from 'components/media/Results';
 import MediaUpload from 'components/MediaUpload';
@@ -132,9 +132,26 @@ export default {
 
 	created() {
 		this.fetchMedia();
+		this.$bus.$on('media:refresh', this.fetchMedia);
+	},
+
+	destroyed() {
+		this.$bus.$off('media:refresh', this.fetchMedia);
+	},
+
+	watch: {
+		showUploadForm(show) {
+			if(!show) {
+				this.fetchMedia();
+			}
+		}
 	},
 
 	computed: {
+		...mapState({
+			siteId: state => state.site.site
+		}),
+
 		colCount() {
 			switch(this.imageSize) {
 				case 0:
@@ -183,9 +200,16 @@ export default {
 
 		fetchMedia() {
 			this.$api
-				.get('media?order=id.desc')
+				.get(`media?order=id.desc&site_ids[]=${this.siteId}`)
 				.then(({ data: json }) => {
 					this.images = json.data;
+				})
+				.catch(() => {
+					this.$message({
+						title: 'Error fetching media items',
+						message: 'Unable to to fetch media items at this time.',
+						type: 'error'
+					});
 				});
 		}
 

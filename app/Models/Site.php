@@ -114,4 +114,32 @@ class Site extends Model
 			->whereNull('parent_id')
 			->where('version', $version);
 	}
+
+	/**
+	 * Sets (and saves) the value of a site option
+	 * @param string $name - The option name
+	 * @param mixed $value - The option value.
+	 */
+	public function setOption($name, $value)
+	{
+		$options = $this->options;
+		if(null === $value) {
+			unset($options[$value]);
+		}
+		else {
+			$options[$name] = $value;
+		}
+		$this->options = $options;
+		$this->save();
+	}
+
+	/**
+	 * Media attached to this site
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+	 */
+	public function media()
+	{
+		return $this->belongsToMany(Media::class, 'media_sites');
+	}
+
 }

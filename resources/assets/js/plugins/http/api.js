@@ -1,9 +1,9 @@
 import axios from 'axios';
 import Config from '../../classes/Config';
 
-export const baseURL = Config.get('api_base_url');
+export const baseURL = Config.get('api_url');
 
-const api = {
+export default {
 	...axios.create({
 		baseURL,
 		headers: {
@@ -13,7 +13,6 @@ const api = {
 		}
 	}),
 	all: axios.all,
-	spread: axios.spread
+	spread: axios.spread,
+	run: axios
 };
-
-export default api;

@@ -23,7 +23,7 @@
 						<el-button type="primary" @click="saveMenu">Save</el-button>
 						<el-button plain class="el-button--icon" @click="previewSite">
 							Preview
-							<icon name="newwindow" aria-hidden="true" width="12" height="12" class="ico" />
+							<icon name="newwindow" aria-hidden="true" :width="12" :height="12" class="ico" />
 						</el-button>
 						<el-button type="success" @click="publishMenu">Publish...</el-button>
 					</div>
@@ -62,7 +62,7 @@
 
 						<span class="menu-item__cell u-flex-auto-left u-flex-grow-none">
 							<el-button @click="removeMenuItem(index)" type="default">
-								<icon name="delete" width="14" height="14" />
+								<icon name="delete" :width="14" :height="14" />
 							</el-button>
 						</span>
 					</div>
@@ -278,6 +278,7 @@ export default {
 	methods: {
 
 		fetchSiteData() {
+			// TODO: catch errors
 			this.$api
 				.get(`sites/${this.$route.params.site_id}?include=pages,role,users`)
 				.then(({ data: json }) => {

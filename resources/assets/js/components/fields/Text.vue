@@ -1,12 +1,15 @@
 <template>
-	<el-input v-model="value"></el-input>
+	<el-input
+		v-model="value"
+		:placeholder="placeholder"
+	></el-input>
 </template>
 
 <script>
-import baseFieldMixin from '../../mixins/baseFieldMixin';
+import BlockField from 'components/BlockField';
 
 export default {
 	name: 'text-field',
-	mixins: [baseFieldMixin]
+	extends: BlockField
 };
 </script>

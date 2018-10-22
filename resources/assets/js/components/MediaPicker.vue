@@ -67,7 +67,8 @@ export default {
 		...mapState({
 			mediaPicker: state => state.media.mediaPicker,
 			currentBlockIndex: state => state.contenteditor.currentBlockIndex,
-			currentRegionName: state => state.contenteditor.currentRegionName
+			currentRegionName: state => state.contenteditor.currentRegionName,
+			siteId: state => state.site.site
 		}),
 
 		...mapGetters([
@@ -96,9 +97,7 @@ export default {
 
 	watch: {
 		visible(show) {
-			// update media if it's not been fetched before or
-			// if 10 minutes have elapsed since the last fetch
-			if(show && (new Date() - this.lastUpdated) / 60000 > 10) {
+			if(show) {
 				this.fetchMedia();
 			}
 		}
@@ -137,13 +136,16 @@ export default {
 				}
 			});
 
+			this.$bus.$emit('block:validate');
+
 			this.hideMediaPicker();
 		},
 
 		fetchMedia() {
+			// TODO: catch errors
 			this.$api
 				// TODO: if unmodified since
-				.get('media?order=id.desc', {})
+				.get(`media?order=id.desc&site_ids[]=${this.siteId}`)
 				.then(({ headers, data: json }) => {
 					this.lastUpdated = headers.date;
 					this.media = json.data;

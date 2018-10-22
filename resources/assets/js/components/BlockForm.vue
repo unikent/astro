@@ -1,13 +1,15 @@
 <script>
 /**
  * Custom form component for use with the block editor which reports its current validation
- * Sends a passValidation or failValidation event to its parent.
+ * Sends a block:setValidation event to the eventBus which can be optionally listened for.
+ * This is listened to by EditBlock for tracking block validation.
  *
  * Used within the editor sidebar to allow users to update blocks.
  *
  * @extends Element UI Form component
  */
 import { Form } from 'element-ui';
+import { eventBus } from 'plugins/eventbus';
 
 export default {
 	name: 'block-form',
@@ -28,27 +30,16 @@ export default {
 	},
 
 	watch: {
-		valid(isValid) {
-			if (isValid) {
-				this.$emit('passValidation');
-			}
-			else {
-				this.$emit('failValidation');
-			}
+		valid(status) {
+			eventBus.$emit('block:setValidation', status);
 		}
 	},
 
 	updated() {
 		// invoked when the form is loaded with a new block of data
-		this.validate((isValid) => {
-			if (isValid) {
-				this.$emit('passValidation');
-			}
-			else {
-				this.$emit('failValidation');
-			}
+		this.validate((status) => {
+			eventBus.$emit('block:failValidation', status);	
 		});
-
 	}
 };
 </script>

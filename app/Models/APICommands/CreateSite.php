@@ -2,6 +2,7 @@
 
 namespace App\Models\APICommands;
 
+use App\Events\PageEvent;
 use App\Models\Definitions\Layout;
 use App\Models\Definitions\SiteDefinition;
 use App\Models\Revision;
@@ -47,7 +48,7 @@ class CreateSite implements APICommand
             if(!is_array($layout)){
             	$layout = SiteDefinition::idToNameAndVersion($layout);
 			}
-            $homepage = $this->createHomePage($site, 'Home Page', $layout, $user);
+            $homepage = $this->createHomePage($site, 'Home', $layout, $user);
             if(!empty($template->defaultPages['children'])){
 				$this->addPages($homepage, $template->defaultPages['children'], $user);
 			}
@@ -97,6 +98,14 @@ class CreateSite implements APICommand
      */
     public function createHomePage($site, $title, $layout, $user)
     {
+		event(new PageEvent(PageEvent::CREATING, null, [
+			'parent' => null,
+			'layout_name' => $layout['name'],
+			'layout_version' => $layout['version'],
+			'slug' => null,
+			'title' => $title,
+			'user' => $user
+		]));
         $page = Page::create([
             'site_id' => $site->id,
             'parent_id' => null,
@@ -118,7 +127,8 @@ class CreateSite implements APICommand
         ]);
         $page->setRevision($revision);
         $page->refresh();
-        return $page;
+		event(new PageEvent(PageEvent::CREATED, $page, null));
+		return $page;
     }
 
     /**

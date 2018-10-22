@@ -1,9 +1,11 @@
 import _ from 'lodash';
 import Vue from 'vue';
-import { Definition } from 'classes/helpers';
+import { getPublishedPreviewURL, getDraftPreviewURL, Definition } from 'classes/helpers';
 import api from 'plugins/http/api';
 import { eventBus } from 'plugins/eventbus';
-import Config from 'classes/Config';
+import { undoStackInstance } from 'plugins/undo-redo';
+import { isIframe } from 'classes/helpers';
+import Validation from 'classes/Validation';
 
 const vue = new Vue();
 
@@ -14,8 +16,6 @@ const vue = new Vue();
  * @property {int} currentLayoutVersion - The version number of the layout in use for the current page.
  * @property {number|null} currentBlockIndex - The index of the currently selected block in the currently selected region.
  * @property {string} currentRegion - The name of the region containing the currently selected block.
- * @property {Object} blockMeta - Some meta about blocks???
- * @property {Object} blockMeta.blocks - Object with keys as region names and values as Arrays of blocks.
  * @property {Array} invalidBlocks - array of block ids of invalid blocks within the page
  * @property {boolean} loaded - has the page data been successfully loaded or not?
  */
@@ -25,15 +25,13 @@ const state = {
 	layoutErrors: [],
 	currentBlockIndex: null,
 	currentRegion: null,
-	blockMeta: {
-		blocks: {}
-	},
 	pageData: {
 		blocks: {}
 	},
 	loaded: false,
 	currentSavedState: '',
-	invalidBlocks: []
+	invalidBlocks: [],
+	currentPageArrayPath: null
 };
 
 const mutations = {
@@ -67,7 +65,7 @@ const mutations = {
 		state.currentBlockIndex = index;
 	},
 
-	setLayoutErrors (state, layoutErrors) {
+	setLayoutErrors(state, layoutErrors) {
 		state.layoutErrors = layoutErrors;
 	},
 
@@ -75,33 +73,12 @@ const mutations = {
 		const block = state.pageData.blocks[region][section].blocks.splice(from, 1)[0];
 		state.pageData.blocks[region][section].blocks.splice(to, 0, block);
 
-		// update metadata order
-		const blockMeta = state.blockMeta.blocks[region][section].blocks.splice(from, 1)[0];
-		state.blockMeta.blocks[region][section].blocks.splice(to, 0, blockMeta);
-
 		// TODO: use state for this
-		Vue.nextTick(() => eventBus.$emit('block:updateOverlay', to));
-	},
-
-	/**
-	 * @param {Object} blockMeta - The offsets and sizes of every block organised the same as pageData.blocks
-	 */
-	addBlockMeta(state, blockMeta) {
-		state.blockMeta = blockMeta;
-	},
-
-	updateBlockMeta(state, { type, region, section, index, value }) {
-		if(region === null) {
-			return;
-		}
-
-		let blockData = state.blockMeta.blocks[region][section].blocks;
-		blockData.splice(index, 1, { ...blockData[index], [type]: value })
+		runInIframeAfterTick(() => eventBus.$emit('block:updateBlockOverlays', to));
 	},
 
 	updateFieldValue(state, { index, name, value, region, section }) {
-		let	idx = index;
-		let fields = state.pageData.blocks[region][section].blocks[idx].fields;
+		let fields = state.pageData.blocks[region][section].blocks[index].fields;
 
 		// if field exists just update it
 		if(_.has(fields, name)) {
@@ -145,26 +122,18 @@ const mutations = {
 
 		// if region is not yet defined in block data, add it
 		if(state.pageData.blocks[region] === void 0) {
-			state.blockMeta.blocks = { ... state.blockMeta.blocks, [region]: [] };
 			state.pageData.blocks = { ... state.pageData.blocks, [region]: [] };
 		}
 
 		// if section is not yet defined in region data, add it
 		// TODO refactor - is this necessary?  Should be more robust...
 		if(state.pageData.blocks[region][sectionIndex] === void 0) {
-			let
-				sections = state.pageData.blocks[region],
-				metaSections = state.blockMeta.blocks[region];
+			let sections = state.pageData.blocks[region];
 
 			for(let i = sections.length; i <= sectionIndex; ++i) {
 				sections.push({
 					name: (i === sectionIndex ? sectionName : 'unknown-section'),
 					blocks: []
-				});
-
-				metaSections.push({
-					size: 0,
-					offset: 0
 				});
 			}
 		}
@@ -174,31 +143,41 @@ const mutations = {
 		}
 
 		if(block) {
-			Definition.fillBlockFields(block);
+			Definition.fillFields(block);
 		}
 
-		state.blockMeta.blocks[region][sectionIndex].blocks.splice(index, (replace ? 1 : 0), {
-			size: 0,
-			offset: 0
-		});
-
 		state.pageData.blocks[region][sectionIndex].blocks.splice(index, (replace ? 1 : 0), block || {});
+
+		if(replace) {
+			runInIframeAfterTick(
+				() => eventBus.$emit('block:showSelectedOverlay', {
+					id: block.id
+				})
+			);
+		}
+
+		// TODO: use state for this
+		runInIframeAfterTick(() => eventBus.$emit('block:updateBlockOverlays'));
+	},
+
+	initialiseBlock(state, { regionName, sectionIndex, blockIndex, block }) {
+		Definition.fillFields(block);
+		state.pageData.blocks[regionName][sectionIndex].blocks.splice(blockIndex, 1, block);
 	},
 
 	/**
 	 * Delete the specified block from the page.
+	 *
 	 * @param state
 	 * @param {string} region - The name of the region containing the block.
-	 * @param {number} index - The index of the block in its section.
 	 * @param {number} section - The index in the region of the section containing the block.
+	 * @param {number} index - The index of the block in its section.
 	 */
-	deleteBlock(state,  { region, index, section } ) {
-
+	deleteBlock(state,  { region, section, index }) {
 		state.pageData.blocks[region][section].blocks.splice(index, 1);
-		state.blockMeta.blocks[region][section].blocks.splice(index, 1);
 
 		// TODO: use state for this
-		Vue.nextTick(() => eventBus.$emit('block:updateOverlay', index));
+		runInIframeAfterTick(() => eventBus.$emit('block:updateBlockOverlays'));
 	},
 
 	updateCurrentSavedState(state) {
@@ -222,13 +201,15 @@ const mutations = {
 		}
 	},
 
-	clearBlockValidationIssues() {
-		state.invalidBlocks = [];
-	},
-
 	setPageTitle(state, { id, title }) {
 		if(state.pageData && state.pageData.id === Number(id)) {
 			state.pageData.title = title;
+		}
+	},
+
+	setPagePath(state, { id, path }) {
+		if(state.pageData && state.pageData.id === Number(id)) {
+			state.pageData.path = path
 		}
 	},
 
@@ -246,15 +227,18 @@ const mutations = {
 		if(state.pageData && state.pageData.id === Number(id)) {
 			state.pageData.status = status;
 		}
+	},
+
+	setCurrentPageArrayPath(state, arrayPath) {
+		state.currentPageArrayPath = arrayPath;
 	}
 
 };
 
 const actions = {
 
-	fetchPage({ commit }, id) {
+	fetchPage({ state, commit, dispatch }, id) {
 		commit('setPage', null);
-		// TODO: refactor into smaller methods
 		return api
 			.get(`pages/${id}?include=blocks.media,site`)
 			.then(response => {
@@ -263,7 +247,6 @@ const actions = {
 				return api
 					.get(`layouts/${page.layout.name}-v${page.layout.version}/definition?include=region_definitions.block_definitions`)
 					.then(({ data: region }) => {
-
 						region.data.region_definitions.forEach(region => {
 							Definition.addRegionDefinition(region);
 							region.block_definitions.forEach(definition => {
@@ -273,31 +256,97 @@ const actions = {
 
 						commit('setBlockDefinitions', Definition.definitions, { root: true });
 						commit('setPage', _.cloneDeep(page));
-						commit('clearBlockValidationIssues');
-
-						const blockMeta = {
-							blocks: {}
-						};
-
-						Object.keys(page.blocks).forEach(region => {
-							blockMeta.blocks[region] = [];
-							page.blocks[region].forEach((section, sindex) => {
-								blockMeta.blocks[region].push({ blocks: [] });
-								page.blocks[region][sindex].blocks.forEach((block) => {
-									Definition.fillBlockFields(block);
-									blockMeta.blocks[region][sindex].blocks.push({ size: 0, offset: 0 });
-									if( typeof block.errors !== void 0 && block.errors !== null) {
-										commit('addBlockValidationIssue', block.id);
-									}
-								});
-							});
-						});
-
-						commit('addBlockMeta', blockMeta);
+						dispatch('initialiseBlocksAndValidate', state.pageData.blocks);
+						undoStackInstance.init(state.pageData);
 						commit('setLoaded');
 					});
 
 			});
+	},
+
+	initialiseBlocksAndValidate({ commit, dispatch }, blocks) {
+		commit('clearBlockErrors');
+
+		Object.keys(blocks).forEach(regionName => {
+			blocks[regionName].forEach((section, sectionIndex) => {
+				blocks[regionName][sectionIndex].blocks.forEach((block, blockIndex) => {
+					commit('initialiseBlock', {
+						regionName,
+						sectionIndex,
+						blockIndex,
+						block
+					});
+
+					dispatch('addBlockErrors', {
+						block,
+						regionName,
+						sectionName: section.name,
+						sectionIndex,
+						blockIndex
+					});
+				});
+			});
+		});
+	},
+
+	addBlockErrors(
+		{ commit },
+		{ block, regionName, sectionName, sectionIndex, blockIndex }
+	) {
+		const
+			definitionType = `${block.definition_name}-v${block.definition_version}`,
+			definition = Definition.get(definitionType),
+			validator = Definition.getValidator(definition),
+			fieldsWithValidation = Validation.flattenRules(
+				Definition.getRules(definition)
+			),
+			fieldsWithErrors = [];
+
+		if(fieldsWithValidation.length) {
+			commit('addBlockErrors', {
+				block,
+				blockInfo: {
+					regionName,
+					sectionName,
+					sectionIndex,
+					blockIndex,
+					blockId: block.id
+				},
+				definitionName: definitionType,
+				errors: {}
+			});
+		}
+
+		// If a validator exists for this definition, validate the block fields via it
+		if(validator) {
+			validator.validate(block.fields, errors => {
+				if(errors) {
+					// loop through errors and add them to the state
+					errors.forEach(({ field, message }) => {
+						fieldsWithErrors.push(field);
+
+						commit('addFieldError', {
+							blockId: `${block.id}`,
+							fieldName: field,
+							errors: [message]
+						});
+					});
+				}
+
+				// Add location to store potential errors for fields that don't
+				// currently have errors, so that the state remains reactive
+				fieldsWithValidation
+					.forEach(fieldPath => {
+						if(!fieldsWithErrors.includes(fieldPath)) {
+							commit('addFieldError', {
+								blockId: `${block.id}`,
+								fieldName: fieldPath,
+								errors: []
+							});
+						}
+					});
+			});
+		}
 	},
 
 	/**
@@ -330,44 +379,38 @@ const actions = {
 
 						const message = vue.$createElement(
 							'div',
-							{
-								'style': {
-									color: '#bb9132'
-								},
-							},
+							{},
 							[
-								vue.$createElement('p', 'The page saved ok, but there are some validation errors.'),
-								vue.$createElement('p', 'You won\'t be able to publish till these are fixed.'),
+								vue.$createElement('p', { class:'el-message__content', style:'padding-bottom:1rem' }, 'The page saved ok, but there are some validation errors.'),
+								vue.$createElement('p', { class:'el-message__content', style:'padding-bottom:1rem' }, 'You won\'t be able to publish until these are fixed.'),
 								vue.$createElement('a', {
 									attrs: {
 										href: '#'
 									},
+									style:'font-size:14px',
 									on: {
 										click(e) {
-											eventBus.$emit('sidebar:openErrors', e);
+											vue.$bus.$emit('sidebar:openErrors', e);
+											vue.$message.closeAll();
 										}
 									}
-								}, 'Check the error sidebar for details.')
+								}, 'Check the error list for details.')
 							],
 
 						);
-						vue.$notify({
-							title: 'Saved',
+						vue.$message({
 							message: message,
 							type: 'warning',
-							duration: 10000,
-							onClick() {
-								this.close();
-							}
+							duration: 7000,
+							showClose: true
 						});
 					}
 					// we're all good
 					else if (response.data.data.valid === 1) {
-						vue.$notify({
-							title: 'Saved',
-							message: 'You saved this page successfully.',
+						vue.$message({
+							message: 'Page saved.',
 							type: 'success',
-							duration: 4000
+							duration: 2000
 						});
 					}
 				}
@@ -381,7 +424,7 @@ const actions = {
 
 					// there seems to be a possibility to return multiple groups of error messages,
 					// so we will cater for that
-					let technicalMessages = []
+					let technicalMessages = [];
 
 					// for each error message group...
 					errorResponse.response.data.errors.forEach(error => {
@@ -392,9 +435,14 @@ const actions = {
 
 						// add detailed error messages
 						let errorsDetails = [];
-						for (var key in error.details) {
-							if (error.details.hasOwnProperty(key)) {
-								errorsDetails.push(vue.$createElement('li', error.details[key]));
+						if (typeof error.details === 'string') {
+							errorsDetails.push(vue.$createElement('li', error.details));
+						}
+						else{
+							for (var key in error.details) {
+								if (error.details.hasOwnProperty(key)) {
+									errorsDetails.push(vue.$createElement('li', error.details[key]));
+								}
 							}
 						}
 
@@ -457,7 +505,11 @@ const getters = {
 	 * @todo - implement once supported by the API.
 	 */
 	publishStatus: (state) =>  {
-		return (state.loaded ? state.pageData.status : '');
+		return (
+			state.loaded &&
+			state.pageData.status ?
+				state.pageData.status : ''
+		);
 	},
 
 	/**
@@ -467,7 +519,11 @@ const getters = {
 	 * @memberof state/page#
 	 */
 	pageTitle: (state) => {
-		return state.loaded ? state.pageData.title : '';
+		return (
+			state.loaded &&
+			state.pageData.title ?
+				state.pageData.title : ''
+		);
 	},
 
 	/**
@@ -477,7 +533,11 @@ const getters = {
 	 * @memberof state/page#
 	 */
 	pageSlug: (state) => {
-		return state.loaded ? state.pageData.slug : '';
+		return (
+			state.loaded &&
+			state.pageData.slug ?
+				state.pageData.slug : ''
+		);
 	},
 
 	/**
@@ -487,7 +547,11 @@ const getters = {
 	 * @memberof state/page#
 	 */
 	pagePath: (state) => {
-		return (state.loaded ? state.pageData.path : '');
+		return (
+			state.loaded &&
+			state.pageData.path ?
+				state.pageData.path : ''
+		);
 	},
 
 	/**
@@ -496,7 +560,12 @@ const getters = {
 	 * @returns {string}
 	 */
 	siteTitle: (state) => {
-		return (state.loaded ? state.pageData.site.title : '');
+		return (
+			state.loaded &&
+			state.pageData.site &&
+			state.pageData.site.name ?
+				state.pageData.site.name : ''
+		);
 	},
 
 	/**
@@ -507,7 +576,12 @@ const getters = {
 	 * @todo Site should be a separate object in store state.
 	 */
 	sitePath: (state) => {
-		return (state.loaded ? state.pageData.site.path : '');
+		return (
+			state.loaded &&
+			state.pageData.site &&
+			state.pageData.site.path ?
+				state.pageData.site.path : ''
+		);
 	},
 
 	/**
@@ -518,7 +592,12 @@ const getters = {
 	 * @todo Site should be a separate object in store state.
 	 */
 	siteDomain: (state) => {
-		return (state.loaded ? state.pageData.site.host : '');
+		return (
+			state.loaded &&
+			state.pageData.site &&
+			state.pageData.site.host ?
+				state.pageData.site.host : ''
+		);
 	},
 
 	/**
@@ -527,9 +606,14 @@ const getters = {
 	 * @returns {string|null} Site definition ID in the form {name}-v{version} or null if no current site.
 	 */
 	siteDefinitionId: (state) => {
-		return (state.loaded) ?
+		return (
+			state.loaded &&
+			state.pageData.site &&
+			state.pageData.site.site_definition_name &&
+			state.pageData.site.site_definition_version ?
 				(state.pageData.site.site_definition_name + '-v' + state.pageData.site.site_definition_version) :
-				null;
+				null
+		);
 	},
 
 	/**
@@ -560,12 +644,7 @@ const getters = {
 	 * @returns {string} Full URL
 	 */
 	draftPreviewURL: (state, getters) => {
-		return (
-			Config.get('base_url', '') + '/draft/' +
-			getters.siteDomain +
-			getters.sitePath +
-			(getters.pagePath === '/' ? '' : getters.pagePath)
-		);
+		return getDraftPreviewURL(getters.siteDomain, getters.sitePath + (getters.pagePath === '/' ? '' : getters.pagePath));
 	},
 
 	/**
@@ -575,12 +654,7 @@ const getters = {
 	 * @returns {string} Full URL
 	 */
 	publishedPreviewURL: (state, getters) => {
-		return (
-			Config.get('base_url', '') + '/published/' +
-			getters.siteDomain +
-			getters.sitePath +
-			(getters.pagePath === '/' ? '' : getters.pagePath)
-		);
+		return getPublishedPreviewURL(getters.siteDomain, getters.sitePath + (getters.pagePath === '/' ? '' : getters.pagePath));
 	},
 
 	unsavedChangesExist: (state) => () => {
@@ -649,9 +723,42 @@ const getters = {
 				state.pageData.blocks[regionName] :
 				null
 		);
+	},
+
+	currentPageBreadcrumbs: (state, getters, rootState) => {
+		if(!rootState.page.currentPageArrayPath) {
+			return [];
+		}
+
+		const path = rootState.page.currentPageArrayPath.split('.');
+
+		let
+			breadcrumbs = [],
+			page = rootState.site.pages;
+
+		for(var i = 0, length = path.length; page !== void 0 && i < length; i++) {
+			page = i > 0 ? page.children[path[i]] : page[path[i]];
+			if(page) {
+				breadcrumbs.push({
+					title: page.title,
+					path: page.path
+				});
+			}
+		}
+
+		return breadcrumbs;
 	}
 
 };
+
+
+const
+	// helper for running stuff only in iframe
+	runInIframeAfterTick = (run) => {
+		if(isIframe) {
+			Vue.nextTick(run);
+		}
+	};
 
 export default {
 	state,

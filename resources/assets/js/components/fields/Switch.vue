@@ -1,12 +1,12 @@
 <template>
-	<el-switch on-text="" off-text="" v-model="value"></el-switch>
+	<el-switch active-text="" inactive-text="" v-model="value"></el-switch>
 </template>
 
 <script>
-import baseFieldMixin from '../../mixins/baseFieldMixin';
+import BlockField from 'components/BlockField';
 
 export default {
 	name: 'switch-field',
-	mixins: [baseFieldMixin]
+	extends: BlockField
 };
 </script>

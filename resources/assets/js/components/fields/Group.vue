@@ -7,10 +7,13 @@
 				<el-form-item
 					:label="f.label"
 					:prop="`${name}.${f.name}`"
-					:rules="rules[name].fields[f.name]"
-					:error="getError(f.name)"
+					:rules="getRules(f.name)"
+					:error="getErrors(`${field.name}.${f.name}`)"
+					:class="{
+						'is-required': isRequiredField(f)
+					}"
+					:id="`${name}-${f.name}`"
 				>
-
 					<template slot="label">
 						<span>{{ f.label }}</span>
 
@@ -22,8 +25,8 @@
 							<icon
 								class="el-form-item__icon-help"
 								name="help-circle"
-								width="15"
-								height="15"
+								:width="15"
+								:height="15"
 								viewBox="0 0 15 15"
 							/>
 						</el-tooltip>
@@ -46,7 +49,7 @@
 <script>
 import _ from 'lodash';
 import { mapState } from 'vuex';
-import baseFieldMixin from 'mixins/baseFieldMixin';
+import BlockField from 'components/BlockField';
 import getFieldMixin from 'mixins/getFieldMixin';
 import { Definition } from 'classes/helpers';
 import Icon from '../Icon';
@@ -54,7 +57,10 @@ import Icon from '../Icon';
 export default {
 
 	name: 'group-field',
-	mixins: [baseFieldMixin, getFieldMixin],
+
+	extends: BlockField,
+
+	mixins: [getFieldMixin],
 
 	components: {
 		Icon
@@ -62,35 +68,16 @@ export default {
 
 	computed: {
 		...mapState({
-			currentIndex: state => state.page.currentBlockIndex,
-			// currentDefinition: state => state.definition.currentBlockDefinition
-		}),
-
-		rules() {
-			return Definition.getRules(this.currentDefinition);
-		}
+			currentIndex: state => state.page.currentBlockIndex
+		})
 	},
 
 	methods: {
 
 		childField(field) {
 			return _.pick(field, ['label', 'default', 'options']);
-		},
-
-		getRules(fieldName) {
-			let rules = Array.isArray(this.rules[this.name]) ?
-				this.rules[this.name][this.rules[this.name].length - 1] :
-				this.rules[this.name];
-
-			return rules.fields[fieldName];
-		},
-
-		getError(fieldName) {
-			return (
-				this.errors && this.errors[fieldName] ?
-					this.errors[fieldName] : null
-			);
 		}
+
 	}
 };
 </script>

@@ -8,6 +8,7 @@
 	<create-page-modal />
 	<edit-page-modal/>
 	<publish-validation-warning-modal />
+	<add-link-modal />
 </div>
 </template>
 
@@ -25,6 +26,7 @@ import MediaOverlay from 'components/media/MediaOverlay';
 import CreatePageModal from 'components/CreatePageModal';
 import EditPageModal from 'components/EditPageModal';
 import PublishValidationWarningModal from 'components/PublishValidationWarningModal';
+import AddLinkModal from 'components/AddLinkModal';
 
 export default {
 
@@ -38,7 +40,8 @@ export default {
 		MediaOverlay,
 		CreatePageModal,
 		EditPageModal,
-		PublishValidationWarningModal
+		PublishValidationWarningModal,
+		AddLinkModal
 	}
 
 };

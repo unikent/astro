@@ -2,8 +2,7 @@
 namespace App\Validation\Brokers;
 
 use Illuminate\Validation\ValidationException;
-use App\Models\Definitions\Block as BlockDefinition;
-use App\Models\Definition\BaseDefinition as Definition;
+use App\Models\Definitions\BaseDefinition as BaseDefinition;
 use Illuminate\Validation\Validator as LaravelValidator;
 use Illuminate\Support\Facades\Validator as ValidatorFacade;
 
@@ -13,7 +12,7 @@ abstract class DefinitionBroker {
 	protected $definition;
 
 
-	public function __construct(BlockDefinition $definition)
+	public function __construct(BaseDefinition $definition)
 	{
 		$this->definition = $definition;
 	}
@@ -70,6 +69,12 @@ abstract class DefinitionBroker {
 						$transformed[$field][] = sprintf('max:%s', $rule[1]);
 						break;
 
+					case 'max_length_without_html':
+						$transformed[$field][] = 'nullable';
+						$transformed[$field][] = 'string';
+						$transformed[$field][] = sprintf($rule[0] . ':%s', $rule[1]);
+						break;
+
 					case 'min_value':
 						$transformed[$field][] = 'nullable';
 						$transformed[$field][] = 'integer';
@@ -84,6 +89,11 @@ abstract class DefinitionBroker {
 
 					case 'regex':
 						$transformed[$field][] = sprintf('regex:/%s/', $rule[1]);
+						break;
+
+					case 'slug':
+						$transformed[$field][] = 'nullable';
+						$transformed[$field][] = sprintf('regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/');
 						break;
 
 					default:

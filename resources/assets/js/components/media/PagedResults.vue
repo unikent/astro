@@ -1,5 +1,5 @@
 <template>
-<div>
+<div v-if="filteredResults.length">
 	<results
 		:results="pagedResults"
 		:view="view"
@@ -24,6 +24,9 @@
 			</slot>
 		</el-pagination>
 	</el-row>
+</div>
+<div v-else class="paged-results__no-data">
+	No results to show.
 </div>
 </template>
 <script>

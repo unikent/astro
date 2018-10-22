@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Definitions\Layout;
 use App\Models\LocalAPIClient;
 use App\Models\Page;
 use Astro\Renderer\AstroRenderer;
 use Astro\Renderer\Base\SingleDefinitionsFolderLocator;
+use Astro\Renderer\Contracts\Locator;
 use Astro\Renderer\Engines\TwigEngine;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -19,12 +21,6 @@ class PageController extends Controller
 {
 	use AuthorizesRequests, DispatchesJobs;
 
-	public function __construct()
-	{
-		parent::__construct();
-		$this->middleware('auth');
-	}
-
 	/**
 	 * Render a draft page.
 	 * GET /path/to/editor/draft/{host}/{path}
@@ -34,9 +30,43 @@ class PageController extends Controller
 	 */
 	public function draft($host, $path = '')
 	{
-		$original_html = $this->renderRoute($host, $path, Page::STATE_DRAFT);
+		return $this->renderRoute($host, $path, Page::STATE_DRAFT, [
+			[$this, 'addPreviewBar'],
+			[$this, 'replaceLinks']
+		]);
+	}
+
+	/**
+	 * Prepend a notification bar at the top of the page.
+	 * @param string $input - Rendered HTML page
+	 * @param \Astro\Renderer\Contracts\Layout $layout - The Layout object within the renderer.
+	 * @return string - The page HTML with a preview notification bar prepended
+	 */
+	public function addPreviewBar($input, $layout)
+	{
 		$preview_bar = file_get_contents(resource_path('views/components/preview-bar.html'));
-		return preg_replace('/(<body[^>]*>)/is', '$1' . $preview_bar, $original_html, 1);
+		return preg_replace('/(<body[^>]*>)/is', '$1' . $preview_bar, $input, 1);
+	}
+
+	/**
+	 * Replace links to live site with links to the draft preview site.
+	 * Uses the env setting APP_PREVIEW_URL_PATTERN / config/definitions 'app_preview_url_pattern'
+	 * to determine what the replacements should look like.
+	 * @param string $input - The HTML version of the current page.
+	 * @param \Astro\Renderer\Contracts\Layout $layout - Layout object used by renderer to render the page.
+	 * @return string - The page HTML with any links to the live site replaced with links to the draft site.
+	 */
+	public function replaceLinks($input, $layout)
+	{
+		$host = $layout->page->site->host;
+		$path = $layout->page->site->path;
+		$link = config('definitions.app_preview_url_pattern');
+		$regex = '#(?P<html_to_keep><a\s[^>]*?href=")http[s]?://' . $host . $path . '(?P<page_path>[^"]+)"#i';
+		return preg_replace_callback($regex, function($matches) use($host, $path, $link) {
+				return $matches['html_to_keep'] . str_replace(['{domain}', '{path}'], [$host, $path . $matches['page_path']], $link) . '"';
+			},
+			$input
+		);
 	}
 
 	/**
@@ -56,9 +86,10 @@ class PageController extends Controller
 	 * @param string $host - The "real" domain name for the site
 	 * @param string $path - The full path to the current page.
 	 * @param string $version -  The version of the site to render ('draft', 'published')
+	 * @param array $filters - Array of optional callables to post-filter the rendered layout.
 	 * @return string - The rendered HTML output.
 	 */
-	public function renderRoute($host, $path, $version)
+	public function renderRoute($host, $path, $version, $filters = [])
 	{
 		$path = '/' . $path;
 		$locator = new SingleDefinitionsFolderLocator(
@@ -68,9 +99,10 @@ class PageController extends Controller
 		);
 		$api = new LocalAPIClient();
 		$engine = new TwigEngine(Config::get('app.definitions_path'));
-
+		// set the global twig variables
+		$engine->addGlobal('config',config('definitions'));
 		// controller
 		$astro = new AstroRenderer();
-		return $astro->renderRoute($host, $path, $api, $engine, $locator, $version);
+		return $astro->renderRoute($host, $path, $api, $engine, $locator, $version, $filters);
 	}
 }

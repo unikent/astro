@@ -58,18 +58,18 @@ class ManageAdmins extends Command
 					if($users->count()) {
 						$this->warn('Did you mean?');
 						foreach ($users as $item) {
-							$this->info("\t" . $item->username . ($item->role == 'admin' ? ' ADMIN' : ''));
+							$this->info("\t" . $item->username . ($item->role == User::ROLE_ADMIN ? ' ADMIN' : ''));
 						}
 					}
 				}
 				if($user) {
-					$user->role = ('+' == $action ? 'admin' : 'user');
+					$user->role = ('+' == $action ? User::ROLE_ADMIN : User::ROLE_USER);
 					$user->save();
 					$this->info('User "' . $username . '" is ' . ('+' == $action ? '' : 'no longer ') . 'an admin.');
 				}
 				break;
 			default:
-				$admins = User::query()->where('role', '=', 'admin')->orderBy('username')->get();
+				$admins = User::query()->where('role', '=', User::ROLE_ADMIN)->orderBy('username')->get();
 				$this->alert('There are ' . $admins->count() . ' superadmins.');
 				foreach($admins as $admin){
 					$this->info($admin->username . ' (' . $admin->email . ')');

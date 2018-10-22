@@ -1,3 +1,7 @@
+import Schema from 'async-validator';
+
+/* global DOMParser */
+
 export default class Validation {
 
 	static messages = {
@@ -9,8 +13,10 @@ export default class Validation {
 		'max_length': (val) => `This field can't be more than ${val} characters long.`
 	};
 
-	static transform(rule, value, message = null) {
-		let tranformedRule = {};
+	static transform(validationRule, message = null) {
+		let
+			[rule, value] = validationRule.split(/:(.*)/, 2),
+			tranformedRule = {};
 
 		if(
 			[
@@ -19,7 +25,7 @@ export default class Validation {
 				'min', 'max', 'length'
 			].indexOf(rule) !== -1
 		) {
-			value = parseFloat(value, 2);
+			value = Number.parseFloat(value, 2);
 		}
 
 		switch(rule) {
@@ -34,7 +40,10 @@ export default class Validation {
 			case 'in':
 				tranformedRule = {
 					type: 'enum',
-					enum: value.split(',')
+					enum: value.split(',').map(value => {
+						const number = Number(value);
+						return isNaN(number) ? value : number;
+					})
 				};
 				break;
 
@@ -86,8 +95,60 @@ export default class Validation {
 				break;
 
 			case 'regex':
-				tranformedRule = { regexp: value };
+				tranformedRule = {
+					regex: value,
+					message: 'The format of this field is invalid.',
+
+					validator(rule, value, cb) {
+						if(
+							value &&
+							value.length &&
+							!value.match(new RegExp(rule.regex))
+						) {
+							return cb(rule.message);
+						}
+
+						return cb();
+					}
+				};
 				break;
+
+			case 'slug':
+				tranformedRule = {
+					message: 'This field should only have lowercase alphanumeric characters (a-z and 0-9). Separate keywords with dashes.',
+
+					validator(rule, value, cb) {
+						if(
+							value &&
+							value.length &&
+							!value.match(new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$'))
+						) {
+							return cb(rule.message);
+						}
+
+						return cb();
+					}
+				};
+				break;
+
+			case 'max_length_without_html': {
+				const maxLength = Number.parseFloat(value, 2);
+
+				tranformedRule = {
+					message: `This field should not be more than ${maxLength} characters.`,
+
+					validator(rule, value, cb) {
+						const html = new DOMParser().parseFromString(value || '', 'text/html');
+
+						if(value && html.body.textContent.length > maxLength) {
+							return cb(rule.message);
+						}
+
+						return cb();
+					}
+				};
+				break;
+			}
 		}
 
 		if(message) {
@@ -98,6 +159,28 @@ export default class Validation {
 		}
 
 		return tranformedRule;
+	}
+
+	static createSchema(rules) {
+		return new Schema(rules);
+	}
+
+	static flattenRules(rules, parent = '') {
+		let fields = [];
+
+		Object.keys(rules).forEach(field => {
+			if(rules[field] && rules[field].fields) {
+				fields = [
+					...fields,
+					...Validation.flattenRules(rules[field].fields, `${field}.`)
+				];
+			}
+			else if(Array.isArray(rules[field])) {
+				fields.push(parent + field);
+			}
+		});
+
+		return fields;
 	}
 
 }

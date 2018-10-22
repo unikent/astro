@@ -18,14 +18,17 @@
 	border-top: 1px solid rgba(191, 203, 217, 0.3);
 }
 
-.block-options-list {
+.block-options-list-scroll {
 	$height: (
 		#{get-height(top-bar)} -
 		#{get-height(block-back-bar)}
 	);
 
 	height: calc(100vh - #{$height});
-	padding: 30px 20px 80px;
 	overflow: auto;
 	will-change: transform; // stop repaint on scroll
+}
+
+.block-options-list {
+	padding: 30px 20px 80px;
 }

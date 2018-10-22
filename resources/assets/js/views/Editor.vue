@@ -1,5 +1,5 @@
 <template>
-<div class="page"  v-if="canUser('site.view')">
+<div class="page"  v-if="canUser('page.edit')">
 
 	<div class="editor-body">
 		<div class="editor-wrapper" ref="editor">
@@ -22,7 +22,7 @@
 		:closable="false"
 		show-icon
 	>
-  </el-alert>
+	</el-alert>
 </div>
 </template>
 
@@ -34,6 +34,9 @@ import Config from 'classes/Config';
 import Sidebar from 'components/sidebar';
 import ModalContainer from 'components/ModalContainer';
 import Icon from 'components/Icon';
+import { undoStackInstance } from 'plugins/undo-redo';
+import { onKeyDown, onKeyUp } from 'plugins/key-commands';
+import { Definition } from 'classes/helpers';
 
 export default {
 	name: 'editor',
@@ -42,6 +45,10 @@ export default {
 		Sidebar,
 		ModalContainer,
 		Icon
+	},
+
+	provide: {
+		fieldType: 'block'
 	},
 
 	data() {
@@ -53,14 +60,15 @@ export default {
 	created() {
 		this.$store.commit('site/updateCurrentSiteID', this.$route.params.site_id);
 		this.$store.dispatch('loadSiteRole', { siteId: this.$route.params.site_id, username: Config.get('username') })
-		.then(() => {
-			if (this.canUser('site.view')) {
-				this.showLoader();
-			}
-			else {
-				this.showPermissionsError = true;
-			}
-		});
+			// TODO: catch errors
+			.then(() => {
+				if (this.canUser('page.edit')) {
+					this.showLoader();
+				}
+				else {
+					this.showPermissionsError = true;
+				}
+			});
 
 		this.views = {
 			desktop: {
@@ -82,23 +90,28 @@ export default {
 				height: '568px'
 			}
 		};
+
+		this.onKeyDown = onKeyDown(undoStackInstance);
+		this.onKeyUp = onKeyUp(undoStackInstance);
+
+		document.addEventListener('keydown', this.onKeyDown);
+		document.addEventListener('keyup', this.onKeyUp);
+
+		this.$bus.$on('block:validate', this.validate);
+		this.$bus.$on('block:validateAll', this.validateAll);
 	},
 
 	destroyed() {
 		// we have left the page editor so remove the snapeshot of the latest saved content
 		this.$store.commit('resetCurrentSavedState');
+
+		document.removeEventListener('keydown', this.onKeyDown);
+		document.removeEventListener('keyup', this.onKeyUp);
+
+		this.$bus.$off('block:validate', this.validate);
+		this.$bus.$off('block:validateAll', this.validateAll);
 	},
 
-	methods: {
-
-		showLoader() {
-			this.loader = Loading.service({
-				target: this.$refs.editor,
-				text: 'Loading preview...',
-				customClass: 'loading-overlay'
-			});
-		},
-	},
 	computed: {
 
 		...mapState([
@@ -107,14 +120,16 @@ export default {
 		]),
 
 		...mapState({
-			page: state => state.page.pageData,
 			pageLoaded: state => state.page.loaded
 		}),
 
 		...mapGetters([
-			'canUser'
+			'canUser',
+			'currentBlock',
+			'currentDefinition'
 		]),
 
+		// get the URL for the route to show the editor preview page (not the external page preview)
 		getPreviewUrl() {
 			// TODO: Don't reload page when page_id changes, use state instead
 			return `${Config.get('base_url', '')}/preview/${this.$route.params.page_id}`;
@@ -141,6 +156,67 @@ export default {
 			else {
 				this.showLoader();
 			}
+		}
+	},
+
+	methods: {
+
+		showLoader() {
+			this.loader = Loading.service({
+				target: this.$refs.editor,
+				text: 'Loading preview...',
+				customClass: 'loading-overlay'
+			});
+		},
+
+		// TODO: turn this into an action
+		validate: _.debounce(
+			function(blockInfo) {
+				const
+					block = blockInfo ?
+						this.$store.getters.getBlock(
+							blockInfo.regionName,
+							blockInfo.sectionIndex,
+							blockInfo.blockIndex
+						) :
+						this.currentBlock,
+					definition = blockInfo ?
+						{
+							name: block.definition_name,
+							version: block.definition_version
+						} :
+						this.currentDefinition;
+
+				if(!block) {
+					return;
+				}
+
+				const validator = Definition.getValidator(definition);
+
+				if(validator) {
+					this.$store.commit('resetFieldErrors', {
+						blockId: `${block.id}`
+					});
+
+					validator.validate(block.fields, (errors, fields) => {
+						if(errors) {
+							errors.forEach(({ field, message }) => {
+								this.$store.commit('addFieldError', {
+									blockId: `${block.id}`,
+									fieldName: field,
+									errors: [message]
+								});
+							});
+						}
+					});
+				}
+			},
+			100,
+			{ trailing: true }
+		),
+
+		validateAll() {
+			this.$store.dispatch('initialiseBlocksAndValidate', this.$store.state.page.pageData.blocks);
 		}
 	}
 };

@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Transformers\Api\v1;
 
+use App\Models\Definitions\Block;
 use App\Models\Page;
 use League\Fractal\ParamBag;
 use League\Fractal\Resource\Item as FractalItem;
@@ -61,9 +62,35 @@ class PageTransformer extends FractalTransformer
 			'status' => $page->status
 		];
 		if($this->full){
-            $data['blocks'] = $page->revision->blocks;
+            $data['blocks'] = $this->transformDynamicBlocks($page->revision->blocks, $data);
         }
         return $data;
+	}
+
+	/**
+	 * Find any dynamic blocks and give them the option to inject dynamic attributes into the block data.
+	 * @param $blocks
+	 * @param array $page_data Array of data about the page (as returned by the transform() method)
+	 * @return mixed
+	 * @throws \InvalidArgumentException if any attributes are returned which are not defined in the block definition.
+	 */
+	public function transformDynamicBlocks($blocks, $page_data)
+	{
+		// boot all block definitions...
+		foreach((array)$blocks as $region_name => $sections){
+			foreach($sections as $section_index => $section) {
+				foreach( $section['blocks'] as $block_index => $block) {
+					$definition = Block::fromDefinitionFile(Block::locateDefinition(Block::idFromNameAndVersion($block['definition_name'], $block['definition_version'])));
+					$dynamic = $definition->getDynamicAttributes($block, $section['name'], $region_name, $page_data);
+					$not_allowed = array_diff(array_keys($dynamic), $definition->getDynamicAttributeNames() ?? []);
+					if($not_allowed) {
+						throw new \InvalidArgumentException('Dynamic attribute(s): "' . join('", "', ($not_allowed)) . '" are not defined for block "' . $block['definition_name'] . '-v' . $block['definition_version'] . '"');
+					}
+					$blocks[$region_name][$section_index]['blocks'][$block_index]['dynamic'] = $dynamic;
+				}
+			}
+		}
+		return $blocks;
 	}
 
     /**
@@ -154,8 +181,8 @@ class PageTransformer extends FractalTransformer
      */
     public function includeRevisions(Page $page)
     {
-        if(!$page->history->isEmpty()){
-            return new FractalCollection($page->revision->history, new RevisionTransformer, false);
+        if(!$page->getRevisions()){
+            return new FractalCollection($page->getRevisions(), new RevisionTransformer, false);
         }
     }
 
@@ -166,7 +193,7 @@ class PageTransformer extends FractalTransformer
 	 */
 	public function includeAncestors(Page $page)
 	{
-		$ancestors = $page->ancestors()->with('revision')->orderBy('lft')->get();
+		$ancestors = $page->getAncestorsWithRevision();
 		if($ancestors){
 			return new FractalCollection($ancestors, new PageTransformer, false);
 		}
@@ -179,7 +206,7 @@ class PageTransformer extends FractalTransformer
 	 */
 	public function includeChildren(Page $page)
 	{
-		$children = $page->children()->with('revision')->orderBy('lft')->get();
+		$children = $page->getChildrenWithRevision();
 		if($children){
 			return new FractalCollection($children, new PageTransformer, false);
 		}
@@ -192,7 +219,7 @@ class PageTransformer extends FractalTransformer
 	 */
 	public function includeSiblings(Page $page)
 	{
-		$siblings = $page->siblingsAndSelf()->with('revision')->orderBy('lft')->get();
+		$siblings = $page->getSiblingsWithRevision();
 		if($siblings){
 			return new FractalCollection($siblings, new PageTransformer, false);
 		}

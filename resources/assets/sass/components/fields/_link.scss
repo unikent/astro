@@ -1,0 +1,17 @@
+.link-field {
+	white-space: nowrap;
+	color: #9b9b9b;
+	overflow: hidden;
+	text-overflow: ellipsis;
+
+	&__add-link-button {
+		float: right;
+		margin-top: 10px;
+
+		.is-error & {
+			color: #f56c6c;
+			border-color: #f56c6c;
+		}
+	}
+
+}

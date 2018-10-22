@@ -1,0 +1,21 @@
+/**
+used on 404 not found pages
+*/
+.not-found {
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+	justify-content:center;
+	height:100vh;
+}
+.not-found__title {
+	font-size: 3rem;
+	color: #333;
+}
+.not-found__text {
+	text-align: center;
+	margin: 2rem 0;
+}
+.not-found__link {
+	text-decoration: none;
+}

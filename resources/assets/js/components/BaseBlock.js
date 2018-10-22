@@ -1,6 +1,8 @@
+import _ from 'lodash';
 import inlineFieldMixin from 'mixins/inlineFieldMixin';
 import imagesLoaded from 'imagesloaded';
 import { eventBus } from 'plugins/eventbus';
+import { imageUrl } from 'classes/helpers';
 
 export default {
 
@@ -29,6 +31,10 @@ export default {
 	},
 
 	methods: {
+		imageUrl(url, defaultUrl) {
+			return imageUrl(url, defaultUrl);
+		},
+
 		watchFields(fields) {
 			Object.keys(fields).map((name) => {
 				if(!this.watching[name]) {
@@ -42,16 +48,26 @@ export default {
 
 						this[name] = newVal;
 
-						// TODO: use state for this?
-						imagesLoaded(this.$el, () => {
-							eventBus.$emit('block:updateOverlay');
-						});
+						this.updateOverlays();
 					}, {
 						deep: true
 					});
 				}
 			});
-		}
+		},
+
+		updateOverlays: _.throttle(
+			function() {
+				eventBus.$emit('block:hideHoverOverlay');
+				eventBus.$emit('block:updateBlockOverlays');
+				const imgs = imagesLoaded(this.$el);
+				imgs.on('always', () => {
+					eventBus.$emit('block:updateBlockOverlays');
+				});
+			},
+			50,
+			{ trailing: true }
+		)
 	}
 
 };

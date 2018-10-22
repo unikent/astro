@@ -2,16 +2,17 @@
 
 namespace App\Models;
 
-use App\Exceptions\UnpublishedParentException;
-use App\Models\Definitions\Region;
+use App\Events\PageEvent;
+use App\Validation\Brokers\BlockBroker;
 use DB;
-use Doctrine\DBAL\Version;
 use Exception;
 use App\Models\Definitions\Layout as LayoutDefinition;
+use \App\Models\Definitions\Block as BlockDefinition;
 use Baum\Node as BaumNode;
-use Illuminate\Database\Eloquent\Collection;
-use League\Fractal\TransformerAbstract;
 use App\Models\Definitions\Layout;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Validator;
+
 /**
  * A Page represents a path in a hierarchical site structure.
  * Each page has a current revision, and each "tree" of pages is scoped by its site_id and version (draft, published, etc).
@@ -75,10 +76,27 @@ class Page extends BaumNode
 	protected static function boot()
 	{
 		parent::boot();
-
+		Event::listen(PageEvent::PAGE_EVENT_WILDCARD, [static::class, 'handlePageEvent'] );
 		static::saving(function ($node) {
 			$node->path = $node->generatePath();
 		});
+	}
+
+	/**
+	 * Give dynamic blocks on a page the option to react to any page change events.
+	 * @param PageEvent $page_event
+	 */
+	protected static function handlePageEvent($page_event) {
+		if($page_event->page) {
+			foreach($page_event->page->revision->blocks as $region_name => $sections) {
+				foreach($sections as $section_index => $section_def) {
+					foreach($section_def['blocks'] as $block_index => $block_data) {
+						$definition = BlockDefinition::fromDefinitionFile(BlockDefinition::locateDefinition(BlockDefinition::idFromNameAndVersion($block_data['definition_name'], $block_data['definition_version'])));
+						$definition->onPageStatusChange($page_event, $block_data, $region_name, $section_index, $section_def, $block_index);
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -151,6 +169,7 @@ class Page extends BaumNode
 			return Page::STATE_NEW;
 		}
 	}
+
 
 	/************************************************************************
 	 * Relations
@@ -323,6 +342,7 @@ class Page extends BaumNode
 	 */
 	public static function findByHostAndPath($host, $path, $version = Page::STATE_PUBLISHED)
 	{
+		$path = rtrim($path, '/');
 		$query = Page::version($version)
 			->join('sites', 'site_id', '=', 'sites.id')
 			->where('sites.host', $host)
@@ -391,7 +411,7 @@ class Page extends BaumNode
 	 */
 	public function loadLayoutDefinition($includeRegions = false)
 	{
-		$file = LayoutDefinition::locateDefinition($this->revision->layout_name, $this->revision->layout_version);
+		$file = LayoutDefinition::locateDefinition(LayoutDefinition::idFromNameAndVersion($this->revision->layout_name, $this->revision->layout_version));
 		$definition = LayoutDefinition::fromDefinitionFile($file);
 
 		if ($includeRegions) $definition->loadRegionDefinitions();
@@ -465,9 +485,74 @@ class Page extends BaumNode
 					$block->order = $i;
 					$block->region_name = $region_name;
 					$block->section_name = $section['name'];
+					$block->errors = $this->validateBlock($block);
 					$block->save();
 				}
 			}
 		}
+	}
+
+	public function validateBlock($block)
+	{
+		$rules = [];
+		// ...load the Block definition...
+		$file = BlockDefinition::locateDefinition(
+			BlockDefinition::idFromNameAndVersion(
+				$block['definition_name'],
+				$block['definition_version']
+			)
+		);
+		$blockDefinition = BlockDefinition::fromDefinitionFile($file);
+
+		// ...load the validation rules from the definition...
+		$bb = new BlockBroker($blockDefinition);
+
+		// ...and then merge the block field validation rules.
+		foreach ($bb->getRules() as $field => $ruleset) {
+			$rules[$field] = $ruleset;
+		}
+		$validator = Validator::make($block->fields, $rules);
+		if ($validator->fails()) {
+			$errors = $validator->errors();
+			return $errors;
+		}
+		return null;
+	}
+
+
+	/**
+	 * Get the revisions to this page.
+	 * @return mixed
+	 */
+	public function getRevisions()
+	{
+		return $this->revision->history;
+	}
+
+	/**
+	 * Get the page's siblings (including the page) together with their revisions.
+	 * @return \Illuminate\Database\Eloquent\Collection|static[]
+	 */
+	public function getSiblingsWithRevision()
+	{
+		return $this->siblingsAndSelf()->with('revision')->orderBy('lft')->get();
+	}
+
+	/**
+	 * Get the page's ancestors with revision data to use with fractal transformer
+	 * @return \Illuminate\Database\Eloquent\Collection|static[]
+	 */
+	public function getAncestorsWithRevision()
+	{
+		return $this->ancestors()->with('revision')->orderBy('lft')->get();
+	}
+
+	/**
+	 * Get the page's children with revision data to use with fractal transformer
+	 * @return \Illuminate\Database\Eloquent\Collection|static[]
+	 */
+	public function getChildrenWithRevision()
+	{
+		return $this->children()->with('revision')->orderBy('lft')->get();
 	}
 }

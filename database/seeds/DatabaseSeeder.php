@@ -74,7 +74,7 @@ class DatabaseSeeder extends Seeder
 
 		$client = new LocalAPIClient($user);
         $site = $client->createSite(
-            'Test Site', 'example.com', '', ['name'=>'school-site','version'=>1]
+            'Test Site', 'beta.test', '', ['name'=>'school-site','version'=>1]
         );
         $client->publishPage(Page::forSiteAndPath($site->id, '/')->first()->id);
 

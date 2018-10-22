@@ -15,7 +15,8 @@ class SetupPermissions extends Command
 	 * @var string
 	 */
 	protected $signature = 'astro:permissions
-								{action : The action to perform this could either be "refresh" or "rename-role"}
+								{action : The action to perform this could either be "add", "install" or "rename-role"}
+								{--yes-remove-non-default-permissions}
 								{--old-slug=}
 								{--new-slug=}
 								{--new-name=}
@@ -51,6 +52,7 @@ class SetupPermissions extends Command
 		Permission::ADD_IMAGE => 'Add Images',
 		Permission::EDIT_IMAGE => 'Edit Images',
 		Permission::USE_IMAGE => 'Use Images',
+		Permission::UNLINK_IMAGE => 'Delete Images',
 		Permission::PUBLISH_PAGE => 'Publish Pages',
 		Permission::PREVIEW_PAGE => 'Preview Pages',
 		Permission::APPROVAL => 'Approve Pages',
@@ -88,6 +90,7 @@ class SetupPermissions extends Command
 			Permission::ADD_IMAGE,
 			Permission::EDIT_IMAGE,
 			Permission::USE_IMAGE,
+			Permission::UNLINK_IMAGE,
 			Permission::PUBLISH_PAGE,
 			Permission::UNPUBLISH_PAGE,
 			Permission::PREVIEW_PAGE,
@@ -103,12 +106,12 @@ class SetupPermissions extends Command
 			Permission::LIST_SITES,
 			Permission::EDIT_SUBSITE,
 			Permission::MOVE_SUBSITE,
-			Permission::ADD_PAGE,
 			Permission::EDIT_PAGE,
 			Permission::DELETE_PAGE,
 			Permission::MOVE_PAGE,
 			Permission::ADD_IMAGE,
 			Permission::EDIT_IMAGE,
+			Permission::UNLINK_IMAGE,
 			Permission::USE_IMAGE,
 			Permission::PUBLISH_PAGE,
 			Permission::UNPUBLISH_PAGE,
@@ -123,7 +126,6 @@ class SetupPermissions extends Command
 			Permission::ADD_IMAGE,
 			Permission::EDIT_IMAGE,
 			Permission::USE_IMAGE,
-			Permission::PUBLISH_PAGE,
 			Permission::PREVIEW_PAGE,
 			Permission::APPROVAL
 		]
@@ -147,14 +149,21 @@ class SetupPermissions extends Command
 	public function handle()
 	{
 		switch ($this->argument('action')) {
-			case 'refresh':
-				$this->refreshAllRolesAndPermissions();
+			case 'add':
+				$this->addRolesAndPermissions();
+				break;
+			case 'install':
+				if ($this->option('yes-remove-non-default-permissions')) {
+					$this->addRolesAndPermissions(true);
+				} else {
+					$this->error('This will remove all permissions and roles from packages like Kent Profiles');
+					$this->line('If you understand and want to do that then specify the --yes-remove-non-default-permissions');
+				}
 				break;
 			case 'rename-role':
 				if ($this->option('old-slug') && $this->option('new-slug') && $this->option('new-name')) {
 					$this->renameRole($this->option('old-slug'), $this->option('new-slug'), $this->option('new-name'));
-				}
-				else {
+				} else {
 					$this->error('You need to specify the --old-slug, --new-slug and --new-name for the role you\'d like to edit');
 				}
 				break;
@@ -164,8 +173,17 @@ class SetupPermissions extends Command
 		}
 	}
 
-	public function refreshAllRolesAndPermissions($value='')
-	{	
+	
+	
+	/**
+	 * addRolesAndPermissions
+	 *
+	 * @param mixed $replace - if set to true this resets all roles and permissions to default
+	 * 				WARNING - this would remove permissions set by packages like Kent Profiles
+	 * @return void
+	 */
+	public function addRolesAndPermissions($replace = false)
+	{
 		$role_ids = [];
 		$permission_ids = [];
 
@@ -181,33 +199,47 @@ class SetupPermissions extends Command
 			// then add permissions to the role
 			$role_permission_ids = [];
 			foreach ($permission_slugs as $permission_slug) {
-
 				$permission = Permission::where('slug', $permission_slug)->first();
 				if (!$permission) {
-					$permission = new Permission(['slug' => $permission_slug, 'name' => self::$permission_names[$permission_slug]]);
+					$permission = new Permission([
+						'slug' => $permission_slug,
+						'name' => self::$permission_names[$permission_slug]
+					]);
 					$permission->save();
 					$this->info('New permision added: ' . $permission->name);
 				}
 				$role_permission_ids[] = $permission->id;
 				$permission_ids[] = $permission->id;
 			}
-
-			$role->permissions()->sync($role_permission_ids);
+			
+			if ($replace) {
+				// set permissions to default - remove any set by packages like kent-profiles
+				$role->permissions()->sync($role_permission_ids);
+			} else {
+				// do not replace exising relationships to avoid removing permissions assigned via
+				// packages like Kent Profiles
+				$role->permissions()->syncWithoutDetaching($role_permission_ids);
+			}
+			
 			$role_ids[] = $role->id;
 		}
-		
-		// then remove any unspecified roles
-		$unspecified_roles = Role::whereNotIn('id', $role_ids)->pluck('id')->toArray();
-		if (!empty($unspecified_roles)) {
-			Role::destroy($unspecified_roles);
-			$this->info('Role ids removed: ' . implode(', ', $unspecified_roles));
-		}
-
-		// also remove any unspecified permissions
-		$unspecified_permissions = Permission::whereNotIn('id', $permission_ids)->pluck('id')->toArray();
-		if (!empty($unspecified_permissions)) {
-			Permission::destroy($unspecified_permissions);
-			$this->info('Permission ids removed: ' . implode(', ', $unspecified_permissions));
+	
+		if ($replace) {
+			// remove all non-default permissions and roles
+			
+			// then remove any unspecified roles
+			$unspecified_roles = Role::whereNotIn('id', $role_ids)->pluck('id')->toArray();
+			if (!empty($unspecified_roles)) {
+				Role::destroy($unspecified_roles);
+				$this->info('Role ids removed: ' . implode(', ', $unspecified_roles));
+			}
+	
+			// also remove any unspecified permissions
+			$unspecified_permissions = Permission::whereNotIn('id', $permission_ids)->pluck('id')->toArray();
+			if (!empty($unspecified_permissions)) {
+				Permission::destroy($unspecified_permissions);
+				$this->info('Permission ids removed: ' . implode(', ', $unspecified_permissions));
+			}
 		}
 	}
 
@@ -219,9 +251,8 @@ class SetupPermissions extends Command
 			$role->slug = $new_slug;
 			$role->save();
 			$this->info('Role has been renamed from "' . $old_slug . '" to "' . $new_slug . '" ("'. $new_name .'")');
-		}
-		else
+		} else {
 			$this->warn('Role "' . $old_slug . '" could not be found');
-
+		}
 	}
 }

@@ -174,7 +174,7 @@
 										type="default"
 										size="small"
 									>
-										<icon name="delete" width="14" height="14" />
+										<icon name="delete" :width="14" :height="14" />
 									</el-button>
 									</div>
 								</td>
@@ -361,6 +361,7 @@ export default {
 
 			this.$api
 				.all([fetchSite, fetchUserList, fetchRoles])
+				// TODO: catch errors
 				.then(this.$api.spread((site, users, roles) => {
 					this.siteTitle = site.data.data.name;
 					this.users = site.data.data.users || [];
@@ -414,6 +415,7 @@ export default {
 						.catch((error) => error.response)
 					);
 
+					// TODO: catch errors
 					this.$api
 						.all(requests)
 						.then(response => {
@@ -459,6 +461,7 @@ export default {
 					cancelButtonText: 'Cancel',
 					type: 'warning'
 				})
+				// TODO: catch
 				.then(() => {
 					this.$api
 						.put(

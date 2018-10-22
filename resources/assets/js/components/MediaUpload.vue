@@ -19,7 +19,7 @@
 			:accept="accept"
 			:multiple="multiple"
 			:on-success="onSuccess"
-			:site-id="Number(this.$route.params.site_id)"
+			:site-id="Number(this.$route.params.site_id || this.$route.params.siteId)"
 		/>
 	</div>
 </template>

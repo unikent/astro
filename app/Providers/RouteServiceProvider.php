@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Page;
+use App\Models\Site;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\Definitions\Block as BlockDefinition;
@@ -40,6 +41,10 @@ class RouteServiceProvider extends ServiceProvider
 			return Page::draft()->where('id', '=', $value)->firstOrFail();
 		});
 
+		Route::bind('site', function($value){
+			return Site::where('id', '=', $value)->firstOrFail();
+		});
+
 		Route::bind('block_definition', function ($value) {
 			$path = BlockDefinition::locateDefinitionOrFail($value);
 			return BlockDefinition::fromDefinitionFile($path);
@@ -63,11 +68,15 @@ class RouteServiceProvider extends ServiceProvider
 	 */
 	public function map()
 	{
-		$this->mapApiRoutes();
-
-		$this->mapWebRoutes();
-
-		//
+		if(!config('app.disable_api_routes') || strtolower(config('app.disable_api_routes')) == 'false' ) {
+			$this->mapApiRoutes();
+		}
+		if(!config('app.disable_preview_routes') || strtolower(config('app.disable_preview_routes')) == 'false') {
+			$this->mapPreviewRoutes();
+		}
+		if(!config('app.disable_web_routes') || strtolower(config('app.disable_web_routes')) == 'false' ) {
+			$this->mapWebRoutes();
+		}
 	}
 
 	/**
@@ -82,6 +91,20 @@ class RouteServiceProvider extends ServiceProvider
 		Route::middleware('web')
 			->namespace($this->namespace)
 			->group(base_path('routes/web.php'));
+	}
+
+	/**
+	 * Define the "preview" routes for the application.
+	 *
+	 * These routes are used to preview draft and published versions of pages and all receive session state, CSRF protection, etc.
+	 *
+	 * @return void
+	 */
+	protected function mapPreviewRoutes()
+	{
+		Route::middleware('web')
+			->namespace($this->namespace)
+			->group(base_path('routes/preview.php'));
 	}
 
 	/**

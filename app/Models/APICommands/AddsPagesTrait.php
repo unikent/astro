@@ -2,6 +2,7 @@
 
 namespace App\Models\APICommands;
 
+use App\Events\PageEvent;
 use App\Models\Definitions\Layout;
 use App\Models\Page;
 use App\Models\Revision;
@@ -24,8 +25,17 @@ trait AddsPagesTrait
 	 * @param int $layout_version The version of the layout for this page.
 	 * @return Page - The newly added page.
 	 */
-	public function addPage($parent, $slug, $title, $user, $layout_name, $layout_version)
+	public function addPage($parent, $slug, $title, $user, $layout_name, $layout_version, $next_id = null)
 	{
+		event(new PageEvent(PageEvent::CREATING, null, [
+			'parent' => $parent,
+			'layout_name' => $layout_name,
+			'layout_version' => $layout_version,
+			'slug' => $slug,
+			'title' => $title,
+			'user' => $user
+		]));
+
 		$page = $parent->children()->create(
 			[
 				'site_id' => $parent->site_id,
@@ -50,6 +60,10 @@ trait AddsPagesTrait
 			'valid' => true
 		]);
 		$page->setRevision($revision);
+		if($next_id) {
+			$page->makePreviousSiblingOf(Page::find($next_id));
+		}
+		event(new PageEvent(PageEvent::CREATED, $page, null));
 		return $page;
 	}
 }

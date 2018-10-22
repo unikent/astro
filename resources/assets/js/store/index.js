@@ -12,6 +12,8 @@ import definition from './modules/definition';
 import contenteditor from './modules/contenteditor';
 
 import Config from 'classes/Config';
+import { addThemeStoreModules } from 'helpers/themeExports';
+import { Definition } from 'classes/helpers';
 
 /* global process */
 
@@ -34,19 +36,21 @@ let store = new Vuex.Store({
 		},
 		wrapperStyles: {},
 		displayIframeOverlay: false,
-		errors: [],
+		errors: {
+			blocks: {}
+		},
 		undoRedo: {
 			canUndo: false,
 			canRedo: false
 		},
-		sidebarCollapsed: false,
 		blockPicker: {
 			visible: false,
 			insertIndex: 0,
 			insertRegion: null,
 			insertSection: null,
 			allowedBlocks: null,	// the constraints on what blocks can be added
-			maxSelectableBlocks: null, // the maximum number of blocks that can be selected 
+			deprecatedBlocks: null, // blocks to hide the block picker
+			maxSelectableBlocks: null, // the maximum number of blocks that can be selected
 			replaceBlocks: false //whether or not to replace the blocks in the current section
 		},
 		currentView: 'desktop',
@@ -67,7 +71,62 @@ let store = new Vuex.Store({
 		}
 	},
 
-	getters: {},
+	getters: {
+
+		/**
+		 * Remove any empty errors and format them in a way that can be used
+		 * directly in the sidebar.
+		 *
+		 * @return     {array}  Our error messages in a nicer format.
+		 */
+		getAllBlockErrors(state) {
+			let messages = {};
+
+			Object.keys(state.errors.blocks).forEach(blockId => {
+				const blockDefinition = Definition.get(state.errors.blocks[blockId].definitionName);
+
+				Object.keys(state.errors.blocks[blockId].errors).forEach(fieldName => {
+					if(state.errors.blocks[blockId].errors[fieldName].length) {
+						if(!messages[blockId]) {
+							messages[blockId] = {
+								label: blockDefinition.label,
+								errors: []
+							};
+						}
+
+						const { label } = getFieldDefinition(
+							blockDefinition,
+							fieldName
+						);
+
+						messages[blockId].errors.push({
+							label,
+							field: fieldName
+						});
+					}
+				})
+			});
+
+			return messages;
+		},
+
+		getAllBlockErrorsCount(state) {
+			let count = 0;
+			const blockErrors = state.errors.blocks;
+
+			Object.keys(blockErrors).forEach(blockId => {
+				Object
+					.keys(blockErrors[blockId].errors)
+					.forEach(fieldName => {
+						if(Array.isArray(blockErrors[blockId].errors[fieldName])) {
+							count += blockErrors[blockId].errors[fieldName].length;
+						}
+					});
+			});
+
+			return count;
+		}
+	},
 
 	mutations: {
 
@@ -95,12 +154,54 @@ let store = new Vuex.Store({
 			state.undoRedo = canUndoRedo;
 		},
 
-		collapseSidebar(state) {
-			state.sidebarCollapsed = true;
+		addBlockErrors(state, { block: { id: blockId }, blockInfo, definitionName, errors }) {
+			const value = { definitionName, blockInfo, errors };
+
+			if(state.errors.blocks[blockId]) {
+				state.errors.blocks[blockId] = value;
+			}
+			else {
+				state.errors.blocks = {
+					...state.errors.blocks,
+					[blockId]: value
+				};
+			}
 		},
 
-		revealSidebar(state) {
-			state.sidebarCollapsed = false;
+		resetFieldErrors(state, { blockId }) {
+			if(state.errors.blocks[blockId]) {
+				Object.keys(state.errors.blocks[blockId].errors).forEach(fieldName =>
+					state.errors.blocks[blockId].errors[fieldName] = []
+				);
+			}
+		},
+
+		deleteBlockValidationIssue(state, blockId) {
+			if(state.errors.blocks[`${blockId}`]) {
+				Vue.delete(state.errors.blocks, `${blockId}`);
+			}
+		},
+
+		clearBlockErrors(state) {
+			state.errors.blocks = {};
+		},
+
+		addFieldError(state, { blockId, fieldName, errors }) {
+			if(state.errors.blocks[blockId].errors[fieldName]) {
+				state.errors.blocks[blockId].errors[fieldName] = errors;
+			}
+			else {
+				state.errors.blocks[blockId].errors = {
+					...state.errors.blocks[blockId].errors,
+					[fieldName]: errors
+				};
+			}
+		},
+
+		updateBlockErrorIndex(state, { blockId, blockIndex }) {
+			if(state.errors.blocks[blockId]) {
+				state.errors.blocks[blockId].blockInfo.blockIndex = blockIndex;
+			}
 		},
 
 		/**
@@ -110,14 +211,16 @@ let store = new Vuex.Store({
 		 * @param {number} sectionIndex - The index of the section within the region to add any blocks to.
 		 * @param {number} insertIndex - The index within the section to add any blocks to.
 		 * @param {Object} blocks - List of allowed block names.
+		 * @param {Object} deprecatedBlocks - List of blocks to hide from picker.
 		 * @param {number} maxSelectableBlocks - the maximum number of blocks that can be selected
 		 * @param {boolean} replaceBlocks - Replace the blocks in the section with the new one
 		 */
-		showBlockPicker(state, { regionName, sectionIndex, insertIndex, blocks, maxSelectableBlocks, replaceBlocks }) {
+		showBlockPicker(state, { regionName, sectionIndex, insertIndex, blocks, deprecatedBlocks, maxSelectableBlocks, replaceBlocks }) {
 			state.blockPicker.insertRegion = regionName;
 			state.blockPicker.insertIndex = insertIndex;
 			state.blockPicker.insertSection = sectionIndex;
 			state.blockPicker.allowedBlocks = blocks;
+			state.blockPicker.deprecatedBlocks = deprecatedBlocks;
 			state.blockPicker.maxSelectableBlocks = maxSelectableBlocks;
 			state.blockPicker.replaceBlocks = replaceBlocks
 			state.blockPicker.visible = true;
@@ -224,14 +327,14 @@ let store = new Vuex.Store({
 		}
 	},
 
-	modules: {
+	modules: addThemeStoreModules({
 		page,
 		definition,
 		contenteditor,
 		site,
 		media,
 		permissions
-	},
+	}),
 
 	plugins: [
 		shareMutations,
@@ -243,5 +346,15 @@ let store = new Vuex.Store({
 
 });
 
+const getFieldDefinition = (definition, fieldName) => {
+	// Remove any digits from field name, to easily find our field definition
+	const path = fieldName.replace(/\.\d+\./g, '.').split('.');
+
+	for(var i = 0, length = path.length; definition && i < length; i++) {
+		definition = definition.fields.find(field => field.name === path[i]);
+	}
+
+	return i && i === length ? definition : null;
+};
 
 export default store;

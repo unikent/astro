@@ -64,7 +64,7 @@
 
 					<td>
 						<div class="cell">
-							<router-link :to="`/site/${site.id}/page/${site.homepage.id}`">
+							<router-link :to="`/site/${site.id}/page/${site.homepage.id}`" v-if="canUserOnSite('page.edit', site.currentRole)">
 								<el-button type="default" size="small">
 									Editor
 								</el-button>
@@ -84,8 +84,13 @@
 									Users
 								</el-button>
 							</router-link>
+							<router-link :to="`/site/${site.id}/profiles`" v-if="canUserOnSite('profile.edit', site.currentRole)">
+								<el-button type="default" size="small">
+									Profiles
+								</el-button>
+							</router-link>
 							<!-- <el-button @click="askRemove(site.id)" type="default" size="small" v-if="canUserOnSite('site.delete', site.currentRole)">
-								<icon name="delete" width="14" height="14" />
+								<icon name="delete" :width="14" :height="14" />
 							</el-button> -->
 						</div>
 					</td>

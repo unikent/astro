@@ -24,11 +24,21 @@
 						"items": { "type": "string" }
 					}
 				},
-				"required": ["type", "name", "label"],
+				"anyOf": [
+					{
+						"properties": {
+							"type": { "enum": ["header", "paragraph"] }
+						},
+						"required": ["type", "name"]
+					},
+					{
+						"required": ["type", "name", "label"]
+					}
+				],
 				"oneOf": [
 					{
 						"properties": {
-							"type": { "enum": ["text", "textarea", "richtext"] },
+							"type": { "enum": ["text", "textarea", "richtext", "link"] },
 							"default": { "type": "string" }
 						}
 					},
@@ -59,7 +69,8 @@
 							"type": {
 								"enum": [
 									"select", "radio", "buttongroup", "number",
-									"slider", "date", "time", "datetime", "group"
+									"slider", "date", "time", "datetime", "group",
+									"header", "paragraph"
 								]
 							},
 							"default": {}

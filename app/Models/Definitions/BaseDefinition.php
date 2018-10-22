@@ -4,6 +4,7 @@ namespace App\Models\Definitions;
 use Config;
 use Exception;
 use JsonSerializable;
+use Illuminate\Support\Facades\Redis;
 use App\Exceptions\JsonDecodeException;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
@@ -21,7 +22,6 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
 {
 
     use HasAttributes, HidesAttributes, GuardsAttributes;
-
 
     protected static $defDir = '';
 
@@ -323,13 +323,52 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
         if(JSON_ERROR_NONE !== json_last_error()){
             throw new JsonDecodeException(json_last_error_msg());
         }
-
-    	$instance = new static();
+		if(!empty($definition['dynamic'])){
+        	// dynamic definitions have a definition class that can do things
+        	$defn_id = static::idFromNameAndVersion($definition['name'], $definition['version']);
+        	$class_path = static::definitionPath($defn_id);
+			$class_name = static::getDynamicClassName($defn_id);
+			$file_path = $class_path . '/' . $class_name. '.php';
+			require_once $file_path;
+			$instance = new $class_name();
+		}
+		else {
+			$instance = new static();
+		}
     	$instance->forceFill($definition);
-
-    	return $instance;
+		return $instance;
     }
 
+	/**
+	 * Get the names of all available dynamic attributes for this definition.
+	 * @return array
+	 */
+    public function getDynamicAttributeNames()
+	{
+		$names = [];
+		foreach($this->dynamicAttributes ?? [] as $attribute) {
+			$names[] = $attribute['name'];
+		}
+		return $names;
+	}
+
+	/**
+	 * Gets the name of the dynamic definition class.
+	 * Dynamic definition classes are the definition name (first character uppercased),
+	 * with any non-alpha-numeric characters removed (and the first following character uppercased)
+	 * @param string $definition_id {name}-v{version}
+	 * @return string - Class (and file, minus .php extension) name for the class that handles dynamic actions for this definition.
+	 */
+    public static function getDynamicClassName($definition_id)
+	{
+		$def = static::idToNameAndVersion($definition_id);
+		$parts = preg_split('/[^a-z0-9]/i', $def['name'], -1, PREG_SPLIT_NO_EMPTY);
+		$class_name = '';
+		foreach($parts as $part) {
+			$class_name .= ucfirst($part);
+		}
+		return $class_name . 'V' . $def['version'];
+	}
 
     /**
      * Returns a new model instance based on a definition file.
@@ -339,13 +378,49 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
      */
     public static function fromDefinitionFile($path)
     {
-    	if(!file_exists($path)){
-    		throw new FileNotFoundException($path);
-    	}
+        $definition = null;
+        static $definitionCache = [];
 
-    	return static::fromDefinition(file_get_contents($path));
+        if(empty($definitionCache[$path])) {
+
+			if (Config::get('database.redis.active')) {
+				try {
+					$definition = Redis::get($path);
+				} catch (Exception $e) {
+				}
+			}
+
+			if (empty($definition)) {
+				if (!file_exists($path)) {
+					throw new FileNotFoundException($path);
+				}
+				$definition = file_get_contents($path);
+				if (Config::get('database.redis.active')) {
+					try {
+						Redis::set($path, $definition);
+					} catch (Exception $e) {
+					}
+				}
+			}
+			$definitionCache[$path] = static::fromDefinition($definition);
+		}
+		return $definitionCache[$path];
+
     }
 
+	/**
+	 * Get the path to the folder containing the specified definition.
+	 * @param string $definition_id - The {name}-v{version} string identifying the definition.
+	 * @return null|string - The path or null if $definition_id is invalid.
+	 */
+    public static function definitionPath($definition_id)
+	{
+		$parts = static::idToNameAndVersion($definition_id);
+		if($parts) {
+			return sprintf('%s/%s/%s/v%d', Config::get('app.definitions_path'), static::$defDir, $parts['name'], $parts['version']);
+		}
+		return null;
+	}
 
     /**
      * Locates a Definition file on disk; when no version is specified
@@ -355,9 +430,8 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
      * @return string|null
      */
     public static function locateDefinition($definition_id){
-    	$parts = static::idToNameAndVersion($definition_id);
-    	if($parts) {
-			$path = sprintf('%s/%s/%s/v%d', Config::get('app.definitions_path'), static::$defDir, $parts['name'], $parts['version']);
+    	$path = static::definitionPath($definition_id);
+    	if($path) {
 			$path .= '/definition.json';
 			return file_exists($path) ? $path : null;
 		}

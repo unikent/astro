@@ -2,6 +2,7 @@
 
 namespace App\Models\APICommands;
 
+use App\Events\PageEvent;
 use App\Models\Contracts\APICommand;
 use App\Models\Revision;
 use DB;
@@ -30,6 +31,8 @@ class UpdatePageSlug implements APICommand
 			if ($input['slug'] == $page->slug) {
 				return $page;
 			}
+			$old_slug = $page->slug;
+			event($page, ['new_slug' => $input['slug']]);
 			// update published version of page if there is one
 			// need to do this BEFORE updating the draft page, as we can only find the published version
 			// by looking for a page with the same path / slug
@@ -39,6 +42,7 @@ class UpdatePageSlug implements APICommand
 			}
 			$this->updateSlugAndPaths($page, $input['slug']);
 			$page->refresh();
+			event($page, ['old_slug' => $old_slug]);
 			return $page;
 		});
 		return $result;

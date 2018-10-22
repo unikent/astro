@@ -18,7 +18,11 @@ class Kernel extends ConsoleKernel
         Commands\AddSite::class,
         Commands\AddUser::class,
         Commands\SetupPermissions::class,
-		Commands\ManageAdmins::class
+		Commands\ManageAdmins::class,
+		Commands\ClearCache::class,
+		Commands\MigratePages::class,
+		Commands\RenewUserAPITokens::class,
+		Commands\UpdateSiteURL::class,
 	];
 
 	/**
@@ -29,8 +33,7 @@ class Kernel extends ConsoleKernel
 	 */
 	protected function schedule(Schedule $schedule)
 	{
-		// $schedule->command('inspire')
-		//          ->hourly();
+		$schedule->command('astro:renewapitokens')->dailyAt('05:00');
 	}
 
 	/**
