@@ -19,11 +19,20 @@
 	align-items: center;
 	justify-content: flex-end;
 }
+
+.top-bar__navigation {
+    display:flex;
+    min-width: 0;
+}
+
 .top-bar__page-title {
-	float: left;
-	display: inline-block;
+	// float: left;
+	// display: inline-block;
 	vertical-align: middle;
 	padding-left: 20px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 	.el-tag {
 		height: 18px;
 		line-height: 16px;
@@ -39,19 +48,27 @@
 		line-height: 16px;
 	}
 }
+
+.top-bar__url  * {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .top-bar__title {
 	font-size: 14px;
 	padding: 1rem 0 0 0;
 }
 
 .top-bar-backbutton {
-	float: left;
-	display: inline-block;
+	// float: left;
+	// display: inline-block;
 	vertical-align: middle;
 	line-height: get-height(top-bar);
 	color: #71787f;
 	font-size: 13px;
 	cursor: pointer;
+    white-space: nowrap;
 }
 .backbutton-icon {
 	margin-right: 6px;
