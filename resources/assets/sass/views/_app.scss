@@ -26,38 +26,36 @@
 }
 
 .top-bar__page-title {
-	// float: left;
-	// display: inline-block;
 	vertical-align: middle;
 	padding-left: 20px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
 	.el-tag {
 		height: 18px;
 		line-height: 16px;
 		font-size: 10px;
 		margin-left: 5px;
 	}
+    min-width: 0;
 }
 .top-bar__url {
 	font-size: 11px;
 	color: #71787f;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    margin-top: 4px;
 	.el-tag {
 		height: 18px;
 		line-height: 16px;
 	}
 }
 
-.top-bar__url  * {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
 .top-bar__title {
 	font-size: 14px;
 	padding: 1rem 0 0 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .top-bar-backbutton {
