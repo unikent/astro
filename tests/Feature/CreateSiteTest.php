@@ -152,8 +152,7 @@ class CreateSiteTest extends TestCase
 	 */
 	public function validDataUnauthorizedUsersProvider()
 	{
-		$users = ['randomer', 'contributor', 'editor', 'owner'];
-		return $this->combineForProvider($this->getValidFixtureData('CreateSite'), array_combine($users, $users));
+		return $this->combineForProvider($this->getValidFixtureData('CreateSite'), $this->unauthorizedUsers());
 	}
 
 	/**
@@ -162,8 +161,7 @@ class CreateSiteTest extends TestCase
 	 */
 	public function unauthorizedUsersInvalidSiteDataProvider()
 	{
-		$users = ['randomer', 'contributor', 'editor', 'owner'];
-		return $this->combineForProvider($this->getInvalidFixtureData('CreateSite'), array_combine($users, $users));
+		return $this->combineForProvider($this->getInvalidFixtureData('CreateSite'), $this->unauthorizedUsers());
 	}
 
 	/**
@@ -172,8 +170,7 @@ class CreateSiteTest extends TestCase
 	 */
 	public function authorizedUsersInvalidSiteDataProvider()
 	{
-		$users = ['admin'];
-		return $this->combineForProvider($this->getInvalidFixtureData('CreateSite'), array_combine($users, $users));
+		return $this->combineForProvider($this->getInvalidFixtureData('CreateSite'), $this->authorizedUsers());
 	}
 
 

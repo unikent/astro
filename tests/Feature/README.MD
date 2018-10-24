@@ -12,11 +12,11 @@ sneaking through to production.
 
 "Helper" traits exist to:
  
- * Setup existing sites / pages in the database based of json or php arrays
+ * Setup existing sites / pages in the database based on json or php arrays
  * Extract named properties (e.g. page title, definition, etc) from json data
- * Make assertions data objects (e.g. pageIsAChildOf)
+ * Make assertions on the database contents (e.g. pageIsAChildOf)
  * Validate that json returned matches a schema.
-
+ * Validate that error responses are correct.
 
 ## Test Configuration 
 
@@ -32,17 +32,108 @@ The Tests\TestCase base class sets the definitions path to the ``tests/Support/F
 
 ## Writing Tests
 
-The API should be tested against requests from each of these users, ensuring that
-they succeed or fail as expected given the privileges for each account.
+Tests should cover the following conditions:
 
-The simplest way to do this is to use phpunit data providers to run each test
-with each valid (or invalid) user.
+- API calls should succeed or fail for each type of user account.
+- Responses should have the expected status code and payload.
+- Error responses (where expected) should be in the expected format with expected values for each error condition.
+- The internal site / page structure should be in the expected state after each command.
 
-Due to the fact that the data provider cannot return the actual user object, as
-data providers run BEFORE the phpunit setup method 
-(see note on https://phpunit.de/manual/current/en/writing-tests-for-phpunit.html#writing-tests-for-phpunit.data-providers);
-instead they should return the property names of the desired user accounts
-and the test itself should access the user object using, eg:
+### Setting up the environment
+
+Tests should use the [CreatesFeatureFixtures trait](Traits/CreatesFeatureFixtures.php) which automatically
+sets up the following environment before each test:
+
+- Two sites based on a test site definition.
+- An admin, viewer, owner, editor, contributor and randomer user account.
+- Gives the admin and viewer accounts "admin" and "viewer" global roles.
+- Adds the owner, editor and contributor to the first site and assigns them the roles they are named after.
+- Does not assign the randomer account any role on any site.
+- Runs the artisan command to setup permissions for roles.
+
+It also provides two utility methods used when creating
+[data providers](https://phpunit.de/manual/3.7/en/writing-tests-for-phpunit.html#writing-tests-for-phpunit.data-providers) 
+to be consumed by tests, `packArrayForProvider()` and `combineForProvider()`. These are useful for creating
+permutations of both user account and test data to run in each test whilst including keys which make
+failed test error messages useful.
+
+The utility method `packArrayForProvider()` takes an array of strings and returns
+an array suitable to be returned by a data provider. PHPUnit expects the values 
+for the array to also be arrays as data providers can provider
+multiple arguments for each iteration of the test  (the values, which are passed as parameters to
+the test method, must be arrays even if there is only one parameter), e.g.
+ 
+    ['admin', 'owner'] -> 
+    [
+      'admin' => ['admin'], 
+      'owner' => ['owner']
+    ]
+
+The "key" in the array returned by a data provider can be output by
+phpunit to identify which data a test fails on. 
+
+The `combineForProvider()` method takes multiple arrays or values as arguments and combines them
+into permutations to be returned by a data provider. This is useful for example to test multiple
+request payloads for multiple users, eg:
+
+```php
+<?php
+
+$this->combineForProvider(
+	['admin', 'owner'],
+	['createSite_Valid_1' => $json1, 'createSite_valid_2' => $json2 ]
+);
+
+/* Result (note: the array key identifies the data set on test failure)
+[
+ 'admin_createsite_valid_1' => [ 'admin', $json1 ],
+ 'admin_createsite_valid_2' => [ 'admin', $json2 ],
+ 'owner_createsite_valid_1' => [ 'owner', $json1 ],
+ 'owner_createsite_valid_2' => [ 'owner', $json2 ]
+]
+*/
+```
+
+### Testing for different user privileges
+
+The simple way to do this is to use a data provider to provide the users accounts who should
+or shouldn't be able to perform the operation under test.
+
+The user accounts created by the [CreatesFeatureFixtures trait](Traits/CreatesFeatureFixtures.php) 
+can be accessed directly as properties, eg. `$this->admin`, `$this->editor`, etc.
+
+There are also two utility methods, `authorizedUsers()` and `unauthorizedUsers()` which can be used
+to get an array of [username => username] for each user account which is either authorized or unauthorized
+to perform the command being tested. By default, all users except for `admin` are considered unauthorized.
+To alter this override the `authorizedUsers` property with an array of usernames that should be allowed to 
+perform the command being tested, eg:
+
+```php
+<?php
+
+class MyCommandTest extends TestCase
+{
+	use CreatesFeatureFixtures;
+	
+	/**
+	 * admins, editors and owners will all be returned from $this->authorizedUsers() and not from $this->unauthorizedUsers()
+ 	 */
+	public $authorizedUsers = ['admin', 'editor', 'owner'];
+}
+```
+
+*NOTE - both the property AND the method are called `authorizedUsers` - the method ensures that
+the array returned is keyed by its values which is useful in providing useful error messages about 
+which user account was under test when a test fails.*
+
+There are also two data provider methods `unauthorizedUserProvider` and `authorizedUserProvider`
+which return the same data but in the correct format for use as a data provider (an array of arrays),
+eg. [ username1 => [username1], username2 => [username2].
+
+*The data provider cannot return the actual user objects, as
+data providers are run [before the phpunit setup method](https://phpunit.de/manual/current/en/writing-tests-for-phpunit.html#writing-tests-for-phpunit.data-providers).
+Instead your data providers should return the names of the object properties that hold the desired user accounts
+and the test itself should access the user object using, eg:*
 
 ```php
 /**
@@ -60,27 +151,9 @@ public function testUsersCanDoSomething($user) {
  */
 public function usersWhoCanDoSomethingProvider()
 {
-    return [
-        'admin' => ['admin'],
-        'owner' => ['owner']
-    ];
+    return $this->authorizedUsers();
 }
 ```
-
-Note that the "key" in the array returned by the data provider can be output by
-phpunit to identify which data a test fails on. PHPUnit expects the values 
-for the array to also be arrays as data providers can potentially return 
-multiple arguments for each iteration of the test.	 
-	 
-The utility method ``packArrayForProvider`` takes an array of strings and returns
-an array suitable for a dataprovider to return, e.g. 
- 
-    ['admin', 'owner'] -> 
-    [
-      'admin' => ['admin'], 
-      'owner' => ['owner']
-    ]
-
 
 ### Test Request Payloads
 
