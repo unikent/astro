@@ -28,17 +28,18 @@ const vue = new Vue();
  *
  * @property {Array} pages - Array of Pages in the current Site.
  * @property {number} site - ID of the current Site.
- * @property {Site} currentSite - Representation of the currently selected Site in the editor, as returned by the API.
+ * @property {Site} siteData - Representation of the currently selected Site in the editor, as returned by the API.
  * @property {Object} editPageModal - Configuration for the edit page modal dialog.
  * @property {boolean} editPageModal.visible - Whether the modal is visible or not.
  * @property {string} editPageModal.title - The page title field value for the modal.
  * @property {string} editPageModal.slug - The page slug field value for the modal.
- * @propoerty {number} editPageModal.id - The id of the page who's settings are being edited.
+ * @property {number} editPageModal.id - The id of the page who's settings are being edited.
  * @property {boolean} editPageModal.editSlug - Whether or not to allow editing of the page slug in the modal (root pages cannot have their slug changed).
  */
 const state = {
 	pages: [],
 	site: 1,
+	siteData: null,
 	layouts: [],
 	siteDefinitions: {},
 	maxDepth: 3,
@@ -66,6 +67,22 @@ const mutations = {
 	 */
 	updateCurrentSiteID(state, id) {
 		state.site = id;
+		if(state.siteData && state.siteData.id !== id) {
+			state.siteData = null;
+		}
+	},
+
+	/**
+	 * Set the site data that represents the site
+	 * @param state
+	 * @param data
+	 */
+	setSiteData(state, data) {
+		// we ignore data if it doesn't match the current site id stored in state.site
+		// in case site has changed since we requested the data...
+		if(!state.siteData || !data || data.id === state.site) {
+			state.siteData = data;
+		}
 	},
 
 	setSite(state, pages) {
@@ -207,6 +224,26 @@ const responseError = response => {
 };
 
 const actions = {
+
+	/**
+	 * load the data that represents the current site
+	 * @param commit
+	 * @param state
+	 * @param bool refresh - Whether or not to refresh the site data if it is already loaded. Defaults to false.
+	 * @returns {Promise.<T>}
+	 */
+	loadSiteData({ commit, state}, refresh = false) {
+		if(refresh || !state.siteData || (state.siteData.id !== state.site)) {
+			return api
+				.get(`sites/${state.site}`)
+				.then((response) => {
+					commit('setSiteData', response.data.data);
+				});
+		}
+		else {
+			return Promise.resolve(state.sitedata);
+		}
+	},
 
 	fetchSite({ commit, state }) {
 		return api
@@ -455,7 +492,7 @@ const getters = {
 			return getPage(state.pages, arrayPath);
 		}
 		return findPageById(state.pages, id);
-	}
+	},
 };
 
 const
