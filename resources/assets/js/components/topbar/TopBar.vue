@@ -1,6 +1,6 @@
 <template>
 	<div class="top-bar">
-		<div>
+		<div class="top-bar__navigation">
 			<slot name="back">
 			<div
 				v-if="(!showBack && this.$route.name !== 'site-list') && sites.length > 1"
