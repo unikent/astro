@@ -59,6 +59,7 @@ Save menu
     Click Element  ${SaveMenu}
     Wait Until Page Contains  ${SaveMenuSuccess}
     Wait Until Element is visible  ${NotificationClose}
+    Sleep  1 Second
     Click Element  ${NotificationClose}
 
 The user saves the menu
