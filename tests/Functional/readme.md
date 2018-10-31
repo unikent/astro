@@ -31,5 +31,5 @@ See [https://github.com/ppodgorsek/docker-robot-framework](https://github.com/pp
 
 Otherwise (in the absense of docker), use: 
 
-`robot --outputdir reports/ ./Tests/`. 
+`robot --outputdir reports/ ./TestCases/`. 
 
