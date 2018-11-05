@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Definitions\Layout;
 use App\Models\LocalAPIClient;
 use App\Models\Page;
 use Astro\Renderer\AstroRenderer;
 use Astro\Renderer\Base\SingleDefinitionsFolderLocator;
-use Astro\Renderer\Contracts\Locator;
 use Astro\Renderer\Engines\TwigEngine;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -100,7 +98,12 @@ class PageController extends Controller
 		$api = new LocalAPIClient();
 		$engine = new TwigEngine(Config::get('app.definitions_path'));
 		// set the global twig variables
-		$engine->addGlobal('config',config('definitions'));
+		$config = config('definitions');
+		// if we are draft, then pass this url replacement pattern defined in our config
+		$config['url_replacement_pattern'] = Page::STATE_DRAFT === $version
+			? $config['app_preview_url_pattern']
+			: $config['app_live_url_pattern'];
+		$engine->addGlobal('config',$config);
 		// controller
 		$astro = new AstroRenderer();
 		return $astro->renderRoute($host, $path, $api, $engine, $locator, $version, $filters);
