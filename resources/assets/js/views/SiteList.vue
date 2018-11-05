@@ -15,7 +15,7 @@
 <el-card>
 	<div slot="header" class="manage-table__header">
 		<span class="main-header">Manage sites</span>
-		<el-button v-if="canUser('site.create')" type="primary" @click="dialogFormVisible = true" class="manage-table__add-button">
+		<el-button v-if="canUser('site.create')" type="primary" @click="dialogFormVisible = true" class="manage-table__add-button" id="add-site">
 			Add Site
 		</el-button>
 	</div>
@@ -104,13 +104,13 @@
 
 					<el-col :span="11">
 						<el-form-item label="Name">
-							<el-input v-model="form.name" auto-complete="off"></el-input>
+							<el-input v-model="form.name" auto-complete="off" id="input-site-name"></el-input>
 						</el-form-item>
 					</el-col>
 
 					<el-col :span="11" :offset="2">
 						<el-form-item label="Site Template">
-							<el-select v-model="form.siteDefinitionId" class="w100" placeholder="Select">
+							<el-select v-model="form.siteDefinitionId" class="w100" placeholder="Select" popper-class="input-site-template" id="input-site-template" >
 								<el-option
 									v-for="(siteDefinition, siteID) in siteDefinitions"
 									:label="siteDefinition.label + ' (v' + siteDefinition.version + ')'"
@@ -133,6 +133,7 @@
 								v-model="form.host"
 								auto-complete="off"
 								placeholder="www.kent.ac.uk"
+								id="input-site-host"
 							/>
 						</el-form-item>
 
@@ -141,7 +142,7 @@
 					<el-col :span="11" :offset="2">
 
 						<el-form-item label="Path">
-							<el-input v-model="form.path" auto-complete="off" placeholder=""></el-input>
+							<el-input v-model="form.path" auto-complete="off" placeholder="" id="input-site-path"></el-input>
 						</el-form-item>
 					</el-col>
 
@@ -160,7 +161,7 @@
 			</el-form>
 			<span slot="footer" class="dialog-footer">
 				<el-button @click="cancelForm">Cancel</el-button>
-				<el-button type="primary" @click="addSite" :disabled="disableSubmit">Add Site</el-button>
+				<el-button type="primary" @click="addSite" :disabled="disableSubmit" id="input-add-site-button">Add Site</el-button>
 			</span>
 		</el-dialog>
 	</div>
@@ -211,6 +212,8 @@ export default {
 			'getGlobalRole'
 		]),
 
+		...mapGetters('auth', ['username']),
+
 		disableSubmit() {
 			return this.form.siteDefinitionId === ''	 ||
 					this.form.name === '' ||
@@ -225,7 +228,7 @@ export default {
 				let currentSite = this.sites[i];
 				currentSite['currentRole'] = ''; // set a default
 				if (currentSite.users) {
-					let result = currentSite.users.find((element) => element.username === Config.get('username'));
+					let result = currentSite.users.find((element) => element.username === this.username);
 					if (result) {
 						currentSite['currentRole'] = result.role;
 					}

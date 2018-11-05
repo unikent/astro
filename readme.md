@@ -28,9 +28,10 @@ Astro has three separate components:
 There are a number of configuration options that can be set depending on whether you are installing
 to use as the editor, the api and / or the previewer.
 
-The three main config files are:
+The main config files are:
 
 - `config/app.php`
+- `config/auth.php`
 - `config/editor.php`
 - `config/definitions.php`
 

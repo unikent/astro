@@ -25,9 +25,6 @@
 		'base_url' => Request::getBaseUrl(),
 		'api_url' => config('editor.astro_api_url'),
 		'logout_url' => config('editor.astro_logout_url'),
-		'username' => $username,
-		'user'     => $user,
-		'api_token' => $api_token,
 		'debug' => config('app.debug'),
 		'published_url_pattern' => config('editor.app_live_url_pattern'),
 		'draft_url_pattern' => config('editor.app_preview_url_pattern'),
@@ -35,6 +32,8 @@
 		'placeholder_image_url' => config('definitions.placeholder_image_url'),
 		'help_url' => config('editor.help_url'),
 		'help_media_url' => config('editor.help_media_url'),
+		'auth_url' => config('editor.auth_url'),
+		'add_user_note' => config('editor.add_user_note'),
 	]); ?>;
 	</script>
 

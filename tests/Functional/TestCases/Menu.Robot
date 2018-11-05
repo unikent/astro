@@ -1,11 +1,8 @@
 *** Settings ***
-Documentation   This suite of tests checks the front office page, the team link and copy on the team section
+Documentation   This suite of tests checks that the menu functtions as it should
 
 Resource  ../Resources/Common.Robot
-Resource  ../Resources/Credentials/Credentials.Robot
-Resource  ../Resources/PO/SiteListings.Robot
-Resource  ../Resources/PO/Menu.Robot
-Resource  ../Resources/PO/SiteAdministration.Robot
+Resource  ../Resources/Menu.Robot
 
 Test Setup  Begin Web Test
 Test Teardown  End Web test
@@ -15,7 +12,6 @@ Test Teardown  End Web test
 User can access a site’s menu manager from the ‘Manage Sites’ listing
     Given the user accesses the menu section of the site
     Then the user should arrive on the menu manager for the site
-
 
 User can access a site’s menu manager from the site’s administration area
     Given the user is in the site administration area

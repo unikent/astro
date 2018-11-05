@@ -53,6 +53,11 @@
 
 		</div>
 
+		<el-button v-if='showInvalidateTokenButton' type="warning"
+			@click="invalidateAPIToken"
+		> Invalidate Token
+		</el-button>
+
 		<div class="top-bar__tools">
 			<slot name="tools" v-if="showTools" />
 
@@ -85,7 +90,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters, mapMutations } from 'vuex';
 import Icon from 'components/Icon';
 import promptToSave from 'mixins/promptToSaveMixin';
 import Config from 'classes/Config.js';
@@ -113,7 +118,7 @@ export default {
 
 	mounted() {
 		this.loadPermissions();
-		this.loadGlobalRole(window.astro.username);
+		// this.loadGlobalRole(window.astro.username); jtw - moved to authiframe
 		this.$store.dispatch('site/fetchLayouts');
 		this.$store.dispatch('site/fetchSiteDefinitions');
 	},
@@ -146,6 +151,10 @@ export default {
 			'unsavedChangesExist'
 		]),
 
+		...mapGetters('auth', [
+			'username'
+		]),
+		
 		// works out if we should show a back button or not (ie whether we're editing a page or on the homepage)
 		showBack() {
 			return ['page', 'profile-editor'].indexOf(this.$route.name) !== -1;
@@ -153,11 +162,6 @@ export default {
 
 		showTools() {
 			return ['site', 'page', 'profile-editor'].indexOf(this.$route.name) !== -1;
-		},
-
-		// lets us output the current user's username in the top bar
-		username() {
-			return window.astro.username;
 		},
 
 		config() {
@@ -171,15 +175,27 @@ export default {
 
 		isUnsaved() {
 			return this.unsavedChangesExist();
+		}, 
+
+		showInvalidateTokenButton() {
+			return Config.get('debug');
 		}
 	},
 
 	methods: {
 
 		...mapActions([
-			'loadPermissions',
-			'loadGlobalRole'
+			'loadPermissions'
+			// 'loadGlobalRole' jtw moved to authiframe
 		]),
+
+		...mapMutations('auth', [
+			'setAPIToken'
+		]),
+
+		invalidateAPIToken() {
+			this.setAPIToken(null);
+		},
 
 		fetchSiteData() {
 			// TODO: catch errors

@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Definitions\Layout;
 use App\Models\LocalAPIClient;
 use App\Models\Page;
 use Astro\Renderer\AstroRenderer;
 use Astro\Renderer\Base\SingleDefinitionsFolderLocator;
-use Astro\Renderer\Contracts\Locator;
 use Astro\Renderer\Engines\TwigEngine;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
