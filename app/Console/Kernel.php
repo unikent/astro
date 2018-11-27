@@ -23,6 +23,8 @@ class Kernel extends ConsoleKernel
 		Commands\CreateJWT::class,
 		Commands\MigratePages::class,
 		Commands\UpdateSiteURL::class,
+		Commands\SetSiteOption::class,
+		Commands\ViewSiteOptions::class,
 	];
 
 	/**
