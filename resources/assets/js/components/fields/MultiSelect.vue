@@ -1,5 +1,12 @@
 <template>
-	<el-select multiple v-model="value" filterable :placeholder="options.placeholder">
+	<el-select
+		v-model="value" 
+		multiple 
+		:allow-create="field.allow_create ? true : false"
+		:default-first-option="field.allow_create ? true : false"
+		:filterable="field.filterable == false && !field.allow_create ? false : true" 
+		:placeholder="options.placeholder"
+	>
 		<el-option
 			v-for="option in options"
 			:label="option.label"
