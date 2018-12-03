@@ -21,9 +21,9 @@ use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable, JsonSerializable
 {
 
-    use HasAttributes, HidesAttributes, GuardsAttributes;
+	use HasAttributes, HidesAttributes, GuardsAttributes;
 
-    protected static $defDir = '';
+	protected static $defDir = '';
 
 	/**
 	 * Extract the name and version number from a definition identifier
@@ -32,7 +32,7 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
 
 	 * @return array|null [ 'name' => {name}, 'version' => {version} ] or null if no match.
 	 */
-    public static function idToNameAndVersion($id)
+	public static function idToNameAndVersion($id)
 	{
 		if(preg_match('/^(.+)-v([0-9]+)$/', $id, $matches)){
 			return [
@@ -56,277 +56,284 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
 		return $name . '-v' . $version;
 	}
 
-    /**
-     * Dynamically retrieve attributes on the model.
-     *
-     * Identical to implementation on Illuminate\Database\Eloquent\Model
-     *
-     * @param  string  $key
-     * @return mixed
-     */
-    public function __get($key)
-    {
-        return $this->getAttribute($key);
-    }
+	/**
+	 * Dynamically retrieve attributes on the model.
+	 *
+	 * Identical to implementation on Illuminate\Database\Eloquent\Model
+	 *
+	 * @param  string  $key
+	 * @return mixed
+	 */
+	public function __get($key)
+	{
+		return $this->getAttribute($key);
+	}
 
-    /**
-     * Dynamically set attributes on the model.
-     *
-     * Identical to implementation on Illuminate\Database\Eloquent\Model
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @return void
-     */
-    public function __set($key, $value)
-    {
-        $this->setAttribute($key, $value);
-    }
-
-
-    /**
-     * Get the attributes that should be converted to dates.
-     *
-     * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes,
-     * which assumes our model is DB-backed / Eloquent.
-     *
-     * @return array
-     */
-    public function getDates()
-    {
-        return $this->dates;
-    }
+	/**
+	 * Dynamically set attributes on the model.
+	 *
+	 * Identical to implementation on Illuminate\Database\Eloquent\Model
+	 *
+	 * @param  string  $key
+	 * @param  mixed  $value
+	 * @return void
+	 */
+	public function __set($key, $value)
+	{
+		$this->setAttribute($key, $value);
+	}
 
 
-    /**
-     * Get the casts array.
-     *
-     * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes,
-     * which assumes our model is DB-backed / Eloquent.
-     *
-     * @return array
-     */
-    public function getCasts()
-    {
-        return $this->casts;
-    }
+	/**
+	 * Get the attributes that should be converted to dates.
+	 *
+	 * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes,
+	 * which assumes our model is DB-backed / Eloquent.
+	 *
+	 * @return array
+	 */
+	public function getDates()
+	{
+		return $this->dates;
+	}
 
 
-    /**
-     * Get an attribute from the model.
-     *
-     * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes,
-     * which assumes our model is DB-backed / Eloquent.
-     *
-     * @param  string  $key
-     * @return mixed
-     */
-    public function getAttribute($key)
-    {
-        if (! $key) {
-            return;
-        }
-
-        if (array_key_exists($key, $this->attributes) ||
-            $this->hasGetMutator($key)) {
-            return $this->getAttributeValue($key);
-        }
-
-        if (method_exists(self::class, $key)) {
-            return;
-        }
-    }
+	/**
+	 * Get the casts array.
+	 *
+	 * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes,
+	 * which assumes our model is DB-backed / Eloquent.
+	 *
+	 * @return array
+	 */
+	public function getCasts()
+	{
+		return $this->casts;
+	}
 
 
-    /**
-     * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes.
-     *
-     * @throws Exception
-     */
-    public function relationsToArray()
-    {
-    	throw new MethodNotSupportedException('This method not supported on a Definition object.');
-    }
+	/**
+	 * Get an attribute from the model.
+	 *
+	 * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes,
+	 * which assumes our model is DB-backed / Eloquent.
+	 *
+	 * @param  string  $key
+	 * @return mixed
+	 */
+	public function getAttribute($key)
+	{
+		if (! $key) {
+			return;
+		}
 
-    /**
-     * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes.
-     *
-     * @throws MethodNotSupportedException
-     */
-    protected function getArrayableRelations()
-    {
-    	throw new MethodNotSupportedException('This method not supported on a Definition object.');
-    }
+		if (array_key_exists($key, $this->attributes) ||
+			$this->hasGetMutator($key)) {
+			return $this->getAttributeValue($key);
+		}
 
-    /**
-     * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes.
-     *
-     * @param  string  $key
-     * @throws MethodNotSupportedException
-     */
-    public function getRelationValue($key)
-    {
-    	throw new MethodNotSupportedException('This method not supported on a Definition object.');
-    }
-
-    /**
-     * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes.
-     *
-     * @param  string  $method
-     * @throws MethodNotSupportedException
-     */
-    protected function getRelationshipFromMethod($method)
-    {
-    	throw new MethodNotSupportedException('This method not supported on a Definition object.');
-    }
-
-    /**
-     * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes.
-     *
-     * @param  string|null  $key
-     * @param  mixed  $default
-     * @throws MethodNotSupportedException
-     */
-    public function getOriginal($key = null, $default = null)
-    {
-    	throw new MethodNotSupportedException('This method not supported on a Definition object.');
-    }
-
-    /**
-     * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes.
-     *
-     * @throws MethodNotSupportedException
-     */
-    public function syncOriginal()
-    {
-    	throw new MethodNotSupportedException('This method not supported on a Definition object.');
-    }
-
-    /**
-     * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes.
-     *
-     * @param  string  $attribute
-     * @throws MethodNotSupportedException
-     */
-    public function syncOriginalAttribute($attribute)
-    {
-    	throw new MethodNotSupportedException('This method not supported on a Definition object.');
-    }
-
-    /**
-     * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes.
-     *
-     * @param  array|string|null  $attributes
-     * @throws MethodNotSupportedException
-     */
-    public function isDirty($attributes = null)
-    {
-    	throw new MethodNotSupportedException('This method not supported on a Definition object.');
-    }
-
-    /**
-     * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes.
-     *
-     * @param  array|string|null  $attributes
-     * @throws MethodNotSupportedException
-     */
-    public function isClean($attributes = null)
-    {
-    	throw new MethodNotSupportedException('This method not supported on a Definition object.');
-    }
-
-    /**
-     * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes.
-     *
-     * @throws MethodNotSupportedException
-     */
-    public function getDirty()
-    {
-    	throw new MethodNotSupportedException('This method not supported on a Definition object.');
-    }
-
-    /**
-     * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes.
-     *
-     * @param  string  $key
-     * @throws MethodNotSupportedException
-     */
-    protected function originalIsNumericallyEquivalent($key)
-    {
-    	throw new MethodNotSupportedException('This method not supported on a Definition object.');
-    }
+		if (method_exists(self::class, $key)) {
+			return;
+		}
+	}
 
 
-    /**
-     * Fill the model with an array of attributes.
-     *
-     * This imitates the implementation on Illuminate\Database\Eloquent\Model, and is
-     * required by the Illuminate\Database\Eloquent\Concerns\HasAttributes trait.
-     *
-     * @param  array  $attributes
-     * @return $this
-     *
-     * @throws \Illuminate\Database\Eloquent\MassAssignmentException
-     */
-    public function fill(array $attributes)
-    {
-        $totallyGuarded = $this->totallyGuarded();
-        foreach ($this->fillableFromArray($attributes) as $key => $value) {
-            if ($this->isFillable($key)) {
-                $this->setAttribute($key, $value);
-            } elseif ($totallyGuarded) {
-                throw new MassAssignmentException($key);
-            }
-        }
-        return $this;
-    }
+	/**
+	 * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes.
+	 *
+	 * @throws Exception
+	 */
+	public function relationsToArray()
+	{
+		throw new MethodNotSupportedException('This method not supported on a Definition object.');
+	}
 
-    /**
-     * Fill the model with an array of attributes. Force mass assignment.
-     *
-     * This imitates the implementation on Illuminate\Database\Eloquent\Model, and is
-     * required by Illuminate\Database\Eloquent\Concerns\HasAttributes.
-     *
-     * @param  array  $attributes
-     * @return $this
-     */
-    public function forceFill(array $attributes)
-    {
-        return static::unguarded(function () use ($attributes) {
-            return $this->fill($attributes);
-        });
-    }
+	/**
+	 * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes.
+	 *
+	 * @throws MethodNotSupportedException
+	 */
+	protected function getArrayableRelations()
+	{
+		throw new MethodNotSupportedException('This method not supported on a Definition object.');
+	}
+
+	/**
+	 * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes.
+	 *
+	 * @param  string  $key
+	 * @throws MethodNotSupportedException
+	 */
+	public function getRelationValue($key)
+	{
+		throw new MethodNotSupportedException('This method not supported on a Definition object.');
+	}
+
+	/**
+	 * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes.
+	 *
+	 * @param  string  $method
+	 * @throws MethodNotSupportedException
+	 */
+	protected function getRelationshipFromMethod($method)
+	{
+		throw new MethodNotSupportedException('This method not supported on a Definition object.');
+	}
+
+	/**
+	 * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes.
+	 *
+	 * @param  string|null  $key
+	 * @param  mixed  $default
+	 * @throws MethodNotSupportedException
+	 */
+	public function getOriginal($key = null, $default = null)
+	{
+		throw new MethodNotSupportedException('This method not supported on a Definition object.');
+	}
+
+	/**
+	 * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes.
+	 *
+	 * @throws MethodNotSupportedException
+	 */
+	public function syncOriginal()
+	{
+		throw new MethodNotSupportedException('This method not supported on a Definition object.');
+	}
+
+	/**
+	 * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes.
+	 *
+	 * @param  string  $attribute
+	 * @throws MethodNotSupportedException
+	 */
+	public function syncOriginalAttribute($attribute)
+	{
+		throw new MethodNotSupportedException('This method not supported on a Definition object.');
+	}
+
+	/**
+	 * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes.
+	 *
+	 * @param  array|string|null  $attributes
+	 * @throws MethodNotSupportedException
+	 */
+	public function isDirty($attributes = null)
+	{
+		throw new MethodNotSupportedException('This method not supported on a Definition object.');
+	}
+
+	/**
+	 * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes.
+	 *
+	 * @param  array|string|null  $attributes
+	 * @throws MethodNotSupportedException
+	 */
+	public function isClean($attributes = null)
+	{
+		throw new MethodNotSupportedException('This method not supported on a Definition object.');
+	}
+
+	/**
+	 * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes.
+	 *
+	 * @throws MethodNotSupportedException
+	 */
+	public function getDirty()
+	{
+		throw new MethodNotSupportedException('This method not supported on a Definition object.');
+	}
+
+	/**
+	 * This overrides the implementation in Illuminate\Database\Eloquent\Concerns\HasAttributes.
+	 *
+	 * @param  string  $key
+	 * @throws MethodNotSupportedException
+	 */
+	protected function originalIsNumericallyEquivalent($key)
+	{
+		throw new MethodNotSupportedException('This method not supported on a Definition object.');
+	}
 
 
-    /**
-     * Returns a JSON representation of the Definition
-     *
-     * @return string
-     */
-    public function toDefinition()
-    {
-    	$this->toJson();
-    }
+	/**
+	 * Fill the model with an array of attributes.
+	 *
+	 * This imitates the implementation on Illuminate\Database\Eloquent\Model, and is
+	 * required by the Illuminate\Database\Eloquent\Concerns\HasAttributes trait.
+	 *
+	 * @param  array  $attributes
+	 * @return $this
+	 *
+	 * @throws \Illuminate\Database\Eloquent\MassAssignmentException
+	 */
+	public function fill(array $attributes)
+	{
+		$totallyGuarded = $this->totallyGuarded();
+		foreach ($this->fillableFromArray($attributes) as $key => $value) {
+			if ($this->isFillable($key)) {
+				$this->setAttribute($key, $value);
+			} elseif ($totallyGuarded) {
+				throw new MassAssignmentException($key);
+			}
+		}
+		return $this;
+	}
+
+	/**
+	 * Fill the model with an array of attributes. Force mass assignment.
+	 *
+	 * This imitates the implementation on Illuminate\Database\Eloquent\Model, and is
+	 * required by Illuminate\Database\Eloquent\Concerns\HasAttributes.
+	 *
+	 * @param  array  $attributes
+	 * @return $this
+	 */
+	public function forceFill(array $attributes)
+	{
+		return static::unguarded(function () use ($attributes) {
+			return $this->fill($attributes);
+		});
+	}
 
 
-    /**
-     * Decodes a JSON-blob of definition-data and returns
-     * a populated model instance.
-     *
-     * @param  string $json
-     * @return DefinitionContract
-     */
-    public static function fromDefinition($json)
-    {
-    	$definition = json_decode($json, TRUE);
+	/**
+	 * Returns a JSON representation of the Definition
+	 *
+	 * @return string
+	 */
+	public function toDefinition()
+	{
+		$this->toJson();
+	}
 
-        if(JSON_ERROR_NONE !== json_last_error()){
-            throw new JsonDecodeException(json_last_error_msg());
-        }
+
+	/**
+	 * Decodes a JSON-blob of definition-data and returns
+	 * a populated model instance.
+	 *
+	 * @param  string $json
+	 * @return DefinitionContract
+	 */
+	public static function fromDefinition($json)
+	{
+		$definition = json_decode($json, TRUE);
+
+		/*
+		loop through each field in $definition and if there $definition[loop count]['dynamic_options']
+		then replace that with a set of options we look up from the internet
+
+		method should be like getDynamicOptions($url, $keyField, $valueField)
+		*/
+
+		if(JSON_ERROR_NONE !== json_last_error()){
+			throw new JsonDecodeException(json_last_error_msg());
+		}
 		if(!empty($definition['dynamic'])){
-        	// dynamic definitions have a definition class that can do things
-        	$defn_id = static::idFromNameAndVersion($definition['name'], $definition['version']);
-        	$class_path = static::definitionPath($defn_id);
+			// dynamic definitions have a definition class that can do things
+			$defn_id = static::idFromNameAndVersion($definition['name'], $definition['version']);
+			$class_path = static::definitionPath($defn_id);
 			$class_name = static::getDynamicClassName($defn_id);
 			$file_path = $class_path . '/' . $class_name. '.php';
 			require_once $file_path;
@@ -335,15 +342,71 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
 		else {
 			$instance = new static();
 		}
-    	$instance->forceFill($definition);
+
+
+		$instance->forceFill($definition);
 		return $instance;
-    }
+	}
+
+	/**
+	 * getDynamicOptions
+	 *
+	 * calls an api, returns an array of key and values
+	 * @todo consider caching the he result in redis for what seems like a sensible amount of time on tues
+	 *
+	 * @param mixed $url
+	 * @param mixed $keyField
+	 * @param mixed $valueField
+	 * @return array assoc array of keys and their values
+	 */
+	public function getDynamicOptions($url, $keyField, $valueField)
+	{
+		$http_client = new \GuzzleHttp\Client();
+
+		// try {
+		// 	if (config('definitions.proxy_url')) {
+		// 		$guzzleOptions = [
+		// 			'proxy' => [
+		// 				'https' => config('definitions.proxy_url'),
+		// 			]
+		// 		];
+		// 	} else {
+		// 		$guzzleOptions = [];
+		// 	}
+
+		// 	$api_url = $fields['url'];
+
+		// 	$res = $http_client->request(
+		// 		'GET',
+		// 		$api_url,
+		// 		$guzzleOptions
+		// 	);
+		// 	$result = $res->getBody();
+		// 	if ($result) {
+		// 		try {
+		// 			$items = json_decode($result, true);
+		// 			$new_items = [];
+		// 			foreach ($items as $item) {
+		// 				$new_item['slug'] = str_slug($item['Title']);
+		// 				foreach ($item as $key => $value) {
+		// 					$new_item[str_slug($key, '_')] = $value;
+		// 				}
+		// 				$new_items[] = $new_item;
+		// 			}
+		// 			return $new_items;
+		// 		}
+		// 		catch (\Exception $e) {}
+		// 	}
+		// } catch (\GuzzleHttp\Exception\ClientException $e) {}
+		// return false;
+
+	}
 
 	/**
 	 * Get the names of all available dynamic attributes for this definition.
 	 * @return array
 	 */
-    public function getDynamicAttributeNames()
+	public function getDynamicAttributeNames()
 	{
 		$names = [];
 		foreach($this->dynamicAttributes ?? [] as $attribute) {
@@ -359,7 +422,7 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
 	 * @param string $definition_id {name}-v{version}
 	 * @return string - Class (and file, minus .php extension) name for the class that handles dynamic actions for this definition.
 	 */
-    public static function getDynamicClassName($definition_id)
+	public static function getDynamicClassName($definition_id)
 	{
 		$def = static::idToNameAndVersion($definition_id);
 		$parts = preg_split('/[^a-z0-9]/i', $def['name'], -1, PREG_SPLIT_NO_EMPTY);
@@ -370,18 +433,18 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
 		return $class_name . 'V' . $def['version'];
 	}
 
-    /**
-     * Returns a new model instance based on a definition file.
-     *
-     * @param  string $path
-     * @return DefinitionContract
-     */
-    public static function fromDefinitionFile($path)
-    {
-        $definition = null;
-        static $definitionCache = [];
+	/**
+	 * Returns a new model instance based on a definition file.
+	 *
+	 * @param  string $path
+	 * @return DefinitionContract
+	 */
+	public static function fromDefinitionFile($path)
+	{
+		$definition = null;
+		static $definitionCache = [];
 
-        if(empty($definitionCache[$path])) {
+		if(empty($definitionCache[$path])) {
 
 			if (Config::get('database.redis.active')) {
 				try {
@@ -406,14 +469,14 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
 		}
 		return $definitionCache[$path];
 
-    }
+	}
 
 	/**
 	 * Get the path to the folder containing the specified definition.
 	 * @param string $definition_id - The {name}-v{version} string identifying the definition.
 	 * @return null|string - The path or null if $definition_id is invalid.
 	 */
-    public static function definitionPath($definition_id)
+	public static function definitionPath($definition_id)
 	{
 		$parts = static::idToNameAndVersion($definition_id);
 		if($parts) {
@@ -422,81 +485,81 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
 		return null;
 	}
 
-    /**
-     * Locates a Definition file on disk; when no version is specified
-     * it will return the latest.
-     *
+	/**
+	 * Locates a Definition file on disk; when no version is specified
+	 * it will return the latest.
+	 *
 	 * @param  string $definition_id - The {name}-v{version} string identifying the definition.
-     * @return string|null
-     */
-    public static function locateDefinition($definition_id){
-    	$path = static::definitionPath($definition_id);
-    	if($path) {
+	 * @return string|null
+	 */
+	public static function locateDefinition($definition_id){
+		$path = static::definitionPath($definition_id);
+		if($path) {
 			$path .= '/definition.json';
 			return file_exists($path) ? $path : null;
 		}
 		return null;
-    }
+	}
 
 
-    /**
-     * Locates a Definition file on disk; throws an exception if no Definition is found.
-     *
-     * @param  string $definition_id - The {name}-v{version} string identifying the definition.
-     * @param  int $version
-     * @throws DefinitionNotFoundException
-     * @return string
-     */
-    public static function locateDefinitionOrFail($definition_id){
-        $path = static::locateDefinition($definition_id);
-        if(is_null($path)) throw new DefinitionNotFoundException;
+	/**
+	 * Locates a Definition file on disk; throws an exception if no Definition is found.
+	 *
+	 * @param  string $definition_id - The {name}-v{version} string identifying the definition.
+	 * @param  int $version
+	 * @throws DefinitionNotFoundException
+	 * @return string
+	 */
+	public static function locateDefinitionOrFail($definition_id){
+		$path = static::locateDefinition($definition_id);
+		if(is_null($path)) throw new DefinitionNotFoundException;
 
-        return $path;
-    }
-
-
-    /**
-     * Convert the model instance to an array.
-     *
-     * This is the same implementation as Illuminate\Database\Eloquent\Model.
-     *
-     * @return array
-     */
-    public function toArray()
-    {
-        return $this->attributesToArray();
-    }
+		return $path;
+	}
 
 
-    /**
-     * Convert the model instance to JSON.
-     *
-     * This is the same implementation as Illuminate\Database\Eloquent\Model.
-     *
-     * @param  int  $options
-     * @return string
-     *
-     * @throws \Illuminate\Database\Eloquent\JsonEncodingException
-     */
-    public function toJson($options = 0)
-    {
-        $json = json_encode($this->jsonSerialize(), $options);
-            if (JSON_ERROR_NONE !== json_last_error()) {
-            throw JsonEncodingException::forModel($this, json_last_error_msg());
-        }
-        return $json;
-    }
+	/**
+	 * Convert the model instance to an array.
+	 *
+	 * This is the same implementation as Illuminate\Database\Eloquent\Model.
+	 *
+	 * @return array
+	 */
+	public function toArray()
+	{
+		return $this->attributesToArray();
+	}
 
-    /**
-     * Convert the object into something JSON serializable.
-     *
-     * This is the same implementation as Illuminate\Database\Eloquent\Model.
-     *
-     * @return array
-     */
-    public function jsonSerialize()
-    {
-        return $this->toArray();
-    }
+
+	/**
+	 * Convert the model instance to JSON.
+	 *
+	 * This is the same implementation as Illuminate\Database\Eloquent\Model.
+	 *
+	 * @param  int  $options
+	 * @return string
+	 *
+	 * @throws \Illuminate\Database\Eloquent\JsonEncodingException
+	 */
+	public function toJson($options = 0)
+	{
+		$json = json_encode($this->jsonSerialize(), $options);
+			if (JSON_ERROR_NONE !== json_last_error()) {
+			throw JsonEncodingException::forModel($this, json_last_error_msg());
+		}
+		return $json;
+	}
+
+	/**
+	 * Convert the object into something JSON serializable.
+	 *
+	 * This is the same implementation as Illuminate\Database\Eloquent\Model.
+	 *
+	 * @return array
+	 */
+	public function jsonSerialize()
+	{
+		return $this->toArray();
+	}
 
 }
