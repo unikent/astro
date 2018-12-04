@@ -1,8 +1,13 @@
 <?php
 namespace App\Models\Definitions;
 
-use App\Events\PageEvent;
+use Config;
+use Exception;
 use App\Models\Page;
+use App\Events\PageEvent;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redis;
+use GuzzleHttp\Client as GuzzleClient;
 
 class Block extends BaseDefinition
 {
@@ -10,7 +15,7 @@ class Block extends BaseDefinition
 	public static $defDir = 'blocks';
 
 	protected $casts = [
-        'fields' => 'array',
+		'fields' => 'array',
 	];
 
 	/**
@@ -115,5 +120,142 @@ class Block extends BaseDefinition
 			}
 		}
 		return $values;
+	}
+
+	/**
+	 * Decodes a JSON-blob of definition-data and returns
+	 * a populated model instance.
+	 *
+	 * @param  string $json
+	 * @return DefinitionContract
+	 * @todo we we want to remove the dynamic options prop after replacement of options?
+	 */
+	public static function fromDefinition($json)
+	{
+		$definition = parent::fromDefinition($json);
+
+		/*
+		for loop block through each field in $definition and if there dynamic options then look those up
+		and set the options
+		*/
+		if (0 != count($definition->fields)) {
+			/*
+			we can't modify the object prop in place so we copy it to an array
+			and then modify and then replace the object prop
+			*/
+			$tempFields = $definition->fields;
+			foreach ($tempFields as &$field) {
+				if (isset($field['dynamic_options'])) {
+					if (isset(
+						$field['dynamic_options']['url'],
+						$field['dynamic_options']['label_field'],
+						$field['dynamic_options']['value_field'],
+					)) {
+						if (!isset($field['dynamic_options']['cache_time']) {
+							$field['dynamic_options']['cache_time'] = 10;
+						}
+
+						$dynamicOptions = self::getDynamicOptions(
+							$field['dynamic_options']['url'],
+							$field['dynamic_options']['label_field'],
+							$field['dynamic_options']['value_field'],
+							$field['dynamic_options']['cache_time']
+
+						);
+						if ($dynamicOptions) {
+							$field['options'] = $dynamicOptions;
+						}
+					}
+				}
+			}
+			$definition->fields = $tempFields;
+		}
+
+		return $definition;
+	}
+	/**
+	 * getDynamicOptions
+	 *
+	 * calls an api, returns an array of key and values
+	 * @todo consider caching the he result in redis for what seems like a sensible amount of time on tues
+	 *
+	 * @param mixed $url
+	 * @param mixed $labelField
+	 * @param mixed $valueField
+	 * @return array assoc array of keys and their values
+	 * @todo REDIS!
+	 */
+	public static function getDynamicOptions($url, $labelField, $valueField, $cacheTime)
+	{
+		$options = [];
+
+		// return cached options if they exist in redis
+		if (Config::get('database.redis.active')) {
+				try {
+					$response = Redis::get($url);
+					if (!empty($response)) {
+						Log::debug('Found dynamic options in redis');
+						$options = json_decode($response, true);
+						return $options;
+					}
+				} catch (Exception $e) {
+			}
+		}
+
+
+		$http_client = new GuzzleClient();
+
+		try {
+			if (config('definitions.proxy_url')) {
+				$guzzleOptions = [
+					'proxy' => [
+						'https' => config('definitions.proxy_url'),
+					]
+				];
+			} else {
+				$guzzleOptions = [];
+			}
+
+			$res = $http_client->request(
+				'GET',
+				$url,
+				$guzzleOptions
+			);
+			$result = $res->getBody();
+			if ($result) {
+				try {
+
+					$items = json_decode($result, true);
+					foreach ($items as $item) {
+						if (isset($item[$valueField], $item[$labelField])) {
+							$options[] = [
+								'value' => $item[$valueField],
+								'label' => $item[$labelField]
+							];
+						}
+					}
+
+					if (Config::get('database.redis.active')) {
+						try {
+							Redis::set($url, json_encode($options));
+							Redis::expire($url, $cacheTime);
+							Log::debug("Adding dynamic options to redis for $url");
+						} catch (Exception $e) {
+							Log::warning("Failed to store API response in redis for $url $e");
+						}
+					}
+
+					return $options;
+
+				} catch (\Exception $e) {
+					Log::error("Failed to decode API response for dynamic options $url");
+					throw $e;
+				}
+			}
+		} catch (\GuzzleHttp\Exception\ClientException $e) {
+			Log::error("Failed to contact API for dynamic options $url");
+			throw $e;
+		}
+		return false;
 	}
 }
