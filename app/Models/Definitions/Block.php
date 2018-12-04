@@ -1,7 +1,6 @@
 <?php
 namespace App\Models\Definitions;
 
-use Config;
 use Exception;
 use App\Models\Page;
 use App\Events\PageEvent;
@@ -149,10 +148,11 @@ class Block extends BaseDefinition
 					if (isset(
 						$field['dynamic_options']['url'],
 						$field['dynamic_options']['label_field'],
-						$field['dynamic_options']['value_field'],
+						$field['dynamic_options']['value_field']
 					)) {
-						if (!isset($field['dynamic_options']['cache_time']) {
-							$field['dynamic_options']['cache_time'] = 10;
+						if (!isset($field['dynamic_options']['cache_time'])) {
+							$field['dynamic_options']['cache_time'] =
+								config('definitions.dynamic_options_cache_time');
 						}
 
 						$dynamicOptions = self::getDynamicOptions(
@@ -160,7 +160,6 @@ class Block extends BaseDefinition
 							$field['dynamic_options']['label_field'],
 							$field['dynamic_options']['value_field'],
 							$field['dynamic_options']['cache_time']
-
 						);
 						if ($dynamicOptions) {
 							$field['options'] = $dynamicOptions;
@@ -177,28 +176,26 @@ class Block extends BaseDefinition
 	 * getDynamicOptions
 	 *
 	 * calls an api, returns an array of key and values
-	 * @todo consider caching the he result in redis for what seems like a sensible amount of time on tues
 	 *
 	 * @param mixed $url
 	 * @param mixed $labelField
 	 * @param mixed $valueField
 	 * @return array assoc array of keys and their values
-	 * @todo REDIS!
 	 */
 	public static function getDynamicOptions($url, $labelField, $valueField, $cacheTime)
 	{
 		$options = [];
 
 		// return cached options if they exist in redis
-		if (Config::get('database.redis.active')) {
-				try {
-					$response = Redis::get($url);
-					if (!empty($response)) {
-						Log::debug('Found dynamic options in redis');
-						$options = json_decode($response, true);
-						return $options;
-					}
-				} catch (Exception $e) {
+		if (config('database.redis.active')) {
+			try {
+				$response = Redis::get($url);
+				if (!empty($response)) {
+					Log::debug("Found dynamic options in redis for $url");
+					$options = json_decode($response, true);
+					return $options;
+				}
+			} catch (Exception $e) {
 			}
 		}
 
@@ -224,7 +221,6 @@ class Block extends BaseDefinition
 			$result = $res->getBody();
 			if ($result) {
 				try {
-
 					$items = json_decode($result, true);
 					foreach ($items as $item) {
 						if (isset($item[$valueField], $item[$labelField])) {
@@ -234,8 +230,7 @@ class Block extends BaseDefinition
 							];
 						}
 					}
-
-					if (Config::get('database.redis.active')) {
+					if (config('database.redis.active')) {
 						try {
 							Redis::set($url, json_encode($options));
 							Redis::expire($url, $cacheTime);
@@ -244,9 +239,7 @@ class Block extends BaseDefinition
 							Log::warning("Failed to store API response in redis for $url $e");
 						}
 					}
-
 					return $options;
-
 				} catch (\Exception $e) {
 					Log::error("Failed to decode API response for dynamic options $url");
 					throw $e;
