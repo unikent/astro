@@ -320,17 +320,38 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
 	{
 		$definition = json_decode($json, TRUE);
 
-		/*
-		loop through each field in $definition and if there $definition[loop count]['dynamic_options']
-		then replace that with a set of options we look up from the internet
-
-		method should be like getDynamicOptions($url, $keyField, $valueField)
-		*/
 
 		if(JSON_ERROR_NONE !== json_last_error()){
 			throw new JsonDecodeException(json_last_error_msg());
 		}
-		if(!empty($definition['dynamic'])){
+
+		/*
+		for loop block through each field in $definition and if there dynamic options then look those up
+        and set the options
+		*/
+		if (isset($definition['fields'])) {
+			foreach ($definition['fields'] as &$field) {
+				if (isset($field['dynamic_options'])) {
+					if (isset(
+						$field['dynamic_options']['url'],
+						$field['dynamic_options']['label_field'],
+						$field['dynamic_options']['value_field']
+					)) {
+						$dynamicOptions = self::getDynamicOptions(
+							$field['dynamic_options']['url'],
+							$field['dynamic_options']['label_field'],
+							$field['dynamic_options']['value_field']
+						);
+						if ($dynamicOptions) {
+							$field['options'] = $dynamicOptions;
+						}
+					}
+				}
+			}
+		}
+
+
+		if (!empty($definition['dynamic'])) {
 			// dynamic definitions have a definition class that can do things
 			$defn_id = static::idFromNameAndVersion($definition['name'], $definition['version']);
 			$class_path = static::definitionPath($defn_id);
@@ -355,13 +376,156 @@ abstract class BaseDefinition implements Arrayable, DefinitionContract, Jsonable
 	 * @todo consider caching the he result in redis for what seems like a sensible amount of time on tues
 	 *
 	 * @param mixed $url
-	 * @param mixed $keyField
+	 * @param mixed $labelField
 	 * @param mixed $valueField
 	 * @return array assoc array of keys and their values
 	 */
-	public function getDynamicOptions($url, $keyField, $valueField)
+	public static function getDynamicOptions($url, $labelField, $valueField)
 	{
-		$http_client = new \GuzzleHttp\Client();
+		// stud this out first...
+		$json = <<<'JSON'
+		[
+            {
+                "value": "American Studies",
+                "label": "American Studies"
+            },
+            {
+                "value": "Anthropology and Conservation",
+                "label": "Anthropology and Conservation"
+            },
+            {
+                "value": "Archaeology, Ancient History and Classics",
+                "label": "Archaeology, Ancient History and Classics"
+            },
+            {
+                "value": "Architecture",
+                "label": "Architecture"
+            },
+            {
+                "value": "Arts",
+                "label": "Arts"
+            },
+            {
+                "value": "Biosciences",
+                "label": "Biosciences"
+            },
+            {
+                "value": "Business, Accounting, Finance, Marketing",
+                "label": "Business, Accounting, Finance, Marketing"
+            },
+            {
+                "value": "Computing",
+                "label": "Computing"
+            },
+            {
+                "value": "Digital Arts and Multimedia",
+                "label": "Digital Arts and Multimedia"
+            },
+            {
+                "value": "Drama and Theatre",
+                "label": "Drama and Theatre"
+            },
+            {
+                "value": "Economics",
+                "label": "Economics"
+            },
+            {
+                "value": "Engineering and Electronics",
+                "label": "Engineering and Electronics"
+            },
+            {
+                "value": "English Literature and Comparative Literature",
+                "label": "English Literature and Comparative Literature"
+            },
+            {
+                "value": "Film",
+                "label": "Film"
+            },
+            {
+                "value": "Health and Social Care",
+                "label": "Health and Social Care"
+            },
+            {
+                "value": "History",
+                "label": "History"
+            },
+            {
+                "value": "Journalism",
+                "label": "Journalism"
+            },
+            {
+                "value": "Languages and Linguistics",
+                "label": "Languages and Linguistics"
+            },
+            {
+                "value": "Law",
+                "label": "Law"
+            },
+            {
+                "value": "Liberal Arts",
+                "label": "Liberal Arts"
+            },
+            {
+                "value": "Mathematics, Statistics and Actuarial Sciences",
+                "label": "Mathematics, Statistics and Actuarial Sciences"
+            },
+            {
+                "value": "Music",
+                "label": "Music"
+            },
+            {
+                "value": "Pharmacy",
+                "label": "Pharmacy"
+            },
+            {
+                "value": "Philosophy",
+                "label": "Philosophy"
+            },
+            {
+                "value": "Physical Sciences",
+                "label": "Physical Sciences"
+            },
+            {
+                "value": "Politics and International Relations",
+                "label": "Politics and International Relations"
+            },
+            {
+                "value": "Psychology",
+                "label": "Psychology"
+            },
+            {
+                "value": "Religious Studies",
+                "label": "Religious Studies"
+            },
+            {
+                "value": "Sociology and Social Policy",
+                "label": "Sociology and Social Policy"
+            },
+            {
+                "value": "Sports and Exercise Sciences",
+                "label": "Sports and Exercise Sciences"
+            },
+            {
+                "value": "Criminology",
+                "label": "Criminology"
+            },
+            {
+                "value": "Cultural Studies",
+                "label": "Cultural Studies"
+            },
+            {
+                "value": "Higher and Degree Apprenticeships",
+                "label": "Higher and Degree Apprenticeships"
+            },
+            {
+                "value": "Human Geography",
+                "label": "Human Geography"
+            }
+        ]
+JSON;
+		return json_decode($json, true);
+
+		// $http_client = new \GuzzleHttp\Client();
 
 		// try {
 		// 	if (config('definitions.proxy_url')) {
