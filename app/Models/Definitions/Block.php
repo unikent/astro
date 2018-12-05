@@ -196,6 +196,7 @@ class Block extends BaseDefinition
 					return $options;
 				}
 			} catch (Exception $e) {
+				Log::warning("Error attempting to load dynamic options in redis for $url");
 			}
 		}
 
