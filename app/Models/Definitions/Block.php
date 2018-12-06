@@ -24,9 +24,7 @@ class Block extends BaseDefinition
 	public function getDynamicAttributes($block_data, $section_name, $region_name, $page_data){ return []; }
 
 	/**
-	 * getPageItemURLPrefix
-	 *
-	 * Get the url prefix for each of the tools relative to the listing
+	 * Get the url prefix for each of the items relative the page a block lives in
 	 *
 	 * @param mixed $page_id - the listing page
 	 * @return string        - the relative url prefix for each tool page
