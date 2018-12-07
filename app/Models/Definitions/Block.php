@@ -24,6 +24,33 @@ class Block extends BaseDefinition
 	public function getDynamicAttributes($block_data, $section_name, $region_name, $page_data){ return []; }
 
 	/**
+	 * Get the url prefix for each of the items relative the page a block lives in
+	 *
+	 * @param mixed $page_id - the listing page
+	 * @return string        - the relative url prefix for each tool page
+	 */
+	public function getDynamicPageURLPrefix($page_id)
+	{
+		// no need for a prefix if the current page's URL ends with a slash
+		if ((substr($_SERVER['REQUEST_URI'], -1) === '/')) {
+			return '';
+		}
+
+		$page = Page::findOrFail($page_id);
+
+		if ($page->slug) {
+			return "{$page->slug}/";
+		}
+
+		if ($page->site->path && $page->site->path !== '/') {
+			$pathMembers = explode('/', $page->site->path);
+			return $pathMembers[count($pathMembers) -1] . '/';
+		}
+
+		return '';
+	}
+
+	/**
 	 * Provide dynamic routing.
 	 * This must be implemented by a custom block class.
 	 * @param $path - Path to route
