@@ -9,7 +9,7 @@
     "production": "cross-env NODE_ENV=production webpack --progress --colors --hide-modules",
     "refresh": "php artisan migrate:refresh && php artisan db:seed",
     "unit": "mocha-webpack --webpack-config resources/assets/js/test/webpack.config-test.babel.js \"resources/assets/js/test/unit/*.js\"",
-    "validate": "cross-env node resources/assets/js/console",
+    "validate": "node node_modules/astro-theme-validator/console",
     "eslint": "node_modules/.bin/eslint resources/assets/js/**/*.{js,vue} --format codeframe",
     "postinstall": "echo 'Installing assets' && mkdir -p public/kent-theme-assets && cp -R node_modules/kent-theme-assets/public/assets public/kent-theme-assets/"
   },
@@ -24,6 +24,7 @@
     "imagesloaded": "^4.1.2",
     "kent-font": "git+ssh://git@gitlab.kent.ac.uk/webdev/kent-font.git#master",
     "kent-theme-assets": "git+ssh://git@gitlab.kent.ac.uk:webdev/kent-theme-assets",
+    "astro-theme-validator": "git+ssh://git@gitlab.kent.ac.uk:webdev/astro-theme-validator",
     "lodash": "^4.17.4",
     "normalize.css": "^7.0.0",
     "scribe-editor": "^3.3.0",
