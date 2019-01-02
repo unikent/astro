@@ -12,6 +12,7 @@ use Baum\Node as BaumNode;
 use App\Models\Definitions\Layout;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * A Page represents a path in a hierarchical site structure.
@@ -544,7 +545,26 @@ class Page extends BaumNode
 	 */
 	public function getAncestorsWithRevision()
 	{
-		return $this->ancestors()->with('revision')->orderBy('lft')->get();
+		$site = $this->site;
+		$parentSiteAncestors = new Collection();
+
+		if (!empty($site->path) && $site->path !== '/') { // check that this is definitely not a root site
+			$bits = explode('/', $site->path);
+			array_pop($bits);
+			$parentPagePath = implode('/', $bits);
+			$parentPage = Page::findByHostAndPath($site->host, $parentPagePath, $this->version);
+			if ($parentPage !== null) {
+				$parentSiteAncestors = $parentPage->getAncestorsWithRevision();
+				$parentSiteAncestors->push($parentPage);
+			}
+		}
+
+		return $parentSiteAncestors->merge($this->ancestors()->with('revision')->orderBy('lft')->get());
+	}
+
+	public function getParentPageBy()
+	{
+		# code...
 	}
 
 	/**
