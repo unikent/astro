@@ -172,6 +172,18 @@ class Page extends BaumNode
 	}
 
 
+	/**
+	 * get the full path of the page, including the path of the site itself
+	 * useful for breadcrumb links
+	 *
+	 * @return string
+	 */
+	public function getFullPathAttribute()
+	{
+		return $this->site->path . $this->path;
+
+	}
+
 	/************************************************************************
 	 * Relations
 	 ************************************************************************/
