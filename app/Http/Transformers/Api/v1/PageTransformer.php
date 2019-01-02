@@ -17,8 +17,8 @@ use App\Http\Transformers\Api\v1\Definitions\LayoutTransformer as LayoutDefiniti
 class PageTransformer extends FractalTransformer
 {
 
-    protected $availableIncludes = [
-    	'parent',
+	protected $availableIncludes = [
+		'parent',
 		'revision',
 		'revisions',
 		'site',
@@ -30,41 +30,43 @@ class PageTransformer extends FractalTransformer
 		'previous'
 	];
 
-    protected $full = true; // whether to include blocks with output
+	protected $full = true; // whether to include blocks with output
 
-    /**
-     * Create a PageTransformer.
-     * @param bool $full Whether or not to include blocks with the output.
-     */
-    public function __construct($full = false)
-    {
-        $this->full = $full;
-    }
+	/**
+	 * Create a PageTransformer.
+	 * @param bool $full Whether or not to include blocks with the output.
+	 */
+	public function __construct($full = false)
+	{
+		$this->full = $full;
+	}
 
-    public function transform(Page $page)
+	public function transform(Page $page)
 	{
 		$data = [
-		    'id' => $page->id,
-            'slug' => $page->slug,
-            'path' => $page->path,
-            'version' => $page->version,
-            'title' => $page->revision->title,
-            'layout' => [
-                'name' => $page->revision->layout_name,
-                'version' => $page->revision->layout_version
-            ],
-            'options' => $page->revision->options,
-            'depth' => $page->depth,
-            'parent_id' => $page->parent_id,
-            'site_id' => $page->site_id,
-            'revision_id' => $page->revision_id,
+			'id' => $page->id,
+			'slug' => $page->slug,
+			'path' => $page->path,
+			'full_path' => $page->full_path,
+			'version' => $page->version,
+			'title' => $page->revision->title,
+			'layout' => [
+				'name' => $page->revision->layout_name,
+				'version' => $page->revision->layout_version
+			],
+			'options' => $page->revision->options,
+			'depth' => $page->depth,
+			'parent_id' => $page->parent_id,
+			'site_id' => $page->site_id,
+			'site_name' => $page->site->name,
+			'revision_id' => $page->revision_id,
 			'valid' => $page->revision->valid,
 			'status' => $page->status
 		];
-		if($this->full){
-            $data['blocks'] = $this->transformDynamicBlocks($page->revision->blocks, $data);
-        }
-        return $data;
+		if ($this->full){
+			$data['blocks'] = $this->transformDynamicBlocks($page->revision->blocks, $data);
+		}
+		return $data;
 	}
 
 	/**
@@ -93,98 +95,98 @@ class PageTransformer extends FractalTransformer
 		return $blocks;
 	}
 
-    /**
-     * Include associated Parent
-     * @param Page $page The Page whose parent to transform.
-     * @return FractalItem
-     */
-    public function includeParent(Page $page, ParamBag $params = null)
-    {
-        if($page->parent) {
-            return new FractalItem($page->parent, new PageTransformer($params->get('full')), false);
-        }
-    }
+	/**
+	 * Include associated Parent
+	 * @param Page $page The Page whose parent to transform.
+	 * @return FractalItem
+	 */
+	public function includeParent(Page $page, ParamBag $params = null)
+	{
+		if($page->parent) {
+			return new FractalItem($page->parent, new PageTransformer($params->get('full')), false);
+		}
+	}
 
-    /**
-     * Include associated Revision
-     * @param Page $page The Page to transform.
-     * @return FractalItem
-     */
-    public function includeRevision(Page $page, ParamBag $params = null)
-    {
-        if($page->revision) {
-            return new FractalItem($page->revision, new RevisionTransformer( $params->get('full') ), false);
-        }
-    }
+	/**
+	 * Include associated Revision
+	 * @param Page $page The Page to transform.
+	 * @return FractalItem
+	 */
+	public function includeRevision(Page $page, ParamBag $params = null)
+	{
+		if($page->revision) {
+			return new FractalItem($page->revision, new RevisionTransformer( $params->get('full') ), false);
+		}
+	}
 
-    /**
-     * Include associated Site
-     * @return FractalItem
-     */
-    public function includeSite(Page $page)
-    {
-        if($page->site){
-            return new FractalItem($page->site, new SiteTransformer($page->version), false);
-        }
-    }
+	/**
+	 * Include associated Site
+	 * @return FractalItem
+	 */
+	public function includeSite(Page $page)
+	{
+		if($page->site){
+			return new FractalItem($page->site, new SiteTransformer($page->version), false);
+		}
+	}
 
-    /**
-     * Include associated Blocks
-     *
-     * It was decided that API clients would rather consume ordered blocks sorted
-     * into regions, rather than duplicating ordering and grouping logic in every client.
-     *
-     * Some nastiness resides here in order to achieve this, commented below...
-     *
-     */
-    public function includeBlocks(Page $page)
-    {
-        if(!$page->blocks->isEmpty()){
-            // Using sortBy instead of orderBy as the collection might have been eager-loaded
-            // Use of groupBy results in a Collection with nested Collections, keyed by 'region_name'.
-            $blocksByRegion = $page->blocks->sortBy('order')->groupBy('region_name');
+	/**
+	 * Include associated Blocks
+	 *
+	 * It was decided that API clients would rather consume ordered blocks sorted
+	 * into regions, rather than duplicating ordering and grouping logic in every client.
+	 *
+	 * Some nastiness resides here in order to achieve this, commented below...
+	 *
+	 */
+	public function includeBlocks(Page $page)
+	{
+		if(!$page->blocks->isEmpty()){
+			// Using sortBy instead of orderBy as the collection might have been eager-loaded
+			// Use of groupBy results in a Collection with nested Collections, keyed by 'region_name'.
+			$blocksByRegion = $page->blocks->sortBy('order')->groupBy('region_name');
 
-            // Unfortunately Fractal cannot serialize a Collection with nested Collections. We use an
-            // inline Transformer to create a FractalItem, serializing nested FractalCollections as we go.
-            // We use the current scope to access the manager and also pass it to createData to ensure
-            // includes continue to function.
-            $scope = $this->getCurrentScope();
+			// Unfortunately Fractal cannot serialize a Collection with nested Collections. We use an
+			// inline Transformer to create a FractalItem, serializing nested FractalCollections as we go.
+			// We use the current scope to access the manager and also pass it to createData to ensure
+			// includes continue to function.
+			$scope = $this->getCurrentScope();
 
-            return new FractalItem($blocksByRegion, function(Collection $blocksByRegion) use ($scope){
-                foreach($blocksByRegion as $region => $blocks){
-                    $collection = new FractalCollection($blocks, new BlockTransformer, false);
-                    $blocksByRegion[$region] = $scope->getManager()->createData($collection, 'blocks', $scope)->toArray();
-                }
+			return new FractalItem($blocksByRegion, function(Collection $blocksByRegion) use ($scope){
+				foreach($blocksByRegion as $region => $blocks){
+					$collection = new FractalCollection($blocks, new BlockTransformer, false);
+					$blocksByRegion[$region] = $scope->getManager()->createData($collection, 'blocks', $scope)->toArray();
+				}
 
-                return $blocksByRegion->toArray();
-            }, false);
-        }else{
-            return [];
-        }
-    }
+				return $blocksByRegion->toArray();
+			}, false);
+		}else{
+			return [];
+		}
+	}
 
-    /**
-     * Include associated Layout/Region definitions
-     * @param Page $page
-     * @return FractalItem
-     */
-    public function includeLayoutDefinition(Page $page)
-    {
-        $layoutDefinition = $page->getLayoutDefinition();
-        return new FractalItem($layoutDefinition, new LayoutDefinitionTransformer, false);
-    }
+	/**
+	 * Include associated Layout/Region definitions
+	 * @param Page $page
+	 * @return FractalItem
+	 */
+	public function includeLayoutDefinition(Page $page)
+	{
+		$layoutDefinition = $page->getLayoutDefinition();
+		return new FractalItem($layoutDefinition, new LayoutDefinitionTransformer, false);
+	}
 
-    /**
-     * Include History (all Revisions up to and including the current one)
-     * @param Page $page The page.
-     * @return FractalCollection
-     */
-    public function includeRevisions(Page $page)
-    {
-        if(!$page->getRevisions()){
-            return new FractalCollection($page->getRevisions(), new RevisionTransformer, false);
-        }
-    }
+	/**
+	 * Include History (all Revisions up to and including the current one)
+	 * @param Page $page The page.
+	 * @return FractalCollection
+	 */
+	public function includeRevisions(Page $page)
+	{
+		if(!$page->getRevisions()){
+			return new FractalCollection($page->getRevisions(), new RevisionTransformer, false);
+		}
+	}
 
 	/**
 	 * Include direct ancestors of this Page, as an array, starting with home page.
