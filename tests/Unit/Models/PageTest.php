@@ -454,7 +454,6 @@ class PageTest extends TestCase
 
 	/**
 	 * @test
-	 * @group wip
 	 */
 	public function homepageHasNoAncestors()
 	{
@@ -472,7 +471,6 @@ class PageTest extends TestCase
 
 	/**
 	 * @test
-	 * @group wip
 	 */
 	public function subpagesHaveExpectedAncestors()
 	{
@@ -518,7 +516,6 @@ class PageTest extends TestCase
 
 	/**
 	 * @test
-	 * @group wip
 	 * @group panic
 	 */
 	public function subpagesOfChildSitesHaveExpectedAncestors()
@@ -616,7 +613,6 @@ class PageTest extends TestCase
 
 	/**
 	 * @test
-	 * @group wip
 	 */
 	public function homepageOfImmediateChildSiteOnlyHasParentHomepageAsAncestor()
 	{
@@ -644,7 +640,6 @@ class PageTest extends TestCase
 
 	/**
 	 * @test
-	 * @group wip
 	 */
 	public function homepageOfChildSiteDeepWithinParentHasManyAncestors()
 	{
@@ -689,7 +684,6 @@ class PageTest extends TestCase
 
 	/**
 	 * @test
-	 * @group wip
 	 */
 	public function homepageOfChildSiteDeepWithinNoneTopLevelParentHasManyAncestors()
 	{
