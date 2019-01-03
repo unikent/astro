@@ -574,11 +574,6 @@ class Page extends BaumNode
 		return $parentSiteAncestors->merge($this->ancestors()->with('revision')->orderBy('lft')->get());
 	}
 
-	public function getParentPageBy()
-	{
-		# code...
-	}
-
 	/**
 	 * Get the page's children with revision data to use with fractal transformer
 	 * @return \Illuminate\Database\Eloquent\Collection|static[]
