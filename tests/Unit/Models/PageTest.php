@@ -452,8 +452,6 @@ class PageTest extends TestCase
 		$this->assertCount(1, $definition->getRegionDefinitions());
 	}
 
-	// Justice and Christian's excellent tests
-
 	/**
 	 * @test
 	 * @group wip
@@ -476,7 +474,7 @@ class PageTest extends TestCase
 	 * @test
 	 * @group wip
 	 */
-	public function subpagesHaveExpectedNumberOfAncestors()
+	public function subpagesHaveExpectedAncestors()
 	{
 		$site = factory(Site::class)->create();
 
@@ -505,8 +503,16 @@ class PageTest extends TestCase
 
 		for ($i=0; $i < count($pages); $i++) {
 			$page = $pages[$i];
-			$ancestorsCount = count($page->getAncestorsWithRevision());
+			$ancestors = $page->getAncestorsWithRevision();
+
+			// do we have the correct number of ancestors
+			$ancestorsCount = count($ancestors);
 			$this->assertEquals($ancestorsCount, $i);
+
+			// do we have the correct parent ancestor
+			if ($i) {
+				$this->assertEquals($page->parent_id, $ancestors[$i-1]->id);
+			}
 		}
 	}
 
@@ -515,7 +521,7 @@ class PageTest extends TestCase
 	 * @group wip
 	 * @group panic
 	 */
-	public function subpagesOfChildSitesHaveExpectedNumberOfAncestors()
+	public function subpagesOfChildSitesHaveExpectedAncestors()
 	{
 		// GIVEN we have a parent site with pages and a subsite with paths at the deepest level
 		$parentSite = factory(Site::class)->create();
@@ -576,18 +582,35 @@ class PageTest extends TestCase
 		// WHEN we count ancestors of each page in the parent
 		for ($i=0; $i < count($pages); $i++) {
 			$page = $pages[$i];
-			$ancestorsCount = count($page->getAncestorsWithRevision());
-			// THEN the count should be correct
-			$this->assertEquals($ancestorsCount, $i);
-		}
+			$ancestors = $page->getAncestorsWithRevision();
 
+			// do we have the correct number of ancestors
+			$ancestorsCount = count($ancestors);
+			$this->assertEquals($ancestorsCount, $i);
+
+			// do we have the correct parent ancestor
+			if ($i) {
+				$this->assertEquals($page->parent_id, $ancestors[$i-1]->id);
+			}
+		}
 
 		// WHEN we count ancestors of each page in the child site
 		for ($i=0; $i < count($childSitePages); $i++) {
 			$page = $childSitePages[$i];
-			$ancestorsCount = count($page->getAncestorsWithRevision());
+			$ancestors = $page->getAncestorsWithRevision();
+			$ancestorsCount = count($ancestors);
+
 			// THEN the count should be correct
 			$this->assertEquals($ancestorsCount, $i + $parentSiteAncestorCount);
+
+			// AND if the page has a parent id then it should match the expected ancestor id
+			if ($i) {
+				$this->assertEquals($page->parent_id, $ancestors[$ancestorsCount-1]->id);
+			} else {
+				// if this the homepage then it has no parent id so we need to check that the ancestor's full_path
+				// is the start of the homepage's full path
+				$this->assertEquals(strpos($page->full_path, $ancestors[$ancestorsCount-1]->id), 0);
+			}
 		}
 	}
 
