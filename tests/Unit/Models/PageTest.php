@@ -476,6 +476,125 @@ class PageTest extends TestCase
 	 * @test
 	 * @group wip
 	 */
+	public function subpagesHaveExpectedNumberOfAncestors()
+	{
+		$site = factory(Site::class)->create();
+
+		$pages[] = factory(Page::class)->create([
+			'site_id' => $site->id,
+			'parent_id' => null
+		]);
+
+		$pages[] = factory(Page::class)->create([
+			'site_id' => $site->id,
+			'parent_id' => $pages[0]->id,
+			'slug' => $this->faker->domainWord
+		]);
+
+		$pages[] = factory(Page::class)->create([
+			'site_id' => $site->id,
+			'parent_id' => $pages[1]->id,
+			'slug' => $this->faker->domainWord
+		]);
+
+		$pages[] = factory(Page::class)->create([
+			'site_id' => $site->id,
+			'parent_id' => $pages[2]->id,
+			'slug' => $this->faker->domainWord
+		]);
+
+		for ($i=0; $i < count($pages); $i++) {
+			$page = $pages[$i];
+			$ancestorsCount = count($page->getAncestorsWithRevision());
+			$this->assertEquals($ancestorsCount, $i);
+		}
+	}
+
+	/**
+	 * @test
+	 * @group wip
+	 * @group panic
+	 */
+	public function subpagesOfChildSitesHaveExpectedNumberOfAncestors()
+	{
+		// GIVEN we have a parent site with pages and a subsite with paths at the deepest level
+		$parentSite = factory(Site::class)->create();
+
+		$pages[] = factory(Page::class)->create([
+			'site_id' => $parentSite->id,
+			'parent_id' => null
+		]);
+
+		$pages[] = factory(Page::class)->create([
+			'site_id' => $parentSite->id,
+			'slug' => $this->faker->domainWord,
+			'parent_id' => $pages[0]->id
+		]);
+
+		$pages[] = factory(Page::class)->create([
+			'site_id' => $parentSite->id,
+			'slug' => $this->faker->domainWord,
+			'parent_id' => $pages[1]->id
+		]);
+
+		$pages[] = factory(Page::class)->create([
+			'site_id' => $parentSite->id,
+			'slug' => $this->faker->domainWord,
+			'parent_id' => $pages[2]->id
+		]);
+
+		$parentSiteAncestorCount = count($pages[count($pages)-1]->getAncestorsWithRevision());
+
+		$childSite = factory(Site::class)->create([
+			'host' => $parentSite->host,
+			'path' => $parentSite->path . $pages[count($pages)-1]->path .  $this->faker->domainWord
+		]);
+
+		$childSitePages[] = factory(Page::class)->create([
+			'site_id' => $childSite->id,
+			'parent_id' => null
+		]);
+
+		$childSitePages[] = factory(Page::class)->create([
+			'site_id' => $childSite->id,
+			'slug' => $this->faker->domainWord,
+			'parent_id' => $childSitePages[0]->id
+		]);
+
+		$childSitePages[] = factory(Page::class)->create([
+			'site_id' => $childSite->id,
+			'slug' => $this->faker->domainWord,
+			'parent_id' => $childSitePages[1]->id
+		]);
+
+		$childSitePages[] = factory(Page::class)->create([
+			'site_id' => $childSite->id,
+			'slug' => $this->faker->domainWord,
+			'parent_id' => $childSitePages[2]->id
+		]);
+
+		// WHEN we count ancestors of each page in the parent
+		for ($i=0; $i < count($pages); $i++) {
+			$page = $pages[$i];
+			$ancestorsCount = count($page->getAncestorsWithRevision());
+			// THEN the count should be correct
+			$this->assertEquals($ancestorsCount, $i);
+		}
+
+
+		// WHEN we count ancestors of each page in the child site
+		for ($i=0; $i < count($childSitePages); $i++) {
+			$page = $childSitePages[$i];
+			$ancestorsCount = count($page->getAncestorsWithRevision());
+			// THEN the count should be correct
+			$this->assertEquals($ancestorsCount, $i + $parentSiteAncestorCount);
+		}
+	}
+
+	/**
+	 * @test
+	 * @group wip
+	 */
 	public function homepageOfImmediateChildSiteOnlyHasParentHomepageAsAncestor()
 	{
 		$parentSite = factory(Site::class)->create();
@@ -504,7 +623,7 @@ class PageTest extends TestCase
 	 * @test
 	 * @group wip
 	 */
-	public function homepageChildSiteDeepWithinParentHasManyAncestors()
+	public function homepageOfChildSiteDeepWithinParentHasManyAncestors()
 	{
 		$parentSite = factory(Site::class)->create();
 
@@ -549,7 +668,7 @@ class PageTest extends TestCase
 	 * @test
 	 * @group wip
 	 */
-	public function homepageChildSiteDeepWithinNoneTopLevelParentHasManyAncestors()
+	public function homepageOfChildSiteDeepWithinNoneTopLevelParentHasManyAncestors()
 	{
 		$parentSite = factory(Site::class)->create([
 			'path' => '/this/is/a/deep/parent'
