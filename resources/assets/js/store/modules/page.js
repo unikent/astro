@@ -240,7 +240,7 @@ const actions = {
 	fetchPage({ state, commit, dispatch }, id) {
 		commit('setPage', null);
 		return api
-			.get(`pages/${id}?include=blocks.media,site`)
+			.get(`pages/${id}?include=blocks.media,site,ancestors`)
 			.then(response => {
 				const page = response.data.data;
 
@@ -726,24 +726,26 @@ const getters = {
 	},
 
 	currentPageBreadcrumbs: (state, getters, rootState) => {
-		if(!rootState.page.currentPageArrayPath) {
-			return [];
+
+		let breadcrumbs = [];
+
+		if(!rootState.page.pageData.ancestors) {
+			return breadcrumbs;
 		}
 
-		const path = rootState.page.currentPageArrayPath.split('.');
+		let pages = _.cloneDeep(rootState.page.pageData.ancestors);
+		pages.push(rootState.page.pageData);
 
-		let
-			breadcrumbs = [],
-			page = rootState.site.pages;
-
-		for(var i = 0, length = path.length; page !== void 0 && i < length; i++) {
-			page = i > 0 ? page.children[path[i]] : page[path[i]];
-			if(page) {
-				breadcrumbs.push({
-					title: page.title,
-					path: page.path
-				});
+		for (var i = 0; i < pages.length; i++) {
+			let breadcrumb = {};
+			breadcrumb.path = pages[i].full_path;
+			if (pages[i].path === '/') {
+				breadcrumb.title = pages[i].site_name;
+			} else {
+				breadcrumb.title = pages[i].title;
 			}
+
+			breadcrumbs.push(breadcrumb);
 		}
 
 		return breadcrumbs;
