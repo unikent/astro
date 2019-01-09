@@ -3381,8 +3381,8 @@ globals@^11.0.1:
   resolved "https://registry.yarnpkg.com/globals/-/globals-11.3.0.tgz#e04fdb7b9796d8adac9c8f64c14837b2313378b0"
 
 globals@^11.1.0:
-  version "11.9.0"
-  resolved "https://registry.yarnpkg.com/globals/-/globals-11.9.0.tgz#bde236808e987f290768a93d065060d78e6ab249"
+  version "11.10.0"
+  resolved "https://registry.yarnpkg.com/globals/-/globals-11.10.0.tgz#1e09776dffda5e01816b3bb4077c8b59c24eaa50"
 
 globals@^9.18.0:
   version "9.18.0"
@@ -4404,7 +4404,7 @@ just-extend@^1.1.27:
 
 "kent-theme-assets@git+ssh://git@gitlab.kent.ac.uk:webdev/kent-theme-assets":
   version "0.0.1"
-  resolved "git+ssh://git@gitlab.kent.ac.uk:webdev/kent-theme-assets#89c6569b05e3a21ca9097b1f369fbd1642d35cb2"
+  resolved "git+ssh://git@gitlab.kent.ac.uk:webdev/kent-theme-assets#129c032aaad469b7b046ed38605c416df866c24f"
 
 killable@^1.0.0:
   version "1.0.0"
