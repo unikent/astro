@@ -145,6 +145,8 @@ class Block extends BaseDefinition
 			$tempFields = $definition->fields;
 			foreach ($tempFields as &$field) {
 				if (isset($field['dynamic_options'])) {
+					// TODO create guzzle object he
+
 					if (isset(
 						$field['dynamic_options']['url'],
 						$field['dynamic_options']['label_field'],
@@ -172,6 +174,43 @@ class Block extends BaseDefinition
 
 		return $definition;
 	}
+
+	/**
+	 * performs a http get request on a given url and returns the result
+	 *
+	 * @param string $url
+	 * @return string json representation of the body | false if connectivity issue
+	 */
+	public static function httpGet($url)
+	{
+		$http_client = new GuzzleClient();
+
+		try {
+			if (config('definitions.proxy_url')) {
+				$guzzleOptions = [
+					'proxy' => [
+						'https' => config('definitions.proxy_url'),
+					]
+				];
+			} else {
+				$guzzleOptions = [];
+			}
+
+			$res = $http_client->request(
+				'GET',
+				$url,
+				$guzzleOptions
+			);
+		} catch (\GuzzleHttp\Exception\ClientException $e) {
+			Log::error("Failed to contact API for dynamic options $url");
+			return false;
+		}
+
+		return $res->getBody();
+	}
+
+
+
 	/**
 	 * getDynamicOptions
 	 *
@@ -199,56 +238,36 @@ class Block extends BaseDefinition
 			}
 		}
 
+		$result = static::httpGet($url);
 
-		$http_client = new GuzzleClient();
-
-		try {
-			if (config('definitions.proxy_url')) {
-				$guzzleOptions = [
-					'proxy' => [
-						'https' => config('definitions.proxy_url'),
-					]
-				];
-			} else {
-				$guzzleOptions = [];
-			}
-
-			$res = $http_client->request(
-				'GET',
-				$url,
-				$guzzleOptions
-			);
-			$result = $res->getBody();
-			if ($result) {
-				try {
-					$items = json_decode($result, true);
-					foreach ($items as $item) {
-						if (isset($item[$valueField], $item[$labelField])) {
-							$options[] = [
-								'value' => $item[$valueField],
-								'label' => $item[$labelField]
-							];
-						}
+		if ($result) {
+			try {
+				$items = json_decode($result, true);
+				foreach ($items as $item) {
+					if (isset($item[$valueField], $item[$labelField])) {
+						$options[] = [
+							'value' => $item[$valueField],
+							'label' => $item[$labelField]
+						];
 					}
-					if (config('database.redis.active')) {
-						try {
-							Redis::set($url, json_encode($options));
-							Redis::expire($url, $cacheTime);
-							Log::debug("Adding dynamic options to redis for $url");
-						} catch (Exception $e) {
-							Log::warning("Failed to store API response in redis for $url $e");
-						}
-					}
-					return $options;
-				} catch (\Exception $e) {
-					Log::error("Failed to decode API response for dynamic options $url");
-					throw $e;
 				}
+				if (config('database.redis.active')) {
+					try {
+						Redis::set($url, json_encode($options));
+						Redis::expire($url, $cacheTime);
+						Log::debug("Adding dynamic options to redis for $url");
+					} catch (Exception $e) {
+						Log::warning("Failed to store API response in redis for $url $e");
+					}
+				}
+				return $options;
+			} catch (\Exception $e) {
+				Log::error("Failed to decode API response for dynamic options $url");
+				throw $e;
 			}
-		} catch (\GuzzleHttp\Exception\ClientException $e) {
-			Log::error("Failed to contact API for dynamic options $url");
-			throw $e;
 		}
-		return false;
+
+		return $options;
 	}
 }
+
