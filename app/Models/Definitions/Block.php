@@ -127,23 +127,33 @@ class Block extends BaseDefinition
 	 *
 	 * @param  string $json
 	 * @return DefinitionContract
-	 * @todo we we want to remove the dynamic options prop after replacement of options?
 	 */
 	public static function fromDefinition($json)
 	{
 		$definition = parent::fromDefinition($json);
 
+		// get dynamic options
+		$definition->fields = self::processDynamicFields($definition->fields);
+
+		return $definition;
+	}
+
+	/**
+	 * Traverse through all dynamic fields recursively,
+	 * pulling in their dynamic options
+	 *
+	 * @param  array $fields
+	 * @return array an array of fields with their dynamic options inserted
+	 * @todo we we want to remove the dynamic options prop after replacement of options?
+	 */
+	public static function processDynamicFields($fields)
+	{
 		/*
 		for loop block through each field in $definition and if there dynamic options then look those up
 		and set the options
 		*/
-		if (0 != count($definition->fields)) {
-			/*
-			we can't modify the object prop in place so we copy it to an array
-			and then modify and then replace the object prop
-			*/
-			$tempFields = $definition->fields;
-			foreach ($tempFields as &$field) {
+		if (0 != count($fields)) {
+			foreach ($fields as &$field) {
 				if (isset($field['dynamic_options'])) {
 					// TODO create guzzle object he
 
@@ -168,11 +178,12 @@ class Block extends BaseDefinition
 						}
 					}
 				}
+				if (isset($field['fields'])) {
+					$field['fields'] = self::processDynamicFields($field['fields']);
+				}
 			}
-			$definition->fields = $tempFields;
 		}
-
-		return $definition;
+		return $fields;
 	}
 
 	/**
@@ -235,6 +246,7 @@ class Block extends BaseDefinition
 					return $options;
 				}
 			} catch (Exception $e) {
+				Log::warning("Error attempting to load dynamic options in redis for $url");
 			}
 		}
 
