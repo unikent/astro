@@ -4,9 +4,12 @@ namespace App\Models\Definitions;
 use Exception;
 use App\Models\Page;
 use App\Events\PageEvent;
+use App\Helpers\CachedHttpClient;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Redis;
-use GuzzleHttp\Client as GuzzleClient;
+
+// use Illuminate\Support\Facades\Redis;
+// use Illuminate\Support\Facades\Cache;
+// use GuzzleHttp\Client as GuzzleClient;
 
 class Block extends BaseDefinition
 {
@@ -155,8 +158,6 @@ class Block extends BaseDefinition
 		if (0 != count($fields)) {
 			foreach ($fields as &$field) {
 				if (isset($field['dynamic_options'])) {
-					// TODO create guzzle object he
-
 					if (isset(
 						$field['dynamic_options']['url'],
 						$field['dynamic_options']['label_field'],
@@ -187,42 +188,6 @@ class Block extends BaseDefinition
 	}
 
 	/**
-	 * performs a http get request on a given url and returns the result
-	 *
-	 * @param string $url
-	 * @return string json representation of the body | false if connectivity issue
-	 */
-	public static function httpGet($url)
-	{
-		$http_client = new GuzzleClient();
-
-		try {
-			if (config('definitions.proxy_url')) {
-				$guzzleOptions = [
-					'proxy' => [
-						'https' => config('definitions.proxy_url'),
-					]
-				];
-			} else {
-				$guzzleOptions = [];
-			}
-
-			$res = $http_client->request(
-				'GET',
-				$url,
-				$guzzleOptions
-			);
-		} catch (\GuzzleHttp\Exception\ClientException $e) {
-			Log::error("Failed to contact API for dynamic options $url");
-			return false;
-		}
-
-		return $res->getBody();
-	}
-
-
-
-	/**
 	 * getDynamicOptions
 	 *
 	 * calls an api, returns an array of key and values
@@ -230,27 +195,17 @@ class Block extends BaseDefinition
 	 * @param mixed $url
 	 * @param mixed $labelField
 	 * @param mixed $valueField
+	 * @param $cacheTime - time in minutes to store newly fetched items in cache
 	 * @return array assoc array of keys and their values
 	 */
 	public static function getDynamicOptions($url, $labelField, $valueField, $cacheTime)
 	{
+		// default to no options
 		$options = [];
 
-		// return cached options if they exist in redis
-		if (config('database.redis.active')) {
-			try {
-				$response = Redis::get($url);
-				if (!empty($response)) {
-					Log::debug("Found dynamic options in redis for $url");
-					$options = json_decode($response, true);
-					return $options;
-				}
-			} catch (Exception $e) {
-				Log::warning("Error attempting to load dynamic options in redis for $url");
-			}
-		}
-
-		$result = static::httpGet($url);
+		// get options from cached api call
+		$cachedHttpClient = new CachedHttpClient();
+		$result = $cachedHttpClient->get($url, $cacheTime);
 
 		if ($result) {
 			try {
@@ -263,16 +218,6 @@ class Block extends BaseDefinition
 						];
 					}
 				}
-				if (config('database.redis.active')) {
-					try {
-						Redis::set($url, json_encode($options));
-						Redis::expire($url, $cacheTime);
-						Log::debug("Adding dynamic options to redis for $url");
-					} catch (Exception $e) {
-						Log::warning("Failed to store API response in redis for $url $e");
-					}
-				}
-				return $options;
 			} catch (\Exception $e) {
 				Log::error("Failed to decode API response for dynamic options $url");
 				throw $e;
@@ -282,4 +227,3 @@ class Block extends BaseDefinition
 		return $options;
 	}
 }
-
