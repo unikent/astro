@@ -7,10 +7,6 @@ use App\Events\PageEvent;
 use App\Helpers\CachedHttpClient;
 use Illuminate\Support\Facades\Log;
 
-// use Illuminate\Support\Facades\Redis;
-// use Illuminate\Support\Facades\Cache;
-// use GuzzleHttp\Client as GuzzleClient;
-
 class Block extends BaseDefinition
 {
 
@@ -190,12 +186,12 @@ class Block extends BaseDefinition
 	/**
 	 * getDynamicOptions
 	 *
-	 * calls an api, returns an array of key and values
+	 * calls an api, returns a array of key and values filtered from that api
 	 *
 	 * @param string $url - an api endpoint to query
-	 * @param string $labelField
-	 * @param string $valueField
-	 * @param int $cacheTime - time in minutes to store newly fetched items in cache
+	 * @param string $labelField - the key in api
+	 * @param string $valueField - the value in the api
+	 * @param int    $cacheTime - time in minutes to store newly fetched items in cache
 	 * @param object $cachedHttpClient - a http client with a get method
 	 * @return array assoc array of keys and their values
 	 */
@@ -209,7 +205,7 @@ class Block extends BaseDefinition
 		// default to no options
 		$options = [];
 
-		if (null !== $cachedHttpClient) {
+		if (null == $cachedHttpClient) {
 			$cachedHttpClient = new CachedHttpClient();
 		}
 
@@ -219,12 +215,14 @@ class Block extends BaseDefinition
 		if ($result) {
 			try {
 				$items = json_decode($result, true);
-				foreach ($items as $item) {
-					if (isset($item[$valueField], $item[$labelField])) {
-						$options[] = [
-							'value' => $item[$valueField],
-							'label' => $item[$labelField]
-						];
+				if (null !== $items) {
+					foreach ($items as $item) {
+						if (isset($item[$valueField], $item[$labelField])) {
+							$options[] = [
+								'value' => $item[$valueField],
+								'label' => $item[$labelField]
+							];
+						}
 					}
 				}
 			} catch (\Exception $e) {
