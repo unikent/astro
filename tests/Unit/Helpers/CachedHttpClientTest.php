@@ -34,7 +34,6 @@ class CachedHttpClientTest extends TestCase
 
 
 	/**
-	 * @group cfc
 	 * @test
 	 */
 	public function repeatedCallToHttpGetReturnsValuesFromCache()
@@ -75,7 +74,6 @@ class CachedHttpClientTest extends TestCase
 	}
 
 	/**
-	 * @group cfc
 	 * @test
 	 */
 	public function repeatedCallToHttpRetrievesDataFromHttpIfCacheHasExpired()
@@ -126,10 +124,9 @@ class CachedHttpClientTest extends TestCase
 	}
 
 	/**
-	 * @group cfc
 	 * @test
 	 */
-	public function callToHttpThrowExceptionOnHttpError()
+	public function callToHttpThrowsExceptionOnHttpError()
 	{
 		// given we have an empty cache
 		// when we call a non existance endpoint
@@ -144,5 +141,27 @@ class CachedHttpClientTest extends TestCase
 		// then an exception this thrown for the request
 		$this->expectException(RequestException::class);
 		$result = $this->cachingClient->get($url, $minutesToCache);
+	}
+
+	/**
+	 * @test
+	 */
+	public function callToClientReturnsExpectedResult()
+	{
+		$expectedResult = json_encode([
+			'four legs' => 'good',
+			'two legs'	=> 'bad'
+		]);
+
+		$this->httpHandler->append(
+			new Response(200, ['Content-Type' => 'application/json'], $expectedResult)
+		);
+
+		$url = 'http://orwell.org/animalfarm';
+		$minutesToCache = 1984;
+
+		$result = $this->cachingClient->get($url, $minutesToCache);
+
+		$this->assertEquals($expectedResult, $result);
 	}
 }
