@@ -192,19 +192,28 @@ class Block extends BaseDefinition
 	 *
 	 * calls an api, returns an array of key and values
 	 *
-	 * @param mixed $url
-	 * @param mixed $labelField
-	 * @param mixed $valueField
-	 * @param $cacheTime - time in minutes to store newly fetched items in cache
+	 * @param string $url - an api endpoint to query
+	 * @param string $labelField
+	 * @param string $valueField
+	 * @param int $cacheTime - time in minutes to store newly fetched items in cache
+	 * @param object $cachedHttpClient - a http client with a get method
 	 * @return array assoc array of keys and their values
 	 */
-	public static function getDynamicOptions($url, $labelField, $valueField, $cacheTime)
-	{
+	public static function getDynamicOptions(
+		$url,
+		$labelField,
+		$valueField,
+		$cacheTime,
+		$cachedHttpClient = null
+	) {
 		// default to no options
 		$options = [];
 
+		if (null !== $cachedHttpClient) {
+			$cachedHttpClient = new CachedHttpClient();
+		}
+
 		// get options from cached api call
-		$cachedHttpClient = new CachedHttpClient();
 		$result = $cachedHttpClient->get($url, $cacheTime);
 
 		if ($result) {
