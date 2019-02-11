@@ -1,8 +1,11 @@
 <?php
 namespace App\Models\Definitions;
 
-use App\Events\PageEvent;
+use Exception;
 use App\Models\Page;
+use App\Events\PageEvent;
+use App\Helpers\CachedHttpClient;
+use Illuminate\Support\Facades\Log;
 
 class Block extends BaseDefinition
 {
@@ -10,7 +13,7 @@ class Block extends BaseDefinition
 	public static $defDir = 'blocks';
 
 	protected $casts = [
-        'fields' => 'array',
+		'fields' => 'array',
 	];
 
 	/**
@@ -142,5 +145,119 @@ class Block extends BaseDefinition
 			}
 		}
 		return $values;
+	}
+
+	/**
+	 * Decodes a JSON-blob of definition-data and returns
+	 * a populated model instance.
+	 *
+	 * @param  string $json
+	 * @return DefinitionContract
+	 */
+	public static function fromDefinition($json)
+	{
+		$definition = parent::fromDefinition($json);
+
+		// get dynamic options
+		$definition->fields = self::processDynamicFields($definition->fields);
+
+		return $definition;
+	}
+
+	/**
+	 * Traverse through all dynamic fields recursively,
+	 * pulling in their dynamic options
+	 *
+	 * @param  array $fields
+	 * @return array an array of fields with their dynamic options inserted
+	 * @todo we we want to remove the dynamic options prop after replacement of options?
+	 */
+	public static function processDynamicFields($fields)
+	{
+		/*
+		for loop block through each field in $definition and if there dynamic options then look those up
+		and set the options
+		*/
+		if (0 != count($fields)) {
+			foreach ($fields as &$field) {
+				if (isset($field['dynamic_options'])) {
+					if (isset(
+						$field['dynamic_options']['url'],
+						$field['dynamic_options']['label_field'],
+						$field['dynamic_options']['value_field']
+					)) {
+						if (!isset($field['dynamic_options']['cache_time'])) {
+							$field['dynamic_options']['cache_time'] =
+								config('definitions.dynamic_options_cache_time');
+						}
+
+						$dynamicOptions = self::getDynamicOptions(
+							$field['dynamic_options']['url'],
+							$field['dynamic_options']['label_field'],
+							$field['dynamic_options']['value_field'],
+							$field['dynamic_options']['cache_time']
+						);
+						if ($dynamicOptions) {
+							$field['options'] = $dynamicOptions;
+						}
+					}
+				}
+				if (isset($field['fields'])) {
+					$field['fields'] = self::processDynamicFields($field['fields']);
+				}
+			}
+		}
+		return $fields;
+	}
+
+	/**
+	 * getDynamicOptions
+	 *
+	 * calls an api, returns a array of key and values filtered from that api
+	 *
+	 * @param string $url - an api endpoint to query
+	 * @param string $labelField - the key in api
+	 * @param string $valueField - the value in the api
+	 * @param int    $cacheTime - time in minutes to store newly fetched items in cache
+	 * @param object $cachedHttpClient - a http client with a get method
+	 * @return array assoc array of keys and their values
+	 */
+	public static function getDynamicOptions(
+		$url,
+		$labelField,
+		$valueField,
+		$cacheTime,
+		$cachedHttpClient = null
+	) {
+		// default to no options
+		$options = [];
+
+		if (null == $cachedHttpClient) {
+			$cachedHttpClient = new CachedHttpClient();
+		}
+
+		// get options from cached api call
+		$result = $cachedHttpClient->get($url, $cacheTime);
+
+		if ($result) {
+			try {
+				$items = json_decode($result, true);
+				if (null !== $items) {
+					foreach ($items as $item) {
+						if (isset($item[$valueField], $item[$labelField])) {
+							$options[] = [
+								'value' => $item[$valueField],
+								'label' => $item[$labelField]
+							];
+						}
+					}
+				}
+			} catch (\Exception $e) {
+				Log::error("Failed to decode API response for dynamic options $url");
+				throw $e;
+			}
+		}
+
+		return $options;
 	}
 }
