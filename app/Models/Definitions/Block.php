@@ -22,9 +22,10 @@ class Block extends BaseDefinition
 	 * @param string $section_name - The name of the section this block is in.
 	 * @param string $region_name - The name of the region this block is in.
 	 * @param array $page_data - The page data (as structured to be sent as json) that this block is part of.
+	 * @param array $query_parameters - The url query parameters as an assoc array.
 	 * @return mixed Array of data.
 	 */
-	public function getDynamicAttributes($block_data, $section_name, $region_name, $page_data){ return []; }
+	public function getDynamicAttributes($block_data, $section_name, $region_name, $page_data, $query_parameters){ return []; }
 
 	/**
 	 * Get the url prefix for each of the items relative the page a block lives in
@@ -35,24 +36,15 @@ class Block extends BaseDefinition
 	 *
 	 *
 	 * @param mixed $page_id - the listing page
+	 * @param string $request_url - the listing page url with a slash or not a slash at the end
 	 * @return string        - the relative url prefix for each tool page
 	 */
-	public function getDynamicPageURLPrefix($page_id)
+	public function getDynamicPageURLPrefix($page_id, $request_url = '')
 	{
 
 		/*
-		work out the requested path and if it ends with a / or not
+		work out if the requested path ends with a / or not
 		 */
-		$request_url = '';
-		if (isset($_SERVER['QUERY_STRING'])) {
-			$query_string = urldecode($_SERVER['QUERY_STRING']);
-			$re = '/path=(.*)($|&)/mU';
-			$result = preg_match($re, $query_string, $matches);
-			if ($result === 1) {
-				$request_url = $matches[1];
-			}
-		}
-
 		if ((substr($request_url, -1) === '/')) {
 			return '';
 		}

@@ -4,6 +4,7 @@ namespace App\Http\Transformers\Api\v1;
 use App\Models\Definitions\Block;
 use App\Models\Page;
 use League\Fractal\ParamBag;
+use Illuminate\Http\Request;
 use League\Fractal\Resource\Item as FractalItem;
 use League\Fractal\Resource\Collection as FractalCollection;
 use League\Fractal\Resource\Item;
@@ -83,7 +84,7 @@ class PageTransformer extends FractalTransformer
 			foreach($sections as $section_index => $section) {
 				foreach( $section['blocks'] as $block_index => $block) {
 					$definition = Block::fromDefinitionFile(Block::locateDefinition(Block::idFromNameAndVersion($block['definition_name'], $block['definition_version'])));
-					$dynamic = $definition->getDynamicAttributes($block, $section['name'], $region_name, $page_data);
+					$dynamic = $definition->getDynamicAttributes($block, $section['name'], $region_name, $page_data, request()->query());
 					$not_allowed = array_diff(array_keys($dynamic), $definition->getDynamicAttributeNames() ?? []);
 					if($not_allowed) {
 						throw new \InvalidArgumentException('Dynamic attribute(s): "' . join('", "', ($not_allowed)) . '" are not defined for block "' . $block['definition_name'] . '-v' . $block['definition_version'] . '"');
