@@ -29,13 +29,31 @@ class Block extends BaseDefinition
 	/**
 	 * Get the url prefix for each of the items relative the page a block lives in
 	 *
+	 * if the path ends with a / then set a prefix of ''
+	 * if the path ends without a / then set a prefix of the last path segment with a /
+	 * 	however, if there's no last path segment then set a prefix of ''
+	 *
+	 *
 	 * @param mixed $page_id - the listing page
 	 * @return string        - the relative url prefix for each tool page
 	 */
 	public function getDynamicPageURLPrefix($page_id)
 	{
-		// no need for a prefix if the current page's URL ends with a slash
-		if ((substr($_SERVER['REQUEST_URI'], -1) === '/')) {
+
+		/*
+		work out the requested path and if it ends with a / or not
+		 */
+		$request_url = '';
+		if (isset($_SERVER['QUERY_STRING'])) {
+			$query_string = urldecode($_SERVER['QUERY_STRING']);
+			$re = '/path=(.*)($|&)/mU';
+			$result = preg_match($re, $query_string, $matches);
+			if ($result === 1) {
+				$request_url = $matches[1];
+			}
+		}
+
+		if ((substr($request_url, -1) === '/')) {
 			return '';
 		}
 
