@@ -96,7 +96,7 @@ class PageController extends Controller
 			'Astro\Renderer\Base\Layout'
 		);
 		$api = new LocalAPIClient();
-		$engine = new TwigEngine(Config::get('app.definitions_path'));
+		$engine = new TwigEngine(Config::get('app.definitions_path'), ['debug' => Config::get('app.debug')]);
 		// set the global twig variables
 		$config = config('definitions');
 		// if we are draft, then pass this url replacement pattern defined in our config
