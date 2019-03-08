@@ -36,7 +36,8 @@ class Revision extends Model
 		'revision_set_id',
 		'options',
 		'blocks',
-		'valid'
+		'valid',
+		'published_at',
 	];
 
 	protected $dates = [
