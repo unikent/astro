@@ -76,7 +76,8 @@ class PageTransformer extends FractalTransformer
 			'site_name' => $page->site->name,
 			'revision_id' => $page->revision_id,
 			'valid' => $page->revision->valid,
-			'status' => $page->status
+			'status' => $page->status,
+			'published_at' => !empty($page->revision->published_at) ? $page->revision->published_at->toDateTimeString() : null
 		];
 		if ($this->full){
 			$data['blocks'] = $this->transformDynamicBlocks($page->revision->blocks, $data);
