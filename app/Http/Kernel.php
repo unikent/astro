@@ -37,10 +37,12 @@ class Kernel extends HttpKernel
 			\Illuminate\Routing\Middleware\SubstituteBindings::class,
 		],
 
+		// temp fix to completely remove throttling from api routes
+		// @todo apply this in a different manner
 		'api' => [
 			'auth:api',
 			'bindings',
-			'throttle:60,1',
+			//'throttle:60,1',
 		],
 	];
 
