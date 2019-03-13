@@ -22,20 +22,30 @@ class Block extends BaseDefinition
 	 * @param string $section_name - The name of the section this block is in.
 	 * @param string $region_name - The name of the region this block is in.
 	 * @param array $page_data - The page data (as structured to be sent as json) that this block is part of.
+	 * @param array $query_parameters - The url query parameters as an assoc array.
 	 * @return mixed Array of data.
 	 */
-	public function getDynamicAttributes($block_data, $section_name, $region_name, $page_data){ return []; }
+	public function getDynamicAttributes($block_data, $section_name, $region_name, $page_data, $query_parameters){ return []; }
 
 	/**
 	 * Get the url prefix for each of the items relative the page a block lives in
 	 *
+	 * if the path ends with a / then set a prefix of ''
+	 * if the path ends without a / then set a prefix of the last path segment with a /
+	 * 	however, if there's no last path segment then set a prefix of ''
+	 *
+	 *
 	 * @param mixed $page_id - the listing page
+	 * @param string $request_url - the listing page url with a slash or not a slash at the end
 	 * @return string        - the relative url prefix for each tool page
 	 */
-	public function getDynamicPageURLPrefix($page_id)
+	public function getDynamicPageURLPrefix($page_id, $request_url = '')
 	{
-		// no need for a prefix if the current page's URL ends with a slash
-		if ((substr($_SERVER['REQUEST_URI'], -1) === '/')) {
+
+		/*
+		work out if the requested path ends with a / or not
+		 */
+		if ((substr($request_url, -1) === '/')) {
 			return '';
 		}
 
