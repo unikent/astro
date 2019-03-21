@@ -1,7 +1,18 @@
 <template>
 <div class="table-field">
 	<el-button type="primary" @click="showEditTableDialog">Edit table</el-button>
-	<el-dialog title="Shipping address" :visible.sync="dialogTableVisible" :modal-append-to-body="true" :fullscreen="true">
+	<el-dialog 
+		custom-class="edit-table-dialog"
+		:visible.sync="editTableDialogVisible" 
+		:append-to-body="true" 
+		:fullscreen="editTableDialogFullscreen"
+		top="8vh">
+		<div slot="title">
+			Edit table <br>
+			<el-button type="text" @click="hideEditTableDialog"><i class="el-icon-arrow-left"></i> Back</el-button>
+			<el-button type="text" @click="toggleDialogFullscreen"><i class="el-icon-d-caret"></i> {{ fullscreenToggleText }}</el-button>
+		</div>
+		
 	  	<el-table :data="gridData">
 	   		<el-table-column property="date" label="Date" width="150"></el-table-column>
 	    	<el-table-column property="name" label="Name" width="200"></el-table-column>
@@ -40,21 +51,25 @@ export default {
 		          address: 'No.1518,  Jinshajiang Road, Putuo District'
 		        }
 	        ],
-	        dialogTableVisible: false
+	        editTableDialogVisible: false,
+	        editTableDialogFullscreen: false
 	    }
+	},
+
+	computed: {
+		fullscreenToggleText() {
+			return this.editTableDialogFullscreen ? 'Disable fullscreen' : 'Enable fullscreen';
+		}
 	},
 	methods: {
 		showEditTableDialog() {
-			// DailogMaker = new Vue.extend(Dialog);
-			// console.log(DailogMaker);
-			// this.dialog = new DailogMaker(
-			// 	// {
-			// 	// 	target: this.$el,
-			// 	// 	visible:true
-			// 	// }
-			// );
-			//this.dialog.$mount('body');
-			this.dialogTableVisible = true;
+			this.editTableDialogVisible = true;
+		},
+		hideEditTableDialog() {
+			this.editTableDialogVisible = false;
+		},
+		toggleDialogFullscreen() {
+			this.editTableDialogFullscreen = !this.editTableDialogFullscreen;
 		}
 	}
 };
