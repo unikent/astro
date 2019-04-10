@@ -8,16 +8,19 @@
 		:fullscreen="editTableDialogFullscreen"
 		top="8vh">
 		<div slot="title">
-			Edit table <br>
-			<el-button type="text" @click="hideEditTableDialog"><i class="el-icon-arrow-left"></i> Back</el-button>
+			Edit table
 			<el-button type="text" @click="toggleDialogFullscreen"><i class="el-icon-d-caret"></i> {{ fullscreenToggleText }}</el-button>
 		</div>
-		
-	  	<el-table :data="gridData">
-	   		<el-table-column property="date" label="Date" width="150"></el-table-column>
-	    	<el-table-column property="name" label="Name" width="200"></el-table-column>
-	    	<el-table-column property="address" label="Address"></el-table-column>
-	  	</el-table>
+
+	  	<editor  
+	  		v-model="value"
+	  		api-key="osn3biyljbcdxznx0pmst1mg0it57o3mtofw4fvu3f8p5bvp" 
+	  		:init="editorConfig"
+	  		:initialValue="editorData"></editor>
+
+	  	<span slot="footer" class="dialog-footer">
+			<el-button type="primary" @click="hideEditTableDialog">Close</el-button>
+		</span>
 	</el-dialog>
 </div>
 </template>
@@ -26,31 +29,22 @@
 import Vue from 'vue';
 import BlockField from 'components/BlockField';
 import { Dialog } from 'element-ui';
+import Editor from '@tinymce/tinymce-vue';
 
 export default {
 	name: 'table-field',
 	extends: BlockField,
+	components: {
+		'editor': Editor
+	},
 	data() {
 		return {
-			gridData: [
-				{
-		          date: '2016-05-02',
-		          name: 'John Smith',
-		          address: 'No.1518,  Jinshajiang Road, Putuo District'
-		        }, {
-		          date: '2016-05-04',
-		          name: 'John Smith',
-		          address: 'No.1518,  Jinshajiang Road, Putuo District'
-		        }, {
-		          date: '2016-05-01',
-		          name: 'John Smith',
-		          address: 'No.1518,  Jinshajiang Road, Putuo District'
-		        }, {
-		          date: '2016-05-03',
-		          name: 'John Smith',
-		          address: 'No.1518,  Jinshajiang Road, Putuo District'
-		        }
-	        ],
+			editorData: '<table><tr><td></td></td></tr><tr><td></td></td></tr></table>',
+			editorConfig: {
+	  			plugins: 'table',
+	  			menubar: false,
+	  			toolbar: 'bold italic link | alignleft aligncenter alignright | undo redo | tableprops tablerowprops tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol'
+	  		},
 	        editTableDialogVisible: false,
 	        editTableDialogFullscreen: false
 	    }
@@ -74,3 +68,8 @@ export default {
 	}
 };
 </script>
+<style>
+	.tox.tox-tinymce-aux {
+		z-index: 3000;
+	}
+</style>
