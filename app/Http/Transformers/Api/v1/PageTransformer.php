@@ -48,10 +48,18 @@ class PageTransformer extends FractalTransformer
 			$this->query_params = request()->query();
 
 			// preview
-			if (!isset($this->query_params['path'])) {
-				// laravel strips off any ending / in request()->url and request()->fullUrl
-				// so we need to get it from $_SERVER
+
+			// @TODO this logic needs to be refactored once we have a better approach to slash vs no-slash url endings
+
+			// laravel strips off any ending / in request()->url and request()->fullUrl
+			// so we need to get it from $_SERVER
+			if (!isset($this->query_params['path']) && isset($_SERVER['PATH_INFO'])) {
 				$this->query_params['path'] = $_SERVER['PATH_INFO'];
+			}
+
+			// webtools-test uses ORIG_PATH_INFO rather than PATH_INFO
+			if (!isset($this->query_params['path']) && isset($_SERVER['ORIG_PATH_INFO'])) {
+				$this->query_params['path'] = $_SERVER['ORIG_PATH_INFO'];
 			}
 		}
 	}
