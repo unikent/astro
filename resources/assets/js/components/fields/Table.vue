@@ -13,12 +13,12 @@
 		</div>
 
 	  	<editor  
-	  		v-model="value"
-	  		api-key="osn3biyljbcdxznx0pmst1mg0it57o3mtofw4fvu3f8p5bvp" 
-	  		:init="editorConfig"
-	  		:initialValue="editorData"></editor>
+			v-model="value"
+			api-key="osn3biyljbcdxznx0pmst1mg0it57o3mtofw4fvu3f8p5bvp"
+			:init="editorConfig"
+			:initialValue="editorData"></editor>
 
-	  	<span slot="footer" class="dialog-footer">
+		<span slot="footer" class="dialog-footer">
 			<el-button type="primary" @click="hideEditTableDialog">Close</el-button>
 		</span>
 	</el-dialog>
@@ -29,6 +29,9 @@
 import Vue from 'vue';
 import BlockField from 'components/BlockField';
 import { Dialog } from 'element-ui';
+import tinyMCE from 'tinymce';
+import 'tinymce/themes/silver/theme';
+import 'tinymce/plugins/table/plugin';
 import Editor from '@tinymce/tinymce-vue';
 
 export default {
@@ -41,13 +44,13 @@ export default {
 		return {
 			editorData: '<table><tr><td></td></td></tr><tr><td></td></td></tr></table>',
 			editorConfig: {
-	  			plugins: 'table',
-	  			menubar: false,
-	  			toolbar: 'bold italic link | alignleft aligncenter alignright | undo redo | tableprops tablerowprops tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol'
-	  		},
-	        editTableDialogVisible: false,
-	        editTableDialogFullscreen: false
-	    }
+				plugins: 'table',
+				menubar: false,
+				toolbar: 'bold italic link | alignleft aligncenter alignright | undo redo | tableprops tablerowprops tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol | tablemergecells tablesplitcells'
+			},
+			editTableDialogVisible: false,
+			editTableDialogFullscreen: false
+		}
 	},
 
 	computed: {

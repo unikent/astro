@@ -7310,6 +7310,11 @@ timers-browserify@^2.0.4:
   dependencies:
     setimmediate "^1.0.4"
 
+tinymce@^5.0.3:
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-5.0.3.tgz#40fa8658b5bdf58e7f04c816b38e1b06f96f6cfe"
+  integrity sha512-x7D0ttqn176Z4CWQIITMjcEtMGUjiaK0Y2FN2vO8DiyUeIHCdr70jJDSoGhuXtXX70Sw4Bd5UFfqIn/bG3HXcg==
+
 tmp@^0.0.33:
   version "0.0.33"
   resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.0.33.tgz#6d34335889768d21b2bcda0aa277ced3b1bfadf9"
