@@ -14,7 +14,6 @@
 
 	  	<editor  
 			v-model="value"
-			api-key="osn3biyljbcdxznx0pmst1mg0it57o3mtofw4fvu3f8p5bvp"
 			:init="editorConfig"
 			:initialValue="editorData"></editor>
 
