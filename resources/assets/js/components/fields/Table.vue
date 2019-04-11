@@ -14,6 +14,7 @@
 
 	  	<editor  
 			v-model="value"
+			v-if="editTableDialogVisible"
 			:init="editorConfig"
 			:initialValue="editorData"></editor>
 
