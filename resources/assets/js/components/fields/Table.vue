@@ -33,6 +33,7 @@ import tinyMCE from 'tinymce';
 import 'tinymce/themes/silver/theme';
 import 'tinymce/plugins/table/plugin';
 import Editor from '@tinymce/tinymce-vue';
+import Config from '../../classes/Config';
 
 export default {
 	name: 'table-field',
@@ -44,6 +45,8 @@ export default {
 		return {
 			editorData: '<table><tr><td></td></td></tr><tr><td></td></td></tr></table>',
 			editorConfig: {
+				skin_url: Config.get('base_url') + '/build/css/tinymce/skins/ui/oxide',
+				content_css: false,
 				plugins: 'table',
 				menubar: false,
 				toolbar: 'bold italic link | alignleft aligncenter alignright | undo redo | tableprops tablerowprops tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol | tablemergecells tablesplitcells'
