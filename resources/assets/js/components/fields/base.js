@@ -16,7 +16,7 @@ import Time          from './Time';
 import DateTime      from './DateTime';
 import NestedOptions from './NestedOptions';
 import Link          from './Link';
-import Table          from './Table';
+import Table         from './Table';
 
 export default {
 	text:        Text,
