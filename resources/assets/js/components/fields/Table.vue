@@ -50,7 +50,7 @@ export default {
 				plugins: 'table',
 				menubar: false,
 				toolbar: 'bold italic link | alignleft aligncenter alignright | undo redo | tableprops tablerowprops tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol | tablemergecells tablesplitcells',
-				table_responsive_width: true,
+				table_toolbar: 'tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol',
 				// if a class_list has been passed in, ensure it is in the right format before passing it on to tinyMCE
 				table_class_list: this.field.class_list === void 0 ? [] : this.field.class_list.map(cssClass => {
 					if (typeof cssClass !== 'object') {
@@ -62,7 +62,7 @@ export default {
 					return cssClass;
 				}),
 				init_instance_callback: editor => {
-					// strip away any content before and after the table
+					// strip away any content after the table has been processed into html
 					editor.on('PostProcess', e => {
 						let table = e.content.match(/<table(.|\s)+<\/table>/gm);
 						e.content = table && table[0] ? table[0] : e.content;
