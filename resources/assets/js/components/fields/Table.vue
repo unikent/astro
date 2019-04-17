@@ -42,7 +42,6 @@ export default {
 		'editor': Editor
 	},
 	data() {
-
 		return {
 			editorConfig: {
 				skin_url: Config.get('base_url') + '/build/css/tinymce/skins/ui/oxide',
@@ -50,7 +49,12 @@ export default {
 				plugins: 'table',
 				menubar: false,
 				toolbar: 'bold italic link | alignleft aligncenter alignright | undo redo | tableprops tablerowprops tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol | tablemergecells tablesplitcells',
-				table_toolbar: 'tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol',
+				table_toolbar: '', // disables the popup toolbar
+				table_appearance_options: false, // disables editing of Cell spacing, Cell padding, Border and Caption 
+				table_advtab: false, // disables table advanced tab
+				table_cell_advtab: false, // disables cell advanced tab
+				table_row_advtab: false, // disables row advanced tab
+				table_resize_bars: false, // disables resizing of table rows and columns
 				// if a class_list has been passed in, ensure it is in the right format before passing it on to tinyMCE
 				table_class_list: this.field.class_list === void 0 ? [] : this.field.class_list.map(cssClass => {
 					if (typeof cssClass !== 'object') {
