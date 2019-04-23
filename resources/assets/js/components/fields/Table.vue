@@ -56,6 +56,7 @@ export default {
 				table_row_advtab: false, // disables row advanced tab
 				table_resize_bars: false, // disables resizing of table rows and columns
 				// if a class_list has been passed in, ensure it is in the right format before passing it on to tinyMCE
+				invalid_styles: 'width height', // disable width and height being set on table elements
 				table_class_list: this.field.class_list === void 0 ? [] : this.field.class_list.map(cssClass => {
 					if (typeof cssClass !== 'object') {
 						cssClass = {
