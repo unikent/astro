@@ -16,6 +16,7 @@ import Time          from './Time';
 import DateTime      from './DateTime';
 import NestedOptions from './NestedOptions';
 import Link          from './Link';
+import Table         from './Table';
 
 export default {
 	text:        Text,
@@ -35,5 +36,6 @@ export default {
 	time:        Time,
 	datetime:    DateTime,
 	nested:      NestedOptions,
-	link:        Link
+	link:        Link,
+	table:        Table
 };
