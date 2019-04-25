@@ -70,7 +70,7 @@ export default {
 					// strip away any content after the table has been processed into html
 					editor.on('PostProcess', e => {
 						let table = e.content.match(/<table(.|\s)+<\/table>/gm);
-						e.content = table && table[0] ? table[0] : e.content;
+						e.content = table && table[0] ? table[0] : this.field.default;
 					});
 				}
 			},
