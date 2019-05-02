@@ -32,6 +32,7 @@ import { Dialog } from 'element-ui';
 import tinyMCE from 'tinymce';
 import 'tinymce/themes/silver/theme';
 import 'tinymce/plugins/table/plugin';
+import 'tinymce/plugins/link/plugin';
 import Editor from '@tinymce/tinymce-vue';
 import Config from '../../classes/Config';
 
@@ -46,7 +47,7 @@ export default {
 			editorConfig: {
 				skin_url: Config.get('base_url') + '/build/css/tinymce/skins/ui/oxide',
 				content_css: false,
-				plugins: 'table',
+				plugins: 'table link',
 				menubar: false,
 				toolbar: 'bold italic link | alignleft aligncenter alignright | undo redo | tableprops tablerowprops tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol | tablemergecells tablesplitcells',
 				table_toolbar: '', // disables the popup toolbar
