@@ -184,6 +184,16 @@ $config = [
 	*/
 	'enable_jwt_dev_routes' => env('ENABLE_JWT_DEV_ROUTES', false),
 
+
+	/*
+	|--------------------------------------------------------------------------
+	| Astro: cache lifetimes
+	|--------------------------------------------------------------------------
+	| time in minutes to cache items for, such as dynamically fetched data
+	*/
+	'cache_scholarship_minutes' => env('CACHE_SCHOLARSHIP_MINUTES', 0),
+
+
 	/*
 	|--------------------------------------------------------------------------
 	| Autoloaded Service Providers

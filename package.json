@@ -14,6 +14,8 @@
     "postinstall": "echo 'Installing assets' && mkdir -p public/kent-theme-assets && cp -R node_modules/kent-theme-assets/public/assets public/kent-theme-assets/"
   },
   "dependencies": {
+    "@tinymce/tinymce-vue": "^2.0.0",
+    "astro-theme-validator": "git+ssh://git@gitlab.kent.ac.uk:webdev/astro-theme-validator",
     "async-validator": "^1.8.1",
     "axios": "^0.17.1",
     "bulma": "^0.6.1",
@@ -24,7 +26,6 @@
     "imagesloaded": "^4.1.2",
     "kent-font": "git+ssh://git@gitlab.kent.ac.uk/webdev/kent-font.git#master",
     "kent-theme-assets": "git+ssh://git@gitlab.kent.ac.uk:webdev/kent-theme-assets",
-    "astro-theme-validator": "git+ssh://git@gitlab.kent.ac.uk:webdev/astro-theme-validator",
     "lodash": "^4.17.4",
     "normalize.css": "^7.0.0",
     "scribe-editor": "^3.3.0",
@@ -33,6 +34,7 @@
     "scribe-plugin-inline-styles-to-elements": "^0.1.0",
     "scribe-plugin-link-prompt-command": "^1.0.0",
     "scribe-plugin-sanitizer": "^0.1.10",
+    "tinymce": "^5.0.3",
     "underscore.string": "^3.3.4",
     "vue": "^2.5.3",
     "vue-chartjs": "^3.0.0",
