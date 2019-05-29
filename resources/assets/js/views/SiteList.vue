@@ -14,7 +14,7 @@
 <div class="site-list">
 <el-card>
 	<div slot="header" class="manage-table__header">
-		<span class="main-header"><el-input v-model="filter" placeholder="Filter sites..." size="large" class="manage-table__search-filter"></el-input></span>
+		<span class="main-header"><el-input v-model="filter" placeholder="Search for sites" size="large" class="manage-table__search-filter"></el-input></span>
 
 		<el-button v-if="canUser('site.create')" type="primary" @click="dialogFormVisible = true" class="manage-table__add-button" id="add-site">
 			Add Site
