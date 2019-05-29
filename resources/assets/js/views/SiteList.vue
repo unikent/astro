@@ -14,7 +14,8 @@
 <div class="site-list">
 <el-card>
 	<div slot="header" class="manage-table__header">
-		<span class="main-header">Manage sites</span>
+		<span class="main-header"><el-input v-model="filter" placeholder="Search for sites" size="large" class="manage-table__search-filter"></el-input></span>
+
 		<el-button v-if="canUser('site.create')" type="primary" @click="dialogFormVisible = true" class="manage-table__add-button" id="add-site">
 			Add Site
 		</el-button>
@@ -46,13 +47,14 @@
 			</thead>
 			<tbody v-loading.body="loading">
 				<tr
-					v-for="site in sitesWithRoles"
+					v-for="site in filteredSites"
 					:key="site.id"
 					class="el-table__row"
 				>
 					<td>
 						<div class="cell">
 							<router-link :to="`/site/${site.id}`">{{site.name}}</router-link>
+							<br><small>{{siteType(site)}}</small>
 						</div>
 					</td>
 
@@ -192,7 +194,8 @@ export default {
 				host: '',
 				siteDefinitionId: '',
 				errors: '',
-			}
+			},
+			filter: '',
 		};
 	},
 
@@ -237,7 +240,26 @@ export default {
 				sitesWithRoles.push(currentSite);
 			}
 			return sitesWithRoles;
-		}
+		},
+
+		filteredSites() {
+			// if no filter, return everything
+			if(!this.filter) {
+				return this.sitesWithRoles;
+			}
+			const filter = this.filter.toLowerCase();
+			const filteredSites = [];
+			for(let i = 0, len = this.sitesWithRoles.length; i < len; i++) {
+				const currentSite = this.sites[i];
+				if(currentSite.host && currentSite.host.toLowerCase().includes(filter)
+				|| currentSite.name && currentSite.name.toLowerCase().includes(filter)
+				|| currentSite.path && currentSite.path.toLowerCase().includes(filter)
+				|| currentSite.site_definition_name && currentSite.site_definition_name.toLowerCase().includes(filter)) {
+					filteredSites.push(currentSite);
+				}
+			}
+			return filteredSites;
+		},
 	},
 
 	methods: {
@@ -326,6 +348,9 @@ export default {
 					// reset the form
 					this.resetForm();
 
+					// reset any filters to avoid missing the newly added site in the list
+					this.filter = '';
+
 				})
 				.catch((errors) => {
 					this.dialogFormVisible = true;
@@ -349,6 +374,16 @@ export default {
 				.catch(() => {
 					// TODO: what do we do when the API is unavaliable
 				});
+		},
+
+		siteType(site) {
+			if(site && site.site_definition_name && site.site_definition_version) {
+				const id = site.site_definition_name + '-v' + site.site_definition_version;
+				if(this.siteDefinitions[id]) {
+					return this.siteDefinitions[id].label + ' v' + site.site_definition_version;
+				}
+			}
+			return '';
 		}
 	}
 };
