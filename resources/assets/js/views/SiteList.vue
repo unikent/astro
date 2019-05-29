@@ -348,6 +348,9 @@ export default {
 					// reset the form
 					this.resetForm();
 
+					// reset any filters to avoid missing the newly added site in the list
+					this.filter = '';
+
 				})
 				.catch((errors) => {
 					this.dialogFormVisible = true;
