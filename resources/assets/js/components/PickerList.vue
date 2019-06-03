@@ -1,8 +1,10 @@
 <template>
 <div>
+	<br>
+	<el-input v-model="filter" placeholder="Search blocks"></el-input>
 	<div class="block-list columns is-multiline">
 		<div
-			v-for="(item, key) in options"
+			v-for="(item, key) in filteredOptions"
 			class="column is-one-quarter"
 		>
 			<div
@@ -51,7 +53,8 @@ export default {
 
 	data() {
 		return {
-			selected: this.selectedOptions ? this.selectedOptions : []
+			selected: this.selectedOptions ? this.selectedOptions : [],
+			filter: '',
 		};
 	},
 
@@ -66,7 +69,25 @@ export default {
 	computed: {
 		labels() {
 			return this.selected.map(name => this.options[name].label);
-		}
+		},
+		filteredOptions() {
+			const filter = this.filter ? this.filter.toLowerCase() : '';
+			if(!filter) {
+				return this.options;
+			}
+			const filteredObject = {};
+			for(let e in this.options) {
+				if (this.options.hasOwnProperty(e)) {
+					const item = this.options[e];
+					if ((item.info && item.info.toLowerCase().includes(filter)) ||
+						(item.label && item.label.toLowerCase().includes(filter)) ||
+						(item.name && item.name.toLowerCase().includes(filter))) {
+						filteredObject[e] = item;
+					}
+				}
+			}
+			return filteredObject;
+		},
 	},
 
 	methods: {
