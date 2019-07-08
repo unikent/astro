@@ -25,6 +25,7 @@ class Kernel extends ConsoleKernel
 		Commands\UpdateSiteURL::class,
 		Commands\SetSiteOption::class,
 		Commands\ViewSiteOptions::class,
+		Commands\CopySite::class,
 	];
 
 	/**
