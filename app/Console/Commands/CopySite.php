@@ -46,6 +46,7 @@ class CopySite extends Command
 	 */
 	public function handle()
 	{
+$this->info('starting');
 		$site = Site::find(intval($this->option('site-id')));
 		$new_name = $this->option('new-name');
 		$new_host = $this->option('new-host'); // TODO: remove http:// or https:// from the front and and trailing '/'
@@ -61,19 +62,28 @@ class CopySite extends Command
 		// if (!$new_name) {
 		// 	$new_name = $site->name;
 		// }
-
+$this->info('about to replicate');
 		$new_site = $site->replicate();
-		$new_site->name = $new_name ?: $new_site->name . ' - ' . date("Ymd");
+		$new_site->name = $new_name ?: $new_site->name . ' - ' . date("Y-m-d:gis");
 		$new_site->host = $new_host ?: $new_site->host;
 		$new_site->path = $new_path ?: $new_site->path;
 
 		//ensure we are not using the same host/path combination
 		if ($new_site->host . $new_site->path == $site->host . $site->path) {
-			$new_site->path = $new_site->path . '-' . date("Ymd");
+			$new_site->path = $new_site->path . '-' . date("Y-m-d:His");
 		}
 
 		$new_site->save();
 
-		dd($new_site);
+		// copy pages over to new site
+		$pages = $site->draftPages()->get();
+		foreach ($pages as $page) {
+			$new_page = $page->replicate();
+			$new_page->site_id = $new_site->id;
+			$new_page->save();
+		}
+
+		// run update site url to update site options and pages
+
 	}
 }
