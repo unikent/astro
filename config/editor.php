@@ -46,4 +46,8 @@ return [
 	// optional instructions when a user logs in via sso but doesnt have required attribute
 	'sso_denied_message' => env('SSO_DENIED_MESSAGE'),
 
+    'clearing' => [
+        'sites' => preg_split('/\s*,\s*/', env('CLEARING_SITE_IDS', ''), -1, PREG_SPLIT_NO_EMPTY),
+        'live_host' => env('CLEARING_LIVE_DOMAIN', 'www.kent.ac.uk'),
+    ],
 ];
