@@ -5078,7 +5078,7 @@ just-extend@^1.1.27:
 
 "kent-theme-assets@git+ssh://git@gitlab.kent.ac.uk:webdev/kent-theme-assets":
   version "0.0.1"
-  resolved "git+ssh://git@gitlab.kent.ac.uk:webdev/kent-theme-assets#f94fab588140b1fea1525fc929985f7992095b98"
+  resolved "git+ssh://git@gitlab.kent.ac.uk:webdev/kent-theme-assets#f89832c84cc1292679780a1231973439acf22208"
 
 killable@^1.0.0:
   version "1.0.0"
