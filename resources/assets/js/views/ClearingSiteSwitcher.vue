@@ -45,7 +45,7 @@
 			:closable="false"
 			show-icon
 		>
-			<div>This will make <strong>{{ clearingSites[selectedSiteID].name }}</strong> the live clearing site.</div>
+			<div v-if="clearingSites[selectedSiteID]">This will make <strong>{{ clearingSites[selectedSiteID].name }}</strong> the live clearing site.</div>
 		</el-alert>
 		<span slot="footer" class="dialog-footer">
 			<el-button @click="showConfirmSwitch = false">Cancel</el-button>
@@ -54,7 +54,7 @@
 	</el-dialog>
 
 </el-card>
-	<div v-else>
+	<div v-else-if="!userCanSwitchClearingSites">
 		<el-alert
 				title="You cannot switch clearing sites"
 				type="error"
@@ -77,10 +77,8 @@ export default {
 		// with some defaults just for testing which should be removed before
 		// going live / merging...
 		const clearingConfig = Config.get('clearing', {
-			'sites': [
-				1,69,3
-			],
-			'live_host': 'www.kent.ac.uk',
+			'sites': [],
+			'live_host': 'example.com',
 		});
 		let clearingSites = {};
 		// initialise the object which maps available clearing sites by id to their data
@@ -154,7 +152,9 @@ export default {
 
 	methods: {
 		changeClearingSite() {
-			this.dialogVisible = false;
+			return this.switchSites().then((a) => {
+				this.showConfirmSwitch = false;
+			});
 		},
 		fetchClearingSites() {
 			this.clearingConfig.sites.forEach((id) => {
@@ -177,6 +177,24 @@ export default {
 						// });
 					});
 			});
+		},
+		switchSites() {
+			return this.$api
+				.post(`command/swapsites`, {
+					'from_id': this.liveClearingSiteID,
+					'to_id': this.selectedSiteID,
+				})
+				.then(({ data: json }) => {
+					this.fetchClearingSites();
+				})
+				.catch(() => {
+					this.siteDataError = true;
+					// this.$message({
+					// 	title: 'Error fetching clearing site information',
+					// 	message: 'Unable to to fetch clearing site information at this time.',
+					// 	type: 'error'
+					// });
+				});
 		},
 	}
 };

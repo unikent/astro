@@ -46,12 +46,22 @@ class SitePolicy extends BasePolicy
      * Determine whether the user can create Sites.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Site  $site
      * @return boolean
      */
     public function create(User $user)
     {
     	return $user->isAdmin();
+    }
+
+    /**
+     * Can the user switch site domains?
+     * @param  \App\Models\User  $user
+     * @return boolean
+     */
+    public function swapsites(User $user)
+    {
+        exit('argh');
+        return $user->isAdmin();
     }
 
 	/**

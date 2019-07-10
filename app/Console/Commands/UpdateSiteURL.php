@@ -22,6 +22,8 @@ class UpdateSiteURL extends Command
 								{--site-id=}
 								{--new-host=}
 								{--new-path=}
+								{?--yes}
+								{?--republish}
 								';
 
 	/**
@@ -51,6 +53,7 @@ class UpdateSiteURL extends Command
 		$site = Site::find(intval($this->option('site-id')));
 		$new_host = $this->option('new-host'); // TODO: remove http:// or https:// from the front and and trailing '/'
 		$new_path = $this->option('new-path'); // TODO ensure there is a begining '/' and remove trailing '/'
+        $autoconfirm = $this->hasOption('yes');
 
 		// check we have a site
 		if (!$site) {
@@ -95,11 +98,10 @@ class UpdateSiteURL extends Command
 		$this->new_site_url_escaped = str_replace('/', '\/', $this->new_site_url);
 
 		// get user confirmation to proceed
-		if (!$this->confirm("Changing site URL from '$this->old_site_url' to '$this->new_site_url'. Do you with to continue?")) {
-			$this->info('Aborting. Because you said to :-D.');
+		if (!$autoconfirm && !$this->confirm("Changing site URL from '$this->old_site_url' to '$this->new_site_url'. Do you with to continue?")) {
+			$this->error('Aborting. Because you said to :-D.');
 			return;
 		}
-
 		$this->updateSiteURL($site, $new_host, $new_path);
 	}
 
