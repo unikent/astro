@@ -155,7 +155,7 @@ export default {
 				type: 'primary'
 			},
 			'draft': {
-				name: 'Draft',
+				name: 'Draft amendments',
 				type: 'warning'
 			},
 			'published': {
