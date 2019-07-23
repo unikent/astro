@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\v1;
 use App\Models\Site;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 /**
  * Controller for running miscellaneous commands
@@ -23,6 +24,7 @@ class CommandController extends ApiController
 		$this->authorize('swapsites', Site::class);
 		$from = Site::findOrFail($request->get('from_id'));
 		$to = Site::findOrfail($request->get('to_id'));
+		$output = new BufferedOutput();
 		if($from->host === $to->host) {
 		    throw new \InvalidArgumentException('Cannot switch domains of two sites with the same domain name: ' . $from->host);
         }
@@ -33,7 +35,7 @@ class CommandController extends ApiController
             '--new-path' => $from->path,
             '--yes' => true,
             '--republish' => true,
-        ]);
+        ], $output);
 		if($tmp_from_result) {
 		    throw new \Exception('Failed to switch domains (step 1)');
         }
@@ -43,7 +45,7 @@ class CommandController extends ApiController
             '--new-path' => $to->path,
             '--yes' => true,
             '--republish' => true,
-        ]);
+        ], $output);
         if($to_result) {
             throw new \Exception('Failed to switch domains (step 2)');
         }
@@ -53,10 +55,10 @@ class CommandController extends ApiController
             '--new-path' => $from->path,
             '--yes' => true,
             '--republish' => true,
-        ]);
+        ], $output);
         if($from_result) {
             throw new \Exception('Failed to switch domains (step 3)');
         }
-        exit('worked');
+        exit($output->fetch());
 	}
 }
