@@ -54,6 +54,7 @@ class UpdateSiteURL extends Command
 		$new_host = $this->option('new-host'); // TODO: remove http:// or https:// from the front and and trailing '/'
 		$new_path = $this->option('new-path'); // TODO ensure there is a begining '/' and remove trailing '/'
         $autoconfirm = $this->hasOption('yes');
+        $republish = $this->hasOption('republish');
 
 		// check we have a site
 		if (!$site) {
@@ -102,10 +103,10 @@ class UpdateSiteURL extends Command
 			$this->error('Aborting. Because you said to :-D.');
 			return;
 		}
-		$this->updateSiteURL($site, $new_host, $new_path);
+		$this->updateSiteURL($site, $new_host, $new_path, $republish);
 	}
 
-	public function updateSiteURL($site , $new_host, $new_path)
+	public function updateSiteURL($site , $new_host, $new_path, $republish = false)
 	{
 		// Update site's host and path & site option links
 		$site->host = $new_host;
@@ -128,28 +129,54 @@ class UpdateSiteURL extends Command
 		$api = new LocalAPIClient($user);
 
 		foreach ($pages as $page) {
-			$page_url = $site->host . $site->path . $page->generatePath();
-
 			try {
+				$page_url = $site->host . $site->path . $page->generatePath();
+
+				// track whether we have republished the page, because if we have, even if there are no changes to the old draft,
+				// we will need to resave it
+				$republished = false;
+
+				// if we are republishing, then either:
+				// 1) There is no published version, in which case we skip this part and just work on the current draft
+				// 2) The published version is the latest draft, in which case we skip this bit, work on the current draft, then republish it
+				// 3) The published version isn't the latest draft, in which case we update the published version, republish it, then go on to update the draft too.
+				if($republish) {
+					$published = $page->publishedVersion();
+
+					// if the published version is not the latest draft...
+					if($published && $published->revision_id !== $page->revision_id) {
+						$new_published_page_regions = $this->replaceURLs($published->revision->blocks);
+						if($new_published_page_regions) {
+							$api->updatePageContent($page->id, $new_published_page_regions);
+							$api->publishPage($page->id);
+							$republished = true;
+						}
+					}
+				}
+
+				// update the draft version of the page if we need to
 				$new_page_regions = $this->replaceURLs($page->revision->blocks);
-			} catch (Exception $e) {
-				$this->error("Skipping page '$page->id' ($page_url). Unable to replace URLs.");
+				if ($new_page_regions || $republished) {
+					$api->updatePageContent($page->id, $new_page_regions);
+					// should we be republishing the latest draft?
+					if(!$republished && $published) {
+						$api->publishPage($page->id);
+					}
+					$this->info("Updated page '$page->id' ($page_url)." . ($republished ? ' and republished the previous published version' : ($published ? ' and published it' : '')));
+				}
+				else {
+					$this->warn("Skipping page '$page->id' ($page_url). No urls to update.");
+					continue;
+				}
+
+			} catch (ValidationException $e) {
+				$this->error("Validation error occured whiles attempting to update and / or republish page '$page->id' ($page_url).");
 				continue;
-			}
-			
-			if (!$new_page_regions) {
-				$this->warn("Skipping page '$page->id' ($page_url). No urls to update.");
+			} catch (Exception $e) {
+				$this->error("Skipping page '$page->id' ($page_url). Unable to replace URLs: " . $e->getMessage());
 				continue;
 			}
 
-			try {
-				$api->updatePageContent($page->id, $new_page_regions);
-				$this->info("Updated page '$page->id' ($page_url).");
-			} catch (ValidationException $e) {
-				$this->error("Validation error occured whiles attempting to update page '$page->id' ($page_url).");
-			} catch (Exception $e) {
-				$this->error("Error occured whiles attempting to update page '$page->id' ($page_url).");
-			}
 		}
 	}
 
