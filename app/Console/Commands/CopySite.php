@@ -49,33 +49,47 @@ class CopySite extends Command
 		$this->info('starting');
 		$site = Site::find(intval($this->option('site-id')));
 
-		$new_name = $this->option('new-name');
-		$new_host = $this->option('new-host'); // TODO: remove http:// or https:// from the front and and trailing '/'
-		$new_path = $this->option('new-path'); // TODO ensure there is a begining '/' and remove trailing '/'
-
 		// check we have a site
 		if (!$site) {
-			$this->error("You need to specify the --site-id of the site whose URL you're attempting to update.");
+			$this->error("You need to specify the --site-id of the site you are attempting to copy.");
 			return;
 		}
 
-		// // check we have a name
-		// if (!$new_name) {
-		// 	$new_name = $site->name;
-		// }
-		$this->info('copying site');
-		$new_site = $site->replicate();
-		$new_site->name = $new_name ?: $new_site->name . ' - ' . date("Y-m-d:His");
-		$new_site->host = $new_host ?: $new_site->host;
-		$new_site->path = $new_path ?: $new_site->path;
+		$new_name = $this->option('new-name') ?: $site->name . ' - ' . date("Y-m-d:His");
+		$new_host = $this->option('new-host') ?: $site->host; // TODO: remove http:// or https:// from the front and and trailing '/'
+		$new_path = $this->option('new-path') ?: $new_site->path; // TODO ensure there is a begining '/' and remove trailing '/'
 
 		//ensure we are not using the same host/path combination
-		if ($new_site->host . $new_site->path == $site->host . $site->path) {
-			$new_site->path = $new_site->path . '-' . date("Y-m-d:His");
+		if ($new_host . $new_path == $site->host . $site->path) {
+			$new_path = $new_path . '-' . date("Y-m-d:His");
+		}
+		
+		$this->info('copying site');
+
+		$user = User::where('role', User::ROLE_ADMIN)->first();
+		$api = new LocalAPIClient($user);
+
+		try {
+			$api->createSite(
+				$new_name, 
+				$new_host, 
+				$new_path, 
+				[
+					'name' => $site->site_definition_name, 
+					'version' => $site->site_definition_version
+				], 
+				$options = $site->options, 
+				false // dont create the default pages
+			);
+			$this->info('site copied');
+		} catch (ValidationException $e) {
+			$this->error("Validation error occured whiles attempting to copy the site.");
+			return;
+		} catch (Exception $e) {
+			$this->error("Error occured whiles attempting to copy the site.");
+			return;
 		}
 
-		$new_site->save();
-		$this->info('site copied');
 
 		// copy pages over to new site
 		$pages = $site->draftPages()->get();
