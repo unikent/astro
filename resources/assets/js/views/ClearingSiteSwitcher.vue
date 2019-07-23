@@ -170,11 +170,6 @@ export default {
 					})
 					.catch(() => {
 						this.siteDataError = true;
-						// this.$message({
-						// 	title: 'Error fetching clearing site information',
-						// 	message: 'Unable to to fetch clearing site information at this time.',
-						// 	type: 'error'
-						// });
 					});
 			});
 		},
@@ -189,11 +184,6 @@ export default {
 				})
 				.catch(() => {
 					this.siteDataError = true;
-					// this.$message({
-					// 	title: 'Error fetching clearing site information',
-					// 	message: 'Unable to to fetch clearing site information at this time.',
-					// 	type: 'error'
-					// });
 				});
 		},
 	}

@@ -60,7 +60,6 @@ class SitePolicy extends BasePolicy
      */
     public function swapsites(User $user)
     {
-        exit('argh');
         return $user->isAdmin();
     }
 

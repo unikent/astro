@@ -53,8 +53,8 @@ class UpdateSiteURL extends Command
 		$site = Site::find(intval($this->option('site-id')));
 		$new_host = $this->option('new-host'); // TODO: remove http:// or https:// from the front and and trailing '/'
 		$new_path = $this->option('new-path'); // TODO ensure there is a begining '/' and remove trailing '/'
-        $autoconfirm = $this->hasOption('yes');
-        $republish = $this->hasOption('republish');
+		$autoconfirm = $this->hasOption('yes');
+		$republish = $this->hasOption('republish');
 
 		// check we have a site
 		if (!$site) {
