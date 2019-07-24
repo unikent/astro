@@ -53,7 +53,7 @@ class CreateSite implements APICommand
             $homepage = $this->createHomePage($site, 'Home', $layout, $user);
 
             //create default pages
-            if($input->get('createDefaultPages') && !empty($template->defaultPages['children'])){
+            if($input->get('create_default_pages') && !empty($template->defaultPages['children'])){
 				$this->addPages($homepage, $template->defaultPages['children'], $user);
 			}
             $site->refresh();
@@ -184,6 +184,9 @@ class CreateSite implements APICommand
             'site_definition.version' => [
                 'required',
                 'integer'
+            ],
+            'create_default_pages' => [
+                'boolean'
             ]
         ];
         return $rules;

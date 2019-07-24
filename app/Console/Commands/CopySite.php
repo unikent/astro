@@ -55,13 +55,13 @@ class CopySite extends Command
 			return;
 		}
 
-		$new_name = $this->option('new-name') ?: $site->name . ' - ' . date("Y-m-d:His");
+		$new_name = $this->option('new-name') ?: $site->name . ' - ' . date("Y-m-d-His");
 		$new_host = $this->option('new-host') ?: $site->host; // TODO: remove http:// or https:// from the front and and trailing '/'
-		$new_path = $this->option('new-path') ?: $new_site->path; // TODO ensure there is a begining '/' and remove trailing '/'
+		$new_path = $this->option('new-path') ?: $site->path; // TODO ensure there is a begining '/' and remove trailing '/'
 
 		//ensure we are not using the same host/path combination
 		if ($new_host . $new_path == $site->host . $site->path) {
-			$new_path = $new_path . '-' . date("Y-m-d:His");
+			$new_path = $new_path . '-' . date("Y-m-d-His");
 		}
 		
 		$this->info('copying site');
@@ -91,31 +91,31 @@ class CopySite extends Command
 		}
 
 
-		// copy pages over to new site
-		$pages = $site->draftPages()->get();
-		$pages = $pages->merge($site->publishedPages()->get());
+		// // copy pages over to new site
+		// $pages = $site->draftPages()->get();
+		// $pages = $pages->merge($site->publishedPages()->get());
 
-		foreach ($pages as $page) {
-			$this->info("copying {$page->version} page {$page->id}");
-			$new_page = $page->replicate();
-			$new_page->site_id = $new_site->id;
+		// foreach ($pages as $page) {
+		// 	$this->info("copying {$page->version} page {$page->id}");
+		// 	$new_page = $page->replicate();
+		// 	$new_page->site_id = $new_site->id;
 
-			$old_parent = $pages->where('id', '=', $page->parent_id)->first();
-			if ($old_parent) {
-				$new_parent = $new_site->pages->where('path', '=', $parent->path)->andWhere('version', '=', $parent->version)->firstOrFail();
-				$new_page->makeChildOf($new_parent);
-			}
+		// 	$old_parent = $pages->where('id', '=', $page->parent_id)->first();
+		// 	if ($old_parent) {
+		// 		$new_parent = $new_site->pages->where('path', '=', $parent->path)->andWhere('version', '=', $parent->version)->firstOrFail();
+		// 		$new_page->makeChildOf($new_parent);
+		// 	}
 
-			//duplicate page's revisions
-			$new_revision = $page->revision->replicate();
-			$new_revision->save();
+		// 	//duplicate page's revisions
+		// 	$new_revision = $page->revision->replicate();
+		// 	$new_revision->save();
 
 
-			$new_page->setRevision($new_revision);
+		// 	$new_page->setRevision($new_revision);
 
-			$new_page->save();
-			$this->info("new {$new_page->version} page {$new_page->id} copied with revision {$new_revision->id}");
-		}
+		// 	$new_page->save();
+		// 	$this->info("new {$new_page->version} page {$new_page->id} copied with revision {$new_revision->id}");
+		// }
 
 		// run update site url to update site options and pages
 

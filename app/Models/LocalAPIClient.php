@@ -131,7 +131,7 @@ class LocalAPIClient implements APIClient
 	 * @param array $options Other options.
 	 * @return Site|object
 	 */
-	public function createSite($name, $host, $path, $site_definition, $options = [], $createDefaultPages = true)
+	public function createSite($name, $host, $path, $site_definition, $options = [], $create_default_pages = true)
 	{
 		return $this->execute(CreateSite::class, [
 			'name' => $name,
@@ -139,7 +139,7 @@ class LocalAPIClient implements APIClient
 			'path' => $path,
 			'site_definition' => $site_definition,
 			'options' => $options,
-			'createDefaultPages' => $createDefaultPages
+			'create_default_pages' => $create_default_pages
 		]);
 	}
 
