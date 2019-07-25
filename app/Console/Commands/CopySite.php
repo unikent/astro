@@ -111,12 +111,24 @@ class CopySite extends Command
 				);
 			}
 			$new_pages[$page->id] = $new_page;
-			$this->info("Page '{$new_page->revision->title}' added, ID: {$new_page->id}.");
+
+			// TODO: Should we set page page options too? (using api->updatePage)
+
+			$published_version = $page->publishedVersion();
+
+			//Where there is a published version, update the page with the published revision and publish it
+			if ($published_version) {
+				$api->updatePageContent($new_page->id, $published_version->revision->blocks);
+				$api->publishPage($new_page->id);
+			}
+
+			// where there isnt a published version or the draft version is not the same as the published version, update the page with the draft version
+			if (!$published_version || $page->revision->id != $published_version->revision->id) {
+				$api->updatePageContent($new_page->id, $page->revision->blocks);
+			}
+
+			$this->info("Page '{$new_page->revision->title}' added, id: {$new_page->id}.");
 		}
-
-		//for each page, where there is a published version, update the page with the published revision and publish it
-		// where there isnt a published version or there is a draft version that is newer than the published version, update the page with the draft version
-
 
 		// run update site url to update site options and pages
 
