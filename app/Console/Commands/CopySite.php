@@ -46,7 +46,6 @@ class CopySite extends Command
 	 */
 	public function handle()
 	{
-		$this->info('starting');
 		$site = Site::find(intval($this->option('site-id')));
 
 		// check we have a site
@@ -64,13 +63,14 @@ class CopySite extends Command
 			$new_path = $new_path . '-' . date("Y-m-d-His");
 		}
 		
-		$this->info('copying site');
+		$this->info('Copying site');
 
 		$user = User::where('role', User::ROLE_ADMIN)->first();
 		$api = new LocalAPIClient($user);
+		$new_site = null;
 
 		try {
-			$api->createSite(
+			$new_site = $api->createSite(
 				$new_name, 
 				$new_host, 
 				$new_path, 
@@ -81,7 +81,7 @@ class CopySite extends Command
 				$options = $site->options, 
 				false // dont create the default pages
 			);
-			$this->info('site copied');
+			$this->info("Site copied. New site id: {$new_site->id}.");
 		} catch (ValidationException $e) {
 			$this->error("Validation error occured whiles attempting to copy the site.");
 			return;
