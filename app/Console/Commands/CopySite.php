@@ -69,26 +69,18 @@ class CopySite extends Command
 		$api = new LocalAPIClient($user);
 		$new_site = null;
 
-		try {
-			$new_site = $api->createSite(
-				$new_name, 
-				$new_host, 
-				$new_path, 
-				[
-					'name' => $site->site_definition_name, 
-					'version' => $site->site_definition_version
-				], 
-				$options = $site->options, 
-				false // dont create the default pages
-			);
-			$this->info("Site copied. New site id: {$new_site->id}.");
-		} catch (ValidationException $e) {
-			$this->error("Validation error occured whiles attempting to copy the site.");
-			return;
-		} catch (Exception $e) {
-			$this->error("Error occured whiles attempting to copy the site.");
-			return;
-		}
+		$new_site = $api->createSite(
+			$new_name, 
+			$new_host, 
+			$new_path, 
+			[
+				'name' => $site->site_definition_name, 
+				'version' => $site->site_definition_version
+			], 
+			$options = $site->options, 
+			false // dont create the default pages
+		);
+		$this->info("Site copied. New site id: {$new_site->id}.");
 
 		$this->info("Copying pages...");
 		$new_pages = [];
