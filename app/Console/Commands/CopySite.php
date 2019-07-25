@@ -90,32 +90,33 @@ class CopySite extends Command
 			return;
 		}
 
+		$this->info("Copying pages...");
+		$new_pages = [];
+		foreach ($site->draftPages()->get() as $page) {
+			$new_page = null;
+			// get the new page
+			if (is_null($page->parent_id)) {
+				$new_page = $new_site->draftHomepage()->first();
+			} else {
+				// create the page if its not a home page
+				$new_page = $api->addPage(
+					$new_pages[$page->parent_id]->id, 
+					null, // leave next_id blank
+					$page->slug, 
+					[
+						'name' => $page->revision->layout_name,
+						'version' => $page->revision->layout_version
+					],
+					$page->revision->title
+				);
+			}
+			$new_pages[$page->id] = $new_page;
+			$this->info("Page '{$new_page->revision->title}' added, ID: {$new_page->id}.");
+		}
 
-		// // copy pages over to new site
-		// $pages = $site->draftPages()->get();
-		// $pages = $pages->merge($site->publishedPages()->get());
+		//for each page, where there is a published version, update the page with the published revision and publish it
+		// where there isnt a published version or there is a draft version that is newer than the published version, update the page with the draft version
 
-		// foreach ($pages as $page) {
-		// 	$this->info("copying {$page->version} page {$page->id}");
-		// 	$new_page = $page->replicate();
-		// 	$new_page->site_id = $new_site->id;
-
-		// 	$old_parent = $pages->where('id', '=', $page->parent_id)->first();
-		// 	if ($old_parent) {
-		// 		$new_parent = $new_site->pages->where('path', '=', $parent->path)->andWhere('version', '=', $parent->version)->firstOrFail();
-		// 		$new_page->makeChildOf($new_parent);
-		// 	}
-
-		// 	//duplicate page's revisions
-		// 	$new_revision = $page->revision->replicate();
-		// 	$new_revision->save();
-
-
-		// 	$new_page->setRevision($new_revision);
-
-		// 	$new_page->save();
-		// 	$this->info("new {$new_page->version} page {$new_page->id} copied with revision {$new_revision->id}");
-		// }
 
 		// run update site url to update site options and pages
 
