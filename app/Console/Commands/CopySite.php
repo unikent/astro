@@ -123,6 +123,12 @@ class CopySite extends Command
 		}
 
 		// run update site url to update site options and pages
-
+		$this->call('astro:updatesiteurl', [
+			'--site-id' => $new_site->id, 
+			'--new-host' => $new_site->host,
+			'--new-path' => $new_site->path,
+			'--url-to-update' => $site->host . $site->path,
+			'--confirm' => true
+		]);
 	}
 }
