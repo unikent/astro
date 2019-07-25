@@ -36,7 +36,7 @@ class CreateSite implements APICommand
                 'path' => $input->get('path'),
                 'site_definition_name' => $site_definition['name'],
                 'site_definition_version' => $site_definition['version'],
-                'options' => $input->get('options')
+                'options' => $input->get('options') ? $input->get('options') : [];
             ]);
             $template =
 				SiteDefinition::fromDefinitionFile(SiteDefinition::locateDefinition(
