@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use App\Models\Site;
 use App\Models\Page;
 use App\Models\User;
+use App\Models\UserSiteRole;
 use App\Models\LocalAPIClient;
 
 class CopySite extends Command
@@ -123,6 +124,7 @@ class CopySite extends Command
 		}
 
 		// run update site url to update urls in site options and pages
+		$this->info("Updating site urls...");
 		$this->call('astro:updatesiteurl', [
 			'--site-id' => $new_site->id, 
 			'--new-host' => $new_site->host,
@@ -130,5 +132,24 @@ class CopySite extends Command
 			'--url-to-update' => $site->host . $site->path,
 			'--confirm' => true
 		]);
+
+		// copy over media items
+		$this->info("Associating media items...");
+		foreach ($site->media as $media_item) {
+			$new_site->media()->save($media_item);
+			$this->info("Media item '{$media_item->filename}' has been added to the media library");
+		}
+
+		// copy over users and roles
+		$this->info("Associating users...");
+		foreach ($site->usersRoles as $userRole) {
+			UserSiteRole::create([
+				'user_id' => $userRole->user->id,
+				'site_id' => $new_site->id,
+				'role_id' => $userRole->role->id
+			]);
+			$this->info("User '{$userRole->user->name}' added as {$userRole->role->name}");
+
+		}
 	}
 }
