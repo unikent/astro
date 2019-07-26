@@ -122,7 +122,7 @@ class CopySite extends Command
 			$this->info("Page '{$new_page->revision->title}' added, id: {$new_page->id}.");
 		}
 
-		// run update site url to update site options and pages
+		// run update site url to update urls in site options and pages
 		$this->call('astro:updatesiteurl', [
 			'--site-id' => $new_site->id, 
 			'--new-host' => $new_site->host,
