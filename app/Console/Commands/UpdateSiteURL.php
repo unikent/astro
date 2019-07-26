@@ -22,8 +22,6 @@ class UpdateSiteURL extends Command
 								{--site-id=}
 								{--new-host=}
 								{--new-path=}
-								{--url-to-update=}
-								{--confirm}
 								';
 
 	/**
@@ -77,7 +75,7 @@ class UpdateSiteURL extends Command
 		$old_path = $site->path;
 
 		// full site URLs
-		$this->old_site_url = $this->option('url-to-update') ?: $old_host . $old_path;
+		$this->old_site_url = $old_host . $old_path;
 		$this->new_site_url = $new_host . $new_path;
 
 		// check that we're not changing to the same URL
@@ -88,11 +86,8 @@ class UpdateSiteURL extends Command
 
 		// check that no other site exists with the new URL
 		if ($existing_site = Site::where('host', '=', $new_host)->where('path', '=', $new_path)->first()) {
-			// if there is, check that we are not deliberately trying to update urls
-			if ($this->old_site_url == $old_host . $old_path) {
-				$this->error("There is already a site with host '$new_host' and path '$new_path'. Its id is '$existing_site->id'.");
-				return;
-			}
+			$this->error("There is already a site with host '$new_host' and path '$new_path'. Its id is '$existing_site->id'.");
+			return;
 		}
 
 		// for findind and replacing URLs in json
@@ -100,11 +95,9 @@ class UpdateSiteURL extends Command
 		$this->new_site_url_escaped = str_replace('/', '\/', $this->new_site_url);
 
 		// get user confirmation to proceed
-		if (!$this->option('confirm')) {
-			if (!$this->confirm("Changing site URL from '$this->old_site_url' to '$this->new_site_url'. Do you with to continue?")) {
-				$this->info('Aborting. Because you said to :-D.');
-				return;
-			}
+		if (!$this->confirm("Changing site URL from '$this->old_site_url' to '$this->new_site_url'. Do you with to continue?")) {
+			$this->info('Aborting. Because you said to :-D.');
+			return;
 		}
 
 		$this->updateSiteURL($site, $new_host, $new_path);

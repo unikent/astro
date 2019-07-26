@@ -123,16 +123,6 @@ class CopySite extends Command
 			$this->info("Page '{$new_page->revision->title}' added, id: {$new_page->id}.");
 		}
 
-		// run update site url to update urls in site options and pages
-		$this->info("Updating site urls...");
-		$this->call('astro:updatesiteurl', [
-			'--site-id' => $new_site->id, 
-			'--new-host' => $new_site->host,
-			'--new-path' => $new_site->path,
-			'--url-to-update' => $site->host . $site->path,
-			'--confirm' => true
-		]);
-
 		// copy over media items
 		$this->info("Associating media items...");
 		foreach ($site->media as $media_item) {
