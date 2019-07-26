@@ -64,11 +64,16 @@ class CopySite extends Command
 			$new_path = $new_path . '-' . date("Y-m-d-His");
 		}
 		
+		$old_site_url = $site->host . $site->path;
+		$new_site_url = $new_host . $new_path;
+		
 		$this->info('Copying site');
 
 		$user = User::where('role', User::ROLE_ADMIN)->first();
 		$api = new LocalAPIClient($user);
 		$new_site = null;
+
+		$replaced_options = $this->replaceURLs($site->options, $old_site_url, $new_site_url);
 
 		$new_site = $api->createSite(
 			$new_name, 
@@ -78,7 +83,7 @@ class CopySite extends Command
 				'name' => $site->site_definition_name, 
 				'version' => $site->site_definition_version
 			], 
-			$options = $site->options, 
+			$options = $replaced_options ?: $site->options,
 			false // dont create the default pages
 		);
 		$this->info("Site copied. New site id: {$new_site->id}.");
@@ -111,13 +116,15 @@ class CopySite extends Command
 
 			//Where there is a published version, update the page with the published revision and publish it
 			if ($published_version) {
-				$api->updatePageContent($new_page->id, $published_version->revision->blocks);
+				$published_content = $this->replaceURLs($published_version->revision->blocks, $old_site_url, $new_site_url);
+				$api->updatePageContent($new_page->id, $published_content);
 				$api->publishPage($new_page->id);
 			}
 
 			// where there isnt a published version or the draft version is not the same as the published version, update the page with the draft version
 			if (!$published_version || $page->revision->id != $published_version->revision->id) {
-				$api->updatePageContent($new_page->id, $page->revision->blocks);
+				$draft_content = $this->replaceURLs($page->revision->blocks, $old_site_url, $new_site_url);
+				$api->updatePageContent($new_page->id, $draft_content);
 			}
 
 			$this->info("Page '{$new_page->revision->title}' added, id: {$new_page->id}.");
@@ -141,5 +148,32 @@ class CopySite extends Command
 			$this->info("User '{$userRole->user->name}' added as {$userRole->role->name}");
 
 		}
+	}
+
+	/**
+	 * This function converts a data array to a json srting and performs a srting 
+	 * replace on the resulting array
+	 * @param array $data
+	 * @return array
+	 */
+	public function replaceURLs($data, $old_site_url, $new_site_url)
+	{
+		if (!is_array($data)) {
+			throw new Exception("Data for replacing urls must be an array");
+		}
+
+		$encoded_data = json_encode($data);
+
+		// for findind and replacing URLs in json
+		$old_site_url_escaped = str_replace('/', '\/', $old_site_url);
+		$new_site_url_escaped = str_replace('/', '\/', $new_site_url);
+
+		// only replace if there is something to replace
+		if (strpos($encoded_data, $old_site_url_escaped)) {
+			$data = str_replace($old_site_url_escaped, $new_site_url_escaped, $encoded_data);
+			$data = json_decode($data, true);
+		}
+
+		return $data;
 	}
 }
