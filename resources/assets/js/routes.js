@@ -21,6 +21,8 @@ import ProfileTopBar from '@theme/profiles/components/topbar';
 
 import TopBar from 'components/topbar';
 
+import ClearingSiteSwitcher from './views/ClearingSiteSwitcher';
+
 const routes = [
 	{
 		path: '/',
@@ -110,6 +112,11 @@ const routes = [
 		path: '/user/:user_id/settings',
 		component: Settings,
 		name: 'settings'
+	},
+	{
+		path: '/clearing',
+		component: ClearingSiteSwitcher,
+		name: 'clearing',
 	},
 	{
 		path: '*',

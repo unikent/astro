@@ -26,9 +26,9 @@ class CachedHttpClient
 			$this->httpClient = $httpClient;
 		} else {
 			if ($httpHandler !== null) {
-				$this->httpClient = new Client(['handler' => $this->httpHandler]);
+				$this->httpClient = new Client(['handler' => $this->httpHandler, 'verify' => false]);
 			} else {
-				$this->httpClient = new Client();
+				$this->httpClient = new Client(['verify' => false]);
 			}
 		}
 

@@ -43,4 +43,6 @@ Route::group(['prefix' => 'v1', 'namespace' => 'v1'], function () {
 	Route::get('roles', 'UserController@roles');
 	Route::put('sites/{site}/users', 'SiteController@users');
 
+	Route::post('command/swapsites', 'CommandController@swapsites');
+
 });
