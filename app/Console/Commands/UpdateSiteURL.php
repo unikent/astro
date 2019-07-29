@@ -141,6 +141,7 @@ class UpdateSiteURL extends Command
 				// track whether we have republished the page, because if we have, even if there are no changes to the old draft,
 				// we will need to resave it
 				$republished = false;
+				$published = null;
 
 				// if we are republishing, then either:
 				// 1) There is no published version, in which case we skip this part and just work on the current draft
