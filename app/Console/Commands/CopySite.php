@@ -105,8 +105,6 @@ class CopySite extends Command
 			}
 			$new_pages[$page->id] = $new_page;
 
-			// TODO: Should we set page page options too? (using api->updatePage)
-
 			$published_version = $page->publishedVersion();
 
 			//Where there is a published version, update the page with the published revision and publish it
@@ -152,32 +150,5 @@ class CopySite extends Command
 			$this->info("User '{$userRole->user->name}' added as {$userRole->role->name}");
 
 		}
-	}
-
-	/**
-	 * This function converts a data array to a json srting and performs a srting 
-	 * replace on the resulting array
-	 * @param array $data
-	 * @return array
-	 */
-	public function replaceURLs($data, $old_site_url, $new_site_url)
-	{
-		if (!is_array($data)) {
-			throw new Exception("Data for replacing urls must be an array");
-		}
-
-		$encoded_data = json_encode($data);
-
-		// for findind and replacing URLs in json
-		$old_site_url_escaped = str_replace('/', '\/', $old_site_url);
-		$new_site_url_escaped = str_replace('/', '\/', $new_site_url);
-
-		// only replace if there is something to replace
-		if (strpos($encoded_data, $old_site_url_escaped)) {
-			$data = str_replace($old_site_url_escaped, $new_site_url_escaped, $encoded_data);
-			$data = json_decode($data, true);
-		}
-
-		return $data;
 	}
 }
