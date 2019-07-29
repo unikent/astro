@@ -22,6 +22,7 @@ class UpdateSiteURL extends Command
 								{--site-id=}
 								{--new-host=}
 								{--new-path=}
+								{--url-to-update=}
 								{?--yes}
 								{?--republish}
 								';
@@ -79,7 +80,7 @@ class UpdateSiteURL extends Command
 		$old_path = $site->path;
 
 		// full site URLs
-		$this->old_site_url = $old_host . $old_path;
+		$this->old_site_url = $this->option('url-to-update') ?: $old_host . $old_path;
 		$this->new_site_url = $new_host . $new_path;
 
 		// check that we're not changing to the same URL
@@ -90,8 +91,11 @@ class UpdateSiteURL extends Command
 
 		// check that no other site exists with the new URL
 		if ($existing_site = Site::where('host', '=', $new_host)->where('path', '=', $new_path)->first()) {
-			$this->error("There is already a site with host '$new_host' and path '$new_path'. Its id is '$existing_site->id'.");
-			return;
+			// if there is, check that we are not deliberately trying to update urls
+			if ($this->old_site_url == $old_host . $old_path) {
+				$this->error("There is already a site with host '$new_host' and path '$new_path'. Its id is '$existing_site->id'.");
+				return;
+			}
 		}
 
 		// for findind and replacing URLs in json
