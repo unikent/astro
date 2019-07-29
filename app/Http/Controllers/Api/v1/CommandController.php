@@ -30,7 +30,7 @@ class CommandController extends ApiController
 		if ($from->host === $to->host) {
 			throw new \InvalidArgumentException('Cannot switch domains of two sites with the same domain name: ' . $from->host);
 		}
-		$tmp_host = microtime(true);
+		$tmp_host = ((string) microtime(true)) . ".test";
 		$tmp_from_result = Artisan::call('astro:updatesiteurl', [
 			'--site-id' => $from->id,
 			'--new-host' => $tmp_host,
