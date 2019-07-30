@@ -41,8 +41,7 @@ class DatabaseSeeder extends Seeder
 			'username' => 'admin',
 			'name'=> 'Admin',
 			'password'=> Hash::make('admin'),
-			'role' => 'admin',
-            'api_token' => 'test'
+			'role' => 'admin'
 		]);
 
 		// create some users to test with...
@@ -50,24 +49,21 @@ class DatabaseSeeder extends Seeder
 			'username' => 'editor',
 			'name' => 'Editor',
 			'password' => Hash::make('editor'),
-			'role' => 'user',
-			'api_token' => 'editor-test'
+			'role' => 'user'
 		]);
 
 		$owner = factory(User::class)->create([
 			'username' => 'owner',
 			'name' => 'Owner',
 			'password' => Hash::make('owner'),
-			'role' => 'user',
-			'api_token' => 'owner-test'
+			'role' => 'user'
 		]);
 
 		$contributor = factory(User::class)->create([
 			'username' => 'contributor',
 			'name' => 'Contributor',
 			'password' => Hash::make('contributor'),
-			'role' => 'user',
-			'api_token' => 'contributor-test'
+			'role' => 'user'
 		]);
 
 

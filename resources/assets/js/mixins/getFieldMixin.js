@@ -5,14 +5,27 @@ export default {
 
 	inject: ['fieldType'],
 
+	computed: {
+		fieldsTypes() {
+			let f = {};
+
+			Object
+				.keys(baseFields)
+				.forEach(
+					type => f[type] = swapParentField(baseFields[type], this.fieldType)
+				);
+
+			return f;
+		}
+	},
+
 	methods: {
 		getField(type) {
 			return (
-				baseFields[type] ?
-					swapParentField(baseFields[type], this.fieldType) :  {
-						name: type,
-						template: '<div>This field type does not exist</div>'
-					}
+				this.fieldsTypes[type] || {
+					name: type,
+					template: '<div>This field type does not exist</div>'
+				}
 			);
 		}
 	}

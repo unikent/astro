@@ -28,9 +28,10 @@ Astro has three separate components:
 There are a number of configuration options that can be set depending on whether you are installing
 to use as the editor, the api and / or the previewer.
 
-The three main config files are:
+The main config files are:
 
 - `config/app.php`
+- `config/auth.php`
 - `config/editor.php`
 - `config/definitions.php`
 
@@ -54,8 +55,19 @@ set of definitions is being used, with the addition of using .env variables if p
 8. Edit any other relevant variables in the .env file (see above configuration options section for details).
 9. Create a symlink in the `public` folder to link `uploads` to `storage/app/public/uploads`. Depending on your system this would be with something like `ln -s ../storage/app/public/uploads/ uploads`.
 10. Run `php artisan migrate --seed` and `DB_CONNECTION=mysql_test php artisan migrate`
-11. Run `php artisan astro:permissions refresh` to setup roles and permissions
+11. Run `php artisan astro:permissions install --yes-remove-non-default-permissions` to setup roles and permissions (see Kent Profiles below)
 12. Ensure that everything is working properly, by running the test suite: `phpunit`
+
+
+#### Kent Profiles
+
+This section is only relevant if you are using the optional [Kent Profiles Package](https://gitlab.kent.ac.uk/webdev/kent-profiles). 
+
+This adds the initial data, permissions and the 'Profile Editor' role to Site Editor. This can only be performed after the initial migration and permissions steps have been completed in the API Installation. 
+
+1. Run `php artisan kentprofiles:categories refresh`
+2. Run `php artisan kentprofiles:socialmedia refresh`
+3. Run `php artisan kentprofiles:permissions add`
 
 ### Editor Installation
 

@@ -7,5 +7,11 @@
 	&__add-link-button {
 		float: right;
 		margin-top: 10px;
+
+		.is-error & {
+			color: #f56c6c;
+			border-color: #f56c6c;
+		}
 	}
+
 }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ca87653e66b54288c97c075473fb7a99",
+    "content-hash": "0131154a2ae57017eaa52445b8559de4",
     "packages": [
         {
             "name": "barryvdh/laravel-debugbar",
@@ -1617,6 +1617,64 @@
                 "psysh"
             ],
             "time": "2017-12-18T16:25:11+00:00"
+        },
+        {
+            "name": "lcobucci/jwt",
+            "version": "3.2.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/lcobucci/jwt.git",
+                "reference": "c9704b751315d21735dc98d78d4f37bd73596da7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lcobucci/jwt/zipball/c9704b751315d21735dc98d78d4f37bd73596da7",
+                "reference": "c9704b751315d21735dc98d78d4f37bd73596da7",
+                "shasum": ""
+            },
+            "require": {
+                "ext-openssl": "*",
+                "php": ">=5.5"
+            },
+            "require-dev": {
+                "mdanter/ecc": "~0.3.1",
+                "mikey179/vfsstream": "~1.5",
+                "phpmd/phpmd": "~2.2",
+                "phpunit/php-invoker": "~1.1",
+                "phpunit/phpunit": "~4.5",
+                "squizlabs/php_codesniffer": "~2.3"
+            },
+            "suggest": {
+                "mdanter/ecc": "Required to use Elliptic Curves based algorithms."
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.1-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Lcobucci\\JWT\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Luís Otávio Cobucci Oblonczyk",
+                    "email": "lcobucci@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A simple library to work with JSON Web Token and JSON Web Signature",
+            "keywords": [
+                "JWS",
+                "jwt"
+            ],
+            "time": "2018-08-03T11:23:50+00:00"
         },
         {
             "name": "league/flysystem",
@@ -3663,17 +3721,22 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/astro-kent-theme.git",
-                "reference": "af989913a2c9d7f22219fad20b20388bda046182"
+                "reference": "593ea035e0a89225019c76ac81c3f310cba2d3f9"
             },
             "require": {
                 "ezyang/htmlpurifier": "4.10.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "5.0"
+                "phpunit/phpunit": "^7"
             },
             "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "App\\Models\\Definitions\\": "tests/mocks/"
+                }
+            },
             "description": "Our block views",
-            "time": "2018-09-14T12:47:24+00:00"
+            "time": "2019-07-10T15:27:20+00:00"
         },
         {
             "name": "unikent/astro-renderer",
@@ -3681,7 +3744,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/astro-renderer.git",
-                "reference": "6a14a63c4c52812c3e4c304c1a84d1fe8ff2d409"
+                "reference": "cef942151f5459a375d6555d778c2fa70ffbd9ee"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.2",
@@ -3709,7 +3772,7 @@
                 }
             ],
             "description": "A simple renderer for Astro",
-            "time": "2018-08-23T14:49:35+00:00"
+            "time": "2019-06-12T15:10:38+00:00"
         },
         {
             "name": "unikent/kent-profiles",
@@ -3717,7 +3780,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/kent-profiles.git",
-                "reference": "0b8953101631b65d782b30d8ada350a601c5bf14"
+                "reference": "4238b20ca8f75f1b8681f9d017d693dc81b13953"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.3"
@@ -3735,40 +3798,7 @@
                 }
             ],
             "description": "A laravel app to manage staff profiles at kent",
-            "time": "2018-09-06T15:57:02+00:00"
-        },
-        {
-            "name": "unikent/kentauth",
-            "version": "dev-laravel/5.3",
-            "source": {
-                "type": "git",
-                "url": "git@gitlab.kent.ac.uk:webdev/kentauth.git",
-                "reference": "29fa4b43cdc0059d8a5b0cb410b9c3588245a40c"
-            },
-            "require-dev": {
-                "mockery/mockery": "0.9.*",
-                "orchestra/database": "~3.1",
-                "orchestra/testbench": "~3.4"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "KentAuth\\": "src/",
-                    "KentAuthTests\\": "tests/"
-                }
-            },
-            "authors": [
-                {
-                    "name": "cs462",
-                    "email": "cs462@kent.ac.uk"
-                },
-                {
-                    "name": "T.Gillett",
-                    "email": "T.Gillett@kent.ac.uk"
-                }
-            ],
-            "description": "Kent Authentiction for Laravel",
-            "time": "2017-05-23T11:17:04+00:00"
+            "time": "2019-06-13T09:38:28+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -4796,6 +4826,7 @@
                 "mock",
                 "xunit"
             ],
+            "abandoned": true,
             "time": "2017-06-30T09:13:00+00:00"
         },
         {
@@ -5473,10 +5504,9 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "unikent/astro-kent-theme": 20,
         "unikent/astro-renderer": 20,
-        "unikent/kentauth": 20,
-        "unikent/kent-profiles": 20,
-        "unikent/astro-kent-theme": 20
+        "unikent/kent-profiles": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

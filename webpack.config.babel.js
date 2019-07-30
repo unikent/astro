@@ -6,6 +6,7 @@ import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import FriendlyErrorsPlugin from 'friendly-errors-webpack-plugin';
 import MixManifestPlugin from './resources/assets/js/console/webpack/MixManifestPlugin';
 import dotenv from 'dotenv';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
 
 // load from .env into process.env
 dotenv.config();
@@ -201,7 +202,14 @@ export default {
 			filename: 'mix-manifest.json',
 			path: path.resolve(__dirname, 'public'),
 			url: hmrURL
-		})
+		}),
+
+		new CopyWebpackPlugin([
+			{
+				from: 'node_modules/tinymce/skins',
+				to: 'css/tinymce/skins'
+			} 
+		]), 
 	],
 
 	resolve: {

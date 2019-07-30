@@ -19,9 +19,13 @@
 	align-items: center;
 	justify-content: flex-end;
 }
+
+.top-bar__navigation {
+    display:flex;
+    min-width: 0;
+}
+
 .top-bar__page-title {
-	float: left;
-	display: inline-block;
 	vertical-align: middle;
 	padding-left: 20px;
 	.el-tag {
@@ -30,28 +34,39 @@
 		font-size: 10px;
 		margin-left: 5px;
 	}
+    min-width: 0;
 }
 .top-bar__url {
 	font-size: 11px;
 	color: #71787f;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    margin-top: 4px;
 	.el-tag {
 		height: 18px;
 		line-height: 16px;
 	}
 }
+
 .top-bar__title {
 	font-size: 14px;
 	padding: 1rem 0 0 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .top-bar-backbutton {
-	float: left;
-	display: inline-block;
+	// float: left;
+	// display: inline-block;
 	vertical-align: middle;
 	line-height: get-height(top-bar);
 	color: #71787f;
 	font-size: 13px;
 	cursor: pointer;
+    white-space: nowrap;
 }
 .backbutton-icon {
 	margin-right: 6px;
@@ -95,6 +110,7 @@
 	fill: #71787f;
 	color: #71787f;
 	font-size: 14px;
+    white-space: nowrap;
 }
 
 .user-account-dropdown {

@@ -2,16 +2,16 @@
 
 namespace App\Models;
 
-use KentAuth\Models\User as KentUser;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends KentUser
+class User extends Authenticatable
 {
 
 	protected $casts = [
 		'settings' => 'json'
 	];
 
-	protected $hidden = [ 'api_token', 'created_at', 'updated_at'];
+	protected $hidden = [ 'created_at', 'updated_at'];
 
 	protected $attributes = [
 		'settings' => '{}'
@@ -32,18 +32,6 @@ class User extends KentUser
 	public function __construct(array $attributes = [])
 	{
 		parent::__construct($attributes);
-
-		$this->generateAPIToken();
-	}
-
-	/**
-	 * Generate a new API token.
-	 * @param bool $override Whether or not to override an existing token.
-	 * @return void
-	 */
-	public function generateAPIToken($override = false)
-	{
-		$this->api_token = $this->api_token && !$override ? $this->api_token : str_random(191); // Max string length without MySQL 5.7, see commit 7c90098
 	}
 
 	/**

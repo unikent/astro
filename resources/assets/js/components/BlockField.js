@@ -1,17 +1,19 @@
 import { mapGetters, mapState } from 'vuex';
 
 import baseFieldMixin from 'mixins/baseFieldMixin';
+import blockErrorsMixin from 'mixins/blockErrorsMixin';
 
 export default {
 
 	name: 'block-field',
 
-	mixins: [baseFieldMixin],
+	mixins: [baseFieldMixin, blockErrorsMixin],
 
 	computed: {
 		...mapGetters([
 			'getCurrentFieldValue',
-			'currentSectionIndex'
+			'currentSectionIndex',
+			'currentDefinition'
 		]),
 
 		...mapState({
@@ -21,7 +23,6 @@ export default {
 	},
 
 	methods: {
-
 		getFieldValue(path) {
 			const value = this.getCurrentFieldValue(path);
 			return value !== void 0 ? value : (this.default || null);
@@ -34,7 +35,9 @@ export default {
 				index: this.currentBlockIndex,
 				region: this.currentRegionName,
 				section: this.currentSectionIndex
-			})
+			});
+
+			this.$bus.$emit('block:validate');
 		}
 	}
 

@@ -20,8 +20,12 @@ class Kernel extends ConsoleKernel
         Commands\SetupPermissions::class,
 		Commands\ManageAdmins::class,
 		Commands\ClearCache::class,
+		Commands\CreateJWT::class,
 		Commands\MigratePages::class,
-		Commands\RenewUserAPITokens::class,
+		Commands\UpdateSiteURL::class,
+		Commands\SetSiteOption::class,
+		Commands\ViewSiteOptions::class,
+		Commands\CopySite::class,
 	];
 
 	/**
@@ -32,7 +36,7 @@ class Kernel extends ConsoleKernel
 	 */
 	protected function schedule(Schedule $schedule)
 	{
-		$schedule->command('astro:renewapitokens')->dailyAt('05:00');
+		// No events to scheduled
 	}
 
 	/**

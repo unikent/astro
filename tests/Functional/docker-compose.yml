@@ -5,7 +5,7 @@ robot:
     volumes:
         - ./reports:/opt/robotframework/reports
         - ./Resources:/opt/robotframework/Resources
-        - ./Tests:/opt/robotframework/tests
+        - ./TestCases:/opt/robotframework/tests
         - ./config.py:/opt/robotframework/config.py
     extra_hosts:
         - "astro.dev:${IP_ADDRESS}"
@@ -13,3 +13,4 @@ robot:
         - "api.astro.test:${IP_ADDRESS}"
         - "media.test:${IP_ADDRESS}"
         - "beta.test:${IP_ADDRESS}"
+        - "sso.test:${IP_ADDRESS}"

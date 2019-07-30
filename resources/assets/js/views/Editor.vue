@@ -14,7 +14,7 @@
 
 	<modal-container />
 </div>
-<div class="page" v-else v-show="showPermissionsError">
+<div class="page" v-else>
 	<el-alert
 		title="You don't have access to this site"
 		type="error"
@@ -36,9 +36,13 @@ import ModalContainer from 'components/ModalContainer';
 import Icon from 'components/Icon';
 import { undoStackInstance } from 'plugins/undo-redo';
 import { onKeyDown, onKeyUp } from 'plugins/key-commands';
+import requiresSitePermissions from 'mixins/requiresSitePermissionsMixin';
+import { Definition } from 'classes/helpers';
 
 export default {
 	name: 'editor',
+
+	mixins: [requiresSitePermissions],
 
 	components: {
 		Sidebar,
@@ -50,25 +54,9 @@ export default {
 		fieldType: 'block'
 	},
 
-	data() {
-		return {
-			showPermissionsError: false
-		}
-	},
-
 	created() {
 		this.$store.commit('site/updateCurrentSiteID', this.$route.params.site_id);
-		this.$store.dispatch('loadSiteRole', { siteId: this.$route.params.site_id, username: Config.get('username') })
-		// TODO: catch errors
-			.then(() => {
-				if (this.canUser('page.edit')) {
-					this.showLoader();
-				}
-				else {
-					this.showPermissionsError = true;
-				}
-			});
-
+		
 		this.views = {
 			desktop: {
 				icon: 'desktop',
@@ -95,6 +83,9 @@ export default {
 
 		document.addEventListener('keydown', this.onKeyDown);
 		document.addEventListener('keyup', this.onKeyUp);
+
+		this.$bus.$on('block:validate', this.validate);
+		this.$bus.$on('block:validateAll', this.validateAll);
 	},
 
 	destroyed() {
@@ -103,18 +94,11 @@ export default {
 
 		document.removeEventListener('keydown', this.onKeyDown);
 		document.removeEventListener('keyup', this.onKeyUp);
+
+		this.$bus.$off('block:validate', this.validate);
+		this.$bus.$off('block:validateAll', this.validateAll);
 	},
 
-	methods: {
-
-		showLoader() {
-			this.loader = Loading.service({
-				target: this.$refs.editor,
-				text: 'Loading preview...',
-				customClass: 'loading-overlay'
-			});
-		},
-	},
 	computed: {
 
 		...mapState([
@@ -127,7 +111,13 @@ export default {
 		}),
 
 		...mapGetters([
-			'canUser'
+			'canUser',
+			'currentBlock',
+			'currentDefinition'
+		]),
+
+		...mapGetters('auth', [
+			'username'
 		]),
 
 		// get the URL for the route to show the editor preview page (not the external page preview)
@@ -157,6 +147,67 @@ export default {
 			else {
 				this.showLoader();
 			}
+		}
+	},
+
+	methods: {
+
+		showLoader() {
+			this.loader = Loading.service({
+				target: this.$refs.editor,
+				text: 'Loading preview...',
+				customClass: 'loading-overlay'
+			});
+		},
+
+		// TODO: turn this into an action
+		validate: _.debounce(
+			function(blockInfo) {
+				const
+					block = blockInfo ?
+						this.$store.getters.getBlock(
+							blockInfo.regionName,
+							blockInfo.sectionIndex,
+							blockInfo.blockIndex
+						) :
+						this.currentBlock,
+					definition = blockInfo ?
+						{
+							name: block.definition_name,
+							version: block.definition_version
+						} :
+						this.currentDefinition;
+
+				if(!block) {
+					return;
+				}
+
+				const validator = Definition.getValidator(definition);
+
+				if(validator) {
+					this.$store.commit('resetFieldErrors', {
+						blockId: `${block.id}`
+					});
+
+					validator.validate(block.fields, (errors, fields) => {
+						if(errors) {
+							errors.forEach(({ field, message }) => {
+								this.$store.commit('addFieldError', {
+									blockId: `${block.id}`,
+									fieldName: field,
+									errors: [message]
+								});
+							});
+						}
+					});
+				}
+			},
+			100,
+			{ trailing: true }
+		),
+
+		validateAll() {
+			this.$store.dispatch('initialiseBlocksAndValidate', this.$store.state.page.pageData.blocks);
 		}
 	}
 };

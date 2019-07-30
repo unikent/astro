@@ -177,6 +177,25 @@ $config = [
 
 	/*
 	|--------------------------------------------------------------------------
+	| Astro: require manual enabling of jwt generator dev tool
+	|--------------------------------------------------------------------------
+	| Set to true to enable the routes that allow creation of arbitrary valid
+	| JWTs for testing purposes in dev (local) environment only.
+	*/
+	'enable_jwt_dev_routes' => env('ENABLE_JWT_DEV_ROUTES', false),
+
+
+	/*
+	|--------------------------------------------------------------------------
+	| Astro: cache lifetimes
+	|--------------------------------------------------------------------------
+	| time in minutes to cache items for, such as dynamically fetched data
+	*/
+	'cache_scholarship_minutes' => env('CACHE_SCHOLARSHIP_MINUTES', 0),
+
+
+	/*
+	|--------------------------------------------------------------------------
 	| Autoloaded Service Providers
 	|--------------------------------------------------------------------------
 	|
@@ -290,15 +309,9 @@ $config = [
 
 		'Fractal' => Spatie\Fractal\FractalFacade::class,
 		'Image' => Intervention\Image\Facades\Image::class,
-		'SSO' => KentAuth\Facades\SSO::class,
+		// 'SSO' => ,
 	],
 
 ];
-
-$disable_kentauth = strtolower(env('DISABLE_KENTAUTH'));
-// don't add kentauth if we have disabled it
-if( !$disable_kentauth || $disable_kentauth == 'false' ) {
-	$config['providers'][] = KentAuth\AuthServiceProvider::class;
-}
 
 return $config;

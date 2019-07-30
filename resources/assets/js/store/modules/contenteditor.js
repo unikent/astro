@@ -78,7 +78,7 @@ const getters = {
 	 * @returns {Object|null}
 	 */
 	currentSection(state, getters) {
-		return getters.currentRegion ? getters.currentRegion[getters.currentSectionIndex] : null;
+		return getters.currentRegion ? getters.currentRegion[state.currentSectionIndex] : null;
 	},
 
 	/**
@@ -87,9 +87,11 @@ const getters = {
 	 * @returns {number} The index of the current named section, or -1.
 	 */
 	currentSectionIndex(state, getters) {
+		if(state.currentSectionIndex !== null) {
+			return state.currentSectionIndex;
+		}
 		const region = getters.currentRegion;
-		const name = state.currentSectionName;
-		return region ? region.findIndex(el => el.name === name) : -1;
+		return region ? region.findIndex(el => el.name === state.currentSectionName) : -1;
 	},
 
 	blocks(state, getters) {
@@ -104,16 +106,6 @@ const getters = {
 	getCurrentFieldValue: (state, getters) => (name) => {
 		const block = getters.currentBlock;
 		return _.get(block.fields, name, null);
-	},
-
-	/*
-	 getCurrentBlock: (state) => () => {
-	 return state.pageData.blocks[state.currentRegion][state.currentBlockIndex];
-	 },
-	 */
-	getBlockMeta: (state) => (index, region, prop = false) => {
-		const blockMeta = state.blockMeta.blocks[region][index];
-		return prop ? blockMeta[prop] : blockMeta;
 	},
 
 	getInvalidBlocks: (state, getters, rootState) => () => {
@@ -156,6 +148,10 @@ const mutations = {
 
 	setCurrentBlockIndex(state, index) {
 		state.currentBlockIndex = index;
+	},
+
+	setCurrentBlockId(state, blockId) {
+		state.currentBlockId = blockId;
 	}
 };
 
@@ -177,18 +173,18 @@ const actions = {
 		// have we actually selected a different block?
 		if(state.currentBlockId !== blockInfo.blockId) {
 			commit('setCurrentBlock', blockInfo);
-			commit('collapseSidebar');
-
-			eventBus.$emit('block:showSelectedOverlay', {
-				id: blockInfo.blockId
-			});
+			eventBus.$emit('block:validate');
 		}
+
+		eventBus.$emit('block:showSelectedOverlay', {
+			id: blockInfo.blockId
+		});
 
 		// make sure we get to see the block menu if we're currently seeing the pages or other sidebar and a user clicks on any block
 		if(rootState.menu.active !== 'blocks') {
 			commit('updateMenuActive', 'blocks');
 		}
-	},
+	}
 
 };
 
