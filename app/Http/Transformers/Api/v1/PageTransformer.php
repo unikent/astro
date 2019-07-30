@@ -4,7 +4,6 @@ namespace App\Http\Transformers\Api\v1;
 use App\Models\Definitions\Block;
 use App\Models\Page;
 use League\Fractal\ParamBag;
-use Illuminate\Http\Request;
 use League\Fractal\Resource\Item as FractalItem;
 use League\Fractal\Resource\Collection as FractalCollection;
 use League\Fractal\Resource\Item;
@@ -32,36 +31,14 @@ class PageTransformer extends FractalTransformer
 	];
 
 	protected $full = true; // whether to include blocks with output
-	protected $query_params = null;
 
 	/**
 	 * Create a PageTransformer.
 	 * @param bool $full Whether or not to include blocks with the output.
 	 */
-	public function __construct($full = false, $query_params = null)
+	public function __construct($full = false)
 	{
 		$this->full = $full;
-
-		// capture any query parameters we may need later from the api call
-		if (null === $query_params) {
-			// live
-			$this->query_params = request()->query();
-
-			// preview
-
-			// @TODO this logic needs to be refactored once we have a better approach to slash vs no-slash url endings
-
-			// laravel strips off any ending / in request()->url and request()->fullUrl
-			// so we need to get it from $_SERVER
-			if (!isset($this->query_params['path']) && isset($_SERVER['PATH_INFO'])) {
-				$this->query_params['path'] = $_SERVER['PATH_INFO'];
-			}
-
-			// webtools-test uses ORIG_PATH_INFO rather than PATH_INFO
-			if (!isset($this->query_params['path']) && isset($_SERVER['ORIG_PATH_INFO'])) {
-				$this->query_params['path'] = $_SERVER['ORIG_PATH_INFO'];
-			}
-		}
 	}
 
 	public function transform(Page $page)
@@ -107,7 +84,7 @@ class PageTransformer extends FractalTransformer
 			foreach($sections as $section_index => $section) {
 				foreach( $section['blocks'] as $block_index => $block) {
 					$definition = Block::fromDefinitionFile(Block::locateDefinition(Block::idFromNameAndVersion($block['definition_name'], $block['definition_version'])));
-					$dynamic = $definition->getDynamicAttributes($block, $section['name'], $region_name, $page_data, $this->query_params);
+					$dynamic = $definition->getDynamicAttributes($block, $section['name'], $region_name, $page_data);
 					$not_allowed = array_diff(array_keys($dynamic), $definition->getDynamicAttributeNames() ?? []);
 					if($not_allowed) {
 						throw new \InvalidArgumentException('Dynamic attribute(s): "' . join('", "', ($not_allowed)) . '" are not defined for block "' . $block['definition_name'] . '-v' . $block['definition_version'] . '"');
