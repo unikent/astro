@@ -22,6 +22,9 @@ class UpdateSiteURL extends Command
 								{--site-id=}
 								{--new-host=}
 								{--new-path=}
+								{--url-to-update=}
+								{?--yes}
+								{?--republish}
 								';
 
 	/**
@@ -51,6 +54,8 @@ class UpdateSiteURL extends Command
 		$site = Site::find(intval($this->option('site-id')));
 		$new_host = $this->option('new-host'); // TODO: remove http:// or https:// from the front and and trailing '/'
 		$new_path = $this->option('new-path'); // TODO ensure there is a begining '/' and remove trailing '/'
+		$autoconfirm = $this->option('yes');
+		$republish = $this->option('republish');
 
 		// check we have a site
 		if (!$site) {
@@ -75,7 +80,7 @@ class UpdateSiteURL extends Command
 		$old_path = $site->path;
 
 		// full site URLs
-		$this->old_site_url = $old_host . $old_path;
+		$this->old_site_url = $this->option('url-to-update') ?: $old_host . $old_path;
 		$this->new_site_url = $new_host . $new_path;
 
 		// check that we're not changing to the same URL
@@ -86,8 +91,11 @@ class UpdateSiteURL extends Command
 
 		// check that no other site exists with the new URL
 		if ($existing_site = Site::where('host', '=', $new_host)->where('path', '=', $new_path)->first()) {
-			$this->error("There is already a site with host '$new_host' and path '$new_path'. Its id is '$existing_site->id'.");
-			return;
+			// if there is, check that we are not deliberately trying to update urls
+			if ($this->old_site_url == $old_host . $old_path) {
+				$this->error("There is already a site with host '$new_host' and path '$new_path'. Its id is '$existing_site->id'.");
+				return;
+			}
 		}
 
 		// for findind and replacing URLs in json
@@ -95,15 +103,16 @@ class UpdateSiteURL extends Command
 		$this->new_site_url_escaped = str_replace('/', '\/', $this->new_site_url);
 
 		// get user confirmation to proceed
-		if (!$this->confirm("Changing site URL from '$this->old_site_url' to '$this->new_site_url'. Do you with to continue?")) {
-			$this->info('Aborting. Because you said to :-D.');
-			return;
+		if (!$autoconfirm) {
+			if (!$this->confirm("Changing site URL from '$this->old_site_url' to '$this->new_site_url'. Do you with to continue?")) {
+				$this->error('Aborting. Because you said to :-D.');
+				return;
+			}
 		}
-
-		$this->updateSiteURL($site, $new_host, $new_path);
+		$this->updateSiteURL($site, $new_host, $new_path, $republish);
 	}
 
-	public function updateSiteURL($site , $new_host, $new_path)
+	public function updateSiteURL($site , $new_host, $new_path, $republish = false)
 	{
 		// Update site's host and path & site option links
 		$site->host = $new_host;
@@ -113,7 +122,7 @@ class UpdateSiteURL extends Command
 		try {
 			$new_options = $this->replaceURLs($site->options);
 		} catch (Exception $e) {}
-		
+
 		$site->options =  $new_options ? $new_options : $site->options;
 
 		$site->save();
@@ -126,33 +135,60 @@ class UpdateSiteURL extends Command
 		$api = new LocalAPIClient($user);
 
 		foreach ($pages as $page) {
-			$page_url = $site->host . $site->path . $page->generatePath();
-
 			try {
+				$page_url = $site->host . $site->path . $page->generatePath();
+
+				// track whether we have republished the page, because if we have, even if there are no changes to the old draft,
+				// we will need to resave it
+				$republished = false;
+				$published = null;
+
+				// if we are republishing, then either:
+				// 1) There is no published version, in which case we skip this part and just work on the current draft
+				// 2) The published version is the latest draft, in which case we skip this bit, work on the current draft, then republish it
+				// 3) The published version isn't the latest draft, in which case we update the published version, republish it, then go on to update the draft too.
+				if($republish) {
+					$published = $page->publishedVersion();
+
+					// if the published version is not the latest draft...
+					if($published && $published->revision_id !== $page->revision_id) {
+						$new_published_page_regions = $this->replaceURLs($published->revision->blocks);
+						if($new_published_page_regions) {
+							$api->updatePageContent($page->id, $new_published_page_regions);
+							$api->publishPage($page->id);
+							$republished = true;
+						}
+					}
+				}
+
+				// update the draft version of the page if we need to
 				$new_page_regions = $this->replaceURLs($page->revision->blocks);
-			} catch (Exception $e) {
-				$this->error("Skipping page '$page->id' ($page_url). Unable to replace URLs.");
+				if ($new_page_regions || $republished) {
+					$api->updatePageContent($page->id, $new_page_regions);
+					// should we be republishing the latest draft?
+					if(!$republished && $published) {
+						$api->publishPage($page->id);
+					}
+					$this->info("Updated page '$page->id' ($page_url)." . ($republished ? ' and republished the previous published version' : ($published ? ' and published it' : '')));
+				}
+				else {
+					$this->warn("Skipping page '$page->id' ($page_url). No urls to update.");
+					continue;
+				}
+
+			} catch (ValidationException $e) {
+				$this->error("Validation error occured whiles attempting to update and / or republish page '$page->id' ($page_url).");
 				continue;
-			}
-			
-			if (!$new_page_regions) {
-				$this->warn("Skipping page '$page->id' ($page_url). No urls to update.");
+			} catch (Exception $e) {
+				$this->error("Skipping page '$page->id' ($page_url). Unable to replace URLs: " . $e->getMessage());
 				continue;
 			}
 
-			try {
-				$api->updatePageContent($page->id, $new_page_regions);
-				$this->info("Updated page '$page->id' ($page_url).");
-			} catch (ValidationException $e) {
-				$this->error("Validation error occured whiles attempting to update page '$page->id' ($page_url).");
-			} catch (Exception $e) {
-				$this->error("Error occured whiles attempting to update page '$page->id' ($page_url).");
-			}
 		}
 	}
 
 	/**
-	 * This function converts a data array to a json srting and performs a srting 
+	 * This function converts a data array to a json srting and performs a srting
 	 * replace on the resulting array
 	 * @param array $data
 	 * @return array

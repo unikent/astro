@@ -22,10 +22,9 @@ class Block extends BaseDefinition
 	 * @param string $section_name - The name of the section this block is in.
 	 * @param string $region_name - The name of the region this block is in.
 	 * @param array $page_data - The page data (as structured to be sent as json) that this block is part of.
-	 * @param array $query_parameters - The url query parameters as an assoc array.
 	 * @return mixed Array of data.
 	 */
-	public function getDynamicAttributes($block_data, $section_name, $region_name, $page_data, $query_parameters){ return []; }
+	public function getDynamicAttributes($block_data, $section_name, $region_name, $page_data){ return []; }
 
 	/**
 	 * Get the url prefix for each of the items relative the page a block lives in

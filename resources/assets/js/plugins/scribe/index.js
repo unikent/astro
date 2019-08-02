@@ -4,6 +4,7 @@ import scribePluginHeadingCommand from 'scribe-plugin-heading-command';
 import scribePluginSanitizer from 'scribe-plugin-sanitizer';
 
 import scribePluginToolbar from 'plugins/scribe/toolbar';
+import scribePluginWordCount from 'plugins/scribe/ux/word-count';
 import scribePluginUnderlineCommand from 'plugins/scribe/ux/underline';
 import scribePluginBoldCommand from 'plugins/scribe/ux/bold';
 import scribePluginLinkCommand from 'plugins/scribe/ux/link';
@@ -51,6 +52,10 @@ export const addScribePlugins = (options) => {
 	scribe.use(scribePluginAddClasses());
 
 	scribe.use(scribePluginKeyboardShortcuts());
+
+	if(options.enableWordCount) {
+		scribe.use(scribePluginWordCount(options.wordCountEl));
+	}
 
 	// add commands for each heading tag enabled
 	config.allowedTags

@@ -3721,7 +3721,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/astro-kent-theme.git",
-                "reference": "593ea035e0a89225019c76ac81c3f310cba2d3f9"
+                "reference": "06266f8a05172fb11e0295bac9605bd4bb12fe4c"
             },
             "require": {
                 "ezyang/htmlpurifier": "4.10.0"
@@ -3736,7 +3736,7 @@
                 }
             },
             "description": "Our block views",
-            "time": "2019-07-10T15:27:20+00:00"
+            "time": "2019-08-01T15:19:50+00:00"
         },
         {
             "name": "unikent/astro-renderer",
@@ -3780,7 +3780,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/kent-profiles.git",
-                "reference": "4238b20ca8f75f1b8681f9d017d693dc81b13953"
+                "reference": "b80a70ee28b77e81782bc68722d6edc9c4fb1352"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.3"
@@ -3798,7 +3798,7 @@
                 }
             ],
             "description": "A laravel app to manage staff profiles at kent",
-            "time": "2019-06-13T09:38:28+00:00"
+            "time": "2019-08-01T09:39:52+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
