@@ -10,16 +10,6 @@
 		</div>
 		<div class="el-row">
 			<el-input v-model="filter" placeholder="Filter by keyword"></el-input>
-			<el-select
-					v-model="statusFilter"
-					placeholder="Filter by status">
-				<el-option
-						v-for="item in statusOptions"
-						:key="item.value"
-						:label="item.label"
-						:value="item.value">
-				</el-option>
-			</el-select>
 		</div>
 		<div class="el-row">
 			<ul>
