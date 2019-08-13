@@ -246,6 +246,22 @@
     	}
 	}
 }
+.el-row__pageitem {
+	padding: 0.5rem;
+	a:link, a:hover, a:visited {
+		text-decoration: none;
+		color: black;
+	}
+	:hover {
+		background-color: #ffe;
+	}
+}
+.el-row__dimmed {
+	color: #777;
+	a:link, a:visited, a:hover {
+		color: #777;
+	}
+}
 
 @each $status, $colour in $status-colours {
 	.el-button--#{$status} {

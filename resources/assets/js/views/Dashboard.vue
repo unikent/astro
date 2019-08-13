@@ -6,22 +6,17 @@
 			<h1><strong>{{ siteData.name }}</strong></h1>
 		</div>
 		<div class="el-row">
-			<router-link :to="`/site/${siteData.id}/page/${homepageID}`"><button class="el-button el-button--primary">Edit Pages</button></router-link>
+			<el-col :xs="24" :md="8">
+				<el-input v-model="filter" placeholder="Filter by keyword"></el-input>
+			</el-col>
 		</div>
-		<div class="el-row">
-			<el-input v-model="filter" placeholder="Filter by keyword"></el-input>
-		</div>
-		<div class="el-row">
-			<ul>
-				<li is="page-item"
-					v-for="page in pages"
-					:page="page"
-					:key="page.id"
-					:filter="filter"
-					:statusFilter="statusFilter"
-				>
-				</li>
-			</ul>
+		<div class="el-row" style="margin-top: 1rem;">
+				<page-item
+					v-for="page in filteredFlattenedPages"
+					:page="page.page"
+					:key="page.page.id"
+					:class="{'el-row__dimmed': !page.matches}"
+				></page-item>
 		</div>
 	</div>
 </el-card>
@@ -66,9 +61,46 @@ export default {
 			pages: state => (state.site.pages && state.site.pages.length > 0) ? state.site.pages : [],
 			homepageID: state => state.site.pages && state.site.pages.length > 0 ? state.site.pages[0].id : '',
 		}),
-		lowerFilter() {
+		filteredFlattenedPages() {
+			let pages = [];
+			this.filterPages(this.pages, pages, this.lowercaseFilter);
+			return pages;
+		},
+		lowercaseFilter() {
 			return this.filter ? this.filter.toLowerCase() : '';
 		},
+	},
+	methods: {
+		filterPages(pages, resultArray, filter) {
+			pages.forEach((page) => {
+				// so we know where to insert this page in case we add its descendants first...
+				const nextPageIndex = resultArray.length;
+
+				if(page.children) {
+					this.filterPages(page.children, resultArray, filter);
+				}
+				const matches = this.shouldPageBeDisplayed(page, filter);
+				if((nextPageIndex !== resultArray.length) || matches) {
+					resultArray.splice(nextPageIndex,0,{matches, page});
+				}
+			});
+		},
+		shouldPageBeDisplayed(page, filter) {
+			return this.pageMatchesFilter(page, filter) &&
+					this.pageMatchesStatus(page, this.statusFilter);
+		},
+		pageMatchesStatus(page, status) {
+			return (!status || this.statusFilter === page.status);
+		},
+		pageMatchesFilter(page, filter) {
+			if(!filter) {
+				return true;
+			}
+			if(page.title && page.title.toLowerCase().indexOf(filter) !== -1) {
+				return true;
+			}
+			return false;
+		}
 	},
 };
 </script>
