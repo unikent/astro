@@ -12,8 +12,7 @@
 			<el-input v-model="filter" placeholder="Filter by keyword"></el-input>
 			<el-select
 					v-model="statusFilter"
-					placeholder="Filter by status"
-			>
+					placeholder="Filter by status">
 				<el-option
 						v-for="item in statusOptions"
 						:key="item.value"
