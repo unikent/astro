@@ -9,7 +9,18 @@
 			<router-link :to="`/site/${siteData.id}/page/${homepageID}`"><button class="el-button el-button--primary">Edit Pages</button></router-link>
 		</div>
 		<div class="el-row">
-			<el-input v-model="filter" placeholder="Filter by page title"></el-input>
+			<el-input v-model="filter" placeholder="Filter by keyword"></el-input>
+			<el-select
+					v-model="statusFilter"
+					placeholder="Filter by status"
+			>
+				<el-option
+						v-for="item in statusOptions"
+						:key="item.value"
+						:label="item.label"
+						:value="item.value">
+				</el-option>
+			</el-select>
 		</div>
 		<div class="el-row">
 			<ul>
@@ -18,6 +29,7 @@
 					:page="page"
 					:key="page.id"
 					:filter="filter"
+					:statusFilter="statusFilter"
 				>
 				</li>
 			</ul>
@@ -29,12 +41,34 @@
 <script>
 import { mapState } from 'vuex';
 import PageItem from '../components/PageItem';
+import ElSelectDropdown from "../../../../node_modules/element-ui/packages/select/src/select-dropdown.vue";
 
 export default {
-	components: {PageItem},
+	components: {
+		ElSelectDropdown,
+		PageItem},
 	data() {
 		return {
 			filter: '',
+			statusFilter: '',
+			statusOptions: [
+				{
+					label: 'All Statuses',
+					value: '',
+				},
+				{
+					label: 'New',
+					value: 'new',
+				},
+				{
+					label: 'Updated',
+					value: 'draft',
+				},
+				{
+					label: 'Published',
+					value: 'published',
+				},
+			],
 		}
 	},
 	computed: {

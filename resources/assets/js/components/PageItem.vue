@@ -1,6 +1,7 @@
 <template>
 	<li v-if="matchesFilter">
 		<router-link :to="{name: 'page', params: {site_id: page.site_id, page_id: page.id}}">{{ page.title }}</router-link>
+		<span>edited {{ page.revision.updated_at }}</span>
 		<ul v-if="page.children && page.children.length > 0">
 			<page-item
 					v-for="child in page.children"
@@ -47,10 +48,10 @@
 				});
 			},
 			shouldPageBeDisplayed(page) {
-				if(page.title && page.title.toLowerCase().indexOf(this.filter) !== -1) {
-					return true;
-				}
-				return false;
+				const passesFilter = (!this.filter ||
+					(page.title && page.title.toLowerCase().indexOf(this.filter) !== -1));
+				const passesStatusFilter = (!this.statusFilter || this.statusFilter === page.status);
+				return passesFilter && passesStatusFilter;
 			}
 		}
 	}
