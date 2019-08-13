@@ -10,27 +10,26 @@
 				<el-input v-model="filter" placeholder="Filter by keyword"></el-input>
 			</el-col>
 		</div>
-		<div class="el-row" style="margin-top: 1rem;">
-				<page-item
-					v-for="page in filteredFlattenedPages"
-					:page="page.page"
-					:key="page.page.id"
-					:class="{'el-row__dimmed': !page.matches}"
-				></page-item>
-		</div>
+		<filterable-page-list
+				class="el-row"
+				style="margin-top: 1rem;"
+				:pages="pages"
+				:filter="filter">
+		</filterable-page-list>
 	</div>
 </el-card>
 </template>
 
 <script>
 import { mapState } from 'vuex';
-import PageItem from '../components/PageItem';
+import FilterablePageList from '../components/FilterablePageList';
 import ElSelectDropdown from "../../../../node_modules/element-ui/packages/select/src/select-dropdown.vue";
 
 export default {
 	components: {
 		ElSelectDropdown,
-		PageItem},
+		FilterablePageList
+	},
 	data() {
 		return {
 			filter: '',
@@ -61,46 +60,6 @@ export default {
 			pages: state => (state.site.pages && state.site.pages.length > 0) ? state.site.pages : [],
 			homepageID: state => state.site.pages && state.site.pages.length > 0 ? state.site.pages[0].id : '',
 		}),
-		filteredFlattenedPages() {
-			let pages = [];
-			this.filterPages(this.pages, pages, this.lowercaseFilter);
-			return pages;
-		},
-		lowercaseFilter() {
-			return this.filter ? this.filter.toLowerCase() : '';
-		},
-	},
-	methods: {
-		filterPages(pages, resultArray, filter) {
-			pages.forEach((page) => {
-				// so we know where to insert this page in case we add its descendants first...
-				const nextPageIndex = resultArray.length;
-
-				if(page.children) {
-					this.filterPages(page.children, resultArray, filter);
-				}
-				const matches = this.shouldPageBeDisplayed(page, filter);
-				if((nextPageIndex !== resultArray.length) || matches) {
-					resultArray.splice(nextPageIndex,0,{matches, page});
-				}
-			});
-		},
-		shouldPageBeDisplayed(page, filter) {
-			return this.pageMatchesFilter(page, filter) &&
-					this.pageMatchesStatus(page, this.statusFilter);
-		},
-		pageMatchesStatus(page, status) {
-			return (!status || this.statusFilter === page.status);
-		},
-		pageMatchesFilter(page, filter) {
-			if(!filter) {
-				return true;
-			}
-			if(page.title && page.title.toLowerCase().indexOf(filter) !== -1) {
-				return true;
-			}
-			return false;
-		}
 	},
 };
 </script>
