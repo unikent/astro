@@ -1,41 +1,98 @@
 <template>
 	<div>
-	<filterable-page-list-item
-			v-for="page in filteredFlattenedPages"
-			:page="page.page"
-			:key="page.page.id"
-			:class="{'el-row__dimmed': !page.matches}"
-	></filterable-page-list-item>
+		<slot name="header" v-if="(filteredFlattenedPages.length)"></slot>
+		<template v-for="{page, matches} in sortedPages">
+		<slot
+				v-if="matches"
+				:page="page"
+				:matches="page">
+
+			<!-- default page item if no alternative content provided -->
+			<el-row class="el-row__pageitem">
+				<el-col :sm="12" :md="8" :style="{'padding-left': (page.depth) + 'rem'}">
+					<router-link :to="{name: 'page', params: {site_id: page.site_id, page_id: page.id}}">{{ page.title }}</router-link>
+				</el-col>
+				<el-col :sm="12" :md="8"><small>{{ page.full_path }}</small></el-col>
+				<el-col :sm="6" :md="6" :title="page.revision.updated_at">{{ page.revision.updated_at}}</el-col>
+			</el-row>
+			<!-- end default page item -->
+		</slot>
+		</template>
+		<slot name="footer" v-if="(filteredFlattenedPages.length)"></slot>
+		<slot name="no-matches" v-if="(!filteredFlattenedPages.length)">No pages match your search.</slot>
 	</div>
 </template>
 
 <script>
 import FilterablePageListItem from './FilterablePageListItem';
 
+/**
+ * Displays a site's hierarchical page structure with optional filtering.
+ */
 export default {
 	name: 'filterable-page-list',
 	components: {
 		FilterablePageListItem,
 	},
 	props: {
-		// a string to filter the pages by
+		/**
+		 * a string to filter the pages by
+		 */
 		filter: {
 			type: String,
 			default: '',
 		},
-		// hierarchical ordered array of pages
+		/**
+		 * hierarchical ordered array of pages
+		 */
 		pages: {
 			type: Array,
 			required: true,
 		},
-		// array of strings matching the statuses to include,
-		// defaults to empty to include ALL
+		/** array of strings matching the statuses to include,
+		 * defaults to empty to include ALL.
+	 	 * Current statuses are 'new' (never published), 'draft' (published but updated) and 'published' (published, not updated)
+		 */
 		statusFilter: {
 			type: Array,
 			default() { return [];},
 		},
+		/**
+		 * Sort order for pages.
+		 * - 'title' - the Page Title A-Z
+		 * - 'url' - the Page path A-Z
+		 * - 'updated-desc' - edited date (newest first)
+		 * - 'updated-asc' - edited date (oldest first)
+		 */
+		sortOrder: {
+			type: String,
+			default: '',
+		},
 	},
 	computed: {
+		/**
+		 * Apply sorting to the filtered pages. Options are:
+		 */
+		sortedPages() {
+			// to avoid sorting filteredFlattenedPages itself
+			let pages = [...this.filteredFlattenedPages];
+			switch(this.sortOrder) {
+				case 'title':
+					pages.sort((p1,p2) => { return p1.page.title.toLowerCase() < p2.page.title.toLowerCase() ? -1 : (p1.page.title.toLowerCase() > p2.page.title.toLowerCase() ? 1 : 0)});
+					break;
+				case 'url':
+					pages.sort((p1,p2) => { return p1.page.full_path < p2.page.full_path ? -1 : (p1.page.full_path > p2.page.full_path ? 1 : 0)});
+					break;
+				case 'updated-desc':
+					console.log('sorting: updated-desc');
+					pages.sort((p1,p2) => { return p1.page.revision.updated_at < p2.page.revision.updated_at ? 1 : (p1.page.revision.updated_at > p2.page.revision.updated_at ? -1 : 0)});
+					break;
+				case 'updated-asc':
+					pages.sort((p1,p2) => { return p1.page.revision.updated_at < p2.page.revision.updated_at ? -1 : (p1.page.revision.updated_at > p2.page.revision.updated_at ? 1 : 0)});
+					break;
+			}
+			return pages;
+		},
 		/**
 		 * Turns the hierarchy of pages into a flattened array, of
 		 * { page: PageObject, matched: Boolean } where page is the page,
@@ -44,7 +101,7 @@ export default {
 		 */
 		filteredFlattenedPages() {
 			let pages = [];
-			this.filterPages(this.pages, pages, this.lowercaseFilter);
+			this.filterPages(this.pages, pages, this.lowercaseFilter, this.statusFilter);
 			return pages;
 		},
 		/**
