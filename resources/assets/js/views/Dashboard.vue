@@ -39,9 +39,11 @@
 			<el-row class="el-row__pageitem" slot-scope="{ page, matches }" :key="page.id">
 				<el-col :sm="12" :md="8" :style="{'padding-left': (page.depth) + 'rem'}">
 					<router-link :to="{name: 'page', params: {site_id: page.site_id, page_id: page.id}}">{{ page.title }}</router-link>
-					<br><small>{{ page.full_path }}</small>
+					<small>({{ updatedDateDifference(page.revision.updated_at)}})</small>
+
 				</el-col>
-				<el-col :sm="6" :md="4" :title="page.revision.updated_at">
+				<el-col style="text-align: right;" :sm="6" :md="4" :title="page.revision.updated_at">
+
 					<small>{{ updatedDate(page.revision.updated_at)}}</small>
 				</el-col>
 				<el-col :sm="8" :md="4" :title="page.revision.updated_at" v-if="page.published_at">
@@ -120,10 +122,14 @@ export default {
 	},
 	methods: {
 		updatedDate(date) {
-			return prettyDate(date);
+			const dt = new Date(date);
+			return dt.toLocaleString("en-GB", {dateStyle: 'medium', timeStyle: 'short'});
+		},
+		updatedDateDifference(date) {
+			return prettyDate(date, false, 0);
 		},
 		publishedDate(date) {
-			return prettyDate(date);
+			return prettyDate(date, false);
 		},
 	}
 };

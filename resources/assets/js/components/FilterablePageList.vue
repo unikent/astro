@@ -24,16 +24,12 @@
 </template>
 
 <script>
-import FilterablePageListItem from './FilterablePageListItem';
 
 /**
  * Displays a site's hierarchical page structure with optional filtering.
  */
 export default {
 	name: 'filterable-page-list',
-	components: {
-		FilterablePageListItem,
-	},
 	props: {
 		/**
 		 * a string to filter the pages by
