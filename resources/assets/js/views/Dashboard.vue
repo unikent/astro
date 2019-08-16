@@ -58,12 +58,10 @@
 <script>
 import { mapState } from 'vuex';
 import FilterablePageList from '../components/FilterablePageList';
-import ElSelectDropdown from "../../../../node_modules/element-ui/packages/select/src/select-dropdown.vue";
 import {prettyDate} from '../classes/helpers.js';
 
 export default {
 	components: {
-		ElSelectDropdown,
 		FilterablePageList
 	},
 	data() {
