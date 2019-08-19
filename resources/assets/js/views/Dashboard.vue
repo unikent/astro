@@ -36,19 +36,19 @@
 				</el-col>
 				<el-col :sm="10" style="text-align: right;">
 					<small>
-
 						[<a target="_blank"
 							:title="page.full_path"
 							:href="pageDraftPreviewURL(page)">preview</a>]
-						[<a v-if="(page.status !== 'new')" target="_blank"
+					</small>
+					<small v-if="(page.status !== 'new')">
+						[<a target="_blank"
 							:title="pagePublishedURL(page)"
 							:href="pagePublishedURL(page)">visit</a>]
-
-						<br>
-
+					</small>
+					<br>
+					<small>
 						edited {{ dateDifference(page.revision.updated_at)}}
 						{{ formattedDate(page.revision.updated_at)}}
-
 					</small>
 				</el-col>
 			</el-row>
@@ -61,11 +61,9 @@
 import { mapState } from 'vuex';
 import FilterablePageList from '../components/FilterablePageList';
 import {prettyDate, getDraftPreviewURL, getPublishedPreviewURL} from '../classes/helpers.js';
-import ElCol from "element-ui/packages/col/src/col";
 
 export default {
 	components: {
-		ElCol,
 		FilterablePageList
 	},
 	data() {
