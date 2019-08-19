@@ -3,7 +3,7 @@
 		<slot name="header" v-if="(filteredFlattenedPages.length)"></slot>
 		<template v-for="{page, matches} in sortedPages">
 		<slot
-				v-if="matches"
+				v-if="matches || displayUnmatched()"
 				:page="page"
 				:matches="page">
 
@@ -80,7 +80,6 @@ export default {
 					pages.sort((p1,p2) => { return p1.page.full_path < p2.page.full_path ? -1 : (p1.page.full_path > p2.page.full_path ? 1 : 0)});
 					break;
 				case 'updated-desc':
-					console.log('sorting: updated-desc');
 					pages.sort((p1,p2) => { return p1.page.revision.updated_at < p2.page.revision.updated_at ? 1 : (p1.page.revision.updated_at > p2.page.revision.updated_at ? -1 : 0)});
 					break;
 				case 'updated-asc':
@@ -179,7 +178,10 @@ export default {
 				return true;
 			}
 			return false;
-		}
+		},
+		displayUnmatched() {
+			return ['','url'].indexOf(this.sortOrder) !== -1;
+		},
 	},
 }
 </script>

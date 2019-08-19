@@ -247,14 +247,16 @@
 	}
 }
 .el-row__pageitem {
+	margin: 0.5rem;
 	padding: 0.5rem;
-	a:link, a:hover, a:visited {
+	a:link, a:visited {
 		text-decoration: none;
-		color: black;
+		color: #03a9f4;
 	}
-	:hover {
-		background-color: #ffe;
+	a:hover {
+		text-decoration: underline;
 	}
+
 }
 .el-row__dimmed {
 	color: #777;

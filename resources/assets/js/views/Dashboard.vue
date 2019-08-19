@@ -9,16 +9,7 @@
 			<el-col :xs="24" :md="8">
 				<el-input v-model="filter" placeholder="Filter by keyword"></el-input>
 			</el-col>
-			<el-col :xs="24" :md="8">
-				<el-select v-model="statusFilter" multiple placeholder="Filter by status">
-					<el-option
-						v-for="option in statusOptions"
-						:value="option.value"
-						:label="option.label"
-						:key="option.value"></el-option>
-				</el-select>
-			</el-col>
-			<el-col :xs="24" :md="8">
+			<el-col :xs="24" :md="16" style="text-align: right;">
 				<el-select v-model="sortOrder" placeholder="Sort">
 					<el-option
 							v-for="option in sortOptions"
@@ -33,21 +24,32 @@
 				style="margin-top: 1rem;"
 				:pages="pages"
 				:filter="filter"
-				:status-filter="statusFilter"
 				:sort-order="sortOrder"
 		>
 			<el-row class="el-row__pageitem" slot-scope="{ page, matches }" :key="page.id">
-				<el-col :sm="12" :md="8" :style="{'padding-left': (page.depth) + 'rem'}">
+				<el-col :sm="14" :style="{'padding-left': pageIndent(page) + 'rem'}">
 					<router-link :to="{name: 'page', params: {site_id: page.site_id, page_id: page.id}}">{{ page.title }}</router-link>
-					<small>({{ updatedDateDifference(page.revision.updated_at)}})</small>
+
+					<br>
+					<small>{{ page.full_path }}</small>
 
 				</el-col>
-				<el-col style="text-align: right;" :sm="6" :md="4" :title="page.revision.updated_at">
+				<el-col :sm="10" style="text-align: right;">
+					<small>
 
-					<small>{{ updatedDate(page.revision.updated_at)}}</small>
-				</el-col>
-				<el-col :sm="8" :md="4" :title="page.revision.updated_at" v-if="page.published_at">
-					<small>{{ publishedDate(page.published_at) }}</small>
+						[<a target="_blank"
+							:title="page.full_path"
+							:href="pageDraftPreviewURL(page)">preview</a>]
+						[<a v-if="(page.status !== 'new')" target="_blank"
+							:title="pagePublishedURL(page)"
+							:href="pagePublishedURL(page)">visit</a>]
+
+						<br>
+
+						edited {{ dateDifference(page.revision.updated_at)}}
+						{{ formattedDate(page.revision.updated_at)}}
+
+					</small>
 				</el-col>
 			</el-row>
 		</filterable-page-list>
@@ -58,10 +60,12 @@
 <script>
 import { mapState } from 'vuex';
 import FilterablePageList from '../components/FilterablePageList';
-import {prettyDate} from '../classes/helpers.js';
+import {prettyDate, getDraftPreviewURL, getPublishedPreviewURL} from '../classes/helpers.js';
+import ElCol from "element-ui/packages/col/src/col";
 
 export default {
 	components: {
+		ElCol,
 		FilterablePageList
 	},
 	data() {
@@ -70,43 +74,24 @@ export default {
 			sortOrder: '',
 			sortOptions: [
 				{
-					label: 'Default',
+					label: 'Sort by default',
 					value: '',
 				},
 				{
-					label: 'Edited (new -> old)',
+					label: 'Sort by edited date (recent first)',
 					value: 'updated-desc',
 				},
 				{
-					label: 'Edited (old -> new)',
+					label: 'Sort by edited date (oldest first)',
 					value: 'updated-asc',
 				},
 				{
-					label: 'Page Title',
+					label: 'Sort by page title',
 					value: 'title',
 				},
 				{
-					label: 'URL',
+					label: 'Sort by URL',
 					value: 'url',
-				},
-			],
-			statusFilter: [],
-			statusOptions: [
-				{
-					label: 'All Statuses',
-					value: '',
-				},
-				{
-					label: 'New',
-					value: 'new',
-				},
-				{
-					label: 'Updated',
-					value: 'draft',
-				},
-				{
-					label: 'Published',
-					value: 'published',
 				},
 			],
 		}
@@ -119,15 +104,36 @@ export default {
 		}),
 	},
 	methods: {
-		updatedDate(date) {
+		/**
+		 * The indent level for the page item in the list
+		 * @param {Object} page - The page item
+		 * @return {integer} - The depth of the page if sorting by hierarchy, otherwise 0
+		 */
+		pageIndent(page) {
+			return ['','url'].indexOf(this.sortOrder) !== -1 ? page.depth : 0;
+		},
+		/**
+		 * Returns a human readable formatted version of the yyyy-mm-dd hh:ii:ss date
+		 * @param date - yyyy-mm-dd hh:ii:ss date
+		 * @returns {string} Nicely formatted date
+		 */
+		formattedDate(date) {
 			const dt = new Date(date);
 			return dt.toLocaleString("en-GB", {dateStyle: 'medium', timeStyle: 'short'});
 		},
-		updatedDateDifference(date) {
+		/**
+		 * Returns a human readable description of the elapsed time between now and the provided date.
+		 * @param date - yyyy-mm-dd hh:ii:ss date assumed to be UCT
+		 * @returns {string} Nicely formatted date
+		 */
+		dateDifference(date) {
 			return prettyDate(date, false, 0);
 		},
-		publishedDate(date) {
-			return prettyDate(date, false);
+		pageDraftPreviewURL(page) {
+			return getDraftPreviewURL(this.siteData.host, page.full_path);
+		},
+		pagePublishedURL(page) {
+			return getPublishedPreviewURL(this.siteData.host, page.full_path);
 		},
 	}
 };
