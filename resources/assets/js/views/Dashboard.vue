@@ -32,7 +32,7 @@
 					<br>
 					<small>
 						Edited: {{ dateDifference(page.revision.updated_at)}}
-						on {{ formattedDate(page.revision.updated_at)}}
+						at {{ formattedDate(page.revision.updated_at)}}
 					</small>
 					<small>
 						-
