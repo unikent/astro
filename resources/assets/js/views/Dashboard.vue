@@ -9,7 +9,7 @@
 			<el-col :xs="24" :md="8">
 				<el-input v-model="filter" placeholder="Filter by keyword"></el-input>
 			</el-col>
-			<el-col :xs="24" :md="16" style="text-align: right;">
+			<el-col :xs="24" :md="16" style="padding-left: 1rem;">
 				<el-select v-model="sortOrder" placeholder="Sort">
 					<el-option
 							v-for="option in sortOptions"
@@ -27,28 +27,23 @@
 				:sort-order="sortOrder"
 		>
 			<el-row class="el-row__pageitem" slot-scope="{ page, matches }" :key="page.id">
-				<el-col :sm="14" :style="{'padding-left': pageIndent(page) + 'rem'}">
+				<el-col :style="{'padding-left': (pageIndent(page)) + 'rem'}">
 					<router-link :to="{name: 'page', params: {site_id: page.site_id, page_id: page.id}}">{{ page.title }}</router-link>
-
 					<br>
-					<small>{{ page.full_path }}</small>
-
-				</el-col>
-				<el-col :sm="10" style="text-align: right;">
 					<small>
-						[<a target="_blank"
+						Edited: {{ dateDifference(page.revision.updated_at)}}
+						on {{ formattedDate(page.revision.updated_at)}}
+					</small>
+					<small>
+						-
+						<a target="_blank"
 							:title="page.full_path"
-							:href="pageDraftPreviewURL(page)">preview</a>]
+							:href="pageDraftPreviewURL(page)">Preview</a>
 					</small>
 					<small v-if="(page.status !== 'new')">
-						[<a target="_blank"
+						, <a target="_blank"
 							:title="pagePublishedURL(page)"
-							:href="pagePublishedURL(page)">visit</a>]
-					</small>
-					<br>
-					<small>
-						edited {{ dateDifference(page.revision.updated_at)}}
-						{{ formattedDate(page.revision.updated_at)}}
+							:href="pagePublishedURL(page)">Live Version</a>
 					</small>
 				</el-col>
 			</el-row>
@@ -117,7 +112,7 @@ export default {
 		 */
 		formattedDate(date) {
 			const dt = new Date(date);
-			return dt.toLocaleString("en-GB", {dateStyle: 'medium', timeStyle: 'short'});
+			return dt.toLocaleString("en-GB", {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' , timeStyle: 'medium'});
 		},
 		/**
 		 * Returns a human readable description of the elapsed time between now and the provided date.
