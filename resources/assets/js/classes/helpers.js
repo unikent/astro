@@ -100,8 +100,21 @@ export const readingSpeedFromString = (str = '', timeToNotice = 500) => {
 	return Math.ceil((str.length * 60000) / 863) + timeToNotice;
 };
 
-export const prettyDate = (date) => {
-	let diff = (new Date().getTime() - new Date(date).getTime()) / 1000,
+/**
+ * Get a rough estimate of time passed between a date and now.
+ * @param {String} date - A date parsable by new Date(date)... although this should not include the timezone at the end or things will get "fun"
+ * @param {boolean} about - True to include the word "about" before the result if the time is not exact
+ * @param {integer|null} timezoneOffset - The timezone offset from UCT for the passed date string
+ * @returns {string} - A nicely formatted string, e.g "about 5 minutes ago"
+ */
+export const prettyDate = (date, about = true, timezoneOffset = null) => {
+    if(!Number.isInteger(timezoneOffset)) {
+        timezoneOffset = new Date().getTimezoneOffset();
+    }
+    // get "now" in UCT seconds
+    const now = Date.now() + (new Date().getTimezoneOffset() * 60000);
+    const then = new Date(date).getTime() + (timezoneOffset * 60000);
+    let diff = (now - then) / 1000,
 		unit = ['second', 'minute', 'hour', 'day', 'week', 'month', 'year'],
 		num = [60, 60, 24, 7, 4.35, 12],
 		i = 0;
@@ -112,7 +125,7 @@ export const prettyDate = (date) => {
 
 	diff = Math.round(diff);
 
-	return `${i > 0 ? 'about ' : ''}${diff} ${unit[i]}${diff === 1 ? '' : 's'} ago`;
+	return `${(i > 0 && about) ? 'about ' : ''}${diff} ${unit[i]}${diff === 1 ? '' : 's'} ago`;
 };
 
 export const notify = ({ title, message, type }) => {

@@ -246,6 +246,24 @@
     	}
 	}
 }
+.el-row__pageitem {
+	margin: 0.5rem;
+	padding: 0.5rem;
+	a:link, a:visited {
+		text-decoration: none;
+		color: #03a9f4;
+	}
+	a:hover {
+		text-decoration: underline;
+	}
+
+}
+.el-row__dimmed {
+	color: #777;
+	a:link, a:visited, a:hover {
+		color: #777;
+	}
+}
 
 @each $status, $colour in $status-colours {
 	.el-button--#{$status} {
