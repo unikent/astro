@@ -36,4 +36,19 @@ return [
 
 	// hotjar ID
 	'hotjar_id' => env('HOTJAR_ID'),
+
+	// URL for the JWT provider
+	'auth_url' => env('AUTH_URL'),
+
+	// optional instructions displayed when asigning roles within sites
+	'add_user_note' => env('ADD_USER_NOTE'),
+
+	// optional instructions when a user logs in via sso but doesnt have required attribute
+	'sso_denied_message' => env('SSO_DENIED_MESSAGE'),
+
+	// configuration for clearing site switcher
+	'clearing' => [
+		'sites' => preg_split('/\s*,\s*/', env('CLEARING_SITE_IDS', ''), -1, PREG_SPLIT_NO_EMPTY),
+		'live_host' => env('CLEARING_LIVE_DOMAIN', 'www.kent.ac.uk'),
+	],
 ];

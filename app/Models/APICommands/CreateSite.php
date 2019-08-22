@@ -26,7 +26,7 @@ class CreateSite implements APICommand
      * @param Authenticatable $user
      * @return Site The newly created Site.
      */
-    public function execute($input,Authenticatable $user)
+    public function execute($input, Authenticatable $user)
     {
         return DB::transaction(function() use($user, $input) {
         	$site_definition = $input->get('site_definition');
@@ -36,7 +36,7 @@ class CreateSite implements APICommand
                 'path' => $input->get('path'),
                 'site_definition_name' => $site_definition['name'],
                 'site_definition_version' => $site_definition['version'],
-                'options' => []
+                'options' => $input->get('options') ?: []
             ]);
             $template =
 				SiteDefinition::fromDefinitionFile(SiteDefinition::locateDefinition(
@@ -48,8 +48,12 @@ class CreateSite implements APICommand
             if(!is_array($layout)){
             	$layout = SiteDefinition::idToNameAndVersion($layout);
 			}
+
+            // create the home page
             $homepage = $this->createHomePage($site, 'Home', $layout, $user);
-            if(!empty($template->defaultPages['children'])){
+
+            //create default pages
+            if($input->get('create_default_pages') && !empty($template->defaultPages['children'])){
 				$this->addPages($homepage, $template->defaultPages['children'], $user);
 			}
             $site->refresh();
@@ -180,6 +184,9 @@ class CreateSite implements APICommand
             'site_definition.version' => [
                 'required',
                 'integer'
+            ],
+            'create_default_pages' => [
+                'boolean'
             ]
         ];
         return $rules;

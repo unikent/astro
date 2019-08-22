@@ -1,6 +1,4 @@
 import Vue from 'vue';
-import { unflatten } from 'flat';
-import Config from 'classes/Config';
 import { win, isIframe } from 'classes/helpers';
 
 /* global Promise, console */
@@ -9,7 +7,7 @@ import { win, isIframe } from 'classes/helpers';
 // we want to share some bits between the top window and iframe
 let shared = isIframe ?
 	win.top.astroInterceptorShared :
-	(win.astroInterceptorShared = { unauthorizedPromise: null, vue: new Vue() });
+	(win.astroInterceptorShared = { unauthorizedPromise: null, vue: new Vue() , forbiddenPromise: null});
 
 export default class Interceptors {
 
@@ -28,12 +26,23 @@ export default class Interceptors {
 		}
 	}
 
+	setAuthToken(request) {
+		return this.store.getters['auth/getAPIToken'].then( (token) => {
+			request.headers['Authorization'] = `Bearer ${token}`;
+			return request;
+		});
+	}
+
 	addRequestInterceptor() {
 		this.requestInterceptor = this.http.interceptors.request.use(
-			request => request,
+			request => {
+				return this.setAuthToken(request)
+			},
 			error => Promise.reject(error)
 		);
 	}
+
+
 
 	addResponseInterceptor() {
 		this.responseInterceptor = this.http.interceptors.response.use(
@@ -59,7 +68,7 @@ export default class Interceptors {
 	 * @return     {Promise}  A promise that is either rejected or resolved.
 	 */
 	handleResponseError(error) {
-		const status = error.response.statusText.replace(/ /g, '');
+		const status = error.response.status;
 
 		// reject the promise if a handler doesn't exist
 		if(typeof this[`handle${status}`] !== 'function') {
@@ -69,15 +78,38 @@ export default class Interceptors {
 		return this[`handle${status}`](error.response);
 	}
 
-	handleUnauthorized(response) {
+	/**
+	 * Handle a 401 Unauthorized response
+	 * @param response
+	 */
+	handle401(response) {
+		let failedToken = response.config.headers.Authorization.substr(7);
+		if(failedToken === 'null') {
+			failedToken = null;
+		}
+		return this.store.dispatch('auth/waitForReauthentication', failedToken)
+			.then((token) => {
+				return this.http.request(response.config);
+			}).catch((err) => {
+			console.log('Im trying...');
+			});
+	}
 
-		if(!shared.unauthorizedPromise) {
-			shared.unauthorizedPromise = new Promise((resolve, reject) => {
+	/**
+	 * Handles 403 responses from the API.
+	 * @param response
+	 * @returns {Promise|null}
+	 */
+	handle403(response) {
+
+		if(!shared.forbiddenPromise) {
+			shared.forbiddenPromise = new Promise((resolve, reject) => {
 				shared.vue.$confirm(
-					`Your authenticated session has expired.
+					`You do not have permission to do something you are doing.
 					Please click OK to reload the current page.
-					Note: all unsaved data will be lost.`,
-					'Session Expired', {
+					Note: all unsaved data will be lost.
+					Alternatively click Cancel and navigate to another page or logout`,
+					'Action Forbidden', {
 						confirmButtonText: 'OK',
 						cancelButtonText: 'Cancel',
 						type: 'warning'
@@ -87,19 +119,23 @@ export default class Interceptors {
 					shared.router.go();
 				}).catch(() => {
 					reject();
-					shared.unauthorizedPromise = null;
+					shared.forbiddenPromise = null;
 				});
 			});
 		}
 
-		return shared.unauthorizedPromise;
+		return shared.forbiddenPromise;
 	}
 
-	handleTooManyRequests(reponse) {
+	/**
+	 * Handle too many requests status code
+	 * @param reponse
+	 * @returns {Promise.<*>}
+	 */
+	handle429(reponse) {
 		if(response.headers['x-ratelimit-reset']) {
 			console.log(new Date(response.headers['x-ratelimit-reset'] * 1000));
 		}
-
 		return Promise.reject(error);
 	}
 }

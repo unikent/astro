@@ -20,12 +20,12 @@
 					</span>
 
 					<div class="u-flex-auto-left">
-						<el-button type="primary" @click="saveMenu">Save</el-button>
-						<el-button plain class="el-button--icon" @click="previewSite">
+						<el-button id="save-menu" type="primary" @click="saveMenu">Save</el-button>
+						<el-button id="preview-menu" plain class="el-button--icon" @click="previewSite">
 							Preview
 							<icon name="newwindow" aria-hidden="true" :width="12" :height="12" class="ico" />
 						</el-button>
-						<el-button type="success" @click="publishMenu">Publish...</el-button>
+						<el-button id="publish-menu" type="success" @click="publishMenu">Publish...</el-button>
 					</div>
 				</div>
 				<draggable
@@ -37,7 +37,7 @@
 						chosenClass: 'menu-editor__menu-item--dragging'
 					}"
 				>
-					<div v-for="(item, index) in menu" class="menu-editor__menu-item">
+					<div v-for="(item, index) in menu" :id="'menu-editor-menu-item-' + index" class="menu-editor__menu-item">
 						<span class="menu-editor-menu__item__drag-handle">
 							<icon name="arrow" />
 						</span>
@@ -49,6 +49,7 @@
 							name="Link text"
 							:errors="errors"
 							:validate="validateMenuItem"
+							class="link-text"
 						/>
 
 						<menu-item-field
@@ -58,10 +59,11 @@
 							name="URL"
 							:errors="errors"
 							:validate="validateMenuItem"
+							class="link-url"
 						/>
 
 						<span class="menu-item__cell u-flex-auto-left u-flex-grow-none">
-							<el-button @click="removeMenuItem(index)" type="default">
+							<el-button class="delete-menu-item-button" @click="removeMenuItem(index)" type="default">
 								<icon name="delete" :width="14" :height="14" />
 							</el-button>
 						</span>
@@ -72,7 +74,7 @@
 				</div>
 
 				<div class="menu-editor__footer">
-					<el-button @click="addMenuItem" class="u-flex-auto-left">Add link</el-button>
+					<el-button id="add-menu-item" @click="addMenuItem" class="u-flex-auto-left">Add link</el-button>
 				</div>
 			</el-card>
 		</div>
@@ -242,6 +244,10 @@ export default {
 			'getGlobalRole'
 		]),
 
+		...mapGetters('auth', [
+			'username'
+		]),
+
 		/**
 		 * checks to see if the current user has the permissions to edit menus for this site
 		 * @returns {boolean}
@@ -307,7 +313,7 @@ export default {
 					// store the current user's role for this site if they have one
 					let siteUsers = json.data.users;
 					if (siteUsers) {
-						const currentRole = siteUsers.find((element) => element.username === Config.get('username'));
+						const currentRole = siteUsers.find((element) => element.username === this.username);
 						if (currentRole) {
 							this.currentRole = currentRole.role;
 						}

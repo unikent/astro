@@ -9,10 +9,6 @@
 			"type": "git"
 		},
 		{
-			"url": "git@gitlab.kent.ac.uk:webdev/kentauth.git",
-			"type": "git"
-		},
-		{
 			"url": "git@gitlab.kent.ac.uk:webdev/kent-profiles.git",
 			"type": "git"
 		},
@@ -34,13 +30,13 @@
 		"kyslik/column-sortable": "^5.4",
 		"laravel/framework": "^5.4",
 		"laravel/tinker": "~1.0",
+		"lcobucci/jwt": "^3.2",
 		"rtconner/laravel-tagging": "^2.2",
 		"spatie/laravel-fractal": "^3.5",
 		"swaggest/json-schema": "^0.12.4",
 		"unikent/astro-kent-theme": "dev-develop",
 		"unikent/astro-renderer": "dev-develop",
-		"unikent/kent-profiles": "dev-master",
-		"unikent/kentauth": "dev-laravel/5.3"
+		"unikent/kent-profiles": "dev-master"
 	},
 	"require-dev": {
 		"fzaninotto/faker": "~1.4",
@@ -56,7 +52,8 @@
 		"psr-4": {
 			"App\\": "app/",
 			"Tests\\": "tests/"
-		}
+		},
+		"exclude-from-classmap": ["/vendor/unikent/astro-kent-theme/tests"]
 	},
 	"scripts": {
 		"post-root-package-install": [

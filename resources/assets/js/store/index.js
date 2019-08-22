@@ -6,9 +6,10 @@ import shareTimeTravel from '../plugins/share-time-travel';
 
 import page from './modules/page';
 import site from './modules/site';
+import auth from './modules/auth';
 import media from './modules/media';
-import permissions from './modules/permissions';
 import definition from './modules/definition';
+import permissions from './modules/permissions';
 import contenteditor from './modules/contenteditor';
 
 import Config from 'classes/Config';
@@ -68,9 +69,9 @@ let store = new Vuex.Store({
 		menu: {
 			active: 'pages',
 			flash: ''
-		}
+		},
 	},
-
+	
 	getters: {
 
 		/**
@@ -333,7 +334,8 @@ let store = new Vuex.Store({
 		contenteditor,
 		site,
 		media,
-		permissions
+		permissions,
+		auth
 	}),
 
 	plugins: [

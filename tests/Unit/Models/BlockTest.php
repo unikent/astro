@@ -92,4 +92,155 @@ class BlockTest extends TestCase
 		$this->assertNotEmpty($definition);				// Is populated, but not empty.
 	}
 
+
+	/**
+	 * @test
+	 * @dataProvider providerDynamicOptions
+	 *
+	 */
+	public function getDynamicOptionsReturnsDynamicOptionsInExpectedFormat($labelField, $valueField, $apiResponseBody, $expectedOptions)
+	{
+		$fakeHttpClient = new class($apiResponseBody) {
+
+			protected $data;
+
+			public function __construct($data) {
+				$this->data = $data;
+			}
+			public function get($url, $cachetime) {
+				return $this->data;
+			}
+		};
+
+		$url = 'https://endpoint.com';
+		$cacheTime = 10;
+
+		$options = BlockDefinition::getDynamicOptions(
+			$url,
+			$labelField,
+			$valueField,
+			$cacheTime,
+			$fakeHttpClient
+		);
+
+		$this->assertEquals($expectedOptions, $options);
+	}
+
+	public function providerDynamicOptions()
+	{
+		return [
+			'subject categories' => [
+				$labelField = 'id',
+				$valueField = 'name',
+				$apiResponseBody = <<< JSON
+{
+  "1": {
+    "id": "1",
+    "created_at": "2012-12-17 16:57:01",
+    "updated_at": "2012-12-17 16:57:01",
+    "name": "American Studies",
+    "hidden": "0"
+  },
+  "2": {
+    "id": "2",
+    "created_at": "2012-12-17 16:57:19",
+    "updated_at": "2012-12-17 16:57:19",
+    "name": "Anthropology and Conservation",
+    "hidden": "0"
+  }
+}
+JSON
+				,$expectedOptions = [
+					[
+						'value' => 'American Studies',
+						'label' => '1',
+					],
+					[
+						'value' => 'Anthropology and Conservation',
+						'label' => '2',
+					]
+				],
+			],
+
+			'the doctors who' => [
+				$labelField = 'actor',
+				$valueField = 'doctor',
+				$apiResponseBody = <<< JSON
+{
+  "1": {
+    "actor": "William Hartnell",
+	"doctor": "1",
+    "first_episode": "An Unearthly Child",
+	"final_episode": "The Tenth Planet",
+	"year": "1963"
+  },
+  "2": {
+    "actor": "Peter Davison",
+	"doctor": "5",
+    "first_episode": "Castrovalva",
+	"final_episode": "The Caves of Androzani",
+	"year": "1981"
+  },
+  "3": {
+    "actor": "Paul McGann",
+	"doctor": "8",
+    "first_episode": "Doctor Who (tv movie)",
+	"final_episode": "The Night of the Doctor",
+	"year": "1996"
+  }
+}
+JSON
+				,$expectedOptions = [
+					[
+						'value' => '1',
+						'label' => 'William Hartnell',
+					],
+					[
+						'value' => '5',
+						'label' => 'Peter Davison',
+					],
+					[
+						'value' => '8',
+						'label' => 'Paul McGann',
+					]
+				],
+			],
+
+			'wrong label' => [
+				$labelField = 'school',
+				$valueField = 'doctor',
+				$apiResponseBody = <<< JSON
+{
+  "1": {
+    "actor": "William Hartnell",
+	"doctor": "1",
+    "first_episode": "An Unearthly Child",
+	"final_episode": "The Tenth Planet",
+	"year": "1963"
+  }
+}
+JSON
+				,$expectedOptions = []
+
+			],
+
+			'wrong value' => [
+				$labelField = 'actor',
+				$valueField = 'price',
+				$apiResponseBody = <<< JSON
+{
+  "1": {
+    "actor": "William Hartnell",
+	"doctor": "1",
+    "first_episode": "An Unearthly Child",
+	"final_episode": "The Tenth Planet",
+	"year": "1963"
+  }
+}
+JSON
+				,$expectedOptions = []
+
+			]
+		];
+	}
 }

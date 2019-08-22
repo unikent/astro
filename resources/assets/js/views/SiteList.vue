@@ -14,8 +14,9 @@
 <div class="site-list">
 <el-card>
 	<div slot="header" class="manage-table__header">
-		<span class="main-header">Manage sites</span>
-		<el-button v-if="canUser('site.create')" type="primary" @click="dialogFormVisible = true" class="manage-table__add-button">
+		<span class="main-header"><el-input v-model="filter" placeholder="Search for sites" size="large" class="manage-table__search-filter"></el-input></span>
+
+		<el-button v-if="canUser('site.create')" type="primary" @click="dialogFormVisible = true" class="manage-table__add-button" id="add-site">
 			Add Site
 		</el-button>
 	</div>
@@ -46,13 +47,14 @@
 			</thead>
 			<tbody v-loading.body="loading">
 				<tr
-					v-for="site in sitesWithRoles"
+					v-for="site in filteredSites"
 					:key="site.id"
 					class="el-table__row"
 				>
 					<td>
 						<div class="cell">
 							<router-link :to="`/site/${site.id}`">{{site.name}}</router-link>
+							<br><small>{{siteType(site)}}</small>
 						</div>
 					</td>
 
@@ -104,13 +106,13 @@
 
 					<el-col :span="11">
 						<el-form-item label="Name">
-							<el-input v-model="form.name" auto-complete="off"></el-input>
+							<el-input v-model="form.name" auto-complete="off" id="input-site-name"></el-input>
 						</el-form-item>
 					</el-col>
 
 					<el-col :span="11" :offset="2">
 						<el-form-item label="Site Template">
-							<el-select v-model="form.siteDefinitionId" class="w100" placeholder="Select">
+							<el-select v-model="form.siteDefinitionId" class="w100" placeholder="Select" popper-class="input-site-template" id="input-site-template" >
 								<el-option
 									v-for="(siteDefinition, siteID) in siteDefinitions"
 									:label="siteDefinition.label + ' (v' + siteDefinition.version + ')'"
@@ -133,6 +135,7 @@
 								v-model="form.host"
 								auto-complete="off"
 								placeholder="www.kent.ac.uk"
+								id="input-site-host"
 							/>
 						</el-form-item>
 
@@ -141,7 +144,7 @@
 					<el-col :span="11" :offset="2">
 
 						<el-form-item label="Path">
-							<el-input v-model="form.path" auto-complete="off" placeholder=""></el-input>
+							<el-input v-model="form.path" auto-complete="off" placeholder="" id="input-site-path"></el-input>
 						</el-form-item>
 					</el-col>
 
@@ -160,7 +163,7 @@
 			</el-form>
 			<span slot="footer" class="dialog-footer">
 				<el-button @click="cancelForm">Cancel</el-button>
-				<el-button type="primary" @click="addSite" :disabled="disableSubmit">Add Site</el-button>
+				<el-button type="primary" @click="addSite" :disabled="disableSubmit" id="input-add-site-button">Add Site</el-button>
 			</span>
 		</el-dialog>
 	</div>
@@ -191,7 +194,8 @@ export default {
 				host: '',
 				siteDefinitionId: '',
 				errors: '',
-			}
+			},
+			filter: '',
 		};
 	},
 
@@ -211,6 +215,8 @@ export default {
 			'getGlobalRole'
 		]),
 
+		...mapGetters('auth', ['username']),
+
 		disableSubmit() {
 			return this.form.siteDefinitionId === ''	 ||
 					this.form.name === '' ||
@@ -225,7 +231,7 @@ export default {
 				let currentSite = this.sites[i];
 				currentSite['currentRole'] = ''; // set a default
 				if (currentSite.users) {
-					let result = currentSite.users.find((element) => element.username === Config.get('username'));
+					let result = currentSite.users.find((element) => element.username === this.username);
 					if (result) {
 						currentSite['currentRole'] = result.role;
 					}
@@ -234,7 +240,26 @@ export default {
 				sitesWithRoles.push(currentSite);
 			}
 			return sitesWithRoles;
-		}
+		},
+
+		filteredSites() {
+			// if no filter, return everything
+			if(!this.filter) {
+				return this.sitesWithRoles;
+			}
+			const filter = this.filter.toLowerCase();
+			const filteredSites = [];
+			for(let i = 0, len = this.sitesWithRoles.length; i < len; i++) {
+				const currentSite = this.sites[i];
+				if(currentSite.host && currentSite.host.toLowerCase().includes(filter)
+				|| currentSite.name && currentSite.name.toLowerCase().includes(filter)
+				|| currentSite.path && currentSite.path.toLowerCase().includes(filter)
+				|| currentSite.site_definition_name && currentSite.site_definition_name.toLowerCase().includes(filter)) {
+					filteredSites.push(currentSite);
+				}
+			}
+			return filteredSites;
+		},
 	},
 
 	methods: {
@@ -323,6 +348,9 @@ export default {
 					// reset the form
 					this.resetForm();
 
+					// reset any filters to avoid missing the newly added site in the list
+					this.filter = '';
+
 				})
 				.catch((errors) => {
 					this.dialogFormVisible = true;
@@ -346,6 +374,16 @@ export default {
 				.catch(() => {
 					// TODO: what do we do when the API is unavaliable
 				});
+		},
+
+		siteType(site) {
+			if(site && site.site_definition_name && site.site_definition_version) {
+				const id = site.site_definition_name + '-v' + site.site_definition_version;
+				if(this.siteDefinitions[id]) {
+					return this.siteDefinitions[id].label + ' v' + site.site_definition_version;
+				}
+			}
+			return '';
 		}
 	}
 };

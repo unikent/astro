@@ -203,3 +203,16 @@
 .richtext-toolbar__tooltip[aria-label]:after {
 	content: attr(aria-label);
 }
+
+.richtext-word-count {
+	line-height: 1;
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	padding: 8px;
+	background-color: #f7f9fb;
+	border-top-left-radius: 4px;
+	color: #444;
+	border: 1px solid #dadde2;
+	font-size: .8rem;
+}

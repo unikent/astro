@@ -6,6 +6,9 @@ $factory->define(App\Models\User::class, function (Faker\Generator $faker) {
 	return [
 		'username' => $faker->username,
 		'name' => $faker->name,
+		'password' => $faker->password,
+		'email' => $faker->email,
+		'role' => 'user',
 		'settings' => new ArrayObject()
 	];
 });

@@ -4,6 +4,20 @@ return [
 
 	/*
 	|--------------------------------------------------------------------------
+	| JWT secret used for signing api tokens
+	|--------------------------------------------------------------------------
+	*/
+	'jwt_secret' => env('AUTH_JWT_SECRET'),
+
+    /*
+	|--------------------------------------------------------------------------
+	| JWT the length of time a generated jwt is valid for in seconds
+	|--------------------------------------------------------------------------
+	*/
+	'jwt_lifetime' => env('AUTH_JWT_LIFETIME', 120),
+
+	/*
+	|--------------------------------------------------------------------------
 	| Authentication Defaults
 	|--------------------------------------------------------------------------
 	|
@@ -37,14 +51,14 @@ return [
 
 	'guards' => [
 		'web' => [
-			'driver' => 'kentauth',
-			'provider' => 'kentauth',
+			'driver' => 'session',
+			'provider' => 'users',
 		],
 
 		'api' => [
-			'driver' => 'token',
+			'driver' => 'jwt',
 			'provider' => 'users',
-		],
+        ],
 	],
 
 	/*
@@ -67,11 +81,6 @@ return [
 	'providers' => [
 		'users' => [
 			'driver' => 'eloquent',
-			'model' => App\Models\User::class,
-		],
-
-		'kentauth' => [
-			'driver' => 'kentauth',
 			'model' => App\Models\User::class,
 		],
 

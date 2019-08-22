@@ -124,7 +124,7 @@ class Site extends Model
 	{
 		$options = $this->options;
 		if(null === $value) {
-			unset($options[$value]);
+			unset($options[$name]);
 		}
 		else {
 			$options[$name] = $value;
