@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Traits;
 
+use App\Console\Commands\CreateJWT;
 use App\Models\LocalAPIClient;
 use App\Models\User;
 use App\Models\Role;
@@ -83,7 +84,6 @@ trait CreatesFeatureFixtures
 			'name'=> 'Admin',
 			'password'=> $hasher->make('admin'),
 			'role' => 'admin',
-			'api_token' => 'admin-test'
 		]);
 
 		$this->viewer = factory(User::class)->create([
@@ -91,7 +91,6 @@ trait CreatesFeatureFixtures
 			'name'=> 'Viewer',
 			'password'=> $hasher->make('viewer'),
 			'role' => 'viewer',
-			'api_token' => 'viewer-test'
 		]);
 
 		// create some users to test with...
@@ -100,7 +99,6 @@ trait CreatesFeatureFixtures
 			'name' => 'Editor',
 			'password' => $hasher->make('editor'),
 			'role' => 'user',
-			'api_token' => 'editor-test'
 		]);
 
 		$this->owner = factory(User::class)->create([
@@ -108,7 +106,6 @@ trait CreatesFeatureFixtures
 			'name' => 'Owner',
 			'password' => $hasher->make('owner'),
 			'role' => 'user',
-			'api_token' => 'owner-test'
 		]);
 
 		$this->contributor = factory(User::class)->create([
@@ -116,7 +113,6 @@ trait CreatesFeatureFixtures
 			'name' => 'Contributor',
 			'password' => $hasher->make('contributor'),
 			'role' => 'user',
-			'api_token' => 'contributor-test'
 		]);
 
 		$this->randomer = factory(User::class)->create([
@@ -124,7 +120,6 @@ trait CreatesFeatureFixtures
 			'name' => 'Random User',
 			'password' => $hasher->make('randomer'),
 			'role' => 'user',
-			'api_token' => 'randomer-test'
 		]);
 
 		$this->client = new LocalAPIClient($this->admin);
@@ -135,8 +130,22 @@ trait CreatesFeatureFixtures
 		$this->client->updateSiteUserRole($this->site->id,'owner', Role::OWNER);
 		$this->client->updateSiteUserRole($this->site->id,'contributor', Role::CONTRIBUTOR);
 
+		$this->createJWTsForUsers($this->allUsers);
+
 		Artisan::call('astro:permissions', ['action' => 'refresh']);
 	}
+
+    /**
+     * For each of our test users this creates a short-lived JWT to use when testing
+     * @param array $usernames - Array of usernames for which we already have created user models as $this->$username
+     */
+	public function createJWTsForUsers($usernames)
+    {
+        $creator = new CreateJWT();
+        foreach($usernames as $username) {
+            $this->{$username}->jwt = $creator->generateJWT($this->$username, $this->jwt_lifetime ?? 3600);
+        }
+    }
 
 	/**
 	 * Gets all the user accounts who are unauthorized by removing any users declared in $this->authorizedUsers from

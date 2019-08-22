@@ -111,7 +111,7 @@ class CreateSiteTest extends TestCase
 			'POST',
 			'/api/v1/sites',
 			$payload,
-			['Authorization' => 'Bearer ' . $user->api_token]
+			['Authorization' => 'Bearer ' . $user->jwt]
 		);
 		$response->assertStatus($expected_status);
 		return $response;
