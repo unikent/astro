@@ -50,20 +50,27 @@ class CachedHttpClient
 
 
 	/**
-	* Get
 	*
-	* perform http get request and cache the results for $minutesToCache minutes
+	* perform http get request and cache the results for $secondsToCache seconds
 	* using the $url as the key
 	*
 	*
 	* @param mixed $url - the http endpoint to make the get request to
-	* @param mixed $minutesToCache - number of seconds to cache the result
+	* @param mixed $secondsToCache - number of seconds to cache the result
 	* @return string - the request body
+	* @todo when we update to laravel 5.8 or above then update this to account for 
+	* 		remember accepting seconds instead of minutes
 	*
 	* @throws GuzzleHttp\Exception\RequestException on http error
 	*/
-	public function get($url, $minutesToCache)
+	public function get($url, $secondsToCache)
 	{
+		/*
+			laravel 5.4 expects cache time to be in minutes NOT seconds
+			when we upgrade to 5.8 or above then update to pass the secondsToCache
+			directly to the remember function
+		*/
+		$minutesToCache = $secondsToCache / 60;
 		$options = Cache::remember($url, $minutesToCache, function () use ($url) {
 			$guzzleOptions = [];
 			try {
