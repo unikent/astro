@@ -2,7 +2,7 @@
 
 Astro is built and maintained by the Web Development Team of the University of Kent.
 
-## The Astro Team Past and Present
+## The Astro Team Past and Present
 
 * Carl Saggs
 * Christian Cable
