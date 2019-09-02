@@ -19,6 +19,14 @@ trait CreatesFeatureFixtures
 {
 	use DatabaseTransactions;
 
+    /**
+     * @var Site|null - A single-page site, created as part of the fixtures
+     */
+	public $site = null;
+    /**
+     * @var Site|null - A multi-page site, created as part of the fixtures
+     */
+	public $multiPageSite = null;
 	/**
 	 * @var User - user with admin privileges.
 	 */
@@ -126,6 +134,11 @@ trait CreatesFeatureFixtures
 		$this->site = $this->client->createSite(
 			'Test Site', 'example.com', '', ['name'=>'one-page-site','version'=>1]
 		);
+
+		$this->multiPageSite = $this->client->createSite(
+		    'Multi Page Test Site', 'multi.test', '', ['name' => 'multi-page-site', 'version' => 1]
+        );
+
 		$this->client->updateSiteUserRole($this->site->id,'editor', Role::EDITOR);
 		$this->client->updateSiteUserRole($this->site->id,'owner', Role::OWNER);
 		$this->client->updateSiteUserRole($this->site->id,'contributor', Role::CONTRIBUTOR);

@@ -84,6 +84,7 @@ abstract class APICommandTestBase extends TestCase
      * Tests that this command fails with a 401 for an invalid JWT with valid request format
      * @test
      * @param string $payload Valid payload for this command
+     * @group api
      * @dataProvider validDataProvider
      */
     public function request_withValidData_andInvalidJWT_failsWith401($payload)
@@ -99,6 +100,7 @@ abstract class APICommandTestBase extends TestCase
     /**
      * Tests that this command fails with a 401 for an invalid JWT with invalid request data
      * @test
+     * @group api
      * @param string $payload Invalid payload for this command
      * @dataProvider invalidDataProvider
      */
@@ -117,6 +119,7 @@ abstract class APICommandTestBase extends TestCase
      * @test
      * @param string $payload Valid payload for this command
      * @dataProvider validDataProvider
+     * @group api
      */
     public function request_withValidData_andNoBearerToken_failsWith401($payload)
     {
@@ -128,6 +131,7 @@ abstract class APICommandTestBase extends TestCase
     /**
      * Tests that this command fails with a 401 for no bearer token with invalid request data
      * @test
+     * @group api
      * @param string $payload Invalid payload for this command
      * @dataProvider invalidDataProvider
      */
