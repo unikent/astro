@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\Definitions\SiteDefinition;
 use App\Models\User;
 use Tests\Feature\Traits\MakesAssertionsAboutErrors;
 use Tests\TestCase;
@@ -35,7 +34,7 @@ use Tests\Feature\Traits\ValidatesJsonSchema;
  *   - Optionally confirm that the underlying database structure has changed as expected
  * @package Tests\Feature
  */
-abstract class APICommandTest extends TestCase
+abstract class APICommandTestBase extends TestCase
 {
     use CreatesFeatureFixtures,
         ExtractsPageAttributesFromPageJson,
@@ -83,6 +82,7 @@ abstract class APICommandTest extends TestCase
 
     /**
      * Tests that this command fails with a 401 for an invalid JWT with valid request format
+     * @test
      * @param string $payload Valid payload for this command
      * @dataProvider validDataProvider
      */
@@ -98,6 +98,7 @@ abstract class APICommandTest extends TestCase
 
     /**
      * Tests that this command fails with a 401 for an invalid JWT with invalid request data
+     * @test
      * @param string $payload Invalid payload for this command
      * @dataProvider invalidDataProvider
      */
@@ -113,6 +114,7 @@ abstract class APICommandTest extends TestCase
 
     /**
      * Tests that this command fails with a 401 for no bearer token with valid request format
+     * @test
      * @param string $payload Valid payload for this command
      * @dataProvider validDataProvider
      */
@@ -125,6 +127,7 @@ abstract class APICommandTest extends TestCase
 
     /**
      * Tests that this command fails with a 401 for no bearer token with invalid request data
+     * @test
      * @param string $payload Invalid payload for this command
      * @dataProvider invalidDataProvider
      */
