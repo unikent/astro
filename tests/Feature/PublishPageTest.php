@@ -58,7 +58,7 @@ class PublishPageTest extends APICommandTestBase
 
 	/**
 	 * @test
-	 * @group apit
+	 * @group api
 	 * @param $user
 	 * @dataProvider authorizedUsersProvider
 	 */
