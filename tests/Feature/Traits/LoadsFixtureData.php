@@ -26,7 +26,7 @@ trait LoadsFixtureData
 	 * Finds fixture data in the fixture path with filenames matching the glob pattern in $match.
 	 * Caches lookups to avoid too much disk scanning during tests. Possibly pointless as I think phpunit may just run these once before tests.
 	 * @param string $match - Filename pattern for glob to match.
-	 * @return array - Fixture data in array in form ['filename-without-dot-json' => data, ... ]
+	 * @return array - Fixture data in array in form ['filename-without-dot-json' => data, ... ].
 	 */
 	public function getFixtureData($match)
 	{
@@ -38,6 +38,9 @@ trait LoadsFixtureData
 				$data = json_decode($contents, true);
 				$id = preg_replace('/^.*?([a-z0-9_-]+)\.json$/i', '$1', $filename);
 				$results[$id] = $data;
+			}
+			if(!$results) {
+				$results['default'] = '';
 			}
 			static::$fixtureCache[$match] = $results;
 		}

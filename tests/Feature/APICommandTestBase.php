@@ -75,6 +75,11 @@ abstract class APICommandTestBase extends TestCase
      */
     abstract protected function fixturesAreUnchanged($payload);
 
+	/**
+	 * @var bool - Set to true to skip the tests that run with invalid fixture data
+	 * (for example, if there is no invalid fixture data)
+	 */
+	protected $skipInvalidFixtureTests = false;
 
     /*******************************************************************************************************
      * Tests
@@ -107,6 +112,9 @@ abstract class APICommandTestBase extends TestCase
      */
     public function request_withInvalidData_andInvalidJWT_failsWith401($payload)
     {
+    	if($this->skipInvalidFixtureTests) {
+			return $this->markTestSkipped('Invalid fixtures N/A');
+		}
 		$payload = $this->modifyFixtureData($payload, __METHOD__);
         // makerequestandteststatuscode just uses the jwt property of the given user
         $user = new User();
@@ -140,6 +148,9 @@ abstract class APICommandTestBase extends TestCase
      */
     public function request_withInvalidData_andNoBearerToken_failsWith401($payload)
     {
+		if($this->skipInvalidFixtureTests) {
+			return $this->markTestSkipped('Invalid fixtures N/A');
+		}
 		$payload = $this->modifyFixtureData($payload, __METHOD__);
         $response = $this->makeRequestAndTestStatusCode(null, $payload, 401, false);
         $this->assertTrue($this->fixturesAreUnchanged($payload));
@@ -167,6 +178,9 @@ abstract class APICommandTestBase extends TestCase
      */
     public function request_withInvalidData_andUnauthorizedUsers_failsWith403($payload, $user)
     {
+		if($this->skipInvalidFixtureTests) {
+			return $this->markTestSkipped('Invalid fixtures N/A');
+		}
     	$payload = $this->modifyFixtureData($payload, __METHOD__);
         $response = $this->makeRequestAndTestStatusCode($this->$user, $payload, 403);
         $this->assertTrue($this->fixturesAreUnchanged($payload));
@@ -180,6 +194,9 @@ abstract class APICommandTestBase extends TestCase
      */
     public function request_withInvalidData_andAuthorizedUsers_failsWith422($payload, $user)
     {
+		if($this->skipInvalidFixtureTests) {
+			return $this->markTestSkipped('Invalid fixtures N/A');
+		}
 		$payload = $this->modifyFixtureData($payload, __METHOD__);
         $response = $this->makeRequestAndTestStatusCode($this->$user, $payload, 422);
         $this->assertTrue($this->fixturesAreUnchanged($payload));
@@ -207,7 +224,7 @@ abstract class APICommandTestBase extends TestCase
         $response = $this->json(
             $this->requestMethod(),
             $this->apiURL(),
-            $payload,
+            $payload ?: [],
             $headers
         );
         $response->assertStatus($expected_status);
