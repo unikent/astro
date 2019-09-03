@@ -59,7 +59,7 @@ class CreateSiteTest extends APICommandTestBase
         // attempt to create the same site twice
         $this->makeRequestAndTestStatusCode($this->admin, $payload, 201);
         $response = $this->makeRequestAndTestStatusCode($this->admin, $payload, 422);
-        $this->assertValidErrorResponseBody($response->getContent(), ['host', 'path']);
+        $this->assertValidErrorResponseBody($response->getContent(), ['host']);
     }
 
 
