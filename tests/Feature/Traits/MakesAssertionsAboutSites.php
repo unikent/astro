@@ -62,7 +62,7 @@ trait MakesAssertionsAboutSites
 	{
 		$two = array_values($two);
 		if(count($one) != count($two)) {
-			return 'different number of pages';
+			return 'different number of pages: ' . count($one) . ' vs ' . count($two);
 		}
 		for($i = 0; $i < count($one); $i++) {
 			$p1 = $one[$i];

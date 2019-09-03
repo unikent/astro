@@ -83,7 +83,6 @@ class CreateSiteTest extends APICommandTestBase
     /**
      * Tests that a site is created properly with only the homepage if create_default_pages option is set to false
      * @test
-     * @todo - implement handling create_default_pages in SiteController
      * @group api
      * @dataProvider validDataProvider
      */
