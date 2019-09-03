@@ -143,6 +143,10 @@ trait CreatesFeatureFixtures
 		$this->client->updateSiteUserRole($this->site->id,'owner', Role::OWNER);
 		$this->client->updateSiteUserRole($this->site->id,'contributor', Role::CONTRIBUTOR);
 
+		$this->client->updateSiteUserRole($this->multiPageSite->id,'editor', Role::EDITOR);
+		$this->client->updateSiteUserRole($this->multiPageSite->id,'owner', Role::OWNER);
+		$this->client->updateSiteUserRole($this->multiPageSite->id,'contributor', Role::CONTRIBUTOR);
+
 		$this->createJWTsForUsers($this->allUsers);
 
 		Artisan::call('astro:permissions', ['action' => 'refresh']);

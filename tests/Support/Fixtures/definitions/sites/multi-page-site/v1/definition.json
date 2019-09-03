@@ -16,6 +16,11 @@
         "slug": "page-2",
         "title": "Page 2",
         "layout": "test-layout-v1"
+      },
+      {
+        "slug": "page-3",
+        "title": "Page 3",
+        "layout": "test-layout-v1"
       }
     ]
   }

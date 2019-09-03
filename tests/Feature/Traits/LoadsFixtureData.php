@@ -30,17 +30,12 @@ trait LoadsFixtureData
 	 */
 	public function getFixtureData($match)
 	{
-	    $search_replace = $this->fixtureDataSearchReplace();
 		if(!array_key_exists($match, static::$fixtureCache)) {
 			$results = [];
 			$pattern = $this->getFixturePath() . '/' . $match . '.json';
 			foreach (glob($pattern) as $filename) {
-				$data = json_decode(
-				            str_replace(array_keys($search_replace), $search_replace,
-                                $this->stripComments(
-                                    file_get_contents($filename)
-                                )
-                            ), true);
+				$contents = $this->stripComments(file_get_contents($filename));
+				$data = json_decode($contents, true);
 				$id = preg_replace('/^.*?([a-z0-9_-]+)\.json$/i', '$1', $filename);
 				$results[$id] = $data;
 			}
@@ -74,14 +69,4 @@ trait LoadsFixtureData
 	{
 		return $this->getFixtureData(strtolower(str_replace(' ', '', $command)) . '_invalid*');
 	}
-
-    /**
-     * Get an array of key => value pairs to search for and replace within loaded fixture data.
-     * Override this in your test classes.
-     * @return array
-     */
-	public function fixtureDataSearchReplace()
-    {
-        return [];
-    }
 }

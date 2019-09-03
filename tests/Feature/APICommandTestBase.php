@@ -89,6 +89,7 @@ abstract class APICommandTestBase extends TestCase
      */
     public function request_withValidData_andInvalidJWT_failsWith401($payload)
     {
+		$payload = $this->modifyFixtureData($payload, __METHOD__);
         // makerequestandteststatuscode just uses the jwt property of the given user
         $user = new User();
         $user->jwt = 'kjadfkjdsf;kja398098ae9083odsaukdsf;j;lsfkjakjdsf83a048afd;a;fdja;ljfd;ljakdfja;jdkfau903uraidjflajfd;a;dfj';
@@ -106,6 +107,7 @@ abstract class APICommandTestBase extends TestCase
      */
     public function request_withInvalidData_andInvalidJWT_failsWith401($payload)
     {
+		$payload = $this->modifyFixtureData($payload, __METHOD__);
         // makerequestandteststatuscode just uses the jwt property of the given user
         $user = new User();
         $user->jwt = 'kjadfkjdsf;kja398098ae9083odsaukdsf;j;lsfkjakjdsf83a048afd;a;fdja;ljfd;ljakdfja;jdkfau903uraidjflajfd;a;dfj';
@@ -123,6 +125,7 @@ abstract class APICommandTestBase extends TestCase
      */
     public function request_withValidData_andNoBearerToken_failsWith401($payload)
     {
+		$payload = $this->modifyFixtureData($payload, __METHOD__);
         $response = $this->makeRequestAndTestStatusCode(null, $payload, 401, false);
         $this->assertTrue($this->fixturesAreUnchanged($payload));
         $this->assertValidErrorResponseBody($response->getContent());
@@ -137,6 +140,7 @@ abstract class APICommandTestBase extends TestCase
      */
     public function request_withInvalidData_andNoBearerToken_failsWith401($payload)
     {
+		$payload = $this->modifyFixtureData($payload, __METHOD__);
         $response = $this->makeRequestAndTestStatusCode(null, $payload, 401, false);
         $this->assertTrue($this->fixturesAreUnchanged($payload));
         $this->assertValidErrorResponseBody($response->getContent());
@@ -150,6 +154,7 @@ abstract class APICommandTestBase extends TestCase
      */
     public function request_withValidData_andUnauthorizedUsers_failsWith403($payload, $user)
     {
+		$payload = $this->modifyFixtureData($payload, __METHOD__);
         $response = $this->makeRequestAndTestStatusCode($this->$user, $payload, 403);
         $this->assertTrue($this->fixturesAreUnchanged($payload));
         $this->assertValidErrorResponseBody($response->getContent());
@@ -162,6 +167,7 @@ abstract class APICommandTestBase extends TestCase
      */
     public function request_withInvalidData_andUnauthorizedUsers_failsWith403($payload, $user)
     {
+    	$payload = $this->modifyFixtureData($payload, __METHOD__);
         $response = $this->makeRequestAndTestStatusCode($this->$user, $payload, 403);
         $this->assertTrue($this->fixturesAreUnchanged($payload));
         $this->assertValidErrorResponseBody($response->getContent());
@@ -174,6 +180,7 @@ abstract class APICommandTestBase extends TestCase
      */
     public function request_withInvalidData_andAuthorizedUsers_failsWith422($payload, $user)
     {
+		$payload = $this->modifyFixtureData($payload, __METHOD__);
         $response = $this->makeRequestAndTestStatusCode($this->$user, $payload, 422);
         $this->assertTrue($this->fixturesAreUnchanged($payload));
         $this->assertValidErrorResponseBody($response->getContent(), true);
@@ -197,7 +204,6 @@ abstract class APICommandTestBase extends TestCase
         if($with_token) {
             $headers['Authorization'] = 'Bearer ' . $user->jwt;
         }
-
         $response = $this->json(
             $this->requestMethod(),
             $this->apiURL(),
@@ -256,4 +262,16 @@ abstract class APICommandTestBase extends TestCase
     {
         return $this->combineForProvider($this->getInvalidFixtureData($this->fixtureDataPrefix()));
     }
+
+	/**
+	 * Override to modify the fixture data for one or more tests. Cannot do this when
+	 * loading the fixtures as that happens BEFORE any setup.
+	 * @param array $input - Array of fixture data
+	 * @param string $test - The name of the test this data is provided for.
+	 * @return array - The modified (or unchanged) fixture data
+	 */
+    protected function modifyFixtureData($input, $test)
+	{
+		return $input;
+	}
 }

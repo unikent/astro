@@ -2,11 +2,6 @@
 
 namespace Tests\Feature;
 
-use Tests\Feature\Traits\MakesAssertionsAboutPages;
-use Tests\Feature\Traits\CreatesFeatureFixtures;
-use Tests\Feature\Traits\ExtractsPageAttributesFromPageJson;
-use Tests\TestCase;
-
 /**
  * Feature tests for the add page api endpoint.
  * See the traits used for additional information about how these tests work.
@@ -14,16 +9,23 @@ use Tests\TestCase;
  */
 class AddPageTest extends APICommandTestBase
 {
+	public $authorizedUsers = [
+		'admin',
+		'owner',
+		'editor',
+	];
+
 	/**
 	 * @test
 	 * @group api
 	 * @dataProvider authorizedUsersProvider
 	 */
-    public function addPageToParentAddsAtEndOfSiblings($user)
+    public function addPageToParent_AddsAtEndOfSiblings($user)
 	{
+		$parent_id = $this->site->draftHomepage->id;
 		$response = $this->json('POST', '/api/v1/pages', [
 				'title' => 'Add At End',
-				'parent_id' => $this->site->draftHomepage->id,
+				'parent_id' => $parent_id,
 				'slug' => 'add-at-end',
 				'layout' => [
 					'name' => 'test-layout',
@@ -31,7 +33,7 @@ class AddPageTest extends APICommandTestBase
 				]
 			],
 			[
-				'Authorization' => 'Bearer ' . $this->$user->api_token
+				'Authorization' => 'Bearer ' . $this->$user->jwt
 			]
 		);
 		// Page has been created
@@ -39,19 +41,79 @@ class AddPageTest extends APICommandTestBase
 		$response->assertJson([
 				'data' => [
 				'title' => 'Add At End',
-				'parent_id' => $this->site->draftHomepage->id,
+				'parent_id' => $parent_id,
 				'slug' => 'add-at-end'
 			]
 		]);
-		$this->assertTrue($this->pageIsLastChildOf($this->getPageId($response->json()['data']), $this->site->draftHomepage->id));
+		$this->assertTrue($this->pageIsLastChildOf($this->getPageId($response->json()['data']), $parent_id));
 	}
 
-	public function addPageBeforePageAddsPageBeforeThatPage()
+	/**
+	 * @test
+	 * @group api
+	 * @dataProvider authorizedUsersProvider
+	 */
+	public function addPageBeforePage_AddsPageBeforeThatPage($user)
 	{
-		$this->markTestIncomplete();
+		$parent_id = $this->multiPageSite->draftHomepage->id;
+		$sibling_id = $this->multiPageSite->draftHomepage->children[0]->id;
+		$response = $this->json('POST', '/api/v1/pages', [
+			'title' => 'Add Before',
+			'parent_id' => $parent_id,
+			'slug' => 'add-at-beginning',
+			'next_id' => $sibling_id,
+			'layout' => [
+				'name' => 'test-layout',
+				'version' => 1
+			]
+		],
+			[
+				'Authorization' => 'Bearer ' . $this->$user->jwt
+			]
+		);
+		// Page has been created
+		$response->assertStatus(201);
+		$response->assertJson([
+			'data' => [
+				'title' => 'Add Before',
+				'parent_id' => $parent_id,
+				'slug' => 'add-at-beginning'
+			]
+		]);
+		$page_id = $this->getPageId($response->json()['data']);
+		$this->assertTrue($this->pageIsFirstChildOf($page_id, $parent_id));
+		$this->assertTrue($this->pageIsPreviousSiblingOf($page_id, $sibling_id));
 	}
 
-    /**
+	/**
+	 * @test
+	 * @group api
+	 * @dataProvider authorizedUsersProvider
+	 */
+	public function addPageBeforePage_withHomepageAsNextPage_FailsWith422($user)
+	{
+		$parent_id = $this->multiPageSite->draftHomepage->id;
+		$sibling_id = $parent_id;
+		$response = $this->json('POST', '/api/v1/pages', [
+			'title' => 'Add Before',
+			'parent_id' => $parent_id,
+			'slug' => 'add-at-beginning',
+			'next_id' => $sibling_id,
+			'layout' => [
+				'name' => 'test-layout',
+				'version' => 1
+			]
+		],
+			[
+				'Authorization' => 'Bearer ' . $this->$user->jwt
+			]
+		);
+		// Page has been created
+		$response->assertStatus(422);
+	}
+
+
+	/**
      * Get the request method to use for this api command
      * @return string - The request method to use for this API request, e.g. GET, POST, DELETE.
      */
@@ -90,10 +152,17 @@ class AddPageTest extends APICommandTestBase
         return true;
     }
 
-    public function fixtureDataSearchReplace()
-    {
-        return [
-            '%homepage_id%' => $this->site->draftHomepage->id
-        ];
-    }
+	/**
+	 * Use correct parent_ids in fixture data
+	 * @param array $input
+	 * @param string $test
+	 * @return array
+	 */
+    protected function modifyFixtureData($input, $test)
+	{
+		if($input['parent_id']) {
+			$input['parent_id'] = $this->site->draftHomepage->id;
+		}
+		return $input;
+	}
 }

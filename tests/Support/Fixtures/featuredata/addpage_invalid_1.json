@@ -1,6 +1,6 @@
 {
   "title": "Add At End",
-  "parent_id": "%homepage_id%",
+  "parent_id": 1,
   "slug": "add-at-end",
   "layout": {
     "name": "invalid-layout",
