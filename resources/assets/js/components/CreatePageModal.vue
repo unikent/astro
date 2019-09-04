@@ -83,7 +83,8 @@ export default {
 				if(this.siteDefinition.availableLayouts !== void 0) {
 					let available = {};
 					this.siteDefinition.availableLayouts.forEach((definitionID) => {
-						if(this.allLayouts[definitionID] !== void 0) {
+						if(this.allLayouts[definitionID] !== void 0 &&
+							!this.isLayoutDeprecated(definitionID, this.siteDefinition)) {
 							available[definitionID] = this.allLayouts[definitionID];
 						}
 					}, this);
@@ -146,6 +147,10 @@ export default {
 			this.visible = false;
 		},
 
+		isLayoutDeprecated(definitionID, siteDefinition){
+			return siteDefinition.deprecatedLayouts &&
+				siteDefinition.deprecatedLayouts.indexOf(definitionID) > -1;
+		},
 		setUserEditingSlug() {
 			this.userEditingSlug = true;
 		},
