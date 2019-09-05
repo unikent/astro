@@ -116,8 +116,8 @@ class Handler extends ExceptionHandler
 		$errors = [
 			'errors' => [
 				[
-					'message' => $message,
-					'details'  => $details
+					'message' => htmlentities($message),
+					'details'  => htmlentities($details)
 				]
 			]
 		];
