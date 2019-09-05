@@ -116,15 +116,15 @@ class Handler extends ExceptionHandler
 		$errors = [
 			'errors' => [
 				[
-					'message' => htmlentities($message),
-					'details'  => htmlentities($details)
+					'message' => $message,
+					'details'  => $details
 				]
 			]
 		];
 
         // Only include stack trace in debug mode (as could reveal secrets)
         if(in_array($code, [500,404]) && config('app.debug') && isset($e))
-        {
+        {  print_r($e->getTrace());
             $errors['errors'][0]['trace'] = $e->getTrace();
         }
 
