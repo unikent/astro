@@ -121,9 +121,7 @@ class Handler extends ExceptionHandler
 				]
 			]
 		];
-if($code == 500 && isset($e)) {
-    print_r($e->getMessage());
-}
+
         // Only include stack trace in debug mode (as could reveal secrets)
         if(in_array($code, [500,404]) && config('app.debug') && isset($e))
         {
