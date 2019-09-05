@@ -472,23 +472,30 @@ class Page extends BaumNode
 	 * @param Page $page - The Page object to create blocks for.
 	 * @param string $layout_name - The name of the layout
 	 * @param integer $layout_version - The version of the layout
+	 * @return bool - true if there are errors, false otherwise
 	 */
 	public function createDefaultBlocks($layout_name, $layout_version)
 	{
 		$layout_definition = Layout::fromDefinitionFile(Layout::locateDefinition(Layout::idFromNameAndVersion($layout_name, $layout_version)));
 		if($layout_definition){
 			$data = $layout_definition->getDefaultPageContent();
-			$this->saveBlocks($this->id, $data);
+			return $this->saveBlocks($this->id, $data);
 		}
+
+		return false;
 	}
 
 	/**
 	 * Saves the default content for the page defined in blocks to the database.
 	 *
+	 * @param int $page_id - The id of the Page object to save blocks to.
 	 * @param array $data ['region-name' => [['name' => 'section-1-name', 'blocks' => [ ... [block def 1], [block def 2]...]],...]]
+	 * @return bool - true if there are errors, false otherwise
 	 */
 	public function saveBlocks($page_id,$data)
 	{
+		$errors = false;
+
 		foreach($data as $region_name => $sections){
 			foreach($sections as $section){
 				foreach($section['blocks'] as $i => $block_data) {
@@ -499,10 +506,13 @@ class Page extends BaumNode
 					$block->region_name = $region_name;
 					$block->section_name = $section['name'];
 					$block->errors = $this->validateBlock($block);
+					$errors = $errors || !empty($block->errors);
 					$block->save();
 				}
 			}
 		}
+
+		return $errors;
 	}
 
 	public function validateBlock($block)
