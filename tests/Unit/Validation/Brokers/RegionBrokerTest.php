@@ -32,7 +32,7 @@ class RegionBrokerTest extends TestCase
 	 */
 	public function getSectionConstraintRules_CreatesRuleValidatingBlockLimits()
 	{
-        $file = RegionDefinition::locateDefinition('test-region-v1');
+        $file = RegionDefinition::locateDefinition('test-region-with-section-with-min-blocks-v1');
         $region = RegionDefinition::fromDefinitionFile($file);
 		$rv = new RegionBroker($region);
 

@@ -1,0 +1,21 @@
+{
+	"label": "Test Region With Section With Min Blocks",
+	"name": "test-region-with-section-with-min-blocks",
+	
+	"version": 1,
+
+	"sections": [
+		{
+			"name": "test-section",
+			"allowedBlocks": [
+				"test-block-v1"
+			],
+			"defaultBlocks": [
+				"test-block-v1"
+			],
+			"optional": false,
+			"min": 2,
+			"max": 5
+		}
+	]
+}

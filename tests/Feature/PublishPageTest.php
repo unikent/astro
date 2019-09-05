@@ -9,7 +9,6 @@ class PublishPageTest extends APICommandTestBase
 		'admin',
 		'owner',
 		'editor',
-		'contributor',
 	];
 
 	// fixtures are currently just json payload

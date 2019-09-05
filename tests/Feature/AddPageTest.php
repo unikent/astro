@@ -12,7 +12,6 @@ class AddPageTest extends APICommandTestBase
 	public $authorizedUsers = [
 		'admin',
 		'owner',
-		'editor',
 	];
 
 	/**
