@@ -1,0 +1,10 @@
+{
+	"label": "Valid Test Layout",
+	"name": "valid-test-layout",
+	
+	"version": 1,
+	
+	"regions": [
+		"valid-test-region-v1"
+	]
+}

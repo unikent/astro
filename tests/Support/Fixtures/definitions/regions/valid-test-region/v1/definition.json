@@ -1,0 +1,22 @@
+{
+	"label": "Valid Test Region",
+	"name": "valid-test-region",
+	
+	"version": 1,
+
+	"sections": [
+		{
+			"name": "test-section",
+			"allowedBlocks": [
+				"valid-test-block-v1"
+			],
+			"defaultBlocks": [
+				"valid-test-block-v1",
+				"valid-test-block-v1"
+			],
+			"optional": true,
+			"min": 2,
+			"max": 5
+		}
+	]
+}
