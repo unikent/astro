@@ -43,7 +43,7 @@ stages:
 feature-branch:
   stage: build-and-test
   script:
-    - vendor/bin/phpunit --group=api
+    - vendor/bin/phpunit
     - yarn run validate
     - yarn run unit
     - rm -rf node_modules .git
