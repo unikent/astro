@@ -58,7 +58,8 @@ class SiteController extends ApiController
 			$request->get('host'),
 			$request->get('path'),
 			$request->get('site_definition', []),
-			$request->get('options')
+			$request->get('options'),
+			$request->has('create_default_pages') ? $request->get('create_default_pages') : true
 		);
 		if ($site instanceof Site) {
 			return fractal($site, new SiteTransformer)->respond(201);

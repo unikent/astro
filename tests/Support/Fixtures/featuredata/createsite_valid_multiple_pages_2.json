@@ -1,0 +1,9 @@
+{
+	"name": "Test Site 2",
+	"host": "beta.test",
+	"path": "",
+	"site_definition": {
+		"name": "multi-page-site",
+		"version": "1"
+	}
+}

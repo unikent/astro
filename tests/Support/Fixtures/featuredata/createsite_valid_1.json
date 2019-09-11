@@ -1,0 +1,9 @@
+{
+	"name": "Test Site 1",
+	"host": "astro.test",
+	"path": "/a/test/path",
+	"site_definition": {
+		"name": "one-page-site",
+		"version": "1"
+	}
+}

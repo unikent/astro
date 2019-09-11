@@ -1,0 +1,22 @@
+{
+  "blocks": {
+    "test-region-v1": [
+      {
+        "name": "test-section",
+        "blocks": [
+          {
+            "definition_name": "not-a-test-block",
+            "definition_version": "1",
+            "region_name": "test-region-v1",
+            "section_name": "test-section",
+            "fields": {
+              "title_of_widget": "Widget Title",
+              "content": "I am content",
+              "number_of_widgets": 20
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
