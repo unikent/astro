@@ -2,7 +2,7 @@ import _ from 'lodash';
 import inlineFieldMixin from 'mixins/inlineFieldMixin';
 import imagesLoaded from 'imagesloaded';
 import { eventBus } from 'plugins/eventbus';
-import { imageUrl } from 'classes/helpers';
+import { imageUrl, assetsUrl } from 'classes/helpers';
 
 export default {
 
@@ -33,6 +33,10 @@ export default {
 	methods: {
 		imageUrl(url, defaultUrl) {
 			return imageUrl(url, defaultUrl);
+		},
+
+		assetsUrl(path) {
+			return assetsUrl(path);
 		},
 
 		watchFields(fields) {
