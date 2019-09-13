@@ -193,6 +193,14 @@ $config = [
 	*/
 	'cache_scholarship_minutes' => env('CACHE_SCHOLARSHIP_MINUTES', 0),
 
+	/*
+	|--------------------------------------------------------------------------
+	| Astro: guides
+	|--------------------------------------------------------------------------
+	| site id of the site containing guides and their taxonomies
+	*/
+	'guide_site_id' => env('GUIDE_SITE_ID', 0),
+
 
 	/*
 	|--------------------------------------------------------------------------
