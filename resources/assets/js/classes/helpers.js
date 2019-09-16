@@ -207,3 +207,12 @@ export const imageUrl = (src_or_url, defaultUrl) => {
 export const assetsUrl = (path) => {
 	return Config.get("assets_base_url") + path;
 };
+
+/**
+	* Generates full url to the block images
+	* @param {String} path - the relative path to the block images.
+	* @returns {String} - the full URL to the block images, taking into account the configured block images base url.
+	*/
+export const blockImageUrl = (path) => {
+	return Config.get("block_image_url") + path;
+};

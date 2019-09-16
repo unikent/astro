@@ -11,7 +11,7 @@
 		user-select: none;
 		line-height: 1.8em;
 		position: relative;
-		height:200px;
+		height:350px;
 	}
 
 	.block-move:before {
@@ -44,5 +44,8 @@
 		opacity: 0.5;
 		color: #777;
 		background-color: #dadde2;
+	}
+	.block-move__image {
+		margin-bottom: 20px;
 	}
 }
