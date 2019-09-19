@@ -1,0 +1,10 @@
+{
+	"label": "layout-with-valid-region-with-valid-block",
+	"name": "layout-with-valid-region-with-valid-block",
+	
+	"version": 1,
+	
+	"regions": [
+		"valid-region-with-valid-block-v1"
+	]
+}

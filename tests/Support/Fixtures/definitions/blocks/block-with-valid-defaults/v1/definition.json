@@ -1,6 +1,6 @@
 {
-	"label": "Test Block",
-	"name": "test-block",
+	"label": "Block with valid dafaults",
+	"name": "block-with-valid-defaults",
 	
 	"version": 1,
 

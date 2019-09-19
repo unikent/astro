@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Site;
 use App\Models\Definitions\SiteDefinition;
+use Tests\Feature\Traits\MakesAssertionsAboutPages;
 
 /**
  * Class CreateSiteTestV2
@@ -101,4 +103,27 @@ class CreateSiteTest extends APICommandTestBase
         $expectedPages['children'] = [];
         $this->assertSiteHasPageStructure($json->data->id, [$expectedPages]);
     }
+
+
+	/**
+     * @test
+     * @group api
+     * @group cable
+     * @dataProvider validDataProvider
+     */
+	public function createSite_withvalidHomepageDefinition_createsSiteWithValidHomePage($payload)
+	{
+		$response = $this->makeRequestAndTestStatusCode($this->admin, $payload, 201);
+		$new_site_info = json_decode($response->getContent(), true);
+		$site = Site::find($new_site_info['data']['id']);
+		$homepage_id = $site->draftHomepage->id;
+		$this->pageIsValid($homepage_id);
+	}
+	/*
+
+	createSite_withInvalidHomepageDefinition_createsSiteWithInvalidHomePage
+
+
+
+	*/
 }

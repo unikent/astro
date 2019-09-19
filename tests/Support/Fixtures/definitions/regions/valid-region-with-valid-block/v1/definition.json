@@ -1,0 +1,22 @@
+{
+	"label": "Valid Region With Valid Block - uses a block which by default has valid data",
+	"name": "valid-region-with-valid-block",
+	
+	"version": 1,
+
+	"sections": [
+		{
+			"name": "test-section",
+			"allowedBlocks": [
+				"block-with-valid-defaults-v1"
+			],
+			"defaultBlocks": [
+				"block-with-valid-defaults-v1",
+				"block-with-valid-defaults-v1"
+			],
+			"optional": true,
+			"min": 2,
+			"max": 5
+		}
+	]
+}

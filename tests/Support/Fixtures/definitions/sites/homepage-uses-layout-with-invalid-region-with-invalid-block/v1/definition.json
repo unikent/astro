@@ -1,0 +1,11 @@
+{
+	"name": "homepage-uses-layout-with-invalid-region-with-invalid-block",
+	"version": 1,
+	"label": "Site with homepage with a invalid default region and with an invalid default block",
+	"defaultPages": {
+		"slug": "",
+		"title": "Home",
+		"layout": "layout-with-invalid-region-with-invalid-block-v1",
+		"children": []
+	}
+}

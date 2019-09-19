@@ -42,7 +42,6 @@ class CreateSite implements APICommand
 				SiteDefinition::fromDefinitionFile(SiteDefinition::locateDefinition(
 					SiteDefinition::idFromNameAndVersion($site_definition['name'],$site_definition['version'])
 				));
-
             $layout = $template->defaultPages['layout'];
             // layout can be {name}-v{version} here in which case we convert to ['name' => '...', 'version' => '...']
             if(!is_array($layout)){
