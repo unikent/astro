@@ -1,0 +1,62 @@
+{
+	"$schema": "http://json-schema.org/draft-06/schema#",
+	"type": "object",
+	"properties": {
+		"data": {
+			"$ref": "#/definitions/site"
+		}
+	},
+	"required": ["data"],
+	"definitions": {
+		"site": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "integer"
+				},
+				"host": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				},
+				"site_definition_name": {
+					"type": "string"
+				},
+				"site_definition_version": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"created_at": { "$ref": "#/definitions/datetime" },
+				"updated_at": { "$ref": "#/definitions/datetime" },
+				"deleted_at": {
+					"oneOf": [
+						{
+							"type": "null"
+						},
+						{
+							"$ref": "#/definitions/datetime"
+						}
+					]
+				}
+			},
+			"required": [
+				"id",
+				"host",
+				"path",
+				"name",
+				"site_definition_name",
+				"site_definition_version",
+				"created_at",
+				"updated_at",
+				"deleted_at"
+			]
+		},
+		"datetime": {
+			"type": "string",
+			"pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-2][0-9]:[0-5][0-9]:[0-5][0-9]$"
+		}
+	}
+}

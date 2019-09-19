@@ -1,0 +1,9 @@
+{
+	"name": "Site with invalid definition name",
+	"host": "astro.test",
+	"path": "/a/test/path",
+	"site_definition": {
+		"name": "not-one-page-site",
+		"version": "1"
+	}
+}

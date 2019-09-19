@@ -421,7 +421,7 @@ assign-symbols@^1.0.0:
 
 "astro-theme-validator@git+ssh://git@gitlab.kent.ac.uk:webdev/astro-theme-validator":
   version "0.0.1"
-  resolved "git+ssh://git@gitlab.kent.ac.uk:webdev/astro-theme-validator#bcabe9aa4aa741d735163308a9b23e2fdc9f6f25"
+  resolved "git+ssh://git@gitlab.kent.ac.uk:webdev/astro-theme-validator#731281889c8e40834713a49d211045e11fe7a453"
   dependencies:
     ajv "^5.3.0"
     babel-core "^6.26.3"
@@ -4430,7 +4430,7 @@ just-extend@^1.1.27:
 
 "kent-theme-assets@git+ssh://git@gitlab.kent.ac.uk:webdev/kent-theme-assets":
   version "0.0.1"
-  resolved "git+ssh://git@gitlab.kent.ac.uk:webdev/kent-theme-assets#7b5365ab93dccf1b83a55e81adaa8ad2cb9f9749"
+  resolved "git+ssh://git@gitlab.kent.ac.uk:webdev/kent-theme-assets#2456483300a176f916330d2099c432ffad2d6d73"
   dependencies:
     axios "^0.19.0"
     vue "^2.6.10"

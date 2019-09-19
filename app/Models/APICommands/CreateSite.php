@@ -143,7 +143,7 @@ class CreateSite implements APICommand
     public function messages(Collection $data, Authenticatable $user)
     {
         return [
-            'host.unique' => '',
+            'host.unique' => 'A site with this host and path already exists.',
             'path.unique' => 'A site with this host and path already exists.'
         ];
     }
@@ -171,7 +171,7 @@ class CreateSite implements APICommand
             'path' =>[
                 'nullable',
                 'regex:/^(\/[a-z0-9_-]+)*$/i',
-                'unique:sites,path,null,id,host,' . $data->get('host'),
+                'unique:sites,path,null,id,host,' . $data->get('host'), // think this fails for cases where path is empty (nulls considered unique by mysql maybe?)
                 'unique_site_path:' . $data->get('host')
             ],
             'site_definition.name' => [

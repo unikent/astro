@@ -198,3 +198,12 @@ export const imageUrl = (src_or_url, defaultUrl) => {
 //	return url !== void 0 ? url :
 //		Config.get('assets_base_url') + (defaultUrl !== void 0 ? defaultUrl : Config.get('default_placeholder_url'));
 };
+
+/**
+	* Generates full url to an asset
+	* @param {String} path - the relative path to the asset.
+	* @returns {String} - the full URL to the asset, taking into account the configured assets base url.
+	*/
+export const assetsUrl = (path) => {
+	return Config.get("assets_base_url") + path;
+};

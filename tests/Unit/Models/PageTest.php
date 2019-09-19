@@ -606,7 +606,8 @@ class PageTest extends TestCase
 			} else {
 				// if this the homepage then it has no parent id so we need to check that the ancestor's full_path
 				// is the start of the homepage's full path
-				$this->assertEquals(strpos($page->full_path, $ancestors[$ancestorsCount-1]->id), 0);
+                $parent_path = $ancestors[$ancestorsCount-1]->full_path;
+                $this->assertEquals($parent_path, substr($page->full_path, 0, strlen($parent_path)));
 			}
 		}
 	}
