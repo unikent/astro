@@ -108,8 +108,7 @@ class CreateSiteTest extends APICommandTestBase
 	/**
      * @test
      * @group api
-     * @group cable
-     * @dataProvider validDataProvider
+     * @dataProvider sitesWithValidData
      */
 	public function createSite_withvalidHomepageDefinition_createsSiteWithValidHomePage($payload)
 	{
@@ -119,11 +118,83 @@ class CreateSiteTest extends APICommandTestBase
 		$homepage_id = $site->draftHomepage->id;
 		$this->pageIsValid($homepage_id);
 	}
-	/*
 
-	createSite_withInvalidHomepageDefinition_createsSiteWithInvalidHomePage
+	/**
+	 * @test
+	 * @group api
+	 * @dataProvider sitesWithInvalidData
+	 */
+	public function createSite_withinvalidHomepageDefinition_createsSiteWithInvalidHomePage($payload)
+	{
+		$response = $this->makeRequestAndTestStatusCode($this->admin, $payload, 201);
+		$new_site_info = json_decode($response->getContent(), true);
+		$site = Site::find($new_site_info['data']['id']);
+		$homepage_id = $site->draftHomepage->id;
+		$this->pageIsValid($homepage_id);
+	}
 
+	/**
+	 * sitesWithInvalidData
+	 * payloads which produce sites with invalid defaults
+	 * @return array
+	 */
+	public function sitesWithInvalidData()
+	{
+		return [
+			'homepage-uses-layout-with-invalid-region-with-valid-block' => [
+				[
+					"name" => "Test Site 1",
+					"host" => "test-site-1.test",
+					"path" => "/a/test/path",
+					"site_definition" => [
+						"name" => "homepage-uses-layout-with-invalid-region-with-valid-block",
+						"version" => "1"
+					]
+				]
+			],
+			'homepage-uses-layout-with-invalid-region-with-invalid-block' => [
+				[
+					"name" => "Test Site 2",
+					"host" => "test-site-2.test",
+					"path" => "/a/test/path",
+					"site_definition" => [
+						"name" => "homepage-uses-layout-with-invalid-region-with-invalid-block",
+						"version" => "1"
+					]
+				]
+			],
+			'homepage-uses-layout-with-valid-region-with-invalid-block' => [
+				[
+					"name" => "Test Site 3",
+					"host" => "test-site-3.test",
+					"path" => "/a/test/path",
+					"site_definition" => [
+						"name" => "homepage-uses-layout-with-valid-region-with-invalid-block",
+						"version" => "1"
+					]
+				]
+			]];
+	}
 
-
-	*/
+	/**
+	 * sitesWithValidData
+	 * payloads which produce sites with valid defaults
+	 * @return void
+	 */
+	public function sitesWithValidData()
+	{
+		return [
+			'homepage-uses-layout-with-valid-region-with-valid-block' => [
+				[
+					"name" => "Test Site 1",
+					"host" => "test-site-1.test",
+					"path" => "/a/test/path",
+					"site_definition" => [
+						"name" => "homepage-uses-layout-with-valid-region-with-valid-block",
+						"version" => "1"
+					]
+				]
+			]
+		];
+	}
 }
