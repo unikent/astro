@@ -157,16 +157,17 @@ the [CreateFeatureFixtures](Traits/CreatesFeatureFixtures.php) trait.
 It uses Laravel's DatabaseTransactions trait to run each test inside a transaction
 which is then rolled back before the next test is run.
 
-1. Two Sites
+1. Three Sites
    1. A single page site based on the one-page-site-v1 definition.
-   1. A multiple page site based on the multi-page-site-v1 definition.
-1. User accounts, each named after the role they have on these two sites:
+   2. A multiple page site based on the multi-page-site-v1 definition.
+   3. A single page site, which is valid by default,  based on the homepage-uses-layout-with-valid-region-with-valid-block-v1 definition.
+2. User accounts, each named after the role they have on these two sites:
    1. owner
-   1. editor
-   1. contributor
-1. An admin account (called 'admin')
-1. An account with _no_ site membership, called 'randomer'
-1. A 'viewer' account (can read everything, as used by astro-www)
+   2. editor
+   3. contributor
+3. An admin account (called 'admin')
+4. An account with _no_ site membership, called 'randomer'
+5. A 'viewer' account (can read everything, as used by astro-www)
 
 All of these are available as [properties](Traits/CreatesFeatureFixtures.php) on the test class:
 
