@@ -110,7 +110,7 @@ class CreateSiteTest extends APICommandTestBase
      * @group api
      * @dataProvider sitesWithValidData
      */
-	public function createSite_withvalidHomepageDefinition_createsSiteWithValidHomePage($payload)
+	public function createSite_withValidHomepageDefinition_createsSiteWithValidHomePage($payload)
 	{
 		$response = $this->makeRequestAndTestStatusCode($this->admin, $payload, 201);
 		$new_site_info = json_decode($response->getContent(), true);
