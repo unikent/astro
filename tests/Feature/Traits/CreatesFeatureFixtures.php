@@ -135,6 +135,13 @@ trait CreatesFeatureFixtures
 			'Test Site', 'example.com', '', ['name'=>'one-page-site','version'=>1]
 		);
 
+		$this->publishableSite = $this->client->createSite(
+			'Publishable Test Site',
+			'publishablesite.com',
+			'',
+			['name'=>'homepage-uses-layout-with-valid-region-with-valid-block','version'=>1]
+		);
+
 		$this->multiPageSite = $this->client->createSite(
 		    'Multi Page Test Site', 'multi.test', '', ['name' => 'multi-page-site', 'version' => 1]
         );
@@ -146,6 +153,10 @@ trait CreatesFeatureFixtures
 		$this->client->updateSiteUserRole($this->multiPageSite->id,'editor', Role::EDITOR);
 		$this->client->updateSiteUserRole($this->multiPageSite->id,'owner', Role::OWNER);
 		$this->client->updateSiteUserRole($this->multiPageSite->id,'contributor', Role::CONTRIBUTOR);
+
+		$this->client->updateSiteUserRole($this->publishableSite->id, 'editor', Role::EDITOR);
+		$this->client->updateSiteUserRole($this->publishableSite->id, 'owner', Role::OWNER);
+		$this->client->updateSiteUserRole($this->publishableSite->id, 'contributor', Role::CONTRIBUTOR);
 
 		$this->createJWTsForUsers($this->allUsers);
 

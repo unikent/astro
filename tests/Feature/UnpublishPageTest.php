@@ -12,7 +12,7 @@ class UnpublishPageTest extends APICommandTestBase
 	public function setup()
 	{
 		parent::setup();
-		$this->client->publishPage($this->site->draftHomepage->id);
+		$this->client->publishPage($this->publishableSite->draftHomepage->id);
 	}
 
 	// the following user types / roles are able to publish
@@ -42,7 +42,7 @@ class UnpublishPageTest extends APICommandTestBase
 	 */
 	public function apiURL()
 	{
-		return '/api/v1/pages/' . ($this->pageToTestID ?? $this->site->draftHomepage->id) . '/unpublish';
+		return '/api/v1/pages/' . ($this->pageToTestID ?? $this->publishableSite->draftHomepage->id) . '/unpublish';
 	}
 
 	/**
@@ -74,7 +74,7 @@ class UnpublishPageTest extends APICommandTestBase
 	 */
 	public function unpublishPage_withValidUserAndPublishedPage_UnpublishesThePage($user)
 	{
-		$page = $this->site->draftHomepage;
+		$page = $this->publishableSite->draftHomepage;
 		$published_page = $page->publishedVersion();
 		$this->assertNotNull($published_page);
 		$current_revision = $page->revision;

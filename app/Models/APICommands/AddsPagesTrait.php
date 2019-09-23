@@ -46,7 +46,7 @@ trait AddsPagesTrait
 				'updated_by' => $user->id
 			]
 		);
-		$page->createDefaultBlocks($layout_name, $layout_version);
+		$errors = $page->createDefaultBlocks($layout_name, $layout_version);
 		$revision_set = RevisionSet::create(['site_id' => $parent->site_id]);
 		$revision = Revision::create([
 			'revision_set_id' => $revision_set->id,
@@ -57,7 +57,7 @@ trait AddsPagesTrait
 			'layout_version' => $layout_version,
 			'blocks' => $page->bake(Layout::idFromNameAndVersion($layout_name, $layout_version)),
 			'options' => null,
-			'valid' => true
+			'valid' => !$errors
 		]);
 		$page->setRevision($revision);
 		if($next_id) {

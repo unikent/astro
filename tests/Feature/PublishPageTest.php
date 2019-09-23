@@ -31,7 +31,7 @@ class PublishPageTest extends APICommandTestBase
 	 */
 	public function apiURL()
 	{
-		return '/api/v1/pages/' . $this->site->draftHomepage->id . '/publish';
+		return '/api/v1/pages/' . $this->publishableSite->draftHomepage->id . '/publish';
 	}
 
 	/**
@@ -63,7 +63,7 @@ class PublishPageTest extends APICommandTestBase
 	 */
 	public function publishPage_withValidUserAndPage_PublishesThePage($user)
 	{
-		$page = $this->site->draftHomepage;
+		$page = $this->publishableSite->draftHomepage;
 		$current_revision = $page->revision;
 		$response = $this->makeRequestAndTestStatusCode($this->$user, null, 200);
 		$published_page = $page->publishedVersion();

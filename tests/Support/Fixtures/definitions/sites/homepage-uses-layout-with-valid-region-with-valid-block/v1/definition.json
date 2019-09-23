@@ -1,0 +1,11 @@
+{
+	"name": "homepage-uses-layout-with-valid-region-with-valid-block",
+	"version": 1,
+	"label": "homepage-uses-layout-with-valid-region-with-valid-block",
+	"defaultPages": {
+		"slug": "",
+		"title": "Home",
+		"layout": "layout-with-valid-region-with-valid-block-v1",
+		"children": []
+	}
+}

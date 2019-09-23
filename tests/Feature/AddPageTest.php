@@ -139,6 +139,65 @@ class AddPageTest extends APICommandTestBase
         return 'AddPage';
     }
 
+	/**
+	 * @test
+	 * @group api
+	 * @dataProvider authorizedUsersProvider
+	 */
+	public function addPage_withValidDefaultData_createsValidPage($user)
+	{
+		// given we have a site with a valid homepage
+		$site = $this->publishableSite;
+		$parent_id = $site->draftHomepage->id;
+
+
+		// when we add a new page with valid defaults
+		$payload = [
+			'title' => 'Valid by default',
+			'parent_id' => $parent_id,
+			'slug' => 'valid-page',
+			'layout' => [
+				'name' => 'layout-with-valid-region-with-valid-block',
+				'version' => 1
+			]
+		];
+		$response = $this->makeRequestAndTestStatusCode($this->$user, $payload, 201);
+		$new_page_info = json_decode($response->getContent(), true);
+		$new_page_id = $new_page_info['data']['id'];
+
+		// then that page should be valid
+		$this->pageIsValid($new_page_id);
+	}
+
+	/**
+	 * @test
+	 * @group api
+	 * @dataProvider authorizedUsersProvider
+	 */
+	public function addPage_withInvalidDefaultData_createsInvalidPage($user)
+	{
+		// given we have a site with a valid homepage
+		$site = $this->publishableSite;
+		$parent_id = $site->draftHomepage->id;
+
+		// when we add a new page with invalid defaults
+		$payload = [
+			'title' => 'Invalid by default',
+			'parent_id' => $parent_id,
+			'slug' => 'valid-page',
+			'layout' => [
+				'name' => 'layout-with-invalid-region-with-valid-block',
+				'version' => 1
+			]
+		];
+		$response = $this->makeRequestAndTestStatusCode($this->$user, $payload, 201);
+		$new_page_info = json_decode($response->getContent(), true);
+		$new_page_id = $new_page_info['data']['id'];
+
+		// then that page should be invalid
+		$this->pageIsInvalid($new_page_id);
+	}
+
     /**
      * Utility method to confirm that the test has not modified the database. This is used as an additional
      * check when testing commands with invalid input or unauthorised users and should be implemented for each

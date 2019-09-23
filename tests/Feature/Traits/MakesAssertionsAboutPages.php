@@ -99,4 +99,26 @@ trait MakesAssertionsAboutPages
 		return ($page1 && $page2 && $page1->parent_id == $page2->parent_id && $page1->parent_id);
 	}
 
+	/**
+	 * Does a page's latest revision pass validation
+	 * @param int $page_id - Id of one of the pages.
+	 * @return bool - True if page passes validation
+	 */
+	public function pageIsValid($page_id)
+	{
+		$page = Page::find($page_id);
+		return ($page->revision->valid == 1);
+	}
+
+	/**
+	 * Does a page's latest revision fail validation
+	 * @param int $page_id - Id of one of the pages.
+	 * @return bool - True if page fails validation
+	 */
+	public function pageIsInvalid($page_id)
+	{
+		$page = Page::find($page_id);
+		return ($page->revision->valid == 0);
+	}
+
 }
