@@ -3994,7 +3994,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/astro-kent-theme.git",
-                "reference": "a559627152e74c646ff03e7b898539bb3bffed6a"
+                "reference": "479270c7695c70a476b1455e77f88845a56afff1"
             },
             "require": {
                 "ezyang/htmlpurifier": "4.10.0"
@@ -4004,12 +4004,17 @@
             },
             "type": "library",
             "autoload": {
+                "classmap": [
+                    "blocks"
+                ]
+            },
+            "autoload-dev": {
                 "psr-4": {
                     "App\\Models\\Definitions\\": "tests/mocks/"
                 }
             },
             "description": "Our block views",
-            "time": "2019-09-17T10:55:48+00:00"
+            "time": "2019-09-23T11:45:18+00:00"
         },
         {
             "name": "unikent/astro-renderer",
