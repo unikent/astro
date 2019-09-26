@@ -170,7 +170,9 @@
 	left: 50%;
 	pointer-events: auto;
 	transition: .3s all ease-in-out;
-	text-align: center;
+	display: flex;
+    justify-content: center;
+    align-items: center;
 
 	&:hover {
 		cursor: pointer;
