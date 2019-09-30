@@ -14,7 +14,7 @@
 				"test-block-v1"
 			],
 			"optional": true,
-			"min": 2,
+			"min": 1,
 			"max": 5
 		}
 	]

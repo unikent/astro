@@ -216,8 +216,11 @@ class UpdateContentTest extends APICommandTestCase
 	{
 		$valid_data = $this->input(null);
 
-		unset($valid_data['blocks']['test-region-v1'][0]['blocks'][1]);
-		unset($valid_data['blocks']['test-region-v1'][0]['blocks'][2]);
+		// change the name of the region used
+		$valid_data['blocks']['test-region-with-section-with-min-blocks'] = $valid_data['blocks']['test-region-v1'];
+        unset($valid_data['blocks']['test-region-v1']);
+		unset($valid_data['blocks']['test-region-with-section-with-min-blocks'][0]['blocks'][1]);
+        unset($valid_data['blocks']['test-region-with-section-with-min-blocks'][0]['blocks'][2]);
 
 		$validator = $this->validator($valid_data);
 		$this->assertFalse($validator->passes());
@@ -278,7 +281,7 @@ class UpdateContentTest extends APICommandTestCase
 	public function validation_ifTooManySectionsInRegionValidation_fails()
 	{
 		$invalid_data = $this->input(null);
-		
+
 		// test-region definition only allows one section
 		$invalid_data['blocks']['test-region-v1'][] = $invalid_data['blocks']['test-region-v1'][0];
 
@@ -293,7 +296,7 @@ class UpdateContentTest extends APICommandTestCase
 	public function validation_ifTooFewSectionsInRegionValidation_fails()
 	{
 		$invalid_data = $this->input(null);
-		
+
 		// test-region definition only allows one section
 		unset($invalid_data['blocks']['test-region-v1'][0]);
 

@@ -48,7 +48,7 @@ class PageTest extends TestCase
 			'test',
 			'example.com',
 			'',
-			['name' => 'one-page-site', 'version' => 1]
+			['name' => 'homepage-uses-layout-with-valid-region-with-valid-block', 'version' => 1]
 		);
 		$api->publishPage($site->draftHomepage->id);
 		$pages = Page::published()->get();
@@ -69,7 +69,7 @@ class PageTest extends TestCase
 			'test',
 			'example.com',
 			'',
-			['name' => 'one-page-site', 'version' => 1]
+			['name' => 'homepage-uses-layout-with-valid-region-with-valid-block', 'version' => 1]
 		);
 		$api->publishPage($site->draftHomepage->id);
 		$pages = Page::draft()->get();
@@ -90,7 +90,7 @@ class PageTest extends TestCase
 			'test',
 			'example.com',
 			'',
-			['name' => 'one-page-site', 'version' => 1]
+			['name' => 'homepage-uses-layout-with-valid-region-with-valid-block', 'version' => 1]
 		);
 		$api->publishPage($site->draftHomepage->id);
 		$pages = Page::version(Page::STATE_DRAFT)->get();
@@ -606,7 +606,8 @@ class PageTest extends TestCase
 			} else {
 				// if this the homepage then it has no parent id so we need to check that the ancestor's full_path
 				// is the start of the homepage's full path
-				$this->assertEquals(strpos($page->full_path, $ancestors[$ancestorsCount-1]->id), 0);
+                $parent_path = $ancestors[$ancestorsCount-1]->full_path;
+                $this->assertEquals($parent_path, substr($page->full_path, 0, strlen($parent_path)));
 			}
 		}
 	}

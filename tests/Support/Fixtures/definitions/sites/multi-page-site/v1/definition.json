@@ -1,0 +1,27 @@
+{
+  "name": "multi-page-site",
+  "version": 1,
+  "label": "A multiple page site template for testing",
+  "defaultPages": {
+    "slug": "",
+    "title": "Home",
+    "layout": "test-layout-v1",
+    "children": [
+      {
+        "slug": "page-1",
+        "title": "Page 1",
+        "layout": "test-layout-v1"
+      },
+      {
+        "slug": "page-2",
+        "title": "Page 2",
+        "layout": "test-layout-v1"
+      },
+      {
+        "slug": "page-3",
+        "title": "Page 3",
+        "layout": "test-layout-v1"
+      }
+    ]
+  }
+}

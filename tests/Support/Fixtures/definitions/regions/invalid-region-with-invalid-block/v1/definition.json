@@ -1,0 +1,21 @@
+{
+	"label": "Invalid Region With Invalid Block - uses a block which by default has invalid data",
+	"name": "invalid-region-with-invalid-block",
+	
+	"version": 1,
+
+	"sections": [
+		{
+			"name": "test-section",
+			"allowedBlocks": [
+				"block-with-invalid-defaults-v1"
+			],
+			"defaultBlocks": [
+				"block-with-invalid-defaults-v1"
+			],
+			"optional": false,
+			"min": 2,
+			"max": 5
+		}
+	]
+}

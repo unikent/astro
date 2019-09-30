@@ -1,0 +1,11 @@
+{
+	"name": "valid-one-page-site",
+	"version": 1,
+	"label": "A single page site template for testing, that is valid by default",
+	"defaultPages": {
+		"slug": "",
+		"title": "Home",
+		"layout": "valid-test-layout-v1",
+		"children": []
+	}
+}

@@ -1,0 +1,43 @@
+{
+	"label": "Block with valid dafaults",
+	"name": "block-with-valid-defaults",
+	
+	"version": 1,
+
+	"fields": [
+		{
+			"name": "content",
+			"label": "Content",
+			"type": "richtext",
+			"default": "blah",
+			"validation": [
+				"required"
+			]
+		},
+		
+		{
+			"name": "title_of_widget",
+			"label": "Title of Widget",
+			"type": "text",
+			"default": "blah", 
+			"validation": [
+				"required",
+				"min_length:1",
+				"max_length:50"
+			]
+		},
+
+		{
+			"name": "number_of_widgets",
+			"label": "Number of Widgets",
+			"type": "integer",
+
+			"default": 10, 
+			"validation": [
+				"required",
+				"min_value:1",
+				"max_value:100"
+			]
+		}
+	]
+}

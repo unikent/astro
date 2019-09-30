@@ -32,31 +32,64 @@ class UpdateContent implements APICommand
 	{
 		$result = DB::transaction(function () use ($input, $user) {
 			$page = Page::find($input['id']);
+			if($this->hasContentChanged($page->revision->blocks, $input['blocks'])) {
+				event(new PageEvent(PageEvent::UPDATING, $page, $input['blocks']));
 
-			event(new PageEvent(PageEvent::UPDATING, $page, $input['blocks']));
+				// Update with new content.
+				$errors = $this->processBlocks($page, $input['blocks']);
 
-			// Update with new content.
-			$errors = $this->processBlocks($page, $input['blocks']);
-
-			// Save our previous state to the revisions table.
-			$previous_revision = $page->revision;
-			$revision = Revision::create([
-				'revision_set_id' => $previous_revision->revision_set_id,
-				'title' => $previous_revision->title,
-				'layout_name' => $previous_revision->layout_name,
-				'layout_version' => $previous_revision->layout_version,
-				'created_by' => $user->id,
-				'updated_by' => $user->id,
-				'blocks' => $page->bake(Layout::idFromNameAndVersion($previous_revision->layout_name, $previous_revision->layout_version)),
-				'options' => '',
-				'valid' => !$errors
-			]);
-			$page->setRevision($revision);
-			$page->fresh();
-			event(new PageEvent(PageEvent::UPDATED, $page, ['previous_revision' => $previous_revision]));
+				// Save our previous state to the revisions table.
+				$previous_revision = $page->revision;
+				$revision = Revision::create([
+					'revision_set_id' => $previous_revision->revision_set_id,
+					'title' => $previous_revision->title,
+					'layout_name' => $previous_revision->layout_name,
+					'layout_version' => $previous_revision->layout_version,
+					'created_by' => $user->id,
+					'updated_by' => $user->id,
+					'blocks' => $page->bake(Layout::idFromNameAndVersion($previous_revision->layout_name, $previous_revision->layout_version)),
+					'options' => '',
+					'valid' => !$errors
+				]);
+				$page->setRevision($revision);
+				$page->fresh();
+				event(new PageEvent(PageEvent::UPDATED, $page, ['previous_revision' => $previous_revision]));
+			}
 			return $page;
 		});
 		return $result;
+	}
+
+	/**
+	 * Compares two sets of page content to see if it has changed
+	 * @param array $one
+	 * @param array $two
+	 */
+	public function hasContentChanged($one, $two)
+	{
+		// lazy, compare in both directions (duplicates effort, but simple...)
+		foreach([[$one,$two], [$two,$one]] as $pair) {
+			list($first, $second) = $pair;
+			// for each key in array
+			foreach($first as $key => $value) {
+				// does the other one have that key?
+				if (!array_key_exists($key, $second)) {
+					return true;
+				}
+				// if they are both arrays, then recursively compare them
+				if (is_array($first[$key]) && is_array($second[$key])) {
+					if($this->hasContentChanged($first[$key],$second[$key])) {
+						return true;
+					}
+				}
+				// otherwise check if the values are different
+				else if ($first[$key] !== $second[$key]) {
+					return true;
+				}
+			}
+		}
+		// no differences
+		return false;
 	}
 
 	/**

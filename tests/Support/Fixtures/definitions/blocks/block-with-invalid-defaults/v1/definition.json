@@ -1,0 +1,18 @@
+{
+	"label": "Block with invalid defaults - default data would not pass validation",
+	"name": "block-with-invalid-defaults",
+	
+	"version": 1,
+
+	"fields": [
+		{
+			"name": "content",
+			"label": "Content",
+			"type": "richtext",
+
+			"validation": [
+				"required"
+			]
+		}
+	]
+}

@@ -69,7 +69,7 @@
 					case 'draft':
 						return {
 							type: 'warning',
-							title: 'Draft'
+							title: 'Draft amendments'
 						};
 
 					case 'published':
