@@ -220,6 +220,30 @@ class Page extends BaumNode
 	 ************************************************************************/
 
 	/**
+	 * Has the page at this path been published?
+≈	 * @param $query
+	 * @return mixed
+	 */
+	public function scopeIsPublished($query)
+	{
+		return $query->whereExists(function($query) {
+			$query->select('id')
+					->from('pages AS p2')
+					->whereRaw('pages.site_id = p2.site_id')
+					->whereRaw('pages.path = p2.path')
+					->where('p2.version', '=', Page::STATE_PUBLISHED);
+		});
+		// would probably be more efficient sql to use the join below
+		// but without adding some select() constraints laravel will build
+		// a query that makes mysql cry about ambiguous columns
+//  		return $query->join('pages AS p2', function($join) {
+//			$join->on('p2.site_id', '=', 'site_id')
+//				->on('p2.path', '=', 'path')
+//				->on('p2.version', '=', Page::STATE_PUBLISHED);
+//		});
+	}
+
+	/**
 	 * Restrict query to draft version of the site.
 	 * @param $query
 	 * @return mixed
