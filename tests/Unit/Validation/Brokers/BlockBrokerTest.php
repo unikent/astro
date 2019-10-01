@@ -202,7 +202,6 @@ class BlockBrokerTest extends TestCase
 		$bv = new BlockBroker($this->block);
 
 		$data = ['categories_of_widgets' => []];
-
 		$bv->validate();
 
 		// invalid data will throw an exception and therefore this assertion will not be reached
