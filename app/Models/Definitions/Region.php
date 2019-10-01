@@ -75,7 +75,7 @@ class Region extends BaseDefinition
 		$sections = [];
 		foreach($this->sections as $section_def){
 			$section = [ 'name' => $section_def['name'], 'blocks' => []];
-			if($section_def['defaultBlocks']){
+			if(isset($section_def['defaultBlocks']) && !empty($section_def['defaultBlocks'])){
 				foreach($section_def['defaultBlocks'] as $block_id){
 					$block_def = Block::fromDefinitionFile(Block::locateDefinition($block_id));
 					if($block_def){
