@@ -52,4 +52,36 @@ class ValidateContentTest extends APICommandTestBase
 	{
 		return true;
 	}
+
+
+
+	/**
+	 * @test
+	 * @group api
+	 * @dataProvider authorizedUsersProvider
+	 * @param $user
+	 */
+	public function updateContent_withMissingOptionalField_Is_Valid($user)
+	{
+		/*
+		$page = $this->site->draftHomepage;
+		$revision = $page->revision;
+		$old_revision_id = $page->revision_id;
+		$payload = [
+			'blocks' => $revision->blocks
+		];
+		$response = $this->makeRequestAndTestStatusCode($this->$user, $payload, 200);
+		$page->refresh();
+		$this->assertEquals($old_revision_id, $page->revision_id);
+		*/
+	}
+
 }
+
+/*
+ideas...
+if item has content then it should fit in min and max
+if item has no content then it should be valid
+if item has content and it is less than min then it should be invalid
+if item has content and it is more than max then it should be invalid
+*/

@@ -48,6 +48,9 @@ class BlockBrokerTest extends TestCase
 
 		$this->assertArrayHasKey('number_of_widgets', $rules);
 		$this->assertNotEmpty($rules['number_of_widgets']);
+
+		$this->assertArrayHasKey('categories_of_widgets', $rules);
+		$this->assertNotEmpty($rules['categories_of_widgets']);
 	}
 
 	/**
@@ -57,10 +60,21 @@ class BlockBrokerTest extends TestCase
 	{
 		$bv = new BlockBroker($this->block);
 		$rules = $bv->getRules();
-
 		$this->assertArrayHasKey('content', $rules);
 		$this->assertContains('present', $rules['content']);
 		$this->assertContains('required', $rules['content']);
+	}
+
+	/**
+	 * @test
+	 */
+	public function getRules_WhenDefinitionHasOptionalRule_TransformsNotRequiredRule()
+	{
+		$bv = new BlockBroker($this->block);
+		$rules = $bv->getRules();
+
+		$this->assertArrayHasKey('categories_of_widgets', $rules);
+		$this->assertNotContains('required', $rules['categories_of_widgets']);
 	}
 
 	/**
@@ -178,6 +192,21 @@ class BlockBrokerTest extends TestCase
 
         $this->expectException(ValidationException::class);
 		$bv->validate();
+	}
+
+	/**
+	 * @test
+	 */
+	public function validate_WhenOptionalMultiSelectIsEmpty_DoesNotThrowException()
+	{
+		$bv = new BlockBroker($this->block);
+
+		$data = ['categories_of_widgets' => []];
+
+		$bv->validate();
+
+		// invalid data will throw an exception and therefore this assertion will not be reached
+		$this->assertTrue(true);
 	}
 
 }
