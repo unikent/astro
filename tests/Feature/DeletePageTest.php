@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 use App\Models\Page;
+use App\Models\DeletedPage;
+use App\Models\LocalAPIClient;
 
 class DeletePageTest extends APICommandTestBase
 {
@@ -63,7 +65,6 @@ class DeletePageTest extends APICommandTestBase
 	/**
 	 * @test
 	 * @group api
-	 * @group wip
 	 * @param $user
 	 * @dataProvider authorizedUsersProvider
 	 */
@@ -74,9 +75,126 @@ class DeletePageTest extends APICommandTestBase
 		$response = $this->makeRequestAndTestStatusCode($this->$user, null, 200);
 		$this->multiPageSite->draftHomepage->refresh();
 		$childrenAfterDelete = count($this->multiPageSite->draftHomepage->children);
-		
+
 		$this->assertNull(Page::find($this->pageToDelete->id));
 		$this->assertNull($this->multiPageSite->draftHomepage->children->find($this->pageToDelete->id));
-		$this->assertTrue($childrenBeforeDelete - $childrenAfterDelete === 1);
+		$this->assertTrue($childrenBeforeDelete - 1 === $childrenAfterDelete);
+		$this->assertNotNull(DeletedPage::where('path','=',$this->pageToDelete->path)->where('revision_id','=',$this->pageToDelete->revision_id)->first());	
 	}
+
+	/**
+	 * @test
+	 * @group api
+	 * @param $user
+	 * @dataProvider authorizedUsersProvider
+	 */
+	public function deletePage_withValidUserAndPublishedPage_DeletesThePage($user)
+	{
+		$this->pageToDelete = $this->publishableMultiPageSite->draftHomepage->children[1];
+		$api = new LocalAPIClient($this->admin);
+		$api->publishPage($this->publishableMultiPageSite->draftHomepage->id);
+		$api->publishPage($this->pageToDelete->id);
+
+		$childrenBeforeDelete = count($this->publishableMultiPageSite->draftHomepage->children);
+		$response = $this->makeRequestAndTestStatusCode($this->$user, null, 200);
+		$this->publishableMultiPageSite->draftHomepage->refresh();
+		$childrenAfterDelete = count($this->publishableMultiPageSite->draftHomepage->children);
+
+		$this->assertNull(Page::find($this->pageToDelete->id));
+		$this->assertNull($this->publishableMultiPageSite->draftHomepage->children->find($this->pageToDelete->id));
+		$this->assertTrue($childrenBeforeDelete - 1 === $childrenAfterDelete);
+		$this->assertNotNull(DeletedPage::where('path','=',$this->pageToDelete->path)->where('revision_id','=',$this->pageToDelete->revision_id)->first());	
+	}
+
+	/**
+	 * @test
+	 * @group api
+	 * @group wip
+	 * @param $user
+	 * @dataProvider authorizedUsersProvider
+	 */
+	public function deletePage_withValidUserAndPublishedPageWithChildren_DeletesThePage($user)
+	{
+		$this->pageToDelete = $this->publishableMultiPageSite->draftHomepage->children[0];
+
+		foreach ($this->publishableMultiPageSite->draftHomepage->descendantsAndSelf()->get() as $descendant) {
+			$api = new LocalAPIClient($this->admin);
+			$api->publishPage($descendant->id);
+			// check that they have been published
+			$this->assertNotNull(
+				Page::findBySiteAndPath($this->publishableMultiPageSite->id, $descendant->path, Page::STATE_PUBLISHED)
+			);
+		}
+
+		$deletedPages = [];
+		foreach ($this->pageToDelete->descendantsAndSelf()->get() as $descendantToDelete) {
+			$deletedPages[] = [
+				'id' => $descendantToDelete->id,
+				'path' => $descendantToDelete->path,
+				'draft_revision_id' => $descendantToDelete->revision_id,
+				'published_revision_id' => $descendantToDelete->publishedVersion()->revision_id
+			];
+		}
+
+		$descendantsBeforeDelete = count($this->publishableMultiPageSite->draftHomepage->descendants()->get());
+		$response = $this->makeRequestAndTestStatusCode($this->$user, null, 200);
+		$this->publishableMultiPageSite->draftHomepage->refresh();
+		$descendantsAfterDelete = count($this->publishableMultiPageSite->draftHomepage->descendants()->get());
+
+		$this->assertNull(Page::find($this->pageToDelete->id));
+		$this->assertNull($this->publishableMultiPageSite->draftHomepage->children->find($this->pageToDelete->id));
+		$this->assertTrue($descendantsBeforeDelete - $descendantsAfterDelete === 4);
+		foreach ($deletedPages as $deletedPage) {
+			$this->assertNotNull(
+				DeletedPage::where('path','=',$deletedPage['path'])
+					->where('revision_id','=',$deletedPage['draft_revision_id'])
+					->first()
+			);
+			//check that published pages have been unpublished
+			$this->assertNull(
+				Page::findBySiteAndPath($this->publishableMultiPageSite->id, $deletedPage['path'], Page::STATE_PUBLISHED)
+			);
+		}
+
+	}
+
+	/**
+	 * @test
+	 * @group api
+	 * @param $user
+	 * @dataProvider authorizedUsersProvider
+	 */
+	public function deletePage_withValidUserAndUnPublishedPageWithChildren_DeletesThePage($user)
+	{
+		$this->pageToDelete = $this->publishableMultiPageSite->draftHomepage->children[0];
+
+		$deletedPages = [];
+		foreach ($this->pageToDelete->descendantsAndSelf()->get() as $descendantToDelete) {
+			$deletedPages[] = [
+				'id' => $descendantToDelete->id,
+				'path' => $descendantToDelete->path,
+				'revision_id' => $descendantToDelete->revision_id,
+			];
+		}
+
+		$descendantsBeforeDelete = count($this->publishableMultiPageSite->draftHomepage->descendants()->get());
+		$response = $this->makeRequestAndTestStatusCode($this->$user, null, 200);
+		$this->publishableMultiPageSite->draftHomepage->refresh();
+		$descendantsAfterDelete = count($this->publishableMultiPageSite->draftHomepage->descendants()->get());
+
+		$this->assertNull(Page::find($this->pageToDelete->id));
+		$this->assertNull($this->publishableMultiPageSite->draftHomepage->children->find($this->pageToDelete->id));
+		$this->assertTrue($descendantsBeforeDelete - $descendantsAfterDelete === 4);
+		foreach ($deletedPages as $deletedPage) {
+			$this->assertNotNull(
+				DeletedPage::where('path','=',$deletedPage['path'])
+					->where('revision_id','=',$deletedPage['revision_id'])
+					->first()
+			);
+		}
+
+	}
+
+
+
 }
