@@ -109,7 +109,6 @@ class DeletePageTest extends APICommandTestBase
 	/**
 	 * @test
 	 * @group api
-	 * @group wip
 	 * @param $user
 	 * @dataProvider authorizedUsersProvider
 	 */
