@@ -14,6 +14,12 @@ class BlockBrokerTest extends TestCase
 
 	protected $block;
 
+	protected $valid_data = [
+			"content" => 'this is some test',
+			"title_of_widget" => 'widget title',
+			"number_of_widgets" => '3',
+			"categories_of_widgets" => ['thingie-me-bob'],
+	];
 
 	public function setUp()
 	{
@@ -21,8 +27,8 @@ class BlockBrokerTest extends TestCase
 
 		Config::set('app.definitions_path', base_path('tests/Support/Fixtures/definitions'));
 
-        $file = BlockDefinition::locateDefinition('test-block-v1');
-        $this->block = BlockDefinition::fromDefinitionFile($file);
+		$file = BlockDefinition::locateDefinition('test-block-v1');
+		$this->block = BlockDefinition::fromDefinitionFile($file);
 	}
 
 
@@ -130,7 +136,6 @@ class BlockBrokerTest extends TestCase
 	}
 
 
-
 	/**
 	 * @test
 	 */
@@ -160,7 +165,7 @@ class BlockBrokerTest extends TestCase
 	{
 		$bv = new BlockBroker($this->block);
 
-		$data = [ 'number_of_widgets' => 23 ];
+		$data = $this->valid_data;
 		$validator = $bv->getValidator($data);
 
 		$this->assertEquals($data, $validator->getData());
@@ -183,29 +188,59 @@ class BlockBrokerTest extends TestCase
 
 	/**
 	 * @test
+	 * @group cfc7
 	 */
-	public function validate_WhenInvalid_ThrowsException()
+	public function validate_WhenInvalid_FailsValidation()
 	{
 		$bv = new BlockBroker($this->block);
 
-		$data = [ 'number_of_widgets' => 101 ];
+		$data = $this->valid_data;
 
-        $this->expectException(ValidationException::class);
-		$bv->validate();
+		// over 100 widgets is invalid
+		$data['number_of_widgets'] = 101;
+		$validator = $bv->getValidator($data);
+
+		$validationResult = $validator->passes();
+
+		$this->assertFalse($validationResult);
 	}
 
 	/**
 	 * @test
+	 * @group cfc7
 	 */
-	public function validate_WhenOptionalMultiSelectIsEmpty_DoesNotThrowException()
+	public function validate_WhenValid_PassesValidation()
 	{
 		$bv = new BlockBroker($this->block);
 
-		$data = ['categories_of_widgets' => []];
-		$bv->validate();
+		$data = $this->valid_data;
 
-		// invalid data will throw an exception and therefore this assertion will not be reached
-		$this->assertTrue(true);
+		// over 100 widgets is invalid
+		$data['number_of_widgets'] = 100;
+		$validator = $bv->getValidator($data);
+
+		$validationResult = $validator->passes();
+
+		$this->assertTrue($validationResult);
 	}
 
+	/**
+	 * @test
+	 * @group cfc7
+	 */
+	public function validate_WhenOptionalMultiSelectIsEmpty_PassesValidation()
+	{
+		$bv = new BlockBroker($this->block);
+
+		$data = $this->valid_data;
+
+		$data['categories_of_widgets'] = [];
+
+		$validator = $bv->getValidator($data);
+
+		$validationResult = $validator->passes();
+
+
+		$this->assertTrue($validationResult);
+	}
 }
