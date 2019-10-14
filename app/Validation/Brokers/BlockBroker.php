@@ -39,7 +39,6 @@ class BlockBroker extends DefinitionBroker
 					$newRules = [];
 					$oldRules = $rules[$fieldName];
 					foreach ($oldRules as $rule) {
-						// avoiding regexp because I am mental
 						$bits = explode('min:', $rule);
 						if (isset($bits[1])) {
 							$newRules[] = 'array_min_or_empty:' . $bits[1];

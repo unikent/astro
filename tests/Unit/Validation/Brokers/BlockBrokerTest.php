@@ -188,7 +188,6 @@ class BlockBrokerTest extends TestCase
 
 	/**
 	 * @test
-	 * @group cfc7
 	 */
 	public function validate_WhenInvalid_FailsValidation()
 	{
@@ -207,12 +206,10 @@ class BlockBrokerTest extends TestCase
 
 	/**
 	 * @test
-	 * @group cfc7
 	 */
 	public function validate_WhenValid_PassesValidation()
 	{
 		$bv = new BlockBroker($this->block);
-
 		$data = $this->valid_data;
 
 		// over 100 widgets is invalid
@@ -226,20 +223,17 @@ class BlockBrokerTest extends TestCase
 
 	/**
 	 * @test
-	 * @group cfc7
 	 */
 	public function validate_WhenOptionalMultiSelectIsEmpty_PassesValidation()
 	{
 		$bv = new BlockBroker($this->block);
-
 		$data = $this->valid_data;
 
+		// catergories_of_widgets is not required so empty should be valid
 		$data['categories_of_widgets'] = [];
 
 		$validator = $bv->getValidator($data);
-
 		$validationResult = $validator->passes();
-
 
 		$this->assertTrue($validationResult);
 	}
