@@ -22,13 +22,16 @@ class DeletePageTest extends APICommandTestBase
 	// the page object we want to delete
 	private $pageToDelete = null;
 
+	// request method
+	private $requestMethod = 'DELETE';
+
 	/**
 	 * Get the request method to use for this api command
 	 * @return string - The request method to use for this API request, e.g. GET, POST, DELETE.
 	 */
 	public function requestMethod()
 	{
-		return 'DELETE';
+		return $this->requestMethod;
 	}
 
 	/**
@@ -80,6 +83,8 @@ class DeletePageTest extends APICommandTestBase
 		$this->assertNull($this->multiPageSite->draftHomepage->children->find($this->pageToDelete->id));
 		$this->assertTrue($childrenBeforeDelete - 1 === $childrenAfterDelete);
 		$this->assertNotNull(DeletedPage::where('path','=',$this->pageToDelete->path)->where('revision_id','=',$this->pageToDelete->revision_id)->first());	
+		$this->requestMethod = 'GET';
+		$this->makeRequestAndTestStatusCode($this->$user, null, 404);
 	}
 
 	/**
@@ -103,7 +108,9 @@ class DeletePageTest extends APICommandTestBase
 		$this->assertNull(Page::find($this->pageToDelete->id));
 		$this->assertNull($this->publishableMultiPageSite->draftHomepage->children->find($this->pageToDelete->id));
 		$this->assertTrue($childrenBeforeDelete - 1 === $childrenAfterDelete);
-		$this->assertNotNull(DeletedPage::where('path','=',$this->pageToDelete->path)->where('revision_id','=',$this->pageToDelete->revision_id)->first());	
+		$this->assertNotNull(DeletedPage::where('path','=',$this->pageToDelete->path)->where('revision_id','=',$this->pageToDelete->revision_id)->first());
+		$this->requestMethod = 'GET';
+		$this->makeRequestAndTestStatusCode($this->$user, null, 404);
 	}
 
 	/**
@@ -155,6 +162,8 @@ class DeletePageTest extends APICommandTestBase
 			);
 		}
 
+		$this->requestMethod = 'GET';
+		$this->makeRequestAndTestStatusCode($this->$user, null, 404);
 	}
 
 	/**
@@ -192,8 +201,8 @@ class DeletePageTest extends APICommandTestBase
 			);
 		}
 
+		$this->requestMethod = 'GET';
+		$this->makeRequestAndTestStatusCode($this->$user, null, 404);
 	}
-
-
 
 }
