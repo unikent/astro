@@ -19,7 +19,7 @@ class ListSites implements APICommand
     public function execute($input, Authenticatable $user)
     {
         $sites = null;
-        if($user->isAdmin()){
+        if($user->isAdmin() || $user->isViewer()){
 			$sites = Site::get();
 		}else {
 			$sites = Site::whereIn('id', $user->roles->pluck('site_id'))->get();

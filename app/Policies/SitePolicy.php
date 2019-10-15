@@ -28,7 +28,7 @@ class SitePolicy extends BasePolicy
      */
     public function view(User $user, Site $site)
     {
-		return $user->hasPermissionForSite(Permission::VIEW_SITE, $site->id);
+		return $user->isViewer() || $user->hasPermissionForSite(Permission::VIEW_SITE, $site->id);
     }
 
 	/**
