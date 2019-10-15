@@ -7,6 +7,7 @@ use App\Models\Definitions\BaseDefinition;
 use App\Models\Definitions\SiteDefinition;
 use App\Models\Page;
 use App\Validation\Rules\LayoutExistsRule;
+use App\Validation\Rules\ArrayContentOptionalRule;
 use App\Validation\Rules\UniqueSitePathRule;
 use App\Validation\Rules\MaxLengthWithoutHtmlRule;
 use DB;
@@ -131,8 +132,36 @@ class AppServiceProvider extends ServiceProvider
 			 return $is;
 		});
 
+		/*
+		if the array is empty is empty then pass, otherwise check it meets the value in min
+		*/
+		Validator::extend('array_min_or_empty', function ($attribute, $value, $parameters, $validator) {
+			// we expect parameters to have at least one member
+			if (count($parameters) === 0) {
+				return false;
+			}
+
+			if (false === is_array($value)) {
+				return false;
+			}
+
+			// empty array passes
+			if (count($value) === 0) {
+				return true;
+			}
+
+			// filled array must have at least $parameters[0] members
+			if (count($value) < $parameters[0]) {
+				return false;
+			}
+
+			return true;
+		});
+
+
 		// Add a validation rule for checking the length of a string once all HTML is removed.
 		MaxLengthWithoutHtmlRule::register();
+
 	}
 
 	/**
