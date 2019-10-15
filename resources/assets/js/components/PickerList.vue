@@ -12,7 +12,7 @@
 				:class="[{ 'block-move--selected': selected.indexOf(key) !== -1 }]"
 				@mousedown="handleMousedown(key)"
 			>
-				<img class="block-move__image" :src="blockImageUrl(item.name+'.png')" width="100%">
+				<img class="block-move__image" :src="blockImageUrl(item)" width="100%" onerror="this.style.display='none'">
 				<h3>{{ item.label }}</h3>
 				<p>{{ item.info }}</p>
 			</div>
@@ -95,8 +95,8 @@ export default {
 	},
 
 	methods: {
-		blockImageUrl(url) {
-			return blockImageUrl(url);
+		blockImageUrl(block) {
+			return blockImageUrl(block.name+'-v'+block.version+'.png');
 		},
 		handleMousedown(name) {
 			const current = this.selected.indexOf(name);

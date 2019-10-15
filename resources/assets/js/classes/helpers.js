@@ -214,5 +214,5 @@ export const assetsUrl = (path) => {
 	* @returns {String} - the full URL to the block images, taking into account the configured block images base url.
 	*/
 export const blockImageUrl = (path) => {
-	return Config.get("block_image_url") + path;
+	return Config.get("block_image_url") + '/' + path;
 };

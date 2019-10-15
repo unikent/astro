@@ -30,7 +30,7 @@
 		'draft_url_pattern' => config('editor.app_preview_url_pattern'),
 		'assets_base_url' => config('definitions.assets_base_url'),
 		'placeholder_image_url' => config('definitions.placeholder_image_url'),
-		'block_image_url' => config('definitions.block_image_url'),
+		'block_image_url' => asset('/build/img/definitions/blocks'),
 		'help_url' => config('editor.help_url'),
 		'help_media_url' => config('editor.help_media_url'),
 		'auth_url' => config('editor.auth_url'),

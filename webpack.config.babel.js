@@ -208,8 +208,18 @@ export default {
 			{
 				from: 'node_modules/tinymce/skins',
 				to: 'css/tinymce/skins'
-			} 
-		]), 
+			},
+			{
+				from: process.env.DEFINITIONS_PATH + '/blocks/*/*/image.png',
+				to: 'img',
+				transformPath(targetPath, absolutePath) {
+					targetPath = targetPath.replace(/^.*\/([a-z0-9_-]+)\/(v[0-9]+)\/image\.png$/i, 'img/definitions/blocks/$1-$2.png');
+					console.log(targetPath);
+					return targetPath;
+				}
+			}
+		], { logLevel: 'debug' }
+		),
 	],
 
 	resolve: {

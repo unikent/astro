@@ -25,10 +25,6 @@ return [
 	// RELATIVE to assets_base_url
 	'placeholder_image_url' => env('PLACEHOLDER_IMAGE_URL', '/kent-theme-assets/assets/images/placeholder.jpg'),
 
-	//  The path to use for the block images,
-	// RELATIVE to assets_base_url
-	'block_image_url' => env('BLOCK_IMAGE_URL', '/kent-theme-assets/assets/images/blocks/'),
-
 	// Set to true to enable google tag manager in templates
 	'enable_tagmanager' => env('ENABLE_TAGMANAGER', false),
 
