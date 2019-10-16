@@ -31,7 +31,8 @@ const state = {
 	loaded: false,
 	currentSavedState: '',
 	invalidBlocks: [],
-	currentPageArrayPath: null
+	currentPageArrayPath: null,
+    currentLayoutLabel: null,
 };
 
 const mutations = {
@@ -231,8 +232,11 @@ const mutations = {
 
 	setCurrentPageArrayPath(state, arrayPath) {
 		state.currentPageArrayPath = arrayPath;
-	}
+	},
 
+	setCurrentLayoutLabel(state, label) {
+	    state.currentLayoutLabel = label;
+    },
 };
 
 const actions = {
@@ -246,14 +250,14 @@ const actions = {
 
 				return api
 					.get(`layouts/${page.layout.name}-v${page.layout.version}/definition?include=region_definitions.block_definitions`)
-					.then(({ data: region }) => {
+					.then(({ data: region}) => {
 						region.data.region_definitions.forEach(region => {
 							Definition.addRegionDefinition(region);
 							region.block_definitions.forEach(definition => {
 								Definition.set(definition);
 							});
 						});
-
+                        commit('setCurrentLayoutLabel', region.data.label);
 						commit('setBlockDefinitions', Definition.definitions, { root: true });
 						commit('setPage', _.cloneDeep(page));
 						dispatch('initialiseBlocksAndValidate', state.pageData.blocks);
@@ -749,7 +753,11 @@ const getters = {
 		}
 
 		return breadcrumbs;
-	}
+	},
+
+    currentLayoutLabel(state) {
+	    return state.currentLayoutLabel;
+    }
 
 };
 
