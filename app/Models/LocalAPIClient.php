@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Exceptions\MethodNotSupportedException;
 use App\Models\APICommands\ListSites;
 use App\Models\APICommands\PublishPage;
 use App\Models\APICommands\UnpublishPage;
@@ -116,7 +117,7 @@ class LocalAPIClient implements APIClient
 	 * Get the sites available to the current user.
 	 * @return null|Collection
 	 */
-	public function getSites()
+	public function getSites($version = 'draft')
 	{
 		return $this->execute(ListSites::class, [
 		]);
@@ -149,9 +150,9 @@ class LocalAPIClient implements APIClient
 	 * @param int|null $next_id
 	 * @param string $slug
 	 * @param array $layout [ 'name' => 'layout-name', 'version' => 'layout-version']
-	 * @param array $options
+	 * @param $title
 	 * @return string json
-	 * @throws
+	 * @internal param array $options
 	 */
 	public function addPage($parent_id, $next_id, $slug, $layout, $title)
 	{
@@ -196,6 +197,7 @@ class LocalAPIClient implements APIClient
 	/**
 	 * @param $draft_id int The id of the draft page content to update.
 	 * @param array $regions Array of [region-name] => [block1, block2, etc]
+	 * @return object
 	 */
 	public function updatePageContent($page_id, $regions)
 	{
@@ -229,6 +231,7 @@ class LocalAPIClient implements APIClient
 	 * @param int $page_id The Page ID
 	 * @param null|string $new_title Updated page title or null to not update.
 	 * @param null|array $options Optional page settings / options to update if present.
+	 * @return object
 	 */
 	public function updatePage($page_id, $new_title = null, $options = null)
 	{
@@ -310,4 +313,16 @@ class LocalAPIClient implements APIClient
 		throw new \LogicException('Delete site not yet implemented.');
 	}
 
+	/**
+	 * Request the json result for the site/{id}?include=$include&version=$version endpoint
+	 * @param $id
+	 * @param string $version
+	 * @param string $include
+	 * @return array representation of site data
+	 * @throws MethodNotSupportedException
+	 */
+	public function getSite($id, $version = 'published', $include = '')
+	{
+		throw new MethodNotSupportedException('getSite is not supported');
+	}
 }

@@ -26,7 +26,7 @@ class ResolveRequest extends FormRequest
     public function rules()
     {
         return [
-            'path' => 'required',
+            'path' => ['string','nullable'],
             'host' => 'required'
         ];
     }
