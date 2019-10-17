@@ -119,13 +119,23 @@ export default {
 				}
 			},
 
-			{
-				test: /\.svg$/,
-				exclude: /node_modules/,
-				loader: 'external-svg-sprite-loader'
-			},
+            {
+                test: /\.svg$/,
+                exclude: [/node_modules/, /assets\/img\/svg/],
+                loader: 'external-svg-sprite-loader'
+            },
 
-			{
+            {
+                test: /\.svg$/,
+                exclude: [/node_modules/],
+                include: /assets\/img\/svg/,
+                loader: 'html-loader',
+                options: {
+                    minimize: true,
+                }
+            },
+
+            {
 				test: /\.(woff2?|ttf|eot|svg|otf)$/,
 				include: /node_modules/,
 				loader: 'file-loader',
