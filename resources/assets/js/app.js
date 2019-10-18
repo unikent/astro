@@ -16,6 +16,9 @@ import './directives/focus';
 
 import App from './views/App';
 
+import SVGIcon from 'components/SVGIcon';
+Vue.component('svg-icon', SVGIcon);
+
 /* global document */
 
 Vue.use(VueRouter);
