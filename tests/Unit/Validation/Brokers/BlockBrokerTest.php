@@ -61,6 +61,26 @@ class BlockBrokerTest extends TestCase
 
 	/**
 	 * @test
+	 *
+	 * 'optional_widget_colours' is a multiselect field with no rules
+	 * this incorrectly triggered a validation exception - this is a regression test for that
+	 * see: https://trello.com/c/C22P3ISc/131-bug-fix-validation-issue-with-multiselect-and-collection-fields-which-do-not-have-any-validation-rules-set
+	 */
+	public function getRules_ReturnsNoValidationRulesForFieldsWithoutRules()
+	{
+		$bv = new BlockBroker($this->block);
+		$rules = $bv->getRules();
+		$fields = $this->block->fields;
+
+		// check to see if the optional field exists
+		$this->assertTrue('optional_widget_colours' === $fields[4]['name']);
+
+		// check that no rules exist for that field
+		$this->assertArrayNotHasKey('optional_widget_colours', $rules);
+	}
+
+	/**
+	 * @test
 	 */
 	public function getRules_WhenDefinitionHasRequiredRule_TransformsRequiredRule()
 	{
