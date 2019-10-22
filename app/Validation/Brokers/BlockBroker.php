@@ -34,9 +34,9 @@ class BlockBroker extends DefinitionBroker
 
 			// if we have a multiselect/collection which is not required then allow it to be empty
 			if (in_array($field['type'], ['multiselect', 'collection'])) {
-				// do we have and validation rules?
+				// do we have any validation rules?
 				if (isset($field['validation'])) {
-					// is this field required?
+					// and is this field required?
 					if (!in_array('required', $field['validation'])) {
 						$newRules = [];
 						$oldRules = $rules[$fieldName];
