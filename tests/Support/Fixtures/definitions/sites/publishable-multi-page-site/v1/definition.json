@@ -1,0 +1,44 @@
+{
+	"name": "publishable-multi-page-site",
+	"version": 1,
+	"label": "publishable-multi-page-site",
+	"defaultPages": {
+		"slug": "",
+		"title": "Home",
+		"layout": "layout-with-valid-region-with-valid-block-v1",
+		"children": [
+			{
+				"slug": "first_child",
+				"title": "First child",
+				"layout": "layout-with-valid-region-with-valid-block-v1",
+				"children": [
+					{
+						"slug": "first_child_of_first_child",
+						"title": "First child of first child",
+						"layout": "layout-with-valid-region-with-valid-block-v1"
+					},
+					{
+						"slug": "second_child_of_first_child",
+						"title": "Second child of first child",
+						"layout": "layout-with-valid-region-with-valid-block-v1"
+					},
+					{
+						"slug": "third_child_of_first_child",
+						"title": "Third child of first child",
+						"layout": "layout-with-valid-region-with-valid-block-v1"
+					}
+				]
+			},
+			{
+				"slug": "second_child",
+				"title": "Second child",
+				"layout": "layout-with-valid-region-with-valid-block-v1"
+			},
+			{
+				"slug": "third_child",
+				"title": "Third child",
+				"layout": "layout-with-valid-region-with-valid-block-v1"
+			}
+		]
+	}
+}

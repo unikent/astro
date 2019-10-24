@@ -14,6 +14,12 @@ class BlockBrokerTest extends TestCase
 
 	protected $block;
 
+	protected $valid_data = [
+			"content" => 'this is some test',
+			"title_of_widget" => 'widget title',
+			"number_of_widgets" => '3',
+			"categories_of_widgets" => ['thingie-me-bob'],
+	];
 
 	public function setUp()
 	{
@@ -21,8 +27,8 @@ class BlockBrokerTest extends TestCase
 
 		Config::set('app.definitions_path', base_path('tests/Support/Fixtures/definitions'));
 
-        $file = BlockDefinition::locateDefinition('test-block-v1');
-        $this->block = BlockDefinition::fromDefinitionFile($file);
+		$file = BlockDefinition::locateDefinition('test-block-v1');
+		$this->block = BlockDefinition::fromDefinitionFile($file);
 	}
 
 
@@ -48,6 +54,29 @@ class BlockBrokerTest extends TestCase
 
 		$this->assertArrayHasKey('number_of_widgets', $rules);
 		$this->assertNotEmpty($rules['number_of_widgets']);
+
+		$this->assertArrayHasKey('categories_of_widgets', $rules);
+		$this->assertNotEmpty($rules['categories_of_widgets']);
+	}
+
+	/**
+	 * @test
+	 *
+	 * 'optional_widget_colours' is a multiselect field with no rules
+	 * this incorrectly triggered a validation exception - this is a regression test for that
+	 * see: https://trello.com/c/C22P3ISc/131-bug-fix-validation-issue-with-multiselect-and-collection-fields-which-do-not-have-any-validation-rules-set
+	 */
+	public function getRules_ReturnsNoValidationRulesForFieldsWithoutRules()
+	{
+		$bv = new BlockBroker($this->block);
+		$rules = $bv->getRules();
+		$fields = $this->block->fields;
+
+		// check to see if the optional field exists
+		$this->assertTrue('optional_widget_colours' === $fields[4]['name']);
+
+		// check that no rules exist for that field
+		$this->assertArrayNotHasKey('optional_widget_colours', $rules);
 	}
 
 	/**
@@ -57,10 +86,21 @@ class BlockBrokerTest extends TestCase
 	{
 		$bv = new BlockBroker($this->block);
 		$rules = $bv->getRules();
-
 		$this->assertArrayHasKey('content', $rules);
 		$this->assertContains('present', $rules['content']);
 		$this->assertContains('required', $rules['content']);
+	}
+
+	/**
+	 * @test
+	 */
+	public function getRules_WhenDefinitionHasOptionalRule_TransformsNotRequiredRule()
+	{
+		$bv = new BlockBroker($this->block);
+		$rules = $bv->getRules();
+
+		$this->assertArrayHasKey('categories_of_widgets', $rules);
+		$this->assertNotContains('required', $rules['categories_of_widgets']);
 	}
 
 	/**
@@ -116,7 +156,6 @@ class BlockBrokerTest extends TestCase
 	}
 
 
-
 	/**
 	 * @test
 	 */
@@ -146,7 +185,7 @@ class BlockBrokerTest extends TestCase
 	{
 		$bv = new BlockBroker($this->block);
 
-		$data = [ 'number_of_widgets' => 23 ];
+		$data = $this->valid_data;
 		$validator = $bv->getValidator($data);
 
 		$this->assertEquals($data, $validator->getData());
@@ -170,14 +209,52 @@ class BlockBrokerTest extends TestCase
 	/**
 	 * @test
 	 */
-	public function validate_WhenInvalid_ThrowsException()
+	public function validate_WhenInvalid_FailsValidation()
 	{
 		$bv = new BlockBroker($this->block);
 
-		$data = [ 'number_of_widgets' => 101 ];
+		$data = $this->valid_data;
 
-        $this->expectException(ValidationException::class);
-		$bv->validate();
+		// over 100 widgets is invalid
+		$data['number_of_widgets'] = 101;
+		$validator = $bv->getValidator($data);
+
+		$validationResult = $validator->passes();
+
+		$this->assertFalse($validationResult);
 	}
 
+	/**
+	 * @test
+	 */
+	public function validate_WhenValid_PassesValidation()
+	{
+		$bv = new BlockBroker($this->block);
+		$data = $this->valid_data;
+
+		// over 100 widgets is invalid
+		$data['number_of_widgets'] = 100;
+		$validator = $bv->getValidator($data);
+
+		$validationResult = $validator->passes();
+
+		$this->assertTrue($validationResult);
+	}
+
+	/**
+	 * @test
+	 */
+	public function validate_WhenOptionalMultiSelectIsEmpty_PassesValidation()
+	{
+		$bv = new BlockBroker($this->block);
+		$data = $this->valid_data;
+
+		// catergories_of_widgets is not required so empty should be valid
+		$data['categories_of_widgets'] = [];
+
+		$validator = $bv->getValidator($data);
+		$validationResult = $validator->passes();
+
+		$this->assertTrue($validationResult);
+	}
 }

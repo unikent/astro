@@ -146,17 +146,29 @@ trait CreatesFeatureFixtures
 		    'Multi Page Test Site', 'multi.test', '', ['name' => 'multi-page-site', 'version' => 1]
         );
 
+		$this->publishableMultiPageSite = $this->client->createSite(
+			'Publishable Multi Page Test Site',
+			'publishable-multi-page-site.com',
+			'',
+			['name'=>'publishable-multi-page-site','version'=>1]
+		);
+
+
 		$this->client->updateSiteUserRole($this->site->id,'editor', Role::EDITOR);
 		$this->client->updateSiteUserRole($this->site->id,'owner', Role::OWNER);
 		$this->client->updateSiteUserRole($this->site->id,'contributor', Role::CONTRIBUTOR);
+
+		$this->client->updateSiteUserRole($this->publishableSite->id, 'editor', Role::EDITOR);
+		$this->client->updateSiteUserRole($this->publishableSite->id, 'owner', Role::OWNER);
+		$this->client->updateSiteUserRole($this->publishableSite->id, 'contributor', Role::CONTRIBUTOR);
 
 		$this->client->updateSiteUserRole($this->multiPageSite->id,'editor', Role::EDITOR);
 		$this->client->updateSiteUserRole($this->multiPageSite->id,'owner', Role::OWNER);
 		$this->client->updateSiteUserRole($this->multiPageSite->id,'contributor', Role::CONTRIBUTOR);
 
-		$this->client->updateSiteUserRole($this->publishableSite->id, 'editor', Role::EDITOR);
-		$this->client->updateSiteUserRole($this->publishableSite->id, 'owner', Role::OWNER);
-		$this->client->updateSiteUserRole($this->publishableSite->id, 'contributor', Role::CONTRIBUTOR);
+		$this->client->updateSiteUserRole($this->publishableMultiPageSite->id, 'editor', Role::EDITOR);
+		$this->client->updateSiteUserRole($this->publishableMultiPageSite->id, 'owner', Role::OWNER);
+		$this->client->updateSiteUserRole($this->publishableMultiPageSite->id, 'contributor', Role::CONTRIBUTOR);
 
 		$this->createJWTsForUsers($this->allUsers);
 

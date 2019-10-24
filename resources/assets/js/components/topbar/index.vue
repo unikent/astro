@@ -6,6 +6,8 @@
 				<el-tag v-if="status.type" :type="status.type">{{ status.title }}</el-tag>
 			</div>
 			<span class="top-bar__url">
+				<span>{{ currentLayoutLabel }}</span>
+				-
 				<span v-if="publishStatus === 'draft' && !pageHasLayoutErrors">
 					<a :href="draftPreviewURL" target="_blank">{{ renderedURL }}</a>
 					<icon name="newwindow" aria-hidden="true" :width="12" :height="12" class="ico" />
@@ -47,6 +49,7 @@
 			...mapGetters([
 				'pageTitle',
 				'publishStatus',
+				'currentLayoutLabel',
 				'pagePath',
 				'sitePath',
 				'siteDomain',

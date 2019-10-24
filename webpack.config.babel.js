@@ -119,13 +119,23 @@ export default {
 				}
 			},
 
-			{
-				test: /\.svg$/,
-				exclude: /node_modules/,
-				loader: 'external-svg-sprite-loader'
-			},
+            {
+                test: /\.svg$/,
+                exclude: [/node_modules/, /assets\/img\/svg/],
+                loader: 'external-svg-sprite-loader'
+            },
 
-			{
+            {
+                test: /\.svg$/,
+                exclude: [/node_modules/],
+                include: /assets\/img\/svg/,
+                loader: 'html-loader',
+                options: {
+                    minimize: true,
+                }
+            },
+
+            {
 				test: /\.(woff2?|ttf|eot|svg|otf)$/,
 				include: /node_modules/,
 				loader: 'file-loader',
@@ -208,8 +218,20 @@ export default {
 			{
 				from: 'node_modules/tinymce/skins',
 				to: 'css/tinymce/skins'
-			} 
-		]), 
+			},
+			{
+				from: process.env.DEFINITIONS_PATH + '/blocks/*/*/image.png',
+				to: 'img',
+				transformPath(targetPath, absolutePath) {
+					targetPath = targetPath.replace(
+						/^.*\/([a-z0-9_-]+)\/(v[0-9]+)\/image\.png$/i,
+						'img/definitions/blocks/$1-$2.png'
+					);
+					return targetPath;
+				}
+			}
+		], { logLevel: 'debug' }
+		),
 	],
 
 	resolve: {

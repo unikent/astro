@@ -17,7 +17,8 @@ class PagePolicy extends BasePolicy
      */
     public function read(User $user, Page $page)
     {
-    	return $user->hasPermissionForSite([
+    	return $user->isViewer() ||
+		    $user->hasPermissionForSite([
     		Permission::PREVIEW_PAGE,
 			Permission::PUBLISH_PAGE,
 			Permission::EDIT_SITE
