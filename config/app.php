@@ -193,7 +193,6 @@ $config = [
 	*/
 	'cache_scholarship_minutes' => env('CACHE_SCHOLARSHIP_MINUTES', 0),
 
-
 	/*
 	|--------------------------------------------------------------------------
 	| Autoloaded Service Providers
