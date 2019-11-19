@@ -48,7 +48,9 @@ class FindLinks extends Command
 	public function handle()
 	{
 		$site = Site::find(intval($this->option('site-id')));
-		$link = $this->option('link');
+		$linkToSearch = $this->option('link');
+		$linkToSearch = ltrim($linkToSearch, 'http://');
+		$linkToSearch = ltrim($linkToSearch, 'https://');
 		$published = $this->option('published');
 
 		// check we have a site
@@ -58,30 +60,37 @@ class FindLinks extends Command
 		}
 
 		// check we have a link
-		if (empty($link)) {
+		if (empty($linkToSearch)) {
 			$this->error("You need to specify the --link you would like to find.");
 			return;
 		}
 
 		$version = $published ? Page::STATE_PUBLISHED : Page::STATE_DRAFT;
-		$urls = [];
+		$urlsCount = 0;
 		foreach ($site->pages($version)->get() as $page) {
 			foreach ($page->revision->blocks as $regionName => $sections) {
 				foreach ($sections as $sectionName => $section) {
 					foreach ($section['blocks'] as $block) {
-						$definitionId = "{$block['definition_name']}-v{$block['definition_version']}";
-						$this->info('checking ' . $page->full_path . " - {$regionName} - {$section['name']} - $definitionId");
-						$definition = Block::fromDefinitionFile(Block::locateDefinition($definitionId));
-						$urls += $this->checkFields($definition->fields, $block['fields']);
+						$blockDefinitionId = "{$block['definition_name']}-v{$block['definition_version']}";
+						$definition = Block::fromDefinitionFile(Block::locateDefinition($blockDefinitionId));
+						$blockUrls = $this->getURLs($definition->fields, $block['fields'], $linkToSearch);
+						if (!empty($blockUrls)) {
+							$this->comment('Found matching URL(s) in: ' . $page->full_path . ", \n region: {$regionName}, \n section: {$section['name']}, \n block: $blockDefinitionId");
+							foreach ($blockUrls as $url) {
+								$this->info(" - {$url}");
+							}
+							$urlsCount += count($blockUrls);
+						}
 					}
 				}
 			}
 		}
-
-		dd($urls);
+		if (empty($urlsCount)) {
+			$this->comment("No URLs found matching '{$linkToSearch}'");
+		}
 	}
 
-	public function checkFields($fields, $data, $indent = 0)
+	public function getURLs($fields, $data, $search)
 	{
 		$urls = [];
 		foreach ($fields as $field) {
@@ -89,23 +98,22 @@ class FindLinks extends Command
 			if ($value) {
 				switch ($field['type']) {
 					case 'group':
-						$urls += $this->checkFields($field['fields'], $value, $indent+1);
+						$urls = array_merge($urls, $this->getURLs($field['fields'], $value, $search));
 						break;
 					case 'collection':
 						foreach ($value as $item) {
-							$urls += $this->checkFields($field['fields'], $item, $indent+1);
+							$urls = array_merge($urls, $this->getURLs($field['fields'], $item, $search));
 						}
 						break;
 					default:
-					// echo $field['type'] . ': ';
-					// var_dump($value);
 						if (is_array($value)) {
 							$value = print_r($value, true);
 						}
-						if (preg_match_all('/(http|https)\S+/', $value, $matches)) {
-								var_dump($matches);
+						if (preg_match_all('/(http|https):\/\/[^\s\'"]+/', $value, $matches)) {
 							foreach ($matches[0] as $match) {
-								$urls[] = $match;
+								if (strpos($match, $search) !== false) {
+									$urls[] = $match;
+								}
 							}
 						}
 						break;
