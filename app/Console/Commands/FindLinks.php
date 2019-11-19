@@ -19,7 +19,7 @@ class FindLinks extends Command
 	 */
 	protected $signature = 'astro:findlinks
 								{--site-id=}
-								{--link=}
+								{--search=}
 								{--published}
 								';
 
@@ -48,7 +48,7 @@ class FindLinks extends Command
 	public function handle()
 	{
 		$site = Site::find(intval($this->option('site-id')));
-		$linkToSearch = $this->option('link');
+		$linkToSearch = $this->option('search');
 		$linkToSearch = ltrim($linkToSearch, 'http://');
 		$linkToSearch = ltrim($linkToSearch, 'https://');
 		$published = $this->option('published');
