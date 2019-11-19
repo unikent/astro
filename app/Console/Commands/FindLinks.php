@@ -75,7 +75,7 @@ class FindLinks extends Command
 						$definition = Block::fromDefinitionFile(Block::locateDefinition($blockDefinitionId));
 						$blockUrls = $this->getURLs($definition->fields, $block['fields'], $linkToSearch);
 						if (!empty($blockUrls)) {
-							$this->comment('Found matching URL(s) in: ' . $page->full_path . ", \n region: {$regionName}, \n section: {$section['name']}, \n block: $blockDefinitionId");
+							$this->comment("Found matching URL(s) in: {$page->full_path} - {$page->revision->title} \n region: {$regionName} \n section: {$section['name']} \n block: $blockDefinitionId");
 							foreach ($blockUrls as $url) {
 								$this->info(" - {$url}");
 							}
