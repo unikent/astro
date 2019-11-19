@@ -26,6 +26,7 @@ class Kernel extends ConsoleKernel
 		Commands\SetSiteOption::class,
 		Commands\ViewSiteOptions::class,
 		Commands\CopySite::class,
+		Commands\FindLinks::class,
 	];
 
 	/**
