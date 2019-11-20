@@ -74,7 +74,7 @@ class FindLinks extends Command
 					foreach ($section['blocks'] as $block) {
 						$blockDefinitionId = "{$block['definition_name']}-v{$block['definition_version']}";
 						$definition = Block::fromDefinitionFile(Block::locateDefinition($blockDefinitionId));
-						$blockUrls = $this->findURLsInPageContent($definition->fields, $block['fields'], $linkToSearch);
+						$blockUrls = $this->findURLsInBlock($definition->fields, $block['fields'], $linkToSearch);
 						if (!empty($blockUrls)) {
 							$this->comment("Found matching URL" . (count($blockUrls) > 1 ? 's': ''). " in: {$page->full_path} - {$page->revision->title} \n region: {$regionName} \n section: {$section['name']} \n block: $blockDefinitionId");
 							foreach ($blockUrls as $url) {
@@ -105,7 +105,13 @@ class FindLinks extends Command
 		}
 	}
 
-	public function findURLsInPageContent($fields, $data, $search)
+	/**
+	 * Finds urls matching the given $search in a given block
+	 * @param $fields - the definition of the block
+	 * @param $data - the block's data
+	 * @param $search - the piece of text to search for
+	 */
+	public function findURLsInBlock($fields, $data, $search)
 	{
 		$urls = [];
 		foreach ($fields as $field) {
@@ -113,11 +119,11 @@ class FindLinks extends Command
 			if ($value) {
 				switch ($field['type']) {
 					case 'group':
-						$urls = array_merge($urls, $this->findURLsInPageContent($field['fields'], $value, $search));
+						$urls = array_merge($urls, $this->findURLsInBlock($field['fields'], $value, $search));
 						break;
 					case 'collection':
 						foreach ($value as $item) {
-							$urls = array_merge($urls, $this->findURLsInPageContent($field['fields'], $item, $search));
+							$urls = array_merge($urls, $this->findURLsInBlock($field['fields'], $item, $search));
 						}
 						break;
 					default:
