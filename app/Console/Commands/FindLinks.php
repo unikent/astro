@@ -61,7 +61,7 @@ class FindLinks extends Command
 
 		// check we have a link
 		if (empty($linkToSearch)) {
-			$this->error("You need to specify the --link you would like to find.");
+			$this->error("You need to specify the link you would like to find using --search= option.");
 			return;
 		}
 
