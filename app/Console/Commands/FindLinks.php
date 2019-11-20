@@ -65,6 +65,7 @@ class FindLinks extends Command
 			return;
 		}
 
+		// search within the contents of each page
 		$version = $published ? Page::STATE_PUBLISHED : Page::STATE_DRAFT;
 		$urlsCount = 0;
 		foreach ($site->pages($version)->get() as $page) {
@@ -73,9 +74,9 @@ class FindLinks extends Command
 					foreach ($section['blocks'] as $block) {
 						$blockDefinitionId = "{$block['definition_name']}-v{$block['definition_version']}";
 						$definition = Block::fromDefinitionFile(Block::locateDefinition($blockDefinitionId));
-						$blockUrls = $this->getURLs($definition->fields, $block['fields'], $linkToSearch);
+						$blockUrls = $this->findURLsInPageContent($definition->fields, $block['fields'], $linkToSearch);
 						if (!empty($blockUrls)) {
-							$this->comment("Found matching URL(s) in: {$page->full_path} - {$page->revision->title} \n region: {$regionName} \n section: {$section['name']} \n block: $blockDefinitionId");
+							$this->comment("Found matching URL" . (count($blockUrls) > 1 ? 's': ''). " in: {$page->full_path} - {$page->revision->title} \n region: {$regionName} \n section: {$section['name']} \n block: $blockDefinitionId");
 							foreach ($blockUrls as $url) {
 								$this->info(" - {$url}");
 							}
@@ -85,12 +86,26 @@ class FindLinks extends Command
 				}
 			}
 		}
+
+		// search within the site's menu
+		$menuVersion = $published ? 'menu_published' : 'menu_draft';
+		foreach ($site->options[$menuVersion] as $menuItem) {
+			if (strpos($menuItem['url'], $linkToSearch) !== false) {
+				$this->comment("Found matching URL in menu item: {$menuItem['text']}");
+				$this->info(" - {$menuItem['url']}");
+				$urlsCount += 1;
+			}
+		}
+
+		// final words
 		if (empty($urlsCount)) {
 			$this->comment("No URLs found matching '{$linkToSearch}'");
+		} else {
+			$this->comment("Found a total of {$urlsCount} URL" . ($urlsCount > 1 ? 's': ''));
 		}
 	}
 
-	public function getURLs($fields, $data, $search)
+	public function findURLsInPageContent($fields, $data, $search)
 	{
 		$urls = [];
 		foreach ($fields as $field) {
@@ -98,11 +113,11 @@ class FindLinks extends Command
 			if ($value) {
 				switch ($field['type']) {
 					case 'group':
-						$urls = array_merge($urls, $this->getURLs($field['fields'], $value, $search));
+						$urls = array_merge($urls, $this->findURLsInPageContent($field['fields'], $value, $search));
 						break;
 					case 'collection':
 						foreach ($value as $item) {
-							$urls = array_merge($urls, $this->getURLs($field['fields'], $item, $search));
+							$urls = array_merge($urls, $this->findURLsInPageContent($field['fields'], $item, $search));
 						}
 						break;
 					default:
