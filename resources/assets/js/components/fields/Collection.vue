@@ -127,7 +127,7 @@ export default {
 		addKeys() {
 			// get the current collection length minus how many keys we have
 			let length = this.currentValue.length - this.keys.length;
-			while(length--) {
+			while(length-- > 0) {
 				this.keys.push(this.incr++);
 			}
 		},
