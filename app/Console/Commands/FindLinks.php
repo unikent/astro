@@ -89,11 +89,14 @@ class FindLinks extends Command
 
 		// search within the site's menu
 		$menuVersion = $published ? 'menu_published' : 'menu_draft';
-		foreach ($site->options[$menuVersion] as $menuItem) {
-			if (strpos($menuItem['url'], $linkToSearch) !== false) {
-				$this->comment("Found matching URL in menu item: {$menuItem['text']}");
-				$this->info(" - {$menuItem['url']}");
-				$urlsCount += 1;
+		if (isset($site->options[$menuVersion])) {
+			$menuItems = $published ? $site->options[$menuVersion]['links'] : $site->options[$menuVersion];
+			foreach ($menuItems as $menuItem) {
+				if (strpos($menuItem['url'], $linkToSearch) !== false) {
+					$this->comment("Found matching URL in menu item: {$menuItem['text']}");
+					$this->info(" - {$menuItem['url']}");
+					$urlsCount += 1;
+				}
 			}
 		}
 
