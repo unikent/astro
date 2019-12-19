@@ -1,4 +1,4 @@
-image: "gitlab.kent.ac.uk:4567/webdev/astro/php7.1:dev"
+image: "gitlab.kent.ac.uk:4567/webdev/astro/php7.1:root-user"
 
 cache:
   key: "$CI_BUILD_REF_NAME-assets"
