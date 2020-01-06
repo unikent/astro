@@ -1215,9 +1215,9 @@
             "authors": [
                 {
                     "name": "Jeremy Lindblom",
-                    "role": "Developer",
                     "email": "jeremeamia@gmail.com",
-                    "homepage": "https://github.com/jeremeamia"
+                    "homepage": "https://github.com/jeremeamia",
+                    "role": "Developer"
                 }
             ],
             "description": "Serialize Closure objects, including their context and binding",
@@ -1314,8 +1314,8 @@
             "authors": [
                 {
                     "name": "Martin Kiesel",
-                    "role": "Developer",
-                    "email": "martin.kiesel@gmail.com"
+                    "email": "martin.kiesel@gmail.com",
+                    "role": "Developer"
                 }
             ],
             "description": "Package for handling column sorting in Laravel 5.4",
@@ -1565,8 +1565,8 @@
             "authors": [
                 {
                     "name": "Luís Otávio Cobucci Oblonczyk",
-                    "role": "Developer",
-                    "email": "lcobucci@gmail.com"
+                    "email": "lcobucci@gmail.com",
+                    "role": "Developer"
                 }
             ],
             "description": "A simple library to work with JSON Web Token and JSON Web Signature",
@@ -3966,19 +3966,19 @@
             "authors": [
                 {
                     "name": "Fabien Potencier",
-                    "role": "Lead Developer",
                     "email": "fabien@symfony.com",
-                    "homepage": "http://fabien.potencier.org"
+                    "homepage": "http://fabien.potencier.org",
+                    "role": "Lead Developer"
                 },
                 {
                     "name": "Armin Ronacher",
-                    "role": "Project Founder",
-                    "email": "armin.ronacher@active-4.com"
+                    "email": "armin.ronacher@active-4.com",
+                    "role": "Project Founder"
                 },
                 {
                     "name": "Twig Team",
-                    "role": "Contributors",
-                    "homepage": "https://twig.symfony.com/contributors"
+                    "homepage": "https://twig.symfony.com/contributors",
+                    "role": "Contributors"
                 }
             ],
             "description": "Twig, the flexible, fast, and secure template language for PHP",
@@ -3994,7 +3994,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/astro-kent-theme.git",
-                "reference": "25ae1307e8836495ece4f93a249200b72aabd03e"
+                "reference": "9dd0c66a02ad9231ce26d347dddc8fcc969ae63c"
             },
             "require": {
                 "ezyang/htmlpurifier": "4.10.0"
@@ -4014,7 +4014,7 @@
                 }
             },
             "description": "Our block views",
-            "time": "2019-11-04T09:57:03+00:00"
+            "time": "2020-01-02T15:45:09+00:00"
         },
         {
             "name": "unikent/astro-renderer",
@@ -4022,7 +4022,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/astro-renderer.git",
-                "reference": "5d53b5691c7d0536c807d82db73f78a6b54b12a5"
+                "reference": "9848b4d29a9f5ada204df15d5575a1cc7c71e60d"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.2",
@@ -4050,7 +4050,7 @@
                 }
             ],
             "description": "A simple renderer for Astro",
-            "time": "2019-10-16T10:55:47+00:00"
+            "time": "2019-12-09T09:55:42+00:00"
         },
         {
             "name": "unikent/kent-profiles",
