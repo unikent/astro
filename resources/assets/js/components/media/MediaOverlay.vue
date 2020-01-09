@@ -79,6 +79,7 @@ export default {
 	created() {
 		this.colours = null;
 		this.prettyNames = {
+			'url'         : 'URL',
 			'filename'    : 'File name',
 			'filesize'    : 'File size',
 			'type'        : 'File type',
@@ -126,7 +127,7 @@ export default {
 
 		getAttributes(media) {
 			return _.pick(media, [
-				'type', 'filename', 'filesize',
+				'url', 'type', 'filename', 'filesize',
 				'height', 'width', 'aspect_ratio'
 			]);
 		},
