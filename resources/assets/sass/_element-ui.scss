@@ -49,10 +49,19 @@
 		font-size: 14px;
 		font-weight: 500;
 		width: 100%;
+		line-height: 1.5;
 
 		span {
 			line-height: 1.5;
 		}
+	}
+
+	.el-form-item__help {
+		display: block;
+		font-size: 0.8rem;
+		line-height: 1.5;
+		font-weight: normal;
+		color: #aaa;
 	}
 
 	.el-form-item__icon-help {
