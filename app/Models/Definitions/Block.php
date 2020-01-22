@@ -72,7 +72,6 @@ class Block extends BaseDefinition
 	 * @return bool
 	 */
 	public function route($path, &$block, $page, $queryParameters = [])
-	// public function route($path, &$block, $page)
 	{
 		return false;
 	}
