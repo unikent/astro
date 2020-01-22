@@ -48,6 +48,7 @@ class PageTransformer extends FractalTransformer
 			'slug' => $page->slug,
 			'path' => $page->path,
 			'full_path' => $page->full_path,
+			'query_parameters' => $page->query_parameters,
 			'version' => $page->version,
 			'title' => $page->revision->title,
 			'layout' => [

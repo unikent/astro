@@ -28,13 +28,24 @@ trait ResolvesRoutes
 	 */
 	public function resolveRoute($host, $path, $version = Page::STATE_DRAFT, $includes = [])
 	{
+		// parse url to extract path and any query parameters
+		$parsedURL = parse_url($path);
+		$path = $parsedURL['path'];
+
+		// parse query params
+		$queryParameters = [];
+		if (isset($parsedURL['query'])) {
+			parse_str($parsedURL['query'], $queryParameters);
+		}
+
 		// Attempt to resolve the Route
 		$page = Page::findByHostAndPath($host, $path, $version);
 		// Attempt to resolve potential dynamic route
 		if(!$page) {
-			$page = $this->resolveDynamicRoute($host, $path, $version, $includes);
+			$page = $this->resolveDynamicRoute($host, $path, $version, $includes, $queryParameters);
 		}
 		if ($page) {
+			$page->query_parameters = $queryParameters;
 			$response = fractal($page, new PageTransformer(true))
 				->parseIncludes($includes)->respond();
 			return $response;
@@ -48,9 +59,10 @@ trait ResolvesRoutes
 	 * @param $path
 	 * @param $version
 	 * @param $includes
+	 * @param $queryParameters - array of query parameters
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	public function resolveDynamicRoute($host, $path, $version, $includes)
+	public function resolveDynamicRoute($host, $path, $version, $includes, $queryParameters)
 	{
 		$original_path = $path;
 		// remove trailing slash
@@ -66,7 +78,7 @@ trait ResolvesRoutes
 						foreach( $section['blocks'] as &$block) {
 							$definition = Block::fromDefinitionFile(Block::locateDefinition(Block::idFromNameAndVersion($block['definition_name'], $block['definition_version'])));
 							$block_path = substr($original_path, strlen($path));
-							$dynamic_page = $definition->route($block_path,$block,$page, $this);
+							$dynamic_page = $definition->route($block_path, $block, $page, $queryParameters, $this);
 							if($dynamic_page) {
 								return $dynamic_page;
 							}

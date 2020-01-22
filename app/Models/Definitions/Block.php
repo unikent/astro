@@ -68,9 +68,14 @@ class Block extends BaseDefinition
 	 * @param $path - Path to route
 	 * @param $block - Reference to the block data that is being returned as part of the page.
 	 * @param $page - The Page object.
+	 * @param array $queryParameters - query string parameters as key/value pairs
 	 * @return bool
 	 */
-	public function route($path, &$block, $page) {return false;}
+	public function route($path, &$block, $page, $queryParameters = [])
+	// public function route($path, &$block, $page)
+	{
+		return false;
+	}
 
 	/**
 	 * Called whenever a page containing this block is changed, created, deleted, moved, etc
