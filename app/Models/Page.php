@@ -24,6 +24,11 @@ class Page extends BaumNode
 {
 	public $table = 'pages';
 
+    /**
+     * @var array name => value array of query parameters used when this page was requested.
+     */
+	public $query_parameters = [];
+
 	public $timestamps = false;
 
 	protected $fillable = [
