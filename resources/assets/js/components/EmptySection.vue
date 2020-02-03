@@ -2,15 +2,15 @@
 <div v-else class="empty-region">
 
 	<el-alert
-		title="We left this space free for you to add some optional blocks to your page."
-		description="This message won't appear on your webpage, but you can add a block here if you'd like to."
+		title="Page section"
+		description="This section of the page is free for you to add one or more optional blocks. This message won't appear on your webpage, but you can add some blocks here if you'd like to."
 		type="info"
 		:closable="false"
 		show-icon
 	>
 	</el-alert>
 
-	<el-button size="large" @click="addBlocks">Add a block</el-button>
+	<el-button size="large" @click="addBlocks">Add a block to this section</el-button>
 </div>
 </template>
 

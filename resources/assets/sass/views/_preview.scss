@@ -30,8 +30,8 @@
 .block-overlay {
 	top: 0;
 	opacity: 1;
-	border-width: 2px;
-	border-style: dotted;
+	border-width: 4px;
+	border-style: dashed;
 	max-width: 100%;
 }
 
@@ -79,7 +79,7 @@
 .block-overlay__buttons {
 	position: absolute;
 	top: 15px;
-	right: 15px;
+	left: 15px;
 }
 
 .move-up,
@@ -124,6 +124,7 @@
 	position: relative;
 	will-change: transform;
 	min-height: 60px;
+	padding: 2px 0;
 }
 
 .block {
@@ -171,6 +172,9 @@
 	pointer-events: auto;
 	transition: .3s all ease-in-out;
 	text-align: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 
 	&:hover {
 		cursor: pointer;
@@ -186,10 +190,10 @@
 
 .add-before {
 	top: 0;
-	transform: translate(-50%, -50%) translateY(-2px);
+	transform: translate(-50%, -50%);
 
 	&:hover {
-		transform: translate(-50%, -50%) translateY(-2px) scale(1.1);
+		transform: translate(-50%, -50%) scale(1.1);
 		svg {
 			transform: scale(1);
 		}
@@ -198,9 +202,9 @@
 
 .add-after {
 	bottom: 0;
-	transform: translate(-50%, 50%) translateY(2px);
+	transform: translate(-50%, 50%);
 
 	&:hover {
-		transform: translate(-50%, 50%) translateY(2px) scale(1.1);
+		transform: translate(-50%, 50%) scale(1.1);
 	}
 }
