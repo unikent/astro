@@ -1,4 +1,3 @@
-
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
@@ -1905,6 +1904,7 @@
                 "cron",
                 "schedule"
             ],
+            "abandoned": "dragonmantank/cron-expression",
             "time": "2017-01-23T04:29:33+00:00"
         },
         {
@@ -3995,7 +3995,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/astro-kent-theme.git",
-                "reference": "15d36bbcde95cf78032aa2014ff140b5f21d567a"
+                "reference": "07d83b5ad644715e6e91d1f72b2056b9560ce2e3"
             },
             "require": {
                 "ezyang/htmlpurifier": "4.10.0"
@@ -4015,7 +4015,7 @@
                 }
             },
             "description": "Our block views",
-            "time": "2020-01-13T15:51:11+00:00"
+            "time": "2020-02-04T12:21:43+00:00"
         },
         {
             "name": "unikent/astro-renderer",
@@ -4059,7 +4059,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/kent-profiles.git",
-                "reference": "73566db4819a7d7db18e8d939402848e37656d89"
+                "reference": "a3ce5ffed0079b19974c6668c2e17528351ab80e"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.3"
@@ -4077,7 +4077,7 @@
                 }
             ],
             "description": "A laravel app to manage staff profiles at kent",
-            "time": "2019-10-02T14:58:35+00:00"
+            "time": "2020-01-23T15:54:52+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -4246,6 +4246,7 @@
                 "selenium",
                 "webdriver"
             ],
+            "abandoned": "php-webdriver/webdriver",
             "time": "2019-06-13T08:02:18+00:00"
         },
         {
