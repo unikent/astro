@@ -9,6 +9,7 @@ use Astro\Renderer\Base\SingleDefinitionsFolderLocator;
 use Astro\Renderer\Engines\TwigEngine;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 
 /**
@@ -26,9 +27,9 @@ class PageController extends Controller
 	 * @param string $path - The full path to the current page.
 	 * @return string - Rendered page HTML with "preview bar" injected.
 	 */
-	public function draft($host, $path = '')
+	public function draft($host, $path = '', Request $request)
 	{
-		return $this->renderRoute($host, $path, Page::STATE_DRAFT, [
+		return $this->renderRoute($host, $path, $request->query(),Page::STATE_DRAFT, [
 			[$this, 'addPreviewBar'],
 			[$this, 'replaceLinks']
 		]);
@@ -74,9 +75,9 @@ class PageController extends Controller
 	 * @param string $path - The full path to the current page.
 	 * @return string - Rendered page HTML
 	 */
-	public function published($host, $path = '')
+	public function published($host, $path = '', Request $request)
 	{
-		return $this->renderRoute($host, $path, Page::STATE_PUBLISHED);
+		return $this->renderRoute($host, $path, $request->query(), Page::STATE_PUBLISHED);
 	}
 
 	/**
@@ -87,10 +88,10 @@ class PageController extends Controller
 	 * @param array $filters - Array of optional callables to post-filter the rendered layout.
 	 * @return string - The rendered HTML output.
 	 */
-	public function renderRoute($host, $path, $version, $filters = [])
+	public function renderRoute($host, $path, $params, $version, $filters = [])
 	{
-		$path = '/' . $path;
-		$locator = new SingleDefinitionsFolderLocator(
+		$path = '/' . $path . $this->paramsToQueryString($params);
+        $locator = new SingleDefinitionsFolderLocator(
 			Config::get('app.definitions_path') ,
 			'Astro\Renderer\Base\Block',
 			'Astro\Renderer\Base\Layout'
@@ -108,4 +109,15 @@ class PageController extends Controller
 		$astro = new AstroRenderer();
 		return $astro->renderRoute($host, $path, $api, $engine, $locator, $version, $filters);
 	}
+
+    /**
+     * Build a query string from the array of parameters
+     * @param array $params - Array of query string parameters and values
+     * @return String - Query string preceded by '?' if not empty, otherwise empty string
+     */
+    public function paramsToQueryString($params)
+    {
+        $params = http_build_query($params);
+        return $params ? ('?' . $params ) : '';
+    }
 }
