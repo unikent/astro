@@ -199,7 +199,8 @@ class CheckDefns extends Command
             'datetime' => '',
             'nested' => '',
             'collection' => '',
-            'group' => ''
+            'group' => '',
+			'video' => ''
         ];
         if(!is_array($fields)){
             $errors[] = 'fields must be an array if present.';

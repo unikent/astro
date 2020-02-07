@@ -17,6 +17,7 @@ import DateTime      from './DateTime';
 import NestedOptions from './NestedOptions';
 import Link          from './Link';
 import Table         from './Table';
+import Video         from './Video';
 
 export default {
 	text:        Text,
@@ -37,5 +38,6 @@ export default {
 	datetime:    DateTime,
 	nested:      NestedOptions,
 	link:        Link,
-	table:        Table
+	table:        Table,
+	video: Video
 };
