@@ -53,4 +53,10 @@ return [
 
 	// site id of the site containing the pg course page renderer
 	'pg_course_page_site_id' => env('PG_COURSE_PAGE_SITE_ID', 0),
+
+	// site id of the site containing the ug profile renderer
+	'ug_profile_page_site_id' => env('UG_PROFILE_PAGE_SITE_ID', 0),
+
+	// site id of the site containing the pg profile renderer
+	'pg_profile_page_site_id' => env('PG_PROFILE_PAGE_SITE_ID', 0),
 ];
