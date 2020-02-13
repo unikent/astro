@@ -185,6 +185,10 @@
 	border-radius: 4px;
 }
 
+.el-dialog__body {
+	word-break: normal;
+}
+
 .tabbed-dialog {
 	.el-tabs--border-card > .el-tabs__header {
 		background-color: #f7f9fb;
