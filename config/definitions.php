@@ -46,5 +46,20 @@ return [
 	'dynamic_options_cache_time' => env('DYNAMIC_OPTIONS_CACHE_TIME', 5*60),
 
 	// site id of the site containing guides and their taxonomies
-	'guide_site_id' => env('GUIDE_SITE_ID', 0)
+	'guide_site_id' => env('GUIDE_SITE_ID', 0),
+
+	// site id of the site containing the ug course page renderer
+	'ug_course_page_site_id' => env('UG_COURSE_PAGE_SITE_ID', 0),
+
+	// site id of the site containing the pg course page renderer
+	'pg_course_page_site_id' => env('PG_COURSE_PAGE_SITE_ID', 0),
+
+	// site id of the site containing the ug profile renderer
+	'ug_profile_page_site_id' => env('UG_PROFILE_PAGE_SITE_ID', 0),
+
+	// site id of the site containing the pg profile renderer
+	'pg_profile_page_site_id' => env('PG_PROFILE_PAGE_SITE_ID', 0),
+
+	// site id of the site containing the modules renderer
+	'module_page_site_id' => env('MODULE_PAGE_SITE_ID', 0),
 ];
