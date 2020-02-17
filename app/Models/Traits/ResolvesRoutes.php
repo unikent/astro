@@ -76,7 +76,6 @@ trait ResolvesRoutes
 						}
 					}
 				}
-				return null;
 			}
 		}
 		return null;
