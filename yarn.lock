@@ -4516,7 +4516,7 @@ just-extend@^1.1.27:
 
 "kent-theme-assets@git+ssh://git@gitlab.kent.ac.uk:webdev/kent-theme-assets":
   version "0.0.1"
-  resolved "git+ssh://git@gitlab.kent.ac.uk:webdev/kent-theme-assets#2c526a8b2221a421cf7966703861b165bf5de420"
+  resolved "git+ssh://git@gitlab.kent.ac.uk:webdev/kent-theme-assets#a9c54eb793790caf574ccdc848ef8973ce02a100"
   dependencies:
     axios "^0.19.0"
     vue "^2.6.10"
