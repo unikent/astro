@@ -38,6 +38,6 @@ export default {
 	datetime:    DateTime,
 	nested:      NestedOptions,
 	link:        Link,
-	table:        Table,
-	video: Video
+	table:       Table,
+	video:       Video
 };
