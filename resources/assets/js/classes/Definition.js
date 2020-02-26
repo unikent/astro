@@ -25,7 +25,8 @@ export default class Definition {
 		datetime   : '*',
 		nested     : 'array',
 		collection : 'array',
-		group      : 'object'
+		group      : 'object',
+		video      : 'object'
 	};
 
 	static definitions = {};

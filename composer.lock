@@ -3995,7 +3995,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/astro-kent-theme.git",
-                "reference": "2715753e3e37831ebf40741e29472acdf7b2eb47"
+                "reference": "0f75c30d737cc413c17b8ea58b7bbc9b96e0d59b"
             },
             "require": {
                 "ezyang/htmlpurifier": "4.10.0"
@@ -4015,7 +4015,7 @@
                 }
             },
             "description": "Our block views",
-            "time": "2020-02-18T14:46:50+00:00"
+            "time": "2020-02-26T10:11:13+00:00"
         },
         {
             "name": "unikent/astro-renderer",
@@ -4059,7 +4059,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/kent-profiles.git",
-                "reference": "a3ce5ffed0079b19974c6668c2e17528351ab80e"
+                "reference": "8dc703aab7afdad40e20288382b8b04699302552"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.3"
@@ -4077,7 +4077,7 @@
                 }
             ],
             "description": "A laravel app to manage staff profiles at kent",
-            "time": "2020-01-23T15:54:52+00:00"
+            "time": "2020-02-19T15:53:16+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -4193,12 +4193,12 @@
             "version": "1.7.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/facebook/php-webdriver.git",
+                "url": "https://github.com/php-webdriver/php-webdriver.git",
                 "reference": "e43de70f3c7166169d0f14a374505392734160e5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/facebook/php-webdriver/zipball/e43de70f3c7166169d0f14a374505392734160e5",
+                "url": "https://api.github.com/repos/php-webdriver/php-webdriver/zipball/e43de70f3c7166169d0f14a374505392734160e5",
                 "reference": "e43de70f3c7166169d0f14a374505392734160e5",
                 "shasum": ""
             },
