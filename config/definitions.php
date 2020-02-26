@@ -62,4 +62,7 @@ return [
 
 	// site id of the site containing the modules renderer
 	'module_page_site_id' => env('MODULE_PAGE_SITE_ID', 0),
+
+	// site id of the site containing the events renderer
+	'event_page_site_id' => env('EVENT_PAGE_SITE_ID', 0),
 ];
