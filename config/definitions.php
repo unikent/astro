@@ -63,6 +63,31 @@ return [
 	// site id of the site containing the modules renderer
 	'module_page_site_id' => env('MODULE_PAGE_SITE_ID', 0),
 
+    'cache' => [
+        'courses' => [
+            'all' => env('CACHE_COURSES_ALL_SECS', 0),  // seconds to cache list of all courses
+            'single' => env('CACHE_COURSES_SINGLE_SECS', 0),  // seconds to cache individual course details
+        ],
+        'events' => [
+            'single' => env('CACHE_EVENTS_SINGLE_SECS', 0),  // seconds to cache single event details
+            'all' => env('CACHE_EVENTS_ALL_SECS', 0),  // seconds to cache list of events for
+        ],
+        'modules' => [
+            'collections' => env('CACHE_MODULES_COLLECTIONS_SECS', 0),  // seconds to cache the list of collections for
+            'subjects' => env('CACHE_MODULES_SUBJECTS_SECS', 0),  // seconds to cache the list of subjects for
+            'modules_collection_index' => env('CACHE_MODULES_COLLECTION_INDEX_SECS', 0),  // seconds to cache the index of module collections for
+            'module' => env('CACHE_MODULE_SECS', 0),  // seconds to cache the full individual module details for
+        ],
+        'student_profiles' => [
+            'all' => env('CACHE_STUDENT_PROFILES_ALL_SECS', 0),  //  seconds to cache a listing of student profiles for
+            'single' => env('CACHE_STUDENT_PROFILES_SINGLE_SECS', 0),  // seconds to cache full details of a single student profile
+        ],
+        'maps' => [
+            'features' => env('CACHE_MAPS_FEATURES_SECS', 0),  // seconds to cache the listing of all maps features for
+        ],
+        'scholarship_minutes' => env('CACHE_SCHOLARSHIPS_MINUTES', 0),  // minutes to cache scholarship listing and details for
+    ],
+
 	// site id of the site containing the events renderer
 	'event_page_site_id' => env('EVENT_PAGE_SITE_ID', 0),
 ];
