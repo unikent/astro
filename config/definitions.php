@@ -87,4 +87,7 @@ return [
         ],
         'scholarship_minutes' => env('CACHE_SCHOLARSHIPS_MINUTES', 0),  // minutes to cache scholarship listing and details for
     ],
+
+	// site id of the site containing the events renderer
+	'event_page_site_id' => env('EVENT_PAGE_SITE_ID', 0),
 ];
