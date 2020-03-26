@@ -27,6 +27,7 @@ before_script:
   - eval $(ssh-agent -s)
   - ssh-add <(echo "$CI_SSH_KEY")
   - composer config -g github-oauth.github.com ${GITHUB_TOKEN}
+  - composer global require "hirak/prestissimo:^0.3"
   - composer validate --no-check-all --ansi
   - composer install --prefer-dist
   - export DEFINITIONS_PATH=`pwd`/vendor/unikent/astro-kent-theme
@@ -72,7 +73,7 @@ develop:
 master:
   stage: build-and-test
   script:
-    - vendor/bin/phpunit
+#    - vendor/bin/phpunit
     - yarn run validate
     - yarn run unit
     - rm -rf node_modules .git
