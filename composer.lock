@@ -6314,7 +6314,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/astro-renderer.git",
-                "reference": "111b7fa4c49ce5d24dbe71a7c5f8fdc280a925ad"
+                "reference": "9848b4d29a9f5ada204df15d5575a1cc7c71e60d"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.2",
