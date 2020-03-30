@@ -44,3 +44,7 @@ export { default as angleup }   from 'IconPath/angle-up.svg';
 export { default as angledown } from 'IconPath/angle-down.svg';
 export { default as write }     from 'IconPath/write.svg';
 export { default as h3 }        from 'IconPath/h3.svg';
+export { default as lightbulb } from 'IconPath/light-bulb.svg';
+export { default as rocket }    from 'IconPath/rocket.svg';
+export { default as announcement }    from 'IconPath/announcement.svg';
+export { default as bell }    from 'IconPath/bell.svg';

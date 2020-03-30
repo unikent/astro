@@ -13,6 +13,21 @@
 		</section>
 	</aside>
 	<div class="router-wrapper">
+		<el-card class="box-card" style="margin-bottom:2rem;background-color:#fdf6ec;">
+			<icon
+				name="bell"
+				:width="24"
+				:height="24"
+				viewBox="0 0 24 24"
+			/>
+			<a href="https://staff.kent.ac.uk/digital" target="_blank" style="margin-left:10px">Find out what's new in Site Editor</a>
+			<icon
+				name="newwindow"
+				:width="17"
+				:height="17"
+				viewBox="0 2 17 17"
+			/>
+		</el-card>
 		<router-view />
 	</div>
 </div>
@@ -32,6 +47,7 @@ export default {
 	props: ['site_id'],
 
 	components: {
+		Icon,
 		SideMenuItem: {
 			props: ['item'],
 
