@@ -20,7 +20,7 @@
 				:height="24"
 				viewBox="0 0 24 24"
 			/>
-			<a href="https://staff.kent.ac.uk/digital" target="_blank" style="margin-left:10px">Find out what's new in Site Editor</a>
+			<a href="https://blogs.kent.ac.uk/webdev/category/site-editor" target="_blank" style="margin-left:10px">Find out what's new in Site Editor</a>
 			<icon
 				name="newwindow"
 				:width="17"
