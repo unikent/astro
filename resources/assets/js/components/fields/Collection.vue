@@ -19,7 +19,7 @@
 					>
 						<template slot="label">
 							<span>{{ fieldDefinition.label }}</span>
-							<span class="el-form-item__help">{{ fieldDefinition.info }}</span>
+							<span class="el-form-item__help" v-html="fieldDefinition.info"></span>
 						</template>
 						<component
 							:is="getField(fieldDefinition.type)"
