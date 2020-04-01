@@ -23,7 +23,7 @@
 				>
 					<template slot="label" v-if="fieldDefinition.label">
 						<span>{{ fieldDefinition.label }}</span>
-						<span class="el-form-item__help">{{ fieldDefinition.info }}</span>
+						<span class="el-form-item__help" v-html="fieldDefinition.info"></span>
 
 						<!-- <el-tooltip content="Highlight field" placement="top">
 							<span
