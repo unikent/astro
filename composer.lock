@@ -1231,6 +1231,7 @@
                 "serialize",
                 "tokenizer"
             ],
+            "abandoned": "opis/closure",
             "time": "2018-03-21T22:21:57+00:00"
         },
         {
@@ -3995,7 +3996,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/astro-kent-theme.git",
-                "reference": "9125929e07053859168977a45cc6580f70d9b944"
+                "reference": "0ad144ec82f3b8287cf4be7c8c489c9dc900b91c"
             },
             "require": {
                 "ezyang/htmlpurifier": "4.10.0"
@@ -4015,7 +4016,7 @@
                 }
             },
             "description": "Our block views",
-            "time": "2020-03-26T16:04:32+00:00"
+            "time": "2020-04-03T07:58:57+00:00"
         },
         {
             "name": "unikent/astro-renderer",
