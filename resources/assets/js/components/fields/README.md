@@ -76,7 +76,7 @@ Input fields share some attributes:
 | `name` | yes | The field name, which must be unique. It can only contain alphanumeric characters, underscores, and dashes. |
 | `label` | yes | A human-friendly label for this field. |
 | `default` | no | A default value for this field. |
-| `info` | no | Additional information about the field, displayed as a tooltip. |
+| `info` | no | Additional information about the field, displayed as help text below the field name. You can include external links to further help or information in the info text using the format `<a href='' target='_blank' rel='external'>Link</a>` |
 | `placeholder` | no | A value for the input's placeholder text. |
 
 #### Input field definitions

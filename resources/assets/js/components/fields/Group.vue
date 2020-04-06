@@ -16,7 +16,7 @@
 				>
 					<template slot="label">
 						<span>{{ f.label }}</span>
-						<span class="el-form-item__help">{{ f.info }}</span>
+						<span class="el-form-item__help" v-html="f.info"></span>
 					</template>
 
 					<component

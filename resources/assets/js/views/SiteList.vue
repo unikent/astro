@@ -15,7 +15,25 @@
 <el-card>
 	<div slot="header" class="manage-table__header">
 		<span class="main-header"><el-input v-model="filter" placeholder="Search for sites" size="large" class="manage-table__search-filter"></el-input></span>
-
+		<el-alert
+		:closable="false"
+		type="warning"
+		style="width:auto"
+		>
+			<icon
+				name="bell"
+				:width="24"
+				:height="24"
+				viewBox="0 0 24 24"
+			/>
+			<a href="https://blogs.kent.ac.uk/webdev/category/site-editor" target="_blank" style="margin-left:10px">Find out what's new in Site Editor</a>
+			<icon
+				name="newwindow"
+				:width="17"
+				:height="17"
+				viewBox="0 2 17 17"
+			/>
+		</el-alert>
 		<el-button v-if="canUser('site.create')" type="primary" @click="dialogFormVisible = true" class="manage-table__add-button" id="add-site">
 			Add Site
 		</el-button>
