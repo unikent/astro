@@ -1064,6 +1064,7 @@
                     "email": "jakub.onderka@gmail.com"
                 }
             ],
+            "abandoned": "php-parallel-lint/php-console-color",
             "time": "2018-09-29T17:23:10+00:00"
         },
         {
@@ -1110,6 +1111,7 @@
                 }
             ],
             "description": "Highlight PHP code in terminal",
+            "abandoned": "php-parallel-lint/php-console-highlighter",
             "time": "2018-09-29T18:48:56+00:00"
         },
         {
@@ -3996,7 +3998,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/astro-kent-theme.git",
-                "reference": "0ad144ec82f3b8287cf4be7c8c489c9dc900b91c"
+                "reference": "9e25502d3c798ed06d0446a3c43a981675535474"
             },
             "require": {
                 "ezyang/htmlpurifier": "4.10.0"
@@ -4016,7 +4018,7 @@
                 }
             },
             "description": "Our block views",
-            "time": "2020-04-03T07:58:57+00:00"
+            "time": "2020-04-08T14:57:06+00:00"
         },
         {
             "name": "unikent/astro-renderer",
