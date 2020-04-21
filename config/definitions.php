@@ -90,4 +90,7 @@ return [
 
 	// site id of the site containing the events renderer
 	'event_page_site_id' => env('EVENT_PAGE_SITE_ID', 0),
+
+	// site id of the site containing the news renderer
+	'news_page_site_id' => env('NEWS_PAGE_SITE_ID', 0),
 ];
