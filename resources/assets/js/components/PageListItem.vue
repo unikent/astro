@@ -78,6 +78,13 @@
 				</el-dropdown-item>
 
 				<el-dropdown-item
+					command="clone"
+					v-if="canUser('page.clone') && pageIsCloneable(page)"
+				>
+					Make a copy
+				</el-dropdown-item>
+
+				<el-dropdown-item
 					v-show="!root"
 					command="remove"
 					divided
@@ -197,7 +204,8 @@ export default {
 		}),
 
 		...mapGetters([
-			'canUser'
+			'canUser',
+			'pageIsCloneable'
 		]),
 
 		root() {
@@ -327,6 +335,10 @@ export default {
 
 		unpublish() {
 			this.showUnpublishModal(this.path);
+		},
+
+		clone(o) {
+			console.log(o);
 		},
 
 		handleCommand(command) {
