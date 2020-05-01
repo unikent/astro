@@ -632,7 +632,7 @@ const getters = {
 		return rootState.site.siteDefinitions[id] !== void 0 ? rootState.site.siteDefinitions[id] : null;
 	},
 
-	pageIsCloneable: (state, getters, rootState) => (page) => {
+	pageIsCopyable: (state, getters, rootState) => (page) => {
 		if (getters.siteDefinition) {
 			let pageLayout = page.layout.name + '-v' + page.layout.version;
 			return getters.siteDefinition.availableLayouts.includes(pageLayout);

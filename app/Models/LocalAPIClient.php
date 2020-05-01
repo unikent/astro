@@ -23,6 +23,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use App\Models\APICommands\CreateSite;
 use App\Models\APICommands\AddPage;
+use App\Models\APICommands\CopyPage;
 use Auth;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -286,9 +287,13 @@ class LocalAPIClient implements APIClient
 		]);
 	}
 
-	public function copyPage()
+	public function copyPage($id, $new_title, $new_slug)
 	{
-		throw new \LogicException('Copy Page not yet implemented.');
+		return $this->execute(CopyPage::class, [
+			'id' => $id,
+			'new_title' => $new_title,
+			'new_slug' => $new_slug
+		]);
 	}
 
 	/**

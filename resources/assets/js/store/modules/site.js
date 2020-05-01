@@ -316,6 +316,28 @@ const actions = {
 			})
 	},
 
+	copyPage({ dispatch }, page) {
+		console.log('copying ', page);
+		api
+			.post(`pages/${page.id}/copy`, {
+				/* eslint-enable camelcase */
+				new_slug: page.slug,
+				new_title: page.title
+			})
+			.then((response) => {
+				page = response.data.data;
+				dispatch('fetchSite');
+			})
+			.catch(() => {
+				vue.$notify({
+					title: 'Page not copied',
+					message: 'Please ensure that there is not already a page with the same slug',
+					type: 'error',
+					duration: 0
+				});
+			})
+	},
+
 	updatePage({ dispatch }, page) {
 		api
 			.put(`pages/${page.id}/content`, {

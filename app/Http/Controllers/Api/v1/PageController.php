@@ -163,6 +163,21 @@ class PageController extends ApiController
 	}
 
 	/**
+	 * POST /api/v1/page/{page}/copy
+	 *
+	 * @param  Request $request
+	 * @param  Page $page
+	 * @return Response
+	 */
+	public function copy(Request $request, Page $page)
+	{
+		$this->authorize('copy', $page);
+		$api = new LocalAPIClient(Auth::user());
+		$result = $api->copyPage($page->id, $request->input('new_title'), $request->input('new_slug'));
+		return fractal($result, new PageTransformer(true))->respond();
+	}
+
+	/**
 	 * POST /api/v1/page/{page}/publish-tree
 	 *
 	 * @param  Request $request

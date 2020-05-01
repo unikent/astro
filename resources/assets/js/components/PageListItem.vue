@@ -78,8 +78,8 @@
 				</el-dropdown-item>
 
 				<el-dropdown-item
-					command="clone"
-					v-if="canUser('page.clone') && pageIsCloneable(page)"
+					command="copy"
+					v-if="canUser('page.copy') && pageIsCopyable(page)"
 				>
 					Make a copy
 				</el-dropdown-item>
@@ -205,7 +205,7 @@ export default {
 
 		...mapGetters([
 			'canUser',
-			'pageIsCloneable'
+			'pageIsCopyable'
 		]),
 
 		root() {
@@ -251,6 +251,7 @@ export default {
 			movePage: 'site/movePage',
 			deletePage: 'site/deletePage',
 			updatePage: 'site/updatePage',
+			copyPage: 'site/copyPage',
 			handleSavePage: 'handleSavePage'
 		}),
 
@@ -337,8 +338,8 @@ export default {
 			this.showUnpublishModal(this.path);
 		},
 
-		clone(o) {
-			console.log(o);
+		copy(page) {
+			this.copyPage(page);
 		},
 
 		handleCommand(command) {
