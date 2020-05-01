@@ -28,6 +28,7 @@ class CopyPage implements APICommand
     public function execute($input, Authenticatable $user)
     {
         return DB::transaction(function() use($input, $user){
+            event(new PageEvent(PageEvent::COPYING, $page));
             $page = Page::find($input['id']);
             $parent = $page->parent_id ? Page::find($page->parent_id) : $page;
 			$newPage = $this->addPage($parent,
@@ -37,6 +38,12 @@ class CopyPage implements APICommand
                 $page->revision->layout_name,
                 $page->revision->layout_version
             );
+
+            $api = new LocalAPIClient($user);
+            $api->updatePageContent($newPage->id, $page->revision->blocks);
+
+            event(new PageEvent(PageEvent::COPIED, $page, ['new_page' => $newPage]));
+
 			return $newPage;
         });
     }
@@ -50,6 +57,8 @@ class CopyPage implements APICommand
     {
         $layout = $data->get('layout', []);
         $version = !empty($layout['version']) ? $layout['version'] : null;
+        $page = Page::find($data->get('id'));
+        $parent = $page->parent_id ? Page::find($page->parent_id) : $page;
 
         return [
             'new_slug' => [
@@ -58,7 +67,7 @@ class CopyPage implements APICommand
                 'regex:/^[a-z0-9_-]+$/',
                 // there must not be an existing draft page with the same slug under the parent page
                 Rule::unique('pages', 'slug')
-                   ->where('parent_id', $data->get('parent_id'))
+                   ->where('parent_id', $parent->id)
                    ->where('version', Page::STATE_DRAFT),
             ],
             'new_title' => [

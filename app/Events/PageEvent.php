@@ -25,6 +25,8 @@ class PageEvent
 	const PUBLISHED = 'astro.page.published';
 	const UNPUBLISHING = 'astro.page.unpublishing';
 	const UNPUBLISHED = 'astro.page.unpublished';
+	const COPYING = 'astro.page.copying';
+	const COPIED = 'astro.page.copied';
 	const MOVING = 'astro.page.moving';
 	const MOVED = 'astro.page.moved';
 	const RENAMING = 'astro.page.renaming';
