@@ -321,8 +321,8 @@ const actions = {
 		api
 			.post(`pages/${page.id}/copy`, {
 				/* eslint-enable camelcase */
-				new_slug: page.slug,
-				new_title: page.title
+				new_slug: page.slug + '_copy',
+				new_title: page.title + ' Copy'
 			})
 			.then((response) => {
 				page = response.data.data;

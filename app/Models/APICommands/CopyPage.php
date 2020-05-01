@@ -2,11 +2,13 @@
 
 namespace App\Models\APICommands;
 
+
 use App\Events\PageEvent;
 use App\Models\Revision;
 use DB;
 use App\Models\Page;
 use App\Models\RevisionSet;
+use App\Models\LocalAPIClient;
 use App\Models\Contracts\APICommand;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Collection;
@@ -28,8 +30,8 @@ class CopyPage implements APICommand
     public function execute($input, Authenticatable $user)
     {
         return DB::transaction(function() use($input, $user){
-            event(new PageEvent(PageEvent::COPYING, $page));
             $page = Page::find($input['id']);
+            event(new PageEvent(PageEvent::COPYING, $page, []));
             $parent = $page->parent_id ? Page::find($page->parent_id) : $page;
 			$newPage = $this->addPage($parent,
                 $input['new_slug'],
