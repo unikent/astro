@@ -79,7 +79,7 @@
 
 				<el-dropdown-item
 					command="copy"
-					v-if="canUser('page.copy') && pageIsCopyable(page)"
+					v-if="canUser('page.add') && pageIsCopyable(page)"
 				>
 					Make a copy
 				</el-dropdown-item>

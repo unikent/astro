@@ -171,10 +171,20 @@ class PageController extends ApiController
 	 */
 	public function copy(Request $request, Page $page)
 	{
-		$this->authorize('copy', $page);
+		$this->authorize('create', [Page::class, $page->site_id]);
 		$api = new LocalAPIClient(Auth::user());
-		$result = $api->copyPage($page->id, $request->input('new_title'), $request->input('new_slug'));
-		return fractal($result, new PageTransformer(true))->respond();
+		$parent = $page->parent_id ? Page::find($page->parent_id) : $page;
+		$newPage = $api->addPage(
+			$parent->id, 
+			null, 
+			$request->input('new_slug'), 
+			[
+				'name' => $page->revision->layout_name,
+				'version' => $page->revision->layout_version
+			], 
+			$request->input('new_title'));
+		$api->updatePageContent($newPage->id, $page->revision->blocks);
+		return fractal($newPage, new PageTransformer(true))->respond();
 	}
 
 	/**
