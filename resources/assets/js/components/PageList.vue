@@ -9,6 +9,7 @@
 			:flatten="true"
 			:open-modal="showPageModal"
 			:open-edit-modal="showEditPageModal"
+			:open-copy-modal="showCopyPageModal"
 			path="0"
 			:depth="0"
 		/>
@@ -62,7 +63,8 @@ export default {
 		...mapActions({
 
 			showPageModal: 'site/showPageModal',
-			showEditPageModal: 'site/showEditPageModal'
+			showEditPageModal: 'site/showEditPageModal',
+			showCopyPageModal: 'site/showCopyPageModal'
 		})
 
 	}

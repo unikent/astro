@@ -53,6 +53,12 @@ const state = {
 		slug: '',
 		id: 0,
 		editSlug: false
+	},
+	copyPageModal: {
+		visible: false,
+		title: '',
+		slug: '',
+		id: 0
 	}
 };
 
@@ -131,6 +137,10 @@ const mutations = {
 		state.editPageModal.visible = visible;
 	},
 
+	setCopyPageModalVisibility(state, visible) {
+		state.copyPageModal.visible = visible;
+	},
+
 	setEditPageModalParent(state, pageId) {
 		state.editPageModal.parentId = pageId;
 	},
@@ -146,6 +156,18 @@ const mutations = {
 		state.editPageModal.slug = page.slug;
 		state.editPageModal.id = page.id;
 		state.editPageModal.editSlug = !!page.parent_id;
+	},
+
+	/**
+	 * Sets the title, slug and id for the copy page modal.
+	 *
+	 * @param state
+	 * @param {Object} page The Page to use data from.
+	 */
+	setCopyPageMeta(state, page) {
+		state.copyPageModal.title = page.title;
+		state.copyPageModal.slug = page.slug;
+		state.copyPageModal.id = page.id;
 	},
 
 	/**
@@ -316,17 +338,20 @@ const actions = {
 			})
 	},
 
-	copyPage({ dispatch }, page) {
-		console.log('copying ', page);
+	copyPage({ dispatch }, data) {
 		api
-			.post(`pages/${page.id}/copy`, {
+			.post(`pages/${data.id}/copy`, {
 				/* eslint-enable camelcase */
-				new_slug: page.slug + '_copy',
-				new_title: page.title + ' Copy'
+				new_title: data.title,
+				new_slug: data.slug
 			})
 			.then((response) => {
-				page = response.data.data;
 				dispatch('fetchSite');
+				vue.$message({
+					message: 'Page successfully copied.',
+					type: 'success',
+					duration: 2000
+				});
 			})
 			.catch(() => {
 				vue.$notify({
@@ -497,6 +522,15 @@ const actions = {
 
 	hideEditPageModal({ commit }) {
 		commit('setEditPageModalVisibility', false);
+	},
+
+	showCopyPageModal({ commit }, page) {
+		commit('setCopyPageMeta', page);
+		commit('setCopyPageModalVisibility', true);
+	},
+
+	hideCopyPageModal({ commit }) {
+		commit('setCopyPageModalVisibility', false);
 	}
 };
 

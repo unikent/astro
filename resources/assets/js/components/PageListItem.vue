@@ -78,7 +78,7 @@
 				</el-dropdown-item>
 
 				<el-dropdown-item
-					command="copy"
+					command="openCopyModal"
 					v-if="canUser('page.add') && pageIsCopyable(page)"
 				>
 					Make a copy
@@ -119,6 +119,7 @@
 				:key="child.id"
 				:open-modal="openModal"
 				:open-edit-modal="openEditModal"
+				:open-copy-modal="openCopyModal"
 				:path="`${path}.${index}`"
 				:depth="depth + 1"
 				:parent-status="page.status"
@@ -143,6 +144,7 @@ export default {
 		'flatten',
 		'open-modal',
 		'open-edit-modal',
+		'open-copy-modal',
 		'path',
 		'depth',
 		'parent-status'

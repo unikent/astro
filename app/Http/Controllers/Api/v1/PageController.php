@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api\v1;
 
-
 use App\Http\Transformers\Api\v1\PageTransformer;
 use App\Models\APICommands\AddPage;
 use App\Models\LocalAPIClient;
@@ -44,7 +43,7 @@ class PageController extends ApiController
 		// admins and 'viewers' can view every page anyway, so
 		// no need for additional db queries to determine the site
 		// when authorizing
-		if(!$request->user()->isAdmin() && !$request->user()->isViewer()) {
+		if (!$request->user()->isAdmin() && !$request->user()->isViewer()) {
 			$page = Page::findByHostAndPath($host, $path, $version);
 			$site = $page ? $page->site : null;
 			$this->authorize('view', $site);
@@ -174,15 +173,18 @@ class PageController extends ApiController
 		$this->authorize('create', [Page::class, $page->site_id]);
 		$api = new LocalAPIClient(Auth::user());
 		$parent = $page->parent_id ? Page::find($page->parent_id) : $page;
+		// add the new page
 		$newPage = $api->addPage(
-			$parent->id, 
-			null, 
-			$request->input('new_slug'), 
+			$parent->id,
+			null,
+			$request->input('new_slug'),
 			[
 				'name' => $page->revision->layout_name,
 				'version' => $page->revision->layout_version
-			], 
-			$request->input('new_title'));
+			],
+			$request->input('new_title')
+		);
+		//update contents of the new page with the old page's content
 		$api->updatePageContent($newPage->id, $page->revision->blocks);
 		return fractal($newPage, new PageTransformer(true))->respond();
 	}
@@ -209,11 +211,9 @@ class PageController extends ApiController
 
 			DB::commit();
 			return response($page->revision->blocks, 200);
-
 		} catch (UnpublishedParentException $e) {
 			DB::rollBack();
 			return response(['errors' => [$e->getMessage()]], 406);
-
 		} catch (Exception $e) {
 			DB::rollBack();
 			throw $e;
@@ -253,5 +253,4 @@ class PageController extends ApiController
 		$api->deletePage($page->id);
 		return (new SymfonyResponse())->setStatusCode(200);
 	}
-
 }
