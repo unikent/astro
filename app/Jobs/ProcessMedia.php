@@ -26,7 +26,7 @@ class ProcessMedia implements ShouldQueue
 	800x450 is used for standard inline videos
 	*/
 	protected $transforms = [
-		 'base64', '400x400', '400w', '800w', '1920w', '400x225', '800x450'
+		 'base64', '400x400', '400w', '800w', '2000w', '400x225', '800x450'
 	];
 
 	/**
@@ -53,7 +53,7 @@ class ProcessMedia implements ShouldQueue
 					$constraint->aspectRatio();
 					// $constraint->upsize();
 				});
-			case '1920w':
+			case '2000w':
 				return $img->fit(1920, 1280, function($constraint) {
 					//$constraint->aspectRatio();
 					// $constraint->upsize();
