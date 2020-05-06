@@ -49,6 +49,27 @@ class PageControllerTest extends ApiControllerTestCase {
 	 * @test
 	 * @group authorization
 	 */
+	public function copy_WhendUserIsAdminAndPageIsAnAvailableLayout_CopiesPageAndReturns200() {
+		// GIVEN - we have an admin user and a page on a site
+		$user = factory(User::class)->states(['admin'])->create();
+		$page = factory(Page::class)->states([ 'withRevision' ])->create();
+		$this->authenticated($user);
+
+		// WHEN we resolve the route on that page as the user
+		$response = $this->action('POST', PageController::class . '@copy', $page, [ 'new_title' => 'New page title', 'new_slug' => 'new-page-slug' ]);
+
+		// THEN we expect a 200 response
+		$response->assertStatus(200);
+		$json = $response->json();
+		$this->assertArrayHasKey('data', $json);
+		$this->assertEquals('new-page-slug', $json['data']['slug']);
+		$this->assertEquals('New page title', $json['data']['title']);
+	}
+
+	/**
+	 * @test
+	 * @group authorization
+	 */
 	public function resolve_WhenRouteFoundAndUserIsViewer_Returns200(){
 		// GIVEN - we have a viewer user and a page on a site
 		$user = factory(User::class)->states(['viewer'])->create();
