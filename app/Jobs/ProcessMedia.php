@@ -18,8 +18,15 @@ class ProcessMedia implements ShouldQueue
 	use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
 	protected $media;
+	/*
+	base64 is used for a low-quality initial image on page load
+	400x400 is used for portraits
+	400w, 800w and 1920w are the standard 3:2 image ratio images used at different browser widths
+	400x225 is used for inline video thumbnails eg in a panel of videos
+	800x450 is used for standard inline videos
+	*/
 	protected $transforms = [
-		 'base64', '400x400', '400w', '800w', '2000w'
+		 'base64', '400x400', '400w', '800w', '1920w', '400x225', '800x450'
 	];
 
 	/**
@@ -38,17 +45,25 @@ class ProcessMedia implements ShouldQueue
 			case '400x400':
 				return $img->fit(400);
 			case '400w':
-				return $img->resize(400, null, function($constraint) {
+				return $img->fit(400, 267, function($constraint) {
 					$constraint->aspectRatio();
 				});
 			case '800w':
-				return $img->resize(800, null, function($constraint) {
+				return $img->fit(800, 533, function($constraint) {
 					$constraint->aspectRatio();
 					// $constraint->upsize();
 				});
-			case '2000w':
-				return $img->resize(2000, null, function($constraint) {
-					$constraint->aspectRatio();
+			case '1920w':
+				return $img->fit(1920, 1280, function($constraint) {
+					//$constraint->aspectRatio();
+					// $constraint->upsize();
+				});
+			case '400x225':
+				return $img->fit(400, 225, function($constraint) {
+					// $constraint->upsize();
+				});
+			case '800x450':
+				return $img->fit(800, 450, function($constraint) {
 					// $constraint->upsize();
 				});
 			case 'base64':
@@ -112,7 +127,7 @@ class ProcessMedia implements ShouldQueue
 						$this
 							->transform($type, $img)
 							->interlace()
-							->save($filepath . $append);
+							->save($filepath . $append, 70);
 					}
 
 					$variants[$type] = $media;
