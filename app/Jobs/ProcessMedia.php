@@ -45,32 +45,18 @@ class ProcessMedia implements ShouldQueue
 			case '400x400':
 				return $img->fit(400);
 			case '400w':
-				return $img->fit(400, 267, function($constraint) {
-					//$constraint->aspectRatio();
-				});
+				return $img->fit(400, 267);
 			case '800w':
-				return $img->fit(800, 533, function($constraint) {
-					//$constraint->aspectRatio();
-					// $constraint->upsize();
-				});
+				return $img->fit(800, 533);
 			case '2000w':
-				return $img->fit(1920, 1280, function($constraint) {
-					//$constraint->aspectRatio();
-					// $constraint->upsize();
-				});
+				return $img->fit(1920, 1280);
 			case '400x225':
-				return $img->fit(400, 225, function($constraint) {
-					// $constraint->upsize();
-				});
+				return $img->fit(400, 225);
 			case '800x450':
-				return $img->fit(800, 450, function($constraint) {
-					// $constraint->upsize();
-				});
+				return $img->fit(800, 450);
 			case 'base64':
 				return (string) $img
-					->fit(50, 33, function($constraint) {
-						//$constraint->aspectRatio();
-					})
+					->fit(50, 33)
 					->blur(3)
 					->encode('data-url');
 		}
