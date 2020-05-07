@@ -46,11 +46,11 @@ class ProcessMedia implements ShouldQueue
 				return $img->fit(400);
 			case '400w':
 				return $img->fit(400, 267, function($constraint) {
-					$constraint->aspectRatio();
+					//$constraint->aspectRatio();
 				});
 			case '800w':
 				return $img->fit(800, 533, function($constraint) {
-					$constraint->aspectRatio();
+					//$constraint->aspectRatio();
 					// $constraint->upsize();
 				});
 			case '2000w':
@@ -68,8 +68,8 @@ class ProcessMedia implements ShouldQueue
 				});
 			case 'base64':
 				return (string) $img
-					->resize(50, null, function($constraint) {
-						$constraint->aspectRatio();
+					->fit(50, 33, function($constraint) {
+						//$constraint->aspectRatio();
 					})
 					->blur(3)
 					->encode('data-url');
