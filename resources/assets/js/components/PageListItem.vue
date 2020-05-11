@@ -78,6 +78,13 @@
 				</el-dropdown-item>
 
 				<el-dropdown-item
+					command="openCopyModal"
+					v-if="canUser('page.add') && pageIsCopyable(page)"
+				>
+					Make a copy
+				</el-dropdown-item>
+
+				<el-dropdown-item
 					v-show="!root"
 					command="remove"
 					divided
@@ -112,6 +119,7 @@
 				:key="child.id"
 				:open-modal="openModal"
 				:open-edit-modal="openEditModal"
+				:open-copy-modal="openCopyModal"
 				:path="`${path}.${index}`"
 				:depth="depth + 1"
 				:parent-status="page.status"
@@ -136,6 +144,7 @@ export default {
 		'flatten',
 		'open-modal',
 		'open-edit-modal',
+		'open-copy-modal',
 		'path',
 		'depth',
 		'parent-status'
@@ -197,7 +206,8 @@ export default {
 		}),
 
 		...mapGetters([
-			'canUser'
+			'canUser',
+			'pageIsCopyable'
 		]),
 
 		root() {
@@ -243,6 +253,7 @@ export default {
 			movePage: 'site/movePage',
 			deletePage: 'site/deletePage',
 			updatePage: 'site/updatePage',
+			copyPage: 'site/copyPage',
 			handleSavePage: 'handleSavePage'
 		}),
 
@@ -327,6 +338,10 @@ export default {
 
 		unpublish() {
 			this.showUnpublishModal(this.path);
+		},
+
+		copy(page) {
+			this.copyPage(page);
 		},
 
 		handleCommand(command) {

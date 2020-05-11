@@ -286,11 +286,6 @@ class LocalAPIClient implements APIClient
 		]);
 	}
 
-	public function copyPage()
-	{
-		throw new \LogicException('Copy Page not yet implemented.');
-	}
-
 	/**
 	 * Update configuration for the given site
 	 * @param integer $id - The unique id of the site to update.

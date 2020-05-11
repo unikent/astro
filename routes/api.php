@@ -21,6 +21,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'v1'], function () {
 	Route::post('pages/{page}/unpublish', 'PageController@unpublish');
 	Route::post('pages/{page}/revert', 'PageController@revert');
 	Route::delete('pages/{page}/force', 'PageController@forceDestroy');
+	Route::post('pages/{page}/copy', 'PageController@copy');
 
 	Route::get('regions/definitions', 'RegionController@definitions');
 	Route::get('regions/{region_definition}/definition', 'RegionController@definition');
