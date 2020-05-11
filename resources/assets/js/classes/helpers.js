@@ -183,7 +183,7 @@ export const getPublishedPreviewURL = (domain, path) => {
  * @param {string|null} defaultUrl - Alternative placeholder image to use (relative to Config.get('assets_base_url') )
  * @returns {string} - url, or Config.get('assets_base_url') + defaultUrl or Config.get('assets_base_url') + Config.get('default_placeholder_image')
  */
-export const imageUrl = (src_or_url, defaultUrl) => {
+export const imageUrl = (src_or_url, defaultUrl, options = null) => {
 	let result = src_or_url && src_or_url.url ? src_or_url.url: src_or_url;
 	if(!result) {
 		result = Config.get('assets_base_url');
@@ -192,6 +192,15 @@ export const imageUrl = (src_or_url, defaultUrl) => {
 		}
 		else {
 			result += Config.get('placeholder_image_url');
+		}
+	}
+	// if we have an image, make sure we choose the right version and not the original (a different version is needed for video placeholders)
+	else {
+		if (options !== null && options.video === true) {
+			result = result.substring(0, result.length - 4) + Config.get('video_version_suffix') + ".jpg";
+		}
+		else {
+			result = result.substring(0, result.length - 4) + Config.get('image_version_suffix') + ".jpg";
 		}
 	}
 	return result;

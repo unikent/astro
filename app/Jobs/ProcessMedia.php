@@ -20,13 +20,10 @@ class ProcessMedia implements ShouldQueue
 	protected $media;
 	/*
 	base64 is used for a low-quality initial image on page load
-	400x400 is used for portraits
-	400w, 800w and 1920w are the standard 3:2 image ratio images used at different browser widths
-	400x225 is used for inline video thumbnails eg in a panel of videos
-	800x450 is used for standard inline videos
+	all other image processing happens on the media server when an image is requested
 	*/
 	protected $transforms = [
-		 'base64', '400x400', '400w', '800w', '2000w', '400x225', '800x450'
+		 'base64'
 	];
 
 	/**
@@ -42,18 +39,6 @@ class ProcessMedia implements ShouldQueue
 
 	protected function transform($type, $img) {
 		switch($type) {
-			case '400x400':
-				return $img->fit(400);
-			case '400w':
-				return $img->fit(400, 267);
-			case '800w':
-				return $img->fit(800, 533);
-			case '2000w':
-				return $img->fit(1920, 1280);
-			case '400x225':
-				return $img->fit(400, 225);
-			case '800x450':
-				return $img->fit(800, 450);
 			case 'base64':
 				return (string) $img
 					->fit(50, 33)
