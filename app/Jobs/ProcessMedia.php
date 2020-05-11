@@ -21,10 +21,11 @@ class ProcessMedia implements ShouldQueue
 	/*
 	base64 is used for a low-quality initial image on page load
 	base64video is used for a low-quality initial placeholder image for videos (16:9)
+	400x400 is used in the UI when choosing an image
 	all other image processing happens on the media server when an image is requested
 	*/
 	protected $transforms = [
-		 'base64', 'base64video'
+		 'base64', 'base64video', '400x400'
 	];
 
 	/**
@@ -40,6 +41,8 @@ class ProcessMedia implements ShouldQueue
 
 	protected function transform($type, $img) {
 		switch($type) {
+			case '400x400':
+				return $img->fit(400);
 			case 'base64':
 				return (string) $img
 					->fit(50, 33)
