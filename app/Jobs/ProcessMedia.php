@@ -20,6 +20,7 @@ class ProcessMedia implements ShouldQueue
 	protected $media;
 	/*
 	base64 is used for a low-quality initial image on page load
+	base64video is used for a low-quality initial placeholder image for videos (16:9)
 	all other image processing happens on the media server when an image is requested
 	*/
 	protected $transforms = [
