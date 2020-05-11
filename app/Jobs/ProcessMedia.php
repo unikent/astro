@@ -23,7 +23,7 @@ class ProcessMedia implements ShouldQueue
 	all other image processing happens on the media server when an image is requested
 	*/
 	protected $transforms = [
-		 'base64'
+		 'base64', 'base64video'
 	];
 
 	/**
@@ -42,6 +42,11 @@ class ProcessMedia implements ShouldQueue
 			case 'base64':
 				return (string) $img
 					->fit(50, 33)
+					->blur(3)
+					->encode('data-url');
+			case 'base64video':
+				return (string) $img
+					->fit(50, 28)
 					->blur(3)
 					->encode('data-url');
 		}
@@ -89,7 +94,7 @@ class ProcessMedia implements ShouldQueue
 				$variants = [];
 
 				foreach($this->transforms as $type) {
-					if($type === 'base64') {
+					if($type === 'base64' or $type === 'base64video') {
 						$media = $this->transform($type, $img);
 					}
 					else {
