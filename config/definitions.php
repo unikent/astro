@@ -31,6 +31,9 @@ return [
 	//  The default size suffix to use for video placeholder images eg '_1920w' or '_400x400'
 	'video_version_suffix' => env('VIDEO_VERSION_SUFFIX', '_800x450'),
 
+	//  The default size suffix to use for square images eg '_400x400'
+	'square_version_suffix' => env('SQUARE_VERSION_SUFFIX', '_400x400'),
+
 	// Set to true to enable google tag manager in templates
 	'enable_tagmanager' => env('ENABLE_TAGMANAGER', false),
 

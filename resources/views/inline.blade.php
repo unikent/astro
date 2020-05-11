@@ -32,6 +32,7 @@
 		'placeholder_image_url' => config('definitions.placeholder_image_url'),
 		'image_version_suffix' => config('definitions.image_version_suffix'),
 		'video_version_suffix' => config('definitions.video_version_suffix'),
+		'square_version_suffix' => config('definitions.square_version_suffix'),
 		'block_image_url' => asset('/build/img/definitions/blocks'),
 		'help_url' => config('editor.help_url'),
 		'help_media_url' => config('editor.help_media_url'),

@@ -31,8 +31,8 @@ export default {
 	},
 
 	methods: {
-		imageUrl(url, defaultUrl) {
-			return imageUrl(url, defaultUrl);
+		imageUrl(url, defaultUrl, options) {
+			return imageUrl(url, defaultUrl, options);
 		},
 
 		assetsUrl(path) {
