@@ -197,9 +197,7 @@ export const imageUrl = (src_or_url, defaultUrl, options) => {
 	}
 	// if we have an image, make sure we choose the right version and not the original (a different version is needed for video placeholders)
 	else {
-		console.log(options);
 		if (typeof options !== 'undefined' && options.video === true) {
-
 			result = result.substring(0, result.length - 4) + Config.get('video_version_suffix') + ".jpg";
 		}
 		else if (typeof options !== 'undefined' && options.square === true) {
