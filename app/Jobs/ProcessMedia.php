@@ -18,8 +18,14 @@ class ProcessMedia implements ShouldQueue
 	use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
 	protected $media;
+	/*
+	base64 is used for a low-quality initial image on page load
+	base64video is used for a low-quality initial placeholder image for videos (16:9)
+	400x400 is used in the UI when choosing an image
+	all other image processing happens on the media server when an image is requested
+	*/
 	protected $transforms = [
-		 'base64', '400x400', '400w', '800w', '2000w'
+		 'base64', 'base64video', '400x400'
 	];
 
 	/**
@@ -37,25 +43,14 @@ class ProcessMedia implements ShouldQueue
 		switch($type) {
 			case '400x400':
 				return $img->fit(400);
-			case '400w':
-				return $img->resize(400, null, function($constraint) {
-					$constraint->aspectRatio();
-				});
-			case '800w':
-				return $img->resize(800, null, function($constraint) {
-					$constraint->aspectRatio();
-					// $constraint->upsize();
-				});
-			case '2000w':
-				return $img->resize(2000, null, function($constraint) {
-					$constraint->aspectRatio();
-					// $constraint->upsize();
-				});
 			case 'base64':
 				return (string) $img
-					->resize(50, null, function($constraint) {
-						$constraint->aspectRatio();
-					})
+					->fit(50, 33)
+					->blur(3)
+					->encode('data-url');
+			case 'base64video':
+				return (string) $img
+					->fit(50, 28)
 					->blur(3)
 					->encode('data-url');
 		}
@@ -103,7 +98,7 @@ class ProcessMedia implements ShouldQueue
 				$variants = [];
 
 				foreach($this->transforms as $type) {
-					if($type === 'base64') {
+					if($type === 'base64' or $type === 'base64video') {
 						$media = $this->transform($type, $img);
 					}
 					else {
@@ -112,7 +107,7 @@ class ProcessMedia implements ShouldQueue
 						$this
 							->transform($type, $img)
 							->interlace()
-							->save($filepath . $append);
+							->save($filepath . $append, 70);
 					}
 
 					$variants[$type] = $media;

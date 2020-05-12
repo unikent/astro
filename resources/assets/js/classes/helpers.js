@@ -181,17 +181,30 @@ export const getPublishedPreviewURL = (domain, path) => {
  * Get a url for an image or a default.
  * @param {String|Object|null} url - URL to the image OR object with url attribute OR null to use default.
  * @param {string|null} defaultUrl - Alternative placeholder image to use (relative to Config.get('assets_base_url') )
+  * @param {object|null} options - Options to allow for for video or square images
  * @returns {string} - url, or Config.get('assets_base_url') + defaultUrl or Config.get('assets_base_url') + Config.get('default_placeholder_image')
  */
-export const imageUrl = (src_or_url, defaultUrl) => {
-	let result = src_or_url && src_or_url.url ? src_or_url.url: src_or_url;
+export const imageUrl = (src_or_url, defaultUrl, options) => {
+	let result = (typeof src_or_url !== 'undefined') && src_or_url && src_or_url.url ? src_or_url.url: src_or_url;
 	if(!result) {
 		result = Config.get('assets_base_url');
-		if(defaultUrl) {
+		if(typeof defaultUrl !== 'undefined') {
 			result += defaultUrl;
 		}
 		else {
 			result += Config.get('placeholder_image_url');
+		}
+	}
+	// if we have an image, make sure we choose the right version and not the original (a different version is needed for video placeholders)
+	else {
+		if (typeof options !== 'undefined' && options.video === true) {
+			result = result.substring(0, result.length - 4) + Config.get('video_version_suffix') + ".jpg";
+		}
+		else if (typeof options !== 'undefined' && options.square === true) {
+			result = result.substring(0, result.length - 4) + Config.get('square_version_suffix') + ".jpg";
+		}
+		else {
+			result = result.substring(0, result.length - 4) + Config.get('image_version_suffix') + ".jpg";
 		}
 	}
 	return result;

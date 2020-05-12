@@ -25,6 +25,15 @@ return [
 	// RELATIVE to assets_base_url
 	'placeholder_image_url' => env('PLACEHOLDER_IMAGE_URL', '/kent-theme-assets/assets/images/placeholder.jpg'),
 
+	//  The default size suffix to use for images eg '_1920w' or '_400x400'
+	'image_version_suffix' => env('IMAGE_VERSION_SUFFIX', '_1920w'),
+
+	//  The default size suffix to use for video placeholder images eg '_1920w' or '_400x400'
+	'video_version_suffix' => env('VIDEO_VERSION_SUFFIX', '_800x450'),
+
+	//  The default size suffix to use for square images eg '_400x400'
+	'square_version_suffix' => env('SQUARE_VERSION_SUFFIX', '_400x400'),
+
 	// Set to true to enable google tag manager in templates
 	'enable_tagmanager' => env('ENABLE_TAGMANAGER', false),
 
