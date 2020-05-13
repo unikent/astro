@@ -200,7 +200,7 @@ class Media extends Model
 			array_walk(
 				$variants,
 				function(&$variant, $key) {
-					if($key !== 'base64') {
+					if($key !== 'base64' and $key !== 'base64video') {
 						$variant = $this->fileUrl . '/' . $this->id . '/' . $variant;
 					}
 				}

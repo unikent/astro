@@ -49,6 +49,76 @@ class PageControllerTest extends ApiControllerTestCase {
 	 * @test
 	 * @group authorization
 	 */
+	public function copy_WhenPageIsAnAvailableLayout_CopiesPageAndReturns200() {
+		// GIVEN - we have an admin user and a page on a site
+		$user = factory(User::class)->states(['admin'])->create();
+		$page = factory(Page::class)->states([ 'withRevision' ])->create();
+		$this->authenticated($user);
+
+		// WHEN we resolve the route on that page as the user
+		$response = $this->action('POST', PageController::class . '@copy', $page, [ 'new_title' => 'New page title', 'new_slug' => 'new-page-slug' ]);
+
+		// THEN we expect a 200 response
+		$response->assertStatus(200);
+
+		// AND a newly created page should be returned in the response
+		$json = $response->json();
+		$this->assertArrayHasKey('data', $json);
+		$this->assertEquals('new-page-slug', $json['data']['slug']);
+		$this->assertEquals('New page title', $json['data']['title']);
+	}
+
+	/**
+	 * @test
+	 * @group authorization
+	 */
+	public function copy_WhenPageIsAnAvailableLayoutAndPageIsTheHomePage_CopiesPageAndMakesNewPageAChildOfCopiedPage() {
+		// GIVEN - we have an admin user and a homepage on a site
+		$user = factory(User::class)->states(['admin'])->create();
+		$homepage = factory(Page::class)->states([ 'withRevision' ])->create();
+		$this->authenticated($user);
+
+		// WHEN we invoke copy on the page
+		$response = $this->action('POST', PageController::class . '@copy', $homepage, [ 'new_title' => 'New page title', 'new_slug' => 'new-page-slug' ]);
+
+		// THEN we expect a 200 response
+		$response->assertStatus(200);
+
+		// AND the newly created page should be a child of the copied page
+		$json = $response->json();
+		$this->assertEquals($homepage->id, $json['data']['parent_id']);
+	}
+
+	/**
+	 * @test
+	 * @group authorization
+	 * @group wip
+	 */
+	public function copy_WhenPageIsAnAvailableLayoutAndPageIsNotTheHomePage_CopiesPageAndMakesNewPageASiblingOfCopiedPage() {
+		// GIVEN - we have an admin user and a homepage on a site
+		$user = factory(User::class)->states(['admin'])->create();
+		$this->authenticated($user);
+		$homepage = factory(Page::class)->states([ 'withRevision' ])->create();
+		// AND we have a child page
+		$response = $this->action('POST', PageController::class . '@copy', $homepage, [ 'new_title' => 'New page title', 'new_slug' => 'new-page-slug' ]);
+		$json = $response->json();
+		$page = Page::find($json['data']['id']); 
+
+		// WHEN we invoke copy on the page
+		$response = $this->action('POST', PageController::class . '@copy', $page, [ 'new_title' => 'Another new page title', 'new_slug' => 'another-new-page-slug' ]);
+
+		// THEN we expect a 200 response
+		$response->assertStatus(200);
+
+		// AND the newly created page should be a sibling of the copied page
+		$json = $response->json();
+		$this->assertEquals($page->parent_id, $json['data']['parent_id']);
+	}
+
+	/**
+	 * @test
+	 * @group authorization
+	 */
 	public function resolve_WhenRouteFoundAndUserIsViewer_Returns200(){
 		// GIVEN - we have a viewer user and a page on a site
 		$user = factory(User::class)->states(['viewer'])->create();
