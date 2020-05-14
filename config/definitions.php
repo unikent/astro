@@ -102,4 +102,7 @@ return [
 
 	// site id of the site containing the news renderer
 	'news_page_site_id' => env('NEWS_PAGE_SITE_ID', 0),
+
+	// site id of the site containing the country page renderer
+	'country_page_site_id' => env('COUNTRY_PAGE_SITE_ID', 0)
 ];
