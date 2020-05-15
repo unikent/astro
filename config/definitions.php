@@ -107,5 +107,5 @@ return [
 	'country_page_site_id' => env('COUNTRY_PAGE_SITE_ID', 0),
 
 	// site id of the site containing the scholarships page renderer
-	'scholarships_page_site_id' => env('SCHOLARSHIPS_PAGE_SITE_ID', 180)
+	'scholarships_page_site_id' => env('SCHOLARSHIPS_PAGE_SITE_ID', 0)
 ];
