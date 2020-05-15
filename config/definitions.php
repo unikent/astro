@@ -94,7 +94,11 @@ return [
         'maps' => [
             'features' => env('CACHE_MAPS_FEATURES_SECS', 0),  // seconds to cache the listing of all maps features for
         ],
-        'scholarship_minutes' => env('CACHE_SCHOLARSHIPS_MINUTES', 0),  // minutes to cache scholarship listing and details for
+        'scholarship_minutes' => env('CACHE_SCHOLARSHIPS_MINUTES', 0),  // minutes to cache scholarship listing and details for,
+		'scholarships' => [
+			'all' => env('CACHE_SCHOLARSHIPS_ALL_SECS', 0),  // seconds to cache the listing of all scholarships for,
+			'single' => env('CACHE_SCHOLARSHIPS_SINGLE_SECS', 0),  // seconds to cache a cholarship page for
+		]
     ],
 
 	// site id of the site containing the events renderer
