@@ -97,7 +97,14 @@ return [
         'scholarship_minutes' => env('CACHE_SCHOLARSHIPS_MINUTES', 0),  // minutes to cache scholarship listing and details for
 		'news' => [
 			'single' => env('CACHE_NEWS_SINGLE_SECS', 0),  //  seconds to cache a news page for
+		],
+		'conversation' => [
+			'all' => env('CACHE_CONVERSATION_ALL_SECS', 0),  //  seconds to cache conversation news stories for
+		],
+		'popular' => [
+			'all' => env('CACHE_POPULAR_ALL_SECS', 0),  //  seconds to cache popular news stories for
 		]
+
     ],
 
 	// site id of the site containing the events renderer
