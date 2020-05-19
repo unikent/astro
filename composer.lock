@@ -1,4 +1,3 @@
-
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
@@ -3999,7 +3998,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/astro-kent-theme.git",
-                "reference": "8e943c050f32ae3d7fc6a44f4420fc5bbe961627"
+                "reference": "b1f996e809e2d54c16d83f16829a6af11d7e6071"
             },
             "require": {
                 "ezyang/htmlpurifier": "4.10.0"
@@ -4019,7 +4018,7 @@
                 }
             },
             "description": "Our block views",
-            "time": "2020-05-18T15:07:00+00:00"
+            "time": "2020-05-19T08:39:58+00:00"
         },
         {
             "name": "unikent/astro-renderer",
