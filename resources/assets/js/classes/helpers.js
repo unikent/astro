@@ -203,6 +203,9 @@ export const imageUrl = (src_or_url, defaultUrl, options) => {
 		else if (typeof options !== 'undefined' && options.square === true) {
 			result = result.substring(0, result.length - 4) + Config.get('square_version_suffix') + ".jpg";
 		}
+		else if (typeof options !== 'undefined' && options.inline === true) {
+			result = result.substring(0, result.length - 4) + Config.get('inline_version_suffix') + ".jpg";
+		}
 		else {
 			result = result.substring(0, result.length - 4) + Config.get('image_version_suffix') + ".jpg";
 		}
