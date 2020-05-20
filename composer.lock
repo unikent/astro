@@ -3998,7 +3998,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/astro-kent-theme.git",
-                "reference": "1145214f680efcc16d9ca5b37ef109a7608009ff"
+                "reference": "0c5145dc817135601747006cd854fad9b980bf32"
             },
             "require": {
                 "ezyang/htmlpurifier": "4.10.0"
@@ -4018,7 +4018,7 @@
                 }
             },
             "description": "Our block views",
-            "time": "2020-05-20T08:57:38+00:00"
+            "time": "2020-05-20T15:52:50+00:00"
         },
         {
             "name": "unikent/astro-renderer",
