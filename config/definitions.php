@@ -94,7 +94,11 @@ return [
         'maps' => [
             'features' => env('CACHE_MAPS_FEATURES_SECS', 0),  // seconds to cache the listing of all maps features for
         ],
-        'scholarship_minutes' => env('CACHE_SCHOLARSHIPS_MINUTES', 0),  // minutes to cache scholarship listing and details for
+        'scholarship_minutes' => env('CACHE_SCHOLARSHIPS_MINUTES', 0),  // minutes to cache scholarship listing and details for,
+		'scholarships' => [
+			'all' => env('CACHE_SCHOLARSHIPS_ALL_SECS', 0),  // seconds to cache the listing of all scholarships for,
+			'single' => env('CACHE_SCHOLARSHIPS_SINGLE_SECS', 0),  // seconds to cache a cholarship page for
+		]
     ],
 
 	// site id of the site containing the events renderer
@@ -104,5 +108,11 @@ return [
 	'news_page_site_id' => env('NEWS_PAGE_SITE_ID', 0),
 
 	// site id of the site containing the country page renderer
-	'country_page_site_id' => env('COUNTRY_PAGE_SITE_ID', 0)
+	'country_page_site_id' => env('COUNTRY_PAGE_SITE_ID', 0),
+
+	// site id of the site containing the scholarships page renderer
+	'scholarships_page_site_id' => env('SCHOLARSHIPS_PAGE_SITE_ID', 0),
+
+	// site id of the site containing the scholarships list renderer
+	'scholarships_list_site_id' => env('SCHOLARSHIPS_LIST_SITE_ID', 0)
 ];
