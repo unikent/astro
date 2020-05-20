@@ -26,7 +26,7 @@ return [
 	'placeholder_image_url' => env('PLACEHOLDER_IMAGE_URL', '/kent-theme-assets/assets/images/placeholder.jpg'),
 
 	//  The default size suffix to use for images eg '_1920w' or '_400x400'
-	'image_version_suffix' => env('IMAGE_VERSION_SUFFIX', '_1920w'),
+	'image_version_suffix' => env('IMAGE_VERSION_SUFFIX', '_2000w'),
 
 	//  The default size suffix to use for video placeholder images eg '_1920w' or '_400x400'
 	'video_version_suffix' => env('VIDEO_VERSION_SUFFIX', '_800x450'),
