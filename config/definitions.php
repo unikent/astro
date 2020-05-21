@@ -34,6 +34,9 @@ return [
 	//  The default size suffix to use for square images eg '_400x400'
 	'square_version_suffix' => env('SQUARE_VERSION_SUFFIX', '_400x400'),
 
+	//  The default size suffix to use for inline images
+	'inline_version_suffix' => env('INLINE_VERSION_SUFFIX', '_inline'),
+
 	// Set to true to enable google tag manager in templates
 	'enable_tagmanager' => env('ENABLE_TAGMANAGER', false),
 
