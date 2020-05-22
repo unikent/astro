@@ -25,6 +25,18 @@ return [
 	// RELATIVE to assets_base_url
 	'placeholder_image_url' => env('PLACEHOLDER_IMAGE_URL', '/kent-theme-assets/assets/images/placeholder.jpg'),
 
+	//  The default size suffix to use for images eg '_1920w' or '_400x400'
+	'image_version_suffix' => env('IMAGE_VERSION_SUFFIX', '_2000w'),
+
+	//  The default size suffix to use for video placeholder images eg '_1920w' or '_400x400'
+	'video_version_suffix' => env('VIDEO_VERSION_SUFFIX', '_800x450'),
+
+	//  The default size suffix to use for square images eg '_400x400'
+	'square_version_suffix' => env('SQUARE_VERSION_SUFFIX', '_400x400'),
+
+	//  The default size suffix to use for inline images
+	'inline_version_suffix' => env('INLINE_VERSION_SUFFIX', '_inline'),
+
 	// Set to true to enable google tag manager in templates
 	'enable_tagmanager' => env('ENABLE_TAGMANAGER', false),
 
@@ -85,7 +97,11 @@ return [
         'maps' => [
             'features' => env('CACHE_MAPS_FEATURES_SECS', 0),  // seconds to cache the listing of all maps features for
         ],
-        'scholarship_minutes' => env('CACHE_SCHOLARSHIPS_MINUTES', 0),  // minutes to cache scholarship listing and details for
+        'scholarship_minutes' => env('CACHE_SCHOLARSHIPS_MINUTES', 0),  // minutes to cache scholarship listing and details for,
+		'scholarships' => [
+			'all' => env('CACHE_SCHOLARSHIPS_ALL_SECS', 0),  // seconds to cache the listing of all scholarships for,
+			'single' => env('CACHE_SCHOLARSHIPS_SINGLE_SECS', 0),  // seconds to cache a cholarship page for
+		]
     ],
 
 	// site id of the site containing the events renderer
@@ -93,4 +109,13 @@ return [
 
 	// site id of the site containing the news renderer
 	'news_page_site_id' => env('NEWS_PAGE_SITE_ID', 0),
+
+	// site id of the site containing the country page renderer
+	'country_page_site_id' => env('COUNTRY_PAGE_SITE_ID', 0),
+
+	// site id of the site containing the scholarships page renderer
+	'scholarships_page_site_id' => env('SCHOLARSHIPS_PAGE_SITE_ID', 0),
+
+	// site id of the site containing the scholarships list renderer
+	'scholarships_list_site_id' => env('SCHOLARSHIPS_LIST_SITE_ID', 0)
 ];
