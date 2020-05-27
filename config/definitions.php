@@ -126,5 +126,8 @@ return [
 	'scholarships_page_site_id' => env('SCHOLARSHIPS_PAGE_SITE_ID', 0),
 
 	// site id of the site containing the scholarships list renderer
-	'scholarships_list_site_id' => env('SCHOLARSHIPS_LIST_SITE_ID', 0)
+	'scholarships_list_site_id' => env('SCHOLARSHIPS_LIST_SITE_ID', 0),
+	
+	// maps api endpoint if not using the kent api
+	'maps_api_url' => env('MAPS_API_URL')
 ];
