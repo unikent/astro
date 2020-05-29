@@ -21,11 +21,13 @@ class ProcessMedia implements ShouldQueue
 	/*
 	base64 is used for a low-quality initial image on page load
 	base64video is used for a low-quality initial placeholder image for videos (16:9)
+	base64square is used for a low-quality initial placeholder image for square images
+	base64inline is used for a low-quality initial placeholder image for inline images
 	400x400 is used in the UI when choosing an image
 	all other image processing happens on the media server when an image is requested
 	*/
 	protected $transforms = [
-		 'base64', 'base64video', '400x400'
+		 'base64', 'base64video', 'base64square', 'base64inline', '400x400'
 	];
 
 	/**
@@ -51,6 +53,16 @@ class ProcessMedia implements ShouldQueue
 			case 'base64video':
 				return (string) $img
 					->fit(50, 28)
+					->blur(3)
+					->encode('data-url');
+			case 'base64square':
+				return (string) $img
+					->fit(50)
+					->blur(3)
+					->encode('data-url');
+			case 'base64inline':
+				return (string) $img
+					->resize(50, null, function($constraint) {$constraint->aspectRatio();})
 					->blur(3)
 					->encode('data-url');
 		}
@@ -98,7 +110,7 @@ class ProcessMedia implements ShouldQueue
 				$variants = [];
 
 				foreach($this->transforms as $type) {
-					if($type === 'base64' or $type === 'base64video') {
+					if($type === 'base64' or $type === 'base64video' or $type === 'base64square' or $type === 'base64inline') {
 						$media = $this->transform($type, $img);
 					}
 					else {

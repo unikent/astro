@@ -32,7 +32,7 @@ return [
 	'video_version_suffix' => env('VIDEO_VERSION_SUFFIX', '_800x450'),
 
 	//  The default size suffix to use for square images eg '_400x400'
-	'square_version_suffix' => env('SQUARE_VERSION_SUFFIX', '_400x400'),
+	'square_version_suffix' => env('SQUARE_VERSION_SUFFIX', '_800x800'),
 
 	//  The default size suffix to use for inline images
 	'inline_version_suffix' => env('INLINE_VERSION_SUFFIX', '_inline'),
