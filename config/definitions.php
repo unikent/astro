@@ -110,6 +110,9 @@ return [
 		],
 		'popular' => [
 			'all' => env('CACHE_POPULAR_ALL_SECS', 0),  //  seconds to cache popular news stories for
+		],
+		'course_news' => [
+			'all' => env('CACHE_COURSE_NEWS_ALL_SECS', 0),  //  seconds to cache course news stories for
 		]
     ],
 
@@ -127,7 +130,7 @@ return [
 
 	// site id of the site containing the scholarships list renderer
 	'scholarships_list_site_id' => env('SCHOLARSHIPS_LIST_SITE_ID', 0),
-	
+
 	// maps api endpoint if not using the kent api
 	'maps_api_url' => env('MAPS_API_URL')
 ];
