@@ -32,7 +32,7 @@ return [
 	'video_version_suffix' => env('VIDEO_VERSION_SUFFIX', '_800x450'),
 
 	//  The default size suffix to use for square images eg '_400x400'
-	'square_version_suffix' => env('SQUARE_VERSION_SUFFIX', '_400x400'),
+	'square_version_suffix' => env('SQUARE_VERSION_SUFFIX', '_800x800'),
 
 	//  The default size suffix to use for inline images
 	'inline_version_suffix' => env('INLINE_VERSION_SUFFIX', '_inline'),
@@ -97,10 +97,22 @@ return [
         'maps' => [
             'features' => env('CACHE_MAPS_FEATURES_SECS', 0),  // seconds to cache the listing of all maps features for
         ],
-        'scholarship_minutes' => env('CACHE_SCHOLARSHIPS_MINUTES', 0),  // minutes to cache scholarship listing and details for,
+        'scholarship_minutes' => env('CACHE_SCHOLARSHIPS_MINUTES', 0),  // minutes to cache scholarship listing and details for
 		'scholarships' => [
 			'all' => env('CACHE_SCHOLARSHIPS_ALL_SECS', 0),  // seconds to cache the listing of all scholarships for,
 			'single' => env('CACHE_SCHOLARSHIPS_SINGLE_SECS', 0),  // seconds to cache a cholarship page for
+		],
+		'news' => [
+			'single' => env('CACHE_NEWS_SINGLE_SECS', 0),  //  seconds to cache a news page for
+		],
+		'conversation' => [
+			'all' => env('CACHE_CONVERSATION_ALL_SECS', 0),  //  seconds to cache conversation news stories for
+		],
+		'popular' => [
+			'all' => env('CACHE_POPULAR_ALL_SECS', 0),  //  seconds to cache popular news stories for
+		],
+		'course_news' => [
+			'all' => env('CACHE_COURSE_NEWS_ALL_SECS', 0),  //  seconds to cache course news stories for
 		]
     ],
 
@@ -117,5 +129,8 @@ return [
 	'scholarships_page_site_id' => env('SCHOLARSHIPS_PAGE_SITE_ID', 0),
 
 	// site id of the site containing the scholarships list renderer
-	'scholarships_list_site_id' => env('SCHOLARSHIPS_LIST_SITE_ID', 0)
+	'scholarships_list_site_id' => env('SCHOLARSHIPS_LIST_SITE_ID', 0),
+
+	// maps api endpoint if not using the kent api
+	'maps_api_url' => env('MAPS_API_URL')
 ];
