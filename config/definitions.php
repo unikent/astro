@@ -104,6 +104,7 @@ return [
 		],
 		'news' => [
 			'single' => env('CACHE_NEWS_SINGLE_SECS', 0),  //  seconds to cache a news page for
+			'all' => env('CACHE_NEWS_ALL_SECS', 0),  //  seconds to cache a news listing for
 		],
 		'conversation' => [
 			'all' => env('CACHE_CONVERSATION_ALL_SECS', 0),  //  seconds to cache conversation news stories for
@@ -132,5 +133,7 @@ return [
 	'scholarships_list_site_id' => env('SCHOLARSHIPS_LIST_SITE_ID', 0),
 
 	// maps api endpoint if not using the kent api
-	'maps_api_url' => env('MAPS_API_URL')
+	'maps_api_url' => env('MAPS_API_URL'),
+
+	'clearing_enabled' => env('CLEARING_ENABLED', false)
 ];
