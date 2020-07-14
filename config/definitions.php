@@ -135,5 +135,7 @@ return [
 	// maps api endpoint if not using the kent api
 	'maps_api_url' => env('MAPS_API_URL'),
 
-	'clearing_enabled' => env('CLEARING_ENABLED', false)
+	'clearing_enabled' => env('CLEARING_ENABLED', false),
+
+	'clearing_banner_message' => env('CLEARING_BANNER_MESSAGE', '')
 ];
