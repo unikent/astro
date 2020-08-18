@@ -29,6 +29,7 @@
 		v-if="canUser('page.preview')"
 		class="toolbar__button-preview"
 		plain
+		v-loading.fullscreen.lock="fullscreenLoading"
 		@click="previewPage"
 		:disabled="pageHasLayoutErrors"
 	>Preview <icon name="newwindow" aria-hidden="true" :width="14" :height="14" class="ico" /></el-button>
@@ -146,11 +147,19 @@ export default {
 
 		/* autosave the page and open a preview window */
 		previewPage() {
+
+			// show loading screen when someone presses preview
+			this.fullscreenLoading = true;
+
 			/* handleSavePage returns a promise so we here we wait for it to complete before
 			opening the preview window */
 			// TODO: catch errors
 			this.handleSavePage()
 				.then(() => {
+
+					// hide loading screen after the page has saved
+					this.fullscreenLoading = false;
+
 					win.open(this.draftLink, '_blank');
 				});
 		},
