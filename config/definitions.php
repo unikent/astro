@@ -137,5 +137,6 @@ return [
 
 	'clearing_enabled' => env('CLEARING_ENABLED', false),
 
+	'clearing_banner_title' => env('CLEARING_BANNER_TITLE', ''),
 	'clearing_banner_message' => env('CLEARING_BANNER_MESSAGE', '')
 ];
