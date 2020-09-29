@@ -32,7 +32,7 @@
 					<br>
 					<small>
 						Edited: {{ dateDifference(page.revision.updated_at)}}
-						at {{ formattedDate(page.revision.updated_at)}}
+						on {{ formattedDate(page.revision.updated_at)}}
 					</small>
 					<small>
 						-
@@ -112,7 +112,7 @@ export default {
 		 */
 		formattedDate(date) {
 			const dt = new Date(date);
-			return dt.toLocaleString("en-GB", {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' , timeStyle: 'medium'});
+			return dt.toLocaleString("en-GB", {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric'});
 		},
 		/**
 		 * Returns a human readable description of the elapsed time between now and the provided date.
