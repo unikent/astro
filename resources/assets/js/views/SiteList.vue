@@ -132,7 +132,7 @@
 						<el-form-item label="Site Template">
 							<el-select v-model="form.siteDefinitionId" class="w100" placeholder="Select" popper-class="input-site-template" id="input-site-template" >
 								<el-option
-									v-for="(siteDefinition, siteID) in siteDefinitions"
+									v-for="(siteDefinition, siteID) in availableSites"
 									:label="siteDefinition.label + ' (v' + siteDefinition.version + ')'"
 									:value="siteID"
 									:key="siteID"
@@ -278,6 +278,17 @@ export default {
 			}
 			return filteredSites;
 		},
+
+		availableSites() {
+
+			let siteDefinitions = {};
+			for(let i in this.siteDefinitions) {
+				if (!this.siteDefinitions[i].deprecated) {
+					siteDefinitions[i] = this.siteDefinitions[i]
+				}
+			}
+			return siteDefinitions;
+		}
 	},
 
 	methods: {
