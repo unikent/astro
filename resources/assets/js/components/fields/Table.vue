@@ -33,6 +33,7 @@ import tinyMCE from 'tinymce';
 import 'tinymce/themes/silver/theme';
 import 'tinymce/plugins/table/plugin';
 import 'tinymce/plugins/link/plugin';
+import 'tinymce/icons/default/icons.js';
 import Editor from '@tinymce/tinymce-vue';
 import Config from '../../classes/Config';
 
