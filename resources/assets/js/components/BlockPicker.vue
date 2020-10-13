@@ -181,7 +181,8 @@ export default {
 					this.$store.commit('setCurrentBlockId', block.id);
 				}
 			}
-			else {
+			// only select the last block if the user added several blocks at once
+			else if (this.selected.length === 1) {
 				this.$store.dispatch('changeBlock', blockInfo);
 				this.$store.commit('setCurrentBlockId', blockInfo.blockId);
 
