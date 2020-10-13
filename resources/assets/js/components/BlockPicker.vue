@@ -150,6 +150,15 @@ export default {
 				fields: {}
 			};
 
+			const blockInfo = {
+				regionName: this.blockPicker.insertRegion,
+				sectionIndex: this.blockPicker.insertSection,
+				sectionName: 'unknown',
+				blockIndex: this.blockPicker.insertIndex,
+				blockId: block.id,
+				id: block.id
+			}
+
 			this.$store.dispatch('addBlockErrors', {
 				block,
 				regionName:  this.blockPicker.insertRegion,
@@ -171,6 +180,18 @@ export default {
 				if(this.currentBlockId === blockId) {
 					this.$store.commit('setCurrentBlockId', block.id);
 				}
+			}
+			else {
+				this.$store.dispatch('changeBlock', blockInfo);
+				this.$store.commit('setCurrentBlockId', blockInfo.blockId);
+
+				this.$nextTick(() =>
+					this.$nextTick(() => this.$bus.$emit('block:showSelectedOverlay', {id: blockInfo.blockId}))
+				);
+
+				this.$nextTick(() =>
+					this.$nextTick(() => this.$bus.$emit('block:scrollToBlock', blockInfo))
+				);
 			}
 
 		},

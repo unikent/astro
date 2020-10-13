@@ -262,6 +262,8 @@ export default {
 		this.$bus.$on('block:hideSelectedOverlay', this.hideSelectedOverlay);
 
 		this.$bus.$on('error-sidebar:scroll-to-error', this.scrollToBlock);
+
+		this.$bus.$on('block:scrollToBlock', this.scrollToBlock);
 	},
 
 	beforeDestroy() {
@@ -279,6 +281,8 @@ export default {
 		this.$bus.$off('block:hideSelectedOverlay', this.hideSelectedOverlay);
 
 		this.$bus.$off('error-sidebar:scroll-to-error', this.scrollToBlock);
+
+		this.$bus.$on('block:scrollToBlock', this.scrollToBlock);
 	},
 
 	methods: {
