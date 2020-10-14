@@ -178,6 +178,7 @@ export default {
 
 			if(replace) {
 				if(this.currentBlockId === blockId) {
+					this.$store.dispatch('changeBlock', blockInfo);
 					this.$store.commit('setCurrentBlockId', block.id);
 				}
 			}

@@ -523,7 +523,7 @@ export default {
 			};
 		},
 
-		showBlockList(offset = 0, replaceBlocks = false) {
+		showBlockList(offset = 0, replaceBlocks = false, maxSelectableBlocks = 1) {
 			const
 				deprecatedBlocks = this.sectionDefinition.deprecatedBlocks ? this.sectionDefinition.deprecatedBlocks : [],
 				maxBlocks = this.sectionDefinition.max || this.sectionDefinition.size;
@@ -535,8 +535,7 @@ export default {
 				blocks: this.sectionConstraints ?
 					this.sectionConstraints.allowedBlocks : [],
 				deprecatedBlocks: deprecatedBlocks,
-				maxSelectableBlocks: this.sectionConstraints.canSwapBlocks ?
-					1 : (maxBlocks ? maxBlocks - this.hoveredBlockSectionLength : null),
+				maxSelectableBlocks: (this.sectionConstraints.canSwapBlocks || maxSelectableBlocks === 1) ? 1 : (maxBlocks ? maxBlocks - this.hoveredBlockSectionLength : null),
 				replaceBlocks: replaceBlocks
 			});
 		},
