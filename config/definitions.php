@@ -54,6 +54,13 @@ return [
 	# proxy that guzzle may need to use when making requests to Kent API
 	'proxy_url' => env('PROXY_URL', ''),
 
+	# kent ldap
+	'kent_ldap' => [
+		'uri' => env('KENT_LDAP_URI', 'ldaps://ldap.id.kent.ac.uk:636'),
+		'rdn' => env('KENT_LDAP_RDN', ''),
+		'password' => env('KENT_LDAP_PASSWORD', ''),
+	],
+
 	// number of seconds to cache dynamic field options, default to 5 minus (5 * 60)
 	'dynamic_options_cache_time' => env('DYNAMIC_OPTIONS_CACHE_TIME', 5*60),
 
