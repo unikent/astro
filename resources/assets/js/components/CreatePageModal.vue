@@ -148,8 +148,10 @@ export default {
 		},
 
 		isLayoutDeprecated(definitionID, siteDefinition){
-			return siteDefinition.deprecatedLayouts &&
-				siteDefinition.deprecatedLayouts.indexOf(definitionID) > -1;
+			if ( typeof(this.allLayouts[definitionID].deprecated) !== 'undefined' && this.allLayouts[definitionID].deprecated ) {
+				return true;
+			}
+			return false;
 		},
 		setUserEditingSlug() {
 			this.userEditingSlug = true;
