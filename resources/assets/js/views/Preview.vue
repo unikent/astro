@@ -262,6 +262,8 @@ export default {
 		this.$bus.$on('block:hideSelectedOverlay', this.hideSelectedOverlay);
 
 		this.$bus.$on('error-sidebar:scroll-to-error', this.scrollToBlock);
+
+		this.$bus.$on('block:scrollToBlock', this.scrollToBlock);
 	},
 
 	beforeDestroy() {
@@ -279,6 +281,8 @@ export default {
 		this.$bus.$off('block:hideSelectedOverlay', this.hideSelectedOverlay);
 
 		this.$bus.$off('error-sidebar:scroll-to-error', this.scrollToBlock);
+
+		this.$bus.$on('block:scrollToBlock', this.scrollToBlock);
 	},
 
 	methods: {
@@ -519,7 +523,7 @@ export default {
 			};
 		},
 
-		showBlockList(offset = 0, replaceBlocks = false) {
+		showBlockList(offset = 0, replaceBlocks = false, maxSelectableBlocks = 1) {
 			const
 				deprecatedBlocks = this.sectionDefinition.deprecatedBlocks ? this.sectionDefinition.deprecatedBlocks : [],
 				maxBlocks = this.sectionDefinition.max || this.sectionDefinition.size;
@@ -531,8 +535,7 @@ export default {
 				blocks: this.sectionConstraints ?
 					this.sectionConstraints.allowedBlocks : [],
 				deprecatedBlocks: deprecatedBlocks,
-				maxSelectableBlocks: this.sectionConstraints.canSwapBlocks ?
-					1 : (maxBlocks ? maxBlocks - this.hoveredBlockSectionLength : null),
+				maxSelectableBlocks: (this.sectionConstraints.canSwapBlocks || maxSelectableBlocks === 1) ? 1 : (maxBlocks ? maxBlocks - this.hoveredBlockSectionLength : null),
 				replaceBlocks: replaceBlocks
 			});
 		},

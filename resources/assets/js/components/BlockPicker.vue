@@ -150,6 +150,15 @@ export default {
 				fields: {}
 			};
 
+			const blockInfo = {
+				regionName: this.blockPicker.insertRegion,
+				sectionIndex: this.blockPicker.insertSection,
+				sectionName: 'unknown',
+				blockIndex: this.blockPicker.insertIndex,
+				blockId: block.id,
+				id: block.id
+			}
+
 			this.$store.dispatch('addBlockErrors', {
 				block,
 				regionName:  this.blockPicker.insertRegion,
@@ -169,8 +178,22 @@ export default {
 
 			if(replace) {
 				if(this.currentBlockId === blockId) {
+					this.$store.dispatch('changeBlock', blockInfo);
 					this.$store.commit('setCurrentBlockId', block.id);
 				}
+			}
+			// only select the last block if the user added several blocks at once
+			else if (this.selected.length === 1) {
+				this.$store.dispatch('changeBlock', blockInfo);
+				this.$store.commit('setCurrentBlockId', blockInfo.blockId);
+
+				this.$nextTick(() =>
+					this.$nextTick(() => this.$bus.$emit('block:showSelectedOverlay', {id: blockInfo.blockId}))
+				);
+
+				this.$nextTick(() =>
+					this.$nextTick(() => this.$bus.$emit('block:scrollToBlock', blockInfo))
+				);
 			}
 
 		},

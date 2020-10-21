@@ -101,19 +101,27 @@ export default {
 		handleMousedown(name) {
 			const current = this.selected.indexOf(name);
 
-			if(current === -1) {
-				if (this.maxSelectableOptions !== null && this.selected.length >= this.maxSelectableOptions) {
-					this.$message({
-						type: 'warning',
-						message: 'Sorry you cannot select any more items.'
-					});
-				}
-				else {
-					this.selected.push(name);
-				}
+			// if users are only allowed to choose 1 block at a time, make it easy for them
+			// otherwise allow them to build up a list of blocks
+			if (this.maxSelectableOptions === 1) {
+				this.selected.splice(current, 1);
+				this.selected.push(name);
 			}
 			else {
-				this.selected.splice(current, 1);
+				if(current === -1) {
+					if (this.maxSelectableOptions !== null && this.selected.length >= this.maxSelectableOptions) {
+						this.$message({
+							type: 'warning',
+							message: 'Sorry you cannot select any more items.'
+						});
+					}
+					else {
+						this.selected.push(name);
+					}
+				}
+				else {
+					this.selected.splice(current, 1);
+				}
 			}
 		}
 	}
