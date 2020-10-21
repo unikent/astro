@@ -121,6 +121,9 @@ return [
 		],
 		'course_news' => [
 			'all' => env('CACHE_COURSE_NEWS_ALL_SECS', 0),  //  seconds to cache course news stories for
+		],
+		'freerooms' => [
+			'all' => env('CACHE_FREEROOMS_ALL_SECS', 0),  //  seconds to cache frerooms data for
 		]
     ],
 
