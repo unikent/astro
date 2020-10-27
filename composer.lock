@@ -4062,7 +4062,7 @@
             "source": {
                 "type": "git",
                 "url": "git@gitlab.kent.ac.uk:webdev/kent-profiles.git",
-                "reference": "c86dc05a7361de3ceaeae03611481afa6c2bc7a5"
+                "reference": "e081e7e7b677f30567c70a367ad823f5e0bd2800"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.3"
@@ -4080,7 +4080,7 @@
                 }
             ],
             "description": "A laravel app to manage staff profiles at kent",
-            "time": "2020-10-23T11:38:51+00:00"
+            "time": "2020-10-27T10:40:32+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
