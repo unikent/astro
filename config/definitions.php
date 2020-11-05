@@ -124,6 +124,9 @@ return [
 		],
 		'freerooms' => [
 			'all' => env('CACHE_FREEROOMS_ALL_SECS', 0),  //  seconds to cache frerooms data for
+		],
+		'libraryoccupancy' => [
+			'all' => env('CACHE_LIBRARYOCCUPANCY_ALL_SECS', 0),  //  seconds to cache library occupancy data for
 		]
     ],
 
