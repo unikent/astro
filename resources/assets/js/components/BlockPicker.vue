@@ -70,7 +70,7 @@ export default {
 			if(this.allowedBlocks) {
 				for(let i in this.allowedBlocks) {
 					let blockId = this.allowedBlocks[i];
-					if (!this.allBlocks[blockId].deprecated) {
+					if (this.allBlocks[blockId] && !this.allBlocks[blockId].deprecated) {
 						if (this.allBlocks[blockId]) {
 							blocks[blockId] = this.allBlocks[blockId];
 						}
