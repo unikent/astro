@@ -17,7 +17,7 @@
     "@tinymce/tinymce-vue": "^2.0.0",
     "astro-theme-validator": "git+ssh://git@gitlab.kent.ac.uk:webdev/astro-theme-validator",
     "async-validator": "^1.8.1",
-    "axios": "^0.17.1",
+    "axios": "^0.21.1",
     "bulma": "^0.6.1",
     "chart.js": "^2.7.1",
     "color-thief-standalone": "^1.0.3",
