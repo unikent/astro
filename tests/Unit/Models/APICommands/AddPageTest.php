@@ -75,7 +75,11 @@ class AddPageTest extends APICommandTestCase
      */
     public function validation_whenParent_existsButIsNotDraft_fails()
     {
-        $this->markTestIncomplete();
+    	$api = $this->api();
+        $site = $this->setupSite($api, $this->loadSiteStructure('default'), 'Test');
+        $api->publishPage($site->homepage->id);
+        $api->publishPage($site->homepage->children()->first()->id);
+
     }
 
     /**
