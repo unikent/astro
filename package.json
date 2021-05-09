@@ -26,7 +26,7 @@
     "imagesloaded": "^4.1.2",
     "kent-font": "git+ssh://git@gitlab.kent.ac.uk/webdev/kent-font.git#master",
     "kent-theme-assets": "git+ssh://git@gitlab.kent.ac.uk:webdev/kent-theme-assets",
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.21",
     "normalize.css": "^7.0.0",
     "scribe-editor": "^3.3.0",
     "scribe-plugin-formatter-plain-text-convert-new-lines-to-html": "^0.1.1",
