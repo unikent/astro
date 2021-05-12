@@ -19,7 +19,7 @@
     "async-validator": "^1.8.1",
     "axios": "^0.17.1",
     "bulma": "^0.6.1",
-    "chart.js": "^2.7.1",
+    "chart.js": "^2.9.4",
     "color-thief-standalone": "^1.0.3",
     "element-ui": "^2.0.5",
     "flat": "^4.0.0",
