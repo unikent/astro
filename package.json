@@ -34,7 +34,7 @@
     "scribe-plugin-inline-styles-to-elements": "^0.1.0",
     "scribe-plugin-link-prompt-command": "^1.0.0",
     "scribe-plugin-sanitizer": "^0.1.10",
-    "tinymce": "^5.0.3",
+    "tinymce": "^5.9.0",
     "underscore.string": "^3.3.4",
     "vue": "^2.5.3",
     "vue-chartjs": "^3.0.0",
