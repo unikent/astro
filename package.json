@@ -22,7 +22,7 @@
     "chart.js": "^2.7.1",
     "color-thief-standalone": "^1.0.3",
     "element-ui": "^2.0.5",
-    "flat": "^4.0.0",
+    "flat": "^5.0.1",
     "imagesloaded": "^4.1.2",
     "kent-font": "git+ssh://git@gitlab.kent.ac.uk/webdev/kent-font.git#master",
     "kent-theme-assets": "git+ssh://git@gitlab.kent.ac.uk:webdev/kent-theme-assets",
